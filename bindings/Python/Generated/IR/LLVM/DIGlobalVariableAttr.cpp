@@ -125,6 +125,16 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyGetSetDef gProperties[] = {
   {
+    "line",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->line());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::DIGlobalVariableAttr::line"),
+    nullptr,
+  },
+  {
     "is_local_to_unit",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -142,6 +152,16 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::llvm::DIGlobalVariableAttr::is_defined"),
+    nullptr,
+  },
+  {
+    "align_in_bits",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->align_in_bits());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::DIGlobalVariableAttr::align_in_bits"),
     nullptr,
   },
   {}  // Sentinel.

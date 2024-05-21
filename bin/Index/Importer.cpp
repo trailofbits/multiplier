@@ -209,7 +209,6 @@ class BuildCommandAction final : public Action {
   std::shared_ptr<pasta::FileSystem> fs;
   const Command &command;
   GlobalIndexingState &ctx;
-  const bool cxx_support;
 
   void RunWithCompiler(pasta::CompileCommand cmd, pasta::Compiler cc);
 
@@ -221,13 +220,11 @@ class BuildCommandAction final : public Action {
   virtual ~BuildCommandAction(void) = default;
 
   inline BuildCommandAction(pasta::FileManager &fm_, const Command &command_,
-                            GlobalIndexingState &ctx_,
-                            bool cxx_support_)
+                            GlobalIndexingState &ctx_)
       : fm(fm_),
         fs(fm.FileSystem()),
         command(command_),
-        ctx(ctx_),
-        cxx_support(cxx_support_) {}
+        ctx(ctx_) {}
 
   void Run(void) final;
 };
@@ -247,7 +244,7 @@ BuildCommandAction::GetCompilerInfo(void) {
     std::string_view arg(arg_);
 
     // Try to detect C++ code.
-    if (!specifies_language && cxx_support) {
+    if (!specifies_language) {
       if (arg.find("++") != std::string_view::npos) {
         inferred_lang = "c++";
 
@@ -296,6 +293,7 @@ BuildCommandAction::GetCompilerInfo(void) {
         arg.starts_with("-mfunction-return=") ||
         arg.starts_with("-fsanitize=") ||
         arg.starts_with("-fcoverage-compilation-dir=") ||
+        arg.starts_with("-fcrash-diagnostics-dir=") ||
         arg == "-pic-is-pie" ||
         arg == "-mindirect-branch-cs-prefix" ||
         arg == "-Wno-cast-function-type-strict" ||
@@ -487,7 +485,7 @@ bool BuildCommandAction::CanRunCompileJob(const pasta::CompileJob &job) const {
     }
 
     if (arg == "c" || arg == "c-header" ||
-        (cxx_support && (arg == "c++" || arg == "c++-header"))) {
+        arg == "c++" || arg == "c++-header") {
 
     } else {
       LOG(ERROR) << "Skipping compile job due to unsupported language "
@@ -511,11 +509,17 @@ static const std::string_view kOptNoStdInc("-nostdinc");
 static const std::string_view kOptNoStdIncxx("-nostdinc++");
 static const std::string_view kOptNoBuiltinInc("-nobuiltininc");
 static const std::string_view kOptNoStdSystemInc("-nostdsysteminc");
+static const std::string_view kXClang("-Xclang");
+static const std::string_view kMLLVM("-mllvm");
 
 static bool IsOptNeedingFixing(std::string_view arg) {
   return arg == kOptNoStdInc || arg == kOptNoStdIncxx ||
          arg == kOptNoBuiltinInc || arg == kOptNoStdSystemInc ||
          arg.starts_with("-fsanitize=");
+}
+
+static bool IsOpt1NeedingFixing(std::string_view arg) {
+  return arg.starts_with(kXClang) || arg.starts_with(kMLLVM);
 }
 
 // The way we do system include directory inference with the compiler means
@@ -528,7 +532,7 @@ static bool IsOptNeedingFixing(std::string_view arg) {
 // to use them.
 static bool NeedsFixing(const pasta::ArgumentVector &argv) {
   for (auto arg : argv) {
-    if (IsOptNeedingFixing(arg)) {
+    if (IsOptNeedingFixing(arg) || IsOpt1NeedingFixing(arg)) {
       return true;
     }
   }
@@ -540,9 +544,15 @@ static bool NeedsFixing(const pasta::ArgumentVector &argv) {
 // themselves derived from `orig_command` and thus should be trusted.
 static std::optional<pasta::CompileCommand> FixedCommand(
     const pasta::CompileCommand &orig_command) {
+
   std::vector<std::string> args;
+  auto skip = false;
   for (auto arg : orig_command.Arguments()) {
-    if (!IsOptNeedingFixing(arg)) {
+    if (skip) {
+      skip = false;
+    } else if (IsOpt1NeedingFixing(arg)) {
+      skip = true;
+    } else if (!IsOptNeedingFixing(arg)) {
       args.emplace_back(arg);
     }
   }
@@ -620,7 +630,9 @@ void BuildCommandAction::Run(void) {
     LOG(ERROR)
         << "Error invoking original compiler to find version information: "
         << std::get<std::string>(maybe_cc_info) << "; original command was: "
-        << command.vec.Join();
+        << command.vec.Join()
+        << ". Perhaps try --env /path/to/file to specify a file containing "
+           "environment variables, to help me find the compiler executable";
     return;
   }
 
@@ -868,7 +880,7 @@ namespace {
 static std::mutex gImportLock;
 }  // namespace
 
-void Importer::Import(const ExecutorOptions &options, bool cxx_support) {
+void Importer::Import(const ExecutorOptions &options) {
   Executor per_path_exe(options);
 
   for (auto &[cwd, commands] : d->commands) {
@@ -889,8 +901,7 @@ void Importer::Import(const ExecutorOptions &options, bool cxx_support) {
     }
 
     for (const Command &cmd : commands) {
-      per_path_exe.EmplaceAction<BuildCommandAction>(d->fm, cmd, d->ctx,
-                                                     cxx_support);
+      per_path_exe.EmplaceAction<BuildCommandAction>(d->fm, cmd, d->ctx);
     }
 
     per_path_exe.Start();

@@ -152,7 +152,7 @@ static PyGetSetDef gProperties[] = {
     "redeclarations",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
+          return ::mx::generator_to_python(*T_cast(self), &T::redeclarations);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::VarTemplateSpecializationDecl::redeclarations"),
@@ -202,30 +202,10 @@ static PyGetSetDef gProperties[] = {
     "template_arguments",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->template_arguments());
+          return ::mx::generator_to_python(*T_cast(self), &T::template_arguments);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::VarTemplateSpecializationDecl::template_arguments"),
-    nullptr,
-  },
-  {
-    "num_template_instantiation_arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->num_template_instantiation_arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::VarTemplateSpecializationDecl::num_template_instantiation_arguments"),
-    nullptr,
-  },
-  {
-    "template_instantiation_arguments",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->template_instantiation_arguments());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::VarTemplateSpecializationDecl::template_instantiation_arguments"),
     nullptr,
   },
   {
@@ -236,16 +216,6 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::VarTemplateSpecializationDecl::template_keyword_token"),
-    nullptr,
-  },
-  {
-    "type_as_written",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->type_as_written());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::VarTemplateSpecializationDecl::type_as_written"),
     nullptr,
   },
   {
@@ -527,28 +497,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL,
     PyDoc_STR("Wrapper for mx::VarTemplateSpecializationDecl::nth_template_argument"),
-  },
-  {
-    "nth_template_instantiation_argument",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          T *obj = T_cast(self);
-          (void) args;
-          while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<uint32_t>(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->nth_template_instantiation_argument(std::move(arg_0.value())));
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'nth_template_instantiation_argument'";
-          return nullptr;
-        }),
-    METH_FASTCALL,
-    PyDoc_STR("Wrapper for mx::VarTemplateSpecializationDecl::nth_template_instantiation_argument"),
   },
   {}  // Sentinel.
 };

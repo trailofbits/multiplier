@@ -72,7 +72,14 @@ gap::generator<RawEntityId> InvalidEntityProvider::Redeclarations(
 
 gap::generator<std::tuple<RawEntityId, RawEntityId, RawEntityId>>
 InvalidEntityProvider::References(const Ptr &, RawEntityId,
-                                  EntityProvider::ReferenceDirection) & {
+                                  EntityProvider::ReferenceDirection, bool) & {
+  co_return;
+}
+
+gap::generator<std::pair<RawEntityId, RawEntityId>>
+InvalidEntityProvider::SpecificReferences(
+    const Ptr &, RawEntityId, RawEntityId,
+    EntityProvider::ReferenceDirection, bool) & {
   co_return;
 }
 

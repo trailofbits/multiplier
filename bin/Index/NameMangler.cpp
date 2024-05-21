@@ -70,9 +70,13 @@ class NameManglerImpl {
  public:
   const uint64_t tu;
   std::string mangled_name;
+  const std::string dummy_mangled_name;
   llvm::raw_string_ostream mangled_name_os;
   std::unique_ptr<clang::MangleContext> mangle_context;
   bool is_precise{false};
+
+  std::unordered_map<const clang::NamedDecl *, std::string>
+      cached_mangled_names;
 
   explicit NameManglerImpl(clang::ASTContext &ast_context_,
                            mx::PackedCompilationId tu_id_);
@@ -80,7 +84,7 @@ class NameManglerImpl {
   // Returns the mangled name of `decl`.
   //
   // NOTE(pag): The same string reference is returned upon each call.
-  const std::string &GetMangledName(const clang::Decl *decl);
+  const std::string &GetMangledName(const clang::NamedDecl *decl);
 
   const std::string &GetMangledNameRec(const clang::FunctionDecl *decl);
   const std::string &GetMangledNameRec(const clang::BlockDecl *decl);
@@ -111,6 +115,7 @@ const std::string &NameManglerImpl::GetMangledNameRec(
   // The clang name-magling fails for deduction guide. if the decl is
   // CXXDeductionGuideDecl then return empty.
   if (decl->getDeclKind() == clang::Decl::Kind::CXXDeductionGuide) {
+    is_precise = false;
     return mangled_name;
   }
 
@@ -118,6 +123,26 @@ const std::string &NameManglerImpl::GetMangledNameRec(
     const auto alias_name = alias_attr->getAliasee();
     mangled_name.assign(alias_name.data(), alias_name.size());
     if (!mangled_name.empty()) {
+      return mangled_name;
+    }
+  }
+
+  // If the return type is dependent or undeduced then ignore.
+  auto rt = decl->getReturnType();
+  if (rt->isDependentType() ||
+      rt->isUndeducedType() ||
+      rt->isUndeducedAutoType()) {
+    is_precise = false;
+    return mangled_name;
+  }
+
+  // If the parameter types are undeduced then ignore.
+  for (auto param : decl->parameters()) {
+    auto pt = param->getType();
+    if (pt->isDependentType() ||
+        pt->isUndeducedType() ||
+        pt->isUndeducedAutoType()) {
+      is_precise = false;
       return mangled_name;
     }
   }
@@ -196,6 +221,16 @@ const std::string &NameManglerImpl::GetMangledNameRec(
 
 const std::string &NameManglerImpl::GetMangledNameRec(
     const clang::FieldDecl *decl) {
+  
+  // If the type is dependent or undeduced then ignore.
+  auto rt = decl->getType();
+  if (rt->isDependentType() ||
+      rt->isUndeducedType() ||
+      rt->isUndeducedAutoType()) {
+    is_precise = false;
+    return mangled_name;
+  }
+
   if (!GetMangledNameImpl(decl->getParent()).empty()) {
     const auto name = decl->getName();
     if (name.empty()) {
@@ -244,7 +279,9 @@ const std::string &NameManglerImpl::GetMangledNameRec(
 
 const std::string &NameManglerImpl::GetMangledNameRec(
     const clang::ParmVarDecl *decl) {
+
   if (decl->getParentFunctionOrMethod() == nullptr) {
+    is_precise = false;
     return mangled_name;
   }
 
@@ -280,6 +317,14 @@ const std::string &NameManglerImpl::GetMangledNameRec(
 
 const std::string &NameManglerImpl::GetMangledNameRec(
     const clang::VarDecl *decl) {
+
+  auto pt = decl->getType();
+  if (pt->isDependentType() ||
+      pt->isUndeducedType() ||
+      pt->isUndeducedAutoType()) {
+    is_precise = false;
+    return mangled_name;
+  }
 
   if (auto param_decl = clang::dyn_cast<clang::ParmVarDecl>(decl)) {
     return GetMangledNameRec(param_decl);
@@ -397,7 +442,8 @@ const std::string &NameManglerImpl::GetMangledNameImpl(
 // NOTE(pag): The same string reference is returned upon each call.
 //
 // XREF(pag): `getMangledNameImpl` in `clang/lib/CodeGen/CodeGenModule.cpp`.
-const std::string &NameManglerImpl::GetMangledName(const clang::Decl *decl) {
+const std::string &NameManglerImpl::GetMangledName(
+    const clang::NamedDecl *decl) {
   mangled_name.clear();
   is_precise = true;
 
@@ -479,12 +525,8 @@ const std::string &NameManglerImpl::GetMangledName(const clang::Decl *decl) {
     is_precise = false;
     return mangled_name;  // No mangled name.
 
-  } else if (auto named_decl = clang::dyn_cast<clang::NamedDecl>(decl)) {
-    return GetMangledNameImpl(named_decl);
-
   } else {
-    is_precise = false;
-    return mangled_name;  // No mangled name.
+    return GetMangledNameImpl(decl);
   }
 }
 
@@ -493,14 +535,26 @@ NameMangler::~NameMangler(void) {}
 NameMangler::NameMangler(const pasta::AST &ast, mx::PackedCompilationId tu_id_)
     : impl(std::make_unique<NameManglerImpl>(ast.UnderlyingAST(), tu_id_)) {}
 
-const std::string &NameMangler::Mangle(const pasta::Decl &decl) const {
-  return impl->GetMangledName(decl.RawDecl());
-}
+const std::string &NameMangler::Mangle(const clang::Decl *decl) const {
+  auto named_decl = clang::dyn_cast_or_null<clang::NamedDecl>(decl);
+  if (!named_decl) {
+    return impl->dummy_mangled_name;
+  }
 
-// This is not a very good API, but basically says that the mangled name
-// can probably be trusted.
-bool NameMangler::MangledNameIsPrecise(void) const {
-  return impl->is_precise;
+  auto it = impl->cached_mangled_names.find(named_decl);
+  if (it != impl->cached_mangled_names.end()) {
+    return it->second;
+  }
+
+  auto &cached_name = impl->cached_mangled_names[named_decl];
+  auto &mangled_name = impl->GetMangledName(named_decl);
+  if (mangled_name.empty() || !impl->is_precise) {
+    return impl->dummy_mangled_name;
+  }
+
+  cached_name.insert(cached_name.end(), mangled_name.begin(),
+                     mangled_name.end());
+  return cached_name;
 }
 
 }  // namespace indexer

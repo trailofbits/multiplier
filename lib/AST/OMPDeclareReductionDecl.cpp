@@ -7,6 +7,7 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/OMPDeclareReductionDecl.h>
+#include "../Reference.h"
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/Expr.h>
 #include <multiplier/AST/NamedDecl.h>
@@ -222,47 +223,43 @@ std::optional<OMPDeclareReductionDecl> OMPDeclareReductionDecl::from(const Token
 }
 
 Expr OMPDeclareReductionDecl::combiner(void) const {
-  RawEntityId eid = impl->reader.getVal58();
+  RawEntityId eid = impl->reader.getVal47();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr OMPDeclareReductionDecl::combiner_in(void) const {
-  RawEntityId eid = impl->reader.getVal66();
+  RawEntityId eid = impl->reader.getVal55();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr OMPDeclareReductionDecl::combiner_out(void) const {
-  RawEntityId eid = impl->reader.getVal67();
+  RawEntityId eid = impl->reader.getVal56();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr OMPDeclareReductionDecl::initializer_original(void) const {
-  RawEntityId eid = impl->reader.getVal68();
+  RawEntityId eid = impl->reader.getVal57();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr OMPDeclareReductionDecl::initializer_private(void) const {
-  RawEntityId eid = impl->reader.getVal79();
+  RawEntityId eid = impl->reader.getVal67();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr OMPDeclareReductionDecl::initializer(void) const {
-  RawEntityId eid = impl->reader.getVal80();
+  RawEntityId eid = impl->reader.getVal68();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 OMPDeclareReductionInitKind OMPDeclareReductionDecl::initializer_kind(void) const {
-  return static_cast<OMPDeclareReductionInitKind>(impl->reader.getVal81());
+  return static_cast<OMPDeclareReductionInitKind>(impl->reader.getVal69());
 }
 
-gap::generator<Decl> OMPDeclareReductionDecl::declarations_in_context(void) const & {
-  EntityProviderPtr ep = impl->ep;
-  auto list = impl->reader.getVal51();
-  for (auto v : list) {
-    if (auto eptr = ep->DeclFor(ep, v)) {
-      co_yield std::move(eptr);
-    }
-  }
+gap::generator<Decl> OMPDeclareReductionDecl::contained_declarations(void) const & {
+  return BuiltinDeclReferences<Decl>(
+      impl->ep, id().Pack(), BuiltinReferenceKind::CONTAINS,
+      EntityProvider::kReferenceFrom, false  /* redecls */);
 }
 
 #pragma GCC diagnostic pop

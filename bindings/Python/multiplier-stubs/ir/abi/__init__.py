@@ -33,7 +33,6 @@ class Operation(multiplier.ir.Operation):
     ...
 
 class CallArgsOp(multiplier.ir.abi.Operation):
-  body: multiplier.ir.Region
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -49,7 +48,6 @@ class CallArgsOp(multiplier.ir.abi.Operation):
 
 class CallExecutionOp(multiplier.ir.abi.Operation):
   result: multiplier.ir.Value
-  body: multiplier.ir.Region
   callee: str
 
   @staticmethod
@@ -80,7 +78,6 @@ class CallOp(multiplier.ir.abi.Operation):
     ...
 
 class CallRetsOp(multiplier.ir.abi.Operation):
-  body: multiplier.ir.Region
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -109,7 +106,6 @@ class DirectOp(multiplier.ir.abi.Operation):
     ...
 
 class EpilogueOp(multiplier.ir.abi.Operation):
-  body: multiplier.ir.Region
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -124,7 +120,6 @@ class EpilogueOp(multiplier.ir.abi.Operation):
     ...
 
 class FuncOp(multiplier.ir.abi.Operation):
-  body: multiplier.ir.Region
   sym_name: str
   is_var_arg: bool
   is_declaration: bool
@@ -158,7 +153,6 @@ class IndirectOp(multiplier.ir.abi.Operation):
     ...
 
 class PrologueOp(multiplier.ir.abi.Operation):
-  body: multiplier.ir.Region
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:

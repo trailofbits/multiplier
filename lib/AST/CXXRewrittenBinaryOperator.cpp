@@ -197,7 +197,7 @@ Expr CXXRewrittenBinaryOperator::lhs(void) const {
 }
 
 BinaryOperatorKind CXXRewrittenBinaryOperator::opcode(void) const {
-  return static_cast<BinaryOperatorKind>(impl->reader.getVal91());
+  return static_cast<BinaryOperatorKind>(impl->reader.getVal89());
 }
 
 std::string_view CXXRewrittenBinaryOperator::opcode_string(void) const {
@@ -206,7 +206,7 @@ std::string_view CXXRewrittenBinaryOperator::opcode_string(void) const {
 }
 
 BinaryOperatorKind CXXRewrittenBinaryOperator::operator_(void) const {
-  return static_cast<BinaryOperatorKind>(impl->reader.getVal93());
+  return static_cast<BinaryOperatorKind>(impl->reader.getVal91());
 }
 
 Token CXXRewrittenBinaryOperator::operator_token(void) const {

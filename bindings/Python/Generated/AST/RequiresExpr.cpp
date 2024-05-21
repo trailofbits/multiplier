@@ -158,7 +158,7 @@ static PyGetSetDef gProperties[] = {
     "local_parameters",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->local_parameters());
+          return ::mx::generator_to_python(*T_cast(self), &T::local_parameters);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::RequiresExpr::local_parameters"),

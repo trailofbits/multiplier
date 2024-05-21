@@ -48,7 +48,6 @@ class MX_EXPORT InjectedClassNameType : public Type {
   static std::optional<InjectedClassNameType> from(const VariantEntity &e);
   static std::optional<InjectedClassNameType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   CXXRecordDecl declaration(void) const;
   Type injected_specialization_type(void) const;
   TemplateSpecializationType injected_tst(void) const;

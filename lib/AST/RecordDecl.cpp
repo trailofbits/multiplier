@@ -7,6 +7,7 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/RecordDecl.h>
+#include "../Reference.h"
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/FieldDecl.h>
 #include <multiplier/AST/NamedDecl.h>
@@ -232,15 +233,15 @@ std::optional<RecordDecl> RecordDecl::from(const TokenContext &t) {
 }
 
 bool RecordDecl::can_pass_in_registers(void) const {
-  return impl->reader.getVal104();
+  return impl->reader.getVal88();
 }
 
 unsigned RecordDecl::num_fields(void) const {
-  return impl->reader.getVal62().size();
+  return impl->reader.getVal51().size();
 }
 
 std::optional<FieldDecl> RecordDecl::nth_field(unsigned n) const {
-  auto list = impl->reader.getVal62();
+  auto list = impl->reader.getVal51();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -254,12 +255,12 @@ std::optional<FieldDecl> RecordDecl::nth_field(unsigned n) const {
 }
 
 gap::generator<FieldDecl> RecordDecl::fields(void) const & {
-  auto list = impl->reader.getVal62();
+  auto list = impl->reader.getVal51();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d62 = ep->DeclFor(ep, v)) {
-      if (auto e = FieldDecl::from_base(std::move(d62))) {
+    if (auto d51 = ep->DeclFor(ep, v)) {
+      if (auto e = FieldDecl::from_base(std::move(d51))) {
         co_yield std::move(*e);
       }
     }
@@ -268,108 +269,108 @@ gap::generator<FieldDecl> RecordDecl::fields(void) const & {
 }
 
 RecordArgPassingKind RecordDecl::argument_passing_restrictions(void) const {
-  return static_cast<RecordArgPassingKind>(impl->reader.getVal85());
+  return static_cast<RecordArgPassingKind>(impl->reader.getVal73());
 }
 
 bool RecordDecl::has_flexible_array_member(void) const {
-  return impl->reader.getVal105();
+  return impl->reader.getVal89();
 }
 
 bool RecordDecl::has_loaded_fields_from_external_storage(void) const {
-  return impl->reader.getVal106();
+  return impl->reader.getVal90();
 }
 
 bool RecordDecl::has_non_trivial_to_primitive_copy_c_union(void) const {
-  return impl->reader.getVal107();
+  return impl->reader.getVal91();
 }
 
 bool RecordDecl::has_non_trivial_to_primitive_default_initialize_c_union(void) const {
-  return impl->reader.getVal108();
+  return impl->reader.getVal92();
 }
 
 bool RecordDecl::has_non_trivial_to_primitive_destruct_c_union(void) const {
-  return impl->reader.getVal109();
+  return impl->reader.getVal93();
 }
 
 bool RecordDecl::has_object_member(void) const {
-  return impl->reader.getVal110();
+  return impl->reader.getVal94();
 }
 
 bool RecordDecl::has_volatile_member(void) const {
-  return impl->reader.getVal111();
+  return impl->reader.getVal95();
 }
 
 bool RecordDecl::is_anonymous_struct_or_union(void) const {
-  return impl->reader.getVal112();
+  return impl->reader.getVal96();
 }
 
 bool RecordDecl::is_captured_record(void) const {
-  return impl->reader.getVal113();
+  return impl->reader.getVal97();
 }
 
 bool RecordDecl::is_injected_class_name(void) const {
-  return impl->reader.getVal114();
+  return impl->reader.getVal98();
 }
 
 bool RecordDecl::is_lambda(void) const {
-  return impl->reader.getVal115();
+  return impl->reader.getVal99();
 }
 
 bool RecordDecl::is_ms_struct(void) const {
-  return impl->reader.getVal116();
+  return impl->reader.getVal100();
 }
 
 bool RecordDecl::is_non_trivial_to_primitive_copy(void) const {
-  return impl->reader.getVal117();
+  return impl->reader.getVal101();
 }
 
 bool RecordDecl::is_non_trivial_to_primitive_default_initialize(void) const {
-  return impl->reader.getVal118();
+  return impl->reader.getVal102();
 }
 
 bool RecordDecl::is_non_trivial_to_primitive_destroy(void) const {
-  return impl->reader.getVal119();
+  return impl->reader.getVal103();
 }
 
 bool RecordDecl::is_or_contains_union(void) const {
-  return impl->reader.getVal120();
+  return impl->reader.getVal104();
 }
 
 bool RecordDecl::is_parameter_destroyed_in_callee(void) const {
-  return impl->reader.getVal121();
+  return impl->reader.getVal105();
 }
 
 bool RecordDecl::is_randomized(void) const {
-  return impl->reader.getVal122();
+  return impl->reader.getVal106();
 }
 
 bool RecordDecl::may_insert_extra_padding(void) const {
-  return impl->reader.getVal123();
+  return impl->reader.getVal107();
 }
 
 std::optional<uint64_t> RecordDecl::size(void) const {
-  if (!impl->reader.getVal124()) {
+  if (!impl->reader.getVal108()) {
     return std::nullopt;
   } else {
-    return static_cast<uint64_t>(impl->reader.getVal79());
+    return static_cast<uint64_t>(impl->reader.getVal67());
   }
   return std::nullopt;
 }
 
 std::optional<uint64_t> RecordDecl::alignment(void) const {
-  if (!impl->reader.getVal125()) {
+  if (!impl->reader.getVal109()) {
     return std::nullopt;
   } else {
-    return static_cast<uint64_t>(impl->reader.getVal80());
+    return static_cast<uint64_t>(impl->reader.getVal68());
   }
   return std::nullopt;
 }
 
 std::optional<uint64_t> RecordDecl::size_without_trailing_padding(void) const {
-  if (!impl->reader.getVal133()) {
+  if (!impl->reader.getVal117()) {
     return std::nullopt;
   } else {
-    return static_cast<uint64_t>(impl->reader.getVal82());
+    return static_cast<uint64_t>(impl->reader.getVal70());
   }
   return std::nullopt;
 }

@@ -11,6 +11,8 @@
 #include <optional>
 #include <vector>
 
+#include "../../include/multiplier/Types.h"
+
 namespace pasta {
 class Decl;
 class DefineMacroDirective;
@@ -30,6 +32,7 @@ enum class MacroKind : unsigned char;
 }  // namespace mx
 namespace indexer {
 
+class PendingFragment;
 class Substitution;
 class SubstitutionNodeList;
 class TokenTree;
@@ -49,10 +52,12 @@ class TokenTreeNode {
       : impl(std::move(impl_)) {}
 
  public:
+  std::optional<TokenTree> Parent(void) const noexcept;
   std::optional<pasta::PrintedToken> PrintedToken(void) const noexcept;
   std::optional<pasta::MacroToken> MacroToken(void) const noexcept;
   std::optional<pasta::Token> Token(void) const noexcept;
   std::optional<TokenTree> SubTree(void) const noexcept;
+
   const void *RawNode(void) const noexcept;
 };
 
@@ -139,15 +144,14 @@ class TokenTree {
   // Create a token tree from the tokens in the inclusive range
   // `[begin_index, end_index]` from `range`.
   static std::optional<TokenTreeNodeRange>
-  Create(const std::optional<pasta::TokenRange> &range,
-         const pasta::PrintedTokenRange &printed_range,
-         const std::vector<pasta::Decl> &top_level_decls,
-         std::ostream &err);
+  Create(const PendingFragment &pf, std::ostream &err);
 
   // Dump.
   void Dump(std::ostream &os) const;
 
   mx::MacroKind Kind(void) const noexcept;
+
+  std::optional<mx::PackedFragmentId> NestedFragmentId(void) const noexcept;
 
   std::optional<pasta::Macro> Macro(void) const noexcept;
 

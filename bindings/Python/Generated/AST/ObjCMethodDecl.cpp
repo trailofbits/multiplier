@@ -148,7 +148,7 @@ static PyGetSetDef gProperties[] = {
     "redeclarations",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
+          return ::mx::generator_to_python(*T_cast(self), &T::redeclarations);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ObjCMethodDecl::redeclarations"),
@@ -458,7 +458,7 @@ static PyGetSetDef gProperties[] = {
     "parameters",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->parameters());
+          return ::mx::generator_to_python(*T_cast(self), &T::parameters);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ObjCMethodDecl::parameters"),
@@ -478,20 +478,20 @@ static PyGetSetDef gProperties[] = {
     "selector_tokens",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->selector_tokens());
+          return ::mx::generator_to_python(*T_cast(self), &T::selector_tokens);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ObjCMethodDecl::selector_tokens"),
     nullptr,
   },
   {
-    "declarations_in_context",
+    "contained_declarations",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->declarations_in_context());
+          return ::mx::generator_to_python(*T_cast(self), &T::contained_declarations);
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCMethodDecl::declarations_in_context"),
+    PyDoc_STR("Wrapper for mx::ObjCMethodDecl::contained_declarations"),
     nullptr,
   },
   {}  // Sentinel.

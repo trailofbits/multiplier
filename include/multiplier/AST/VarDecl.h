@@ -12,7 +12,6 @@
 #include <multiplier/AST/LanguageLinkage.h>
 #include <multiplier/AST/StorageClass.h>
 #include <multiplier/AST/StorageDuration.h>
-#include <multiplier/AST/TemplateSpecializationKind.h>
 #include <multiplier/AST/ThreadStorageClassSpecifier.h>
 #include <multiplier/AST/VarDeclInitializationStyle.h>
 #include <multiplier/AST/VarDeclTLSKind.h>
@@ -84,14 +83,10 @@ class MX_EXPORT VarDecl : public DeclaratorDecl {
   VarDeclInitializationStyle initializer_style(void) const;
   std::optional<VarDecl> initializing_declaration(void) const;
   LanguageLinkage language_linkage(void) const;
-  Token point_of_instantiation(void) const;
   StorageClass storage_class(void) const;
   StorageDuration storage_duration(void) const;
   VarDeclTLSKind tls_kind(void) const;
   ThreadStorageClassSpecifier tsc_spec(void) const;
-  std::optional<VarDecl> template_instantiation_pattern(void) const;
-  TemplateSpecializationKind template_specialization_kind(void) const;
-  TemplateSpecializationKind template_specialization_kind_for_instantiation(void) const;
   bool has_constant_initialization(void) const;
   bool has_dependent_alignment(void) const;
   bool has_external_storage(void) const;

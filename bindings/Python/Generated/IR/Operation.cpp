@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[973]) || tp >= &(gTypes[1414])) {
+  if (tp < &(gTypes[973]) || tp >= &(gTypes[1413])) {
     return std::nullopt;
   }
 
@@ -1769,52 +1769,48 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       tp = &(gTypes[1399]);
       break;
 
-    case mx::ir::hl::TypeOfTypeOp::static_kind():
+    case mx::ir::hl::UnionDeclOp::static_kind():
       tp = &(gTypes[1400]);
       break;
 
-    case mx::ir::hl::UnionDeclOp::static_kind():
+    case mx::ir::hl::UnreachableOp::static_kind():
       tp = &(gTypes[1401]);
       break;
 
-    case mx::ir::hl::UnreachableOp::static_kind():
+    case mx::ir::hl::VAArgExprOp::static_kind():
       tp = &(gTypes[1402]);
       break;
 
-    case mx::ir::hl::VAArgExprOp::static_kind():
-      tp = &(gTypes[1403]);
-      break;
-
     case mx::ir::core::BinLAndOp::static_kind():
-      tp = &(gTypes[1405]);
+      tp = &(gTypes[1404]);
       break;
 
     case mx::ir::core::BinLOrOp::static_kind():
-      tp = &(gTypes[1406]);
+      tp = &(gTypes[1405]);
       break;
 
     case mx::ir::core::ImplicitReturnOp::static_kind():
-      tp = &(gTypes[1407]);
+      tp = &(gTypes[1406]);
       break;
 
     case mx::ir::core::LazyOp::static_kind():
-      tp = &(gTypes[1408]);
+      tp = &(gTypes[1407]);
       break;
 
     case mx::ir::core::ScopeOp::static_kind():
-      tp = &(gTypes[1409]);
+      tp = &(gTypes[1408]);
       break;
 
     case mx::ir::core::SelectOp::static_kind():
-      tp = &(gTypes[1410]);
+      tp = &(gTypes[1409]);
       break;
 
     case mx::ir::unsup::UnsupportedDeclOp::static_kind():
-      tp = &(gTypes[1412]);
+      tp = &(gTypes[1411]);
       break;
 
     case mx::ir::unsup::UnsupportedStmtOp::static_kind():
-      tp = &(gTypes[1413]);
+      tp = &(gTypes[1412]);
       break;
 
   }
@@ -1892,7 +1888,7 @@ static PyGetSetDef gProperties[] = {
     "operands",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->operands());
+          return ::mx::generator_to_python(*T_cast(self), &T::operands);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::Operation::operands"),
@@ -1912,7 +1908,7 @@ static PyGetSetDef gProperties[] = {
     "results",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->results());
+          return ::mx::generator_to_python(*T_cast(self), &T::results);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::Operation::results"),
@@ -1932,7 +1928,7 @@ static PyGetSetDef gProperties[] = {
     "regions",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->regions());
+          return ::mx::generator_to_python(*T_cast(self), &T::regions);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::Operation::regions"),
@@ -1952,7 +1948,7 @@ static PyGetSetDef gProperties[] = {
     "only_region_blocks",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->only_region_blocks());
+          return ::mx::generator_to_python(*T_cast(self), &T::only_region_blocks);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::Operation::only_region_blocks"),
@@ -1962,7 +1958,7 @@ static PyGetSetDef gProperties[] = {
     "uses",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->uses());
+          return ::mx::generator_to_python(*T_cast(self), &T::uses);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::Operation::uses"),

@@ -20,6 +20,8 @@ DEFINE_uint64(file_id, 0, "ID of the file from which to print variable names");
 DEFINE_bool(show_locations, false, "Show the file locations of the variable?");
 
 static void PrintVariableNames(mx::Index index) {
+  mx::QualifiedNameRenderOptions opts;
+
   for (mx::VarDecl var : mx::VarDecl::in(index)) {
     auto fragment = mx::Fragment::containing(var);
     auto file = mx::File::containing(fragment);
@@ -28,7 +30,7 @@ static void PrintVariableNames(mx::Index index) {
         << (file ? file->id().Pack() : mx::kInvalidEntityId) << '\t'
         << fragment.id().Pack() << '\t'
         << var.id().Pack() << '\t'
-        << var.name()
+        << var.qualified_name(opts).data()
         << (var.is_definition() ? "\tdef" : "\tdecl");
 
     if (FLAGS_show_locations && file) {

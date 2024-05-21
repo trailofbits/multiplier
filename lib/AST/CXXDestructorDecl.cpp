@@ -7,6 +7,7 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/CXXDestructorDecl.h>
+#include "../Reference.h"
 #include <multiplier/AST/CXXMethodDecl.h>
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/DeclaratorDecl.h>
@@ -226,7 +227,7 @@ std::optional<CXXDestructorDecl> CXXDestructorDecl::from(const TokenContext &t) 
 
 std::optional<FunctionDecl> CXXDestructorDecl::operator_delete(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal179();
+    RawEntityId eid = impl->reader.getVal163();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -239,7 +240,7 @@ std::optional<FunctionDecl> CXXDestructorDecl::operator_delete(void) const {
 
 std::optional<Expr> CXXDestructorDecl::operator_delete_this_argument(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal180();
+    RawEntityId eid = impl->reader.getVal164();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }

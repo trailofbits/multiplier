@@ -7,6 +7,7 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/CXXConversionDecl.h>
+#include "../Reference.h"
 #include <multiplier/AST/CXXMethodDecl.h>
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/DeclaratorDecl.h>
@@ -225,16 +226,16 @@ std::optional<CXXConversionDecl> CXXConversionDecl::from(const TokenContext &t) 
 }
 
 Type CXXConversionDecl::conversion_type(void) const {
-  RawEntityId eid = impl->reader.getVal179();
+  RawEntityId eid = impl->reader.getVal163();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool CXXConversionDecl::is_explicit(void) const {
-  return impl->reader.getVal181();
+  return impl->reader.getVal165();
 }
 
 bool CXXConversionDecl::is_lambda_to_block_pointer_conversion(void) const {
-  return impl->reader.getVal182();
+  return impl->reader.getVal166();
 }
 
 #pragma GCC diagnostic pop

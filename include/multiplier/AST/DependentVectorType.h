@@ -48,7 +48,6 @@ class MX_EXPORT DependentVectorType : public Type {
   static std::optional<DependentVectorType> from(const VariantEntity &e);
   static std::optional<DependentVectorType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   Token attribute_token(void) const;
   Type element_type(void) const;
   Expr size_expression(void) const;

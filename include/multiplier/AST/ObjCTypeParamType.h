@@ -47,7 +47,6 @@ class MX_EXPORT ObjCTypeParamType : public Type {
   static std::optional<ObjCTypeParamType> from(const VariantEntity &e);
   static std::optional<ObjCTypeParamType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   ObjCTypeParamDecl declaration(void) const;
   bool is_sugared(void) const;
 };

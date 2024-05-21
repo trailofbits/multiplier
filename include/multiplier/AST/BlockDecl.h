@@ -14,6 +14,7 @@ namespace mx {
 class EntityProvider;
 class Fragment;
 class Index;
+class Reference;
 class BlockDecl;
 class CompoundStmt;
 class Decl;
@@ -83,7 +84,7 @@ class MX_EXPORT BlockDecl : public Decl {
   std::optional<ParmVarDecl> nth_parameter_declaration(unsigned n) const;
   unsigned num_parameter_declarations(void) const;
   gap::generator<ParmVarDecl> parameter_declarations(void) const &;
-  gap::generator<Decl> declarations_in_context(void) const &;
+  gap::generator<Decl> contained_declarations(void) const &;
 };
 
 static_assert(sizeof(BlockDecl) == sizeof(Decl));

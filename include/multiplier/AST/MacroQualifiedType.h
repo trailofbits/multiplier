@@ -46,7 +46,6 @@ class MX_EXPORT MacroQualifiedType : public Type {
   static std::optional<MacroQualifiedType> from(const VariantEntity &e);
   static std::optional<MacroQualifiedType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   Type modified_type(void) const;
   Type underlying_type(void) const;
   bool is_sugared(void) const;

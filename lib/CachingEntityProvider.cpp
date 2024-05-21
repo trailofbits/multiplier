@@ -184,8 +184,15 @@ gap::generator<RawEntityId> CachingEntityProvider::Redeclarations(
 gap::generator<std::tuple<RawEntityId, RawEntityId, RawEntityId>>
 CachingEntityProvider::References(
     const Ptr &self, RawEntityId eid,
-    EntityProvider::ReferenceDirection direction) & {
-  return next->References(self, eid, direction);
+    EntityProvider::ReferenceDirection direction, bool get_redecls) & {
+  return next->References(self, eid, direction, get_redecls);
+}
+
+gap::generator<std::pair<RawEntityId, RawEntityId>>
+CachingEntityProvider::SpecificReferences(
+    const Ptr &self, RawEntityId eid, RawEntityId kind_id,
+    EntityProvider::ReferenceDirection direction, bool get_redecls) & {
+  return next->SpecificReferences(self, eid, kind_id, direction, get_redecls);
 }
 
 gap::generator<RawEntityId> CachingEntityProvider::FindSymbol(

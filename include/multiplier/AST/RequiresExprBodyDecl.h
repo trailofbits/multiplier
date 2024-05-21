@@ -14,6 +14,7 @@ namespace mx {
 class EntityProvider;
 class Fragment;
 class Index;
+class Reference;
 class Decl;
 class RequiresExprBodyDecl;
 class Stmt;
@@ -63,7 +64,7 @@ class MX_EXPORT RequiresExprBodyDecl : public Decl {
   static std::optional<RequiresExprBodyDecl> from(const VariantEntity &e);
   static std::optional<RequiresExprBodyDecl> from(const TokenContext &t);
 
-  gap::generator<Decl> declarations_in_context(void) const &;
+  gap::generator<Decl> contained_declarations(void) const &;
 };
 
 static_assert(sizeof(RequiresExprBodyDecl) == sizeof(Decl));

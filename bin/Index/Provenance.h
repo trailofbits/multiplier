@@ -74,14 +74,21 @@ class TokenProvenanceCalculator {
 
     unsigned Depth(TokenProvenanceCalculator &self);
 
-    gap::generator<TokenInfo *> Children(TokenProvenanceCalculator &self);
+    TokenInfo *OnlyChild(
+        const TokenProvenanceCalculator &self) const noexcept;
+
+    gap::generator<TokenInfo *> Children(
+        const TokenProvenanceCalculator &self) const &;
+
+    gap::generator<TokenInfo *> MultipleChildren(
+        const TokenProvenanceCalculator &self) const &;
 
     bool DeriveFrom(TokenProvenanceCalculator &self, TokenInfo *parent);
   };
 
   template <typename T>
   TokenInfo *InfoOrEmpty(const T &entity) {
-    auto info_it = info_map.find(em.EntityId(entity));
+    auto info_it = info_map.find(RawEntity(entity));
     if (info_it != info_map.end()) {
       return info_it->second;
     } else {
@@ -93,21 +100,24 @@ class TokenProvenanceCalculator {
   const EntityMapper &em;
   mx::RawEntityId fragment_index{mx::kInvalidEntityId};
   std::deque<TokenInfo> infos;
-  std::unordered_map<mx::RawEntityId, TokenInfo *> info_map;
-  std::unordered_map<const void *, pasta::Token> parsed_tokens;
-  std::unordered_map<TokenInfo *, std::vector<TokenInfo *>> multiple_children;
+  std::unordered_map<const void *, TokenInfo *> info_map;
+  std::unordered_map<const TokenInfo *, std::vector<TokenInfo *>>
+      multiple_children;
   std::vector<TokenInfo *> ordered_tokens;
   std::vector<pasta::MacroToken> expansion_toks;
   std::optional<TokenInfo> empty;
 
   void Sort(void);
-  bool Pull(const std::vector<TokenTreeNode> &tokens);
+  void FallbackInitMacroProvenance(const std::vector<TokenTreeNode> &tokens);
   bool Pull(void);
   bool Push(void);
+  bool FinalPush(void);
 
   template <typename T>
   bool TryConnect(TokenInfo *, const T &tok);
-  void ConnectToDerived(TokenInfo *, std::optional<pasta::MacroToken>);
+  void TryConnectToConcatenatedTokens(
+      TokenInfo *, const pasta::MacroToken &, const pasta::Macro &parent);
+  bool BackupConnectToDerived(TokenInfo *, const pasta::MacroToken &);
   void Clear(void);
 
  public:

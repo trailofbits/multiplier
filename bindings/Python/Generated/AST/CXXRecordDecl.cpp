@@ -156,7 +156,7 @@ static PyGetSetDef gProperties[] = {
     "redeclarations",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
+          return ::mx::generator_to_python(*T_cast(self), &T::redeclarations);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::CXXRecordDecl::redeclarations"),
@@ -206,7 +206,7 @@ static PyGetSetDef gProperties[] = {
     "constructors",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->constructors());
+          return ::mx::generator_to_python(*T_cast(self), &T::constructors);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::CXXRecordDecl::constructors"),
@@ -350,26 +350,6 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::CXXRecordDecl::ms_vtor_disp_mode"),
-    nullptr,
-  },
-  {
-    "template_instantiation_pattern",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->template_instantiation_pattern());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXRecordDecl::template_instantiation_pattern"),
-    nullptr,
-  },
-  {
-    "template_specialization_kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->template_specialization_kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXRecordDecl::template_specialization_kind"),
     nullptr,
   },
   {
@@ -1203,16 +1183,6 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "methods",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->methods());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXRecordDecl::methods"),
-    nullptr,
-  },
-  {
     "needs_implicit_copy_assignment",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -1406,7 +1376,7 @@ static PyGetSetDef gProperties[] = {
     "derived_classes",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->derived_classes());
+          return ::mx::generator_to_python(*T_cast(self), &T::derived_classes);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::CXXRecordDecl::derived_classes"),
@@ -1416,10 +1386,20 @@ static PyGetSetDef gProperties[] = {
     "base_classes",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->base_classes());
+          return ::mx::generator_to_python(*T_cast(self), &T::base_classes);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::CXXRecordDecl::base_classes"),
+    nullptr,
+  },
+  {
+    "methods",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::methods);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXRecordDecl::methods"),
     nullptr,
   },
   {}  // Sentinel.

@@ -46,13 +46,9 @@ struct TokenContext @0xb9ff75e040124cb3 {
   # value is present.
   parentIndex @0 :UInt32;
   
-  # Index of the aliased token context (shifted left by 1). Low bit is 1 if this
-  # value is present. The `entityId` at the indexed context should match.
-  aliasIndex @1 :UInt32;
-  
   # Entity ID. This should generally be in the same fragment, but sometimes
   # isn't.
-  entityId @2 :UInt64;
+  entityId @1 :UInt64;
 }
 
 struct File @0x987f05f6a48636d5 {
@@ -75,30 +71,39 @@ struct FileInfo @0xfd1022cb187f18f8 {
   path @1 :Text;
 }
 
+struct NestedFragment @0xd023961e5f656717 {
+  # ID of this sub fragment.
+  id @0 :UInt64;
+  
+  # Number of parsed tokens in this sub fragment. This includes parsed tokens
+  # in transitively nested sub fragments.
+  numParsedTokens @1 : UInt32;
+
+  # Offset into the parsed tokens of the parent fragment where this nested
+  # fragment should go.
+  offsetInParsedTokenList @2 : UInt32;
+}
+
 struct Fragment @0xe5f27760091f9a3a {
-  # List of parent IDs of this fragment. The first entry in the list is the
-  # immediate parent.
-  parentIds @0 :List(UInt64);
+  # ID of this fragment's parent, or an invalid ID.
+  parentFragmentId @0 :UInt64;
+
+  # List of C++ template fragments lexically nested inside of this fragment.
+  # These are referenced by the preprocessed code.
+  nestedFragments @1 :List(NestedFragment);
   
   # Inclusive range of file token IDs for the unparsed data of this fragment.
-  firstFileTokenId @1 :UInt64;
-  lastFileTokenId @2 :UInt64;
+  firstFileTokenId @2 :UInt64;
+  lastFileTokenId @3 :UInt64;
   
   # List of top-level declarations in this fragment.
-  topLevelDeclarations @3 :List(UInt64);
+  topLevelDeclarations @4 :List(UInt64);
   
   # List of top-level macros or tokens in this code.
-  topLevelMacros @4 :List(UInt64);
+  topLevelMacros @5 :List(UInt64);
   
-  # Parsed tokens go through an extra level of indirection to get into
-  # `tokenOffsets`, `tokenKinds`, and `derivedTokenIds`.
-  #
-  # Indexed by `ParsedTokenId::offset`.
-  parsedTokenOffsetToIndex @5 :List(UInt32);
-  
-  # Inverse of the above. This is to let us get from a "final" macro token
-  # back to a parsed token. There is one for every token. A value is valid
-  # iff parsedTokenOffsetToIndex[macroTokenIndexToParsedTokenOffset[i]] == i.
+  # This is to let us get from a "final" macro token back to a parsed token.
+  # There is one for every non-parsed token token.
   macroTokenIndexToParsedTokenOffset @6 :List(UInt32);
   
   # Inverted map of macro tokens -> macro id of containing macro. The macro
@@ -168,6 +173,11 @@ struct Fragment @0xe5f27760091f9a3a {
   cXXBaseSpecifiers @22 :List(AST.CXXBaseSpecifier);
   designators @23 :List(AST.Designator);
   cXXCtorInitializers @24 :List(AST.CXXCtorInitializer);
+
+  # These are lists. When things in the AST need a list of stuff, they store
+  # them in here.
+  textLists @25 :List(Text);
+  uInt64Lists @26 :List(UInt64);
 }
 
 struct Compilation @0xc8b5fa5dd0739e82 {

@@ -46,7 +46,6 @@ class MX_EXPORT ComplexType : public Type {
   static std::optional<ComplexType> from(const VariantEntity &e);
   static std::optional<ComplexType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   Type element_type(void) const;
   bool is_sugared(void) const;
 };

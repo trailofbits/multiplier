@@ -353,11 +353,11 @@ class MX_EXPORT AllocaOp final : public Operation {
   // Imported methods:
   //::mlir::TypedValue<IntegerType> array_size(void) const;
   //::mlir::TypedValue<LLVMPointerType> res(void) const;
-  //::std::optional<unsignedlonglong> alignment(void) const;
+  //::std::optional<unsigned long long> alignment(void) const;
   //::mlir::Type elem_type(void) const;
   bool inalloca(void) const;
-  //::llvm::SmallVector<MemorySlot,3> promotable_slots(void) const;
-  //::llvm::SmallVector<DestructurableMemorySlot,1> destructurable_slots(void) const;
+  //::llvm::SmallVector<MemorySlot, 3> promotable_slots(void) const;
+  //::llvm::SmallVector<DestructurableMemorySlot, 1> destructurable_slots(void) const;
   //Type result_ptr_element_type(void) const;
 };
 static_assert(sizeof(AllocaOp) == sizeof(Operation));
@@ -399,14 +399,14 @@ class MX_EXPORT AtomicCmpXchgOp final : public Operation {
   //::mlir::LLVM::AtomicOrdering success_ordering(void) const;
   //::mlir::LLVM::AtomicOrdering failure_ordering(void) const;
   //::std::optional<StringRef> syncscope(void) const;
-  //::std::optional<unsignedlonglong> alignment(void) const;
+  //::std::optional<unsigned long long> alignment(void) const;
   bool weak(void) const;
   bool volatile__(void) const;
   //::std::optional<ArrayAttr> access_groups(void) const;
   //::std::optional<ArrayAttr> alias_scopes(void) const;
   //::std::optional<ArrayAttr> noalias_scopes(void) const;
   //::std::optional<ArrayAttr> tbaa(void) const;
-  //::llvm::SmallVector<Value,6> accessed_operands(void) const;
+  //::llvm::SmallVector<Value, 6> accessed_operands(void) const;
 };
 static_assert(sizeof(AtomicCmpXchgOp) == sizeof(Operation));
 
@@ -428,13 +428,13 @@ class MX_EXPORT AtomicRMWOp final : public Operation {
   //::mlir::LLVM::AtomicBinOp bin_op(void) const;
   //::mlir::LLVM::AtomicOrdering ordering(void) const;
   //::std::optional<StringRef> syncscope(void) const;
-  //::std::optional<unsignedlonglong> alignment(void) const;
+  //::std::optional<unsigned long long> alignment(void) const;
   bool volatile__(void) const;
   //::std::optional<ArrayAttr> access_groups(void) const;
   //::std::optional<ArrayAttr> alias_scopes(void) const;
   //::std::optional<ArrayAttr> noalias_scopes(void) const;
   //::std::optional<ArrayAttr> tbaa(void) const;
-  //::llvm::SmallVector<Value,6> accessed_operands(void) const;
+  //::llvm::SmallVector<Value, 6> accessed_operands(void) const;
 };
 static_assert(sizeof(AtomicRMWOp) == sizeof(Operation));
 
@@ -468,7 +468,7 @@ class MX_EXPORT BrOp final : public Operation {
 
   // Imported methods:
   //::mlir::Operation::operand_range dest_operands(void) const;
-  //::mlir::Block* dest(void) const;
+  //::mlir::Block * dest(void) const;
   //::std::optional<LoopAnnotationAttr> loop_annotation(void) const;
 };
 static_assert(sizeof(BrOp) == sizeof(Operation));
@@ -515,7 +515,7 @@ class MX_EXPORT CallOp final : public Operation {
   //::std::optional<ArrayAttr> alias_scopes(void) const;
   //::std::optional<ArrayAttr> noalias_scopes(void) const;
   //::std::optional<ArrayAttr> tbaa(void) const;
-  //::llvm::SmallVector<Value,6> accessed_operands(void) const;
+  //::llvm::SmallVector<Value, 6> accessed_operands(void) const;
   //::mlir::CallInterfaceCallable callable_for_callee(void) const;
   //::mlir::Operation::operand_range arg_operands(void) const;
   //LLVMFunctionType callee_function_type(void) const;
@@ -534,7 +534,7 @@ class MX_EXPORT ComdatOp final : public Operation {
   ::mlir::LLVM::ComdatOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Region body(void) const;
+  //::mlir::Region & body(void) const;
   std::string_view sym_name(void) const;
 };
 static_assert(sizeof(ComdatOp) == sizeof(Operation));
@@ -571,8 +571,8 @@ class MX_EXPORT CondBrOp final : public Operation {
   //::mlir::TypedValue<IntegerType> condition(void) const;
   //::mlir::Operation::operand_range true_dest_operands(void) const;
   //::mlir::Operation::operand_range false_dest_operands(void) const;
-  //::mlir::Block* true_dest(void) const;
-  //::mlir::Block* false_dest(void) const;
+  //::mlir::Block * true_dest(void) const;
+  //::mlir::Block * false_dest(void) const;
   //::std::optional<ArrayRef<int>> branch_weights(void) const;
   //::std::optional<LoopAnnotationAttr> loop_annotation(void) const;
 };
@@ -627,7 +627,7 @@ class MX_EXPORT ExtractValueOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value container(void) const;
   ::mx::ir::Value res(void) const;
-  //::llvm::ArrayRef<longlong> position(void) const;
+  //::llvm::ArrayRef<long long> position(void) const;
 };
 static_assert(sizeof(ExtractValueOp) == sizeof(Operation));
 
@@ -935,7 +935,7 @@ class MX_EXPORT GlobalOp final : public Operation {
   ::mlir::LLVM::GlobalOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Region initializer(void) const;
+  //::mlir::Region & initializer(void) const;
   //::mlir::Type global_type(void) const;
   bool constant(void) const;
   std::string_view sym_name(void) const;
@@ -943,7 +943,7 @@ class MX_EXPORT GlobalOp final : public Operation {
   bool dso_local(void) const;
   bool thread_local__(void) const;
   //::std::optional<Attribute> value(void) const;
-  //::std::optional<unsignedlonglong> alignment(void) const;
+  //::std::optional<unsigned long long> alignment(void) const;
   uint32_t addr_space(void) const;
   //::std::optional<UnnamedAddr> unnamed_addr(void) const;
   //::std::optional<StringRef> section(void) const;
@@ -952,8 +952,8 @@ class MX_EXPORT GlobalOp final : public Operation {
   //::mlir::LLVM::Visibility visibility__(void) const;
   //Type type(void) const;
   //Attribute value_or_null(void) const;
-  //Region& initializer_region(void) const;
-  //Block* initializer_block(void) const;
+  //Region & initializer_region(void) const;
+  //Block * initializer_block(void) const;
 };
 static_assert(sizeof(GlobalOp) == sizeof(Operation));
 
@@ -1033,7 +1033,7 @@ class MX_EXPORT InsertValueOp final : public Operation {
   ::mx::ir::Value container(void) const;
   ::mx::ir::Value value(void) const;
   ::mx::ir::Value res(void) const;
-  //::llvm::ArrayRef<longlong> position(void) const;
+  //::llvm::ArrayRef<long long> position(void) const;
 };
 static_assert(sizeof(InsertValueOp) == sizeof(Operation));
 
@@ -1069,8 +1069,8 @@ class MX_EXPORT InvokeOp final : public Operation {
   //::mlir::Operation::operand_range callee_operands(void) const;
   //::mlir::Operation::operand_range normal_dest_operands(void) const;
   //::mlir::Operation::operand_range unwind_dest_operands(void) const;
-  //::mlir::Block* normal_dest(void) const;
-  //::mlir::Block* unwind_dest(void) const;
+  //::mlir::Block * normal_dest(void) const;
+  //::mlir::Block * unwind_dest(void) const;
   //::std::optional<LLVMFunctionType> callee_type(void) const;
   //::std::optional<StringRef> callee(void) const;
   //::std::optional<ArrayRef<int>> branch_weights(void) const;
@@ -1093,7 +1093,7 @@ class MX_EXPORT FuncOp final : public Operation {
   ::mlir::LLVM::LLVMFuncOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Region body(void) const;
+  //::mlir::Region & body(void) const;
   std::string_view sym_name(void) const;
   //::std::optional<StringRef> sym_visibility(void) const;
   //::mlir::LLVM::LLVMFunctionType function_type(void) const;
@@ -1106,7 +1106,7 @@ class MX_EXPORT FuncOp final : public Operation {
   //::std::optional<ArrayAttr> passthrough(void) const;
   //::std::optional<ArrayAttr> arg_attrs(void) const;
   //::std::optional<ArrayAttr> res_attrs(void) const;
-  //::std::optional<unsignedlonglong> function_entry_count(void) const;
+  //::std::optional<unsigned long long> function_entry_count(void) const;
   //::std::optional<MemoryEffectsAttr> memory(void) const;
   //::mlir::LLVM::Visibility visibility__(void) const;
   //::std::optional<bool> arm_streaming(void) const;
@@ -1117,16 +1117,16 @@ class MX_EXPORT FuncOp final : public Operation {
   //::std::optional<bool> arm_shared_za(void) const;
   //::std::optional<StringRef> section(void) const;
   //::std::optional<UnnamedAddr> unnamed_addr(void) const;
-  //::std::optional<unsignedlonglong> alignment(void) const;
+  //::std::optional<unsigned long long> alignment(void) const;
   //::std::optional<VScaleRangeAttr> vscale_range(void) const;
   //::std::optional<FramePointerKindAttr> frame_pointer(void) const;
   //::std::optional<StringRef> target_cpu(void) const;
   //::std::optional<TargetFeaturesAttr> target_features(void) const;
-  //Block* add_entry_block(void) const;
+  //Block * add_entry_block(void) const;
   bool is_var_arg(void) const;
   //ArrayRef<Type> argument_types(void) const;
   //ArrayRef<Type> result_types(void) const;
-  //Region* callable_region(void) const;
+  //Region * callable_region(void) const;
 };
 static_assert(sizeof(FuncOp) == sizeof(Operation));
 
@@ -1195,7 +1195,7 @@ class MX_EXPORT LoadOp final : public Operation {
   // Imported methods:
   //::mlir::TypedValue<LLVMPointerType> addr(void) const;
   ::mx::ir::Value res(void) const;
-  //::std::optional<unsignedlonglong> alignment(void) const;
+  //::std::optional<unsigned long long> alignment(void) const;
   bool volatile__(void) const;
   bool nontemporal(void) const;
   bool invariant(void) const;
@@ -1205,7 +1205,7 @@ class MX_EXPORT LoadOp final : public Operation {
   //::std::optional<ArrayAttr> alias_scopes(void) const;
   //::std::optional<ArrayAttr> noalias_scopes(void) const;
   //::std::optional<ArrayAttr> tbaa(void) const;
-  //::llvm::SmallVector<Value,6> accessed_operands(void) const;
+  //::llvm::SmallVector<Value, 6> accessed_operands(void) const;
 };
 static_assert(sizeof(LoadOp) == sizeof(Operation));
 
@@ -1469,7 +1469,7 @@ class MX_EXPORT StoreOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value value(void) const;
   //::mlir::TypedValue<LLVMPointerType> addr(void) const;
-  //::std::optional<unsignedlonglong> alignment(void) const;
+  //::std::optional<unsigned long long> alignment(void) const;
   bool volatile__(void) const;
   bool nontemporal(void) const;
   //::mlir::LLVM::AtomicOrdering ordering(void) const;
@@ -1478,7 +1478,7 @@ class MX_EXPORT StoreOp final : public Operation {
   //::std::optional<ArrayAttr> alias_scopes(void) const;
   //::std::optional<ArrayAttr> noalias_scopes(void) const;
   //::std::optional<ArrayAttr> tbaa(void) const;
-  //::llvm::SmallVector<Value,6> accessed_operands(void) const;
+  //::llvm::SmallVector<Value, 6> accessed_operands(void) const;
 };
 static_assert(sizeof(StoreOp) == sizeof(Operation));
 
@@ -1516,7 +1516,7 @@ class MX_EXPORT SwitchOp final : public Operation {
   //::mlir::TypedValue<IntegerType> value(void) const;
   //::mlir::Operation::operand_range default_operands(void) const;
   //::mlir::OperandRangeRange case_operands(void) const;
-  //::mlir::Block* default_destination(void) const;
+  //::mlir::Block * default_destination(void) const;
   //::mlir::SuccessorRange case_destinations(void) const;
   //::std::optional<DenseIntElementsAttr> case_values(void) const;
   //::llvm::ArrayRef<int> case_operand_segments(void) const;
@@ -2762,7 +2762,7 @@ class MX_EXPORT MemcpyInlineOp final : public Operation {
   //::std::optional<ArrayAttr> alias_scopes(void) const;
   //::std::optional<ArrayAttr> noalias_scopes(void) const;
   //::std::optional<ArrayAttr> tbaa(void) const;
-  //::llvm::SmallVector<Value,6> accessed_operands(void) const;
+  //::llvm::SmallVector<Value, 6> accessed_operands(void) const;
 };
 static_assert(sizeof(MemcpyInlineOp) == sizeof(Operation));
 
@@ -2786,7 +2786,7 @@ class MX_EXPORT MemcpyOp final : public Operation {
   //::std::optional<ArrayAttr> alias_scopes(void) const;
   //::std::optional<ArrayAttr> noalias_scopes(void) const;
   //::std::optional<ArrayAttr> tbaa(void) const;
-  //::llvm::SmallVector<Value,6> accessed_operands(void) const;
+  //::llvm::SmallVector<Value, 6> accessed_operands(void) const;
 };
 static_assert(sizeof(MemcpyOp) == sizeof(Operation));
 
@@ -2810,7 +2810,7 @@ class MX_EXPORT MemmoveOp final : public Operation {
   //::std::optional<ArrayAttr> alias_scopes(void) const;
   //::std::optional<ArrayAttr> noalias_scopes(void) const;
   //::std::optional<ArrayAttr> tbaa(void) const;
-  //::llvm::SmallVector<Value,6> accessed_operands(void) const;
+  //::llvm::SmallVector<Value, 6> accessed_operands(void) const;
 };
 static_assert(sizeof(MemmoveOp) == sizeof(Operation));
 
@@ -2834,7 +2834,7 @@ class MX_EXPORT MemsetOp final : public Operation {
   //::std::optional<ArrayAttr> alias_scopes(void) const;
   //::std::optional<ArrayAttr> noalias_scopes(void) const;
   //::std::optional<ArrayAttr> tbaa(void) const;
-  //::llvm::SmallVector<Value,6> accessed_operands(void) const;
+  //::llvm::SmallVector<Value, 6> accessed_operands(void) const;
 };
 static_assert(sizeof(MemsetOp) == sizeof(Operation));
 

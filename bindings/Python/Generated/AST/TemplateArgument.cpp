@@ -211,23 +211,23 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "as_declaration",
+    "declaration",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->as_declaration());
+          return ::mx::to_python(T_cast(self)->declaration());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::TemplateArgument::as_declaration"),
+    PyDoc_STR("Wrapper for mx::TemplateArgument::declaration"),
     nullptr,
   },
   {
-    "as_type",
+    "type",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->as_type());
+          return ::mx::to_python(T_cast(self)->type());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::TemplateArgument::as_type"),
+    PyDoc_STR("Wrapper for mx::TemplateArgument::type"),
     nullptr,
   },
   {
@@ -251,13 +251,33 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "pack_elements",
+    "expression",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->pack_elements());
+          return ::mx::to_python(T_cast(self)->expression());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::TemplateArgument::pack_elements"),
+    PyDoc_STR("Wrapper for mx::TemplateArgument::expression"),
+    nullptr,
+  },
+  {
+    "num_pack_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_pack_arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TemplateArgument::num_pack_arguments"),
+    nullptr,
+  },
+  {
+    "pack_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::pack_arguments);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TemplateArgument::pack_arguments"),
     nullptr,
   },
   {}  // Sentinel.
@@ -335,6 +355,28 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::TemplateArgument::from"),
+  },
+  {
+    "nth_pack_argument",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          T *obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<uint32_t>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->nth_pack_argument(std::move(arg_0.value())));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'nth_pack_argument'";
+          return nullptr;
+        }),
+    METH_FASTCALL,
+    PyDoc_STR("Wrapper for mx::TemplateArgument::nth_pack_argument"),
   },
   {}  // Sentinel.
 };

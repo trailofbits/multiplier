@@ -197,7 +197,7 @@ Token AtomicExpr::builtin_token(void) const {
 }
 
 AtomicExprAtomicOp AtomicExpr::operation(void) const {
-  return static_cast<AtomicExprAtomicOp>(impl->reader.getVal91());
+  return static_cast<AtomicExprAtomicOp>(impl->reader.getVal89());
 }
 
 std::string_view AtomicExpr::operation_as_string(void) const {

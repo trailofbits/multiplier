@@ -7,6 +7,7 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/TranslationUnitDecl.h>
+#include "../Reference.h"
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/Frontend/Token.h>
@@ -218,14 +219,10 @@ std::optional<TranslationUnitDecl> TranslationUnitDecl::from(const TokenContext 
   return std::nullopt;
 }
 
-gap::generator<Decl> TranslationUnitDecl::declarations_in_context(void) const & {
-  EntityProviderPtr ep = impl->ep;
-  auto list = impl->reader.getVal51();
-  for (auto v : list) {
-    if (auto eptr = ep->DeclFor(ep, v)) {
-      co_yield std::move(eptr);
-    }
-  }
+gap::generator<Decl> TranslationUnitDecl::contained_declarations(void) const & {
+  return BuiltinDeclReferences<Decl>(
+      impl->ep, id().Pack(), BuiltinReferenceKind::CONTAINS,
+      EntityProvider::kReferenceFrom, false  /* redecls */);
 }
 
 #pragma GCC diagnostic pop

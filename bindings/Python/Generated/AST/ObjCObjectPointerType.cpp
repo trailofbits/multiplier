@@ -125,16 +125,6 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyGetSetDef gProperties[] = {
   {
-    "desugar",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->desugar());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::desugar"),
-    nullptr,
-  },
-  {
     "interface_declaration",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -198,7 +188,7 @@ static PyGetSetDef gProperties[] = {
     "type_arguments",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->type_arguments());
+          return ::mx::generator_to_python(*T_cast(self), &T::type_arguments);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::type_arguments"),
@@ -208,7 +198,7 @@ static PyGetSetDef gProperties[] = {
     "type_arguments_as_written",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->type_arguments_as_written());
+          return ::mx::generator_to_python(*T_cast(self), &T::type_arguments_as_written);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::type_arguments_as_written"),
@@ -298,7 +288,7 @@ static PyGetSetDef gProperties[] = {
     "qualifiers",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->qualifiers());
+          return ::mx::generator_to_python(*T_cast(self), &T::qualifiers);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::qualifiers"),
@@ -328,7 +318,7 @@ static PyGetSetDef gProperties[] = {
     "protocols",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->protocols());
+          return ::mx::generator_to_python(*T_cast(self), &T::protocols);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ObjCObjectPointerType::protocols"),

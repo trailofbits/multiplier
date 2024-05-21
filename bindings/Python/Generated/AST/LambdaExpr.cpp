@@ -198,7 +198,7 @@ static PyGetSetDef gProperties[] = {
     "explicit_template_parameters",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->explicit_template_parameters());
+          return ::mx::generator_to_python(*T_cast(self), &T::explicit_template_parameters);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::LambdaExpr::explicit_template_parameters"),

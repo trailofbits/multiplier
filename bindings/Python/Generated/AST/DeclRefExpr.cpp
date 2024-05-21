@@ -135,16 +135,6 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "found_declaration",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->found_declaration());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DeclRefExpr::found_declaration"),
-    nullptr,
-  },
-  {
     "l_angle_token",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -202,26 +192,6 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::DeclRefExpr::has_qualifier"),
-    nullptr,
-  },
-  {
-    "has_template_keyword_and_arguments_info",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_template_keyword_and_arguments_info());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DeclRefExpr::has_template_keyword_and_arguments_info"),
-    nullptr,
-  },
-  {
-    "has_template_keyword",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_template_keyword());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::DeclRefExpr::has_template_keyword"),
     nullptr,
   },
   {

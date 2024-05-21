@@ -135,16 +135,6 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "desugar",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->desugar());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::FunctionProtoType::desugar"),
-    nullptr,
-  },
-  {
     "ellipsis_token",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -208,7 +198,7 @@ static PyGetSetDef gProperties[] = {
     "parameter_types",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->parameter_types());
+          return ::mx::generator_to_python(*T_cast(self), &T::parameter_types);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::FunctionProtoType::parameter_types"),
@@ -348,7 +338,7 @@ static PyGetSetDef gProperties[] = {
     "exception_types",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->exception_types());
+          return ::mx::generator_to_python(*T_cast(self), &T::exception_types);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::FunctionProtoType::exception_types"),

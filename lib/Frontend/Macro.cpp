@@ -7,7 +7,7 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/Frontend/Macro.h>
-#include <multiplier/Reference.h>
+#include "../Reference.h"
 #include <multiplier/Frontend/File.h>
 #include <multiplier/Frontend/Token.h>
 
@@ -163,7 +163,7 @@ std::optional<Macro> Macro::parent(void) const {
   return std::nullopt;
 }
 
-gap::generator<MacroOrToken> Macro::children(void) const & {
+gap::generator<PreprocessedEntity> Macro::children(void) const & {
   Index index(impl->ep);
   auto list = impl->reader.getVal2();
   for (auto v : list) {
@@ -172,6 +172,8 @@ gap::generator<MacroOrToken> Macro::children(void) const & {
       co_yield std::move(std::get<Macro>(e));
     } else if (std::holds_alternative<Token>(e)) {
       co_yield std::move(std::get<Token>(e));
+    } else if (std::holds_alternative<Fragment>(e)) {
+      co_yield std::move(std::get<Fragment>(e));
     } else {
       assert(false);
     }

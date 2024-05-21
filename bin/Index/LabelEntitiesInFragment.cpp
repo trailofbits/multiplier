@@ -17,23 +17,288 @@
 
 #include "LabelEntitiesInFragment.h"
 
+#include <iostream>
+
 namespace indexer {
 namespace {
 
-static bool IsAcceptableRepeatedToken(const pasta::Token &tok) {
-  switch (tok.Kind()) {
-    case pasta::TokenKind::kUnknown:
-    case pasta::TokenKind::kKeyword__Attribute:
-    case pasta::TokenKind::kKeyword__Declspec:
-    case pasta::TokenKind::kLParenthesis:
-    case pasta::TokenKind::kRParenthesis:
-      return true;
-    default:
-      return false;
+// Figure out the fragment index of a given token.
+static std::optional<mx::PackedFragmentId> IdentifyAsNestedFragmentToken(
+    PendingFragment &pf, const pasta::PrintedToken &tok,
+    bool might_have_nested_fragments) {
+
+#define D(...)
+
+  auto frag_index = pf.fragment_index;
+  auto pt = tok.DerivedLocation();
+
+  // Try to find a printed token that is a macro directive marker, and then
+  // invent a nested fragment for it (if it is part of a different fragment).
+  if (pt && pt->Role() == pasta::TokenRole::kMacroDirectiveMarker) {
+    if (auto dir = pt->Directive()) {
+      mx::EntityId vid(pf.em.EntityId(dir.value()));
+      auto dir_id = vid.Extract<mx::MacroId>();
+      if (dir_id && dir_id->fragment_id != pf.fragment_index) {
+        return mx::FragmentId(dir_id->fragment_id);
+      }
+    }
+  }
+
+  // If we're dealing with printed tokens, then we need to manually determine
+  // which tokens needs to be excised. This is somewhat tedious as it involves
+  // the token contexts.
+  if (pf.parsed_tokens_are_printed) {
+
+    D( std::cerr << tok.Index() << ' ' << tok.Data() << '\n'; )
+
+    mx::RawEntityId parent_frag_index = pf.fragment_index;
+    if (pf.raw_parent_entity) {
+      auto parent_eid = pf.em.EntityId(pf.raw_parent_entity);
+      if (auto parent_did = mx::EntityId(parent_eid).Extract<mx::DeclId>()) {
+        parent_frag_index = parent_did->fragment_id;
+        D( std::cerr << "\tparent frag index is " << parent_frag_index << '\n'; )
+      }
+    }
+
+    // std::cerr << tok.Index() << ' ' << tok.Data();
+    // for (const pasta::TokenContext &ctx : TokenContexts(tok)) {
+    //   std::cerr << " -> " << ctx.KindName();
+    //   if (auto decl = pasta::Decl::From(ctx)) {
+    //     std::cerr << ':' << decl->KindName();
+    //   } else if (auto type = pasta::Type::From(ctx)) {
+    //     std::cerr << ':' << type->KindName();
+    //   }
+    // }
+    // std::cerr << '\n';
+
+    for (const pasta::TokenContext &ctx : TokenContexts(tok)) {
+      auto kind = ctx.Kind();
+      if (pasta::TokenContextKind::kAST == kind) {
+        break;
+      }
+
+      if (pasta::TokenContextKind::kDecl != kind) {
+        D( std::cerr << "\tresetting on " << ctx.KindName() << '\n'; )
+        frag_index = pf.fragment_index;
+        continue;
+      }
+
+      auto did = mx::EntityId(pf.em.EntityId(ctx.Data())).Extract<mx::DeclId>();
+      if (!did) {
+        D( std::cerr << "\tno decl id\n"; )
+        continue;
+      }
+
+      auto decl_frag_index = did->fragment_id;
+
+      if (decl_frag_index == pf.fragment_index) {
+        if (frag_index != pf.fragment_index) {
+          D( std::cerr << "\t\texiting on next same frag\n"; )
+          break;
+        }
+
+        D( std::cerr << "\t\tsame frag: " << pf.fragment_index << '\n'; )
+        break;
+      }
+
+      if (decl_frag_index == parent_frag_index) {
+        D( std::cerr << "\t\texiting to parent frag\n"; )
+        frag_index = pf.fragment_index;
+        break;
+      }
+
+      D( std::cerr << "\t\tfound: " << decl_frag_index << '\n'; )
+      frag_index = decl_frag_index;
+    }
+
+  // If we're dealing with parsed tokens, then we might need to excise some
+  // template code.
+  } else if (might_have_nested_fragments) {
+
+    if (!pt) {
+      assert(false);
+      return std::nullopt;
+    }
+
+    // Find the largest interval that is contained within `pf` that contains
+    // `pt`. We only want the largest (i.e. outermost) one, because any smaller
+    // ones nested inside of that will be discovered (via this mechanism) as
+    // nested fragments of that fragment.
+    mx::EntityOffset max_interval_size = 0u;
+
+    pf.em.nested_fragment_bounds.visit_overlapping(
+        pt->Index(),
+        [&] (const FragmentBounds &bounds) {
+          auto interval_size = bounds.stop - bounds.start + 1u;
+          auto interval_frag = bounds.value.Unpack().fragment_id;
+          if (interval_size > max_interval_size &&
+              interval_frag != pf.fragment_index &&
+              bounds.start > pf.first_parsed_token_index &&
+              bounds.stop < pf.last_parsed_token_index) {
+            max_interval_size = interval_size;
+            frag_index = interval_frag;
+          }
+        });
+
+  } else {
+    return std::nullopt;
+  }
+
+  if (frag_index == pf.fragment_index) {
+    return std::nullopt;
+  }
+
+  return mx::FragmentId(frag_index);
+}
+
+static bool IsNonLineBreakingWhitespaceOrEmpty(std::string_view td) {
+  return IsWhitespaceOrEmpty(td) && !std::count(td.begin(), td.end(), '\n');
+}
+
+// Search for gaps between two tokens identified in the same nested fragment,
+// and then fill them.
+static void IdentifyNestedFragmentTokens(
+    PendingFragment &pf, bool might_have_nested_fragments) {
+
+  if (!pf.parsed_tokens_are_printed && !might_have_nested_fragments) {
+    return;
+  }
+
+  std::optional<std::pair<mx::EntityOffset, mx::PackedFragmentId>> prev;
+
+  // NOTE(pag): `ExpandRange` in `IndexCompileJob.cpp` tries to put the leading
+  //            indentation of a fragment with the fragment itself. This is so
+  //            that things "look right" when previewed independently. Here, we
+  //            want to make sure we capture that too.
+  std::optional<pasta::PrintedToken> previous_indent;
+
+  for (auto tok : pf.parsed_tokens) {
+    auto fid = IdentifyAsNestedFragmentToken(
+        pf, tok, might_have_nested_fragments);
+
+    if (!fid) {
+      previous_indent.reset();
+      if (IsNonLineBreakingWhitespaceOrEmpty(tok.Data())) {
+        previous_indent.emplace(std::move(tok));
+      }
+      continue;
+    }
+
+    auto ti = tok.Index();
+    if (prev && (prev->first + 1u) < ti && prev->second == fid.value()) {
+      for (auto i = prev->first + 1u; i < ti; ++i) {
+        pf.token_to_nested_fragment.emplace(
+            RawEntity(pf.parsed_tokens[i]), fid.value());
+      }
+    }
+
+    pf.token_to_nested_fragment.emplace(RawEntity(tok), fid.value());
+
+    // Mark leading indents as being part of this fragment.
+    if (previous_indent) {
+      pf.token_to_nested_fragment.emplace(RawEntity(previous_indent.value()),
+                                          fid.value());
+      previous_indent.reset(); 
+    }
+
+    prev.reset();
+    prev.emplace(ti, fid.value());
   }
 }
 
-}  // namespace
+// Labels entities (decls, stmts, types, tokens). The idea here is that in
+// `rpc::Fragment`, which is derived from a Cap'n Proto schema, we have a
+// lists of entities (decls, stmts, etc.). We index code at the granularity of
+// fragments (represented here as `PendingFragment`) which contain one or more
+// top-level declarations. Each fragment has a unique code ID, and there is an
+// `ast::EntityList` associated with each fragment. We'd like to be able to
+// reference across fragments, and to do so deterministically. The way we do
+// this is that we assign IDs to each entity in a deterministic way for each
+// fragment, so then we we go and build the serialized form of a fragment,
+// then we can just use these IDs to build up the references and know that
+// things will generally work out. One trick is our IDs are compound: they
+// include the fragment ID, the entity kind, the entity sub-kind, and then
+// the offset in the shared entity list `rpc::Fragment::entities`. This way,
+// it's easy to identify exactly which entity we need to reference inside of an
+// entity list.
+class EntityLabeller final : public EntityVisitor {
+ public:
+  EntityMapper &em;
+  PendingFragment &fragment;
+
+  // Vector of the next declarations to visit. This lets us do breadth-first
+  // visiting.
+  std::vector<pasta::Decl> next_decls;
+
+  explicit EntityLabeller(PendingFragment &fragment_);
+
+  virtual ~EntityLabeller(void);
+
+  bool Enter(const pasta::Decl &entity) final;
+
+  void Accept(const pasta::Decl &entity) final;
+
+  // Don't enter these.
+  void Accept(const pasta::Stmt &) final {}
+  void Accept(const pasta::Type &) final {}
+  void Accept(const pasta::Attr &) final {}
+
+  // NOTE(pag): Don't label statements as they are not referenceable across
+  //            fragments, and if we did label them, then we'd want them to
+  //            be fragment-specific, and that data would get wiped out by
+  //            `EntityMapper::ResetForFragment`.
+  bool Enter(const pasta::Stmt &) final {
+    return true;
+  }
+
+  // NOTE(pag): Don't recursively descend into types. We may end up walking
+  //            from a `FunctionProtoType` into a `typedef` (e.g. an argument
+  //            or return value type), and that `typedef` is likely part of
+  //            a different fragment, and we don't want to pull in things like
+  //            structures from that other fragment.
+  //
+  // NOTE(pag): We can't rely on the order of types being deterministic for
+  //            the "same" fragment in different translation units.
+  bool Enter(const pasta::Type &) final {
+    return false;
+  }
+
+  // NOTE(pag): Don't go into attributes. They can be shared by multiple
+  //            fragments, and can contain types / statements. We'll deal with
+  //            them later and more comprehensively during the building phase.
+  //
+  //            Another reason not to visit these is that because they can be
+  //            duplicated so much, it means we sometimes internalize the
+  //            duplicated versions into fragments, but this mechanism uses
+  //            per-fragment storage in the `EntityLabeller`, which gets
+  //            cleaned out between fragment persisting by
+  //            `EntityMapper::ResetForFragment`, so we don't want to give
+  //            something an ID, then lose track of it, and then assign a
+  //            new ID to it. That would result in a kind of double
+  //            serialization.
+  bool Enter(const pasta::Attr &attr) final {
+    return false;
+  }
+
+  void Run(void);
+
+  // Create initial fragment token IDs for all of the tokens in the range of
+  // this fragment. This needs to be careful about assigning IDs to tokens that
+  // aren't actually parsed, i.e. tokens whose roles are things like
+  // intermediate macro expansions.
+  //
+  // NOTE(pag): This labeling process is tightly coupled with how tokens are
+  //            serialized into fragments, and how token trees are serialized
+  //            into fragments.
+  bool Label(const pasta::PrintedToken &entity);
+
+  // Create initial macro IDs for all of the top-level macros in the range of
+  // this fragment.
+  bool Label(const pasta::Macro &entity);
+
+  private:
+   bool ShouldLabelDecl(const pasta::Decl &decl);
+};
 
 EntityLabeller::~EntityLabeller(void) {};
 
@@ -58,48 +323,17 @@ bool EntityLabeller::Enter(const pasta::Decl &entity) {
 }
 
 void EntityLabeller::Accept(const pasta::Decl &entity) {
-  next_decls.push_back(entity);
-}
-
-void EntityLabeller::Accept(const pasta::Type &entity) {
-  next_types.push_back(entity);
-}
-
-bool EntityLabeller::Enter(const pasta::Attr &attr) {
-  fragment.TryAdd(attr);
-
-  // NOTE(pag): Want to return `true` because some attributes contain constant
-  //            expressions.
-  //
-  // TODO(pag): Consider `return fragment.TryAdd`, given that it now has logic
-  //            to figure out if the attribute ought belong to this fragment
-  //            or not.
-  return true;
+  next_decls.emplace_back(entity);
 }
 
 void EntityLabeller::Run(void) {
   std::vector<pasta::Decl> curr_decls;
-  std::vector<pasta::Type> curr_types;
 
-  for (auto changed = true; changed; ) {
-    changed = false;
+  while (!next_decls.empty()) {
     curr_decls.swap(next_decls);
-    curr_types.swap(next_types);
-
-    // NOTE(pag): Macros are handled in `Persist.cpp`, because we want to
-    //            merge expansions and argument pre-expansion phases.
-
     next_decls.clear();
-    next_types.clear();
-
-    for (const pasta::Decl &entity : curr_decls) {
-      changed = true;
-      this->EntityVisitor::Accept(entity);
-    }
-
-    for (const pasta::Type &entity : curr_types) {
-      changed = true;
-      this->EntityVisitor::Accept(entity);
+    for (const auto &decl : curr_decls) {
+      this->EntityVisitor::Accept(decl);
     }
   }
 }
@@ -109,8 +343,14 @@ bool EntityLabeller::ShouldLabelDecl(const pasta::Decl &decl) {
     return true;
   }
 
+  // If we've encountered a top-level declaration, then make sure it's part of
+  // this fragment. We don't want to enter into another fragment.
   auto end = fragment.top_level_decls.end();
-  return std::find(fragment.top_level_decls.begin(), end, decl) != end;
+  if (std::find(fragment.top_level_decls.begin(), end, decl) != end) {
+    return true;
+  }
+
+  return false;
 }
 
 // Create initial fragment token IDs for all of the tokens in the range of
@@ -122,53 +362,34 @@ bool EntityLabeller::ShouldLabelDecl(const pasta::Decl &decl) {
 //            serialized into fragments, and how token trees are serialized
 //            into fragments.
 bool EntityLabeller::Label(const pasta::PrintedToken &entity) {
-  CHECK(fragment.parsed_tokens.Contains(entity));
+  if (!IsParsedToken(entity)) {
+    return false;
+  }
+
+  // Figure out if this token is in a sub-range of tokens belonging to a
+  // nested fragment.
+  auto raw_entity = RawEntity(entity);
+  if (fragment.token_to_nested_fragment.count(raw_entity)) {
+    return false;
+  }
+
   mx::ParsedTokenId id;    
-  id.offset = next_parsed_token_index++;
+  id.offset = fragment.num_parsed_tokens++;
   id.fragment_id = fragment.fragment_index;
   id.kind = TokenKindFromPasta(entity);
 
-  CHECK(em.token_tree_ids.emplace(RawEntity(entity), id).second);
+  CHECK(em.token_tree_ids.emplace(raw_entity, id).second);
 
-  if (std::optional<pasta::Token> pt = entity.DerivedLocation()) {
-
-    // NOTE(pag): This can happen where a printed attribute ends up referring
-    //            back to a macro directive marker, where the macro directive
-    //            is something like the following:
-    //
-    //    #pragma clang attribute push(__attribute__((...)), apply_to=...)
-    //
-    //            These kinds of attributes are annoying because they don't
-    //            communicate that they were implicitly applied.
-    if (!IsParsedToken(pt.value())) {
-      CHECK(pt->Role() == pasta::TokenRole::kMacroDirectiveMarker);
-      return true;
-    }
-
-    auto raw_pt = RawEntity(pt.value());
-
-    // NOTE(pag): We may see the same token come up multiple times, especially
-    //            if this is purely printed tokens, rather than parsed tokens
-    //            aligned with printed tokens. A good example is that the
-    //            pure pretty-printed code will separately print the syntax for
-    //            each attribute in its own `__attribute__` block, whereas in
-    //            the pasrsed source code, multiple attributes may belong to the
-    //            same syntactical block.
-    if (!em.token_tree_ids.emplace(raw_pt, id).second) {
-      LOG_IF(WARNING, !IsAcceptableRepeatedToken(pt.value()))
-            << "Token kind " << pt.value().KindName()
-            << " is repeated and exist in the token tree!";
-    }
+  // NOTE(pag): We may see the same token come up multiple times, especially
+  //            if this is purely printed tokens, rather than parsed tokens
+  //            aligned with printed tokens. A good example is that the
+  //            pure pretty-printed code will separately print the syntax for
+  //            each attribute in its own `__attribute__` block, whereas in
+  //            the pasrsed source code, multiple attributes may belong to the
+  //            same syntactical block.
+  if (auto pt = entity.DerivedLocation()) {
+    em.token_tree_ids.emplace(RawEntity(pt.value()), id);
   }
-
-  // // If we didn't just add the token, then we should be in the nested fragment
-  // // case, and we want to overwrite the token id.
-  // if (!res.second) {
-  //   mx::EntityId prev_id(res.first->second);
-  //   CHECK_NE(prev_id.Extract<mx::ParsedTokenId>()->fragment_id,
-  //            fragment.fragment_index);
-  //   res.first->second = id;
-  // }
 
   return true;
 }
@@ -176,6 +397,10 @@ bool EntityLabeller::Label(const pasta::PrintedToken &entity) {
 // Create initial macro IDs for all of the top-level macros in the range of
 // this fragment.
 bool EntityLabeller::Label(const pasta::Macro &entity) {
+  if (!IsVisibleAcrossFragments(entity)) {
+    return false;
+  }
+
   auto &entity_list = fragment.EntityListFor(entity);
 
   mx::MacroId id;
@@ -186,11 +411,9 @@ bool EntityLabeller::Label(const pasta::Macro &entity) {
   // Macro directives and macro `#define` parameters can be referenced by other
   // fragments that contain expansions of those definitions, and substitutions
   // of those parameters for arguments.
-  if (AreVisibleAcrossFragments(entity)) {
-    CHECK(em.entity_ids.emplace(entity.RawMacro(), id).second);
-  }
+  CHECK(em.entity_ids.emplace(entity.RawMacro(), id).second);
 
-  CHECK(em.token_tree_ids.emplace(entity.RawMacro(), id).second);
+  // CHECK(em.token_tree_ids.emplace(entity.RawMacro(), id).second);
 
   // NOTE(pag): `TokenTreeSerializationSchedule::RecordEntityId` in Persist.cpp
   //            fills in the empty slots.
@@ -215,13 +438,23 @@ bool EntityLabeller::Label(const pasta::Macro &entity) {
   return true;
 }
 
+}  // namespace
+
 // Initialize the entity labeller for a fragment. This focuses only on the top-
 // level entities.
 void InitializeEntityLabeller(PendingFragment &pf) {
-  CHECK(!pf.has_labelled_decls);
-  CHECK(!pf.labeller);
 
-  pf.labeller.reset(new EntityLabeller(pf));
+  EntityLabeller labeller(pf);
+
+  // TODO(pag): Define macro directives and their parameters need to be
+  //            part of the global entity map, not the per-fragment ones.
+  //
+  //            Make sure to check and fix uses of `PerFragmentEntityId` in
+  //            entity mapper.
+
+  for (const auto &macro : pf.top_level_macros) {
+    (void) labeller.Label(macro);
+  }
 
   // Go top-down through the top-level declarations of this pending fragment
   // and build up an initial list of `decls_to_serialize` and
@@ -243,78 +476,40 @@ void InitializeEntityLabeller(PendingFragment &pf) {
 
   CHECK(pf.decls_to_serialize.empty());
 
-#ifndef NDEBUG
-  const EntityMapper &em = pf.em;
-   // The NDEBUG condition check will get hit often if we add all template
-   // and specialization AST node as new TLDS. The TLD may be reached from the 
-   // other fragment causing the id to exist in the mapper.
   for (const pasta::Decl &decl : pf.top_level_decls) {
-    CHECK_EQ(em.EntityId(decl), mx::kInvalidEntityId);
+    (void) labeller.EntityVisitor::Accept(decl);
   }
-#endif
 
-  for (const pasta::Decl &decl : pf.top_level_decls) {
-    (void) pf.labeller->EntityVisitor::Accept(decl);
-  }
+  labeller.Run();
 }
 
-// Label the initial entities of this fragment. This focuses on finding the
+// Label the parsed tokens of this fragment. This focuses on finding the
 // entities that syntactically belong to this fragment, and assigning them
 // IDs. Labeling happens first for all fragments, then we run `Build` for
 // new fragments that we want to serialize.
-void LabelDeclsInFragment(PendingFragment &pf) {
-  CHECK(!!pf.labeller);
-
-  if (pf.has_labelled_decls) {
-    return;
-  }
-
-  pf.has_labelled_decls = true;
-
-#ifndef NDEBUG
-  const EntityMapper &em = pf.em;
-   // The NDEBUG condition check will get hit often if we add all template
-   // and specialization AST node as new TLDS. The TLD may be reached from the 
-   // other fragment causing the id to exist in the mapper.
-  for (const pasta::Decl &decl : pf.top_level_decls) {
-    CHECK_NE(em.EntityId(decl), mx::kInvalidEntityId);
-  }
-#endif
-
-  pf.labeller->Run();
-}
-
-// Label the parsed tokens and macros of this fragment. This focuses on finding the
-// entities that syntactically belong to this fragment, and assigning them
-// IDs. Labeling happens first for all fragments, then we run `Build` for
-// new fragments that we want to serialize.
-void LabelTokensAndMacrosInFragment(PendingFragment &pf) {
+void LabelTokensInFragment(PendingFragment &pf) {
 
   if (pf.has_labelled_tokens) {
     return;  // Already done.
   }
 
+  EntityLabeller labeller(pf);
   pf.has_labelled_tokens = true;
 
-  EntityLabeller labeller(pf);
+  auto might_have_nested_fragments =
+      pf.num_top_level_declarations == 1u &&
+      pf.file_location.has_value() &&
+      (pf.first_parsed_token_index + 2u) <= pf.last_parsed_token_index;
 
-  // TODO(pag): Define macro directives and their parameters need to be
-  //            part of the global entity map, not the per-fragment ones.
-  //
-  //            Make sure to check and fix uses of `PerFragmentEntityId` in
-  //            entity mapper.
-
-  for (const pasta::Macro &macro : pf.top_level_macros) {
-    (void) pf.labeller->Label(macro);
-  }
+  IdentifyNestedFragmentTokens(pf, might_have_nested_fragments);
 
   // Visit all of the tokens; it's possible we came across something that was
   // missed by the above process.
-  for (pasta::PrintedToken tok : pf.parsed_tokens) {
-    (void) pf.labeller->Label(tok);
+  for (auto tok : pf.parsed_tokens) {
+    (void) labeller.Label(tok);
   }
 
-  pf.labeller->Run();
+  CHECK(labeller.next_decls.empty());
 }
 
 }  // namespace indexer

@@ -44,11 +44,6 @@ std::optional<ModuleOp> ModuleOp::producing(const ::mx::ir::Value &that) {
   return ::mlir::ModuleOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Region ModuleOp::body_region(void) const {
-  auto &val = underlying_repr().getBodyRegion();
-  return ::mx::ir::Region(module_, val);
-}
-
 std::optional<std::string_view> ModuleOp::name(void) const {
   auto opt_val = underlying_repr().getName();
   if (!opt_val) {

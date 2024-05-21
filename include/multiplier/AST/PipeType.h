@@ -46,7 +46,6 @@ class MX_EXPORT PipeType : public Type {
   static std::optional<PipeType> from(const VariantEntity &e);
   static std::optional<PipeType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   Type element_type(void) const;
   bool is_read_only(void) const;
   bool is_sugared(void) const;

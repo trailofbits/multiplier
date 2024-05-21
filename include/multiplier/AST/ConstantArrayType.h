@@ -49,7 +49,6 @@ class MX_EXPORT ConstantArrayType : public ArrayType {
   static std::optional<ConstantArrayType> from(const VariantEntity &e);
   static std::optional<ConstantArrayType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   std::optional<Expr> size_expression(void) const;
   bool is_sugared(void) const;
 };

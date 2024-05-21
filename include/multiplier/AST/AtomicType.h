@@ -46,7 +46,6 @@ class MX_EXPORT AtomicType : public Type {
   static std::optional<AtomicType> from(const VariantEntity &e);
   static std::optional<AtomicType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   Type value_type(void) const;
   bool is_sugared(void) const;
 };

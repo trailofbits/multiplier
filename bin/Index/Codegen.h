@@ -11,8 +11,6 @@
 #include <string>
 #include <vector>
 
-#include "Action.h"
-
 namespace pasta {
 class AST;
 class Decl;
@@ -20,7 +18,7 @@ class Decl;
 namespace indexer {
 
 class EntityMapper;
-class GlobalIndexingState;
+class NameMangler;
 class PendingFragment;
 
 class CodeGeneratorImpl;
@@ -45,7 +43,8 @@ class CodeGenerator {
   // IR gets emitted to same module and saved with the same code ids. If
   // the top-level declaration is not `FunctionDecl`, it will visit
   // AST node and generate source ir for function decl found.
-  std::string GenerateSourceIR(const pasta::AST &ast, const EntityMapper &em);
+  std::string GenerateSourceIR(const pasta::AST &ast, const EntityMapper &em,
+                               const NameMangler &nm);
 };
 
 }  // namespace indexer

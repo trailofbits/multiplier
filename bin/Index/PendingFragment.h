@@ -8,6 +8,7 @@
 
 #include <cassert>
 #include <cstdint>
+#include <IntervalTree.h>
 #include <memory>
 #include <multiplier/AST/AttrKind.h>
 #include <multiplier/AST/DeclKind.h>
@@ -33,8 +34,9 @@
 
 namespace indexer {
 
+enum class IdStatus : int;
+
 class EntityMapper;
-class EntityLabeller;
 class TypeMapper;
 
 using Pseudo = std::variant<pasta::TemplateArgument,
@@ -58,6 +60,11 @@ class FileLocationOfFragment {
         last_file_token_id(end) {}
 };
 
+using FragmentBounds = interval_tree::Interval<mx::EntityOffset,
+                                               mx::PackedFragmentId>;
+
+using FragmentIdMap = std::unordered_map<const void *, mx::PackedFragmentId>;
+
 // Summary information about a group of top-level declarations that are
 // somehow lexically/syntactically "stuck together" and thus serialized
 // together. For example, `int optind, opterr, optopt;` is one example of
@@ -67,14 +74,15 @@ class FileLocationOfFragment {
 // represents a single logical thing.
 class PendingFragment {
  public:
-  inline PendingFragment(mx::PackedFragmentId fragment_id_, bool is_new_,
+  inline PendingFragment(mx::PackedFragmentId fragment_id_, IdStatus id_status_,
                          mx::PackedCompilationId tu_id_,
-                         uint64_t first_parsed_token_index_,
-                         uint64_t last_parsed_token_index_,
+                         mx::EntityOffset first_parsed_token_index_,
+                         mx::EntityOffset last_parsed_token_index_,
                          EntityMapper &em_,
                          const pasta::TokenRange *original_tokens_,
                          pasta::PrintedTokenRange parsed_tokens_,
-                         std::optional<FileLocationOfFragment> file_location_)
+                         std::optional<FileLocationOfFragment> file_location_,
+                         bool parsed_tokens_are_printed_)
       : fragment_id(fragment_id_),
         fragment_index(fragment_id.Unpack().fragment_id),
         compilation_id(tu_id_),
@@ -83,7 +91,8 @@ class PendingFragment {
         file_location(std::move(file_location_)),
         first_parsed_token_index(first_parsed_token_index_),
         last_parsed_token_index(last_parsed_token_index_),
-        is_new(is_new_) {
+        id_status(id_status_),
+        parsed_tokens_are_printed(parsed_tokens_are_printed_) {
     if (original_tokens_) {
       original_tokens = *original_tokens_;
     }
@@ -126,12 +135,15 @@ class PendingFragment {
   // us to avoid oddities in Clang, e.g. where clang will associate struct
   // attributes on forward declarations with prior definitions if they already
   // exist.
-  const uint64_t first_parsed_token_index;
-  const uint64_t last_parsed_token_index;  // Inclusive.
+  const mx::EntityOffset first_parsed_token_index;
+  const mx::EntityOffset last_parsed_token_index;  // Inclusive.
 
   unsigned num_top_level_declarations{0u};
   unsigned num_top_level_macros{0u};
 
+  // Number of labelled parsed tokens.
+  mx::EntityOffset num_parsed_tokens{0u};
+  
   // Macros, declarations, statements, types, and pseudo-entities to serialize,
   // in their order of appearance and serialization.
   //
@@ -151,26 +163,37 @@ class PendingFragment {
   EntityList<pasta::Designator> designators_to_serialize;
   EntityList<pasta::CXXCtorInitializer> cxx_ctor_initializers_to_serialize;
 
-  // The entity labeller for this fragment.
-  std::unique_ptr<EntityLabeller> labeller;
+  // Mapping of tokens belonging to nested fragments to their nested fragment
+  // IDs.
+  FragmentIdMap token_to_nested_fragment;
 
   // Did we encounter an error during serialization?
   bool has_error{false};
+
+  // Is this a floating directive fragment, or a freestanding decl fragment?
+  bool is_floating{false};
 
   // Is this a new fragment? This affects whether or not we keep track of types.
   // We don't want `PendingFragment` for a pre-existing type to "take ownership"
   // of a type, only to have that pending fragment "thrown away" later (due to
   // it being redundant), yet have other fragments in the TU point to type IDs
   // that logically belong to this type.
-  const bool is_new;
+  const IdStatus id_status;
+
+  // Are the parsed tokens actually printed tokens? This happens when we need
+  // to render out the specialized version of templates.
+  const bool parsed_tokens_are_printed;
 
   // Keep track on if we've labelled some top-level entities in the entity
   // mapper.
-  bool has_labelled_decls{false};
   bool has_labelled_tokens{false};
 
   // Should we drop token provenance after we've labelled tokens? This helps
   bool drop_token_provenance{false};
+
+  inline FragmentBounds Bounds(void) const noexcept {
+    return {first_parsed_token_index, last_parsed_token_index, fragment_id};
+  }
 
   // Types have special serialization that is sort of fragment-specific. We
   // collect the types that are "new" and seen by virtue of this fragment, but

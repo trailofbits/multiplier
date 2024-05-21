@@ -58,6 +58,9 @@ class GlobalIndexingState {
   // Tracks progress in serializing fragments.
   std::unique_ptr<ProgressBar> fragment_progress;
 
+  // Tracks progress in serializing fragments.
+  std::unique_ptr<ProgressBar> nested_fragment_progress;
+
   // Tracks progress in serializing types.
   std::unique_ptr<ProgressBar> type_progress;
 
@@ -122,7 +125,7 @@ class GlobalIndexingState {
   // and partially so that we can do things like print out fragments, or chunks
   // thereof.
   void PersistFragment(const pasta::AST &ast, NameMangler &mangler,
-                       EntityMapper &em, TokenProvenanceCalculator &provenance,
+                       TokenProvenanceCalculator &provenance,
                        PendingFragment &fragment);
 
   // Persist a type fragment into the database. Type fragments are special
@@ -139,7 +142,8 @@ class GlobalIndexingState {
   // Persist the compilation.
   void PersistCompilation(const pasta::Compiler &compiler,
                           const pasta::CompileJob &job, const pasta::AST &ast,
-                          const EntityMapper &em, mx::PackedCompilationId tu_id,
+                          const EntityMapper &em, const NameMangler &nm,
+                          mx::PackedCompilationId tu_id,
                           std::vector<mx::PackedFragmentId> fragment_ids);
 };
 

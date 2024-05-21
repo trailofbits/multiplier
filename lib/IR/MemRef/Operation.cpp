@@ -142,11 +142,6 @@ std::optional<GenericAtomicRMWOp> GenericAtomicRMWOp::producing(const ::mx::ir::
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Region GenericAtomicRMWOp::atomic_body(void) const {
-  auto &val = underlying_repr().getAtomicBody();
-  return ::mx::ir::Region(module_, val);
-}
-
 std::optional<LoadOp> LoadOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::MEMREF_LOAD) {
     return reinterpret_cast<const LoadOp &>(that);
@@ -227,11 +222,6 @@ std::optional<AllocaScopeOp> AllocaScopeOp::producing(const ::mx::ir::Value &tha
 
 ::mlir::memref::AllocaScopeOp AllocaScopeOp::underlying_repr(void) const noexcept {
   return ::mlir::memref::AllocaScopeOp(this->::mx::ir::Operation::op_);
-}
-
-::mx::ir::Region AllocaScopeOp::body_region(void) const {
-  auto &val = underlying_repr().getBodyRegion();
-  return ::mx::ir::Region(module_, val);
 }
 
 std::optional<AllocaScopeReturnOp> AllocaScopeReturnOp::from(const ::mx::ir::Operation &that) {
@@ -347,6 +337,31 @@ std::optional<DMAStartOp> DMAStartOp::producing(const ::mx::ir::Value &that) {
   return ::mlir::memref::DmaStartOp(this->::mx::ir::Operation::op_);
 }
 
+unsigned int DMAStartOp::src_mem_ref_rank(void) const {
+  auto val = underlying_repr().getSrcMemRefRank();
+  return val;
+}
+
+unsigned int DMAStartOp::dst_mem_ref_rank(void) const {
+  auto val = underlying_repr().getDstMemRefRank();
+  return val;
+}
+
+unsigned int DMAStartOp::src_memory_space(void) const {
+  auto val = underlying_repr().getSrcMemorySpace();
+  return val;
+}
+
+unsigned int DMAStartOp::dst_memory_space(void) const {
+  auto val = underlying_repr().getDstMemorySpace();
+  return val;
+}
+
+unsigned int DMAStartOp::tag_mem_ref_rank(void) const {
+  auto val = underlying_repr().getTagMemRefRank();
+  return val;
+}
+
 bool DMAStartOp::is_dest_memory_space_faster(void) const {
   auto val = underlying_repr().isDestMemorySpaceFaster();
   return val;
@@ -354,6 +369,11 @@ bool DMAStartOp::is_dest_memory_space_faster(void) const {
 
 bool DMAStartOp::is_src_memory_space_faster(void) const {
   auto val = underlying_repr().isSrcMemorySpaceFaster();
+  return val;
+}
+
+unsigned int DMAStartOp::faster_mem_pos(void) const {
+  auto val = underlying_repr().getFasterMemPos();
   return val;
 }
 
@@ -378,6 +398,11 @@ std::optional<DMAWaitOp> DMAWaitOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::memref::DmaWaitOp DMAWaitOp::underlying_repr(void) const noexcept {
   return ::mlir::memref::DmaWaitOp(this->::mx::ir::Operation::op_);
+}
+
+unsigned int DMAWaitOp::tag_mem_ref_rank(void) const {
+  auto val = underlying_repr().getTagMemRefRank();
+  return val;
 }
 
 std::optional<ExpandShapeOp> ExpandShapeOp::from(const ::mx::ir::Operation &that) {
@@ -618,6 +643,16 @@ std::optional<ReinterpretCastOp> ReinterpretCastOp::producing(const ::mx::ir::Va
   return ::mlir::memref::ReinterpretCastOp(this->::mx::ir::Operation::op_);
 }
 
+unsigned int ReinterpretCastOp::result_rank(void) const {
+  auto val = underlying_repr().getResultRank();
+  return val;
+}
+
+unsigned int ReinterpretCastOp::offset_size_and_stride_start_operand_index(void) const {
+  auto val = underlying_repr().getOffsetSizeAndStrideStartOperandIndex();
+  return val;
+}
+
 std::optional<ReshapeOp> ReshapeOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::MEMREF_RESHAPE) {
     return reinterpret_cast<const ReshapeOp &>(that);
@@ -726,6 +761,11 @@ std::optional<SubViewOp> SubViewOp::producing(const ::mx::ir::Value &that) {
 ::mx::ir::Value SubViewOp::view_source(void) const {
   auto val = underlying_repr().getViewSource();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+unsigned int SubViewOp::offset_size_and_stride_start_operand_index(void) const {
+  auto val = underlying_repr().getOffsetSizeAndStrideStartOperandIndex();
+  return val;
 }
 
 }  // namespace mx::ir::memref

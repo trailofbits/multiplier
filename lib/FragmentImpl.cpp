@@ -19,16 +19,6 @@ namespace {
 // A zero-sized string view that nontheless has a valid `.data()` pointer.
 static const std::string_view kEmptyStringView("");
 
-// Return the immediate parent ID of this fragment. 
-static RawEntityId ParentFragmentId(auto id_list) {
-  if (!id_list.size()) {
-    return kInvalidEntityId;
-  }
-  auto frag_id = id_list[0];
-  assert(EntityId(frag_id).Extract<FragmentId>().has_value());
-  return frag_id;
-}
-
 }  // namespace
 
 FragmentImpl::FragmentImpl(EntityProviderPtr ep_,
@@ -36,18 +26,19 @@ FragmentImpl::FragmentImpl(EntityProviderPtr ep_,
                            RawEntityId id_)
     : EntityImpl<rpc::Fragment>(std::move(ep_), kj::mv(data_)),
       fragment_id(EntityId(id_).Extract<FragmentId>()->fragment_id),
-      parent_fragment_id(ParentFragmentId(reader.getParentIds())),
+      parent_fragment_id(reader.getParentFragmentId()),
       parsed_token_reader(this),
       macro_token_reader(this),
       token_context_reader(this),
       num_parsed_tokens(reader.getParsedTokenContextOffsets().size()),
-      num_tokens(reader.getTokenKinds().size()) {
+      num_tokens(reader.getTokenKinds().size()),
+      num_nested_fragments(reader.getNestedFragments().size()) {
 
   assert(num_parsed_tokens <= num_tokens);
   assert(num_tokens == reader.getDerivedTokenIds().size());
   assert((num_tokens + 1u) == reader.getTokenOffsets().size());
-  assert(num_parsed_tokens == reader.getParsedTokenOffsetToIndex().size());
-  assert(num_tokens == reader.getMacroTokenIndexToParsedTokenOffset().size());
+  assert((num_tokens - num_parsed_tokens) ==
+         reader.getMacroTokenIndexToParsedTokenOffset().size());
   assert(num_tokens == reader.getRelatedEntityId().size());
 }
 
@@ -131,19 +122,26 @@ EntityId ReadMacroTokensFromFragment::NthParsedTokenId(EntityOffset ti) const {
   }
 
   const auto &reader = fragment->reader;
-  auto mti2o = reader.getMacroTokenIndexToParsedTokenOffset();
-  auto to = mti2o[ti];
+  auto to = ti;
+  auto npt = fragment->num_parsed_tokens;
+  if (ti >= npt) {
+    to = reader.getMacroTokenIndexToParsedTokenOffset()[ti - npt];
+  }
 
   // NOTE(pag): Not an asserting condition; the serialization code stores
   //            `num_parsed_tokens` for "no relation" and stores
   //            `num_parsed_tokens + 1` for a one-to-many relation.
-  if (to >= fragment->num_parsed_tokens) {
+  if (to == npt) {
+    return kInvalidEntityId;
+
+  } else if (to > npt) {
+    assert(false);
     return kInvalidEntityId;
   }
 
   ParsedTokenId id;
   id.fragment_id = fragment->fragment_id;
-  id.kind = static_cast<TokenKind>(reader.getTokenKinds()[ti]);
+  id.kind = static_cast<TokenKind>(reader.getTokenKinds()[to]);
   id.offset = to;
 
   return id;
@@ -200,69 +198,43 @@ EntityId ReadMacroTokensFromFragment::NthFileTokenId(EntityOffset ti) const {
     mx::VariantId vid = eid.Unpack();
     if (std::holds_alternative<mx::FileTokenId>(vid)) {
       return eid;
+    }
 
-    } else if (std::holds_alternative<mx::ParsedTokenId>(vid)) {
-
-      // NOTE(pag): a macro token should only ever be derived from another macro
-      //            token, or a file token.
-      assert(false);
-
-      mx::ParsedTokenId tid = std::get<mx::ParsedTokenId>(vid);
-      FragmentId fid(tid.fragment_id);
-      if (tid.fragment_id == fragment->fragment_id) {
-        if (tid.offset < fragment->num_parsed_tokens) {
-          // Follow to the next one.
-          ti = reader.getParsedTokenOffsetToIndex()[tid.offset];
-        } else {
-          assert(false);
-          return kInvalidEntityId;
-        }
-
-      } else if (FragmentImplPtr frag = fragment->ep->FragmentFor(
-          fragment->ep, fid)) {
-        assert(false);
-        return frag->ParsedTokenReader(frag)->NthFileTokenId(tid.offset);
-      } else {
-        assert(false);
-        return kInvalidEntityId;
-      }
-
-    } else if (std::holds_alternative<mx::MacroTokenId>(vid)) {
-      mx::MacroTokenId tid = std::get<mx::MacroTokenId>(vid);
-      FragmentId fid(tid.fragment_id);
-      if (tid.fragment_id == fragment->fragment_id) {
-        if (ti != tid.offset) {
-
-          // The serialization in the Indexer's persistence code serializes
-          // all "afters" of macros before all befores. Following a derivation
-          // means going back in time from afters to befores, and so the
-          // indices should be increasing.
-//          assert(ti < tid.offset);
-          assert(ti < fragment->num_tokens);
-
-          ti = tid.offset;  // Follow to the next one.
-          continue;
-
-        } else {
-          assert(false);
-          return kInvalidEntityId;
-        }
-
-      // NOTE(pag): We might find ourselves crossing into a different fragment's
-      //            tokens when a directive is embedded some larger fragment.
-      } else if (FragmentImplPtr frag =
-          fragment->ep->FragmentFor(fragment->ep, fid)) {
-        return frag->MacroTokenReader(frag)->NthFileTokenId(tid.offset);
-
-      } else {
-        assert(false);
-        return kInvalidEntityId;
-      }
-
-    } else {
+    // NOTE(pag): a macro token should only ever be derived from another macro
+    //            token, or a file token.
+    if (!std::holds_alternative<mx::MacroTokenId>(vid)) {
       assert(std::holds_alternative<mx::InvalidId>(vid));
       return kInvalidEntityId;
     }
+
+    mx::MacroTokenId tid = std::get<mx::MacroTokenId>(vid);
+    FragmentId fid(tid.fragment_id);
+    if (tid.fragment_id == fragment->fragment_id) {
+      if (ti == tid.offset) {
+        assert(false);
+        return kInvalidEntityId;
+      }
+
+      // The serialization in the Indexer's persistence code serializes
+      // all "afters" of macros before all befores. Following a derivation
+      // means going back in time from afters to befores, and so the
+      // indices should be increasing.
+      // assert(ti < tid.offset);
+      assert(ti < fragment->num_tokens);
+
+      ti = tid.offset;  // Follow to the next one.
+      continue;
+    }
+
+    // NOTE(pag): We might find ourselves crossing into a different fragment's
+    //            tokens when a directive is embedded some larger fragment.
+    FragmentImplPtr frag = fragment->ep->FragmentFor(fragment->ep, fid);
+    if (!frag) {
+      assert(false);
+      return kInvalidEntityId;
+    }
+
+    return frag->MacroTokenReader(frag)->NthFileTokenId(tid.offset);
   }
 
   assert(false);
@@ -309,14 +281,7 @@ TokenKind ReadParsedTokensFromFragment::NthTokenKind(EntityOffset to) const {
     return TokenKind::UNKNOWN;
   }
 
-  const auto &reader = fragment->reader;
-  auto ti = reader.getParsedTokenOffsetToIndex()[to];
-  if (ti >= fragment->num_tokens) {
-    assert(false);
-    return TokenKind::UNKNOWN;
-  }
-
-  return static_cast<TokenKind>(reader.getTokenKinds()[ti]);
+  return static_cast<TokenKind>(fragment->reader.getTokenKinds()[to]);
 }
 
 // Return the data of the Nth token.
@@ -327,13 +292,7 @@ std::string_view ReadParsedTokensFromFragment::NthTokenData(
     return kEmptyStringView;
   }
 
-  auto ti = fragment->reader.getParsedTokenOffsetToIndex()[to];
-  if (ti >= fragment->num_tokens) {
-    assert(false);
-    return kEmptyStringView;
-  }
-
-  return this->ReadMacroTokensFromFragment::NthTokenData(ti);
+  return this->ReadMacroTokensFromFragment::NthTokenData(to);
 }
 
 // Return the id of the token from which the Nth token is derived. This is
@@ -347,29 +306,16 @@ EntityId ReadParsedTokensFromFragment::NthDerivedTokenId(
     return kInvalidEntityId;
   }
 
-  const auto &reader = fragment->reader;
-  auto ti = reader.getParsedTokenOffsetToIndex()[to];
-  if (ti >= fragment->num_tokens) {
-    assert(false);
-    return kInvalidEntityId;
-  }
-
   MacroTokenId id;
   id.fragment_id = fragment->fragment_id;
-  id.offset = ti;
-  id.kind = static_cast<TokenKind>(reader.getTokenKinds()[ti]);
+  id.offset = to;
+  id.kind = static_cast<TokenKind>(fragment->reader.getTokenKinds()[to]);
   return id;
 }
 
 // Return the id of the parsed token which is derived from the Nth token.
 EntityId ReadParsedTokensFromFragment::NthParsedTokenId(EntityOffset to) const {
   if (to >= fragment->num_parsed_tokens) {
-    return kInvalidEntityId;
-  }
-
-  const auto &reader = fragment->reader;
-  auto ti = reader.getParsedTokenOffsetToIndex()[to];
-  if (ti >= fragment->num_tokens) {
     assert(false);
     return kInvalidEntityId;
   }
@@ -377,7 +323,7 @@ EntityId ReadParsedTokensFromFragment::NthParsedTokenId(EntityOffset to) const {
   ParsedTokenId id;
   id.fragment_id = fragment->fragment_id;
   id.offset = to;
-  id.kind = static_cast<TokenKind>(reader.getTokenKinds()[ti]);
+  id.kind = static_cast<TokenKind>(fragment->reader.getTokenKinds()[to]);
   return id;
 }
 
@@ -385,34 +331,22 @@ EntityId ReadParsedTokensFromFragment::NthParsedTokenId(EntityOffset to) const {
 EntityId ReadParsedTokensFromFragment::NthContainingMacroId(
     EntityOffset to) const {
   if (to >= fragment->num_parsed_tokens) {
-    return kInvalidEntityId;
-  }
-
-  const auto &reader = fragment->reader;
-  auto ti = reader.getParsedTokenOffsetToIndex()[to];
-  if (ti >= fragment->num_tokens) {
     assert(false);
     return kInvalidEntityId;
   }
 
-  return reader.getMacroTokenIndexToMacroId()[ti];
+  return fragment->reader.getMacroTokenIndexToMacroId()[to];
 }
 
 // Return an entity id associated with the Nth token.
 EntityId ReadParsedTokensFromFragment::NthRelatedEntityId(
     EntityOffset to) const {
   if (to >= fragment->num_parsed_tokens) {
-    return kInvalidEntityId;
-  }
-
-  const auto &reader = fragment->reader;
-  auto ti = reader.getParsedTokenOffsetToIndex()[to];
-  if (ti >= fragment->num_tokens) {
     assert(false);
     return kInvalidEntityId;
   }
 
-  return reader.getRelatedEntityId()[ti];
+  return fragment->reader.getRelatedEntityId()[to];
 }
 
 // Return the id of the Nth token.
@@ -422,28 +356,20 @@ EntityId ReadParsedTokensFromFragment::NthTokenId(EntityOffset to) const {
     return kInvalidEntityId;
   }
 
-  const auto &reader = fragment->reader;
-  auto ti = reader.getParsedTokenOffsetToIndex()[to];
-  if (ti >= fragment->num_tokens) {
-    assert(false);
-    return kInvalidEntityId;
-  }
-
   ParsedTokenId id;
   id.fragment_id = fragment->fragment_id;
   id.offset = to;
-  id.kind = static_cast<TokenKind>(reader.getTokenKinds()[ti]);
+  id.kind = static_cast<TokenKind>(fragment->reader.getTokenKinds()[to]);
   return id;
 }
 
 EntityId ReadParsedTokensFromFragment::NthFileTokenId(EntityOffset to) const {
   if (to >= fragment->num_parsed_tokens) {
     assert(false);
-    return {};
+    return kInvalidEntityId;
   }
 
-  auto ti = fragment->reader.getParsedTokenOffsetToIndex()[to];
-  return this->ReadMacroTokensFromFragment::NthFileTokenId(ti);
+  return this->ReadMacroTokensFromFragment::NthFileTokenId(to);
 }
 
 // Returns `true` if `this` is logically equivalent to `that`.

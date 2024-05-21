@@ -7,6 +7,7 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/NamespaceDecl.h>
+#include "../Reference.h"
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/NamedDecl.h>
 #include <multiplier/AST/Stmt.h>
@@ -219,42 +220,26 @@ std::optional<NamespaceDecl> NamespaceDecl::from(const TokenContext &t) {
   return std::nullopt;
 }
 
-std::optional<NamespaceDecl> NamespaceDecl::anonymous_namespace(void) const {
-  if (true) {
-    RawEntityId eid = impl->reader.getVal56();
-    if (eid == kInvalidEntityId) {
-      return std::nullopt;
-    }
-    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return NamespaceDecl::from_base(std::move(eptr));
-    }
-  }
-  return std::nullopt;
-}
-
-NamespaceDecl NamespaceDecl::original_namespace(void) const {
-  RawEntityId eid = impl->reader.getVal57();
-  return NamespaceDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
-}
-
 Token NamespaceDecl::r_brace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal58());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
 }
 
 bool NamespaceDecl::is_anonymous_namespace(void) const {
-  return impl->reader.getVal75();
+  return impl->reader.getVal63();
 }
 
 bool NamespaceDecl::is_inline(void) const {
-  return impl->reader.getVal76();
+  return impl->reader.getVal64();
 }
 
 bool NamespaceDecl::is_nested(void) const {
-  return impl->reader.getVal77();
+  return impl->reader.getVal65();
 }
 
-bool NamespaceDecl::is_original_namespace(void) const {
-  return impl->reader.getVal78();
+gap::generator<Decl> NamespaceDecl::contained_declarations(void) const & {
+  return BuiltinDeclReferences<Decl>(
+      impl->ep, id().Pack(), BuiltinReferenceKind::CONTAINS,
+      EntityProvider::kReferenceFrom, false  /* redecls */);
 }
 
 #pragma GCC diagnostic pop

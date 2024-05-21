@@ -206,7 +206,7 @@ std::optional<StringLiteral> PredefinedExpr::function_name(void) const {
 }
 
 PredefinedIdentKind PredefinedExpr::identifier_kind(void) const {
-  return static_cast<PredefinedIdentKind>(impl->reader.getVal91());
+  return static_cast<PredefinedIdentKind>(impl->reader.getVal89());
 }
 
 std::string_view PredefinedExpr::identifier_kind_name(void) const {

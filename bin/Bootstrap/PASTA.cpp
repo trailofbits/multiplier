@@ -112,13 +112,6 @@ static const std::unordered_set<std::string> gUnserializableTypes{
   "TranslationUnitDecl",
 };
 
-// These are replicated into fragments.
-static const std::unordered_set<std::string> gSpecialDeclContexts{
-  "NamespaceDecl",
-  "ExternCContextDecl",
-  "LinkageSpecDecl",
-};
-
 static const std::unordered_set<std::string> gFragmentEntityTypes{
 #define FRAG_ENT_TYPE(type_name, lower_name) #type_name ,
   FOR_EACH_ENTITY_CATEGORY(FRAG_ENT_TYPE)
@@ -256,6 +249,17 @@ static const std::unordered_set<std::string> kDeclContextTypes{
   "TranslationUnitDecl",
 };
 
+// These are replicated into fragments.
+//
+// NOTE(pag): Make sure to keep up-to-date with `bin/Index/Util.cpp` function
+//            `ShouldInternalizeDeclContextIntoFragment`.
+static const std::unordered_set<std::string> gSpecialDeclContexts{
+  "NamespaceDecl",
+  "ExternCContextDecl",
+  "LinkageSpecDecl",
+  "ExportDecl",
+};
+
 static const std::unordered_set<std::string> gConcreteClassNames{
   "Token",
   "TokenRange",
@@ -299,6 +303,13 @@ static const std::unordered_set<std::string> gEntityClassNames{
 // to check the conditions that would be asserted, and if those conditions
 // aren't satisfied, then return `std::nullopt`.
 static std::set<std::pair<std::string, std::string>> kMethodBlackList{
+
+  // We have `::Tokens()`, so we don't need these redundancies.
+  {"Stmt", "BeginToken"},
+  {"Stmt", "EndToken"},
+  {"Decl", "BeginToken"},
+  {"Decl", "EndToken"},
+
   {"Expr", "ClassifyLValue"},  // Calls `clang::Expr::ClassifyImpl`.
   {"Expr", "IsBoundMemberFunction"},  // Calls `clang::Expr::ClassifyImpl`.
   {"Expr", "IsModifiableLvalue"},  // Calls `clang::Expr::ClassifyImpl`.
@@ -321,7 +332,15 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"Decl", "NextDeclarationInContext"},
   {"Decl", "HasDefiningAttribute"},  // Already have `Decl::DefiningAttribute`.
 
-  {"Decl", "Redeclarations"},  // Implement it ourselves.
+  // We have more derived versions of these
+  {"Decl", "DescribedTemplate"},
+  {"Decl", "DescribedTemplateParameters"},
+
+  // Implement it ourselves.
+  {"Decl", "Redeclarations"},
+  {"Decl", "ParentFunctionOrMethod"},
+
+  // These make no sense on a whole-program scope
   {"Decl", "MostRecentDeclaration"},
   {"NamedDecl", "MostRecentDeclaration"},
   {"VarTemplateDecl", "MostRecentDeclaration"},
@@ -340,6 +359,9 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"EnumDecl", "PreviousDeclaration"},
   {"RecordDecl", "PreviousDeclaration"},
   {"RecordDecl", "FirstNamedDataMember"},
+  {"NamespaceDecl", "OriginalNamespace"},
+  {"NamespaceDecl", "IsOriginalNamespace"},
+  {"NamespaceDecl", "AnonymousNamespace"},
 
   // We hoist forward declarations embedded in declarators out into their own
   // freestanding fragments that aren't associated with files, and so the return
@@ -348,6 +370,7 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
 
   // These are redundant.
   {"FunctionDecl", "ParameterDeclarations"},
+  {"DeclRefExpr", "FoundDeclaration"},
 
   // These can crash?
   {"Expr", "BestDynamicClassType"},
@@ -355,6 +378,8 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
 
   // These are odd.
   {"CXXRecordDecl", "IsParsingBaseSpecifiers"},
+  {"DeclRefExpr", "HasTemplateKeywordAndArgumentsInfo"},
+  {"DeclRefExpr", "HasTemplateKeyword"},
 
   // These have assertions related to FIXME comments, and so we don't want them.
   {"CXXRecordDecl", "MostRecentNonInjectedDeclaration"},
@@ -691,6 +716,15 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"Decl", "IsCanonicalDeclaration"},
   {"Decl", "IsFirstDeclaration"},
   {"Decl", "IdentifierNamespace"},
+  {"Decl", "IsInLocalScopeForInstantiation"},
+  {"Decl", "ShouldSkipCheckingODR"},
+  {"Decl", "HasAttributes"},
+  {"Decl", "HasBody"},
+  {"Decl", "HasOwningModule"},
+  {"Decl", "HasTagIdentifierNamespace"},
+  {"Decl", "IsDefinedOutsideFunctionOrMethod"},
+  {"Decl", "IsDiscardedInGlobalModuleFragment"},
+  {"Decl", "IsFunctionPointerType"},
 
   {"MemberPointerType", "MostRecentCXXRecordDeclaration"},
   {"Expr", "Dependence"},
@@ -704,15 +738,21 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"Decl", "Access"},
   {"Expr","IsKnownToHaveBooleanValue"},
 
-  {"NamespaceDecl","AlreadyLoadedDeclarations"},
-  {"LinkageSpecDecl","AlreadyLoadedDeclarations"},
-  {"ExternCContextDecl","AlreadyLoadedDeclarations"},
+  {"Decl","AlreadyLoadedDeclarations"},
+  {"Decl","DeclarationsInContext"},
 
   {"EnumDecl", "ODRHash"},
   {"CXXRecordDecl", "ODRHash"},
   {"FunctionDecl", "ODRHash"},
   {"CXXRecordDecl", "VisibleConversionFunctions"},
   {"FunctionDecl", "WillHaveBody"},
+
+  // These will be discovered dynamically. This is because methods on class
+  // template specializations might not actually have bodies.
+  {"CXXRecordDecl", "Methods"},
+
+  // We provide a custom and configurable way of computing this.
+  {"NamedDecl", "QualifiedNameAsString"},
 
   // These will apply to functions, enums, classes, etc.
   {"Decl", "TypeAsWritten"},
@@ -733,6 +773,8 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"FunctionDecl", "InstantiatedFromMemberFunction"},
   {"FunctionDecl", "IsThisDeclarationInstantiatedFromAFriendDefinition"},
   {"VarDecl", "InstantiatedFromStaticDataMember"},
+
+  {"TemplateArgument", "PackElements"}
 
   // Add stuff here to avoid waiting for PASTA bootstrap, and also add it into
   // PASTA's nullptr checking stuff.
@@ -1080,7 +1122,7 @@ static std::optional<std::string> GetFirstTemplateParameterType(
   if (record) {
     if (auto cspec = pasta::ClassTemplateSpecializationDecl::From(*record)) {
       for (pasta::TemplateArgument arg : cspec->TemplateArguments()) {
-        if (auto arg_type = arg.AsType()) {
+        if (auto arg_type = arg.Type()) {
           if (auto arg_record = arg_type->AsTagDeclaration()) {
             return arg_record->Name();
           } else if (auto itype = CxxIntType(*arg_type)) {
@@ -1098,7 +1140,7 @@ static std::optional<pasta::RecordDecl> GetTemplateParameterRecord(
   if (record) {
     if (auto cspec = pasta::ClassTemplateSpecializationDecl::From(*record)) {
       for (pasta::TemplateArgument arg : cspec->TemplateArguments()) {
-        if (auto arg_type = arg.AsType()) {
+        if (auto arg_type = arg.Type()) {
           return arg_type->AsRecordDeclaration();
         }
       }
@@ -2143,7 +2185,7 @@ MethodListPtr CodeGenerator::RunOnClass(
   } else if (is_macro) {
     if (class_name == "Macro") {
       needed_decls.insert("MacroKind");
-      class_os << "using MacroOrToken = std::variant<Macro, Token>;\n";
+      class_os << "using PreprocessedEntity = std::variant<Macro, Token, Fragment>;\n";
     }
 
     serialize_cpp_os
@@ -3189,6 +3231,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 
   auto methods = cls->record.Methods();
   assert(methods);
+
   for (pasta::CXXMethodDecl method : *methods) {
     if (dont_serialize) {
       continue;
@@ -3300,16 +3343,15 @@ MethodListPtr CodeGenerator::RunOnClass(
             << getter_name << "());\n"
             << "}\n\n";
 
-        serialize_cpp_os
-            << "  auto et" << i << " = es.EntityId(e." << method_name << "());\n";
-
         // For builtin declarations, we sometimes need to go looking for the
         // token, because it never existed in any parsed representation.
         if (class_name == "Decl" && method_name == "Token") {
           serialize_cpp_os
-              << "  if (!et" << i << ") {\n"
-              << "    et" << i << " = pf.DeclTokenEntityId(e);\n"
-              << "  }\n";
+              << "  auto et" << i << " = pf.DeclTokenEntityId(e);\n";
+        } else {
+          serialize_cpp_os
+              << "  auto et" << i << " = es.EntityId(e." << method_name << "());\n";
+
         }
 
         serialize_cpp_os
@@ -3349,7 +3391,7 @@ MethodListPtr CodeGenerator::RunOnClass(
       } else if (record_name == "MacroRange") {
         const auto i = storage.AddMethod("List(UInt64)");  // Reference list.
         auto [getter_name, setter_name, init_name] = NamesFor(i);
-        auto cxx_element_name = "MacroOrToken";
+        auto cxx_element_name = "PreprocessedEntity";
 
         serialize_inc_os
               << "  MX_VISIT_MACRO_RANGE(" << class_name << ", "
@@ -3371,6 +3413,8 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "      co_yield std::move(std::get<Macro>(e));\n"
             << "    } else if (std::holds_alternative<Token>(e)) {\n"
             << "      co_yield std::move(std::get<Token>(e));\n"
+            << "    } else if (std::holds_alternative<Fragment>(e)) {\n"
+            << "      co_yield std::move(std::get<Fragment>(e));\n"
             << "    } else {\n"
             << "      assert(false);\n"
             << "    }\n"
@@ -3440,10 +3484,14 @@ MethodListPtr CodeGenerator::RunOnClass(
 
         const auto i = storage.AddMethod("Text");
         auto [getter_name, setter_name, init_name] = NamesFor(i);
+        auto meth_or_func = "MX_APPLY_METHOD";
+        if (class_name == "NamedDecl" && method_name == "Name") {
+          meth_or_func = "MX_APPLY_FUNC";
+        }
 
         serialize_inc_os
             << "  MX_VISIT_TEXT(" << class_name << ", " << api_name
-            << ", " << i << ", MX_APPLY_METHOD, " << method_name << ", "
+            << ", " << i << ", " << meth_or_func << ", " << method_name << ", "
             << record_name << ", " << nth_entity_reader << ")\n";
 
         class_os
@@ -3457,8 +3505,13 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "  return std::string_view(data.cStr(), data.size());\n"
             << "}\n\n";
 
-        serialize_cpp_os
-            << "  b." << setter_name << "(e." << method_name << "());\n";
+        if (!strcmp(meth_or_func, "MX_APPLY_METHOD")) {
+          serialize_cpp_os
+              << "  b." << setter_name << "(e." << method_name << "());\n";
+        } else {
+          serialize_cpp_os
+              << "  b." << setter_name << "(" << method_name << "(e));\n";
+        }
 
       // Handle `std::string_view`. Cap'n Proto requires that `:Text` fields
       // are `NUL`-terminated, so we convert the string view into a
@@ -3581,9 +3634,15 @@ MethodListPtr CodeGenerator::RunOnClass(
           abort();
         }
 
+        // Work around this method returning only the pattern info for definitions.
+        auto meth_or_func = "MX_APPLY_METHOD";
+        if ((class_name == "FunctionDecl" && api_name == "TemplateInstantiationPattern")) {
+          meth_or_func = "MX_APPLY_FUNC";
+        }
+
         serialize_inc_os
             << "  MX_VISIT_ENTITY(" << class_name << ", " << api_name
-            << ", " << i << ", MX_APPLY_METHOD, " << method_name << ", "
+            << ", " << i << ", " << meth_or_func << ", " << method_name << ", "
             << record_name << ", " << nth_entity_reader << ")\n";
 
         lib_cpp_os
@@ -3677,64 +3736,78 @@ MethodListPtr CodeGenerator::RunOnClass(
     }
   }
 
+  // Allow the blacklist to recursively when a method name isn't actually in
+  // a base class, but is in many derived classes, and we just want to wipe
+  // out all of those derived class methods.
+  for (const auto &[reject_class_name, reject_method_name] : kMethodBlackList) {
+    if (reject_class_name == "Type" && reject_method_name == "PointeeType") {
+      continue;
+    } else if (reject_class_name == class_name) {
+      std::string snake_name = CapitalCaseToSnakeCase(reject_method_name);
+      std::string api_name = SnakeCaseToAPICase(snake_name);
+      (void) seen_methods->emplace(api_name);
+    }
+  }
+
   // If this is a `DeclContext`, then try to add the `DeclarationsInContext`
   // method.
-  if (kDeclContextTypes.count(class_name) &&
-      !gSpecialDeclContexts.count(class_name)) {
-    static const std::string method_name = "DeclarationsInContext";
-    static const std::string snake_name = "declarations_in_context";
+  if (kDeclContextTypes.count(class_name)) {
+    needs_reference = true;
+
+    static const std::string snake_name = "contained_declarations";
     static const std::string api_name = SnakeCaseToAPICase(snake_name);
     if (seen_methods->emplace(api_name).second) {
 
       const auto i = storage.AddMethod("List(UInt64)");
       auto [getter_name, setter_name, init_name] = NamesFor(i);
 
-//      static const std::string camel_name = "declarationsInContext";
-
-      serialize_inc_os
-          << "  MX_VISIT_DECL_CONTEXT(" << class_name << ", " << api_name
-          << ", " << i << ", MX_APPLY_FUNC, DeclarationsInDeclContext, Decl, "
-          << nth_entity_reader << ")\n";
+      // NOTE(pag): This method is implemented in terms of a dynamic lookup of
+      //            but we still have this here so that `BuildPendingFragment`
+      //            goes and discovers more stuff to serialize.
+      if (!gSpecialDeclContexts.count(class_name)) {
+        serialize_inc_os
+            << "  MX_VISIT_DECL_CONTEXT(" << class_name << ", " << api_name
+            << ", " << i << ", MX_APPLY_FUNC, DeclarationsInDeclContext, Decl, "
+            << nth_entity_reader << ")\n";
+      }
 
       class_os
-          << "  gap::generator<Decl> " << api_name << "(void) const &;\n";
+          << "  gap::generator<Decl> contained_declarations(void) const &;\n";
 
       lib_cpp_os
           << "gap::generator<Decl> "
           << class_name << "::" << api_name
           << "(void) const & {\n"
-          << "  EntityProviderPtr ep = impl->ep;\n"
-          << "  auto list = impl->reader." << getter_name << "();\n"
-          << "  for (auto v : list) {\n"
-          << "    if (auto eptr = ep->DeclFor(ep, v)) {\n"
-          << "      co_yield std::move(eptr);\n"
-          << "    }\n"
-          << "  }\n"
+          << "  return BuiltinDeclReferences<Decl>(\n"
+          << "      impl->ep, id().Pack(), BuiltinReferenceKind::CONTAINS,\n"
+          << "      EntityProvider::kReferenceFrom, false  /* redecls */);\n"
           << "}\n\n";
-
-      serialize_cpp_os
-          << "  pasta::DeclContext dc" << i << "(e);\n"
-          << "  auto v" << i << " = DeclarationsInDeclContext(dc" << i << ");\n"
-          << "  auto sv" << i << " = b." << init_name << "(static_cast<unsigned>(v"
-          << i << ".size()));\n"
-          << "  auto i" << i << " = 0u;\n"
-          << "  for (const pasta::Decl &e" << i << " : v" << i << ") {\n"
-          << "    sv" << i << ".set(i" << i << ", es.EntityId(e" << i << "));\n"
-          << "    ++i" << i << ";\n"
-          << "  }\n";
     }
   }
 
   // Additional special methods for specific derived classes go here
+  if (class_name == "NamedDecl") {
+    forward_decls.insert("QualifiedNameRenderOptions");
+    seen_methods->emplace("qualified_name");
+    class_os
+        << "  // Compute a qualified name for this declaration.\n"
+        << "  TokenRange qualified_name(const QualifiedNameRenderOptions &options) const;\n";
+  }
 
   if (class_name == "CXXRecordDecl") {
+    seen_methods->emplace("derived_classes");
+    seen_methods->emplace("base_classes");
+    seen_methods->emplace("methods");
     class_os
         << "  // List of base and derived classes.\n"
         << "  gap::generator<CXXRecordDecl> derived_classes(void) const &;\n"
-        << "  gap::generator<CXXRecordDecl> base_classes(void) const &;\n";
+        << "  gap::generator<CXXRecordDecl> base_classes(void) const &;\n"
+        << "  gap::generator<CXXMethodDecl> methods(void) const &;\n";
   }
 
   if (class_name == "CXXMethodDecl") {
+    seen_methods->emplace("overridden_by_methods");
+    seen_methods->emplace("transitive_overridden_by_methods");
     class_os
         << "  // List of methods that can override this method.\n"
         << "  gap::generator<CXXMethodDecl> overridden_by_methods(void) const &;\n"
@@ -3743,6 +3816,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 
   // `FunctionDecl::callers`.
   if (class_name == "FunctionDecl") {
+    seen_methods->emplace("callers");
     class_os
         << "  // Callers of a `FunctionDecl` can be `CallExpr`, `CxxNewExpr`,\n"
         << "  // `CxxConstructExpr`, etc. Even `CastExpr` can sometimes be a call\n"
@@ -3754,6 +3828,8 @@ MethodListPtr CodeGenerator::RunOnClass(
   if (class_name == "CallExpr") {
     forward_decls.insert("Type");
     forward_decls.insert("CastExpr");
+    seen_methods->emplace("casted_return_type");
+    seen_methods->emplace("casted_return_value");
     class_os
         << "  std::optional<Type> casted_return_type(void) const;\n"
         << "  std::optional<CastExpr> casted_return_value(void) const;\n";
@@ -4160,11 +4236,14 @@ void CodeGenerator::RunOnClassHierarchies(void) {
         << "#include <multiplier/" << dir_name << '/' << name << ".h>\n";
 
     if (needs_reference) {
-      fs << "#include <multiplier/Reference.h>\n";
+      fs << "#include \"../Reference.h\"\n";
     }
 
     auto needs_fragment = is_root;
     for (const std::string &other_name : forward_decls) {
+      if (other_name == "QualifiedNameRenderOptions") {
+        continue;
+      }
       if (other_name == "TokenRange") {
         needs_fragment = true;
       } else if (name != other_name && !other_name.ends_with("Impl")) {

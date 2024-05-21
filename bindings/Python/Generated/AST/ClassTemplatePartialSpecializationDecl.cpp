@@ -148,7 +148,7 @@ static PyGetSetDef gProperties[] = {
     "redeclarations",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
+          return ::mx::generator_to_python(*T_cast(self), &T::redeclarations);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ClassTemplatePartialSpecializationDecl::redeclarations"),
@@ -162,26 +162,6 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ClassTemplatePartialSpecializationDecl::injected_specialization_type"),
-    nullptr,
-  },
-  {
-    "instantiated_from_member",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->instantiated_from_member());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ClassTemplatePartialSpecializationDecl::instantiated_from_member"),
-    nullptr,
-  },
-  {
-    "instantiated_from_member_template",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->instantiated_from_member_template());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ClassTemplatePartialSpecializationDecl::instantiated_from_member_template"),
     nullptr,
   },
   {

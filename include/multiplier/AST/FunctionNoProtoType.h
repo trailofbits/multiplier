@@ -48,7 +48,6 @@ class MX_EXPORT FunctionNoProtoType : public FunctionType {
   static std::optional<FunctionNoProtoType> from(const VariantEntity &e);
   static std::optional<FunctionNoProtoType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   bool is_sugared(void) const;
 };
 

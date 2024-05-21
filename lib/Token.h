@@ -213,6 +213,11 @@ class CustomTokenReader final : public TokenReader {
   virtual ~CustomTokenReader(void) noexcept;
 
   // Append a token into this reader.
+  inline void Append(Token tok) noexcept {
+    Append(std::move(tok.impl), tok.offset);
+  }
+
+  // Append a token into this reader.
   void Append(TokenImplPtr reader, EntityOffset offset) noexcept;
 
   // Append a simple token into this reader.

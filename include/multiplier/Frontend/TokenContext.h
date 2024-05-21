@@ -43,9 +43,6 @@ class MX_EXPORT TokenContext {
   // Offset of this token context's parent within the fragment.
   std::optional<unsigned> parent_offset;
 
-  // Offset of this context's alias within the fragment.
-  std::optional<unsigned> alias_offset;
-
   // Entity to which this token context refers. In general, this belongs to
   // the current fragment, but in rare instances it may not.
   RawEntityId referenced_entity_id{kInvalidEntityId};
@@ -77,10 +74,6 @@ class MX_EXPORT TokenContext {
     return parent_offset.has_value();
   }
 
-  inline bool is_alias(void) const noexcept {
-    return alias_offset.has_value();
-  }
-
   // NOTE(pag): This is sort of an internal API, though it makes it convenient
   //            to identify token contexts.
   inline unsigned index_in_fragment(void) const noexcept {
@@ -99,9 +92,6 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_FORWARD_DECLARE_GETTER
-
-  // Return the aliased context, if any.
-  std::optional<TokenContext> aliasee(void) const;
 
   // Return the parent context, if any.
   std::optional<TokenContext> parent(void) const;

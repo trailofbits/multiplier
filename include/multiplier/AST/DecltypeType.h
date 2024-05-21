@@ -47,7 +47,6 @@ class MX_EXPORT DecltypeType : public Type {
   static std::optional<DecltypeType> from(const VariantEntity &e);
   static std::optional<DecltypeType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   Expr underlying_expression(void) const;
   Type underlying_type(void) const;
   bool is_sugared(void) const;

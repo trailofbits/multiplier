@@ -15,6 +15,7 @@ namespace mx {
 
 class FileLocationCache;
 class ProxyTokenTreeVisitor;
+class QualifiedNameRenderOptions;
 class UserToken;
 
 namespace {
@@ -2266,7 +2267,6 @@ static LoaderFunc * const gHighLevelLoaders[] = {
   PythonBinding<mx::ir::hl::TypeDeclOp>::load,
   PythonBinding<mx::ir::hl::TypeDefOp>::load,
   PythonBinding<mx::ir::hl::TypeOfExprOp>::load,
-  PythonBinding<mx::ir::hl::TypeOfTypeOp>::load,
   PythonBinding<mx::ir::hl::UnionDeclOp>::load,
   PythonBinding<mx::ir::hl::UnreachableOp>::load,
   PythonBinding<mx::ir::hl::VAArgExprOp>::load,
@@ -2567,6 +2567,13 @@ PyMODINIT_FUNC PyInit_multiplier(void) {
   // Doesn't have any methods, so no schema is made for it. We manually inject
   // this so that we can handle `Token::location`.
   if (!mx::PythonBinding<mx::FileLocationCache>::load(frontendm)) {
+    Py_DECREF(m);
+    return nullptr;
+  }
+
+  // Doesn't have any methods, so no schema is made fo rit. We manually inject
+  // this so that we can handle `NamedDecl::qualified_name`.
+  if (!mx::PythonBinding<mx::QualifiedNameRenderOptions>::load(astm)) {
     Py_DECREF(m);
     return nullptr;
   }

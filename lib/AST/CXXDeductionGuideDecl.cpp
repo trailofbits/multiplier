@@ -7,6 +7,7 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/CXXDeductionGuideDecl.h>
+#include "../Reference.h"
 #include <multiplier/AST/CXXConstructorDecl.h>
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/DeclaratorDecl.h>
@@ -226,7 +227,7 @@ std::optional<CXXDeductionGuideDecl> CXXDeductionGuideDecl::from(const TokenCont
 
 std::optional<CXXConstructorDecl> CXXDeductionGuideDecl::corresponding_constructor(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal164();
+    RawEntityId eid = impl->reader.getVal148();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -238,16 +239,16 @@ std::optional<CXXConstructorDecl> CXXDeductionGuideDecl::corresponding_construct
 }
 
 TemplateDecl CXXDeductionGuideDecl::deduced_template(void) const {
-  RawEntityId eid = impl->reader.getVal165();
+  RawEntityId eid = impl->reader.getVal149();
   return TemplateDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 DeductionCandidate CXXDeductionGuideDecl::deduction_candidate_kind(void) const {
-  return static_cast<DeductionCandidate>(impl->reader.getVal166());
+  return static_cast<DeductionCandidate>(impl->reader.getVal150());
 }
 
 bool CXXDeductionGuideDecl::is_explicit(void) const {
-  return impl->reader.getVal168();
+  return impl->reader.getVal152();
 }
 
 #pragma GCC diagnostic pop

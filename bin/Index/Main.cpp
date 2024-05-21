@@ -48,8 +48,6 @@ DEFINE_int32(num_indexer_workers, -1, "Number of worker threads to use for paral
 
 DEFINE_int32(num_command_workers, -1, "Number of worker threads to use for parallel command interpretation jobs.");
 
-DEFINE_bool(cxx_support, false, "Try to index C++ code.");
-
 // Should we show progress bars when indexing?
 DEFINE_bool(show_progress, false, "Show indexing progress bars?");
 
@@ -168,7 +166,6 @@ int main(int argc, char *argv[], char *envp[]) {
      << " [--env PATH_TO_COPIED_ENV_VARS]\n"
      << " [--show_progress]\n"
      << " [--generate_sourceir]\n"
-     << " [--cxx_support]\n"
      << " --db DATABASE\n"
      << " --workspace INDEXER_WORKSPACE_DIR\n"
      << " --target COMPILE_COMMANDS\n";
@@ -296,7 +293,7 @@ int main(int argc, char *argv[], char *envp[]) {
   // commands, albeit slightly modified, so that we can get the compiler to
   // tell us about include search paths, etc. The result of this is that
   // indexing actions are enqueued into the `executor`.
-  importer.Import(command_exe_options, FLAGS_cxx_support);
+  importer.Import(command_exe_options);
 
   // Start the executor, so that we can start processing the indexing actions.
   // Wait for all actions to complete.

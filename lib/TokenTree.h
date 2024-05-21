@@ -137,7 +137,7 @@ class TokenTreeImpl {
       SequenceNode *seq, TokenIndex fti, const Bounds &bounds);
 
   SequenceNode *ExtendWithMacroChild(
-      SequenceNode *seq, const MacroOrToken &mt,
+      SequenceNode *seq, const PreprocessedEntity &mt,
       const Bounds &bounds, const TrailingTokens &trailing_tokens);
 
   SequenceNode *ExtendWithMacroChildren(
@@ -146,6 +146,10 @@ class TokenTreeImpl {
 
   SequenceNode *ExtendWithMacro(
       SequenceNode *seq, const Macro &macro, const Bounds &bounds,
+      const TrailingTokens &trailing_toks);
+
+  SequenceNode *ExtendWithFragment(
+      SequenceNode *seq, const Fragment &frag, const Bounds &bounds,
       const TrailingTokens &trailing_toks);
 
   SequenceNode *ExtendWithSubstitution(
@@ -169,7 +173,7 @@ class TokenTreeImpl {
 
   TokenTreeImpl::SequenceNode *ProcessMacroChildren(
       TokenTreeImpl::SequenceNode *, const Bounds &bounds,
-      std::vector<MacroOrToken> mts, std::vector<Token> fts,
+      std::vector<PreprocessedEntity> mts, std::vector<Token> fts,
       const TrailingTokens &trailing_toks);
 
   Node CreateFragmentNode(const Fragment &entity, const Bounds &bounds);

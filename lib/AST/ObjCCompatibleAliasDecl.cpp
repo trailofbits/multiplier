@@ -221,7 +221,7 @@ std::optional<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::from(const Token
 }
 
 ObjCInterfaceDecl ObjCCompatibleAliasDecl::class_interface(void) const {
-  RawEntityId eid = impl->reader.getVal56();
+  RawEntityId eid = impl->reader.getVal45();
   return ObjCInterfaceDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 

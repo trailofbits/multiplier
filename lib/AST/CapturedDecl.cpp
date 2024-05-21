@@ -7,6 +7,7 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/CapturedDecl.h>
+#include "../Reference.h"
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/ImplicitParamDecl.h>
 #include <multiplier/AST/Stmt.h>
@@ -220,20 +221,20 @@ std::optional<CapturedDecl> CapturedDecl::from(const TokenContext &t) {
 }
 
 ImplicitParamDecl CapturedDecl::context_parameter(void) const {
-  RawEntityId eid = impl->reader.getVal49();
+  RawEntityId eid = impl->reader.getVal38();
   return ImplicitParamDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 bool CapturedDecl::is_nothrow(void) const {
-  return impl->reader.getVal50();
+  return impl->reader.getVal39();
 }
 
 unsigned CapturedDecl::num_parameters(void) const {
-  return impl->reader.getVal51().size();
+  return impl->reader.getVal40().size();
 }
 
 std::optional<ImplicitParamDecl> CapturedDecl::nth_parameter(unsigned n) const {
-  auto list = impl->reader.getVal51();
+  auto list = impl->reader.getVal40();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -247,12 +248,12 @@ std::optional<ImplicitParamDecl> CapturedDecl::nth_parameter(unsigned n) const {
 }
 
 gap::generator<ImplicitParamDecl> CapturedDecl::parameters(void) const & {
-  auto list = impl->reader.getVal51();
+  auto list = impl->reader.getVal40();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d51 = ep->DeclFor(ep, v)) {
-      if (auto e = ImplicitParamDecl::from_base(std::move(d51))) {
+    if (auto d40 = ep->DeclFor(ep, v)) {
+      if (auto e = ImplicitParamDecl::from_base(std::move(d40))) {
         co_yield std::move(*e);
       }
     }
@@ -260,14 +261,10 @@ gap::generator<ImplicitParamDecl> CapturedDecl::parameters(void) const & {
   co_return;
 }
 
-gap::generator<Decl> CapturedDecl::declarations_in_context(void) const & {
-  EntityProviderPtr ep = impl->ep;
-  auto list = impl->reader.getVal52();
-  for (auto v : list) {
-    if (auto eptr = ep->DeclFor(ep, v)) {
-      co_yield std::move(eptr);
-    }
-  }
+gap::generator<Decl> CapturedDecl::contained_declarations(void) const & {
+  return BuiltinDeclReferences<Decl>(
+      impl->ep, id().Pack(), BuiltinReferenceKind::CONTAINS,
+      EntityProvider::kReferenceFrom, false  /* redecls */);
 }
 
 #pragma GCC diagnostic pop

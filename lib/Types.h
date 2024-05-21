@@ -23,11 +23,10 @@ static constexpr RawEntityId kMinEntityIdIncrement = 1ull;
 //            bound on the number of tokens, we're really using the number of
 //            tokens as a proxy for estimating the size (of anything, e.g.
 //            all AST nodes) that need to fit in the fragment.
-static constexpr unsigned kBigFragmentIdNumBits = 16u;
+static constexpr unsigned kBigFragmentIdNumBits = 20u;
 static constexpr RawEntityId kMaxBigFragmentId = 1ull << kBigFragmentIdNumBits;
 
-static constexpr uint64_t kNumTokensInBigFragment =
-    (1ull << kBigFragmentIdNumBits) / 6u  /* fudge factor */;
+static constexpr uint64_t kNumTokensInBigFragment = 16000u;
 
 static constexpr unsigned kFileIdNumBits = 20u;
 static constexpr RawEntityId kMaxFileId = 1ull << kFileIdNumBits;

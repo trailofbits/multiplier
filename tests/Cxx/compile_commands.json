@@ -81,7 +81,7 @@
 },
 {
     "file": "NestedTemplate.cpp",
-    "command": "/usr/bin/c++ std=c++20 NestedTemplate.cpp",
+    "command": "/usr/bin/c++ -std=c++20 NestedTemplate.cpp",
     "directory": ""
 },
 {
@@ -112,11 +112,6 @@
 {
     "file": "MixingMethodBounds.cpp",
     "command": "/usr/bin/c++ -std=c++20 MixingMethodBounds.cpp",
-    "directory": ""
-},
-{
-    "file": "EvilNamespaceNesting.cpp",
-    "command": "/usr/bin/c++ EvilNamespaceNesting.cpp",
     "directory": ""
 },
 {
@@ -182,6 +177,41 @@
 {
     "file": "ExplicitInstantiationDefinitionMethod.cpp",
     "command": "/usr/bin/c++ ExplicitInstantiationDefinitionMethod.cpp",
+    "directory": ""
+},
+{
+    "file": "LambdaInRequiresClause.cpp",
+    "command": "/usr/bin/c++ -std=c++20 LambdaInRequiresClause.cpp",
+    "directory": ""
+},
+{
+    "file": "WasmModuleBuilder.cpp",
+    "command": "/usr/bin/c++ -std=c++20 WasmModuleBuilder.cpp",
+    "directory": ""
+},
+{
+    "file": "AutoDeduce.cpp",
+    "command": "/usr/bin/c++ -std=c++20 AutoDeduce.cpp",
+    "directory": ""
+},
+{
+    "file": "OMPKinds.cpp",
+    "command": "/usr/bin/c++ -std=c++20 OMPKinds.cpp",
+    "directory": ""
+},
+{
+    "file": "ArgumentPack.cpp",
+    "command": "/usr/bin/c++ -std=c++20 ArgumentPack.cpp",
+    "directory": ""
+},
+{
+    "file": "AbslInlineData.cpp",
+    "command": "/usr/bin/c++ -std=c++20 AbslInlineData.cpp",
+    "directory": ""
+},
+{
+    "file": "LambdaInConstructorInClassInFunction.cpp",
+    "command": "/usr/bin/c++ -std=c++20 LambdaInConstructorInClassInFunction.cpp",
     "directory": ""
 }
 ]

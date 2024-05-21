@@ -100,22 +100,17 @@ std::optional<VectorType> VectorType::from(const TokenContext &t) {
   return std::nullopt;
 }
 
-Type VectorType::desugar(void) const {
+Type VectorType::element_type(void) const {
   RawEntityId eid = impl->reader.getVal19();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
-Type VectorType::element_type(void) const {
-  RawEntityId eid = impl->reader.getVal20();
-  return Type(impl->ep->TypeFor(impl->ep, eid));
-}
-
 VectorKind VectorType::vector_kind(void) const {
-  return static_cast<VectorKind>(impl->reader.getVal28());
+  return static_cast<VectorKind>(impl->reader.getVal27());
 }
 
 bool VectorType::is_sugared(void) const {
-  return impl->reader.getVal21();
+  return impl->reader.getVal20();
 }
 
 #pragma GCC diagnostic pop

@@ -85,7 +85,7 @@ class MX_EXPORT BrOp final : public Operation {
 
   // Imported methods:
   //::mlir::Operation::operand_range operands(void) const;
-  //::mlir::Block* dest(void) const;
+  //::mlir::Block * dest(void) const;
 };
 static_assert(sizeof(BrOp) == sizeof(Operation));
 
@@ -121,8 +121,8 @@ class MX_EXPORT CondBrOp final : public Operation {
   ::mx::ir::Value cond(void) const;
   //::mlir::Operation::operand_range true_operands(void) const;
   //::mlir::Operation::operand_range false_operands(void) const;
-  //::mlir::Block* true_dest(void) const;
-  //::mlir::Block* false_dest(void) const;
+  //::mlir::Block * true_dest(void) const;
+  //::mlir::Block * false_dest(void) const;
 };
 static_assert(sizeof(CondBrOp) == sizeof(Operation));
 
@@ -140,7 +140,7 @@ class MX_EXPORT CondScopeRetOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value cond(void) const;
   //::mlir::Operation::operand_range dest_operands(void) const;
-  //::mlir::Block* dest(void) const;
+  //::mlir::Block * dest(void) const;
 };
 static_assert(sizeof(CondScopeRetOp) == sizeof(Operation));
 
@@ -194,7 +194,7 @@ class MX_EXPORT InlineScopeOp final : public Operation {
   ::vast::ll::InlineScope underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Region body(void) const;
+  //::mlir::Region & body(void) const;
 };
 static_assert(sizeof(InlineScopeOp) == sizeof(Operation));
 
@@ -227,7 +227,7 @@ class MX_EXPORT FuncOp final : public Operation {
   ::vast::ll::FuncOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Region body(void) const;
+  //::mlir::Region & body(void) const;
   std::string_view sym_name(void) const;
   //::vast::core::FunctionType function_type(void) const;
   //::vast::core::GlobalLinkageKind linkage(void) const;
@@ -235,7 +235,7 @@ class MX_EXPORT FuncOp final : public Operation {
   //::std::optional<ArrayAttr> arg_attrs(void) const;
   //::std::optional<ArrayAttr> res_attrs(void) const;
   bool is_var_arg(void) const;
-  //::mlir::Region* callable_region(void) const;
+  //::mlir::Region * callable_region(void) const;
   //llvm::ArrayRef<Type> callable_results(void) const;
   //::mlir::ArrayAttr callable_arg_attrs(void) const;
   //::mlir::ArrayAttr callable_res_attrs(void) const;
@@ -292,8 +292,8 @@ class MX_EXPORT ScopeOp final : public Operation {
   ::vast::ll::Scope underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Region body(void) const;
-  //mlir::Block* start__block(void) const;
+  //::mlir::Region & body(void) const;
+  //mlir::Block * start__block(void) const;
 };
 static_assert(sizeof(ScopeOp) == sizeof(Operation));
 

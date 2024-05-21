@@ -139,6 +139,11 @@ enum class BuiltinReferenceKind : int {
   //            to the `to`. Ditto for variable and functions. This, however,
   //            doesn't fit well with specializations of members.
   SPECIALIZES,
+
+  // A relation used to implement `*::contained_declarations`. `A` is a
+  // declaration, e.g. a variable declaration, in the body of a function `B`,
+  // then we say that `B` contains `A`.
+  CONTAINS,
 };
 
 inline static const char *EnumerationName(BuiltinReferenceKind) {
@@ -148,7 +153,7 @@ inline static const char *EnumerationName(BuiltinReferenceKind) {
 MX_EXPORT const char *EnumeratorName(BuiltinReferenceKind);
 
 inline static constexpr unsigned NumEnumerators(BuiltinReferenceKind) {
-  return 16;
+  return 17;
 }
 
 class MX_EXPORT ReferenceKind {

@@ -133,16 +133,6 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "is_alias",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_alias());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TokenContext::is_alias"),
-    nullptr,
-  },
-  {
     "index_in_fragment",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -250,16 +240,6 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::TokenContext::as_cxx_ctor_initializer"),
-    nullptr,
-  },
-  {
-    "aliasee",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->aliasee());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::TokenContext::aliasee"),
     nullptr,
   },
   {

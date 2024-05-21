@@ -172,7 +172,7 @@ static PyGetSetDef gProperties[] = {
     "redeclarations",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
+          return ::mx::generator_to_python(*T_cast(self), &T::redeclarations);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::VarDecl::redeclarations"),
@@ -239,16 +239,6 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "point_of_instantiation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->point_of_instantiation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::VarDecl::point_of_instantiation"),
-    nullptr,
-  },
-  {
     "storage_class",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -286,36 +276,6 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::VarDecl::tsc_spec"),
-    nullptr,
-  },
-  {
-    "template_instantiation_pattern",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->template_instantiation_pattern());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::VarDecl::template_instantiation_pattern"),
-    nullptr,
-  },
-  {
-    "template_specialization_kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->template_specialization_kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::VarDecl::template_specialization_kind"),
-    nullptr,
-  },
-  {
-    "template_specialization_kind_for_instantiation",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->template_specialization_kind_for_instantiation());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::VarDecl::template_specialization_kind_for_instantiation"),
     nullptr,
   },
   {

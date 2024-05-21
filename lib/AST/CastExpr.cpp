@@ -226,7 +226,7 @@ bool CastExpr::changes_volatile_qualification(void) const {
 }
 
 CastKind CastExpr::cast_kind(void) const {
-  return static_cast<CastKind>(impl->reader.getVal91());
+  return static_cast<CastKind>(impl->reader.getVal89());
 }
 
 std::string_view CastExpr::cast_kind_name(void) const {

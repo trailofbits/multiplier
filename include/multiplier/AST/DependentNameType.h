@@ -48,7 +48,6 @@ class MX_EXPORT DependentNameType : public TypeWithKeyword {
   static std::optional<DependentNameType> from(const VariantEntity &e);
   static std::optional<DependentNameType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   bool is_sugared(void) const;
 };
 

@@ -148,7 +148,7 @@ static PyGetSetDef gProperties[] = {
     "redeclarations",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
+          return ::mx::generator_to_python(*T_cast(self), &T::redeclarations);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::EnumDecl::redeclarations"),
@@ -168,7 +168,7 @@ static PyGetSetDef gProperties[] = {
     "enumerators",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->enumerators());
+          return ::mx::generator_to_python(*T_cast(self), &T::enumerators);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::EnumDecl::enumerators"),
@@ -202,26 +202,6 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::EnumDecl::promotion_type"),
-    nullptr,
-  },
-  {
-    "template_instantiation_pattern",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->template_instantiation_pattern());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::EnumDecl::template_instantiation_pattern"),
-    nullptr,
-  },
-  {
-    "template_specialization_kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->template_specialization_kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::EnumDecl::template_specialization_kind"),
     nullptr,
   },
   {

@@ -53,7 +53,7 @@ class MX_EXPORT MacroSubstitution : public Macro {
   static std::optional<MacroSubstitution> from(const VariantEntity &e);
   static std::optional<MacroSubstitution> from(const TokenContext &t);
 
-  gap::generator<MacroOrToken> replacement_children(void) const &;
+  gap::generator<PreprocessedEntity> replacement_children(void) const &;
   Token first_fully_substituted_token(void) const;
   Token last_fully_substituted_token(void) const;
   Token name_or_operator(void) const;

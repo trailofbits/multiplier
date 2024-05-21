@@ -151,7 +151,7 @@ std::optional<MacroSubstitution> MacroSubstitution::from(const TokenContext &t) 
   return std::nullopt;
 }
 
-gap::generator<MacroOrToken> MacroSubstitution::replacement_children(void) const & {
+gap::generator<PreprocessedEntity> MacroSubstitution::replacement_children(void) const & {
   Index index(impl->ep);
   auto list = impl->reader.getVal4();
   for (auto v : list) {
@@ -160,6 +160,8 @@ gap::generator<MacroOrToken> MacroSubstitution::replacement_children(void) const
       co_yield std::move(std::get<Macro>(e));
     } else if (std::holds_alternative<Token>(e)) {
       co_yield std::move(std::get<Token>(e));
+    } else if (std::holds_alternative<Fragment>(e)) {
+      co_yield std::move(std::get<Fragment>(e));
     } else {
       assert(false);
     }

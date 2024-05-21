@@ -58,6 +58,9 @@ void GlobalIndexingState::InitializeProgressBars(void) {
   fragment_progress.reset(new ProgressBar("Fragment serialization",
                                           report_freq));
 
+  nested_fragment_progress.reset(new ProgressBar("Nested fragment serialization",
+                                                 report_freq));
+
   type_progress.reset(new ProgressBar("Type serialization",
                                       report_freq));
 

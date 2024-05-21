@@ -185,7 +185,7 @@ struct MangledNameRecord {
   static constexpr const char *kExitStatements[] = {nullptr};
 
   static constexpr const char *kInsertStatement =
-      R"(INSERT INTO mangled_name (entity_id, data)
+      R"(INSERT OR REPLACE INTO mangled_name (entity_id, data)
          VALUES (?1, ?2))";
 
   // A `DeclId` or a `MacroId`.
@@ -282,7 +282,8 @@ struct ReferenceRecord {
                  (12, "EXPANSION_OF"),
                  (13, "EXTENDS"),
                  (14, "OVERRIDES"),
-                 (15, "SPECIALIZES")
+                 (15, "SPECIALIZES"),
+                 (16, "CONTAINS")
           )"};
 
   static constexpr const char *kExitStatements[] = {nullptr};
@@ -364,13 +365,43 @@ struct FragmentRecord {
             fragment_id INTEGER PRIMARY KEY,
             data BLOB NOT NULL
           ) WITHOUT ROWID)",
-
        nullptr};
 
-  static constexpr const char *kExitStatements[] = {nullptr};
+  static constexpr const char *kExitStatements[] =
+      {nullptr};
 
   static constexpr const char *kInsertStatement =
       "INSERT OR IGNORE INTO fragment (fragment_id, data) VALUES (?1, ?2)";
+
+  RawEntityId id;
+  std::string data;
+};
+
+// A replacement fragment exists to take the place of a pre-existing fragment,
+// e.g. if we see a method on a class template specialization in one TU, and it
+// is not used, and therefore has no substituted body, then we want this to be
+// replaced by "the same" fragment in another TU, but where that method is used,
+// and whose body is subject to substitution.
+struct ReplacementFragmentRecord {
+  static constexpr const char *kTableName = "replacement_fragment";
+
+  static constexpr const char *kInitStatements[] =
+      {R"(CREATE TABLE IF NOT EXISTS replacement_fragment (
+            fragment_id INTEGER PRIMARY KEY,
+            data BLOB NOT NULL
+          ) WITHOUT ROWID)",
+
+       nullptr};
+
+  static constexpr const char *kExitStatements[] =
+      {R"(INSERT OR REPLACE INTO fragment (fragment_id, data)
+          SELECT fragment_id, data FROM replacement_fragment)",
+
+       R"(DELETE FROM replacement_fragment)",
+       nullptr};
+
+  static constexpr const char *kInsertStatement =
+      "INSERT OR IGNORE INTO replacement_fragment (fragment_id, data) VALUES (?1, ?2)";
 
   RawEntityId id;
   std::string data;
@@ -501,6 +532,7 @@ class DatabaseWriter final {
 
   MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_DECLARE_ADD_RECORD)
   MX_FOR_EACH_ENTITY_RECORD_TYPE(MX_DECLARE_ADD_RECORD)
+  MX_DECLARE_ADD_RECORD(ReplacementFragmentRecord)
 #undef MX_DECLARE_ADD_RECORD
 
   template <typename T1, typename T2, typename... Ts>

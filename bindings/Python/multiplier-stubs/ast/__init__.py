@@ -5683,11 +5683,13 @@ class TemplateArgument(multiplier.Entity):
   is_instantiation_dependent: bool
   contains_unexpanded_parameter_pack: bool
   is_pack_expansion: bool
-  as_declaration: Optional[multiplier.ast.ValueDecl]
-  as_type: Optional[multiplier.ast.Type]
+  declaration: Optional[multiplier.ast.ValueDecl]
+  type: Optional[multiplier.ast.Type]
   parameter_type_for_declaration: Optional[multiplier.ast.Type]
   null_pointer_type: Optional[multiplier.ast.Type]
-  pack_elements: Optional[Sequence[multiplier.ast.TemplateArgument]]
+  expression: Optional[multiplier.ast.Expr]
+  num_pack_arguments: int
+  pack_arguments: Iterable[multiplier.ast.TemplateArgument]
 
   @staticmethod
   def static_category() -> multiplier.EntityCategory:
@@ -5716,6 +5718,9 @@ class TemplateArgument(multiplier.Entity):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.TemplateArgument]:
+    ...
+
+  def nth_pack_argument(self, n: int) -> Optional[multiplier.ast.TemplateArgument]:
     ...
 
 class Attr(multiplier.Entity):
@@ -30650,7 +30655,6 @@ class Type(multiplier.Entity):
     ...
 
 class TemplateTypeParmType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   declaration: Optional[multiplier.ast.TemplateTypeParmDecl]
   is_parameter_pack: bool
   is_sugared: bool
@@ -30704,7 +30708,6 @@ class TemplateTypeParmType(multiplier.ast.Type):
     ...
 
 class TemplateSpecializationType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   aliased_type: Optional[multiplier.ast.Type]
   is_current_instantiation: bool
   is_sugared: bool
@@ -30812,7 +30815,6 @@ class TagType(multiplier.ast.Type):
     ...
 
 class RecordType(multiplier.ast.TagType):
-  desugar: multiplier.ast.Type
   has_const_fields: bool
   is_sugared: bool
 
@@ -30865,7 +30867,6 @@ class RecordType(multiplier.ast.TagType):
     ...
 
 class EnumType(multiplier.ast.TagType):
-  desugar: multiplier.ast.Type
   is_sugared: bool
 
   @staticmethod
@@ -30917,7 +30918,6 @@ class EnumType(multiplier.ast.TagType):
     ...
 
 class SubstTemplateTypeParmType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   associated_declaration: multiplier.ast.Decl
   pack_index: Optional[int]
   replaced_parameter: multiplier.ast.TemplateTypeParmDecl
@@ -30973,7 +30973,6 @@ class SubstTemplateTypeParmType(multiplier.ast.Type):
     ...
 
 class SubstTemplateTypeParmPackType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   associated_declaration: multiplier.ast.Decl
   final: bool
   replaced_parameter: multiplier.ast.TemplateTypeParmDecl
@@ -31078,7 +31077,6 @@ class ReferenceType(multiplier.ast.Type):
     ...
 
 class RValueReferenceType(multiplier.ast.ReferenceType):
-  desugar: multiplier.ast.Type
   is_sugared: bool
 
   @staticmethod
@@ -31130,7 +31128,6 @@ class RValueReferenceType(multiplier.ast.ReferenceType):
     ...
 
 class LValueReferenceType(multiplier.ast.ReferenceType):
-  desugar: multiplier.ast.Type
   is_sugared: bool
 
   @staticmethod
@@ -31268,7 +31265,6 @@ class QualifiedType(multiplier.ast.Type):
     ...
 
 class PointerType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   pointee_type: multiplier.ast.Type
   is_sugared: bool
 
@@ -31321,7 +31317,6 @@ class PointerType(multiplier.ast.Type):
     ...
 
 class PipeType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   element_type: multiplier.ast.Type
   is_read_only: bool
   is_sugared: bool
@@ -31375,7 +31370,6 @@ class PipeType(multiplier.ast.Type):
     ...
 
 class ParenType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   inner_type: multiplier.ast.Type
   is_sugared: bool
 
@@ -31428,7 +31422,6 @@ class ParenType(multiplier.ast.Type):
     ...
 
 class PackExpansionType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   pattern: multiplier.ast.Type
   is_sugared: bool
 
@@ -31481,7 +31474,6 @@ class PackExpansionType(multiplier.ast.Type):
     ...
 
 class ObjCTypeParamType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   declaration: multiplier.ast.ObjCTypeParamDecl
   is_sugared: bool
 
@@ -31534,7 +31526,6 @@ class ObjCTypeParamType(multiplier.ast.Type):
     ...
 
 class ObjCObjectType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   base_type: multiplier.ast.Type
   interface: multiplier.ast.ObjCInterfaceDecl
   super_class_type: Optional[multiplier.ast.Type]
@@ -31660,7 +31651,6 @@ class ObjCInterfaceType(multiplier.ast.ObjCObjectType):
     ...
 
 class ObjCObjectPointerType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   interface_declaration: multiplier.ast.ObjCInterfaceDecl
   interface_type: multiplier.ast.ObjCInterfaceType
   object_type: multiplier.ast.ObjCObjectType
@@ -31740,7 +31730,6 @@ class ObjCObjectPointerType(multiplier.ast.Type):
     ...
 
 class MemberPointerType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   class_: multiplier.ast.Type
   pointee_type: multiplier.ast.Type
   is_member_data_pointer: bool
@@ -31796,7 +31785,6 @@ class MemberPointerType(multiplier.ast.Type):
     ...
 
 class MatrixType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   element_type: multiplier.ast.Type
   is_sugared: bool
 
@@ -31948,7 +31936,6 @@ class ConstantMatrixType(multiplier.ast.MatrixType):
     ...
 
 class MacroQualifiedType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   modified_type: multiplier.ast.Type
   underlying_type: multiplier.ast.Type
   is_sugared: bool
@@ -32002,7 +31989,6 @@ class MacroQualifiedType(multiplier.ast.Type):
     ...
 
 class InjectedClassNameType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   declaration: multiplier.ast.CXXRecordDecl
   injected_specialization_type: multiplier.ast.Type
   injected_tst: multiplier.ast.TemplateSpecializationType
@@ -32113,7 +32099,6 @@ class FunctionType(multiplier.ast.Type):
 
 class FunctionProtoType(multiplier.ast.FunctionType):
   can_throw: Optional[multiplier.ast.CanThrowResult]
-  desugar: multiplier.ast.Type
   ellipsis_token: multiplier.frontend.Token
   exception_spec_declaration: Optional[multiplier.ast.FunctionDecl]
   exception_spec_template: Optional[multiplier.ast.FunctionDecl]
@@ -32191,7 +32176,6 @@ class FunctionProtoType(multiplier.ast.FunctionType):
     ...
 
 class FunctionNoProtoType(multiplier.ast.FunctionType):
-  desugar: multiplier.ast.Type
   is_sugared: bool
 
   @staticmethod
@@ -32243,7 +32227,6 @@ class FunctionNoProtoType(multiplier.ast.FunctionType):
     ...
 
 class DependentVectorType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   attribute_token: multiplier.frontend.Token
   element_type: multiplier.ast.Type
   size_expression: multiplier.ast.Expr
@@ -32299,7 +32282,6 @@ class DependentVectorType(multiplier.ast.Type):
     ...
 
 class DependentSizedExtVectorType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   attribute_token: multiplier.frontend.Token
   element_type: multiplier.ast.Type
   size_expression: multiplier.ast.Expr
@@ -32354,7 +32336,6 @@ class DependentSizedExtVectorType(multiplier.ast.Type):
     ...
 
 class DependentBitIntType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   num_bits_expression: multiplier.ast.Expr
   is_signed: bool
   is_sugared: bool
@@ -32409,7 +32390,6 @@ class DependentBitIntType(multiplier.ast.Type):
     ...
 
 class DependentAddressSpaceType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   address_space_expression: multiplier.ast.Expr
   attribute_token: multiplier.frontend.Token
   pointee_type: multiplier.ast.Type
@@ -32464,7 +32444,6 @@ class DependentAddressSpaceType(multiplier.ast.Type):
     ...
 
 class DeducedType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   resolved_type: Optional[multiplier.ast.Type]
   is_deduced: bool
   is_sugared: bool
@@ -32624,7 +32603,6 @@ class AutoType(multiplier.ast.DeducedType):
     ...
 
 class DecltypeType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   underlying_expression: multiplier.ast.Expr
   underlying_type: multiplier.ast.Type
   is_sugared: bool
@@ -32678,7 +32656,6 @@ class DecltypeType(multiplier.ast.Type):
     ...
 
 class ComplexType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   element_type: multiplier.ast.Type
   is_sugared: bool
 
@@ -32731,7 +32708,6 @@ class ComplexType(multiplier.ast.Type):
     ...
 
 class BuiltinType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   builtin_kind: multiplier.ast.BuiltinTypeKind
   is_floating_point: bool
   is_integer: bool
@@ -32790,7 +32766,6 @@ class BuiltinType(multiplier.ast.Type):
     ...
 
 class BlockPointerType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   pointee_type: multiplier.ast.Type
   is_sugared: bool
 
@@ -32843,7 +32818,6 @@ class BlockPointerType(multiplier.ast.Type):
     ...
 
 class BitIntType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   is_signed: bool
   is_sugared: bool
   is_unsigned: bool
@@ -32897,7 +32871,6 @@ class BitIntType(multiplier.ast.Type):
     ...
 
 class BTFTagAttributedType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   attribute: multiplier.ast.BTFTypeTagAttr
   wrapped_type: multiplier.ast.Type
   is_sugared: bool
@@ -32951,7 +32924,6 @@ class BTFTagAttributedType(multiplier.ast.Type):
     ...
 
 class AttributedType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   attribute: Optional[multiplier.ast.Attr]
   attribute_kind: multiplier.ast.AttrKind
   equivalent_type: multiplier.ast.Type
@@ -33013,7 +32985,6 @@ class AttributedType(multiplier.ast.Type):
     ...
 
 class AtomicType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   value_type: multiplier.ast.Type
   is_sugared: bool
 
@@ -33114,7 +33085,6 @@ class ArrayType(multiplier.ast.Type):
     ...
 
 class VariableArrayType(multiplier.ast.ArrayType):
-  desugar: multiplier.ast.Type
   brackets_range: multiplier.frontend.TokenRange
   l_bracket_token: multiplier.frontend.Token
   r_bracket_token: multiplier.frontend.Token
@@ -33170,7 +33140,6 @@ class VariableArrayType(multiplier.ast.ArrayType):
     ...
 
 class IncompleteArrayType(multiplier.ast.ArrayType):
-  desugar: multiplier.ast.Type
   is_sugared: bool
 
   @staticmethod
@@ -33222,7 +33191,6 @@ class IncompleteArrayType(multiplier.ast.ArrayType):
     ...
 
 class DependentSizedArrayType(multiplier.ast.ArrayType):
-  desugar: multiplier.ast.Type
   brackets_range: multiplier.frontend.TokenRange
   l_bracket_token: multiplier.frontend.Token
   r_bracket_token: multiplier.frontend.Token
@@ -33278,7 +33246,6 @@ class DependentSizedArrayType(multiplier.ast.ArrayType):
     ...
 
 class ConstantArrayType(multiplier.ast.ArrayType):
-  desugar: multiplier.ast.Type
   size_expression: Optional[multiplier.ast.Expr]
   is_sugared: bool
 
@@ -33331,7 +33298,6 @@ class ConstantArrayType(multiplier.ast.ArrayType):
     ...
 
 class AdjustedType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   resolved_type: multiplier.ast.Type
   original_type: multiplier.ast.Type
   is_sugared: bool
@@ -33483,7 +33449,6 @@ class TypeWithKeyword(multiplier.ast.Type):
     ...
 
 class ElaboratedType(multiplier.ast.TypeWithKeyword):
-  desugar: multiplier.ast.Type
   named_type: multiplier.ast.Type
   owned_tag_declaration: Optional[multiplier.ast.TagDecl]
   is_sugared: bool
@@ -33537,7 +33502,6 @@ class ElaboratedType(multiplier.ast.TypeWithKeyword):
     ...
 
 class DependentTemplateSpecializationType(multiplier.ast.TypeWithKeyword):
-  desugar: multiplier.ast.Type
   is_sugared: bool
   num_template_arguments: int
   template_arguments: Iterable[multiplier.ast.TemplateArgument]
@@ -33594,7 +33558,6 @@ class DependentTemplateSpecializationType(multiplier.ast.TypeWithKeyword):
     ...
 
 class DependentNameType(multiplier.ast.TypeWithKeyword):
-  desugar: multiplier.ast.Type
   is_sugared: bool
 
   @staticmethod
@@ -33646,7 +33609,6 @@ class DependentNameType(multiplier.ast.TypeWithKeyword):
     ...
 
 class VectorType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   element_type: multiplier.ast.Type
   vector_kind: multiplier.ast.VectorKind
   is_sugared: bool
@@ -33750,7 +33712,6 @@ class ExtVectorType(multiplier.ast.VectorType):
     ...
 
 class UsingType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   found_declaration: multiplier.ast.UsingShadowDecl
   underlying_type: multiplier.ast.Type
   is_sugared: bool
@@ -33805,7 +33766,6 @@ class UsingType(multiplier.ast.Type):
     ...
 
 class UnresolvedUsingType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   declaration: multiplier.ast.UnresolvedUsingTypenameDecl
   is_sugared: bool
 
@@ -33858,7 +33818,6 @@ class UnresolvedUsingType(multiplier.ast.Type):
     ...
 
 class UnaryTransformType(multiplier.ast.Type):
-  desugar: Optional[multiplier.ast.Type]
   base_type: Optional[multiplier.ast.Type]
   utt_kind: multiplier.ast.UnaryTransformTypeUTTKind
   underlying_type: Optional[multiplier.ast.Type]
@@ -33913,7 +33872,6 @@ class UnaryTransformType(multiplier.ast.Type):
     ...
 
 class TypedefType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   declaration: multiplier.ast.TypedefNameDecl
   is_sugared: bool
   type_matches_declaration: bool
@@ -33967,7 +33925,6 @@ class TypedefType(multiplier.ast.Type):
     ...
 
 class TypeOfType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   type_kind: multiplier.ast.TypeOfKind
   unmodified_type: multiplier.ast.Type
   is_sugared: bool
@@ -34021,7 +33978,6 @@ class TypeOfType(multiplier.ast.Type):
     ...
 
 class TypeOfExprType(multiplier.ast.Type):
-  desugar: multiplier.ast.Type
   type_kind: multiplier.ast.TypeOfKind
   underlying_expression: multiplier.ast.Expr
   is_sugared: bool
@@ -44503,7 +44459,7 @@ class Expr(multiplier.ast.ValueStmt):
   ignore_parenthesis_casts: multiplier.ast.Expr
   ignore_parenthesis_implicit_casts: multiplier.ast.Expr
   ignore_parenthesis_l_value_casts: multiplier.ast.Expr
-  ignore_parenthesis_noop_casts: multiplier.ast.Expr
+  ignore_parenthesis_noop_casts: Optional[multiplier.ast.Expr]
   ignore_parentheses: multiplier.ast.Expr
   ignore_unless_spelled_in_source: multiplier.ast.Expr
   contains_errors: bool
@@ -45000,15 +44956,12 @@ class DependentCoawaitExpr(multiplier.ast.Expr):
 
 class DeclRefExpr(multiplier.ast.Expr):
   declaration: multiplier.ast.ValueDecl
-  found_declaration: multiplier.ast.NamedDecl
   l_angle_token: multiplier.frontend.Token
   r_angle_token: multiplier.frontend.Token
   template_keyword_token: multiplier.frontend.Token
   had_multiple_candidates: bool
   has_explicit_template_arguments: bool
   has_qualifier: bool
-  has_template_keyword_and_arguments_info: bool
-  has_template_keyword: bool
   is_captured_by_copy_in_lambda_with_explicit_object_parameter: bool
   is_immediate_escalating: bool
   is_non_odr_use: multiplier.ast.NonOdrUseReason
@@ -47493,7 +47446,7 @@ class UserDefinedLiteral(multiplier.ast.CallExpr):
 class CXXUuidofExpr(multiplier.ast.Expr):
   expression_operand: Optional[multiplier.ast.Expr]
   guid_declaration: multiplier.ast.MSGuidDecl
-  type_operand: multiplier.ast.Type
+  type_operand: Optional[multiplier.ast.Type]
   type_operand_source_info: multiplier.ast.Type
   is_type_operand: bool
 
@@ -47684,8 +47637,8 @@ class CXXUnresolvedConstructExpr(multiplier.ast.Expr):
 
 class CXXTypeidExpr(multiplier.ast.Expr):
   expression_operand: Optional[multiplier.ast.Expr]
-  type_operand: multiplier.ast.Type
-  type_operand_source_info: multiplier.ast.Type
+  type_operand: Optional[multiplier.ast.Type]
+  type_operand_source_info: Optional[multiplier.ast.Type]
   is_most_derived: Optional[bool]
   is_potentially_evaluated: bool
   is_type_operand: bool
@@ -48242,7 +48195,7 @@ class CXXRewrittenBinaryOperator(multiplier.ast.Expr):
 class CXXPseudoDestructorExpr(multiplier.ast.Expr):
   base: multiplier.ast.Expr
   colon_colon_token: multiplier.frontend.Token
-  destroyed_type: multiplier.ast.Type
+  destroyed_type: Optional[multiplier.ast.Type]
   destroyed_type_token: multiplier.frontend.Token
   operator_token: multiplier.frontend.Token
   tilde_token: multiplier.frontend.Token
@@ -57419,27 +57372,18 @@ class Decl(multiplier.Entity):
   attributes: Iterable[multiplier.ast.Attr]
   availability: multiplier.ast.AvailabilityResult
   defining_attribute: Optional[multiplier.ast.Attr]
-  described_template: Optional[multiplier.ast.TemplateDecl]
-  described_template_parameters: Optional[multiplier.ast.TemplateParameterList]
   external_source_symbol_attribute: Optional[multiplier.ast.ExternalSourceSymbolAttr]
   friend_object_kind: multiplier.ast.DeclFriendObjectKind
   max_alignment: Optional[int]
   module_ownership_kind: multiplier.ast.DeclModuleOwnershipKind
   non_closure_context: Optional[multiplier.ast.Decl]
-  has_attributes: bool
-  has_owning_module: bool
-  has_tag_identifier_namespace: bool
-  is_defined_outside_function_or_method: bool
   is_deprecated: bool
-  is_discarded_in_global_module_fragment: bool
   is_file_context_declaration: bool
   is_function_or_function_template: bool
-  is_function_pointer_type: bool
   is_implicit: bool
   is_in_anonymous_namespace: bool
   is_in_another_module_unit: bool
   is_in_export_declaration_context: bool
-  is_in_local_scope_for_instantiation: Optional[bool]
   is_in_std_namespace: bool
   is_invisible_outside_the_owning_module: bool
   is_local_extern_declaration: bool
@@ -57454,7 +57398,6 @@ class Decl(multiplier.Entity):
   is_unavailable: bool
   is_unconditionally_visible: bool
   is_weak_imported: bool
-  should_skip_checking_odr: bool
   kind: multiplier.ast.DeclKind
   category: multiplier.ast.DeclCategory
   token: multiplier.frontend.Token
@@ -57574,7 +57517,7 @@ class CapturedDecl(multiplier.ast.Decl):
   is_nothrow: bool
   num_parameters: int
   parameters: Iterable[multiplier.ast.ImplicitParamDecl]
-  declarations_in_context: Iterable[multiplier.ast.Decl]
+  contained_declarations: Iterable[multiplier.ast.Decl]
 
   @overload
   @staticmethod
@@ -57685,7 +57628,7 @@ class BlockDecl(multiplier.ast.Decl):
   parameters: Iterable[multiplier.ast.ParmVarDecl]
   num_parameter_declarations: int
   parameter_declarations: Iterable[multiplier.ast.ParmVarDecl]
-  declarations_in_context: Iterable[multiplier.ast.Decl]
+  contained_declarations: Iterable[multiplier.ast.Decl]
 
   @overload
   @staticmethod
@@ -58252,7 +58195,7 @@ class TranslationUnitDecl(multiplier.ast.Decl):
   canonical_declaration: multiplier.ast.TranslationUnitDecl
   definition: Optional[multiplier.ast.TranslationUnitDecl]
   redeclarations: Iterable[multiplier.ast.TranslationUnitDecl]
-  declarations_in_context: Iterable[multiplier.ast.Decl]
+  contained_declarations: Iterable[multiplier.ast.Decl]
 
   @overload
   @staticmethod
@@ -58535,7 +58478,7 @@ class RequiresExprBodyDecl(multiplier.ast.Decl):
   canonical_declaration: multiplier.ast.RequiresExprBodyDecl
   definition: Optional[multiplier.ast.RequiresExprBodyDecl]
   redeclarations: Iterable[multiplier.ast.RequiresExprBodyDecl]
-  declarations_in_context: Iterable[multiplier.ast.Decl]
+  contained_declarations: Iterable[multiplier.ast.Decl]
 
   @overload
   @staticmethod
@@ -58920,7 +58863,6 @@ class NamedDecl(multiplier.ast.Decl):
   formal_linkage: multiplier.ast.Linkage
   name: str
   obj_cf_string_formatting_family: Optional[multiplier.ast.ObjCStringFormatFamily]
-  qualified_name_as_string: str
   underlying_declaration: multiplier.ast.NamedDecl
   visibility: Optional[multiplier.ast.Visibility]
   has_external_formal_linkage: bool
@@ -59013,6 +58955,9 @@ class NamedDecl(multiplier.ast.Decl):
 
   @staticmethod
   def from_base(parent: multiplier.ast.Decl) -> Optional[multiplier.ast.NamedDecl]:
+    ...
+
+  def qualified_name(self, options: multiplier.ast.QualifiedNameRenderOptions) -> multiplier.frontend.TokenRange:
     ...
 
 class LabelDecl(multiplier.ast.NamedDecl):
@@ -59875,7 +59820,7 @@ class OMPDeclareReductionDecl(multiplier.ast.ValueDecl):
   initializer_private: multiplier.ast.Expr
   initializer: multiplier.ast.Expr
   initializer_kind: multiplier.ast.OMPDeclareReductionInitKind
-  declarations_in_context: Iterable[multiplier.ast.Decl]
+  contained_declarations: Iterable[multiplier.ast.Decl]
 
   @overload
   @staticmethod
@@ -60352,14 +60297,10 @@ class VarDecl(multiplier.ast.DeclaratorDecl):
   initializer_style: multiplier.ast.VarDeclInitializationStyle
   initializing_declaration: Optional[multiplier.ast.VarDecl]
   language_linkage: multiplier.ast.LanguageLinkage
-  point_of_instantiation: multiplier.frontend.Token
   storage_class: multiplier.ast.StorageClass
   storage_duration: multiplier.ast.StorageDuration
   tls_kind: multiplier.ast.VarDeclTLSKind
   tsc_spec: multiplier.ast.ThreadStorageClassSpecifier
-  template_instantiation_pattern: Optional[multiplier.ast.VarDecl]
-  template_specialization_kind: multiplier.ast.TemplateSpecializationKind
-  template_specialization_kind_for_instantiation: multiplier.ast.TemplateSpecializationKind
   has_constant_initialization: bool
   has_dependent_alignment: bool
   has_external_storage: bool
@@ -60878,10 +60819,7 @@ class VarTemplateSpecializationDecl(multiplier.ast.VarDecl):
   specialized_template: multiplier.ast.VarTemplateDecl
   num_template_arguments: int
   template_arguments: Iterable[multiplier.ast.TemplateArgument]
-  num_template_instantiation_arguments: int
-  template_instantiation_arguments: Iterable[multiplier.ast.TemplateArgument]
   template_keyword_token: multiplier.frontend.Token
-  type_as_written: Optional[multiplier.ast.Type]
   is_class_scope_explicit_specialization: bool
   is_explicit_instantiation_or_specialization: bool
   is_explicit_specialization: bool
@@ -60976,14 +60914,10 @@ class VarTemplateSpecializationDecl(multiplier.ast.VarDecl):
   def nth_template_argument(self, n: int) -> Optional[multiplier.ast.TemplateArgument]:
     ...
 
-  def nth_template_instantiation_argument(self, n: int) -> Optional[multiplier.ast.TemplateArgument]:
-    ...
-
 class VarTemplatePartialSpecializationDecl(multiplier.ast.VarTemplateSpecializationDecl):
   canonical_declaration: multiplier.ast.VarTemplatePartialSpecializationDecl
   definition: Optional[multiplier.ast.VarTemplatePartialSpecializationDecl]
   redeclarations: Iterable[multiplier.ast.VarTemplatePartialSpecializationDecl]
-  instantiated_from_member: Optional[multiplier.ast.VarTemplatePartialSpecializationDecl]
   template_parameters: multiplier.ast.TemplateParameterList
   has_associated_constraints: bool
 
@@ -61294,13 +61228,8 @@ class FunctionDecl(multiplier.ast.DeclaratorDecl):
   multi_version_kind: multiplier.ast.MultiVersionKind
   overloaded_operator: multiplier.ast.OverloadedOperatorKind
   parameters_tokens: multiplier.frontend.TokenRange
-  point_of_instantiation: multiplier.frontend.Token
-  primary_template: Optional[multiplier.ast.FunctionTemplateDecl]
   return_type: multiplier.ast.Type
   storage_class: multiplier.ast.StorageClass
-  template_instantiation_pattern: Optional[multiplier.ast.FunctionDecl]
-  template_specialization_kind: multiplier.ast.TemplateSpecializationKind
-  template_specialization_kind_for_instantiation: multiplier.ast.TemplateSpecializationKind
   templated_kind: multiplier.ast.FunctionDeclTemplatedKind
   has_cxx_explicit_function_object_parameter: bool
   has_implicit_return_zero: bool
@@ -61359,7 +61288,9 @@ class FunctionDecl(multiplier.ast.DeclaratorDecl):
   parameters: Iterable[multiplier.ast.ParmVarDecl]
   uses_seh_try: bool
   body: Optional[multiplier.ast.Stmt]
-  declarations_in_context: Iterable[multiplier.ast.Decl]
+  num_template_arguments: int
+  template_arguments: Iterable[multiplier.ast.TemplateArgument]
+  contained_declarations: Iterable[multiplier.ast.Decl]
   callers: Iterable[multiplier.ast.Stmt]
 
   @overload
@@ -61450,6 +61381,9 @@ class FunctionDecl(multiplier.ast.DeclaratorDecl):
     ...
 
   def nth_parameter(self, n: int) -> Optional[multiplier.ast.ParmVarDecl]:
+    ...
+
+  def nth_template_argument(self, n: int) -> Optional[multiplier.ast.TemplateArgument]:
     ...
 
 class CXXMethodDecl(multiplier.ast.FunctionDecl):
@@ -62437,7 +62371,7 @@ class OMPDeclareMapperDecl(multiplier.ast.OMPDeclarativeDirectiveValueDecl):
   definition: Optional[multiplier.ast.OMPDeclareMapperDecl]
   redeclarations: Iterable[multiplier.ast.OMPDeclareMapperDecl]
   mapper_variable_reference: multiplier.ast.Expr
-  declarations_in_context: Iterable[multiplier.ast.Decl]
+  contained_declarations: Iterable[multiplier.ast.Decl]
 
   @overload
   @staticmethod
@@ -63219,7 +63153,7 @@ class TagDecl(multiplier.ast.TypeDecl):
   may_have_out_of_date_definition: bool
   num_template_parameter_lists: int
   template_parameter_lists: Iterable[multiplier.ast.TemplateParameterList]
-  declarations_in_context: Iterable[multiplier.ast.Decl]
+  contained_declarations: Iterable[multiplier.ast.Decl]
 
   @overload
   @staticmethod
@@ -63451,8 +63385,6 @@ class CXXRecordDecl(multiplier.ast.RecordDecl):
   lambda_static_invoker: Optional[multiplier.ast.CXXMethodDecl]
   ms_inheritance_model: Optional[multiplier.ast.MSInheritanceModel]
   ms_vtor_disp_mode: multiplier.ast.MSVtorDispMode
-  template_instantiation_pattern: Optional[multiplier.ast.CXXRecordDecl]
-  template_specialization_kind: multiplier.ast.TemplateSpecializationKind
   has_any_dependent_bases: Optional[bool]
   has_constexpr_default_constructor: Optional[bool]
   has_constexpr_destructor: Optional[bool]
@@ -63530,13 +63462,12 @@ class CXXRecordDecl(multiplier.ast.RecordDecl):
   is_standard_layout: Optional[bool]
   is_structural: Optional[bool]
   is_trivial: Optional[bool]
-  is_trivially_copy_constructible: bool
+  is_trivially_copy_constructible: Optional[bool]
   is_trivially_copyable: Optional[bool]
   lambda_is_default_constructible_and_assignable: Optional[bool]
   may_be_abstract: Optional[bool]
   may_be_dynamic_class: Optional[bool]
   may_be_non_dynamic_class: Optional[bool]
-  methods: Optional[Sequence[multiplier.ast.CXXMethodDecl]]
   needs_implicit_copy_assignment: Optional[bool]
   needs_implicit_copy_constructor: Optional[bool]
   needs_implicit_default_constructor: Optional[bool]
@@ -63558,6 +63489,7 @@ class CXXRecordDecl(multiplier.ast.RecordDecl):
   has_own_virtual_base_table_pointer: Optional[bool]
   derived_classes: Iterable[multiplier.ast.CXXRecordDecl]
   base_classes: Iterable[multiplier.ast.CXXRecordDecl]
+  methods: Iterable[multiplier.ast.CXXMethodDecl]
 
   @overload
   @staticmethod
@@ -63654,15 +63586,11 @@ class ClassTemplateSpecializationDecl(multiplier.ast.CXXRecordDecl):
   definition: Optional[multiplier.ast.ClassTemplateSpecializationDecl]
   redeclarations: Iterable[multiplier.ast.ClassTemplateSpecializationDecl]
   extern_token: multiplier.frontend.Token
-  point_of_instantiation: multiplier.frontend.Token
   specialization_kind: multiplier.ast.TemplateSpecializationKind
   specialized_template: multiplier.ast.ClassTemplateDecl
   num_template_arguments: int
   template_arguments: Iterable[multiplier.ast.TemplateArgument]
-  num_template_instantiation_arguments: int
-  template_instantiation_arguments: Iterable[multiplier.ast.TemplateArgument]
   template_keyword_token: multiplier.frontend.Token
-  type_as_written: Optional[multiplier.ast.Type]
   is_class_scope_explicit_specialization: bool
   is_explicit_instantiation_or_specialization: bool
   is_explicit_specialization: bool
@@ -63757,16 +63685,11 @@ class ClassTemplateSpecializationDecl(multiplier.ast.CXXRecordDecl):
   def nth_template_argument(self, n: int) -> Optional[multiplier.ast.TemplateArgument]:
     ...
 
-  def nth_template_instantiation_argument(self, n: int) -> Optional[multiplier.ast.TemplateArgument]:
-    ...
-
 class ClassTemplatePartialSpecializationDecl(multiplier.ast.ClassTemplateSpecializationDecl):
   canonical_declaration: multiplier.ast.ClassTemplatePartialSpecializationDecl
   definition: Optional[multiplier.ast.ClassTemplatePartialSpecializationDecl]
   redeclarations: Iterable[multiplier.ast.ClassTemplatePartialSpecializationDecl]
   injected_specialization_type: multiplier.ast.Type
-  instantiated_from_member: Optional[multiplier.ast.ClassTemplatePartialSpecializationDecl]
-  instantiated_from_member_template: Optional[multiplier.ast.ClassTemplatePartialSpecializationDecl]
   template_parameters: multiplier.ast.TemplateParameterList
   has_associated_constraints: bool
 
@@ -63866,8 +63789,6 @@ class EnumDecl(multiplier.ast.TagDecl):
   integer_type: Optional[multiplier.ast.Type]
   integer_type_range: multiplier.frontend.TokenRange
   promotion_type: Optional[multiplier.ast.Type]
-  template_instantiation_pattern: Optional[multiplier.ast.EnumDecl]
-  template_specialization_kind: multiplier.ast.TemplateSpecializationKind
   is_closed: bool
   is_closed_flag: bool
   is_closed_non_flag: bool
@@ -64531,7 +64452,6 @@ class RedeclarableTemplateDecl(multiplier.ast.TemplateDecl):
   canonical_declaration: multiplier.ast.RedeclarableTemplateDecl
   definition: Optional[multiplier.ast.RedeclarableTemplateDecl]
   redeclarations: Iterable[multiplier.ast.RedeclarableTemplateDecl]
-  instantiated_from_member_template: Optional[multiplier.ast.RedeclarableTemplateDecl]
   is_member_specialization: bool
 
   @overload
@@ -65419,7 +65339,7 @@ class ObjCMethodDecl(multiplier.ast.NamedDecl):
   parameters: Iterable[multiplier.ast.ParmVarDecl]
   num_selector_tokens: int
   selector_tokens: Iterable[multiplier.frontend.Token]
-  declarations_in_context: Iterable[multiplier.ast.Decl]
+  contained_declarations: Iterable[multiplier.ast.Decl]
 
   @overload
   @staticmethod
@@ -65532,7 +65452,7 @@ class ObjCContainerDecl(multiplier.ast.NamedDecl):
   methods: Iterable[multiplier.ast.ObjCMethodDecl]
   num_properties: int
   properties: Iterable[multiplier.ast.ObjCPropertyDecl]
-  declarations_in_context: Iterable[multiplier.ast.Decl]
+  contained_declarations: Iterable[multiplier.ast.Decl]
 
   @overload
   @staticmethod
@@ -66395,13 +66315,11 @@ class NamespaceDecl(multiplier.ast.NamedDecl):
   canonical_declaration: multiplier.ast.NamespaceDecl
   definition: Optional[multiplier.ast.NamespaceDecl]
   redeclarations: Iterable[multiplier.ast.NamespaceDecl]
-  anonymous_namespace: Optional[multiplier.ast.NamespaceDecl]
-  original_namespace: multiplier.ast.NamespaceDecl
   r_brace_token: multiplier.frontend.Token
   is_anonymous_namespace: bool
   is_inline: bool
   is_nested: bool
-  is_original_namespace: bool
+  contained_declarations: Iterable[multiplier.ast.Decl]
 
   @overload
   @staticmethod
@@ -66595,6 +66513,7 @@ class LinkageSpecDecl(multiplier.ast.Decl):
   language: multiplier.ast.LinkageSpecLanguageIDs
   r_brace_token: multiplier.frontend.Token
   has_braces: bool
+  contained_declarations: Iterable[multiplier.ast.Decl]
 
   @overload
   @staticmethod
@@ -67273,6 +67192,7 @@ class ExternCContextDecl(multiplier.ast.Decl):
   canonical_declaration: multiplier.ast.ExternCContextDecl
   definition: Optional[multiplier.ast.ExternCContextDecl]
   redeclarations: Iterable[multiplier.ast.ExternCContextDecl]
+  contained_declarations: Iterable[multiplier.ast.Decl]
 
   @overload
   @staticmethod
@@ -67368,7 +67288,7 @@ class ExportDecl(multiplier.ast.Decl):
   export_token: multiplier.frontend.Token
   r_brace_token: multiplier.frontend.Token
   has_braces: bool
-  declarations_in_context: Iterable[multiplier.ast.Decl]
+  contained_declarations: Iterable[multiplier.ast.Decl]
 
   @overload
   @staticmethod

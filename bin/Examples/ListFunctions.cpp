@@ -11,21 +11,21 @@
 #include "Index.h"
 #include <multiplier/AST.h>
 
-DEFINE_uint64(fragment_id, 0, "ID of the fragment from which to print function names");
-DEFINE_uint64(file_id, 0, "ID of the file from which to print function names");
 DEFINE_bool(list_variables, false, "Should we list the variables inside of functions?");
 DEFINE_bool(show_locations, false, "Show the file locations of the functions?");
 
 static void PrintFunctionNames(mx::Index index) {
+  mx::QualifiedNameRenderOptions opts;
+
   for (mx::FunctionDecl func : mx::FunctionDecl::in(index)) {
     auto file = mx::File::containing(func);
     auto fragment = mx::Fragment::containing(func);
-
+    auto qual_name = func.qualified_name(opts);
     std::cout
         << (file ? file->id().Pack() : mx::kInvalidEntityId) << '\t'
         << fragment.id() << '\t'
         << func.id() << '\t'
-        << func.name()
+        << qual_name.data()
         << (func.is_definition() ? "\tdef" : "\tdecl");
 
     if (FLAGS_show_locations && file) {
@@ -40,7 +40,7 @@ static void PrintFunctionNames(mx::Index index) {
     std::cout << '\n';
 
     if (FLAGS_list_variables) {
-      for (const mx::Decl &var : func.declarations_in_context()) {
+      for (const mx::Decl &var : func.contained_declarations()) {
         std::cout
             << "\t\t" << var.id() << '\t' << mx::EnumeratorName(var.kind());
 

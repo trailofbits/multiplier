@@ -148,30 +148,10 @@ static PyGetSetDef gProperties[] = {
     "redeclarations",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
+          return ::mx::generator_to_python(*T_cast(self), &T::redeclarations);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::NamespaceDecl::redeclarations"),
-    nullptr,
-  },
-  {
-    "anonymous_namespace",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->anonymous_namespace());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NamespaceDecl::anonymous_namespace"),
-    nullptr,
-  },
-  {
-    "original_namespace",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->original_namespace());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NamespaceDecl::original_namespace"),
     nullptr,
   },
   {
@@ -215,13 +195,13 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "is_original_namespace",
+    "contained_declarations",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_original_namespace());
+          return ::mx::generator_to_python(*T_cast(self), &T::contained_declarations);
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::NamespaceDecl::is_original_namespace"),
+    PyDoc_STR("Wrapper for mx::NamespaceDecl::contained_declarations"),
     nullptr,
   },
   {}  // Sentinel.

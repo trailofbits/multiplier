@@ -42,6 +42,8 @@ int main(int argc, char *argv[]) {
   mx::Index index(mx::Index::in_memory_cache(
       mx::Index::from_database(FLAGS_db)));
 
+  mx::QualifiedNameRenderOptions opts;
+
   for (mx::NamedEntity ent : index.query_entities(FLAGS_name)) {
     if (std::holds_alternative<mx::NamedDecl>(ent)) {
       mx::NamedDecl decl = std::get<mx::NamedDecl>(ent);
@@ -55,7 +57,7 @@ int main(int argc, char *argv[]) {
       std::cout
           << (file ? file->id().Pack() : mx::kInvalidEntityId) << '\t'
           << frag.id() << '\t'
-          << decl.id() << '\t' << decl.name() << '\t'
+          << decl.id() << '\t' << decl.qualified_name(opts).data() << '\t'
           << mx::EnumeratorName(decl.kind()) << std::endl;
 
     } else if (std::holds_alternative<mx::DefineMacroDirective>(ent)) {

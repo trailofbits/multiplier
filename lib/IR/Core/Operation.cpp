@@ -134,11 +134,6 @@ std::optional<LazyOp> LazyOp::producing(const ::mx::ir::Value &that) {
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Region LazyOp::lazy(void) const {
-  auto &val = underlying_repr().getLazy();
-  return ::mx::ir::Region(module_, val);
-}
-
 std::optional<ScopeOp> ScopeOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::CORE_SCOPE) {
     return reinterpret_cast<const ScopeOp &>(that);
@@ -155,11 +150,6 @@ std::optional<ScopeOp> ScopeOp::producing(const ::mx::ir::Value &that) {
 
 ::vast::core::ScopeOp ScopeOp::underlying_repr(void) const noexcept {
   return ::vast::core::ScopeOp(this->::mx::ir::Operation::op_);
-}
-
-::mx::ir::Region ScopeOp::body(void) const {
-  auto &val = underlying_repr().getBody();
-  return ::mx::ir::Region(module_, val);
 }
 
 std::optional<SelectOp> SelectOp::from(const ::mx::ir::Operation &that) {

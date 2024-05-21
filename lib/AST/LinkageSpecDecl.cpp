@@ -7,6 +7,7 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/LinkageSpecDecl.h>
+#include "../Reference.h"
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/Frontend/Token.h>
@@ -219,19 +220,25 @@ std::optional<LinkageSpecDecl> LinkageSpecDecl::from(const TokenContext &t) {
 }
 
 Token LinkageSpecDecl::extern_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal49());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 LinkageSpecLanguageIDs LinkageSpecDecl::language(void) const {
-  return static_cast<LinkageSpecLanguageIDs>(impl->reader.getVal65());
+  return static_cast<LinkageSpecLanguageIDs>(impl->reader.getVal54());
 }
 
 Token LinkageSpecDecl::r_brace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal56());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
 }
 
 bool LinkageSpecDecl::has_braces(void) const {
-  return impl->reader.getVal50();
+  return impl->reader.getVal39();
+}
+
+gap::generator<Decl> LinkageSpecDecl::contained_declarations(void) const & {
+  return BuiltinDeclReferences<Decl>(
+      impl->ep, id().Pack(), BuiltinReferenceKind::CONTAINS,
+      EntityProvider::kReferenceFrom, false  /* redecls */);
 }
 
 #pragma GCC diagnostic pop

@@ -274,7 +274,7 @@ static PyGetSetDef gProperties[] = {
     "counters",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->counters());
+          return ::mx::generator_to_python(*T_cast(self), &T::counters);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::OMPLoopDirective::counters"),
@@ -294,7 +294,7 @@ static PyGetSetDef gProperties[] = {
     "dependent_counters",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->dependent_counters());
+          return ::mx::generator_to_python(*T_cast(self), &T::dependent_counters);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::OMPLoopDirective::dependent_counters"),
@@ -314,7 +314,7 @@ static PyGetSetDef gProperties[] = {
     "dependent_initializers",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->dependent_initializers());
+          return ::mx::generator_to_python(*T_cast(self), &T::dependent_initializers);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::OMPLoopDirective::dependent_initializers"),
@@ -334,7 +334,7 @@ static PyGetSetDef gProperties[] = {
     "finals",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->finals());
+          return ::mx::generator_to_python(*T_cast(self), &T::finals);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::OMPLoopDirective::finals"),
@@ -354,7 +354,7 @@ static PyGetSetDef gProperties[] = {
     "finals_conditions",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->finals_conditions());
+          return ::mx::generator_to_python(*T_cast(self), &T::finals_conditions);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::OMPLoopDirective::finals_conditions"),
@@ -664,7 +664,7 @@ static PyGetSetDef gProperties[] = {
     "initializers",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->initializers());
+          return ::mx::generator_to_python(*T_cast(self), &T::initializers);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::OMPLoopDirective::initializers"),
@@ -684,7 +684,7 @@ static PyGetSetDef gProperties[] = {
     "private_counters",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->private_counters());
+          return ::mx::generator_to_python(*T_cast(self), &T::private_counters);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::OMPLoopDirective::private_counters"),
@@ -704,7 +704,7 @@ static PyGetSetDef gProperties[] = {
     "updates",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->updates());
+          return ::mx::generator_to_python(*T_cast(self), &T::updates);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::OMPLoopDirective::updates"),

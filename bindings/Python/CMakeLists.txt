@@ -29,6 +29,7 @@ add_library("mx-python" SHARED
   "FileLocationCache.cpp"
   "Forward.h"  # Auto-generated.
   "Module.cpp"  # Auto-generated.
+  "QualifiedNameRenderOptions.cpp"
   "SharedPyPtr.h"
   "TokenTreeVisitor.h"
   "TokenTreeVisitor.cpp"

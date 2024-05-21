@@ -44,7 +44,7 @@ class MX_EXPORT CallArgsOp final : public Operation {
 
   // Imported methods:
   //::mlir::Operation::result_range results(void) const;
-  ::mx::ir::Region body(void) const;
+  //::mlir::Region & body(void) const;
 };
 static_assert(sizeof(CallArgsOp) == sizeof(Operation));
 
@@ -62,7 +62,7 @@ class MX_EXPORT CallExecutionOp final : public Operation {
   // Imported methods:
   //::mlir::Operation::operand_range args(void) const;
   ::mx::ir::Value result(void) const;
-  ::mx::ir::Region body(void) const;
+  //::mlir::Region & body(void) const;
   std::string_view callee(void) const;
   //::mlir::CallInterfaceCallable callable_for_callee(void) const;
   //::mlir::Operation::operand_range arg_operands(void) const;
@@ -102,7 +102,7 @@ class MX_EXPORT CallRetsOp final : public Operation {
 
   // Imported methods:
   //::mlir::Operation::result_range results(void) const;
-  ::mx::ir::Region body(void) const;
+  //::mlir::Region & body(void) const;
 };
 static_assert(sizeof(CallRetsOp) == sizeof(Operation));
 
@@ -136,7 +136,7 @@ class MX_EXPORT EpilogueOp final : public Operation {
 
   // Imported methods:
   //::mlir::Operation::result_range results(void) const;
-  ::mx::ir::Region body(void) const;
+  //::mlir::Region & body(void) const;
 };
 static_assert(sizeof(EpilogueOp) == sizeof(Operation));
 
@@ -152,7 +152,7 @@ class MX_EXPORT FuncOp final : public Operation {
   ::vast::abi::FuncOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Region body(void) const;
+  //::mlir::Region & body(void) const;
   std::string_view sym_name(void) const;
   //::vast::core::FunctionType function_type(void) const;
   //::vast::core::GlobalLinkageKind linkage(void) const;
@@ -160,7 +160,7 @@ class MX_EXPORT FuncOp final : public Operation {
   //::std::optional<ArrayAttr> arg_attrs(void) const;
   //::std::optional<ArrayAttr> res_attrs(void) const;
   bool is_var_arg(void) const;
-  //::mlir::Region* callable_region(void) const;
+  //::mlir::Region * callable_region(void) const;
   //llvm::ArrayRef<Type> callable_results(void) const;
   //::mlir::ArrayAttr callable_arg_attrs(void) const;
   //::mlir::ArrayAttr callable_res_attrs(void) const;
@@ -200,7 +200,7 @@ class MX_EXPORT PrologueOp final : public Operation {
 
   // Imported methods:
   //::mlir::Operation::result_range results(void) const;
-  ::mx::ir::Region body(void) const;
+  //::mlir::Region & body(void) const;
 };
 static_assert(sizeof(PrologueOp) == sizeof(Operation));
 

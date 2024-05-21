@@ -125,16 +125,6 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyGetSetDef gProperties[] = {
   {
-    "fields",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->fields());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::hl::StructDeclOp::fields"),
-    nullptr,
-  },
-  {
     "name",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -142,6 +132,16 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::hl::StructDeclOp::name"),
+    nullptr,
+  },
+  {
+    "is_complete_definition",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_complete_definition());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::hl::StructDeclOp::is_complete_definition"),
     nullptr,
   },
   {}  // Sentinel.

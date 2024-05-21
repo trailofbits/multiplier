@@ -138,6 +138,7 @@ class FragmentImpl final : public EntityImpl<rpc::Fragment> {
   // For bounds checking.
   const EntityOffset num_parsed_tokens;
   const EntityOffset num_tokens;
+  const EntityOffset num_nested_fragments;
 
   // Cached token tree.
   //

@@ -134,6 +134,16 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::ir::memref::SubViewOp::view_source"),
     nullptr,
   },
+  {
+    "offset_size_and_stride_start_operand_index",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->offset_size_and_stride_start_operand_index());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::memref::SubViewOp::offset_size_and_stride_start_operand_index"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

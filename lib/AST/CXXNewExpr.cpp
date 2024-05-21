@@ -235,7 +235,7 @@ TokenRange CXXNewExpr::direct_initializer_range(void) const {
 }
 
 CXXNewInitializationStyle CXXNewExpr::initialization_style(void) const {
-  return static_cast<CXXNewInitializationStyle>(impl->reader.getVal91());
+  return static_cast<CXXNewInitializationStyle>(impl->reader.getVal89());
 }
 
 std::optional<Expr> CXXNewExpr::initializer(void) const {
@@ -298,7 +298,7 @@ bool CXXNewExpr::is_parenthesis_type_id(void) const {
 }
 
 bool CXXNewExpr::pass_alignment(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal90();
 }
 
 unsigned CXXNewExpr::num_placement_arguments(void) const {

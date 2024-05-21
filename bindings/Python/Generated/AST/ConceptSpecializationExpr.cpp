@@ -178,7 +178,7 @@ static PyGetSetDef gProperties[] = {
     "template_arguments",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->template_arguments());
+          return ::mx::generator_to_python(*T_cast(self), &T::template_arguments);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ConceptSpecializationExpr::template_arguments"),

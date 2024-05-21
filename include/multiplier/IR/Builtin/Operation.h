@@ -34,7 +34,7 @@ class MX_EXPORT ModuleOp final : public Operation {
   ::mlir::ModuleOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Region body_region(void) const;
+  //::mlir::Region & body_region(void) const;
   //::std::optional<StringRef> sym_name(void) const;
   //::std::optional<StringRef> sym_visibility(void) const;
   std::optional<std::string_view> name(void) const;

@@ -19,11 +19,17 @@ class TokenTree;
 class TokenTreeNode;
 class TypeMapper;
 
+using NestedFragmentIntervals = interval_tree::IntervalTree<
+    mx::EntityOffset, mx::PackedFragmentId>;
+
 // Provides entity IDs and offsets to the serialization code.
 class EntityMapper final {
  public:
   // Set of all top-level declarations (from the perspective of fragments).
   std::unordered_set<const void *> top_level_decls;
+
+  // Locations of all fragments that are templates.
+  NestedFragmentIntervals nested_fragment_bounds;
 
   // Globally (within a translation unit) entity ids. Generally, these are
   // things that can be referenced across fragments.
@@ -121,7 +127,6 @@ class EntityMapper final {
     return mx::kInvalidEntityId;
   }
 
-
   inline mx::RawEntityId SelectiveEntityId(const void *entity) const {
     if (generate_source_ir) {
       return EntityId(entity);
@@ -157,9 +162,17 @@ class EntityMapper final {
     top_level_decls.insert(RawEntity(decl));
   }
 
-  inline bool IsTopLevel(const pasta::Decl &decl) {
-    return top_level_decls.count(RawEntity(decl)) != 0u;
+  inline bool IsTopLevel(const pasta::Decl &decl) const {
+    return IsTopLevel(RawEntity(decl));
   }
+
+  inline bool IsTopLevel(const void *decl) const {
+    return top_level_decls.count(decl) != 0u;
+  }
+
+  // ID of the parent fragment.
+  mx::RawEntityId ParentFragmentId(
+      const void *parent_entity, const std::vector<pasta::Decl> &decls) const;
 };
 
 }  // namespace indexer

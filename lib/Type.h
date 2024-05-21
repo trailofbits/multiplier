@@ -30,16 +30,19 @@ class ReadTypeTokens final : public TokenReader {
   EntityOffset NumTokens(void) const final;
 
   // Return the kind of the Nth token.
-  TokenKind NthTokenKind(EntityOffset index) const final;
+  TokenKind NthTokenKind(EntityOffset) const final;
+
+  // Return teh category of the Nth token.
+  TokenCategory NthTokenCategory(EntityOffset) const final;
 
   // Return the data of the Nth token.
-  std::string_view NthTokenData(EntityOffset index) const final;
+  std::string_view NthTokenData(EntityOffset) const final;
 
   // Return the id of the token from which the Nth token is derived.
-  EntityId NthDerivedTokenId(EntityOffset token_index) const final;
+  EntityId NthDerivedTokenId(EntityOffset) const final;
 
   // Return the id of the parsed token which is derived from the Nth token.
-  EntityId NthParsedTokenId(EntityOffset token_index) const final;
+  EntityId NthParsedTokenId(EntityOffset) const final;
 
   // Return the id of the macro containing the Nth token.
   EntityId NthContainingMacroId(EntityOffset) const final;

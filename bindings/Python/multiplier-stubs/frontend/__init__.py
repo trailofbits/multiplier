@@ -639,7 +639,6 @@ class TokenCategory(IntEnum):
 class TokenContext(object):
   entity_id: int
   has_parent: bool
-  is_alias: bool
   index_in_fragment: int
   as_declaration: Optional[multiplier.ast.Decl]
   as_statement: Optional[multiplier.ast.Stmt]
@@ -651,7 +650,6 @@ class TokenContext(object):
   as_cxx_base_specifier: Optional[multiplier.ast.CXXBaseSpecifier]
   as_designator: Optional[multiplier.ast.Designator]
   as_cxx_ctor_initializer: Optional[multiplier.ast.CXXCtorInitializer]
-  aliasee: Optional[multiplier.frontend.TokenContext]
   parent: Optional[multiplier.frontend.TokenContext]
 
 class Compilation(multiplier.Entity):
@@ -943,7 +941,7 @@ class Macro(multiplier.Entity):
   generate_expansion_tokens: Iterable[multiplier.frontend.Token]
   kind: multiplier.frontend.MacroKind
   parent: Optional[multiplier.frontend.Macro]
-  children: Iterable[multiplier.frontend.Macro | multiplier.frontend.Token]
+  children: Iterable[multiplier.frontend.Macro | multiplier.frontend.Token | multiplier.Fragment]
 
   @staticmethod
   def static_category() -> multiplier.EntityCategory:
@@ -1019,7 +1017,7 @@ class Macro(multiplier.Entity):
     ...
 
 class MacroSubstitution(multiplier.frontend.Macro):
-  replacement_children: Iterable[multiplier.frontend.Macro | multiplier.frontend.Token]
+  replacement_children: Iterable[multiplier.frontend.Macro | multiplier.frontend.Token | multiplier.Fragment]
   first_fully_substituted_token: multiplier.frontend.Token
   last_fully_substituted_token: multiplier.frontend.Token
   name_or_operator: multiplier.frontend.Token
@@ -1217,7 +1215,7 @@ class MacroStringify(multiplier.frontend.MacroSubstitution):
     ...
 
 class MacroExpansion(multiplier.frontend.MacroSubstitution):
-  intermediate_children: Iterable[multiplier.frontend.Macro | multiplier.frontend.Token]
+  intermediate_children: Iterable[multiplier.frontend.Macro | multiplier.frontend.Token | multiplier.Fragment]
   definition: Optional[multiplier.frontend.DefineMacroDirective]
   num_arguments: int
   arguments: Iterable[multiplier.frontend.MacroArgument]
@@ -1679,10 +1677,10 @@ class MacroDirective(multiplier.frontend.Macro):
 
 class DefineMacroDirective(multiplier.frontend.MacroDirective):
   name: multiplier.frontend.Token
-  body: Iterable[multiplier.frontend.Macro | multiplier.frontend.Token]
+  body: Iterable[multiplier.frontend.Macro | multiplier.frontend.Token | multiplier.Fragment]
   is_variadic: bool
   is_function_like: bool
-  parameters: Iterable[multiplier.frontend.Macro | multiplier.frontend.Token]
+  parameters: Iterable[multiplier.frontend.Macro | multiplier.frontend.Token | multiplier.Fragment]
 
   @overload
   @staticmethod

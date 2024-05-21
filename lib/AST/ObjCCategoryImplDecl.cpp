@@ -7,6 +7,7 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/ObjCCategoryImplDecl.h>
+#include "../Reference.h"
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/NamedDecl.h>
 #include <multiplier/AST/ObjCCategoryDecl.h>
@@ -223,12 +224,12 @@ std::optional<ObjCCategoryImplDecl> ObjCCategoryImplDecl::from(const TokenContex
 }
 
 ObjCCategoryDecl ObjCCategoryImplDecl::category_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal67();
+  RawEntityId eid = impl->reader.getVal56();
   return ObjCCategoryDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Token ObjCCategoryImplDecl::category_name_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal68());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal57());
 }
 
 #pragma GCC diagnostic pop

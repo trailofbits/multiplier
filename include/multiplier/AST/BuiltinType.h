@@ -47,7 +47,6 @@ class MX_EXPORT BuiltinType : public Type {
   static std::optional<BuiltinType> from(const VariantEntity &e);
   static std::optional<BuiltinType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   BuiltinTypeKind builtin_kind(void) const;
   bool is_floating_point(void) const;
   bool is_integer(void) const;

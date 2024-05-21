@@ -14,6 +14,7 @@ namespace mx {
 class EntityProvider;
 class Fragment;
 class Index;
+class Reference;
 class Decl;
 class NamedDecl;
 class ObjCContainerDecl;
@@ -84,7 +85,7 @@ class MX_EXPORT ObjCContainerDecl : public NamedDecl {
   std::optional<ObjCPropertyDecl> nth_propertie(unsigned n) const;
   unsigned num_properties(void) const;
   gap::generator<ObjCPropertyDecl> properties(void) const &;
-  gap::generator<Decl> declarations_in_context(void) const &;
+  gap::generator<Decl> contained_declarations(void) const &;
 };
 
 static_assert(sizeof(ObjCContainerDecl) == sizeof(NamedDecl));

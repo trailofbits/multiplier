@@ -47,7 +47,6 @@ class MX_EXPORT ObjCObjectType : public Type {
   static std::optional<ObjCObjectType> from(const VariantEntity &e);
   static std::optional<ObjCObjectType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   Type base_type(void) const;
   ObjCInterfaceDecl interface(void) const;
   std::optional<Type> super_class_type(void) const;

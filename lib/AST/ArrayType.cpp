@@ -113,7 +113,7 @@ Type ArrayType::element_type(void) const {
 }
 
 ArraySizeModifier ArrayType::size_modifier(void) const {
-  return static_cast<ArraySizeModifier>(impl->reader.getVal28());
+  return static_cast<ArraySizeModifier>(impl->reader.getVal27());
 }
 
 #pragma GCC diagnostic pop

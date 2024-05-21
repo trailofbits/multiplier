@@ -42,7 +42,6 @@ class MX_EXPORT MatrixType : public Type {
   static std::optional<MatrixType> from(const VariantEntity &e);
   static std::optional<MatrixType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   Type element_type(void) const;
   bool is_sugared(void) const;
 };

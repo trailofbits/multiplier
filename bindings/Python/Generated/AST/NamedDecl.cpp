@@ -396,7 +396,7 @@ static PyGetSetDef gProperties[] = {
     "redeclarations",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
+          return ::mx::generator_to_python(*T_cast(self), &T::redeclarations);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::NamedDecl::redeclarations"),
@@ -430,16 +430,6 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::NamedDecl::obj_cf_string_formatting_family"),
-    nullptr,
-  },
-  {
-    "qualified_name_as_string",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->qualified_name_as_string());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::NamedDecl::qualified_name_as_string"),
     nullptr,
   },
   {
@@ -752,6 +742,28 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::NamedDecl::from_base"),
+  },
+  {
+    "qualified_name",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          T *obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<QualifiedNameRenderOptions>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->qualified_name(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'qualified_name'";
+          return nullptr;
+        }),
+    METH_FASTCALL,
+    PyDoc_STR("Wrapper for mx::NamedDecl::qualified_name"),
   },
   {}  // Sentinel.
 };

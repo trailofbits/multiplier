@@ -10,6 +10,7 @@
 #include <multiplier/AST/CXXMethodDecl.h>
 #include <multiplier/AST/DeclCategory.h>
 #include <multiplier/AST/DeclKind.h>
+#include <multiplier/AST/FriendDecl.h>
 #include <multiplier/AST/ImplicitParamDecl.h>
 #include <multiplier/AST/ObjCMethodDecl.h>
 #include <multiplier/AST/TagDecl.h>
@@ -26,6 +27,7 @@
 #include "Fragment.h"
 #include "Reference.h"
 #include "Type.h"
+#include "Util.h"
 
 namespace mx {
 namespace {
@@ -583,11 +585,6 @@ static TokenCategory ClassifyMacro(TokenKind kind, MacroId id,
   return baseline_category;
 }
 
-static inline TokenCategory Rebase(DeclCategory category) {
-  return static_cast<TokenCategory>(
-      int(category) + int(TokenCategory::COMMENT));
-}
-
 static TokenCategory ClassifyDecl(const TokenReader *reader, EntityOffset index,
                                   DeclId id, TokenCategory baseline_category) {
   switch (id.kind) {
@@ -617,10 +614,12 @@ static TokenCategory ClassifyDecl(const TokenReader *reader, EntityOffset index,
     case DeclKind::USING_ENUM:
       return TokenCategory::ENUM;
 
+    case DeclKind::TYPE_ALIAS:
     case DeclKind::TYPEDEF:
     case DeclKind::USING:
     case DeclKind::UNRESOLVED_USING_TYPENAME:
     case DeclKind::UNRESOLVED_USING_IF_EXISTS:
+    case DeclKind::UNRESOLVED_USING_VALUE:  // Might not be a type.
       return TokenCategory::TYPE_ALIAS;
 
     case DeclKind::CLASS_TEMPLATE_PARTIAL_SPECIALIZATION:
@@ -657,37 +656,56 @@ static TokenCategory ClassifyDecl(const TokenReader *reader, EntityOffset index,
     // but we'll try to be more precise by fetching the actual decl.
 
     case DeclKind::CONCEPT:
-      baseline_category = TokenCategory::CONCEPT;
-      break;
+      return TokenCategory::CONCEPT;
+
+    // E.g. `__make_integer_seq`.
     case DeclKind::BUILTIN_TEMPLATE:
-      baseline_category = TokenCategory::BUILTIN_TYPE_NAME;
-      break;
+      return TokenCategory::BUILTIN_TYPE_NAME;
+    
     case DeclKind::CLASS_TEMPLATE:
-      baseline_category = TokenCategory::CLASS;
-      break;
+      return TokenCategory::CLASS;
+
     case DeclKind::VAR_TEMPLATE:
-      baseline_category = TokenCategory::GLOBAL_VARIABLE;
-      break;
+      return TokenCategory::GLOBAL_VARIABLE;
+
+    // Could be a method.
     case DeclKind::FUNCTION_TEMPLATE:
       baseline_category = TokenCategory::FUNCTION;
       break;
+
     case DeclKind::TYPE_ALIAS_TEMPLATE:
       baseline_category = TokenCategory::TYPE_ALIAS;
       break;
+
     case DeclKind::VAR_TEMPLATE_PARTIAL_SPECIALIZATION:
     case DeclKind::VAR_TEMPLATE_SPECIALIZATION:
-      baseline_category = TokenCategory::GLOBAL_VARIABLE;
-      break;
+      return TokenCategory::GLOBAL_VARIABLE;
+
     case DeclKind::RECORD:
       baseline_category = TokenCategory::STRUCT;
       break;
+
+    case DeclKind::ACCESS_SPEC:
+    case DeclKind::LINKAGE_SPEC:
+    case DeclKind::FRIEND:
+    case DeclKind::FRIEND_TEMPLATE:
+    case DeclKind::STATIC_ASSERT:
+    case DeclKind::FILE_SCOPE_ASM:
+    case DeclKind::EXTERN_C_CONTEXT:
+      return TokenCategory::KEYWORD;
+
+    case DeclKind::EMPTY:
+      return TokenCategory::PUNCTUATION;
+
     case DeclKind::CXX_METHOD:
     case DeclKind::OBJ_C_METHOD:
       baseline_category = TokenCategory::INSTANCE_METHOD;
       break;
+
     case DeclKind::IMPLICIT_PARAM:
       baseline_category = TokenCategory::PARAMETER_VARIABLE;
       break;
+
     case DeclKind::VAR:
       baseline_category = TokenCategory::LOCAL_VARIABLE;
       break;
@@ -704,8 +722,7 @@ static TokenCategory ClassifyDecl(const TokenReader *reader, EntityOffset index,
     return baseline_category;
   }
 
-  const Decl &decl = std::get<Decl>(ent);
-  return Rebase(decl.category());
+  return ConvertDeclCategoryToTokenCategory(std::get<Decl>(ent).category());
 }
 
 static TokenCategory ClassifyStmt(StmtId id, TokenKind kind,
@@ -718,6 +735,13 @@ static TokenCategory ClassifyStmt(StmtId id, TokenKind kind,
     case StmtKind::FIXED_POINT_LITERAL:
       return TokenCategory::LITERAL;
 
+    // E.g. `__c11_atomic_load(...)`.
+    case StmtKind::ATOMIC_EXPR:
+      if (kind == TokenKind::IDENTIFIER) {
+        return TokenCategory::KEYWORD;
+      }
+      break;
+
     // E.g. `__func__`.
     case StmtKind::PREDEFINED_EXPR:
       if (kind == TokenKind::KEYWORD___FUNC__) {
@@ -727,8 +751,9 @@ static TokenCategory ClassifyStmt(StmtId id, TokenKind kind,
       }
 
     default:
-      return baseline_category;
+      break;
   }
+  return baseline_category;
 }
 
 static TokenCategory ClassifyType(TypeId id, TokenKind,

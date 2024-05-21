@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1415]) || tp >= &(gTypes[1416])) {
+  if (tp < &(gTypes[1414]) || tp >= &(gTypes[1415])) {
     return std::nullopt;
   }
 
@@ -126,7 +126,7 @@ static PyGetSetDef gProperties[] = {
     "blocks",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->blocks());
+          return ::mx::generator_to_python(*T_cast(self), &T::blocks);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::Region::blocks"),
@@ -136,7 +136,7 @@ static PyGetSetDef gProperties[] = {
     "reverse_blocks",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->reverse_blocks());
+          return ::mx::generator_to_python(*T_cast(self), &T::reverse_blocks);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::Region::reverse_blocks"),
@@ -166,7 +166,7 @@ static PyGetSetDef gProperties[] = {
     "entry_block_arguments",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->entry_block_arguments());
+          return ::mx::generator_to_python(*T_cast(self), &T::entry_block_arguments);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::Region::entry_block_arguments"),
@@ -258,7 +258,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1415]);
+  PyTypeObject * const tp = &(gTypes[1414]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

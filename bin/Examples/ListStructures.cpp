@@ -14,6 +14,8 @@
 DEFINE_bool(show_locations, false, "Show the file locations of the structures");
 
 static void PrintStructures(mx::Index index) {
+  mx::QualifiedNameRenderOptions opts;
+
   for (mx::TagDecl tag : mx::TagDecl::in(index)) {
     if (!tag.is_definition()) {
       continue;
@@ -25,7 +27,7 @@ static void PrintStructures(mx::Index index) {
     std::cout
         << (file ? file->id().Pack() : mx::kInvalidEntityId) << '\t'
         << fragment.id().Pack() << '\t' << tag.id() << '\t'
-        << tag.name();
+        << tag.qualified_name(opts).data();
 
     if (FLAGS_show_locations && file) {
       std::cout << '\t' << file_paths[file->id()].generic_string();
@@ -38,7 +40,7 @@ static void PrintStructures(mx::Index index) {
 
     std::cout << '\n';
 
-    for (const mx::Decl &decl : tag.declarations_in_context()) {
+    for (const mx::Decl &decl : tag.contained_declarations()) {
       if (auto field = mx::NamedDecl::from(decl)) {
         std::cout << "\t\t" << field->id() << '\t' << field->name();
         if (FLAGS_show_locations && file) {

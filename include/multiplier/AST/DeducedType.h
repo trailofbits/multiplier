@@ -42,7 +42,6 @@ class MX_EXPORT DeducedType : public Type {
   static std::optional<DeducedType> from(const VariantEntity &e);
   static std::optional<DeducedType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   std::optional<Type> resolved_type(void) const;
   bool is_deduced(void) const;
   bool is_sugared(void) const;

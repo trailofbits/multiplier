@@ -12,12 +12,12 @@
 #include <multiplier/AST/MSInheritanceModel.h>
 #include <multiplier/AST/MSVtorDispMode.h>
 #include <multiplier/AST/RecordDecl.h>
-#include <multiplier/AST/TemplateSpecializationKind.h>
 
 namespace mx {
 class EntityProvider;
 class Fragment;
 class Index;
+class Reference;
 class CXXBaseSpecifier;
 class CXXConstructorDecl;
 class CXXDestructorDecl;
@@ -104,8 +104,6 @@ class MX_EXPORT CXXRecordDecl : public RecordDecl {
   std::optional<CXXMethodDecl> lambda_static_invoker(void) const;
   std::optional<MSInheritanceModel> ms_inheritance_model(void) const;
   MSVtorDispMode ms_vtor_disp_mode(void) const;
-  std::optional<CXXRecordDecl> template_instantiation_pattern(void) const;
-  TemplateSpecializationKind template_specialization_kind(void) const;
   std::optional<bool> has_any_dependent_bases(void) const;
   std::optional<bool> has_constexpr_default_constructor(void) const;
   std::optional<bool> has_constexpr_destructor(void) const;
@@ -183,13 +181,12 @@ class MX_EXPORT CXXRecordDecl : public RecordDecl {
   std::optional<bool> is_standard_layout(void) const;
   std::optional<bool> is_structural(void) const;
   std::optional<bool> is_trivial(void) const;
-  bool is_trivially_copy_constructible(void) const;
+  std::optional<bool> is_trivially_copy_constructible(void) const;
   std::optional<bool> is_trivially_copyable(void) const;
   std::optional<bool> lambda_is_default_constructible_and_assignable(void) const;
   std::optional<bool> may_be_abstract(void) const;
   std::optional<bool> may_be_dynamic_class(void) const;
   std::optional<bool> may_be_non_dynamic_class(void) const;
-  std::optional<std::vector<CXXMethodDecl>> methods(void) const;
   std::optional<bool> needs_implicit_copy_assignment(void) const;
   std::optional<bool> needs_implicit_copy_constructor(void) const;
   std::optional<bool> needs_implicit_default_constructor(void) const;
@@ -212,6 +209,7 @@ class MX_EXPORT CXXRecordDecl : public RecordDecl {
   // List of base and derived classes.
   gap::generator<CXXRecordDecl> derived_classes(void) const &;
   gap::generator<CXXRecordDecl> base_classes(void) const &;
+  gap::generator<CXXMethodDecl> methods(void) const &;
 };
 
 static_assert(sizeof(CXXRecordDecl) == sizeof(RecordDecl));

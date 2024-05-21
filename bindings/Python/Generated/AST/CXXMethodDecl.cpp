@@ -160,7 +160,7 @@ static PyGetSetDef gProperties[] = {
     "redeclarations",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
+          return ::mx::generator_to_python(*T_cast(self), &T::redeclarations);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::CXXMethodDecl::redeclarations"),
@@ -320,7 +320,7 @@ static PyGetSetDef gProperties[] = {
     "overridden_methods",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->overridden_methods());
+          return ::mx::generator_to_python(*T_cast(self), &T::overridden_methods);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::CXXMethodDecl::overridden_methods"),
@@ -330,7 +330,7 @@ static PyGetSetDef gProperties[] = {
     "overridden_by_methods",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->overridden_by_methods());
+          return ::mx::generator_to_python(*T_cast(self), &T::overridden_by_methods);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::CXXMethodDecl::overridden_by_methods"),
@@ -340,7 +340,7 @@ static PyGetSetDef gProperties[] = {
     "transitive_overridden_by_methods",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->transitive_overridden_by_methods());
+          return ::mx::generator_to_python(*T_cast(self), &T::transitive_overridden_by_methods);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::CXXMethodDecl::transitive_overridden_by_methods"),

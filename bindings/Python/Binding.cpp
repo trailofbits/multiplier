@@ -41,10 +41,19 @@ SharedPyObject *PythonBinding<bool>::to_python(bool val) noexcept {
       } \
       \
       int did_overflow = 0; \
-      const auto ret = static_cast<longest_type>( \
-          PyLong_AsLongLongAndOverflow(obj, &did_overflow)); \
+      longest_type ret = {}; \
+      if constexpr (std::is_signed_v<longest_type>) { \
+        ret = static_cast<longest_type>( \
+            PyLong_AsLongLongAndOverflow(obj, &did_overflow)); \
+        if (did_overflow) { \
+          PyErr_Clear(); \
+          return std::nullopt; \
+        } \
+      } else { \
+        ret = static_cast<longest_type>(PyLong_AsUnsignedLongLongMask(obj)); \
+      } \
       const auto ret_casted = static_cast<type_name>(ret); \
-      if (ret != ret_casted || did_overflow) { \
+      if (ret != ret_casted) { \
         return std::nullopt; \
       } \
       \

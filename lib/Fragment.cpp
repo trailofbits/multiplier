@@ -31,33 +31,36 @@ namespace ir {
 class SourceIRImpl;
 }  // namespace ir
 
-Fragment Fragment::containing(const Fragment &child) noexcept {
-  for (mx::RawEntityId parent_id : child.impl->reader.getParentIds()) {
-    return Fragment(child.impl->ep->FragmentFor(child.impl->ep, parent_id));
+std::optional<Fragment> Fragment::containing(const Fragment &child) noexcept {
+  auto parent_id = child.impl->parent_fragment_id;
+  auto parent_fid = EntityId(parent_id).Extract<FragmentId>();
+  if (!parent_fid) {
+    return std::nullopt;
   }
-  return child;
+
+  auto eptr = child.impl->ep->FragmentFor(child.impl->ep, parent_id);
+  if (!eptr) {
+    assert(false);
+    return std::nullopt;
+  }
+
+  return Fragment(std::move(eptr));
 }
 
 // A fragment can be nested inside of another fragment. This is very common
 // with C++ templates, but can also happen in C due to elaborated type uses,
 // such as `struct foo`, acting as forward declarations upon their first use.
 std::optional<Fragment> Fragment::parent(void) const noexcept {
-  for (mx::RawEntityId parent_id : impl->reader.getParentIds()) {
-    return Fragment(impl->ep->FragmentFor(impl->ep, parent_id));
-  }
-  return std::nullopt;
+  return Fragment::containing(*this);
 }
 
 std::optional<PackedFragmentId> Fragment::parent_id(void) const noexcept {
-  for (mx::RawEntityId parent_id : impl->reader.getParentIds()) {
-    VariantId vid = EntityId(parent_id).Unpack();
-    if (std::holds_alternative<FragmentId>(vid)) {
-      return std::get<FragmentId>(vid);
-    } else {
-      break;
-    }
+  auto parent_id = impl->parent_fragment_id;
+  if (auto parent_fid = EntityId(parent_id).Extract<FragmentId>()) {
+    return parent_fid.value();
+  } else {
+    return std::nullopt;
   }
-  return std::nullopt;
 }
 
 // Return the fragment containing a query match.
@@ -266,7 +269,7 @@ gap::generator<Fragment> Fragment::nested_fragments(void) const & {
 
 // Return the list of top-level macros in this fragment.
 // This will return a mix of `Macro` or `Token` values.
-gap::generator<MacroOrToken> Fragment::preprocessed_code(void) const & {
+gap::generator<PreprocessedEntity> Fragment::preprocessed_code(void) const & {
   EntityIdListReader macro_ids = impl->reader.getTopLevelMacros();
 
   const EntityProviderPtr ep = impl->ep;
@@ -278,45 +281,65 @@ gap::generator<MacroOrToken> Fragment::preprocessed_code(void) const & {
       // NOTE(pag): We don't check for fragments matching as we might have
       //            macros (e.g. `#define` in nested macros that we inject as
       //            top-level macros).
-      if (eptr) {
-        co_yield Macro(std::move(eptr));
-      } else {
+      if (!eptr) {
         assert(false);
+        continue;
       }
+      
+      co_yield Macro(std::move(eptr));
 
     } else if (std::holds_alternative<MacroTokenId>(vid)) {
       MacroTokenId tid = std::get<MacroTokenId>(vid);
-      if (tid.fragment_id == impl->fragment_id &&
-          tid.offset < impl->num_tokens) {
-        co_yield Token(impl->MacroTokenReader(impl), tid.offset);
-      } else {
+      if (tid.fragment_id != impl->fragment_id ||
+          tid.offset >= impl->num_tokens) {
         assert(false);
+        continue;
       }
+
+      co_yield Token(impl->MacroTokenReader(impl), tid.offset);
 
     } else if (std::holds_alternative<ParsedTokenId>(vid)) {
       ParsedTokenId tid = std::get<ParsedTokenId>(vid);
-      if (tid.fragment_id == impl->fragment_id &&
-          tid.offset < impl->num_parsed_tokens) {
-        co_yield Token(impl->ParsedTokenReader(impl), tid.offset);
-      } else {
+      if (tid.fragment_id != impl->fragment_id ||
+          tid.offset >= impl->num_parsed_tokens) {
         assert(false);
+        continue;
       }
+
+      co_yield Token(impl->ParsedTokenReader(impl), tid.offset);
 
     // File tokens can come up via whitespace injection.
     } else if (std::holds_alternative<FileTokenId>(vid)) {
       FileTokenId tid = std::get<FileTokenId>(vid);
       FileId fid(tid.file_id);
-      FileImplPtr file = ep->FileFor(ep, fid);
-      if (!file) {
+      FileImplPtr eptr = ep->FileFor(ep, fid);
+      if (!eptr) {
         assert(false);
         continue;
       }
 
-      if (tid.offset < file->num_tokens) {
-        co_yield Token(file->TokenReader(file), tid.offset);
-      } else {
+      if (tid.offset >= eptr->num_tokens) {
         assert(false);
+        continue;
       }
+
+      co_yield Token(eptr->TokenReader(eptr), tid.offset);
+
+    // Nested fragment.
+    } else if (std::holds_alternative<FragmentId>(vid)) {
+      FragmentId fid = std::get<FragmentId>(vid);
+      if (fid.fragment_id == impl->fragment_id) {
+        assert(false);
+        continue;
+      }
+
+      FragmentImplPtr eptr = ep->FragmentFor(ep, eid);
+      if (!eptr) {
+        assert(false);
+        continue;
+      }
+
+      co_yield Fragment(std::move(eptr));
 
     } else {
       //assert(false);

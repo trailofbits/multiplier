@@ -127,7 +127,7 @@ gap::generator<Compilation> Compilation::in(const Index &index) {
 // The fragments owned by this compilation. This will be a subset of all
 // observable fragments by this compilation, because some of them may be
 // owned by a different compilation.
-gap::generator<Fragment> Compilation::fragments(void) const & noexcept {
+gap::generator<Fragment> Compilation::fragments(void) const & {
   auto ep = impl->ep;
   for (RawEntityId eid : impl->reader.getFragmentIds()) {
     if (FragmentImplPtr fptr = ep->FragmentFor(ep, eid)) {
@@ -139,7 +139,7 @@ gap::generator<Fragment> Compilation::fragments(void) const & noexcept {
 }
 
 // The files parsed by this compilation.
-gap::generator<File> Compilation::files(void) const & noexcept {
+gap::generator<File> Compilation::files(void) const & {
   auto ep = impl->ep;
   for (RawEntityId eid : impl->reader.getFileIds()) {
     if (FileImplPtr fptr = ep->FileFor(ep, eid)) {
@@ -242,7 +242,7 @@ Compilation::auxiliary_target_triple(void) const noexcept {
 }
 
 // Arguments to this compile command.
-gap::generator<std::string_view> Compilation::arguments(void) const noexcept {
+gap::generator<std::string_view> Compilation::arguments(void) const & {
   rpc::CompileCommand::Reader reader = impl->reader.getCommand();
   for (capnp::Text::Reader arg : reader.getArguments()) {
     co_yield std::string_view(arg.cStr(), arg.size());
@@ -274,7 +274,7 @@ ReadIncludePath(rpc::IncludePath::Reader ip) {
 // List of system include directories that influenced parsing. These can be
 // built-in or specified with command-line options like `-isystem /path`.
 gap::generator<std::pair<IncludePathLocation, std::filesystem::path>>
-Compilation::system_include_directories(void) const & noexcept {
+Compilation::system_include_directories(void) const & {
   rpc::CompileCommand::Reader reader = impl->reader.getCommand();
   for (rpc::IncludePath::Reader ip : reader.getSystemIncludePaths()) {
     co_yield ReadIncludePath(std::move(ip));
@@ -284,7 +284,7 @@ Compilation::system_include_directories(void) const & noexcept {
 // List of system include directories that influenced parsing. These are
 // usually specified with command-line options like `-I /path`.
 gap::generator<std::pair<IncludePathLocation, std::filesystem::path>>
-Compilation::user_include_directories(void) const & noexcept {
+Compilation::user_include_directories(void) const & {
   rpc::CompileCommand::Reader reader = impl->reader.getCommand();
   for (rpc::IncludePath::Reader ip : reader.getUserIncludePaths()) {
     co_yield ReadIncludePath(std::move(ip));
@@ -294,7 +294,7 @@ Compilation::user_include_directories(void) const & noexcept {
 // List of framework directories that influenced parsing. These are relevant
 // on macOS.
 gap::generator<std::pair<IncludePathLocation, std::filesystem::path>>
-Compilation::framework_directories(void) const & noexcept {
+Compilation::framework_directories(void) const & {
   rpc::CompileCommand::Reader reader = impl->reader.getCommand();
   for (rpc::IncludePath::Reader ip : reader.getFrameworkPaths()) {
     co_yield ReadIncludePath(std::move(ip));

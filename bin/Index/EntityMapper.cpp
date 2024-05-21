@@ -171,38 +171,16 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Token &entity) const {
     return mx::kInvalidEntityId;
   }
 
-  // NOTE(pag): May be part of a directive, which may be referenced by other
-  //            fragments, so we use `EntityId`, which falls back on
-  //            `PerFragmentEntityId`.
-  auto eid = EntityId(RawEntity(entity));
+  auto eid = PerFragmentEntityId(RawEntity(entity));
   if (eid != mx::kInvalidEntityId) {
     return eid;
   }
 
-  // We shouldn't get parsed tokens here, though when serializing types or
-  // freestanding fragments, i.e. where we've pulled out a forward declaration
-  // embedded in a declarator, then we might get here. Generally, this suggests
-  // a bug in PASTA, where we've used `PrintedTokenRange::Create(decl)`, and
-  // then there is some method, e.g. `decl.Location()` that should correspond
-  // to one of the `PrintedToken::DerivedLocation()`s return values, but
-  // doesn't. This means that PASTA's internal pretty printers aren't
-  // sufficiently marking locations/provenenance info. A good way to diagnose
-  // this is to check if `PendingFragment::drop_token_provenance` is `true`, and
-  // if so, then go and print out each printed token and whether its derived
-  // location has a value (where we create the fragment). What you'll see is
-  // that `entity.Data()` here likely matches some printed token data over there
-  // that has no corresponding derived (parsed) token.
-  if (IsParsedToken(entity)) {
-
-    // NOTE(pag): Is it technically common to observe these types of issues
-    //            when serializing things like namespaces, which are semi-
-    //            internalized into fragments.
-    if (auto ft = entity.FileLocation()) {
-      return EntityId(ft.value());
-    }
-
-    // assert(false);
-    return mx::kInvalidEntityId;
+  // NOTE(pag): Is it technically common to observe these types of issues
+  //            when serializing things like namespaces, which are semi-
+  //            internalized into fragments.
+  if (auto ft = entity.FileLocation()) {
+    return EntityId(ft.value());
   }
 
   return mx::kInvalidEntityId;
@@ -295,16 +273,7 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::DerivedToken &entity) const 
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::PrintedToken &entity) const {
-  if (auto id = PerFragmentEntityId(RawEntity(entity));
-      id != mx::kInvalidEntityId) {
-    return id;
-  }
-
-  if (auto pt = entity.DerivedLocation()) {
-    return EntityId(pt.value());
-  }
-
-  return mx::kInvalidEntityId;
+  return PerFragmentEntityId(RawEntity(entity));
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::MacroToken &entity) {
@@ -398,6 +367,64 @@ std::optional<const pasta::Stmt> EntityMapper::ParentStmt(
     return ast.Adopt(static_cast<const clang::Stmt *>(it->second));
   }
   return std::nullopt;
+}
+
+// ID of the parent fragment.
+mx::RawEntityId EntityMapper::ParentFragmentId(
+    const void *parent_entity, const std::vector<pasta::Decl> &decls) const {
+  if (!parent_entity) {
+    return mx::kInvalidEntityId;
+  }
+
+  mx::VariantId vid = mx::EntityId(this->EntityId(parent_entity)).Unpack();
+  mx::RawEntityId parent_frag_index = mx::kInvalidEntityId;
+
+  if (std::holds_alternative<mx::DeclId>(vid)) {
+    parent_frag_index = std::get<mx::DeclId>(vid).fragment_id;
+
+  } else if (std::holds_alternative<mx::MacroId>(vid)) {
+    parent_frag_index = std::get<mx::MacroId>(vid).fragment_id;
+
+  } else if (std::holds_alternative<mx::FragmentId>(vid)) {
+    parent_frag_index = std::get<mx::FragmentId>(vid).fragment_id;
+
+  // This generally indicates one of a few problems:
+  //
+  //    - There is something that was discovered, e.g. via a template
+  //      specialization list, that isn't actually discoverable from a decl
+  //      context (i.e. it's not added to a `DeclContext` in Clang). This
+  //      generally requires a Clang patch. You can test this by checking:
+  //
+  //        decl->getDeclContext()->containsDecl(decl)
+  //        decl->getLexicalDeclContext()->containsDecl(decl)
+  //
+  //    - There is something wrong in Bounds.cpp in PASTA. This could be that
+  //      there is something that shows up with a token location logically
+  //      before that of `parent_entity`.
+  //
+  //    - The bounds of the entity and its parents match, but there is a
+  //      heuristic, e.g. `ExpandDeclRange` or a called function in
+  //      `IndexCompileJob.cpp`, that goes and expands the range (e.g. to
+  //      include leading whitespace), and that triggers a child to somehow
+  //      show up before its parent.
+  //
+  //    - There is some really annoying nesting of lambdas and templates that
+  //      screws up the `TLDFinder`.
+  } else {
+    CHECK(!decls.empty());
+    LOG(ERROR)
+        << "Couldn't find parent fragment ID of " << decls.front().KindName()
+        << " (it " << (IsLambda(decls.front()) ? "is" : "isn't")
+        << " a lambda; its parent " << (IsTopLevel(parent_entity) ? "is" : "isn't")
+        << " a top-level entity)"
+        << PrefixedLocation(decls.front(), " at or near ")
+        << " in main job file "
+        << pasta::AST::From(decls.front()).MainFile().Path().generic_string();
+
+    return mx::kInvalidEntityId;
+  }
+
+  return mx::EntityId(mx::FragmentId(parent_frag_index)).Pack();
 }
 
 void EntityMapper::ResetForFragment(void) {

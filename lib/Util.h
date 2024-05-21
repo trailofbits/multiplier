@@ -11,6 +11,8 @@
 
 namespace mx {
 
+enum class DeclCategory : unsigned char;
+enum class TokenCategory : unsigned char;
 enum class StmtKind : unsigned char;
 
 template <typename ForwardIterator, typename T>
@@ -49,5 +51,8 @@ static ForwardIterator UpperBound(ForwardIterator first, ForwardIterator last,
 // return a value. This is usually a good stopping point to say "this thing
 // isn't a line of code".
 bool IsNonValueStatement(StmtKind kind);
+
+// Converts a declaration category into token category.
+TokenCategory ConvertDeclCategoryToTokenCategory(DeclCategory category);
 
 }  // namespace mx

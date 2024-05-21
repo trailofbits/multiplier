@@ -21,6 +21,8 @@
 #include "TokenTree.h"
 #include "Util.h"
 
+#include <iostream>
+
 namespace indexer {
 namespace {
 
@@ -41,6 +43,8 @@ static void AddDeclReferenceFrom(
   // of the context in which declaration is referred.
   mx::ReferenceRecord record{from_id, to_id, from_id, default_kind};
   DeclReferenceKind(ast, em, from_entity, to_entity, record);
+  // std::cerr << mx::EnumeratorName(record.kind) << " " << record.from_entity_id
+  //           << " -> " << record.to_entity_id << '\n'; 
   database.AddAsync(record);
 }
 
@@ -259,7 +263,7 @@ static void AddFunctionSpecialization(
       raw_tpl_id = em.EntityId(func_pattern.value());
     }
   
-  } else if (auto tpl_pattern = func.TemplateInstantiationPattern()) {
+  } else if (auto tpl_pattern = TemplateInstantiationPattern(func)) {
     if (auto tpl = tpl_pattern->DescribedFunctionTemplate()) {
       raw_tpl_id = em.EntityId(tpl.value());
     } else {

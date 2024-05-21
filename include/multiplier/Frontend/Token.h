@@ -20,6 +20,7 @@ namespace mx {
 
 class Compilation;
 class CompilationImpl;
+class CustomTokenReader;
 class Designator;
 class EntityProvider;
 class File;
@@ -28,6 +29,7 @@ class Fragment;
 class Index;
 class MacroSubstitution;
 class MacroVAOpt;
+class NamedDecl;
 class Reference;
 class RegexQuery;
 class RegexQueryMatch;
@@ -78,12 +80,14 @@ class MX_EXPORT Token final {
  private:
   friend class Compilation;
   friend class CompilationImpl;
+  friend class CustomTokenReader;
   friend class EntityProvider;
   friend class File;
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
   friend class Macro;
+  friend class NamedDecl;
   friend class Reference;
   friend class TokenContext;
   friend class TokenRangeIterator;
@@ -255,11 +259,13 @@ class MX_EXPORT TokenRangeIterator {
 // A range of tokens.
 class MX_EXPORT TokenRange {
  protected:
+  friend class CustomTokenReader;
   friend class EntityProvider;
   friend class File;
   friend class Fragment;
   friend class FragmentImpl;
   friend class Macro;
+  friend class NamedDecl;
   friend class RegexQuery;
   friend class RegexQueryMatch;
   friend class RegexQueryMatchImpl;

@@ -230,21 +230,8 @@ std::optional<RedeclarableTemplateDecl> RedeclarableTemplateDecl::from(const Tok
   return std::nullopt;
 }
 
-std::optional<RedeclarableTemplateDecl> RedeclarableTemplateDecl::instantiated_from_member_template(void) const {
-  if (true) {
-    RawEntityId eid = impl->reader.getVal58();
-    if (eid == kInvalidEntityId) {
-      return std::nullopt;
-    }
-    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return RedeclarableTemplateDecl::from_base(std::move(eptr));
-    }
-  }
-  return std::nullopt;
-}
-
 bool RedeclarableTemplateDecl::is_member_specialization(void) const {
-  return impl->reader.getVal77();
+  return impl->reader.getVal65();
 }
 
 #pragma GCC diagnostic pop

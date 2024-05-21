@@ -94,7 +94,6 @@ class CopyOp(multiplier.ir.memref.Operation):
 
 class GenericAtomicRMWOp(multiplier.ir.memref.Operation):
   result: multiplier.ir.Value
-  atomic_body: multiplier.ir.Region
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -153,7 +152,6 @@ class AllocaOp(multiplier.ir.memref.Operation):
     ...
 
 class AllocaScopeOp(multiplier.ir.memref.Operation):
-  body_region: multiplier.ir.Region
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -239,8 +237,14 @@ class DimOp(multiplier.ir.memref.Operation):
     ...
 
 class DMAStartOp(multiplier.ir.memref.Operation):
+  src_mem_ref_rank: int
+  dst_mem_ref_rank: int
+  src_memory_space: int
+  dst_memory_space: int
+  tag_mem_ref_rank: int
   is_dest_memory_space_faster: bool
   is_src_memory_space_faster: bool
+  faster_mem_pos: int
   is_strided: bool
 
   @staticmethod
@@ -256,6 +260,7 @@ class DMAStartOp(multiplier.ir.memref.Operation):
     ...
 
 class DMAWaitOp(multiplier.ir.memref.Operation):
+  tag_mem_ref_rank: int
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -406,6 +411,8 @@ class ReallocOp(multiplier.ir.memref.Operation):
     ...
 
 class ReinterpretCastOp(multiplier.ir.memref.Operation):
+  result_rank: int
+  offset_size_and_stride_start_operand_index: int
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -480,6 +487,7 @@ class ViewOp(multiplier.ir.memref.Operation):
 
 class SubViewOp(multiplier.ir.memref.Operation):
   view_source: multiplier.ir.Value
+  offset_size_and_stride_start_operand_index: int
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:

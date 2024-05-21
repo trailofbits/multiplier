@@ -7,6 +7,7 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/OMPDeclareMapperDecl.h>
+#include "../Reference.h"
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/Expr.h>
 #include <multiplier/AST/NamedDecl.h>
@@ -223,18 +224,14 @@ std::optional<OMPDeclareMapperDecl> OMPDeclareMapperDecl::from(const TokenContex
 }
 
 Expr OMPDeclareMapperDecl::mapper_variable_reference(void) const {
-  RawEntityId eid = impl->reader.getVal58();
+  RawEntityId eid = impl->reader.getVal47();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
-gap::generator<Decl> OMPDeclareMapperDecl::declarations_in_context(void) const & {
-  EntityProviderPtr ep = impl->ep;
-  auto list = impl->reader.getVal51();
-  for (auto v : list) {
-    if (auto eptr = ep->DeclFor(ep, v)) {
-      co_yield std::move(eptr);
-    }
-  }
+gap::generator<Decl> OMPDeclareMapperDecl::contained_declarations(void) const & {
+  return BuiltinDeclReferences<Decl>(
+      impl->ep, id().Pack(), BuiltinReferenceKind::CONTAINS,
+      EntityProvider::kReferenceFrom, false  /* redecls */);
 }
 
 #pragma GCC diagnostic pop

@@ -124,6 +124,26 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
 namespace {
 static PyGetSetDef gProperties[] = {
+  {
+    "result_rank",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->result_rank());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::memref::ReinterpretCastOp::result_rank"),
+    nullptr,
+  },
+  {
+    "offset_size_and_stride_start_operand_index",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->offset_size_and_stride_start_operand_index());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::memref::ReinterpretCastOp::offset_size_and_stride_start_operand_index"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

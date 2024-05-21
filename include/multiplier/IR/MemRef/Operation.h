@@ -137,8 +137,8 @@ class MX_EXPORT GenericAtomicRMWOp final : public Operation {
   //::mlir::TypedValue<MemRefType> memref(void) const;
   //::mlir::Operation::operand_range indices(void) const;
   ::mx::ir::Value result(void) const;
-  ::mx::ir::Region atomic_body(void) const;
-  //Region& body(void) const;
+  //::mlir::Region & atomic_body(void) const;
+  //Region & body(void) const;
   //Value current_value(void) const;
   //MemRefType mem_ref_type(void) const;
 };
@@ -180,10 +180,10 @@ class MX_EXPORT AllocOp final : public Operation {
   //::mlir::Operation::operand_range dynamic_sizes(void) const;
   //::mlir::Operation::operand_range symbol_operands(void) const;
   //::mlir::TypedValue<MemRefType> memref(void) const;
-  //::std::optional<unsignedlonglong> alignment(void) const;
+  //::std::optional<unsigned long long> alignment(void) const;
   //StringRef alignment_attr_str_name(void) const;
   //MemRefType type(void) const;
-  //SmallVector<OpFoldResult,6> mixed_sizes(void) const;
+  //SmallVector<OpFoldResult, 6> mixed_sizes(void) const;
 };
 static_assert(sizeof(AllocOp) == sizeof(Operation));
 
@@ -202,12 +202,12 @@ class MX_EXPORT AllocaOp final : public Operation {
   //::mlir::Operation::operand_range dynamic_sizes(void) const;
   //::mlir::Operation::operand_range symbol_operands(void) const;
   //::mlir::TypedValue<MemRefType> memref(void) const;
-  //::std::optional<unsignedlonglong> alignment(void) const;
-  //::llvm::SmallVector<MemorySlot,3> promotable_slots(void) const;
-  //::llvm::SmallVector<DestructurableMemorySlot,1> destructurable_slots(void) const;
+  //::std::optional<unsigned long long> alignment(void) const;
+  //::llvm::SmallVector<MemorySlot, 3> promotable_slots(void) const;
+  //::llvm::SmallVector<DestructurableMemorySlot, 1> destructurable_slots(void) const;
   //StringRef alignment_attr_str_name(void) const;
   //MemRefType type(void) const;
-  //SmallVector<OpFoldResult,6> mixed_sizes(void) const;
+  //SmallVector<OpFoldResult, 6> mixed_sizes(void) const;
 };
 static_assert(sizeof(AllocaOp) == sizeof(Operation));
 
@@ -224,7 +224,7 @@ class MX_EXPORT AllocaScopeOp final : public Operation {
 
   // Imported methods:
   //::mlir::Operation::result_range results(void) const;
-  ::mx::ir::Region body_region(void) const;
+  //::mlir::Region & body_region(void) const;
 };
 static_assert(sizeof(AllocaScopeOp) == sizeof(Operation));
 
@@ -277,9 +277,9 @@ class MX_EXPORT CollapseShapeOp final : public Operation {
   //::mlir::TypedValue<MemRefType> src(void) const;
   //::mlir::TypedValue<MemRefType> result(void) const;
   //::mlir::ArrayAttr reassociation(void) const;
-  //SmallVector<AffineMap,4> reassociation_maps(void) const;
-  //SmallVector<SmallVector<AffineExpr,2>,4> reassociation_exprs(void) const;
-  //SmallVector<SmallVector<longlong,2>,4> reassociation_indices(void) const;
+  //SmallVector<AffineMap, 4> reassociation_maps(void) const;
+  //SmallVector<SmallVector<AffineExpr, 2>, 4> reassociation_exprs(void) const;
+  //SmallVector<SmallVector<long long, 2>, 4> reassociation_indices(void) const;
   //MemRefType src_type(void) const;
   //MemRefType result_type(void) const;
   //Value view_source(void) const;
@@ -317,7 +317,7 @@ class MX_EXPORT DimOp final : public Operation {
   ::mx::ir::Value source(void) const;
   //::mlir::TypedValue<IndexType> index(void) const;
   //::mlir::TypedValue<IndexType> result(void) const;
-  //std::optional<longlong> constant_index(void) const;
+  //std::optional<long long> constant_index(void) const;
   //Value shaped_value(void) const;
   //OpFoldResult dimension(void) const;
   //Speculation::Speculatability speculatability(void) const;
@@ -338,20 +338,20 @@ class MX_EXPORT DMAStartOp final : public Operation {
   // Imported methods:
   //::mlir::Operation::operand_range operands(void) const;
   //Value src_mem_ref(void) const;
-  //unsignedint src_mem_ref_rank(void) const;
+  unsigned int src_mem_ref_rank(void) const;
   //operand_range src_indices(void) const;
   //Value dst_mem_ref(void) const;
-  //unsignedint dst_mem_ref_rank(void) const;
-  //unsignedint src_memory_space(void) const;
-  //unsignedint dst_memory_space(void) const;
+  unsigned int dst_mem_ref_rank(void) const;
+  unsigned int src_memory_space(void) const;
+  unsigned int dst_memory_space(void) const;
   //operand_range dst_indices(void) const;
   //Value num_elements(void) const;
   //Value tag_mem_ref(void) const;
-  //unsignedint tag_mem_ref_rank(void) const;
+  unsigned int tag_mem_ref_rank(void) const;
   //operand_range tag_indices(void) const;
   bool is_dest_memory_space_faster(void) const;
   bool is_src_memory_space_faster(void) const;
-  //unsignedint faster_mem_pos(void) const;
+  unsigned int faster_mem_pos(void) const;
   bool is_strided(void) const;
   //Value stride(void) const;
   //Value num_elements_per_stride(void) const;
@@ -373,7 +373,7 @@ class MX_EXPORT DMAWaitOp final : public Operation {
   //::mlir::TypedValue<MemRefType> tag_mem_ref(void) const;
   //::mlir::Operation::operand_range tag_indices(void) const;
   //::mlir::TypedValue<IndexType> num_elements(void) const;
-  //unsignedint tag_mem_ref_rank(void) const;
+  unsigned int tag_mem_ref_rank(void) const;
 };
 static_assert(sizeof(DMAWaitOp) == sizeof(Operation));
 
@@ -392,9 +392,9 @@ class MX_EXPORT ExpandShapeOp final : public Operation {
   //::mlir::TypedValue<MemRefType> src(void) const;
   //::mlir::TypedValue<MemRefType> result(void) const;
   //::mlir::ArrayAttr reassociation(void) const;
-  //SmallVector<AffineMap,4> reassociation_maps(void) const;
-  //SmallVector<SmallVector<AffineExpr,2>,4> reassociation_exprs(void) const;
-  //SmallVector<SmallVector<longlong,2>,4> reassociation_indices(void) const;
+  //SmallVector<AffineMap, 4> reassociation_maps(void) const;
+  //SmallVector<SmallVector<AffineExpr, 2>, 4> reassociation_exprs(void) const;
+  //SmallVector<SmallVector<long long, 2>, 4> reassociation_indices(void) const;
   //MemRefType src_type(void) const;
   //MemRefType result_type(void) const;
   //Value view_source(void) const;
@@ -435,8 +435,8 @@ class MX_EXPORT ExtractStridedMetadataOp final : public Operation {
   //::mlir::TypedValue<IndexType> offset(void) const;
   //::mlir::Operation::result_range sizes(void) const;
   //::mlir::Operation::result_range strides(void) const;
-  //SmallVector<OpFoldResult,6> constified_mixed_sizes(void) const;
-  //SmallVector<OpFoldResult,6> constified_mixed_strides(void) const;
+  //SmallVector<OpFoldResult, 6> constified_mixed_sizes(void) const;
+  //SmallVector<OpFoldResult, 6> constified_mixed_strides(void) const;
   //OpFoldResult constified_mixed_offset(void) const;
   ::mx::ir::Value view_source(void) const;
 };
@@ -476,7 +476,7 @@ class MX_EXPORT GlobalOp final : public Operation {
   //::mlir::MemRefType type(void) const;
   //::std::optional<Attribute> initial_value(void) const;
   bool constant(void) const;
-  //::std::optional<unsignedlonglong> alignment(void) const;
+  //::std::optional<unsigned long long> alignment(void) const;
   bool is_external(void) const;
   bool is_uninitialized(void) const;
   //ElementsAttr constant_init_value(void) const;
@@ -555,7 +555,7 @@ class MX_EXPORT ReallocOp final : public Operation {
   // Imported methods:
   //::mlir::TypedValue<MemRefType> source(void) const;
   //::mlir::TypedValue<IndexType> dynamic_result_size(void) const;
-  //::std::optional<unsignedlonglong> alignment(void) const;
+  //::std::optional<unsigned long long> alignment(void) const;
   //MemRefType type(void) const;
 };
 static_assert(sizeof(ReallocOp) == sizeof(Operation));
@@ -577,17 +577,17 @@ class MX_EXPORT ReinterpretCastOp final : public Operation {
   //::mlir::Operation::operand_range sizes(void) const;
   //::mlir::Operation::operand_range strides(void) const;
   //::mlir::TypedValue<MemRefType> result(void) const;
-  //::llvm::ArrayRef<longlong> static_offsets(void) const;
-  //::llvm::ArrayRef<longlong> static_sizes(void) const;
-  //::llvm::ArrayRef<longlong> static_strides(void) const;
+  //::llvm::ArrayRef<long long> static_offsets(void) const;
+  //::llvm::ArrayRef<long long> static_sizes(void) const;
+  //::llvm::ArrayRef<long long> static_strides(void) const;
   //::mlir::Operation::operand_range dynamic_sizes(void) const;
   //MemRefType type(void) const;
   //Value view_source(void) const;
-  //unsignedint result_rank(void) const;
-  //std::array<unsignedint,3> array_attr_max_ranks(void) const;
-  //unsignedint offset_size_and_stride_start_operand_index(void) const;
-  //SmallVector<OpFoldResult,6> constified_mixed_sizes(void) const;
-  //SmallVector<OpFoldResult,6> constified_mixed_strides(void) const;
+  unsigned int result_rank(void) const;
+  //std::array<unsigned int, 3> array_attr_max_ranks(void) const;
+  unsigned int offset_size_and_stride_start_operand_index(void) const;
+  //SmallVector<OpFoldResult, 6> constified_mixed_sizes(void) const;
+  //SmallVector<OpFoldResult, 6> constified_mixed_strides(void) const;
   //OpFoldResult constified_mixed_offset(void) const;
 };
 static_assert(sizeof(ReinterpretCastOp) == sizeof(Operation));
@@ -690,15 +690,15 @@ class MX_EXPORT SubViewOp final : public Operation {
   //::mlir::Operation::operand_range sizes(void) const;
   //::mlir::Operation::operand_range strides(void) const;
   //::mlir::TypedValue<MemRefType> result(void) const;
-  //::llvm::ArrayRef<longlong> static_offsets(void) const;
-  //::llvm::ArrayRef<longlong> static_sizes(void) const;
-  //::llvm::ArrayRef<longlong> static_strides(void) const;
+  //::llvm::ArrayRef<long long> static_offsets(void) const;
+  //::llvm::ArrayRef<long long> static_sizes(void) const;
+  //::llvm::ArrayRef<long long> static_strides(void) const;
   ::mx::ir::Value view_source(void) const;
   //::mlir::Operation::operand_range dynamic_sizes(void) const;
   //MemRefType source_type(void) const;
   //MemRefType type(void) const;
-  //std::array<unsignedint,3> array_attr_max_ranks(void) const;
-  //unsignedint offset_size_and_stride_start_operand_index(void) const;
+  //std::array<unsigned int, 3> array_attr_max_ranks(void) const;
+  unsigned int offset_size_and_stride_start_operand_index(void) const;
   //llvm::SmallBitVector dropped_dims(void) const;
 };
 static_assert(sizeof(SubViewOp) == sizeof(Operation));

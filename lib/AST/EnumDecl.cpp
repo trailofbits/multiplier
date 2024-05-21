@@ -7,6 +7,7 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/EnumDecl.h>
+#include "../Reference.h"
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/EnumConstantDecl.h>
 #include <multiplier/AST/NamedDecl.h>
@@ -225,11 +226,11 @@ std::optional<EnumDecl> EnumDecl::from(const TokenContext &t) {
 }
 
 unsigned EnumDecl::num_enumerators(void) const {
-  return impl->reader.getVal62().size();
+  return impl->reader.getVal51().size();
 }
 
 std::optional<EnumConstantDecl> EnumDecl::nth_enumerator(unsigned n) const {
-  auto list = impl->reader.getVal62();
+  auto list = impl->reader.getVal51();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -243,12 +244,12 @@ std::optional<EnumConstantDecl> EnumDecl::nth_enumerator(unsigned n) const {
 }
 
 gap::generator<EnumConstantDecl> EnumDecl::enumerators(void) const & {
-  auto list = impl->reader.getVal62();
+  auto list = impl->reader.getVal51();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d62 = ep->DeclFor(ep, v)) {
-      if (auto e = EnumConstantDecl::from_base(std::move(d62))) {
+    if (auto d51 = ep->DeclFor(ep, v)) {
+      if (auto e = EnumConstantDecl::from_base(std::move(d51))) {
         co_yield std::move(*e);
       }
     }
@@ -258,7 +259,7 @@ gap::generator<EnumConstantDecl> EnumDecl::enumerators(void) const & {
 
 std::optional<Type> EnumDecl::integer_type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal79();
+    RawEntityId eid = impl->reader.getVal67();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -270,12 +271,12 @@ std::optional<Type> EnumDecl::integer_type(void) const {
 }
 
 TokenRange EnumDecl::integer_type_range(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal80(), impl->reader.getVal82());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal68(), impl->reader.getVal70());
 }
 
 std::optional<Type> EnumDecl::promotion_type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal83();
+    RawEntityId eid = impl->reader.getVal71();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -286,49 +287,32 @@ std::optional<Type> EnumDecl::promotion_type(void) const {
   return std::nullopt;
 }
 
-std::optional<EnumDecl> EnumDecl::template_instantiation_pattern(void) const {
-  if (true) {
-    RawEntityId eid = impl->reader.getVal84();
-    if (eid == kInvalidEntityId) {
-      return std::nullopt;
-    }
-    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return EnumDecl::from_base(std::move(eptr));
-    }
-  }
-  return std::nullopt;
-}
-
-TemplateSpecializationKind EnumDecl::template_specialization_kind(void) const {
-  return static_cast<TemplateSpecializationKind>(impl->reader.getVal85());
-}
-
 bool EnumDecl::is_closed(void) const {
-  return impl->reader.getVal104();
+  return impl->reader.getVal88();
 }
 
 bool EnumDecl::is_closed_flag(void) const {
-  return impl->reader.getVal105();
+  return impl->reader.getVal89();
 }
 
 bool EnumDecl::is_closed_non_flag(void) const {
-  return impl->reader.getVal106();
+  return impl->reader.getVal90();
 }
 
 bool EnumDecl::is_complete(void) const {
-  return impl->reader.getVal107();
+  return impl->reader.getVal91();
 }
 
 bool EnumDecl::is_fixed(void) const {
-  return impl->reader.getVal108();
+  return impl->reader.getVal92();
 }
 
 bool EnumDecl::is_scoped(void) const {
-  return impl->reader.getVal109();
+  return impl->reader.getVal93();
 }
 
 bool EnumDecl::is_scoped_using_class_tag(void) const {
-  return impl->reader.getVal110();
+  return impl->reader.getVal94();
 }
 
 #pragma GCC diagnostic pop

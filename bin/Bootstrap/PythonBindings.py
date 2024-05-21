@@ -168,6 +168,7 @@ namespace mx {
 
 class FileLocationCache;
 class ProxyTokenTreeVisitor;
+class QualifiedNameRenderOptions;
 class UserToken;
 
 namespace {
@@ -254,6 +255,13 @@ MODULE_CPP_SUFFIX = """
   // Doesn't have any methods, so no schema is made for it. We manually inject
   // this so that we can handle `Token::location`.
   if (!mx::PythonBinding<mx::FileLocationCache>::load(frontendm)) {
+    Py_DECREF(m);
+    return nullptr;
+  }
+
+  // Doesn't have any methods, so no schema is made fo rit. We manually inject
+  // this so that we can handle `NamedDecl::qualified_name`.
+  if (!mx::PythonBinding<mx::QualifiedNameRenderOptions>::load(astm)) {
     Py_DECREF(m);
     return nullptr;
   }
@@ -420,6 +428,22 @@ PROPERTY_SPEC = """  {{
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {{
           return ::mx::to_python(T_cast(self)->{cxx_method_name}());
+        }}),
+    nullptr,
+    PyDoc_STR("Wrapper for {cxx_namespace}{cxx_class_name}::{cxx_method_name}"),
+    nullptr,
+  }},
+"""
+
+
+# With generators, we want to make sure that we keep the object from which the
+# generator is produced alive as long as the generator itself, because some
+# internal state may get accessed during generation.
+GENERATOR_SPEC = """  {{
+    "{py_method_name}",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {{
+          return ::mx::generator_to_python(*T_cast(self), &T::{cxx_method_name});
         }}),
     nullptr,
     PyDoc_STR("Wrapper for {cxx_namespace}{cxx_class_name}::{cxx_method_name}"),
@@ -925,6 +949,22 @@ BINDING_CPP_FOOTER = """}  // namespace mx
 """
 
 
+class QualifiedNameRenderOptionsSchema(Schema):
+  def __init__(self, *args):
+    super().__init__()
+
+  def __str__(self) -> str:
+    return f"QualifiedNameRenderOptions"
+
+  @property
+  def python_value_name(self):
+    return "multiplier.ast.QualifiedNameRenderOptions"
+
+  @property
+  def cxx_value_name(self):
+    return "QualifiedNameRenderOptions"
+
+
 class UserTokenSchema(Schema):
   def __init__(self, *args):
     super().__init__()
@@ -1197,7 +1237,8 @@ def _wrap_property(class_schema: ClassSchema, schema: NamedSchema,
   rel_ns = _relative_namespace(class_schema)
   cxx_namespace = rel_ns and f"mx::{rel_ns}::" or "mx::"
 
-  out.append(PROPERTY_SPEC.format(
+  spec = isinstance(schema.return_type, GapGeneratorSchema) and GENERATOR_SPEC or PROPERTY_SPEC
+  out.append(spec.format(
       py_method_name=renamer.rename_method(class_schema, schema),
       cxx_class_name=class_schema.name,
       cxx_method_name=schema.name,
@@ -1770,6 +1811,7 @@ def run_on_ast(ast: AST, ns_name: str):
   lifter: SchemaLifter = SchemaLifter()
   lifter.add_lifter("mx::FileLocationCache", FileLocationCacheSchema)
   lifter.add_lifter("mx::TokenTreeVisitor", TokenTreeVisitorSchema)
+  lifter.add_lifter("mx::QualifiedNameRenderOptions", QualifiedNameRenderOptionsSchema)
   lifter.add_lifter("mx::UserToken", UserTokenSchema)
   lifter.add_lifter("mx::VariantEntity", VariantEntitySchema)
   lifter.add_lifter("mx::EntityId", EntityIdSchema)

@@ -82,7 +82,12 @@ class SQLiteEntityProvider final : public EntityProvider {
   gap::generator<RawEntityId> Redeclarations(const Ptr &, RawEntityId) & final;
 
   gap::generator<std::tuple<RawEntityId, RawEntityId, RawEntityId>>
-  References(const Ptr &, RawEntityId eid, ReferenceDirection) & final;
+  References(const Ptr &, RawEntityId eid, ReferenceDirection,
+             bool redecls) & final;
+
+  gap::generator<std::pair<RawEntityId, RawEntityId>>
+  SpecificReferences(const Ptr &, RawEntityId eid, RawEntityId kind_id,
+                     ReferenceDirection direction, bool redecls) & final;
 
   gap::generator<RawEntityId> FindSymbol(const Ptr &, std::string name) & final;
 

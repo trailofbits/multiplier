@@ -148,7 +148,7 @@ static PyGetSetDef gProperties[] = {
     "redeclarations",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->redeclarations());
+          return ::mx::generator_to_python(*T_cast(self), &T::redeclarations);
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::LinkageSpecDecl::redeclarations"),
@@ -192,6 +192,16 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::LinkageSpecDecl::has_braces"),
+    nullptr,
+  },
+  {
+    "contained_declarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::contained_declarations);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LinkageSpecDecl::contained_declarations"),
     nullptr,
   },
   {}  // Sentinel.

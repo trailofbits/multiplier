@@ -243,11 +243,11 @@ bool MemberExpr::is_arrow(void) const {
 }
 
 bool MemberExpr::is_implicit_access(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal90();
 }
 
 NonOdrUseReason MemberExpr::is_non_odr_use(void) const {
-  return static_cast<NonOdrUseReason>(impl->reader.getVal91());
+  return static_cast<NonOdrUseReason>(impl->reader.getVal89());
 }
 
 #pragma GCC diagnostic pop

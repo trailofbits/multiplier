@@ -124,6 +124,16 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
 namespace {
 static PyGetSetDef gProperties[] = {
+  {
+    "calling_convention",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->calling_convention());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::DISubroutineTypeAttr::calling_convention"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

@@ -229,7 +229,7 @@ gap::generator<Expr> CXXConstructExpr::arguments(void) const & {
 }
 
 CXXConstructionKind CXXConstructExpr::construction_kind(void) const {
-  return static_cast<CXXConstructionKind>(impl->reader.getVal91());
+  return static_cast<CXXConstructionKind>(impl->reader.getVal89());
 }
 
 CXXConstructorDecl CXXConstructExpr::constructor(void) const {
@@ -266,7 +266,7 @@ bool CXXConstructExpr::is_std_initializer_list_initialization(void) const {
 }
 
 bool CXXConstructExpr::requires_zero_initialization(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal90();
 }
 
 #pragma GCC diagnostic pop

@@ -56,7 +56,7 @@ static clang::Type *BasicTypeDeduplication(
     EntityList<const clang::Stmt *> *list = nullptr);
 
 static clang::Type *BasicTypeDeduplication(
-    clang::ASTContext &ctx,clang::QualType type, uint32_t &up_quals,
+    clang::ASTContext &ctx, clang::QualType type, uint32_t &up_quals,
     EntityList<const clang::Stmt *> *list = nullptr) {
 
   clang::Type *tp = const_cast<clang::Type *>(type.getTypePtrOrNull());
@@ -68,13 +68,12 @@ static clang::Type *BasicTypeDeduplication(
   return BasicTypeDeduplication(ctx, tp, up_quals, list);
 }
 
-
 clang::Type *BasicTypeDeduplication(
     clang::ASTContext &ctx, clang::Type *type, uint32_t &up_quals,
     EntityList<const clang::Stmt *> *list) {
 
   if (!type) {
-    return nullptr;
+    return const_cast<clang::Type *>(ctx.UnresolvedTy.getTypePtr());
   }
 
   // Early exit: we're not interested in finding nested statements, so replace
@@ -231,6 +230,10 @@ bool TypePrintingPolicy::ShouldPrintOriginalTypeOfAdjustedType(void) const {
 
 bool TypePrintingPolicy::ShouldPrintOriginalTypeOfDecayedType(void) const {
   return false;
+}
+
+bool TypePrintingPolicy::ShouldPrintDeducedTypes(void) const {
+  return true;
 }
 
 clang::QualType TypeMapper::Compress(clang::ASTContext &context,
@@ -408,7 +411,6 @@ bool TypeMapper::AddEntityId(PendingFragment &pf, pasta::Type *entity_) {
     pf.TryAdd(ast.Adopt(stmt));
   }
 
-
   TypeKey dedup_type_key(raw_type, raw_qualifiers);
   assert(dedup_type_key.first != nullptr);
 
@@ -429,17 +431,18 @@ bool TypeMapper::AddEntityId(PendingFragment &pf, pasta::Type *entity_) {
   entity = ast.Adopt(raw_type, raw_qualifiers);
 
   auto token_range = pasta::PrintedTokenRange::Create(entity, pp);
-  auto [type_id, is_new_type_id] = id_store.GetOrCreateTypeIdForHash(
+  auto hash = HashType(pf, entity, token_range);
+  auto [type_id, id_status] = id_store.GetOrCreateTypeIdForHash(
       mx::FromPasta(entity.Kind()),
       raw_qualifiers,
-      HashType(pf, entity, token_range),
+      hash,
       token_range.size());
 
   auto tid = type_id.Unpack();
   type_ids.emplace(orig_type_key, tid);
   type_ids.emplace(dedup_type_key, tid);
 
-  return is_new_type_id;
+  return id_status == IdStatus::kNew;
 }
 
 mx::PackedTypeId TypeMapper::TypeId(const pasta::Type &type) const {

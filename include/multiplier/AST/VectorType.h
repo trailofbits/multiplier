@@ -47,7 +47,6 @@ class MX_EXPORT VectorType : public Type {
   static std::optional<VectorType> from(const VariantEntity &e);
   static std::optional<VectorType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   Type element_type(void) const;
   VectorKind vector_kind(void) const;
   bool is_sugared(void) const;

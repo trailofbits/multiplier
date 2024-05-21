@@ -252,7 +252,7 @@ def find_qobject_connect(index: mx.Index, seen: Set[int]) -> Iterable[mx.ast.CXX
 
         # Go through all declarations in the class body. We want to see methods and function templates, as most
         # definitions of `connect` are actually method templates.
-        for decl in ent.declarations_in_context:
+        for decl in ent.contained_declarations:
             if not isinstance(decl, mx.ast.NamedDecl) or decl.name != "connect":
                 continue
 
@@ -391,6 +391,14 @@ class CallGraph:
     def _overloads(meth: mx.ast.CXXMethodDecl):
         yield meth
 
+    def __iter__(self) -> Iterable[Call]:
+        for calls in self.calls.values():
+            for call in calls:
+                yield call
+
+    def callees(self, func: mx.ast.FunctionDecl) -> Iterable[Call]:
+        yield from self.calls.get(func, [])
+
     def _add_callees(self, func: mx.ast.FunctionDecl, work_list: List[mx.ast.FunctionDecl]):
         if func in self.calls:
             return
@@ -483,6 +491,8 @@ def main():
     parser.add_argument("--db", type=str, required=True, help="Path to the database")
     parser.add_argument("--dot", type=str, help="Path to the output DOT file")
     parser.add_argument("--locations", type=str, help="Path to the output locations file")
+    parser.add_argument("--only_cycles", action="store_true", help="Should acyclic signals be removed?")
+    parser.add_argument("--save_references", action="store_true", help="Should references be added back into the database?")
     args = parser.parse_args()
     index = mx.Index.in_memory_cache(mx.Index.from_database(args.db))
     seen: Set[int] = set()
@@ -491,13 +501,24 @@ def main():
         for signal in find_signals(activate, seen):
             debug("SIGNAL {}: {}", name(signal), " ".join(t.data for t in signal.type.tokens))
 
+    signal_slots: List[Tuple[mx.ast.FunctionDecl, mx.ast.FunctionDecl]] = []
+
     for connect in find_qobject_connect(index, seen):
         for connect_call, sender, signal, receiver, slot in find_connections(connect, seen):
             debug("CONNECT({}, {})", name(signal), name(slot))
             rx_edge: Call = Call(receiver, connect_call, slot.canonical_declaration)
             cg.inject_call(signal, rx_edge)
+            signal_slots.append((signal.canonical_declaration, slot.canonical_declaration))
 
-    cg.remove_acyclic()
+    # Add the actual references into the database.
+    if args.save_references:
+        call_kind = mx.ReferenceKind.get(index, mx.BuiltinReferenceKind.CALLS)
+        for signal, slot in signal_slots:
+            for call in cg.callees(signal):
+                mx.Reference.add(call_kind, call.call, slot)
+
+    if args.only_cycles:
+        cg.remove_acyclic()
 
     if args.dot:
         with open(args.dot, "w") as f:

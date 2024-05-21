@@ -14,7 +14,6 @@ add_executable("${exe_name}"
   "BuildPendingFragment.cpp"
   "Codegen.cpp"
   "Codegen.h"
-  "CodegenMetaGenerator.h"
   "Context.cpp"
   "Context.h"
   "Endian.h"
@@ -81,6 +80,7 @@ target_link_libraries("${exe_name}"
     glog::glog
     gflags::gflags
     concurrentqueue
+    intervaltree
     reproc++
     xxHash::xxhash
     RocksDB::rocksdb

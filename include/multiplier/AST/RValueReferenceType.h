@@ -48,7 +48,6 @@ class MX_EXPORT RValueReferenceType : public ReferenceType {
   static std::optional<RValueReferenceType> from(const VariantEntity &e);
   static std::optional<RValueReferenceType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   bool is_sugared(void) const;
 };
 

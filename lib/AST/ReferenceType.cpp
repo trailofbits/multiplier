@@ -107,16 +107,16 @@ Type ReferenceType::pointee_type(void) const {
 }
 
 Type ReferenceType::pointee_type_as_written(void) const {
-  RawEntityId eid = impl->reader.getVal20();
+  RawEntityId eid = impl->reader.getVal25();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool ReferenceType::is_inner_reference(void) const {
-  return impl->reader.getVal21();
+  return impl->reader.getVal20();
 }
 
 bool ReferenceType::is_spelled_as_l_value(void) const {
-  return impl->reader.getVal22();
+  return impl->reader.getVal21();
 }
 
 #pragma GCC diagnostic pop

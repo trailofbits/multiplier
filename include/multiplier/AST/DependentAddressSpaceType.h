@@ -47,7 +47,6 @@ class MX_EXPORT DependentAddressSpaceType : public Type {
   static std::optional<DependentAddressSpaceType> from(const VariantEntity &e);
   static std::optional<DependentAddressSpaceType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   Expr address_space_expression(void) const;
   Token attribute_token(void) const;
   Type pointee_type(void) const;

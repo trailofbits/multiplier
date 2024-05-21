@@ -43,6 +43,14 @@ KindAndColor(mx::RawEntityId id) {
   }
 }
 
+static const char *ReferenceName(const mx::Reference &ref) {
+  if (auto brk = ref.builtin_reference_kind()) {
+    return EnumeratorName(brk.value());
+  } else {
+    return "reference";
+  }
+}
+
 int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
@@ -95,7 +103,7 @@ int main(int argc, char *argv[]) {
 
         for (mx::Reference ref : mx::Reference::to(decl)) {
           if (auto ref_stmt = ref.as_statement()) {
-            add_edge(ref_stmt->id().Pack(), user_id, "reference", path_len);
+            add_edge(ref_stmt->id().Pack(), user_id, ReferenceName(ref), path_len);
           }
         }
 
@@ -135,7 +143,7 @@ int main(int argc, char *argv[]) {
           for (mx::Reference ref : mx::Reference::to(def.value())) {
             if (auto ref_macro = ref.as_macro()) {
               auto macro_id = ref_macro->id().Pack();  // Expansion.
-              add_back_edge(macro_id, user_id, "reference", path_len);
+              add_back_edge(macro_id, user_id, ReferenceName(ref), path_len);
             }
           }
         }
@@ -151,7 +159,7 @@ int main(int argc, char *argv[]) {
         for (mx::Reference ref : mx::Reference::to(file)) {
           if (auto ref_macro = ref.as_macro()) {
             auto macro_id = ref_macro->id().Pack();  // Include.
-            add_back_edge(macro_id, user_id, "reference", path_len);
+            add_back_edge(macro_id, user_id, ReferenceName(ref), path_len);
           }
         }
       }

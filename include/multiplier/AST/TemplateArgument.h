@@ -30,6 +30,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Reference;
+class Expr;
 class File;
 class TemplateArgument;
 class TemplateArgumentImpl;
@@ -103,11 +104,14 @@ class MX_EXPORT TemplateArgument {
   bool is_instantiation_dependent(void) const;
   bool contains_unexpanded_parameter_pack(void) const;
   bool is_pack_expansion(void) const;
-  std::optional<ValueDecl> as_declaration(void) const;
-  std::optional<Type> as_type(void) const;
+  std::optional<ValueDecl> declaration(void) const;
+  std::optional<Type> type(void) const;
   std::optional<Type> parameter_type_for_declaration(void) const;
   std::optional<Type> null_pointer_type(void) const;
-  std::optional<std::vector<TemplateArgument>> pack_elements(void) const;
+  std::optional<Expr> expression(void) const;
+  std::optional<TemplateArgument> nth_pack_argument(unsigned n) const;
+  unsigned num_pack_arguments(void) const;
+  gap::generator<TemplateArgument> pack_arguments(void) const &;
 };
 
 #endif

@@ -220,7 +220,7 @@ std::optional<LifetimeExtendedTemporaryDecl> MaterializeTemporaryExpr::lifetime_
 }
 
 StorageDuration MaterializeTemporaryExpr::storage_duration(void) const {
-  return static_cast<StorageDuration>(impl->reader.getVal91());
+  return static_cast<StorageDuration>(impl->reader.getVal89());
 }
 
 Expr MaterializeTemporaryExpr::sub_expression(void) const {

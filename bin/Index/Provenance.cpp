@@ -16,6 +16,10 @@
 #pragma clang diagnostic ignored "-Wshadow"
 #pragma clang diagnostic ignored "-Wcast-align"
 #include <clang/Basic/TokenKinds.h>
+#include <clang/AST/TemplateBase.h>
+#include <clang/AST/TemplateName.h>
+#include <clang/AST/Type.h>
+#include <llvm/Support/raw_ostream.h>
 #pragma clang diagnostic pop
 
 #include <algorithm>
@@ -24,6 +28,7 @@
 #include <iostream>
 #include <multiplier/AST/StmtKind.h>
 #include <multiplier/Frontend/TokenKind.h>
+#include <pasta/AST/AST.h>
 #include <pasta/AST/Attr.h>
 #include <pasta/AST/Decl.h>
 #include <pasta/AST/Macro.h>
@@ -170,15 +175,21 @@ static bool AcceptOOK(pasta::OverloadedOperatorKind ook, pasta::TokenKind tk) {
   }
 }
 
+static mx::RawEntityId VisitType(
+    const EntityMapper &em, const pasta::Type &type, std::string_view tok_data,
+    int context_depth);
+
 // Visit the `stmt` and try to make `raw_token` or the token data in it.
 // Depending on the quality of information we have, we might go for exact
 // matches (against `raw_token`), or in-name-only matches, e.g. the field is
 // called `foo` and the data of the token is also `foo`.
-static const void *VisitStmt(const pasta::Stmt &stmt,
-                             const void *raw_token,
-                             std::string_view token_data,
-                             pasta::TokenKind token_kind,
-                             bool is_identifier) {
+static mx::RawEntityId VisitStmt(const EntityMapper &em,
+                                 const pasta::Stmt &stmt,
+                                 const void *raw_token,
+                                 std::string_view token_data,
+                                 pasta::TokenKind token_kind,
+                                 bool is_identifier,
+                                 int depth) {
 
   auto check_token = [=] (const pasta::Token &et) {
     if (raw_token) {
@@ -188,6 +199,8 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
     }
   };
 
+  const auto raw_stmt = em.EntityId(stmt);
+
   // Try to match the named declaration referenced by a `DeclRefExpr`.
   if (auto dre = pasta::DeclRefExpr::From(stmt)) {
     auto decl = dre->Declaration();
@@ -195,12 +208,12 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
 
       if (auto nd = pasta::NamedDecl::From(decl)) {
         if (nd->Name() == token_data) {
-          return RawEntity(nd.value());
+          return em.EntityId(nd.value());
         }
 
         // Common case for C code.
         if (check_token(dre->ExpressionToken())) {
-          return RawEntity(nd.value());
+          return em.EntityId(nd.value());
         }
 
         // Sometimes the expression token is waaaay off, e.g. in the
@@ -208,7 +221,7 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
         // token for `__and_<....>::value` is `__and_`. In this case, we use
         // the end token.
         if (check_token(dre->EndToken())) {
-          return RawEntity(nd.value());
+          return em.EntityId(nd.value());
         }
 
         // For C++ code, something like `B::name<...>` where `B` is the
@@ -216,20 +229,35 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
         // and `name` is the token previous to the `LAngleToken`.
         if (auto before_l_angle = dre->LAngleToken().PreviousLocation()) {
           if (check_token(before_l_angle.value())) {
-            return RawEntity(nd.value());
+            return em.EntityId(nd.value());
           }
         }
       }
     }
 
+    // TODO(pag): Use `std::ispunct` on `token_data[0]`?
     if (auto meth = pasta::CXXMethodDecl::From(decl)) {
       if (AcceptOOK(meth->OverloadedOperator(), token_kind)) {
-        return RawEntity(meth.value());
+        return em.EntityId(meth.value());
       }
+    }
+
+  // `this`.
+  } else if (auto this_ = pasta::CXXThisExpr::From(stmt)) {
+    if (token_kind == pasta::TokenKind::kKeywordThis || token_data == "this") {
+      return raw_stmt;
     }
 
   // Try to match on `member` in `base->member` or `base.member`.
   } else if (auto me = pasta::MemberExpr::From(stmt)) {
+    if (token_kind == pasta::TokenKind::kPeriod ||
+        token_kind == pasta::TokenKind::kArrow) {
+      if (check_token(me->OperatorToken())) {
+        return raw_stmt;
+      }
+      return mx::kInvalidEntityId;
+    }
+
     pasta::ValueDecl md = me->MemberDeclaration();
 
     // With a `CxxMemberCallExpr` to an overloaded operator, we might see the
@@ -238,34 +266,60 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
     if (auto func = pasta::FunctionDecl::From(md)) {
       auto ook = func->OverloadedOperator();
       if (AcceptOOK(ook, token_kind)) {
-        return RawEntity(md);
+        return em.EntityId(md);
       }
     }
 
+    if (!is_identifier) {
+      return mx::kInvalidEntityId;
+    }
+
     if (check_token(me->MemberToken())) {
-      return RawEntity(md);
+      return em.EntityId(md);
     }
 
     // Failing this, try to match on `base` in `base->member` or `base.member`.
-    return VisitStmt(me->Base(), raw_token, token_data, token_kind,
-                     is_identifier);
+    return VisitStmt(em, me->Base(), raw_token, token_data, token_kind,
+                     is_identifier, depth);
+
+  // Something like `__c11_atomic_load(...)` of an `_Atomic`-qualified variable.
+  } else if (auto atomic = pasta::AtomicExpr::From(stmt)) {
+    if (is_identifier) {
+      if (token_data == atomic->BuiltinToken().Data()) {
+        return raw_stmt;
+      }
+    } else if (!depth && (token_kind == pasta::TokenKind::kRParenthesis ||
+                          token_kind == pasta::TokenKind::kLParenthesis)) {
+      auto r_paren = atomic->RParenToken();
+      if (r_paren.Kind() == pasta::TokenKind::kRParenthesis) {
+        if (check_token(r_paren)) {
+          return raw_stmt;
+        }
+
+        if (auto l_paren = r_paren.BalancedLocation()) {
+          if (check_token(l_paren.value())) {
+            return raw_stmt;
+          }
+        }
+      }
+    }
 
   // The label name in an `asm goto`.
   } else if (auto addr = pasta::AddrLabelExpr::From(stmt)) {
     if (check_token(addr->LabelToken())) {
-      return RawEntity(addr->Label());
+      return em.EntityId(addr->Label());
     }
 
   } else if (auto ce = pasta::CXXConstructExpr::From(stmt)) {
     pasta::CXXConstructorDecl cd = ce->Constructor();
     if (check_token(ce->Token())) {
-      return RawEntity(cd);
+      return em.EntityId(cd);
     }
 
   // Try to match on `label` in `goto label;`.
   } else if (auto gt = pasta::GotoStmt::From(stmt)) {
     if (check_token(gt->LabelToken())) {
-      return RawEntity(gt->Label());
+      return em.EntityId(gt->Label());
     }
 
   // Try to match on `member` in `{ .member = ... }`.
@@ -273,124 +327,195 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
     for (pasta::Designator de : di->Designators()) {
       if (auto f = de.Field()) {
         if (check_token(de.FieldToken())) {
-          return RawEntity(f.value());
+          return em.EntityId(f.value());
         }
       }
     }
 
   } else if (auto ili = pasta::InitListExpr::From(stmt)) {
-    // TODO(pag): Issue #192.
-//    auto bi = ili->BeginToken().Index();
-//    auto ei = ili->EndToken().Index();
-//    auto ti = token.Index();
-//    if (bi <= ti && ti <= ei) {
-//      return RawEntity(ili);
-//    }
+    if (token_kind == pasta::TokenKind::kLBrace) {
+      if (check_token(ili->BeginToken())) {
+        return raw_stmt;
+      }
+    } else if (token_kind == pasta::TokenKind::kRBrace) {
+      if (check_token(ili->EndToken())) {
+        return raw_stmt;
+      }
+    }
 
   // Try to match on `label` in `label:`.
   } else if (auto ls = pasta::LabelStmt::From(stmt)) {
     if (check_token(ls->IdentifierToken())) {
-      return RawEntity(ls->Declaration());
+      return em.EntityId(ls->Declaration());
     }
 
   } else if (auto pde = pasta::PredefinedExpr::From(stmt)) {
     if (is_identifier && check_token(pde->ExpressionToken())) {
-      return RawEntity(pde.value());
+      return raw_stmt;
     }
 
   // Try to match on `func`, `(`, or `)` in `func()`.
   } else if (auto call = pasta::CallExpr::From(stmt)) {
-    auto ret = VisitStmt(call->Callee(), raw_token, token_data, token_kind,
-                         is_identifier);
-    if (ret || is_identifier) {
-      return ret;
+    if (auto oc = pasta::CXXOperatorCallExpr::From(stmt)) {
+      // Try to match the operator token itself, or the `operator` keyword.
+      if (AcceptOOK(oc->Operator(), token_kind) || token_data == "operator") {
+        return em.EntityId(call->CalleeDeclaration());
+      }
+    }
+
+    if (token_kind != pasta::TokenKind::kLParenthesis &&
+        token_kind != pasta::TokenKind::kRParenthesis) {
+      return VisitStmt(em, call->Callee(), raw_token, token_data, token_kind,
+                       is_identifier, depth);
+    }
+
+    if (depth) {
+      return mx::kInvalidEntityId;
     }
 
     // Try to match the `)` in `func()`.
     auto r_paren = call->RParenToken();
     if (r_paren.Kind() != pasta::TokenKind::kRParenthesis) {
-      return nullptr;
+      return mx::kInvalidEntityId;
     }
 
     if (token_kind == pasta::TokenKind::kRParenthesis) {
       if (check_token(r_paren)) {
-        return RawEntity(call.value());
+        return raw_stmt;
       }
 
     } else if (token_kind == pasta::TokenKind::kLParenthesis) {
       auto l_paren = r_paren.BalancedLocation();
       if (!l_paren || l_paren->Kind() != pasta::TokenKind::kLParenthesis) {
         assert(false);
-        return nullptr;
+        return mx::kInvalidEntityId;
       }
 
       if (check_token(l_paren.value())) {
-        return RawEntity(call.value());
+        return raw_stmt;
       }
     }
 
-  // Parentheses.
-  } else if (auto paren = pasta::ParenExpr::From(stmt)) {
+  } else if (auto fce = pasta::CXXFunctionalCastExpr::From(stmt)) {
+
+    if (is_identifier) {
+      return VisitType(em, fce->TypeAsWritten(), token_data, 0u);
+
+    } else if (!depth) {
+      if (token_kind == pasta::TokenKind::kLParenthesis) {
+        if (check_token(fce->LParenToken())) {
+          return raw_stmt;
+        }
+      } else if (token_kind == pasta::TokenKind::kRParenthesis) {
+        if (check_token(fce->RParenToken())) {
+          return raw_stmt;
+        }
+      }
+    }
+
+  } else if (auto ece = pasta::ExplicitCastExpr::From(stmt)) {
+    if (token_kind != pasta::TokenKind::kLParenthesis &&
+        token_kind != pasta::TokenKind::kRParenthesis) {
+      return mx::kInvalidEntityId;
+    }
+
+    if (!depth) {
+      return mx::kInvalidEntityId;
+    }
+
+    auto begin_tok = ece->BeginToken();
+    if (begin_tok.Kind() != pasta::TokenKind::kLParenthesis) {
+      return mx::kInvalidEntityId;
+    }
+
     if (token_kind == pasta::TokenKind::kLParenthesis) {
-      if (check_token(paren->BeginToken())) {
-        return RawEntity(paren.value());
+      if (check_token(begin_tok)) {
+        return raw_stmt;
       }
-    } else if (token_kind == pasta::TokenKind::kRParenthesis) {
-      if (check_token(paren->EndToken())) {
-        return RawEntity(paren.value());
-      }
-    }
-
-  // Braces.
-  } else if (auto comp = pasta::CompoundStmt::From(stmt)) {
-    if (token_kind == pasta::TokenKind::kLBrace) {
-      auto l_brace = comp->LeftBraceToken();
-      if (raw_token) {
-        if (raw_token == RawEntity(l_brace)) {
-          return RawEntity(comp.value());
-        }
-      } else if (l_brace.Kind() == token_kind) {
-        return RawEntity(comp.value());
-      }
-    } else if (token_kind == pasta::TokenKind::kRBrace) {
-      auto r_brace = comp->RightBraceToken();
-      if (raw_token) {
-        if (raw_token == RawEntity(r_brace)) {
-          return RawEntity(comp.value());
-        }
-      } else if (r_brace.Kind() == pasta::TokenKind::kRBrace) {
-        return RawEntity(comp.value());
-      }
-    }
-  
-  // Binary operator.
-  } else if (auto binary = pasta::BinaryOperator::From(stmt)) {
-    auto ot = binary->OperatorToken();
-    if (token_kind == ot.Kind()) {
-      if (raw_token) {
-        if (raw_token == RawEntity(ot)) {
-          return RawEntity(stmt);
-        }
-      } else {
-        return RawEntity(stmt);
-      }
-    }
-  
-  // Unary operator.
-  } else if (auto unary = pasta::UnaryOperator::From(stmt)) {
-    auto ot = unary->OperatorToken();
-    if (token_kind == ot.Kind()) {
-      if (raw_token) {
-        if (raw_token == RawEntity(ot)) {
-          return RawEntity(stmt);
-        }
-      } else {
-        return RawEntity(stmt);
+    } else if (auto balanced = begin_tok.BalancedLocation()) {
+      if (check_token(balanced.value())) {
+        return raw_stmt;
       }
     }
   }
 
-  return nullptr;
+  // TODO(pag): CoroutineBodyStmt.
+
+  // // Declaration statement, which might have an assignment.
+  // } else if (auto dstmt = pasta::DeclStmt::From(stmt)) {
+
+  if (depth) {
+    return mx::kInvalidEntityId;
+  }
+
+  switch (stmt.Kind()) {
+
+    // Binary operator.
+    case pasta::StmtKind::kBinaryOperator:
+      if (check_token(reinterpret_cast<const pasta::BinaryOperator &>(stmt).OperatorToken())) {
+        return raw_stmt;
+      }
+      break;
+
+    // Unary operator.
+    case pasta::StmtKind::kUnaryOperator:
+      if (check_token(reinterpret_cast<const pasta::UnaryOperator &>(stmt).OperatorToken())) {
+        return raw_stmt;
+      }
+      break;
+    case pasta::StmtKind::kSwitchStmt:
+      if (token_kind == pasta::TokenKind::kLBrace ||
+          token_kind == pasta::TokenKind::kRBrace) {
+        return raw_stmt;
+      }
+      [[fallthrough]];
+    case pasta::StmtKind::kStmtExpr:
+    case pasta::StmtKind::kParenExpr:
+    case pasta::StmtKind::kIfStmt:
+    case pasta::StmtKind::kWhileStmt:
+    case pasta::StmtKind::kDoStmt:
+    case pasta::StmtKind::kForStmt:
+    case pasta::StmtKind::kCXXCatchStmt:
+      if (token_kind == pasta::TokenKind::kLParenthesis ||
+          token_kind == pasta::TokenKind::kRParenthesis) {
+        return raw_stmt;
+      }
+      break;
+    case pasta::StmtKind::kCompoundStmt:
+      if (token_kind == pasta::TokenKind::kLBrace ||
+          token_kind == pasta::TokenKind::kRBrace) {
+        return raw_stmt;
+      }
+      break;
+    default:
+      break;
+  }
+
+  return mx::kInvalidEntityId;
+}
+
+// Try to see if a token matches a declaration. As above, sometimes we have
+// the raw parsed token and want an exact match, whereas other times we only
+// have token data, and will accept an in-name-only match.
+static bool TokenMatchesDecl(
+    pasta::TokenKind tk, const void *raw_token, const pasta::Decl &decl,
+    std::string_view token_data);
+
+// Try to match some token data against a `clang::TemplateName`.
+static mx::RawEntityId VisitTemplateName(
+    const EntityMapper &em, const pasta::AST &ast, clang::TemplateName tn,
+    std::string_view tok_data) {
+
+  if (auto raw_tpl = tn.getAsTemplateDecl()) {
+    auto decl = ast.Adopt(
+        reinterpret_cast<const clang::Decl *>(raw_tpl));
+    if (TokenMatchesDecl(pasta::TokenKind::kIdentifier, nullptr,
+                         decl, tok_data)) {
+      return em.EntityId(decl);
+    }
+  }
+
+  return mx::kInvalidEntityId;
 }
 
 // Try to match some token data, e.g. identifier data `foo`, against the name of
@@ -401,27 +526,72 @@ static const void *VisitStmt(const pasta::Stmt &stmt,
 // ways, we use PASTA's pretty printer and logic in this and other functions
 // to emulate the kinds of information gleaned from `clang::TypeLoc`s. PASTA
 // doesn't wrap `clang::TypeLoc`s, though.
-static const void *VisitType(const pasta::Type &type,
-                             std::string_view tok_data,
-                             int context_depth) {
+mx::RawEntityId VisitType(
+    const EntityMapper &em, const pasta::Type &type, std::string_view tok_data,
+    int context_depth) {
 
   if (auto typedef_type = pasta::TypedefType::From(type)) {
     auto typedef_decl = typedef_type->Declaration();
     if (typedef_decl.Name() == tok_data) {
-      return RawEntity(typedef_decl);
+      return em.EntityId(typedef_decl);
     }
 
   } else if (auto tag_type = pasta::TagType::From(type)) {
     auto tag_decl = tag_type->Declaration();
-    if (tag_decl.Name() == tok_data) {
-      return RawEntity(tag_decl);
+    if (TokenMatchesDecl(pasta::TokenKind::kIdentifier, nullptr,
+                         tag_decl, tok_data)) {
+      return em.EntityId(tag_decl);
     }
 
-  } else if (auto deduced_type = pasta::DeducedType::From(type)) {
-    if (deduced_type->IsDeduced()) {
-      auto resolved_type = deduced_type->ResolvedType();
-      if (resolved_type) {
-        return VisitType(resolved_type.value(), tok_data, context_depth);
+  } else if (auto spec = pasta::TemplateSpecializationType::From(type)) {
+    if (!context_depth && spec->IsSugared()) {
+      auto eid = VisitType(em, spec->Desugar(), tok_data, context_depth);
+      if (eid != mx::kInvalidEntityId) {
+        return eid;
+      }
+    }
+
+    // This might find a builtin template decl.
+    auto raw_type = clang::dyn_cast<clang::TemplateSpecializationType>(
+        spec->RawType());
+    return VisitTemplateName(em, pasta::AST::From(type),
+                             raw_type->getTemplateName(), tok_data);
+
+  } else if (auto param = pasta::TemplateTypeParmType::From(type)) {
+
+    if (auto decl = param->Declaration()) {
+      if (TokenMatchesDecl(pasta::TokenKind::kIdentifier, nullptr,
+                           decl.value(), tok_data)) {
+        return em.EntityId(decl.value());
+      }
+    }
+
+    // PASTA's pretty printer ensures that this won't get split up into
+    // a bunch of individual tokens.
+    if (tok_data.starts_with("type-parameter-")) {
+      return em.EntityId(type);
+    }
+
+  } else if (auto inj_type = pasta::InjectedClassNameType::From(type)) {
+    auto decl = inj_type->Declaration();
+    if (TokenMatchesDecl(pasta::TokenKind::kIdentifier, nullptr,
+                         decl, tok_data)) {
+      return em.EntityId(decl);
+    }
+
+    if (!context_depth) {
+      auto tst = inj_type->InjectedSpecializationType();
+      if (tst != type) {
+        return VisitType(em, tst, tok_data, context_depth);
+      }
+    }
+
+  } else if (auto builtin_type = pasta::BuiltinType::From(type)) {
+    if (tok_data.starts_with("__")) {
+      if (tok_data.ends_with("_t") ||
+          tok_data == "__make_integer_seq" ||
+          tok_data == "__type_pack_element") {
+        return em.EntityId(type);
       }
     }
 
@@ -432,13 +602,25 @@ static const void *VisitType(const pasta::Type &type,
   // } else if (auto func_type = pasta::FunctionProtoType::From(type);
   //            func_type && !context_depth) {
   //   return type.RawType();
+  } else if (!context_depth) {
+    if (auto unqual_type = type.UnqualifiedType(); unqual_type != type) {
+      return VisitType(em, unqual_type, tok_data, context_depth);
 
-  } else if (auto unqual_type = type.UnqualifiedType();
-             unqual_type != type) {
-    return VisitType(unqual_type, tok_data, context_depth);
+    } else if (auto elaborated_type = pasta::ElaboratedType::From(type)) {
+      return VisitType(em, elaborated_type->NamedType(), tok_data,
+                       context_depth);
+
+    } else if (auto deduced_type = pasta::DeducedType::From(type)) {
+      if (deduced_type->IsDeduced()) {
+        auto resolved_type = deduced_type->ResolvedType();
+        if (resolved_type) {
+          return VisitType(em, resolved_type.value(), tok_data, context_depth);
+        }
+      }
+    }
   }
 
-  return nullptr;
+  return mx::kInvalidEntityId;
 }
 
 static std::optional<pasta::IncludeLikeMacroDirective>
@@ -759,14 +941,12 @@ static std::string_view NameWithoutTilde(const std::string &name,
 // Try to see if a token matches a declaration. As above, sometimes we have
 // the raw parsed token and want an exact match, whereas other times we only
 // have token data, and will accept an in-name-only match.
-static bool TokenMatchesDecl(pasta::TokenKind tk, const void *raw_token,
-                             const pasta::Decl &decl,
-                             std::string_view token_data) {
-
+bool TokenMatchesDecl(pasta::TokenKind tk, const void *raw_token,
+                      const pasta::Decl &decl, std::string_view token_data) {
   auto is_cxx_destructor = decl.Kind() == pasta::DeclKind::kCXXDestructor;
 
   if (auto func = pasta::FunctionDecl::From(decl)) {
-    
+
     // Try to match the operator token itself, or the `operator` keyword.
     auto ook = func->OverloadedOperator();
     if (AcceptOOK(ook, tk)) {
@@ -794,13 +974,63 @@ static bool TokenMatchesDecl(pasta::TokenKind tk, const void *raw_token,
     if (token_data == NameWithoutTilde(nd_name, is_cxx_destructor)) {
       return true;
     }
+
+    // Template specialization.
+    return nd_name.ends_with('>') &&
+           token_data.size() < nd_name.size() &&
+           nd_name.starts_with(token_data) &&
+           nd_name[token_data.size()] == '<';
   }
 
-  if (raw_token) {
-    return RawEntity(decl.Token()) == raw_token;
+  if (raw_token && RawEntity(decl.Token()) == raw_token) {
+    return true;
   }
 
   return false;
+}
+
+static mx::RawEntityId VisitTemplateArgument(
+    const EntityMapper &em, const pasta::TemplateArgument &arg,
+    std::string_view tok_data) {
+
+  switch (arg.Kind()) {
+    case pasta::TemplateArgumentKind::kType:
+      if (auto t = arg.Type()) {
+        return VisitType(em, t.value(), tok_data, 0u);
+      }
+      break;
+
+    case pasta::TemplateArgumentKind::kDeclaration:
+      if (auto d = arg.Declaration()) {
+        if (TokenMatchesDecl(pasta::TokenKind::kIdentifier, nullptr, d.value(),
+                             tok_data)) {
+          return em.EntityId(d.value());
+        }
+      }
+
+      if (auto t = arg.ParameterTypeForDeclaration()) {
+        return VisitType(em, t.value(), tok_data, 0u);
+      }
+      break;
+
+    case pasta::TemplateArgumentKind::kTemplate:
+    case pasta::TemplateArgumentKind::kTemplateExpansion: {
+      auto raw_arg = reinterpret_cast<const clang::TemplateArgument *>(
+          arg.RawTemplateArgument());
+      return VisitTemplateName(em, pasta::AST::From(arg),
+                               raw_arg->getAsTemplateOrTemplatePattern(),
+                               tok_data);
+    }
+
+    case pasta::TemplateArgumentKind::kEmpty:
+    case pasta::TemplateArgumentKind::kNullPointer:
+    case pasta::TemplateArgumentKind::kIntegral:
+    case pasta::TemplateArgumentKind::kExpression:
+    case pasta::TemplateArgumentKind::kPack:
+    case pasta::TemplateArgumentKind::kStructuralValue:
+      break;
+  }
+  return mx::kInvalidEntityId;
 }
 
 }  // namespace
@@ -817,7 +1047,6 @@ mx::RawEntityId RelatedEntityIdToPrintedToken(
   if (parsed_tok) {
     tk = parsed_tok->Kind();
     self = RawEntity(parsed_tok.value());
-    token_data = parsed_tok->Data();
   }
 
   const void *related_entity = nullptr;
@@ -930,16 +1159,22 @@ mx::RawEntityId RelatedEntityIdToPrintedToken(
                 break;
             }
           } else {
-            related_entity = VisitStmt(stmt.value(), self, token_data, tk,
-                                       is_identifier);
+            auto eid = VisitStmt(em, stmt.value(), self, token_data, tk,
+                                 is_identifier, depth);
+            if (eid != mx::kInvalidEntityId) {
+              return eid;
+            }
           }
         }
         break;
 
       case pasta::TokenContextKind::kType:
-        if (!is_literal) {
-          related_entity = VisitType(
-              pasta::Type::From(context).value(), token_data, depth);
+        if (is_identifier) {
+          auto eid = VisitType(
+              em, pasta::Type::From(context).value(), token_data, depth);
+          if (eid != mx::kInvalidEntityId) {
+            return eid;
+          }
         }
         break;
 
@@ -974,14 +1209,25 @@ mx::RawEntityId RelatedEntityIdToPrintedToken(
           }
         }
         break;
+
       case pasta::TokenContextKind::kDesignator:
         if (!is_literal) {
           if (auto d = pasta::Designator::From(context)) {
             if (RawEntity(d->FieldToken()) == self) {
               if (auto field = d->Field()) {
                 related_entity = RawEntity(field.value());
-                break;
               }
+            }
+          }
+        }
+        break;
+
+      case pasta::TokenContextKind::kTemplateArgument:
+        if (is_identifier) {
+          if (auto a = pasta::TemplateArgument::From(context)) {
+            auto eid = VisitTemplateArgument(em, a.value(), token_data);
+            if (eid != mx::kInvalidEntityId) {
+              return eid;
             }
           }
         }
@@ -1005,31 +1251,22 @@ mx::RawEntityId RelatedEntityIdToPrintedToken(
 // declaration token to render the entity name.
 mx::RawEntityId PendingFragment::DeclTokenEntityId(
     const pasta::Decl &decl) const {
-
-  auto decl_id = em.EntityId(decl);
-
-  // If we have a name for this entity, then try to find it.
-  if (auto nd = pasta::NamedDecl::From(decl)) {
-    auto dt = decl.Token();
-    if (!dt.Data().empty() && dt.Data() == nd->Name()) {
-      auto loc_tok_id = em.EntityId(dt);
-      auto pl = mx::EntityId(loc_tok_id).Extract<mx::ParsedTokenId>();
-      if (pl && pl->fragment_id == fragment_index) {
-        return loc_tok_id;
+  if (!IsLambda(decl)) {
+    if (auto eid = em.EntityId(decl.Token()); eid != mx::kInvalidEntityId) {
+      return eid;
+    } else if (auto vd = pasta::DeclaratorDecl::From(decl)) {
+      if (auto eid = em.EntityId(vd->FirstInnerToken());
+          eid != mx::kInvalidEntityId) {
+        return eid;
+      }
+    } else if (auto td = pasta::TagDecl::From(decl)) {
+      if (auto eid = em.EntityId(td->FirstInnerToken());
+          eid != mx::kInvalidEntityId) {
+        return eid;
       }
     }
   }
-
-  // Otherwise, scan.
-  for (pasta::PrintedToken tok : parsed_tokens) {
-    auto dt = tok.DerivedLocation();
-    auto rel_id = RelatedEntityIdToPrintedToken(em, tok, dt);
-    if (decl_id == rel_id) {
-      return em.EntityId(tok);
-    }
-  }
-
-  return mx::kInvalidEntityId;
+  return em.EntityId(parsed_tokens.At(0u));
 }
 
 unsigned TokenProvenanceCalculator::TokenInfo::Depth(
@@ -1053,17 +1290,45 @@ unsigned TokenProvenanceCalculator::TokenInfo::Depth(
   return depth;
 }
 
+TokenProvenanceCalculator::TokenInfo *
+TokenProvenanceCalculator::TokenInfo::OnlyChild(
+    const TokenProvenanceCalculator &self) const noexcept {
+  if (!child) {
+    return nullptr;
+  } else if (child < self.infos.size()) {
+    return nullptr;
+  } else {
+    return reinterpret_cast<TokenInfo *>(child);
+  }
+}
+
 gap::generator<TokenProvenanceCalculator::TokenInfo *>
 TokenProvenanceCalculator::TokenInfo::Children(
-    TokenProvenanceCalculator &self) {
+    const TokenProvenanceCalculator &self) const & {
   if (!child) {
     co_return;
   } else if (child < self.infos.size()) {
-    for (TokenInfo *c : self.multiple_children[this]) {
-      co_yield c;
+    auto it = self.multiple_children.find(this);
+    auto end = self.multiple_children.end();
+    if (it != end) {
+      for (auto tok : it->second) {
+        co_yield tok;
+      }
     }
   } else {
     co_yield reinterpret_cast<TokenInfo *>(child);
+  }
+}
+
+gap::generator<TokenProvenanceCalculator::TokenInfo *>
+TokenProvenanceCalculator::TokenInfo::MultipleChildren(
+    const TokenProvenanceCalculator &self) const & {
+  auto it = self.multiple_children.find(this);
+  auto end = self.multiple_children.end();
+  if (it != end) {
+    for (auto tok : it->second) {
+      co_yield tok;
+    }
   }
 }
 
@@ -1071,6 +1336,10 @@ bool TokenProvenanceCalculator::TokenInfo::DeriveFrom(
     TokenProvenanceCalculator &self, TokenInfo *new_parent) {
 
   if (new_parent == &(self.empty.value())) {
+    return false;
+  }
+
+  if (new_parent == this) {
     return false;
   }
 
@@ -1095,7 +1364,7 @@ bool TokenProvenanceCalculator::TokenInfo::DeriveFrom(
 TokenProvenanceCalculator::TokenProvenanceCalculator(const EntityMapper &em_)
     : em(em_) {
   empty.emplace(mx::kInvalidEntityId, 0u, mx::kInvalidEntityId,
-                mx::kInvalidEntityId);      
+                mx::kInvalidEntityId);
 }
 
 TokenProvenanceCalculator::~TokenProvenanceCalculator(void) {}
@@ -1103,24 +1372,27 @@ TokenProvenanceCalculator::~TokenProvenanceCalculator(void) {}
 void TokenProvenanceCalculator::Clear(void) {
   infos.clear();
   info_map.clear();
-  ordered_tokens.clear();
   expansion_toks.clear();
   multiple_children.clear();
   ordered_tokens.clear();
-  parsed_tokens.clear();
   fragment_index = mx::kInvalidEntityId;
 }
 
 template <typename T>
 bool TokenProvenanceCalculator::TryConnect(TokenInfo *child_info,
                                            const T &dt) {
-  auto dt_it = info_map.find(em.EntityId(dt));
+  auto dt_it = info_map.find(RawEntity(dt));
   if (dt_it == info_map.end()) {
     return false;
   }
 
   TokenInfo *parent_info = dt_it->second;
-  return child_info->DeriveFrom(*this, parent_info);
+  if (!child_info->DeriveFrom(*this, parent_info)) {
+    return false;
+  }
+
+  child_info->derived_token_id = parent_info->entity_id;
+  return true;
 }
 
 static void FillExpansionTokens(const pasta::Macro &macro,
@@ -1143,45 +1415,37 @@ static void FillExpansionTokens(const pasta::Macro &macro,
 // `info->derived_token_id`. However, there are more subtle cases, such as a
 // number being derived from `__COUNTER__`, or an identifier being derived from
 // token concatenations.
-void TokenProvenanceCalculator::ConnectToDerived(
-    TokenInfo *info, std::optional<pasta::MacroToken> mtok) {
-  auto derived_it = info_map.find(info->derived_token_id);
-  if (derived_it != info_map.end() &&
-      info->DeriveFrom(*this, derived_it->second)) {
-    return;
-  }
+bool TokenProvenanceCalculator::BackupConnectToDerived(
+    TokenInfo *info, const pasta::MacroToken &mtok) {
 
-  if (!mtok) {
-    return;
-  }
-
-  std::optional<pasta::Macro> parent = mtok->Parent();
+  std::optional<pasta::Macro> parent = mtok.Parent();
   if (!parent) {
     assert(false);
-    return;
+    return false;
   }
 
   // If this token is derived from the body of a macro, and we failed to
   // connect it above, then that generally means the current fragment is
   // not the macro definition itself.
   auto parent_kind = parent->Kind();
-  if (parent_kind == pasta::MacroKind::kDefineDirective) {
-    return;
+  if (parent_kind == pasta::MacroKind::kDefineDirective ||
+      parent_kind == pasta::MacroKind::kParameterSubstitution) {
+    return false;
   }
 
   auto sub = pasta::MacroSubstitution::From(parent.value());
-  if (!sub || parent_kind == pasta::MacroKind::kParameterSubstitution) {
-    return;
+  if (!sub) {
+    return false;
   }
 
-  const void *self = RawEntity(mtok.value());
+  const void *self = RawEntity(mtok);
 
   // Don't connect us into intermediate body tokens.
   if (parent_kind == pasta::MacroKind::kExpansion) {
     auto &exp = reinterpret_cast<pasta::MacroExpansion &>(parent.value());
     for (pasta::Macro n : exp.IntermediateChildren()) {
       if (RawEntity(n) == self) {
-        return;
+        return false;
       }
     }
   }
@@ -1191,7 +1455,7 @@ void TokenProvenanceCalculator::ConnectToDerived(
   expansion_toks.clear();
   for (pasta::Macro n : parent->Children()) {
     if (RawEntity(n) == self) {
-      return;
+      return false;
     }
 
     FillExpansionTokens(n, expansion_toks);
@@ -1213,10 +1477,14 @@ void TokenProvenanceCalculator::ConnectToDerived(
       case pasta::TokenKind::kUnknown:
         continue;
       default:
-        TryConnect(info, n);
+        if (TryConnect(info, n)) {
+          return true;
+        }
         break;
     }
   }
+
+  return false;
 }
 
 // Order token `a` before token `b` if:
@@ -1283,6 +1551,16 @@ static int Score(mx::RawEntityId fragment_index, mx::EntityId eid) {
     if (std::get<mx::MacroId>(vid).fragment_id != fragment_index) {
       score += 1;
     }
+    switch (std::get<mx::MacroId>(vid).kind) {
+      case mx::MacroKind::DEFINE_DIRECTIVE:
+        score += 3;
+        break;
+      case mx::MacroKind::EXPANSION:
+        score += 2;
+        break;
+      default:
+        break;
+    }
     score += 30;
 
   } else if (std::holds_alternative<mx::StmtId>(vid)) {
@@ -1326,16 +1604,29 @@ static int Score(mx::RawEntityId fragment_index, mx::EntityId eid) {
 bool TokenProvenanceCalculator::Pull(void) {
   bool changed = false;
   for (TokenInfo *tok : ordered_tokens) {
-    auto parent_related_entity_id = tok->related_entity_id;
-    auto parent_has_rel = parent_related_entity_id != mx::kInvalidEntityId;
-    auto parent_has_parsed = tok->parsed_token_id != mx::kInvalidEntityId;
-    if (parent_has_parsed) {
+    if (tok->parsed_token_id != mx::kInvalidEntityId) {
       continue;
     }
 
-    if (!tok->child) {
-      continue;  // No children.
+    if (tok->related_entity_id != mx::kInvalidEntityId) {
+      continue;
     }
+
+    // No children.
+    if (!tok->child) {
+      continue;
+    }
+
+    // One child.
+    if (auto only_child = tok->OnlyChild(*this)) {
+      changed = Update(&(tok->parsed_token_id),
+                       only_child->parsed_token_id, changed);
+      changed = Update(&(tok->related_entity_id),
+                       only_child->related_entity_id, changed);
+      continue;
+    }
+
+    // Multiple children; score them for the sake of propagation.
 
     TokenInfo *matching_parsed = nullptr;
     TokenInfo *matching_rel = nullptr;
@@ -1347,7 +1638,7 @@ bool TokenProvenanceCalculator::Pull(void) {
     int other_parsed_score = -1;
     int other_rel_score = -1;
 
-    for (TokenInfo *derived_tok : tok->Children(*this)) {
+    for (TokenInfo *derived_tok : tok->MultipleChildren(*this)) {
       auto score = Score(fragment_index, derived_tok->related_entity_id);
 
       if (tok->data_hash == derived_tok->data_hash) {
@@ -1356,7 +1647,9 @@ bool TokenProvenanceCalculator::Pull(void) {
             matching_parsed = derived_tok;
             matching_parsed_score = score;
           }
-        } else if (derived_tok->related_entity_id != mx::kInvalidEntityId) {
+        }
+
+        if (derived_tok->related_entity_id != mx::kInvalidEntityId) {
           if (score > matching_rel_score) {
             matching_rel = derived_tok;
             matching_rel_score = score;
@@ -1368,7 +1661,9 @@ bool TokenProvenanceCalculator::Pull(void) {
             other_parsed = derived_tok;
             other_parsed_score = score;
           }
-        } else if (derived_tok->related_entity_id != mx::kInvalidEntityId) {
+        }
+
+        if (derived_tok->related_entity_id != mx::kInvalidEntityId) {
           if (score > other_rel_score) {
             other_rel = derived_tok;
             other_rel_score = score;
@@ -1378,107 +1673,46 @@ bool TokenProvenanceCalculator::Pull(void) {
     }
 
     if (matching_parsed) {
-      if (!parent_has_rel ||
-          parent_related_entity_id == matching_parsed->related_entity_id) {
-        changed = Update(&(tok->parsed_token_id),
-                         matching_parsed->parsed_token_id, changed);
-        changed = Update(&(tok->related_entity_id),
-                         matching_parsed->related_entity_id, changed);
-        continue;
-      }
-    }
-
-    if (matching_rel) {
-      if (!parent_has_rel) {
-        changed = Update(&(tok->related_entity_id),
-                         matching_rel->related_entity_id, changed);
-        continue;
-      }
+      tok->parsed_token_id = matching_parsed->parsed_token_id;
+      tok->related_entity_id = matching_parsed->related_entity_id;
+      matching_parsed->derived_token_id = tok->entity_id;
+      changed = true;
+      continue;
     }
 
     if (other_parsed) {
-      if (!parent_has_rel ||
-          parent_related_entity_id == other_parsed->related_entity_id) {
-        changed = Update(&(tok->parsed_token_id),
-                         other_parsed->parsed_token_id, changed);
-        changed = Update(&(tok->related_entity_id),
-                         other_parsed->related_entity_id, changed);
-        continue;
-      }
+      tok->parsed_token_id = other_parsed->parsed_token_id;
+      tok->related_entity_id = other_parsed->related_entity_id;
+      other_parsed->derived_token_id = tok->entity_id;
+      changed = true;
+      continue;
+    }
+
+    if (matching_rel) {
+      assert(matching_rel->parsed_token_id == mx::kInvalidEntityId);
+      tok->related_entity_id = matching_rel->related_entity_id;
+      changed = true;
+      continue;
     }
 
     if (other_rel) {
-      if (!parent_has_rel) {
-        changed = Update(&(tok->related_entity_id),
-                         other_rel->related_entity_id, changed);
-        continue;
-      }
+      assert(other_rel->parsed_token_id == mx::kInvalidEntityId);
+      tok->related_entity_id = other_rel->related_entity_id;
+      changed = true;
+      continue;
     }
   }
 
   return changed;
 }
 
-bool TokenProvenanceCalculator::Pull(const std::vector<TokenTreeNode> &tokens) {
-  // Force in the derived token stuff, guaranteeing data likeness. This is its
-  // own pass because a token may have multiple parents.
-  for (TokenInfo *parent : ordered_tokens) {
-    if (!parent->child) {
-      continue;
-    }
-
-    for (TokenInfo *child : parent->Children(*this)) {
-      if (child->data_hash == parent->data_hash) {
-        assert(parent->entity_id != child->entity_id);
-        child->derived_token_id = parent->entity_id;
-        break;
-      }
-    }
-  }
-
-  // Force in the derived token stuff in the absence of info.
-  for (TokenInfo *parent : ordered_tokens) {
-    if (!parent->child) {
-      continue;
-    }
-
-    for (TokenInfo *child : parent->Children(*this)) {
-      if (child->derived_token_id == mx::kInvalidEntityId) {
-        assert(parent->entity_id != child->entity_id);
-        child->derived_token_id = parent->entity_id;
-      }
-    }
-  }
-
-  // // Finally, any token info that doesn't have a derived token id might be
-  // // related to a file token, or to a token in the definition of a macro body.
-  // for (const TokenTreeNode &node : tokens) {
-  //   TokenInfo *info = info_map[em.EntityId(node)];
-  //   if (info->derived_token_id != mx::kInvalidEntityId) {
-  //     continue;
-  //   }
-
-  //   if (auto pt = node.Token()) {
-  //     info->derived_token_id = em.EntityId(pt->DerivedLocation());
-  //   }
-
-  //   if (info->derived_token_id != mx::kInvalidEntityId) {
-  //     continue;
-  //   }
-
-  //   if (auto mt = node.MacroToken()) {
-  //     info->derived_token_id = em.EntityId(mt->DerivedLocation());
-  //   }
-  // }
-
-  // Do single-step connections between the tokens and the what they are
-  // derived from.
-  (void) Pull();
+void TokenProvenanceCalculator::FallbackInitMacroProvenance(
+    const std::vector<TokenTreeNode> &tokens) {
 
   // Try to force in some extra macro connections. If we do these too early
   // then we'll miss opportunities to connect things to their parsed tokens.
   for (const TokenTreeNode &node : tokens) {
-    TokenInfo *info = info_map[em.EntityId(node)];
+    TokenInfo *info = info_map[RawEntity(node)];
     if (info->related_entity_id != mx::kInvalidEntityId) {
       continue;
     }
@@ -1498,8 +1732,6 @@ bool TokenProvenanceCalculator::Pull(const std::vector<TokenTreeNode> &tokens) {
           RelatedEntityIdToMacroToken(em, ml.value(), true  /* force */);
     }
   }
-
-  return true;
 }
 
 // Push information from originating tokens down to derived tokens.
@@ -1507,33 +1739,104 @@ bool TokenProvenanceCalculator::Push(void) {
   auto it = ordered_tokens.rbegin();
   auto it_end = ordered_tokens.rend();
   auto changed = false;
+
   for (; it != it_end; ++it) {
     TokenInfo *tok = *it;
 
-    if (!tok->child) {
-      continue;  // No children.
+    const auto parsed_id = tok->parsed_token_id;
+    if (parsed_id == mx::kInvalidEntityId || !tok->child) {
+      continue;
+    }
+
+    auto rel_id = tok->related_entity_id;
+
+    for (TokenInfo *derived_tok : tok->Children(*this)) {
+      if (derived_tok->parsed_token_id != mx::kInvalidEntityId ||
+          derived_tok->related_entity_id != mx::kInvalidEntityId) {
+        continue;
+      }
+
+      assert(derived_tok->related_entity_id == mx::kInvalidEntityId ||
+             rel_id != mx::kInvalidEntityId);
+
+      derived_tok->parsed_token_id = parsed_id;
+      derived_tok->related_entity_id = rel_id;
+      changed = true;
+    }
+  }
+
+  return changed;
+}
+
+
+// Push information from originating tokens down to derived tokens.
+bool TokenProvenanceCalculator::FinalPush(void) {
+  auto it = ordered_tokens.rbegin();
+  auto it_end = ordered_tokens.rend();
+  auto changed = false;
+
+  for (; it != it_end; ++it) {
+    TokenInfo *tok = *it;
+
+    // We would have pushed this in `Push()`.
+    if (tok->parsed_token_id != mx::kInvalidEntityId) {
+      continue;
     }
 
     const auto rel_id = tok->related_entity_id;
-    const auto parsed_id = tok->parsed_token_id;
+    if (rel_id == mx::kInvalidEntityId || !tok->child) {
+      continue;
+    }
 
     for (TokenInfo *derived_tok : tok->Children(*this)) {
-      auto derived_parsed_id = derived_tok->parsed_token_id;
-      auto derived_rel_id = derived_tok->related_entity_id;
-      if (derived_parsed_id == mx::kInvalidEntityId &&
-          derived_rel_id == mx::kInvalidEntityId &&
-          rel_id != mx::kInvalidEntityId) {
-        changed = Update(&(derived_tok->related_entity_id), rel_id, changed);
-        changed = Update(&(derived_tok->parsed_token_id), parsed_id, changed);
-
-      } else if (derived_parsed_id == mx::kInvalidEntityId &&
-                 derived_rel_id == rel_id &&
-                 parsed_id != mx::kInvalidEntityId) {
-        changed = Update(&(derived_tok->parsed_token_id), parsed_id, changed);
+      if (derived_tok->related_entity_id == mx::kInvalidEntityId) {
+        derived_tok->related_entity_id = rel_id;
+        changed = true;
       }
     }
   }
+
   return changed;
+}
+
+// Try to connect the macro token resulting from a token paste to the original
+// tokens that were pasted.
+void TokenProvenanceCalculator::TryConnectToConcatenatedTokens(
+    TokenInfo *child, const pasta::MacroToken &mt, const pasta::Macro &parent) {
+  if (parent.Kind() != pasta::MacroKind::kConcatenate) {
+    return;
+  }
+
+  auto concat = reinterpret_cast<const pasta::MacroConcatenate &>(parent);
+  if (concat.PastedToken() != mt) {
+    return;
+  }
+
+  for (auto lhs : concat.Children()) {
+    if (lhs.Kind() != pasta::MacroKind::kToken) {
+      assert(false);
+      continue;
+    }
+
+    const auto &lhs_tok = reinterpret_cast<const pasta::MacroToken &>(lhs);
+
+    auto parent_it = info_map.find(RawEntity(lhs_tok));
+    if (parent_it == info_map.end()) {
+      continue;
+    }
+
+    if (parent_it->second->entity_id == child->derived_token_id) {
+      continue;
+    }
+
+    if (!child->DeriveFrom(*this, parent_it->second)) {
+      continue;
+    }
+
+    if (child->derived_token_id == mx::kInvalidEntityId) {
+      child->derived_token_id = parent_it->second->entity_id;
+    }
+  }
 }
 
 // This is the version containing all token tree nodes. `tokens` is generally
@@ -1551,7 +1854,7 @@ void TokenProvenanceCalculator::Run(
     std::optional<pasta::PrintedToken> cl = node.PrintedToken();
     std::optional<pasta::MacroToken> ml = node.MacroToken();
 
-    mx::RawEntityId tok_id = em.EntityId(node);
+    const mx::RawEntityId tok_id = em.EntityId(node);
     assert(tok_id != mx::kInvalidEntityId);
 
     uint64_t data_hash = 0u;
@@ -1568,12 +1871,7 @@ void TokenProvenanceCalculator::Run(
     mx::RawEntityId rel_id = mx::kInvalidEntityId;
     if (cl) {
       parsed_id = em.EntityId(cl.value());
-      if (auto it = parsed_tokens.find(RawEntity(cl.value()));
-          it != parsed_tokens.end()) {
-        rel_id = RelatedEntityIdToPrintedToken(em, cl.value(), it->second);
-      } else {
-        rel_id = RelatedEntityIdToPrintedToken(em, cl.value(), pl);
-      }
+      rel_id = RelatedEntityIdToPrintedToken(em, cl.value(), pl);
     }
 
     if (pl && parsed_id == mx::kInvalidEntityId) {
@@ -1616,66 +1914,134 @@ void TokenProvenanceCalculator::Run(
     }
 #endif
 
-    info_map.emplace(tok_id  /* node */, &info);
-    info_map.emplace(parsed_id, &info);
-
-    if (cl) {
-      info_map.emplace(em.EntityId(cl.value()), &info);
-    }
-
+    info_map.emplace(RawEntity(node), &info);
     if (ml) {
-      info_map.emplace(em.EntityId(ml.value()), &info);
+      info_map.emplace(RawEntity(ml.value()), &info);
     }
 
     ordered_tokens.push_back(&info);
-
-    if (pl) {
-      auto pl_dl_id = em.EntityId(pl->DerivedLocation());
-      if (pl_dl_id != info.entity_id) {
-        info.derived_token_id = pl_dl_id;
-      }
-    }
-
-    if (info.derived_token_id != mx::kInvalidEntityId) {
-      continue;
-    }
-
-    // NOTE(pag): With macro tokens, we might find that we are missing some
-    //            "in-between" tokens due to the token tree process eliminating
-    //            tokens belonging to argument pre-expansion phases. In these
-    //            situations, we need to make an extra hop.
-    if (ml) {
-      auto dl = ml->DerivedLocation();
-      info.derived_token_id = em.EntityId(dl);
-      assert(info.derived_token_id != info.entity_id);
-
-      if (info.derived_token_id != mx::kInvalidEntityId) {
-        continue;
-      }
-
-      // Hop.
-      assert(!std::holds_alternative<pasta::FileToken>(dl));
-      if (std::holds_alternative<pasta::MacroToken>(dl)) {
-        info.derived_token_id = em.EntityId(
-            std::get<pasta::MacroToken>(dl).DerivedLocation());
-        assert(info.derived_token_id != info.entity_id);
-      }
-    }
-
-    if (info.derived_token_id != mx::kInvalidEntityId) {
-      continue;
-    }
   }
 
-  info_map.erase(mx::kInvalidEntityId);
-  info_map.emplace(mx::kInvalidEntityId, &(empty.value()));
+  info_map.erase(nullptr);
 
   // Do single-step connections between the tokens and the what they are
   // derived from.
   for (const TokenTreeNode &node : tokens) {
-    TokenInfo *info = info_map[em.EntityId(node)];
-    ConnectToDerived(info, node.MacroToken());
+    TokenInfo *child = info_map[RawEntity(node)];
+    assert(child != nullptr);
+    assert(child->derived_token_id == mx::kInvalidEntityId);
+
+    auto pl = node.Token();
+    auto cl = node.PrintedToken();
+    auto ml = node.MacroToken();
+
+    if (!pl && cl) {
+      pl = cl->DerivedLocation();
+    }
+
+    if (pl && !ml) {
+      ml = pl->MacroLocation();
+    }
+
+    pasta::DerivedToken dl;
+    if (pl) {
+      dl = pl->DerivedLocation();
+    } else if (ml) {
+      dl = ml->DerivedLocation();
+    }
+
+    TokenInfo *prev_child = child;
+
+    while (!std::holds_alternative<std::monostate>(dl)) {
+      if (auto it = info_map.find(RawEntity(dl)); it != info_map.end()) {
+        if (prev_child->DeriveFrom(*this, it->second)) {
+          child->derived_token_id = it->second->entity_id;
+          break;
+        }
+      }
+
+      // Synthesize a file token node.
+      if (std::holds_alternative<pasta::FileToken>(dl)) {
+        const auto &ft = std::get<pasta::FileToken>(dl);
+        auto found_eid = em.EntityId(ft);
+        TokenInfo &finfo = infos.emplace_back(
+            found_eid, child->data_hash, child->related_entity_id,
+            child->parsed_token_id);
+#ifndef NDEBUG
+        finfo.data = ft.Data();
+#endif
+        info_map.emplace(RawEntity(ft), &finfo);
+        if (prev_child->DeriveFrom(*this, &finfo)) {
+          ordered_tokens.push_back(&finfo);
+          child->derived_token_id = found_eid;
+          break;
+        }
+
+      // NOTE(pag): With macro tokens, we might find that we are missing some
+      //            "in-between" tokens due to the token tree process eliminating
+      //            tokens belonging to argument pre-expansion phases. In these
+      //            situations, we need to make an extra hop.
+      } else if (std::holds_alternative<pasta::MacroToken>(dl)) {
+        auto &mt = std::get<pasta::MacroToken>(dl);
+        auto found_eid = em.EntityId(mt); 
+        TokenInfo &minfo = infos.emplace_back(
+            found_eid, child->data_hash, child->related_entity_id,
+            child->parsed_token_id);
+
+#ifndef NDEBUG
+        minfo.data = child->data;
+#endif
+
+        // NOTE(pag): We *don't* add `minfo` into `info_map`, so that nothing
+        //            else finds it, as it's entity info is not complete.
+        if (!prev_child->DeriveFrom(*this, &minfo)) {
+          ordered_tokens.push_back(&minfo);
+          
+          if (found_eid != mx::kInvalidEntityId) {
+            child->derived_token_id = found_eid;
+            child = &minfo;
+          }
+
+          prev_child = &minfo;
+        }
+
+        dl = mt.DerivedLocation();
+
+      } else {
+        assert(false);
+        break;
+      }
+    }
+
+    if (ml) {
+      if (auto parent = ml->Parent()) {
+        TryConnectToConcatenatedTokens(child, ml.value(), parent.value());
+      }
+    }
+
+    if (child->derived_token_id != mx::kInvalidEntityId) {
+      continue;
+    }
+
+    while (ml) {
+      if (BackupConnectToDerived(child, ml.value())) {
+        break;
+      }
+
+      dl = ml->DerivedLocation();
+      if (!std::holds_alternative<pasta::MacroToken>(dl)) {
+        break;
+      }
+
+      ml = std::move(std::get<pasta::MacroToken>(dl));
+    }
+
+    if (child->derived_token_id == mx::kInvalidEntityId) {
+      child->DeriveFrom(*this, &(empty.value()));
+    }
   }
+
+  info_map.emplace(nullptr, &(empty.value()));
 
   // NOTE(pag): Depth values are actually very very large positive numbers.
   auto min_depth = ~0u;
@@ -1684,15 +2050,31 @@ void TokenProvenanceCalculator::Run(
   }
 
   Sort();
-  
+
   auto max_depth = (~0u - min_depth) + 1u;
   auto iter = 0u;
 
   // Iteratively improve connections.
-  for (auto changed = Pull(tokens); changed && iter <= max_depth; ++iter) {
+  for (auto changed = true; changed && iter <= max_depth; ++iter) {
     changed = Pull();
-    changed = Push() || changed;
   }
+
+  FallbackInitMacroProvenance(tokens);
+
+  iter = 0u;
+  for (auto changed = true; changed && iter <= max_depth;) {
+    changed = false;
+    if (!Push()) {
+      break;
+    }
+
+    changed = true;
+    if (!Pull()) {
+      ++iter;
+    }
+  }
+
+  FinalPush();
 }
 
 // This is the backup version when `tokens` only contains parsed tokens.
@@ -1704,7 +2086,6 @@ void TokenProvenanceCalculator::Run(
 
   for (pasta::PrintedToken tok : tokens) {
     std::optional<pasta::Token> pl = tok.DerivedLocation();
-    std::optional<pasta::MacroToken> ml;
 
     mx::RawEntityId tok_id = em.EntityId(tok);
     mx::RawEntityId rel_id = mx::kInvalidEntityId;
@@ -1712,19 +2093,9 @@ void TokenProvenanceCalculator::Run(
 
     if (pl) {
       const pasta::Token &parsed_tok = pl.value();
-      ml = parsed_tok.MacroLocation();
-
-      if (tok_id == mx::kInvalidEntityId) {
-        tok_id = em.EntityId(parsed_tok);
-      }
 
       parsed_id = em.EntityId(parsed_tok);
       rel_id = RelatedEntityIdToPrintedToken(em, tok, parsed_tok);
-
-      if (ml && rel_id == mx::kInvalidEntityId) {
-        rel_id = RelatedEntityIdToMacroToken(em, ml.value());
-      }
-
       if (rel_id == mx::kInvalidEntityId) {
         rel_id = RelatedEntityIdToPrintedToken(em, tok, std::nullopt);
       }
@@ -1737,54 +2108,28 @@ void TokenProvenanceCalculator::Run(
     info.data = tok.Data();
 #endif
 
-    info_map.emplace(tok_id, &info);
+    info_map.emplace(RawEntity(tok), &info);
 
     if (pl) {
-      info_map.emplace(em.EntityId(pl.value()), &info);
-    }
-
-    if (ml) {
-      info_map.emplace(em.EntityId(ml.value()), &info);
+      info.derived_token_id = em.EntityId(pl->FileLocation());
     }
 
     ordered_tokens.push_back(&info);
   }
 
-  info_map.erase(mx::kInvalidEntityId);
-  info_map.emplace(mx::kInvalidEntityId, &(empty.value()));
-
-  // Do single-step connections between the tokens.
-  for (pasta::PrintedToken tok : tokens) {
-
-    std::optional<pasta::MacroToken> mt;
-    if (auto pdt = tok.DerivedLocation()) {
-      auto dt = pdt->DerivedLocation();
-      if (std::holds_alternative<pasta::MacroToken>(dt)) {
-        mt = std::move(std::get<pasta::MacroToken>(dt));
-      }
-    }
-
-    TokenInfo *info = info_map[em.EntityId(tok)];
-    ConnectToDerived(info, mt);
-  }
+  info_map.erase(nullptr);
+  info_map.emplace(nullptr, &(empty.value()));
 
   Sort();
 
   for (auto changed = true; changed; ) {
     changed = Pull();
-    changed = Push() || changed;
   }
 }
 
 void TokenProvenanceCalculator::Init(
     const pasta::PrintedTokenRange &printed_toks) {
   Clear();
-
-  for (pasta::PrintedToken tok : printed_toks) {
-    if (std::optional<pasta::Token> parsed_tok = tok.DerivedLocation()) {
-      parsed_tokens.emplace(RawEntity(tok), std::move(parsed_tok.value()));
-    }
-  }
 }
 
 #ifndef NDEBUG
@@ -1815,18 +2160,18 @@ void TokenProvenanceCalculator::Dump(std::ostream &os) {
      << "node [shape=none margin=0 nojustify=false labeljust=l font=courier];\n";
 
   auto order = 0u;
-  for (TokenInfo *t : ordered_tokens) {
-    auto id = reinterpret_cast<uintptr_t>(t);
+  for (TokenInfo &t : infos) {
+    auto id = reinterpret_cast<uintptr_t>(&t);
     os << "n" << id
        << " [label=<<TABLE cellpadding=\"2\" cellspacing=\"0\" border=\"1\"><TR>"
-       << "<TD>depth=" << (~0u - t->Depth(*this)) << "</TD></TR><TR><TD>order="
-       << order << "</TD></TR><TR><TD>id=" << t->entity_id
-       << "</TD></TR><TR><TD>derived=" << t->derived_token_id
-       << "</TD></TR><TR><TD>rel=" << t->related_entity_id
-       << "</TD></TR><TR><TD>parsed=" << t->parsed_token_id
-       << "</TD></TR><TR><TD>" << TokData(t->data) << "</TD></TR></TABLE>>];\n";
+       << "<TD>depth=" << (~0u - t.Depth(*this)) << "</TD></TR><TR><TD>order="
+       << order << "</TD></TR><TR><TD>id=" << t.entity_id
+       << "</TD></TR><TR><TD>derived=" << t.derived_token_id
+       << "</TD></TR><TR><TD>rel=" << t.related_entity_id
+       << "</TD></TR><TR><TD>parsed=" << t.parsed_token_id
+       << "</TD></TR><TR><TD>" << TokData(t.data) << "</TD></TR></TABLE>>];\n";
 
-    for (TokenInfo *c : t->Children(*this)) {
+    for (TokenInfo *c : t.Children(*this)) {
       os << "n" << id << " -> n" << reinterpret_cast<uintptr_t>(c) << ";\n";
     }
 

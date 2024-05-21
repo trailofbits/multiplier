@@ -88,6 +88,8 @@ class SQLiteEntityProviderImpl {
   sqlite::Statement get_entities_by_name;
   sqlite::Statement get_references_to;
   sqlite::Statement get_references_from;
+  sqlite::Statement get_specific_references_to;
+  sqlite::Statement get_specific_references_from;
   sqlite::Statement get_fragments_covered_by_tokens;
 
 #define MX_DECLARE_GET_STATEMENTS(name) \
@@ -276,6 +278,34 @@ SQLiteEntityProviderImpl::SQLiteEntityProviderImpl(unsigned worker_index,
           "SELECT DISTINCT r.to_entity_id, r.context_id, r.kind_id "
           "FROM reference AS r "
           "WHERE r.to_entity_id > ?1 "
+          "  AND r.from_entity_id IN (SELECT l.entity_id "
+          "                         FROM " + entity_id_list + " AS l "
+          "                         ORDER BY l.entity_id ASC) "
+          "ORDER BY r.to_entity_id ASC, "
+          "         r.context_id ASC, "
+          "         r.kind_id ASC, "
+          "         r.from_entity_id ASC "
+          "LIMIT " MX_TO_STR(MX_REFERENCE_PAGE_SIZE))),
+
+      get_specific_references_to(db.Prepare(
+          "SELECT DISTINCT r.from_entity_id, r.context_id "
+          "FROM reference AS r "
+          "WHERE r.from_entity_id > ?1 "
+          "  AND r.kind_id = ?2 "
+          "  AND r.to_entity_id IN (SELECT l.entity_id "
+          "                         FROM " + entity_id_list + " AS l "
+          "                         ORDER BY l.entity_id ASC) "
+          "ORDER BY r.from_entity_id ASC, "
+          "         r.context_id ASC, "
+          "         r.kind_id ASC, "
+          "         r.to_entity_id ASC "
+          "LIMIT " MX_TO_STR(MX_REFERENCE_PAGE_SIZE))),
+
+      get_specific_references_from(db.Prepare(
+          "SELECT DISTINCT r.to_entity_id, r.context_id "
+          "FROM reference AS r "
+          "WHERE r.to_entity_id > ?1 "
+          "  AND r.kind_id = ?2 "
           "  AND r.from_entity_id IN (SELECT l.entity_id "
           "                         FROM " + entity_id_list + " AS l "
           "                         ORDER BY l.entity_id ASC) "
@@ -644,11 +674,115 @@ RawEntityIdList SQLiteEntityProvider::ReadRedeclarations(
   return ret;
 }
 
+gap::generator<std::pair<RawEntityId, RawEntityId>>
+SQLiteEntityProvider::SpecificReferences(
+    const Ptr &self, RawEntityId raw_id, RawEntityId kind_id,
+    EntityProvider::ReferenceDirection dir, bool get_redecls) & {
+
+  ImplPtr context = impl.Lock();
+  sqlite::Statement &get_references = (dir == EntityProvider::kReferenceTo ?
+                                       context->get_specific_references_to :
+                                       context->get_specific_references_from);
+  sqlite::Statement &add_entity_id = context->add_entity_id_to_list;
+
+  EntityId eid(raw_id);
+  VariantId vid = eid.Unpack();
+
+  // First, read the redeclarations for whatever this entity is.
+  RawEntityIdList redecl_ids;
+  if (get_redecls) {
+    do {
+      for (RawEntityId raw_redecl_id : self->Redeclarations(self, raw_id)) {
+        redecl_ids.push_back(raw_redecl_id);
+      }
+    } while (false);
+
+    // Sanity check the redeclarations.
+    if (std::find(redecl_ids.begin(), redecl_ids.end(), raw_id) ==
+        redecl_ids.end()) {
+      assert(false);
+      co_return;
+    }
+  } else {
+    redecl_ids.push_back(raw_id);
+  }
+
+  // NOTE(pag): SQLite doesn't understand unsigned integers. When it sees our
+  //            entity IDs, if the high bit is `1`, then it treats those as
+  //            negative numbers. To get pagination-like effects, we iterate
+  //            from one lower bound to the next lower bound. So, we can't
+  //            start with `kInvalidEntityId` (zero) as our initial lower bound,
+  //            which would be natural given the unsigned representation of
+  //            raw entity IDs, so instead we use the minimum signed 64-bit
+  //            integer.
+  auto lower_bound = std::numeric_limits<int64_t>::min();
+
+  std::array<std::pair<RawEntityId, RawEntityId>, MX_REFERENCE_PAGE_SIZE>
+      paged_results;
+
+  auto version = self->VersionNumber();
+  for (auto found = true; found; ) {
+    found = false;
+    auto num_paged_results = 0u;
+
+    // Go collect a "page" of reference entries. We go one page at a time so
+    // that we can avoid having do to any kind of clever query caching to make
+    // generators / coroutines work.
+    do {
+      sqlite::AbortingTransaction temporary_changes_only(context->db);
+
+      // Clear our old entity id list.
+      context->clear_entity_id_list.Execute();
+
+      // Fill the entity id list with the redeclarations.
+      for (RawEntityId raw_redecl_id : redecl_ids) {
+        add_entity_id.BindValues(raw_redecl_id);
+        add_entity_id.Execute();
+      }
+
+      // (Re)do the join to get the next page of entity references.
+      get_references.BindValues(lower_bound, kind_id);
+      while (get_references.ExecuteStep()) {
+        found = true;
+        RawEntityId from_id = kInvalidEntityId;
+        RawEntityId context_id = kInvalidEntityId;
+
+        get_references.Row().Columns(from_id, context_id);
+
+        // For next page.
+        lower_bound = std::max(lower_bound, static_cast<int64_t>(from_id));
+
+        vid = EntityId(from_id).Unpack();
+        if (std::holds_alternative<InvalidId>(vid)) {
+          assert(from_id == kInvalidEntityId);
+          continue;
+        }
+
+        paged_results[num_paged_results].first = from_id;
+        paged_results[num_paged_results].second = context_id;
+        ++num_paged_results;
+      }
+
+      get_references.Reset();
+    } while (false);
+
+    for (auto i = 0u; i < num_paged_results; ++i) {
+      co_yield paged_results[i];
+    }
+
+    // Index changed on us; exit early.
+    if (found && version != self->VersionNumber()) {
+      co_return;
+    }
+  }
+}
+
 // Generate references to `raw_id` as a tuple of `from_id`, `context_id`, and
 // `kind_id`. Internally, this will handle redeclarations.
 gap::generator<std::tuple<RawEntityId, RawEntityId, RawEntityId>>
 SQLiteEntityProvider::References(const Ptr &self, RawEntityId raw_id,
-                                 EntityProvider::ReferenceDirection dir) & {
+                                 EntityProvider::ReferenceDirection dir,
+                                 bool get_redecls) & {
 
   ImplPtr context = impl.Lock();
   sqlite::Statement &get_references = (dir == EntityProvider::kReferenceTo ?
@@ -661,17 +795,21 @@ SQLiteEntityProvider::References(const Ptr &self, RawEntityId raw_id,
 
   // First, read the redeclarations for whatever this entity is.
   RawEntityIdList redecl_ids;
-  do {
-    for (RawEntityId raw_redecl_id : self->Redeclarations(self, raw_id)) {
-      redecl_ids.push_back(raw_redecl_id);
-    }
-  } while (false);
+  if (get_redecls) {
+    do {
+      for (RawEntityId raw_redecl_id : self->Redeclarations(self, raw_id)) {
+        redecl_ids.push_back(raw_redecl_id);
+      }
+    } while (false);
 
-  // Sanity check the redeclarations.
-  if (std::find(redecl_ids.begin(), redecl_ids.end(), raw_id) ==
-      redecl_ids.end()) {
-    assert(false);
-    co_return;
+    // Sanity check the redeclarations.
+    if (std::find(redecl_ids.begin(), redecl_ids.end(), raw_id) ==
+        redecl_ids.end()) {
+      assert(false);
+      co_return;
+    }
+  } else {
+    redecl_ids.push_back(raw_id);
   }
 
   // NOTE(pag): SQLite doesn't understand unsigned integers. When it sees our

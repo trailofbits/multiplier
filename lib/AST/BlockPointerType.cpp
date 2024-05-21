@@ -97,18 +97,13 @@ std::optional<BlockPointerType> BlockPointerType::from(const TokenContext &t) {
   return std::nullopt;
 }
 
-Type BlockPointerType::desugar(void) const {
+Type BlockPointerType::pointee_type(void) const {
   RawEntityId eid = impl->reader.getVal19();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
-Type BlockPointerType::pointee_type(void) const {
-  RawEntityId eid = impl->reader.getVal20();
-  return Type(impl->ep->TypeFor(impl->ep, eid));
-}
-
 bool BlockPointerType::is_sugared(void) const {
-  return impl->reader.getVal21();
+  return impl->reader.getVal20();
 }
 
 #pragma GCC diagnostic pop

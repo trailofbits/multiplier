@@ -149,7 +149,6 @@ class ImplicitReturnOp(multiplier.ir.core.Operation):
 
 class LazyOp(multiplier.ir.core.Operation):
   result: multiplier.ir.Value
-  lazy: multiplier.ir.Region
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -164,7 +163,6 @@ class LazyOp(multiplier.ir.core.Operation):
     ...
 
 class ScopeOp(multiplier.ir.core.Operation):
-  body: multiplier.ir.Region
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -203,6 +201,8 @@ class Type(multiplier.ir.Type):
 
 class FunctionType(multiplier.ir.core.Type):
   is_var_arg: bool
+  num_inputs: int
+  num_results: int
   var_arg: bool
 
   @staticmethod

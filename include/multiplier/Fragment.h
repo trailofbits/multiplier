@@ -42,7 +42,7 @@ class RegexQueryMatch;
                               MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_FORWARD_DECLARE
 
-using MacroOrToken = std::variant<Macro, Token>;
+using PreprocessedEntity = std::variant<Macro, Token, Fragment>;
 
 // A fragment of code containing one or more top-level declarations, the
 // associated declaration and statement entities, macro expansion/substitution
@@ -87,9 +87,8 @@ class MX_EXPORT Fragment {
   std::optional<Fragment> parent(void) const noexcept;
   std::optional<PackedFragmentId> parent_id(void) const noexcept;
 
-  // Return a fragment's parent fragment. If this is a top-level fragment, then
-  // this returns the argument.
-  static Fragment containing(const Fragment &) noexcept;
+  // Return a fragment's parent fragment, if any.
+  static std::optional<Fragment> containing(const Fragment &) noexcept;
 
   // Return the fragment containing a query match.
   static Fragment containing(const RegexQueryMatch &) noexcept;
@@ -141,7 +140,7 @@ class MX_EXPORT Fragment {
   gap::generator<Decl> top_level_declarations(void) const &;
 
   // Return the list of top-level macros or macro tokens in this code.
-  gap::generator<MacroOrToken> preprocessed_code(void) const &;
+  gap::generator<PreprocessedEntity> preprocessed_code(void) const &;
 
   inline bool operator==(const Fragment &that) const noexcept {
     return id() == that.id();

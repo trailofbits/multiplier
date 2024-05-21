@@ -31,7 +31,6 @@
 #include <llvm/Support/raw_ostream.h>
 
 #include "Endian.h"
-#include "Util.h"
 
 // For internal limits, e.g. `kMaxBigFragmentId`.
 #include "../../lib/Types.h"
@@ -51,7 +50,7 @@ static std::mutex gKeyShards[kNumKeyShards];
 static std::mutex gOpenDbsLock;
 static std::unordered_map<std::string, std::weak_ptr<IdStoreImpl>> gOpenDbs;
 
-static rocksdb::Options DBOptions(void) {
+inline static rocksdb::Options DBOptions(void) {
   rocksdb::Options options;
   options.create_if_missing = true;
   options.compression = rocksdb::kZSTD;
@@ -63,12 +62,12 @@ static rocksdb::Options DBOptions(void) {
   return options;
 }
 
-static std::unique_lock<std::mutex> KeyShardGuard(std::string_view key) {
+inline static std::unique_lock<std::mutex> KeyShardGuard(std::string_view key) {
   return std::unique_lock<std::mutex>(gKeyShards[Hash32(key) % kNumKeyShards]);
 }
 
 // Convert an entity ID into big endian.
-static mx::RawEntityId Canonicalize(mx::RawEntityId id) {
+inline static mx::RawEntityId Canonicalize(mx::RawEntityId id) {
   if MX_CONSTEXPR_ENDIAN (MX_LITTLE_ENDIAN) {
     return __builtin_bswap64(id);
   }
@@ -135,10 +134,7 @@ struct Tag {};
 //            following functions must be compatible with the parameter lists
 //            of the `IdStore::GetOrCreate*` methods.
 
-static mx::FragmentId MakeId(Tag<mx::FragmentId>, mx::RawEntityId index,
-                             mx::RawEntityId /* tok_id */,
-                             size_t /* num_tokens */,
-                             const std::string & /* hash */) {
+static mx::FragmentId MakeId(Tag<mx::FragmentId>, mx::RawEntityId index) {
   return mx::FragmentId(index);
 }
 
@@ -161,6 +157,14 @@ static mx::TypeId MakeId(Tag<mx::TypeId>, mx::RawEntityId index,
                          size_t /* num_tokens */,
                          const std::string & /* hash */) {
   return mx::TypeId(index, type_kind);
+}
+
+static bool IsReplaceable(const std::string &val) {
+  if (val.size() <= sizeof(mx::RawEntityId)) {
+    return false;
+  }
+
+  return val[sizeof(mx::RawEntityId)];
 }
 
 }  // namespace
@@ -302,15 +306,17 @@ class IdStoreImpl {
             mx::kMaxSmallTypeId)),
         next_big_type_index(configs.emplace_back(
             "META::NEXT_BIG_TYPE_INDEX", "BTI", 1, mx::kMaxBigTypeId)) {
-          EnterNextIndices();
-        }
+    EnterNextIndices();
+  }
 
   // Set `val` to `key`.
-  void UnlockedSet(const std::string &key, mx::RawEntityId val);
+  void UnlockedSet(const std::string &key, mx::RawEntityId val,
+                   bool is_replaceable=false);
 
   // Implements a transactional get or set operation.
   template <typename MakeId>
-  MaybeNewId<mx::RawEntityId> GetOrSet(const std::string &key, MakeId make_id);
+  MaybeNewId<mx::RawEntityId> GetOrSet(
+      const std::string &key, MakeId make_id, bool is_replaceable=false);
 
   template <typename IdType, typename... Args>
   MaybeNewId<mx::SpecificEntityId<IdType>> GetOrCreateId(
@@ -424,41 +430,61 @@ void IdStoreImpl::ExitRocksDB(void) {
 }
 
 // Set `val` to `key`.
-void IdStoreImpl::UnlockedSet(const std::string &key, mx::RawEntityId id) {
+void IdStoreImpl::UnlockedSet(const std::string &key, mx::RawEntityId id,
+                              bool is_replaceable) {
   std::string val;
   IDMarshaller id_marshal;
   id_marshal.Store(id);
   id_marshal.LoadInto(val);
+  if (is_replaceable) {
+    val.push_back('\1');
+  }
   CHECK(rocks_db->Put(kWriteOptions, key, val).ok());
 }
 
-// Core `GetOrSet` primitive used by higher-level APIs.
+// Core `GetOrSet` primitive used by higher-level APIs. If the request to create
+// a new ID is marked as *not* replaceable, but it conflicts with a previous ID
+// that *was* marked as replaceable, then we will pretend that the old ID is new
+// and we'll unmark it.
 template <typename MakeId>
 MaybeNewId<mx::RawEntityId> IdStoreImpl::GetOrSet(
-    const std::string &key, MakeId make_id) {
+    const std::string &key, MakeId make_id, bool is_replaceable) {
 
   IDMarshaller id_marshal;
   std::string val;
 
   // Racy read, relying on RocksDB to implement the concurrency control.
   auto racy_get_status = rocks_db->Get(kReadOptions, cf_handle, key, &val);
-  if (racy_get_status.ok() && val.size() == sizeof(id_marshal)) {
+  if (racy_get_status.ok() && val.size() >= sizeof(id_marshal)) {
     id_marshal.Store(val);
-    return {id_marshal.Load(), false};
+    IdStatus status = IdStatus::kExisting;
+    auto found_id = id_marshal.Load();
+    if (IsReplaceable(val) && !is_replaceable) {
+      auto locker = KeyShardGuard(key);
+      UnlockedSet(key, found_id, false  /* is_replaceable */);
+      status = IdStatus::kExistingButReplaced;
+    }
+    return {found_id, status};
   }
 
   auto locker = KeyShardGuard(key);
 
   // Uncontended read, synchronized with concurrent `Put`s.
   auto locked_get_status = rocks_db->Get(kReadOptions, cf_handle, key, &val);
-  if (locked_get_status.ok() && val.size() == sizeof(id_marshal)) {
+  if (locked_get_status.ok() && val.size() >= sizeof(id_marshal)) {
     id_marshal.Store(val);
-    return {id_marshal.Load(), false};
+    IdStatus status = IdStatus::kExisting;
+    auto found_id = id_marshal.Load();
+    if (IsReplaceable(val) && !is_replaceable) {
+      UnlockedSet(key, found_id, false  /* is_replaceable */);
+      status = IdStatus::kExistingButReplaced;
+    }
+    return {found_id, status};
   }
 
   auto invented_id = make_id();
-  UnlockedSet(key, invented_id);
-  return {invented_id, true};
+  UnlockedSet(key, invented_id, is_replaceable);
+  return {invented_id, IdStatus::kNew};
 }
 
 IdStore::~IdStore(void) {}
@@ -466,14 +492,29 @@ IdStore::~IdStore(void) {}
 IdStore::IdStore(std::filesystem::path path) 
     : impl(IdStoreImpl::Open(path)) {}
 
+// NOTE(pag): Here we need to track whether or not we can replace a fragment.
 MaybeNewId<mx::PackedFragmentId> IdStore::GetOrCreateFragmentIdForHash(
-    mx::RawEntityId tok_id, std::string hash, size_t num_tokens) {
+    mx::RawEntityId context_id, std::string hash, size_t num_tokens,
+    bool is_replaceable) {
 
-  // "Big codes" have IDs in the range [1, mx::kMaxNumBigPendingFragments)`.
-  return impl->GetOrCreateId<mx::FragmentId>(
-      (num_tokens >= mx::kNumTokensInBigFragment ?
-       impl->next_big_fragment_index : impl->next_small_fragment_index),
-      tok_id, num_tokens, hash);
+  // "Big fragments" have IDs in the range [1, mx::kMaxNumBigPendingFragments)`.
+  auto is_big_frag = num_tokens >= mx::kNumTokensInBigFragment;
+  auto &config = is_big_frag ? impl->next_big_fragment_index :
+                 impl->next_small_fragment_index;
+  mx::RawEntityId max_id_val = is_big_frag ? mx::kMaxBigFragmentId : ~0ull;
+
+  auto [found_id, is_new] = impl->GetOrSet(
+        config.Key(context_id, num_tokens, hash),
+        [&] (void) {
+          return config.PackAndCheckId<mx::FragmentId>();
+        },
+        is_replaceable);
+
+  auto maybe_eid = mx::EntityId(found_id).Extract<mx::FragmentId>();
+  CHECK(maybe_eid.has_value());
+  CHECK_LT(maybe_eid->fragment_id, max_id_val);
+
+  return {maybe_eid.value(), is_new};
 }
 
 MaybeNewId<mx::PackedTypeId> IdStore::GetOrCreateTypeIdForHash(

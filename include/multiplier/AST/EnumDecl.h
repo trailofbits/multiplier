@@ -9,12 +9,12 @@
 #pragma once
 
 #include <multiplier/AST/TagDecl.h>
-#include <multiplier/AST/TemplateSpecializationKind.h>
 
 namespace mx {
 class EntityProvider;
 class Fragment;
 class Index;
+class Reference;
 class Decl;
 class EnumConstantDecl;
 class EnumDecl;
@@ -79,8 +79,6 @@ class MX_EXPORT EnumDecl : public TagDecl {
   std::optional<Type> integer_type(void) const;
   TokenRange integer_type_range(void) const;
   std::optional<Type> promotion_type(void) const;
-  std::optional<EnumDecl> template_instantiation_pattern(void) const;
-  TemplateSpecializationKind template_specialization_kind(void) const;
   bool is_closed(void) const;
   bool is_closed_flag(void) const;
   bool is_closed_non_flag(void) const;

@@ -15,6 +15,7 @@ namespace mx {
 class EntityProvider;
 class Fragment;
 class Index;
+class Reference;
 class Decl;
 class NamedDecl;
 class Stmt;
@@ -89,7 +90,7 @@ class MX_EXPORT TagDecl : public TypeDecl {
   std::optional<TemplateParameterList> nth_template_parameter_list(unsigned n) const;
   unsigned num_template_parameter_lists(void) const;
   gap::generator<TemplateParameterList> template_parameter_lists(void) const &;
-  gap::generator<Decl> declarations_in_context(void) const &;
+  gap::generator<Decl> contained_declarations(void) const &;
 };
 
 static_assert(sizeof(TagDecl) == sizeof(TypeDecl));

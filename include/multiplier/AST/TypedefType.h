@@ -47,7 +47,6 @@ class MX_EXPORT TypedefType : public Type {
   static std::optional<TypedefType> from(const VariantEntity &e);
   static std::optional<TypedefType> from(const TokenContext &t);
 
-  Type desugar(void) const;
   TypedefNameDecl declaration(void) const;
   bool is_sugared(void) const;
   bool type_matches_declaration(void) const;

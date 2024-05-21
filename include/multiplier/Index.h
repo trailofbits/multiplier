@@ -92,7 +92,7 @@ inline constexpr unsigned NumEnumerators(IndexStatus) {
 MX_EXPORT const char *EnumeratorName(IndexStatus);
 
 // Access to the indexed code.
-class MX_EXPORT Index {
+class MX_EXPORT Index final {
  private:
   friend class Reference;
   friend class ReferenceKind;
@@ -256,7 +256,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_REFERENCE_AS,
 #endif  // __CDT_PARSER__
 
 // User-definable token. See `TokenRange::create`.
-class MX_EXPORT UserToken {
+class MX_EXPORT UserToken final {
  public:
 
   // The kind of this token.
@@ -298,6 +298,57 @@ class MX_EXPORT UserToken {
     related_entity.swap(that.related_entity);
     return *this;
   }
+};
+
+// User configuration for rendering qualified names.
+class MX_EXPORT QualifiedNameRenderOptions final {
+ public:
+
+  // Should the name be fully qualified, i.e. with all parent classes/namespaces?
+  bool fully_qualified{true};
+
+  // If the class is unnamed, then should we render out `(anonumous class)`?
+  bool render_anonymous_classes{true};
+
+  // If the struct is unnamed, then should we render out `(anonumous struct)`?
+  bool render_anonymous_structs{true};
+
+  // If the field is unnamed, then should we render out `(anonumous field)`?
+  bool render_anonymous_fields{true};
+
+  // If the union is unnamed, then should we render out `(anonymous union)`?
+  bool render_anonymous_unions{true};
+  
+  // If the enum is unnamed, then should we render out `(anonymous enum)`?
+  bool render_anonymous_enums{true};
+  
+  // If the namespace is anonymous, then should we render out
+  // `(anonymous namespace)`?
+  bool render_anonymous_namespaces{true};
+
+  // If the parameter is unnamed, then should we render out
+  // `(anonumous parameter)`?
+  bool render_anonymous_parameters{true};
+
+  // If the namespace is marked as inline, then should we render out the name
+  // of the inline namespace, or skip it?
+  bool render_inline_namespaces{true};
+
+  // When rendering names of template declarations, should we render the
+  // template paramters?
+  bool render_template_parameters{true};
+
+  // WHen rendering names of template specializations, should we render the
+  // template arguments?
+  bool render_template_arguments{true};
+
+  // Some declarations might not have a name, e.g. a parameter might be unnamed
+  // in a given place, but have a name elsewhere. This option tells us to try
+  // to go and look for an alternative name in a redeclaration.
+  bool find_name_in_redeclaration{true};
+
+  // Should function parameter types be included?
+  bool include_function_parameter_types{false};
 };
 
 }  // namespace mx

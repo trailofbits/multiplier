@@ -31,6 +31,11 @@ std::optional<ArrayType> ArrayType::from(const ::mx::ir::Type &that) {
   return ::mlir::LLVM::LLVMArrayType(this->::mx::ir::Type::type_);
 }
 
+unsigned int ArrayType::num_elements(void) const {
+  auto val = underlying_repr().getNumElements();
+  return val;
+}
+
 std::optional<FunctionType> FunctionType::from(const ::mx::ir::Type &that) {
   if (that.kind() == TypeKind::LLVM_FUNCTION) {
     return reinterpret_cast<const FunctionType &>(that);
@@ -44,6 +49,11 @@ std::optional<FunctionType> FunctionType::from(const ::mx::ir::Type &that) {
 
 bool FunctionType::is_var_arg(void) const {
   auto val = underlying_repr().isVarArg();
+  return val;
+}
+
+unsigned int FunctionType::num_params(void) const {
+  auto val = underlying_repr().getNumParams();
   return val;
 }
 
@@ -63,6 +73,11 @@ std::optional<PointerType> PointerType::from(const ::mx::ir::Type &that) {
   return ::mlir::LLVM::LLVMPointerType(this->::mx::ir::Type::type_);
 }
 
+unsigned int PointerType::address_space(void) const {
+  auto val = underlying_repr().getAddressSpace();
+  return val;
+}
+
 std::optional<FixedVectorType> FixedVectorType::from(const ::mx::ir::Type &that) {
   if (that.kind() == TypeKind::LLVM_FIXED_VECTOR) {
     return reinterpret_cast<const FixedVectorType &>(that);
@@ -74,6 +89,11 @@ std::optional<FixedVectorType> FixedVectorType::from(const ::mx::ir::Type &that)
   return ::mlir::LLVM::LLVMFixedVectorType(this->::mx::ir::Type::type_);
 }
 
+unsigned int FixedVectorType::num_elements(void) const {
+  auto val = underlying_repr().getNumElements();
+  return val;
+}
+
 std::optional<ScalableVectorType> ScalableVectorType::from(const ::mx::ir::Type &that) {
   if (that.kind() == TypeKind::LLVM_SCALABLE_VECTOR) {
     return reinterpret_cast<const ScalableVectorType &>(that);
@@ -83,6 +103,11 @@ std::optional<ScalableVectorType> ScalableVectorType::from(const ::mx::ir::Type 
 
 ::mlir::LLVM::LLVMScalableVectorType ScalableVectorType::underlying_repr(void) const noexcept {
   return ::mlir::LLVM::LLVMScalableVectorType(this->::mx::ir::Type::type_);
+}
+
+unsigned int ScalableVectorType::min_num_elements(void) const {
+  auto val = underlying_repr().getMinNumElements();
+  return val;
 }
 
 std::optional<TargetExtType> TargetExtType::from(const ::mx::ir::Type &that) {

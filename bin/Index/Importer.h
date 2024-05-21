@@ -42,7 +42,7 @@ class Importer {
   bool ImportCMakeCompileCommand(llvm::json::Object &o,
                                  const EnvVariableMap &envp);
 
-  void Import(const ExecutorOptions &options, bool fast_mode);
+  void Import(const ExecutorOptions &options);
 };
 
 }  // namespace indexer

@@ -46,11 +46,6 @@ std::optional<CallArgsOp> CallArgsOp::producing(const ::mx::ir::Value &that) {
   return ::vast::abi::CallArgsOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Region CallArgsOp::body(void) const {
-  auto &val = underlying_repr().getBody();
-  return ::mx::ir::Region(module_, val);
-}
-
 std::optional<CallExecutionOp> CallExecutionOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::ABI_CALL_EXEC) {
     return reinterpret_cast<const CallExecutionOp &>(that);
@@ -72,11 +67,6 @@ std::optional<CallExecutionOp> CallExecutionOp::producing(const ::mx::ir::Value 
 ::mx::ir::Value CallExecutionOp::result(void) const {
   auto val = underlying_repr().getResult();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
-}
-
-::mx::ir::Region CallExecutionOp::body(void) const {
-  auto &val = underlying_repr().getBody();
-  return ::mx::ir::Region(module_, val);
 }
 
 std::string_view CallExecutionOp::callee(void) const {
@@ -133,11 +123,6 @@ std::optional<CallRetsOp> CallRetsOp::producing(const ::mx::ir::Value &that) {
   return ::vast::abi::CallRetsOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Region CallRetsOp::body(void) const {
-  auto &val = underlying_repr().getBody();
-  return ::mx::ir::Region(module_, val);
-}
-
 std::optional<DirectOp> DirectOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::ABI_DIRECT) {
     return reinterpret_cast<const DirectOp &>(that);
@@ -174,11 +159,6 @@ std::optional<EpilogueOp> EpilogueOp::producing(const ::mx::ir::Value &that) {
   return ::vast::abi::EpilogueOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Region EpilogueOp::body(void) const {
-  auto &val = underlying_repr().getBody();
-  return ::mx::ir::Region(module_, val);
-}
-
 std::optional<FuncOp> FuncOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::ABI_FUNC) {
     return reinterpret_cast<const FuncOp &>(that);
@@ -195,11 +175,6 @@ std::optional<FuncOp> FuncOp::producing(const ::mx::ir::Value &that) {
 
 ::vast::abi::FuncOp FuncOp::underlying_repr(void) const noexcept {
   return ::vast::abi::FuncOp(this->::mx::ir::Operation::op_);
-}
-
-::mx::ir::Region FuncOp::body(void) const {
-  auto &val = underlying_repr().getBody();
-  return ::mx::ir::Region(module_, val);
 }
 
 std::string_view FuncOp::sym_name(void) const {
@@ -265,11 +240,6 @@ std::optional<PrologueOp> PrologueOp::producing(const ::mx::ir::Value &that) {
 
 ::vast::abi::PrologueOp PrologueOp::underlying_repr(void) const noexcept {
   return ::vast::abi::PrologueOp(this->::mx::ir::Operation::op_);
-}
-
-::mx::ir::Region PrologueOp::body(void) const {
-  auto &val = underlying_repr().getBody();
-  return ::mx::ir::Region(module_, val);
 }
 
 std::optional<RetDirectOp> RetDirectOp::from(const ::mx::ir::Operation &that) {

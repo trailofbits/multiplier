@@ -53,8 +53,7 @@ static mx::BuiltinReferenceKind ClassifyCall(const pasta::Stmt &parent,
                                              const pasta::Stmt &child,
                                              const pasta::Decl &decl) {
   // This function is used as a callee.
-  if (CalleeExpr(parent) == child ||
-      ReferencedDecl(parent) == decl) {
+  if (CalleeExpr(parent) == child || ReferencedDecl(parent) == decl) {
     return mx::BuiltinReferenceKind::CALLS;
   
   // This declaration is used as an argument.
@@ -131,7 +130,7 @@ static bool MemberPointerIsMethodPointer(pasta::Expr member_pointer) {
 
 enum class ContinuationAction {
   kKeepAscending,
-  kDoneClassifying
+  kDoneClassifying,
 };
 
 using ClassificationAction = std::pair<std::optional<mx::BuiltinReferenceKind>,
@@ -321,8 +320,13 @@ static ClassificationAction ClassifyParentChild(
     case pasta::StmtKind::kMemberExpr:
       if (auto member = pasta::MemberExpr::From(parent)) {
         //assert(member->Base() == child);
-        return {mx::BuiltinReferenceKind::ACCESSES_VALUE,
-                ContinuationAction::kDoneClassifying};
+        if (pasta::CXXMethodDecl::From(member->MemberDeclaration())) {
+          return {std::nullopt, ContinuationAction::kKeepAscending};
+
+        } else {
+          return {mx::BuiltinReferenceKind::ACCESSES_VALUE,
+                  ContinuationAction::kDoneClassifying};
+        }
       }
 
       assert(false);
@@ -336,6 +340,8 @@ static ClassificationAction ClassifyParentChild(
     case pasta::StmtKind::kCXXConstructExpr:
     case pasta::StmtKind::kCXXNewExpr:
     case pasta::StmtKind::kCXXDeleteExpr:
+    case pasta::StmtKind::kCXXMemberCallExpr:
+    case pasta::StmtKind::kCXXOperatorCallExpr:
       return {ClassifyCall(parent, child, decl),
               ContinuationAction::kDoneClassifying};
 
@@ -403,7 +409,7 @@ gap::generator<mx::ReferenceRecord> EnumerateStmtToDeclReferences(
   while (maybe_parent) {
     auto [classified_kind, continuation_action] = ClassifyParentChild(
         maybe_parent.value(), stmt, to_decl);
-    
+
     if (classified_kind) {
       record.context_entity_id = em->EntityId(maybe_parent.value());
       record.kind = classified_kind.value();
@@ -495,6 +501,10 @@ gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Decl decl) {
   } else if (auto td_ = pasta::TypedefNameDecl::From(decl)) {
     for (auto ref : DeclReferencesFrom(td_->UnderlyingType())) {
       co_yield ref;
+    }
+  } else if (auto dd = pasta::DecompositionDecl::From(decl)) {
+    for (auto binding : dd->Bindings()) {
+      co_yield binding;
     }
   }
 }

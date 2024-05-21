@@ -7,6 +7,7 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST/ExternCContextDecl.h>
+#include "../Reference.h"
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/Frontend/Token.h>
@@ -216,6 +217,12 @@ std::optional<ExternCContextDecl> ExternCContextDecl::from(const TokenContext &t
     return from_base(base.value());
   }
   return std::nullopt;
+}
+
+gap::generator<Decl> ExternCContextDecl::contained_declarations(void) const & {
+  return BuiltinDeclReferences<Decl>(
+      impl->ep, id().Pack(), BuiltinReferenceKind::CONTAINS,
+      EntityProvider::kReferenceFrom, false  /* redecls */);
 }
 
 #pragma GCC diagnostic pop
