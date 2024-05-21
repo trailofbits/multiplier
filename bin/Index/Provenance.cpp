@@ -477,7 +477,7 @@ static mx::RawEntityId VisitStmt(const EntityMapper &em,
     case pasta::StmtKind::kForStmt:
     case pasta::StmtKind::kCXXCatchStmt:
       if (token_kind == pasta::TokenKind::kLParenthesis ||
-          token_kind == pasta::TokenKind::kLParenthesis) {
+          token_kind == pasta::TokenKind::kRParenthesis) {
         return raw_stmt;
       }
       break;
