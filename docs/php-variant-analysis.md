@@ -7,7 +7,7 @@ Using Multiplier to identify bugs similar to the vulnerability identified in
 
 Clone PHP source and checkout the vulnerable commit:
 
-```
+```shell
 $ git clone git@github.com:php/php-src.git
 $ cd php-src
 $ git checkout 414d5620
@@ -29,7 +29,7 @@ Note that `_php_filter_validate_domain()` takes a second argument of type
 
 Install deps (Ubuntu 20.04) and generate `compile_commands.json`:
 
-```
+```shell
 $ sudo apt install -y pkg-config build-essential autoconf bison re2c \
                     libxml2-dev libsqlite3-dev
 $ ./buildconf
@@ -43,25 +43,20 @@ Modify `compile_commands.json` to only contain entry for the compilation unit
 for the `ext/filter/logical_filters.c` file (e.g. remove lines 2-1878,
 1915-2847).
 
-Start Multiplier indexer in one terminal:
+Start Multiplier indexer:
 
-```
-$ ./bin/Index/mx-index --workspace_dir /tmp/ws/ --logtostderr --minloglevel 0
+```shell
+$ ./bin/mx-index --target <path_to>/php-src/compile_commands.json --database /tmp/php.db --workspace_dir /tmp/php.ws --show_progress
 ```
 
-(All following commands should be executed in a separate terminal.)
+This could take some time. When indexing is done, the indexer will exit.
 
-Import the `compile_commands.json` file:
-
-```
-$ ./bin/Import/mx-import --path <path_to>/php-src/compile_commands.json
-```
 
 Identify the ID for the `ext/filter/logical_filters.c` file (note that ID
 values will differ in different workspaces):
 
-```
-$ ./bin/Examples/mx-list-files
+```shell
+$ ./bin/mx-list-files --db /tmp/php.db
 208	/home/huckfinn/tob/targets/php-src/TSRM/TSRM.h
 260	/home/huckfinn/tob/targets/php-src/Zend/zend.h
 90	/home/huckfinn/tob/targets/php-src/Zend/zend_API.h
@@ -74,8 +69,8 @@ $ ./bin/Examples/mx-list-files
 
 Identify the fragment ID of the functions of interest:
 
-```
-$ ./bin/Examples/mx-list-functions -file_id 265
+```shell
+$ ./bin/mx-list-functions --db /tmp/php.db --file_id 265
 265	65536	495	def	php_filter_validate_mac
 265	65537	268435951	def	php_filter_validate_ip
 265	65538	536871407	def	_php_filter_validate_ipv6
@@ -99,8 +94,8 @@ $ ./bin/Examples/mx-list-functions -file_id 265
 
 Find sketchy casts in the `php_filter_validate_domain()` function:
 
-```
-$ ./bin/Examples/mx-find-sketchy-casts -fragment_id 65543
+```shell
+$ ./bin/mx-find-sketchy-casts --db /tmp/php.db --fragment_id 65543
 ( ( * ( value ) ) . value . str ) -> len
 U_LONG -> INT
 ```
@@ -110,7 +105,7 @@ been applied. Can confirm this by printing the tokens in the fragment, and
 notice that the first and second arguments to `_php_filter_validate_domain()`
 have been expanded.)
 
-```
+```shell
 $ ./bin/Examples/mx-print-fragment -fragment_id 65543
  void php_filter_validate_domain (  zval * value , zend_long flags , zval * option_array , char * charset  ) { if ( ! _php_filter_validate_domain (  ( ( * ( value ) ) . value . str ) -> val  ,  ( ( * ( value ) ) . value . str ) -> len  , flags ) ) {  if ( ( executor_globals . exception ) ) { return ; } else if ( flags & 0x8000000 ) { zval_ptr_dtor ( value ) ; do { ( * ( value ) ) . u1 . type_info = 1 ; } while ( 0 ) ; } else { zval_ptr_dtor ( value ) ; do { ( * ( value ) ) . u1 . type_info = 2 ; } while ( 0 ) ; } return ;  } }⏎
 ```
@@ -120,14 +115,15 @@ flag to `mx-print-fragment`.)
 
 Get the entity ID of the `php_filter_validate_domain()` function:
 
-```
+```shell
 $ ./bin/Examples/mx-list-functions -fragment_id 65543
 265	65543	1879048687	def	php_filter_validate_domain
 ```
 
 Get the call hierarchy of the `php_filter_validate_domain()` function using its
 entity ID as reference:
-```
+
+```shell
 $ ./bin/Examples/mx-print-call-hierarchy -entity_id 1879048687
 php_filter_validate_domain	265             65543           1879048687      FUNCTION
 ```

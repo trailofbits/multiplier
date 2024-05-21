@@ -487,6 +487,12 @@ static mx::RawEntityId VisitStmt(const EntityMapper &em,
         return raw_stmt;
       }
       break;
+    case pasta::StmtKind::kLambdaExpr:
+      if (token_kind == pasta::TokenKind::kLSquare ||
+          token_kind == pasta::TokenKind::kRSquare) {
+        return raw_stmt;
+      }
+      break;
     default:
       break;
   }

@@ -1,133 +1,47 @@
-# Multiplier
+# Multiplier: Find more bugs faster
 
-Multiplier is a code auditing productivity multiplier. It...
+Multiplier provides precise, and comprehensive code understanding capabilities
+by storing a compressed representation of build artifacts, called entities, in
+an index database. Entities in Multiplier’s index include files, tokens, macro
+expansions, abstract syntax tree (AST) nodes, and compilations (represented with
+MLIR). Each entity is uniquely identified by a 64 bit integer, and is available
+through scripting in C++ or Python as a fully formed object with methods. For
+example, the AST entities (declarations, statements, types, templates, etc.) are
+persistent forms of AST nodes found in Clang, and the methods available on these
+entities mirror those that can be called on those objects in-memory in Clang.
+With Multiplier's API, you can get everywhere from anywhere.
 
- * Comprehensively indexes code (this repository)
- * Provides a C++ API to access indexed code (this repository)
- * Provides a Python API to access indexed code ([py-multiplier](https://github.com/trailofbits/py-multiplier))
- * Provides a GUI for browsing indexed code ([qt-multiplier](https://github.com/trailofbits/qt-multiplier))
+- [Getting and building the code](docs/BUILD.md)
+- Included utilities:
+  - [mx-find-symbol](): Find entities in the database given a symbol name
+  - [mx-list-files](): List all indexed files
+  - [mx-list-functions](): List all indexed functions
+  - [mx-list-macros](): List all indexed macros
+  - [mx-list-redeclarations](): List all redeclarations of a given entity
+  - [mx-list-structures](): List all indexed structures/unions/classes/enums
+  - [mx-list-variables](): List all indexed variables
+  - [mx-regex-query](): Peform a regular expression-based search through the code
+- Included tools:
+  - [mx-find-calls-in-macro-expansions](): Finds function calls that are inside
+    of the argument list of macros
+  - [mx-find-divergent-candidates](): Find potential variants of [divergent representations](https://blog.trailofbits.com/2022/11/10/divergent-representations-variable-overflows-c-compiler/) in source code.
+  - [mx-find-flexible-user-copies](): Find uses of `copy_to_user` in the Linux kernel that overwrite [flexible array members](https://en.wikipedia.org/wiki/Flexible_array_member)
+  - [mx-find-linked-structures](): Find data structures containing self-referential pointers (e.g. linked lists, trees), or that transitively contain such self-referential data structures
+  - [mx-find-sketchy-casts](): Generic "sketchy" cast finder (e.g. implicit downcasts)
+  - [mx-harness](): Extract an entity (e.g. function) and all of its dependencies, and save them into a file
+  - [mx-highlight-entity](): Highlight a specific entity within its surrounding code
+  - [mx-print-call-graph](): Print a call graph (DOT digraph format)
+  - [mx-print-reference-graph](): Print the reference graph (DOT digraph format)
+  - [mx-print-token-graph](): Print the graph (DOT digraph format) relating source code, macros, parsed tokens, and AST nodes for a given fragment
+  - [mx-taint-entity](): Print the taint graph (DOT digraph format) given a taint source, and treating memory dereferences as taint sinks
 
-## Pre-built releases
 
-You probably want pre-built releases of Multiplier, including its GUI. Hop over to
-the [qt-multiplier releases](https://github.com/trailofbits/qt-multiplier/releases) page
-to download those. The releases come with Multiplier's indexer, headers, libraries, etc.
-built in.
 
-Another place to find pre-built releases is [package-multiplier](https://github.com/trailofbits/package-multiplier/releases).
-These releases mostly focus on meeting deliverables for the DARPA V-SPELLS program.
-
-## Building Multiplier
-
-### Step 0
-
-Going forward, we assume the environment variable `WORKSPACE_DIR` dir represents
-the directory where everything goes.
-
-### Step 1
-
-#### macOS
-
-##### XCode
-
-Make sure that you have an up-to-date XCode. At a command line, you should be able
-to run `clang --version` and see something like this:
-
-```shell
-% clang --version
-Apple clang version 13.1.6 (clang-1316.0.21.2.3)
-Target: x86_64-apple-darwin21.4.0
-Thread model: posix
-InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
-```
-
-If you don't see that, then try the following:
-
-```shell
-xcode-select --install
-```
-
-This will pop open some dialogs and you should click "Install". After installing,
-try running the following command:
-
-```shell
-% xcode-select -p
-/Applications/Xcode.app/Contents/Developer
-```
-
-It is worth it to try opening XCode (the app). Sometimes opening the GUI triggers
-further downloads and installs, which you should do. It is likely that you will
-need to re-do this step after each OS update/upgrade.
-
-If you already had XCode installed, and perhaps had it configured for iOS development
-or something like that, then you should open up the XCode app, open its "Preferences"
-menu, go to the "Locations" tab, and then modify the path for "Command Line Tools."
-
-##### Build tools
-
-Make sure that you have an up-to-date CMake build and Ninja build. On macOS, you
-can [install Homebrew](https://brew.sh/) and run the following:
-
-```shell
-brew install ninja cmake graphviz xdot
-```
-
-An alternative is to [download](https://cmake.org/download/) and install CMake from
-the official website.
-
-#### Linux
-
-```shell
-sudo apt-get update
-sudo apt-get install build-essential ninja-build cmake graphviz xdot gcc g++
-```
-
-### Step 2
-
-Set up your environment.
-
-```shell
-mkdir -p "${WORKSPACE_DIR}/build"
-mkdir -p "${WORKSPACE_DIR}/src"
-mkdir -p "${WORKSPACE_DIR}/install"
-```
-
-Set virtual environment for Python:
-
-```shell
-if [[ ! -f "${WORKSPACE_DIR}/install/bin/activate" ]]; then
-  python3 -m venv "${WORKSPACE_DIR}/install"
-fi
-source "${WORKSPACE_DIR}/install/bin/activate"
-```
-
-### Step 3: Download and build Multiplier
-
-**Note:** Multiplier will download and build most/all of its dependencies during
-CMake's configuration stage, unless you specify otherwise.
-
-```shell
-cd "${WORKSPACE_DIR}/src"
-git clone git@github.com:trailofbits/multiplier.git
-```
-
-```shell
-mkdir -p "${WORKSPACE_DIR}/build/multiplier"
-cd "${WORKSPACE_DIR}/build/multiplier"
-cmake \
-  -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_INSTALL_PREFIX="${WORKSPACE_DIR}/install" \
-  -DMX_ENABLE_BOOTSTRAP=OFF \
-  -DMX_BOOTSTRAP_VAST=OFF \
-  -DMX_BOOTSTRAP_PASTA=OFF \
-  -DMX_ENABLE_RE2=ON \
-  -DMX_ENABLE_INSTALL=ON \
-  -GNinja \
-  "${WORKSPACE_DIR}/src/multiplier"
-
-ninja install
-```
+- [PHP Variant Analysis Example](docs/php-variant-analysis.md)
 
 # License
 
-This research was developed with funding from the Defense Advanced Research Projects Agency (DARPA). The views, opinions and/or findings expressed are those of the author and should not be interpreted as representing the official views or policies of the Department of Defense or the U.S. Government.
+This research was developed with funding from the Defense Advanced Research
+Projects Agency (DARPA). The views, opinions and/or findings expressed are those
+of the author and should not be interpreted as representing the official views
+or policies of the Department of Defense or the U.S. Government.
