@@ -11,33 +11,33 @@ persistent forms of AST nodes found in Clang, and the methods available on these
 entities mirror those that can be called on those objects in-memory in Clang.
 With Multiplier's API, you can get everywhere from anywhere.
 
-- [Getting and building the code](docs/BUILD.md)
+* [Getting and building the code](docs/BUILD.md)
+* About:
+  * [How do other indexers work](docs/other-indexers.md), and why the normal way of indexing code is insufficient for C/C++ 
+  * [What analysis challenges Multiplier solves](docs/why-multiplier.md)
+* Included tools:
+  * [Finds function calls that are inside of the argument list of macros](docs/mx-find-calls-in-macro-expansions.md)
+  * [Find possible divergent representations](docs/mx-find-divergent-candidates.md)
+  * [Find uses of `copy_to_user` in the Linux kernel that overwrite flexible array members](docs/mx-find-flexible-user-copies.md)
+  * [Find data structures containing self-referential pointers, such as linked lists and trees](docs/mx-find-linked-structures.md)
+  * [Generic finder for "sketchy" casts flowing to function arguments and to return sites](docs/mx-find-sketchy-casts.md)
+  * [Extract an entity, e.g. a function, and all of its dependencies into a file](docs/mx-harness.md)
+  * [Highlight a specific entity within its surrounding code](docs/mx-highlight-entity.md)
+  * [Print a call graph](docs/mx-print-call-graph.md)
+  * [Print the reference graph](docs/mx-print-reference-graph.md)
+  * [Print a graph relating source code, macros, parsed tokens, and AST nodes](docs/mx-print-token-graph.md)
+  * [Print the taint graph given a taint source, and treating memory dereferences as taint sinks](docs/mx-taint-entity.md)
 - Included utilities:
-  - [mx-find-symbol](): Find entities in the database given a symbol name
-  - [mx-list-files](): List all indexed files
-  - [mx-list-functions](): List all indexed functions
-  - [mx-list-macros](): List all indexed macros
-  - [mx-list-redeclarations](): List all redeclarations of a given entity
-  - [mx-list-structures](): List all indexed structures/unions/classes/enums
-  - [mx-list-variables](): List all indexed variables
-  - [mx-regex-query](): Peform a regular expression-based search through the code
-- Included tools:
-  - [mx-find-calls-in-macro-expansions](): Finds function calls that are inside
-    of the argument list of macros
-  - [mx-find-divergent-candidates](): Find potential variants of [divergent representations](https://blog.trailofbits.com/2022/11/10/divergent-representations-variable-overflows-c-compiler/) in source code.
-  - [mx-find-flexible-user-copies](): Find uses of `copy_to_user` in the Linux kernel that overwrite [flexible array members](https://en.wikipedia.org/wiki/Flexible_array_member)
-  - [mx-find-linked-structures](): Find data structures containing self-referential pointers (e.g. linked lists, trees), or that transitively contain such self-referential data structures
-  - [mx-find-sketchy-casts](): Generic "sketchy" cast finder (e.g. implicit downcasts)
-  - [mx-harness](): Extract an entity (e.g. function) and all of its dependencies, and save them into a file
-  - [mx-highlight-entity](): Highlight a specific entity within its surrounding code
-  - [mx-print-call-graph](): Print a call graph (DOT digraph format)
-  - [mx-print-reference-graph](): Print the reference graph (DOT digraph format)
-  - [mx-print-token-graph](): Print the graph (DOT digraph format) relating source code, macros, parsed tokens, and AST nodes for a given fragment
-  - [mx-taint-entity](): Print the taint graph (DOT digraph format) given a taint source, and treating memory dereferences as taint sinks
-
-
-
-- [PHP Variant Analysis Example](docs/php-variant-analysis.md)
+  - [Find entities in the database given a symbol name](docs/mx-find-symbol.md)
+  - [List all indexed files](docs/mx-list-files.md)
+  - [List all indexed functions](docs/mx-list-functions.md)
+  - [List all indexed macros](docs/mx-list-macros.md)
+  - [List all redeclarations of a given entity](docs/mx-list-redeclarations.md)
+  - [List all indexed structures/unions/classes/enums](docs/mx-list-structures.md)
+  - [List all indexed variables](docs/mx-list-variables.md)
+  - [Search the code with regular expressions](docs/mx-regex-query.md)
+- Writeups
+  - [PHP variant analysis](docs/php-variant-analysis.md)
 
 # License
 
