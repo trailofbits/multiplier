@@ -1212,7 +1212,8 @@ bool IsImplicitMethod(const pasta::Decl &decl) {
 
 // Get the unqualified, non-parameterized name of a declaration.
 std::string Name(const pasta::NamedDecl &decl) {
-  auto raw_decl = reinterpret_cast<const clang::NamedDecl *>(decl.RawDecl());
+  auto raw_decl = const_cast<clang::NamedDecl *>(
+      reinterpret_cast<const clang::NamedDecl *>(decl.RawDecl()));
 
   if (auto cls = dyn_cast<clang::CXXRecordDecl>(raw_decl)) {
     if (cls->isLambda()) {
@@ -1221,6 +1222,18 @@ std::string Name(const pasta::NamedDecl &decl) {
   }
 
   std::string name;
+
+  // If we have an anonymous tag (`enum`, `struct`, `union`) defined in the
+  // declarator of a `typedef`, then we actually want to save the name as empty.
+  // However, the name printer's logic will go and invoke the type printer,
+  // which will then go and print the `typedef`'s name. Thus we short-cirucit
+  // this situation by returning an empty name if this is a tag in a typedef.
+  if (auto tag = clang::dyn_cast<clang::TagDecl>(raw_decl)) {
+    if (tag->getTypedefNameForAnonDecl()) {
+      return name;
+    }
+  }
+
   llvm::raw_string_ostream os(name);
   clang::PrintingPolicy pp(raw_decl->getASTContext().getLangOpts());
   pp.FullyQualifiedName = false;
@@ -1233,7 +1246,9 @@ std::string Name(const pasta::NamedDecl &decl) {
   pp.IncludeTagDefinition = false;
   pp.AnonymousTagLocations = false;
   pp.CleanUglifiedParameters = false;
+  pp.SuppressTagKeyword = true;
   raw_decl->printName(os, pp);
+
   if (name.starts_with('(') || name.starts_with("using ")) {
     return {};
   }
