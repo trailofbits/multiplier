@@ -894,9 +894,6 @@ void GlobalIndexingState::PersistFragment(
   // Figure out parentage/inheritance between the entities.
   LabelParentsInPendingFragment(pf);
 
-  // Serialize all discovered entities.
-  SerializePendingFragment(fb, database, pf);
-
   // Serialize the parent fragment id(s), if any.
   RecordParentFragment(fb, database, pf);
 
@@ -961,6 +958,14 @@ void GlobalIndexingState::PersistFragment(
     pf.top_level_macros.clear();
     PersistParsedTokens(pf, fb, provenance);
   }
+
+  // Serialize all discovered entities.
+  //
+  // Issue #480: `PersistTokenTree` is responsible for inventing macro IDs and
+  //             filling `pf.macros_to_serialize`, so in order to serialize the
+  //             index information about macros, we need to do it after calling
+  //             `PersistTokenTree`.
+  SerializePendingFragment(fb, database, pf);
 
   PersistTokenContexts(pf, fb);
   LinkEntitiesAcrossFragments(database, pf, mangler);
