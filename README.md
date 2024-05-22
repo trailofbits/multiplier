@@ -1,7 +1,7 @@
 # _Multiplier_ finds more bugs faster
 
 Multiplier provides precise and comprehensive code understanding capabilities.
-It does so by persisting build artifacts into a database, and then making them
+It does so by saving build artifacts into a database, and then making them
 persistently accessible using a C++ or Python API.
 
 Multiplier emphasizes the ability to unique identify *all* entities in a build
@@ -11,8 +11,8 @@ interest over one of the representations, and then accurately relay results back
 to humans in a readable form, or to follow-on scripts via entity IDs.
 
 Multiplier's APIs are extensive, and often provide as-good or better-than
-compiler-level quality information, but linked at a whole-program level. We like
-to say that with its APIs, *you can get everywhere from anywhere*.
+compiler-level quality information, but linked at a whole-program granularity.
+We like to say that with its APIs, *you can get everywhere from anywhere*.
 
 * About
   * [How do other indexers work](docs/other-indexers.md), and why the normal way of indexing code is insufficient for C/C++ 
