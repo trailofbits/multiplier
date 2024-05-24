@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Decl;
+class File;
 class SEHLeaveStmt;
 class Stmt;
 class Token;
@@ -30,11 +31,10 @@ class MX_EXPORT SEHLeaveStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<SEHLeaveStmt> in(const Index &index);
-  static gap::generator<SEHLeaveStmt> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<SEHLeaveStmt> by_id(const Index &, EntityId);
   static gap::generator<SEHLeaveStmt> in(const Fragment &frag);
   static gap::generator<SEHLeaveStmt> in(const File &file);
+  static gap::generator<SEHLeaveStmt> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<SEHLeaveStmt> from(const ir::Operation &op);
   static gap::generator<std::pair<SEHLeaveStmt, ir::Operation>> in(const Compilation &tu);
@@ -50,6 +50,8 @@ class MX_EXPORT SEHLeaveStmt : public Stmt {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<SEHLeaveStmt> by_id(const Index &, EntityId);
 
   static std::optional<SEHLeaveStmt> from_base(const Stmt &parent);
   inline static std::optional<SEHLeaveStmt> from(const Stmt &parent) {

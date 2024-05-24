@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Decl;
 class Expr;
+class File;
 class OMPAllocateDecl;
 class OMPDeclarativeDirectiveDecl;
 class Stmt;
@@ -33,11 +34,10 @@ class MX_EXPORT OMPAllocateDecl : public OMPDeclarativeDirectiveDecl {
   friend class Decl;
  public:
   static gap::generator<OMPAllocateDecl> in(const Index &index);
-  static gap::generator<OMPAllocateDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<OMPAllocateDecl> by_id(const Index &, EntityId);
   static gap::generator<OMPAllocateDecl> in(const Fragment &frag);
   static gap::generator<OMPAllocateDecl> in(const File &file);
+  static gap::generator<OMPAllocateDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<OMPAllocateDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<OMPAllocateDecl, ir::Operation>> in(const Compilation &tu);
@@ -57,6 +57,8 @@ class MX_EXPORT OMPAllocateDecl : public OMPDeclarativeDirectiveDecl {
   OMPAllocateDecl canonical_declaration(void) const;
   std::optional<OMPAllocateDecl> definition(void) const;
   gap::generator<OMPAllocateDecl> redeclarations(void) const &;
+  static std::optional<OMPAllocateDecl> by_id(const Index &, EntityId);
+
   static std::optional<OMPAllocateDecl> from_base(const Decl &parent);
   inline static std::optional<OMPAllocateDecl> from(const Decl &parent) {
     return from_base(parent);

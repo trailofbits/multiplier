@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Decl;
 class Expr;
+class File;
 class ImplicitValueInitExpr;
 class Stmt;
 class Token;
@@ -34,11 +35,10 @@ class MX_EXPORT ImplicitValueInitExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<ImplicitValueInitExpr> in(const Index &index);
-  static gap::generator<ImplicitValueInitExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ImplicitValueInitExpr> by_id(const Index &, EntityId);
   static gap::generator<ImplicitValueInitExpr> in(const Fragment &frag);
   static gap::generator<ImplicitValueInitExpr> in(const File &file);
+  static gap::generator<ImplicitValueInitExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<ImplicitValueInitExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<ImplicitValueInitExpr, ir::Operation>> in(const Compilation &tu);
@@ -54,6 +54,8 @@ class MX_EXPORT ImplicitValueInitExpr : public Expr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<ImplicitValueInitExpr> by_id(const Index &, EntityId);
 
   static std::optional<ImplicitValueInitExpr> from_base(const Stmt &parent);
   inline static std::optional<ImplicitValueInitExpr> from(const Stmt &parent) {

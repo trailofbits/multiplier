@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Attr;
 class BPFPreserveAccessIndexAttr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT BPFPreserveAccessIndexAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<BPFPreserveAccessIndexAttr> in(const Index &index);
-  static gap::generator<BPFPreserveAccessIndexAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<BPFPreserveAccessIndexAttr> by_id(const Index &, EntityId);
   static gap::generator<BPFPreserveAccessIndexAttr> in(const Fragment &frag);
   static gap::generator<BPFPreserveAccessIndexAttr> in(const File &file);
+  static gap::generator<BPFPreserveAccessIndexAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::BPF_PRESERVE_ACCESS_INDEX;
   }
+
+  static std::optional<BPFPreserveAccessIndexAttr> by_id(const Index &, EntityId);
 
   static std::optional<BPFPreserveAccessIndexAttr> from_base(const Attr &parent);
   inline static std::optional<BPFPreserveAccessIndexAttr> from(const Attr &parent) {

@@ -16,6 +16,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class Token;
 class ZeroCallUsedRegsAttr;
@@ -32,15 +33,16 @@ class MX_EXPORT ZeroCallUsedRegsAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ZeroCallUsedRegsAttr> in(const Index &index);
-  static gap::generator<ZeroCallUsedRegsAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ZeroCallUsedRegsAttr> by_id(const Index &, EntityId);
   static gap::generator<ZeroCallUsedRegsAttr> in(const Fragment &frag);
   static gap::generator<ZeroCallUsedRegsAttr> in(const File &file);
+  static gap::generator<ZeroCallUsedRegsAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ZERO_CALL_USED_REGS;
   }
+
+  static std::optional<ZeroCallUsedRegsAttr> by_id(const Index &, EntityId);
 
   static std::optional<ZeroCallUsedRegsAttr> from_base(const Attr &parent);
   inline static std::optional<ZeroCallUsedRegsAttr> from(const Attr &parent) {

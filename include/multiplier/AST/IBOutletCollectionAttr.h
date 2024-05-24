@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class IBOutletCollectionAttr;
 class InheritableAttr;
 class Token;
@@ -32,15 +33,16 @@ class MX_EXPORT IBOutletCollectionAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<IBOutletCollectionAttr> in(const Index &index);
-  static gap::generator<IBOutletCollectionAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<IBOutletCollectionAttr> by_id(const Index &, EntityId);
   static gap::generator<IBOutletCollectionAttr> in(const Fragment &frag);
   static gap::generator<IBOutletCollectionAttr> in(const File &file);
+  static gap::generator<IBOutletCollectionAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::IB_OUTLET_COLLECTION;
   }
+
+  static std::optional<IBOutletCollectionAttr> by_id(const Index &, EntityId);
 
   static std::optional<IBOutletCollectionAttr> from_base(const Attr &parent);
   inline static std::optional<IBOutletCollectionAttr> from(const Attr &parent) {

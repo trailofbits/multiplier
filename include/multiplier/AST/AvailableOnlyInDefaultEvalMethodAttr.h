@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Attr;
 class AvailableOnlyInDefaultEvalMethodAttr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT AvailableOnlyInDefaultEvalMethodAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<AvailableOnlyInDefaultEvalMethodAttr> in(const Index &index);
-  static gap::generator<AvailableOnlyInDefaultEvalMethodAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<AvailableOnlyInDefaultEvalMethodAttr> by_id(const Index &, EntityId);
   static gap::generator<AvailableOnlyInDefaultEvalMethodAttr> in(const Fragment &frag);
   static gap::generator<AvailableOnlyInDefaultEvalMethodAttr> in(const File &file);
+  static gap::generator<AvailableOnlyInDefaultEvalMethodAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::AVAILABLE_ONLY_IN_DEFAULT_EVAL_METHOD;
   }
+
+  static std::optional<AvailableOnlyInDefaultEvalMethodAttr> by_id(const Index &, EntityId);
 
   static std::optional<AvailableOnlyInDefaultEvalMethodAttr> from_base(const Attr &parent);
   inline static std::optional<AvailableOnlyInDefaultEvalMethodAttr> from(const Attr &parent) {

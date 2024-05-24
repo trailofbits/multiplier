@@ -33,6 +33,7 @@ class Index;
 class Reference;
 class CXXBaseSpecifier;
 class CXXBaseSpecifierImpl;
+class CXXRecordDecl;
 class File;
 class Token;
 class TokenRange;
@@ -46,6 +47,7 @@ class Value;
 class MX_EXPORT CXXBaseSpecifier {
  public:
   std::optional<Decl> parent_declaration(void) const;
+std::optional<uint64_t> offset_in_bits(void) const;
  protected:
   friend class Attr;
   friend class Decl;
@@ -85,6 +87,14 @@ class MX_EXPORT CXXBaseSpecifier {
 
   PackedCXXBaseSpecifierId id(void) const;
 
+  static gap::generator<CXXBaseSpecifier> in(const Index &index);
+  static gap::generator<CXXBaseSpecifier> in(const Fragment &frag);
+  static gap::generator<CXXBaseSpecifier> in(const File &file);
+  static gap::generator<CXXBaseSpecifier> containing(const Token &tok);
+  bool contains(const Token &tok) const;
+
+  static std::optional<CXXBaseSpecifier> by_id(const Index &, EntityId);
+
   inline static std::optional<CXXBaseSpecifier> from(const CXXBaseSpecifier &self) {
     return self;
   }
@@ -99,14 +109,15 @@ class MX_EXPORT CXXBaseSpecifier {
 
   TokenRange tokens(void) const;
   Token base_type_token(void) const;
+  Token ellipsis_token(void) const;
   bool is_virtual(void) const;
-  TagTypeKind base_kind(void) const;
   bool is_pack_expansion(void) const;
   bool constructors_are_inherited(void) const;
-  Token ellipsis_token(void) const;
+  TagTypeKind base_kind(void) const;
   AccessSpecifier semantic_access_specifier(void) const;
   AccessSpecifier lexical_access_specifier(void) const;
   Type base_type(void) const;
+  std::optional<CXXRecordDecl> base_class(void) const;
 };
 
 #endif

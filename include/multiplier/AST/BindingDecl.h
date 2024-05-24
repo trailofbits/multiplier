@@ -17,6 +17,7 @@ class Index;
 class BindingDecl;
 class Decl;
 class Expr;
+class File;
 class NamedDecl;
 class Stmt;
 class Token;
@@ -36,11 +37,10 @@ class MX_EXPORT BindingDecl : public ValueDecl {
   friend class Decl;
  public:
   static gap::generator<BindingDecl> in(const Index &index);
-  static gap::generator<BindingDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<BindingDecl> by_id(const Index &, EntityId);
   static gap::generator<BindingDecl> in(const Fragment &frag);
   static gap::generator<BindingDecl> in(const File &file);
+  static gap::generator<BindingDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<BindingDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<BindingDecl, ir::Operation>> in(const Compilation &tu);
@@ -60,6 +60,8 @@ class MX_EXPORT BindingDecl : public ValueDecl {
   BindingDecl canonical_declaration(void) const;
   std::optional<BindingDecl> definition(void) const;
   gap::generator<BindingDecl> redeclarations(void) const &;
+  static std::optional<BindingDecl> by_id(const Index &, EntityId);
+
   static std::optional<BindingDecl> from_base(const Decl &parent);
   inline static std::optional<BindingDecl> from(const Decl &parent) {
     return from_base(parent);

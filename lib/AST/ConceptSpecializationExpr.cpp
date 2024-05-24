@@ -10,6 +10,7 @@
 #include <multiplier/AST/ConceptDecl.h>
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/Expr.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/AST/ImplicitConceptSpecializationDecl.h>
 #include <multiplier/AST/NamedDecl.h>
 #include <multiplier/AST/Stmt.h>
@@ -32,6 +33,43 @@ static const StmtKind kConceptSpecializationExprDerivedKinds[] = {
     ConceptSpecializationExpr::static_kind(),
 };
 }  // namespace
+
+gap::generator<ConceptSpecializationExpr> ConceptSpecializationExpr::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (StmtKind k : kConceptSpecializationExprDerivedKinds) {
+    for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
+      if (std::optional<ConceptSpecializationExpr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<ConceptSpecializationExpr> ConceptSpecializationExpr::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (StmtKind k : kConceptSpecializationExprDerivedKinds) {
+      for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
+        if (std::optional<ConceptSpecializationExpr> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+gap::generator<ConceptSpecializationExpr> ConceptSpecializationExpr::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (StmtKind k : kConceptSpecializationExprDerivedKinds) {
+    for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
+      if (std::optional<ConceptSpecializationExpr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
 
 gap::generator<ConceptSpecializationExpr> ConceptSpecializationExpr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -137,43 +175,6 @@ std::optional<ConceptSpecializationExpr> ConceptSpecializationExpr::from_base(co
       return reinterpret_cast<const ConceptSpecializationExpr &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<ConceptSpecializationExpr> ConceptSpecializationExpr::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (StmtKind k : kConceptSpecializationExprDerivedKinds) {
-    for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<ConceptSpecializationExpr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<ConceptSpecializationExpr> ConceptSpecializationExpr::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (StmtKind k : kConceptSpecializationExprDerivedKinds) {
-    for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<ConceptSpecializationExpr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<ConceptSpecializationExpr> ConceptSpecializationExpr::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (StmtKind k : kConceptSpecializationExprDerivedKinds) {
-      for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<ConceptSpecializationExpr> e = from_base(std::move(eptr))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
   }
 }
 

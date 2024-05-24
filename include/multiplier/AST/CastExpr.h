@@ -19,6 +19,7 @@ class CastExpr;
 class Decl;
 class Expr;
 class FieldDecl;
+class File;
 class NamedDecl;
 class Stmt;
 class Token;
@@ -37,11 +38,10 @@ class MX_EXPORT CastExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<CastExpr> in(const Index &index);
-  static gap::generator<CastExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CastExpr> by_id(const Index &, EntityId);
   static gap::generator<CastExpr> in(const Fragment &frag);
   static gap::generator<CastExpr> in(const File &file);
+  static gap::generator<CastExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<CastExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<CastExpr, ir::Operation>> in(const Compilation &tu);
@@ -53,6 +53,8 @@ class MX_EXPORT CastExpr : public Expr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<CastExpr> by_id(const Index &, EntityId);
 
   static std::optional<CastExpr> from_base(const Stmt &parent);
   inline static std::optional<CastExpr> from(const Stmt &parent) {

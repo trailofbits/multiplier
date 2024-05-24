@@ -8,6 +8,7 @@
 
 #include <multiplier/AST/OverrideAttr.h>
 #include <multiplier/AST/Attr.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/AST/InheritableAttr.h>
 #include <multiplier/Frontend/Token.h>
 
@@ -24,6 +25,43 @@ static const AttrKind kOverrideAttrDerivedKinds[] = {
     OverrideAttr::static_kind(),
 };
 }  // namespace
+
+gap::generator<OverrideAttr> OverrideAttr::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (AttrKind k : kOverrideAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
+      if (std::optional<OverrideAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<OverrideAttr> OverrideAttr::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (AttrKind k : kOverrideAttrDerivedKinds) {
+      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+        if (std::optional<OverrideAttr> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+gap::generator<OverrideAttr> OverrideAttr::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (AttrKind k : kOverrideAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+      if (std::optional<OverrideAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
 
 gap::generator<OverrideAttr> OverrideAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -66,43 +104,6 @@ std::optional<OverrideAttr> OverrideAttr::from_base(const Attr &parent) {
       return reinterpret_cast<const OverrideAttr &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<OverrideAttr> OverrideAttr::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (AttrKind k : kOverrideAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<OverrideAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<OverrideAttr> OverrideAttr::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (AttrKind k : kOverrideAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<OverrideAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<OverrideAttr> OverrideAttr::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (AttrKind k : kOverrideAttrDerivedKinds) {
-      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<OverrideAttr> e = from_base(std::move(eptr))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
   }
 }
 

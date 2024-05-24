@@ -16,6 +16,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class MSVtorDispAttr;
 class Token;
@@ -32,15 +33,16 @@ class MX_EXPORT MSVtorDispAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<MSVtorDispAttr> in(const Index &index);
-  static gap::generator<MSVtorDispAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<MSVtorDispAttr> by_id(const Index &, EntityId);
   static gap::generator<MSVtorDispAttr> in(const Fragment &frag);
   static gap::generator<MSVtorDispAttr> in(const File &file);
+  static gap::generator<MSVtorDispAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MS_VTOR_DISP;
   }
+
+  static std::optional<MSVtorDispAttr> by_id(const Index &, EntityId);
 
   static std::optional<MSVtorDispAttr> from_base(const Attr &parent);
   inline static std::optional<MSVtorDispAttr> from(const Attr &parent) {

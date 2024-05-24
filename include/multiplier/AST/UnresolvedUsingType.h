@@ -32,11 +32,12 @@ class MX_EXPORT UnresolvedUsingType : public Type {
   static gap::generator<UnresolvedUsingType> in(const Index &index);
   static gap::generator<UnresolvedUsingType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<UnresolvedUsingType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::UNRESOLVED_USING;
   }
+
+  static std::optional<UnresolvedUsingType> by_id(const Index &, EntityId);
 
   static std::optional<UnresolvedUsingType> from_base(const Type &parent);
   inline static std::optional<UnresolvedUsingType> from(const Type &parent) {

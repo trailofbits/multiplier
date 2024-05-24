@@ -9,6 +9,7 @@
 #include <multiplier/AST/OMPCapturedExprDecl.h>
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/DeclaratorDecl.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/AST/NamedDecl.h>
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/Frontend/Token.h>
@@ -30,6 +31,43 @@ static const DeclKind kOMPCapturedExprDeclDerivedKinds[] = {
     OMPCapturedExprDecl::static_kind(),
 };
 }  // namespace
+
+gap::generator<OMPCapturedExprDecl> OMPCapturedExprDecl::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (DeclKind k : kOMPCapturedExprDeclDerivedKinds) {
+    for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
+      if (std::optional<OMPCapturedExprDecl> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<OMPCapturedExprDecl> OMPCapturedExprDecl::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (DeclKind k : kOMPCapturedExprDeclDerivedKinds) {
+      for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
+        if (std::optional<OMPCapturedExprDecl> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+gap::generator<OMPCapturedExprDecl> OMPCapturedExprDecl::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (DeclKind k : kOMPCapturedExprDeclDerivedKinds) {
+    for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
+      if (std::optional<OMPCapturedExprDecl> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
 
 gap::generator<OMPCapturedExprDecl> OMPCapturedExprDecl::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -164,43 +202,6 @@ std::optional<OMPCapturedExprDecl> OMPCapturedExprDecl::from_base(const Decl &pa
       return reinterpret_cast<const OMPCapturedExprDecl &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<OMPCapturedExprDecl> OMPCapturedExprDecl::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (DeclKind k : kOMPCapturedExprDeclDerivedKinds) {
-    for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<OMPCapturedExprDecl> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<OMPCapturedExprDecl> OMPCapturedExprDecl::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (DeclKind k : kOMPCapturedExprDeclDerivedKinds) {
-    for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<OMPCapturedExprDecl> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<OMPCapturedExprDecl> OMPCapturedExprDecl::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (DeclKind k : kOMPCapturedExprDeclDerivedKinds) {
-      for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<OMPCapturedExprDecl> e = from_base(std::move(eptr))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
   }
 }
 

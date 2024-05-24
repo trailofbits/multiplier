@@ -89,7 +89,7 @@ extern void LinkEntitiesAcrossFragments(
 // Identify all unique entity IDs referenced by this fragment,
 // and map them to the fragment ID in the data store.
 extern void LinkExternalReferencesInFragment(
-    const pasta::AST &ast, mx::DatabaseWriter &database,
+    mx::DatabaseWriter &database,
     const PendingFragment &pf);
 
 // Serialize all entities into the Cap'n Proto version of the fragment.
@@ -969,7 +969,7 @@ void GlobalIndexingState::PersistFragment(
 
   PersistTokenContexts(pf, fb);
   LinkEntitiesAcrossFragments(database, pf, mangler);
-  LinkExternalReferencesInFragment(ast, database, pf);
+  LinkExternalReferencesInFragment(database, pf);
   LinkEntityNamesToFragment(database, pf);
 
   // Add the fragment to the database. In the IDStore, we can detect whether

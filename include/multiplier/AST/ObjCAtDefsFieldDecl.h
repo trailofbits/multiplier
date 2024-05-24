@@ -17,6 +17,7 @@ class Index;
 class Decl;
 class DeclaratorDecl;
 class FieldDecl;
+class File;
 class NamedDecl;
 class ObjCAtDefsFieldDecl;
 class Stmt;
@@ -38,11 +39,10 @@ class MX_EXPORT ObjCAtDefsFieldDecl : public FieldDecl {
   friend class Decl;
  public:
   static gap::generator<ObjCAtDefsFieldDecl> in(const Index &index);
-  static gap::generator<ObjCAtDefsFieldDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ObjCAtDefsFieldDecl> by_id(const Index &, EntityId);
   static gap::generator<ObjCAtDefsFieldDecl> in(const Fragment &frag);
   static gap::generator<ObjCAtDefsFieldDecl> in(const File &file);
+  static gap::generator<ObjCAtDefsFieldDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<ObjCAtDefsFieldDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<ObjCAtDefsFieldDecl, ir::Operation>> in(const Compilation &tu);
@@ -62,6 +62,8 @@ class MX_EXPORT ObjCAtDefsFieldDecl : public FieldDecl {
   ObjCAtDefsFieldDecl canonical_declaration(void) const;
   std::optional<ObjCAtDefsFieldDecl> definition(void) const;
   gap::generator<ObjCAtDefsFieldDecl> redeclarations(void) const &;
+  static std::optional<ObjCAtDefsFieldDecl> by_id(const Index &, EntityId);
+
   static std::optional<ObjCAtDefsFieldDecl> from_base(const Decl &parent);
   inline static std::optional<ObjCAtDefsFieldDecl> from(const Decl &parent) {
     return from_base(parent);

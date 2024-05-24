@@ -31,11 +31,12 @@ class MX_EXPORT AdjustedType : public Type {
   static gap::generator<AdjustedType> in(const Index &index);
   static gap::generator<AdjustedType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<AdjustedType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::ADJUSTED;
   }
+
+  static std::optional<AdjustedType> by_id(const Index &, EntityId);
 
   static std::optional<AdjustedType> from_base(const Type &parent);
   inline static std::optional<AdjustedType> from(const Type &parent) {

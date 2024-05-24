@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class OptimizeNoneAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT OptimizeNoneAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<OptimizeNoneAttr> in(const Index &index);
-  static gap::generator<OptimizeNoneAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<OptimizeNoneAttr> by_id(const Index &, EntityId);
   static gap::generator<OptimizeNoneAttr> in(const Fragment &frag);
   static gap::generator<OptimizeNoneAttr> in(const File &file);
+  static gap::generator<OptimizeNoneAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OPTIMIZE_NONE;
   }
+
+  static std::optional<OptimizeNoneAttr> by_id(const Index &, EntityId);
 
   static std::optional<OptimizeNoneAttr> from_base(const Attr &parent);
   inline static std::optional<OptimizeNoneAttr> from(const Attr &parent) {

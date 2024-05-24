@@ -25,6 +25,17 @@ static const TypeKind kExtVectorTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<ExtVectorType> ExtVectorType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kExtVectorTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<ExtVectorType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<ExtVectorType> ExtVectorType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = ExtVectorType::from(*ctx)) {
@@ -66,17 +77,6 @@ std::optional<ExtVectorType> ExtVectorType::from_base(const Type &parent) {
       return reinterpret_cast<const ExtVectorType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<ExtVectorType> ExtVectorType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kExtVectorTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<ExtVectorType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

@@ -353,6 +353,11 @@ class ParentTrackerVisitor : public EntityVisitor {
   }
 
   void Accept(const pasta::CXXBaseSpecifier &entity) final {
+    if (parent_decl) {
+
+    } else {
+      assert(false);
+    }
     if (AddToMaps(RawEntity(entity))) {
       this->EntityVisitor::Accept(entity);
     }

@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Decl;
 class Expr;
+class File;
 class ObjCForCollectionStmt;
 class Stmt;
 class Token;
@@ -31,11 +32,10 @@ class MX_EXPORT ObjCForCollectionStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<ObjCForCollectionStmt> in(const Index &index);
-  static gap::generator<ObjCForCollectionStmt> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ObjCForCollectionStmt> by_id(const Index &, EntityId);
   static gap::generator<ObjCForCollectionStmt> in(const Fragment &frag);
   static gap::generator<ObjCForCollectionStmt> in(const File &file);
+  static gap::generator<ObjCForCollectionStmt> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<ObjCForCollectionStmt> from(const ir::Operation &op);
   static gap::generator<std::pair<ObjCForCollectionStmt, ir::Operation>> in(const Compilation &tu);
@@ -51,6 +51,8 @@ class MX_EXPORT ObjCForCollectionStmt : public Stmt {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<ObjCForCollectionStmt> by_id(const Index &, EntityId);
 
   static std::optional<ObjCForCollectionStmt> from_base(const Stmt &parent);
   inline static std::optional<ObjCForCollectionStmt> from(const Stmt &parent) {

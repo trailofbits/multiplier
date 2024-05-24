@@ -18,6 +18,7 @@ class CoroutineSuspendExpr;
 class CoyieldExpr;
 class Decl;
 class Expr;
+class File;
 class Stmt;
 class Token;
 class ValueStmt;
@@ -36,11 +37,10 @@ class MX_EXPORT CoyieldExpr : public CoroutineSuspendExpr {
   friend class Stmt;
  public:
   static gap::generator<CoyieldExpr> in(const Index &index);
-  static gap::generator<CoyieldExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CoyieldExpr> by_id(const Index &, EntityId);
   static gap::generator<CoyieldExpr> in(const Fragment &frag);
   static gap::generator<CoyieldExpr> in(const File &file);
+  static gap::generator<CoyieldExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<CoyieldExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<CoyieldExpr, ir::Operation>> in(const Compilation &tu);
@@ -56,6 +56,8 @@ class MX_EXPORT CoyieldExpr : public CoroutineSuspendExpr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<CoyieldExpr> by_id(const Index &, EntityId);
 
   static std::optional<CoyieldExpr> from_base(const Stmt &parent);
   inline static std::optional<CoyieldExpr> from(const Stmt &parent) {

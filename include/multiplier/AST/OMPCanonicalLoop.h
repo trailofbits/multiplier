@@ -17,6 +17,7 @@ class Index;
 class CapturedStmt;
 class Decl;
 class DeclRefExpr;
+class File;
 class OMPCanonicalLoop;
 class Stmt;
 class Token;
@@ -32,11 +33,10 @@ class MX_EXPORT OMPCanonicalLoop : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<OMPCanonicalLoop> in(const Index &index);
-  static gap::generator<OMPCanonicalLoop> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<OMPCanonicalLoop> by_id(const Index &, EntityId);
   static gap::generator<OMPCanonicalLoop> in(const Fragment &frag);
   static gap::generator<OMPCanonicalLoop> in(const File &file);
+  static gap::generator<OMPCanonicalLoop> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<OMPCanonicalLoop> from(const ir::Operation &op);
   static gap::generator<std::pair<OMPCanonicalLoop, ir::Operation>> in(const Compilation &tu);
@@ -52,6 +52,8 @@ class MX_EXPORT OMPCanonicalLoop : public Stmt {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<OMPCanonicalLoop> by_id(const Index &, EntityId);
 
   static std::optional<OMPCanonicalLoop> from_base(const Stmt &parent);
   inline static std::optional<OMPCanonicalLoop> from(const Stmt &parent) {

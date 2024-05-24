@@ -9,6 +9,7 @@
 #include <multiplier/AST/IntegerLiteral.h>
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/Expr.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/ValueStmt.h>
@@ -28,6 +29,43 @@ static const StmtKind kIntegerLiteralDerivedKinds[] = {
     IntegerLiteral::static_kind(),
 };
 }  // namespace
+
+gap::generator<IntegerLiteral> IntegerLiteral::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (StmtKind k : kIntegerLiteralDerivedKinds) {
+    for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
+      if (std::optional<IntegerLiteral> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<IntegerLiteral> IntegerLiteral::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (StmtKind k : kIntegerLiteralDerivedKinds) {
+      for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
+        if (std::optional<IntegerLiteral> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+gap::generator<IntegerLiteral> IntegerLiteral::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (StmtKind k : kIntegerLiteralDerivedKinds) {
+    for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
+      if (std::optional<IntegerLiteral> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
 
 gap::generator<IntegerLiteral> IntegerLiteral::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -133,43 +171,6 @@ std::optional<IntegerLiteral> IntegerLiteral::from_base(const Stmt &parent) {
       return reinterpret_cast<const IntegerLiteral &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<IntegerLiteral> IntegerLiteral::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (StmtKind k : kIntegerLiteralDerivedKinds) {
-    for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<IntegerLiteral> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<IntegerLiteral> IntegerLiteral::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (StmtKind k : kIntegerLiteralDerivedKinds) {
-    for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<IntegerLiteral> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<IntegerLiteral> IntegerLiteral::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (StmtKind k : kIntegerLiteralDerivedKinds) {
-      for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<IntegerLiteral> e = from_base(std::move(eptr))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
   }
 }
 

@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class ArmInAttr;
 class Attr;
+class File;
 class Token;
 class TypeAttr;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT ArmInAttr : public TypeAttr {
   friend class Attr;
  public:
   static gap::generator<ArmInAttr> in(const Index &index);
-  static gap::generator<ArmInAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ArmInAttr> by_id(const Index &, EntityId);
   static gap::generator<ArmInAttr> in(const Fragment &frag);
   static gap::generator<ArmInAttr> in(const File &file);
+  static gap::generator<ArmInAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ARM_IN;
   }
+
+  static std::optional<ArmInAttr> by_id(const Index &, EntityId);
 
   static std::optional<ArmInAttr> from_base(const Attr &parent);
   inline static std::optional<ArmInAttr> from(const Attr &parent) {

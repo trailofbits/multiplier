@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Decl;
 class Expr;
+class File;
 class ObjCProtocolDecl;
 class ObjCProtocolExpr;
 class Stmt;
@@ -35,11 +36,10 @@ class MX_EXPORT ObjCProtocolExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<ObjCProtocolExpr> in(const Index &index);
-  static gap::generator<ObjCProtocolExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ObjCProtocolExpr> by_id(const Index &, EntityId);
   static gap::generator<ObjCProtocolExpr> in(const Fragment &frag);
   static gap::generator<ObjCProtocolExpr> in(const File &file);
+  static gap::generator<ObjCProtocolExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<ObjCProtocolExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<ObjCProtocolExpr, ir::Operation>> in(const Compilation &tu);
@@ -55,6 +55,8 @@ class MX_EXPORT ObjCProtocolExpr : public Expr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<ObjCProtocolExpr> by_id(const Index &, EntityId);
 
   static std::optional<ObjCProtocolExpr> from_base(const Stmt &parent);
   inline static std::optional<ObjCProtocolExpr> from(const Stmt &parent) {

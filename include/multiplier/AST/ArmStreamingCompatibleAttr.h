@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class ArmStreamingCompatibleAttr;
 class Attr;
+class File;
 class Token;
 class TypeAttr;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT ArmStreamingCompatibleAttr : public TypeAttr {
   friend class Attr;
  public:
   static gap::generator<ArmStreamingCompatibleAttr> in(const Index &index);
-  static gap::generator<ArmStreamingCompatibleAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ArmStreamingCompatibleAttr> by_id(const Index &, EntityId);
   static gap::generator<ArmStreamingCompatibleAttr> in(const Fragment &frag);
   static gap::generator<ArmStreamingCompatibleAttr> in(const File &file);
+  static gap::generator<ArmStreamingCompatibleAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ARM_STREAMING_COMPATIBLE;
   }
+
+  static std::optional<ArmStreamingCompatibleAttr> by_id(const Index &, EntityId);
 
   static std::optional<ArmStreamingCompatibleAttr> from_base(const Attr &parent);
   inline static std::optional<ArmStreamingCompatibleAttr> from(const Attr &parent) {

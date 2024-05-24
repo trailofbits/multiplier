@@ -18,6 +18,7 @@ class CXXForRangeStmt;
 class Decl;
 class DeclStmt;
 class Expr;
+class File;
 class Stmt;
 class Token;
 class VarDecl;
@@ -33,11 +34,10 @@ class MX_EXPORT CXXForRangeStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<CXXForRangeStmt> in(const Index &index);
-  static gap::generator<CXXForRangeStmt> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CXXForRangeStmt> by_id(const Index &, EntityId);
   static gap::generator<CXXForRangeStmt> in(const Fragment &frag);
   static gap::generator<CXXForRangeStmt> in(const File &file);
+  static gap::generator<CXXForRangeStmt> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<CXXForRangeStmt> from(const ir::Operation &op);
   static gap::generator<std::pair<CXXForRangeStmt, ir::Operation>> in(const Compilation &tu);
@@ -53,6 +53,8 @@ class MX_EXPORT CXXForRangeStmt : public Stmt {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<CXXForRangeStmt> by_id(const Index &, EntityId);
 
   static std::optional<CXXForRangeStmt> from_base(const Stmt &parent);
   inline static std::optional<CXXForRangeStmt> from(const Stmt &parent) {

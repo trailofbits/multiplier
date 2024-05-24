@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class LifetimeBoundAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT LifetimeBoundAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<LifetimeBoundAttr> in(const Index &index);
-  static gap::generator<LifetimeBoundAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<LifetimeBoundAttr> by_id(const Index &, EntityId);
   static gap::generator<LifetimeBoundAttr> in(const Fragment &frag);
   static gap::generator<LifetimeBoundAttr> in(const File &file);
+  static gap::generator<LifetimeBoundAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::LIFETIME_BOUND;
   }
+
+  static std::optional<LifetimeBoundAttr> by_id(const Index &, EntityId);
 
   static std::optional<LifetimeBoundAttr> from_base(const Attr &parent);
   inline static std::optional<LifetimeBoundAttr> from(const Attr &parent) {

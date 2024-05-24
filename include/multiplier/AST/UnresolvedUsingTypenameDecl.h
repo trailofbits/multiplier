@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Decl;
+class File;
 class NamedDecl;
 class Stmt;
 class Token;
@@ -34,11 +35,10 @@ class MX_EXPORT UnresolvedUsingTypenameDecl : public TypeDecl {
   friend class Decl;
  public:
   static gap::generator<UnresolvedUsingTypenameDecl> in(const Index &index);
-  static gap::generator<UnresolvedUsingTypenameDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<UnresolvedUsingTypenameDecl> by_id(const Index &, EntityId);
   static gap::generator<UnresolvedUsingTypenameDecl> in(const Fragment &frag);
   static gap::generator<UnresolvedUsingTypenameDecl> in(const File &file);
+  static gap::generator<UnresolvedUsingTypenameDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<UnresolvedUsingTypenameDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<UnresolvedUsingTypenameDecl, ir::Operation>> in(const Compilation &tu);
@@ -58,6 +58,8 @@ class MX_EXPORT UnresolvedUsingTypenameDecl : public TypeDecl {
   UnresolvedUsingTypenameDecl canonical_declaration(void) const;
   std::optional<UnresolvedUsingTypenameDecl> definition(void) const;
   gap::generator<UnresolvedUsingTypenameDecl> redeclarations(void) const &;
+  static std::optional<UnresolvedUsingTypenameDecl> by_id(const Index &, EntityId);
+
   static std::optional<UnresolvedUsingTypenameDecl> from_base(const Decl &parent);
   inline static std::optional<UnresolvedUsingTypenameDecl> from(const Decl &parent) {
     return from_base(parent);

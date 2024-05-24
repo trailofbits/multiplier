@@ -14,6 +14,7 @@ namespace mx {
 class EntityProvider;
 class Fragment;
 class Index;
+class File;
 class Macro;
 class MacroVAOptArgument;
 namespace ir {
@@ -27,12 +28,9 @@ class MX_EXPORT MacroVAOptArgument : public Macro {
   friend class FragmentImpl;
   friend class Macro;
  public:
+  static gap::generator<MacroVAOptArgument> in(const Index &index);
   static gap::generator<MacroVAOptArgument> in(const Fragment &frag);
   static gap::generator<MacroVAOptArgument> in(const File &file);
-
-  static gap::generator<MacroVAOptArgument> in(const Index &index);
-  static std::optional<MacroVAOptArgument> by_id(const Index &, EntityId);
-
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::VA_OPT_ARGUMENT;
   }
@@ -42,6 +40,8 @@ class MX_EXPORT MacroVAOptArgument : public Macro {
 
   static gap::generator<MacroVAOptArgument> containing(const Token &token);
   bool contains(const Token &token);
+
+  static std::optional<MacroVAOptArgument> by_id(const Index &, EntityId);
 
   static std::optional<MacroVAOptArgument> from_base(const Macro &parent);
   inline static std::optional<MacroVAOptArgument> from(const Macro &parent) {

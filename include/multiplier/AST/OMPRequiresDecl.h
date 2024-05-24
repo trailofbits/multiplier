@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Decl;
+class File;
 class OMPDeclarativeDirectiveDecl;
 class OMPRequiresDecl;
 class Stmt;
@@ -32,11 +33,10 @@ class MX_EXPORT OMPRequiresDecl : public OMPDeclarativeDirectiveDecl {
   friend class Decl;
  public:
   static gap::generator<OMPRequiresDecl> in(const Index &index);
-  static gap::generator<OMPRequiresDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<OMPRequiresDecl> by_id(const Index &, EntityId);
   static gap::generator<OMPRequiresDecl> in(const Fragment &frag);
   static gap::generator<OMPRequiresDecl> in(const File &file);
+  static gap::generator<OMPRequiresDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<OMPRequiresDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<OMPRequiresDecl, ir::Operation>> in(const Compilation &tu);
@@ -56,6 +56,8 @@ class MX_EXPORT OMPRequiresDecl : public OMPDeclarativeDirectiveDecl {
   OMPRequiresDecl canonical_declaration(void) const;
   std::optional<OMPRequiresDecl> definition(void) const;
   gap::generator<OMPRequiresDecl> redeclarations(void) const &;
+  static std::optional<OMPRequiresDecl> by_id(const Index &, EntityId);
+
   static std::optional<OMPRequiresDecl> from_base(const Decl &parent);
   inline static std::optional<OMPRequiresDecl> from(const Decl &parent) {
     return from_base(parent);

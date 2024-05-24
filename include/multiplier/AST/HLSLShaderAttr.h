@@ -16,6 +16,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class HLSLShaderAttr;
 class InheritableAttr;
 class Token;
@@ -32,15 +33,16 @@ class MX_EXPORT HLSLShaderAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<HLSLShaderAttr> in(const Index &index);
-  static gap::generator<HLSLShaderAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<HLSLShaderAttr> by_id(const Index &, EntityId);
   static gap::generator<HLSLShaderAttr> in(const Fragment &frag);
   static gap::generator<HLSLShaderAttr> in(const File &file);
+  static gap::generator<HLSLShaderAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::HLSL_SHADER;
   }
+
+  static std::optional<HLSLShaderAttr> by_id(const Index &, EntityId);
 
   static std::optional<HLSLShaderAttr> from_base(const Attr &parent);
   inline static std::optional<HLSLShaderAttr> from(const Attr &parent) {

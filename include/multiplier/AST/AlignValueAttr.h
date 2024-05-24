@@ -17,6 +17,7 @@ class Index;
 class AlignValueAttr;
 class Attr;
 class Expr;
+class File;
 class Token;
 namespace ir {
 class Operation;
@@ -30,15 +31,16 @@ class MX_EXPORT AlignValueAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<AlignValueAttr> in(const Index &index);
-  static gap::generator<AlignValueAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<AlignValueAttr> by_id(const Index &, EntityId);
   static gap::generator<AlignValueAttr> in(const Fragment &frag);
   static gap::generator<AlignValueAttr> in(const File &file);
+  static gap::generator<AlignValueAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ALIGN_VALUE;
   }
+
+  static std::optional<AlignValueAttr> by_id(const Index &, EntityId);
 
   static std::optional<AlignValueAttr> from_base(const Attr &parent);
   inline static std::optional<AlignValueAttr> from(const Attr &parent) {

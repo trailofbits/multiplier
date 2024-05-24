@@ -7,6 +7,7 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/Frontend/MacroVAOpt.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/Frontend/Macro.h>
 
 #include "../EntityProvider.h"
@@ -22,6 +23,43 @@ static const MacroKind kMacroVAOptDerivedKinds[] = {
     MacroVAOpt::static_kind(),
 };
 }  // namespace
+
+gap::generator<MacroVAOpt> MacroVAOpt::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (MacroKind k : kMacroVAOptDerivedKinds) {
+    for (MacroImplPtr eptr : ep->MacrosFor(ep, k)) {
+      if (std::optional<MacroVAOpt> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<MacroVAOpt> MacroVAOpt::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (MacroKind k : kMacroVAOptDerivedKinds) {
+      for (MacroImplPtr eptr : ep->MacrosFor(ep, k, frag_id)) {
+        if (std::optional<MacroVAOpt> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+gap::generator<MacroVAOpt> MacroVAOpt::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (MacroKind k : kMacroVAOptDerivedKinds) {
+    for (MacroImplPtr eptr : ep->MacrosFor(ep, k, frag_id)) {
+      if (std::optional<MacroVAOpt> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
 
 gap::generator<MacroVAOpt> MacroVAOpt::containing(const Macro &macro) {
   for (auto impl = macro.parent(); impl; impl = impl->parent()) {
@@ -80,43 +118,6 @@ std::optional<MacroVAOpt> MacroVAOpt::from_base(const Macro &parent) {
       return reinterpret_cast<const MacroVAOpt &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<MacroVAOpt> MacroVAOpt::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (MacroKind k : kMacroVAOptDerivedKinds) {
-    for (MacroImplPtr eptr : ep->MacrosFor(ep, k)) {
-      if (std::optional<MacroVAOpt> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<MacroVAOpt> MacroVAOpt::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (MacroKind k : kMacroVAOptDerivedKinds) {
-    for (MacroImplPtr eptr : ep->MacrosFor(ep, k, frag_id)) {
-      if (std::optional<MacroVAOpt> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<MacroVAOpt> MacroVAOpt::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (MacroKind k : kMacroVAOptDerivedKinds) {
-      for (MacroImplPtr eptr : ep->MacrosFor(ep, k, frag_id)) {
-        if (std::optional<MacroVAOpt> e = from_base(std::move(eptr))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
   }
 }
 

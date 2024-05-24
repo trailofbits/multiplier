@@ -33,11 +33,12 @@ class MX_EXPORT InjectedClassNameType : public Type {
   static gap::generator<InjectedClassNameType> in(const Index &index);
   static gap::generator<InjectedClassNameType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<InjectedClassNameType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::INJECTED_CLASS_NAME;
   }
+
+  static std::optional<InjectedClassNameType> by_id(const Index &, EntityId);
 
   static std::optional<InjectedClassNameType> from_base(const Type &parent);
   inline static std::optional<InjectedClassNameType> from(const Type &parent) {

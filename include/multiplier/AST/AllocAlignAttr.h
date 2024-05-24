@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class AllocAlignAttr;
 class Attr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT AllocAlignAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<AllocAlignAttr> in(const Index &index);
-  static gap::generator<AllocAlignAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<AllocAlignAttr> by_id(const Index &, EntityId);
   static gap::generator<AllocAlignAttr> in(const Fragment &frag);
   static gap::generator<AllocAlignAttr> in(const File &file);
+  static gap::generator<AllocAlignAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ALLOC_ALIGN;
   }
+
+  static std::optional<AllocAlignAttr> by_id(const Index &, EntityId);
 
   static std::optional<AllocAlignAttr> from_base(const Attr &parent);
   inline static std::optional<AllocAlignAttr> from(const Attr &parent) {

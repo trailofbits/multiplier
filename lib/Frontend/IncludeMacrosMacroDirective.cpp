@@ -7,6 +7,7 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/Frontend/IncludeMacrosMacroDirective.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/Frontend/IncludeLikeMacroDirective.h>
 #include <multiplier/Frontend/Macro.h>
 #include <multiplier/Frontend/MacroDirective.h>
@@ -24,6 +25,43 @@ static const MacroKind kIncludeMacrosMacroDirectiveDerivedKinds[] = {
     IncludeMacrosMacroDirective::static_kind(),
 };
 }  // namespace
+
+gap::generator<IncludeMacrosMacroDirective> IncludeMacrosMacroDirective::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (MacroKind k : kIncludeMacrosMacroDirectiveDerivedKinds) {
+    for (MacroImplPtr eptr : ep->MacrosFor(ep, k)) {
+      if (std::optional<IncludeMacrosMacroDirective> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<IncludeMacrosMacroDirective> IncludeMacrosMacroDirective::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (MacroKind k : kIncludeMacrosMacroDirectiveDerivedKinds) {
+      for (MacroImplPtr eptr : ep->MacrosFor(ep, k, frag_id)) {
+        if (std::optional<IncludeMacrosMacroDirective> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+gap::generator<IncludeMacrosMacroDirective> IncludeMacrosMacroDirective::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (MacroKind k : kIncludeMacrosMacroDirectiveDerivedKinds) {
+    for (MacroImplPtr eptr : ep->MacrosFor(ep, k, frag_id)) {
+      if (std::optional<IncludeMacrosMacroDirective> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
 
 gap::generator<IncludeMacrosMacroDirective> IncludeMacrosMacroDirective::containing(const Macro &macro) {
   for (auto impl = macro.parent(); impl; impl = impl->parent()) {
@@ -82,43 +120,6 @@ std::optional<IncludeMacrosMacroDirective> IncludeMacrosMacroDirective::from_bas
       return reinterpret_cast<const IncludeMacrosMacroDirective &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<IncludeMacrosMacroDirective> IncludeMacrosMacroDirective::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (MacroKind k : kIncludeMacrosMacroDirectiveDerivedKinds) {
-    for (MacroImplPtr eptr : ep->MacrosFor(ep, k)) {
-      if (std::optional<IncludeMacrosMacroDirective> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<IncludeMacrosMacroDirective> IncludeMacrosMacroDirective::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (MacroKind k : kIncludeMacrosMacroDirectiveDerivedKinds) {
-    for (MacroImplPtr eptr : ep->MacrosFor(ep, k, frag_id)) {
-      if (std::optional<IncludeMacrosMacroDirective> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<IncludeMacrosMacroDirective> IncludeMacrosMacroDirective::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (MacroKind k : kIncludeMacrosMacroDirectiveDerivedKinds) {
-      for (MacroImplPtr eptr : ep->MacrosFor(ep, k, frag_id)) {
-        if (std::optional<IncludeMacrosMacroDirective> e = from_base(std::move(eptr))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
   }
 }
 

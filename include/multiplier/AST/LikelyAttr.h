@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class LikelyAttr;
 class StmtAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT LikelyAttr : public StmtAttr {
   friend class Attr;
  public:
   static gap::generator<LikelyAttr> in(const Index &index);
-  static gap::generator<LikelyAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<LikelyAttr> by_id(const Index &, EntityId);
   static gap::generator<LikelyAttr> in(const Fragment &frag);
   static gap::generator<LikelyAttr> in(const File &file);
+  static gap::generator<LikelyAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::LIKELY;
   }
+
+  static std::optional<LikelyAttr> by_id(const Index &, EntityId);
 
   static std::optional<LikelyAttr> from_base(const Attr &parent);
   inline static std::optional<LikelyAttr> from(const Attr &parent) {

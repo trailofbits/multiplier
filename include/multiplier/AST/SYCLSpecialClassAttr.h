@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class SYCLSpecialClassAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT SYCLSpecialClassAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<SYCLSpecialClassAttr> in(const Index &index);
-  static gap::generator<SYCLSpecialClassAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<SYCLSpecialClassAttr> by_id(const Index &, EntityId);
   static gap::generator<SYCLSpecialClassAttr> in(const Fragment &frag);
   static gap::generator<SYCLSpecialClassAttr> in(const File &file);
+  static gap::generator<SYCLSpecialClassAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SYCL_SPECIAL_CLASS;
   }
+
+  static std::optional<SYCLSpecialClassAttr> by_id(const Index &, EntityId);
 
   static std::optional<SYCLSpecialClassAttr> from_base(const Attr &parent);
   inline static std::optional<SYCLSpecialClassAttr> from(const Attr &parent) {

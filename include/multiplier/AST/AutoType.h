@@ -36,11 +36,12 @@ class MX_EXPORT AutoType : public DeducedType {
   static gap::generator<AutoType> in(const Index &index);
   static gap::generator<AutoType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<AutoType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::AUTO;
   }
+
+  static std::optional<AutoType> by_id(const Index &, EntityId);
 
   static std::optional<AutoType> from_base(const Type &parent);
   inline static std::optional<AutoType> from(const Type &parent) {

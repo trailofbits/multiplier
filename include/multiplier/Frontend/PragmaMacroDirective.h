@@ -14,6 +14,7 @@ namespace mx {
 class EntityProvider;
 class Fragment;
 class Index;
+class File;
 class Macro;
 class MacroDirective;
 class PragmaMacroDirective;
@@ -29,12 +30,9 @@ class MX_EXPORT PragmaMacroDirective : public MacroDirective {
   friend class MacroDirective;
   friend class Macro;
  public:
+  static gap::generator<PragmaMacroDirective> in(const Index &index);
   static gap::generator<PragmaMacroDirective> in(const Fragment &frag);
   static gap::generator<PragmaMacroDirective> in(const File &file);
-
-  static gap::generator<PragmaMacroDirective> in(const Index &index);
-  static std::optional<PragmaMacroDirective> by_id(const Index &, EntityId);
-
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::PRAGMA_DIRECTIVE;
   }
@@ -44,6 +42,8 @@ class MX_EXPORT PragmaMacroDirective : public MacroDirective {
 
   static gap::generator<PragmaMacroDirective> containing(const Token &token);
   bool contains(const Token &token);
+
+  static std::optional<PragmaMacroDirective> by_id(const Index &, EntityId);
 
   static std::optional<PragmaMacroDirective> from_base(const Macro &parent);
   inline static std::optional<PragmaMacroDirective> from(const Macro &parent) {

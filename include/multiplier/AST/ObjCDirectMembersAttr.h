@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class ObjCDirectMembersAttr;
 class Token;
 namespace ir {
@@ -29,15 +30,16 @@ class MX_EXPORT ObjCDirectMembersAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<ObjCDirectMembersAttr> in(const Index &index);
-  static gap::generator<ObjCDirectMembersAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ObjCDirectMembersAttr> by_id(const Index &, EntityId);
   static gap::generator<ObjCDirectMembersAttr> in(const Fragment &frag);
   static gap::generator<ObjCDirectMembersAttr> in(const File &file);
+  static gap::generator<ObjCDirectMembersAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_DIRECT_MEMBERS;
   }
+
+  static std::optional<ObjCDirectMembersAttr> by_id(const Index &, EntityId);
 
   static std::optional<ObjCDirectMembersAttr> from_base(const Attr &parent);
   inline static std::optional<ObjCDirectMembersAttr> from(const Attr &parent) {

@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Attr;
 class CoroOnlyDestroyWhenCompleteAttr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT CoroOnlyDestroyWhenCompleteAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<CoroOnlyDestroyWhenCompleteAttr> in(const Index &index);
-  static gap::generator<CoroOnlyDestroyWhenCompleteAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CoroOnlyDestroyWhenCompleteAttr> by_id(const Index &, EntityId);
   static gap::generator<CoroOnlyDestroyWhenCompleteAttr> in(const Fragment &frag);
   static gap::generator<CoroOnlyDestroyWhenCompleteAttr> in(const File &file);
+  static gap::generator<CoroOnlyDestroyWhenCompleteAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CORO_ONLY_DESTROY_WHEN_COMPLETE;
   }
+
+  static std::optional<CoroOnlyDestroyWhenCompleteAttr> by_id(const Index &, EntityId);
 
   static std::optional<CoroOnlyDestroyWhenCompleteAttr> from_base(const Attr &parent);
   inline static std::optional<CoroOnlyDestroyWhenCompleteAttr> from(const Attr &parent) {

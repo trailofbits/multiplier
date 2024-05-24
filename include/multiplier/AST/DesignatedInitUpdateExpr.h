@@ -17,6 +17,7 @@ class Index;
 class Decl;
 class DesignatedInitUpdateExpr;
 class Expr;
+class File;
 class InitListExpr;
 class Stmt;
 class Token;
@@ -35,11 +36,10 @@ class MX_EXPORT DesignatedInitUpdateExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<DesignatedInitUpdateExpr> in(const Index &index);
-  static gap::generator<DesignatedInitUpdateExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<DesignatedInitUpdateExpr> by_id(const Index &, EntityId);
   static gap::generator<DesignatedInitUpdateExpr> in(const Fragment &frag);
   static gap::generator<DesignatedInitUpdateExpr> in(const File &file);
+  static gap::generator<DesignatedInitUpdateExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<DesignatedInitUpdateExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<DesignatedInitUpdateExpr, ir::Operation>> in(const Compilation &tu);
@@ -55,6 +55,8 @@ class MX_EXPORT DesignatedInitUpdateExpr : public Expr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<DesignatedInitUpdateExpr> by_id(const Index &, EntityId);
 
   static std::optional<DesignatedInitUpdateExpr> from_base(const Stmt &parent);
   inline static std::optional<DesignatedInitUpdateExpr> from(const Stmt &parent) {

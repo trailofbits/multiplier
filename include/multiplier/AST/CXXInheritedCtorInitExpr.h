@@ -19,6 +19,7 @@ class CXXConstructorDecl;
 class CXXInheritedCtorInitExpr;
 class Decl;
 class Expr;
+class File;
 class Stmt;
 class Token;
 class ValueStmt;
@@ -36,11 +37,10 @@ class MX_EXPORT CXXInheritedCtorInitExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<CXXInheritedCtorInitExpr> in(const Index &index);
-  static gap::generator<CXXInheritedCtorInitExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CXXInheritedCtorInitExpr> by_id(const Index &, EntityId);
   static gap::generator<CXXInheritedCtorInitExpr> in(const Fragment &frag);
   static gap::generator<CXXInheritedCtorInitExpr> in(const File &file);
+  static gap::generator<CXXInheritedCtorInitExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<CXXInheritedCtorInitExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<CXXInheritedCtorInitExpr, ir::Operation>> in(const Compilation &tu);
@@ -56,6 +56,8 @@ class MX_EXPORT CXXInheritedCtorInitExpr : public Expr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<CXXInheritedCtorInitExpr> by_id(const Index &, EntityId);
 
   static std::optional<CXXInheritedCtorInitExpr> from_base(const Stmt &parent);
   inline static std::optional<CXXInheritedCtorInitExpr> from(const Stmt &parent) {

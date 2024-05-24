@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class NoThreadSafetyAnalysisAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT NoThreadSafetyAnalysisAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<NoThreadSafetyAnalysisAttr> in(const Index &index);
-  static gap::generator<NoThreadSafetyAnalysisAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<NoThreadSafetyAnalysisAttr> by_id(const Index &, EntityId);
   static gap::generator<NoThreadSafetyAnalysisAttr> in(const Fragment &frag);
   static gap::generator<NoThreadSafetyAnalysisAttr> in(const File &file);
+  static gap::generator<NoThreadSafetyAnalysisAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_THREAD_SAFETY_ANALYSIS;
   }
+
+  static std::optional<NoThreadSafetyAnalysisAttr> by_id(const Index &, EntityId);
 
   static std::optional<NoThreadSafetyAnalysisAttr> from_base(const Attr &parent);
   inline static std::optional<NoThreadSafetyAnalysisAttr> from(const Attr &parent) {

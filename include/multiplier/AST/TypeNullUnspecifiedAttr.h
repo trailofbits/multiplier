@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class Token;
 class TypeAttr;
 class TypeNullUnspecifiedAttr;
@@ -31,15 +32,16 @@ class MX_EXPORT TypeNullUnspecifiedAttr : public TypeAttr {
   friend class Attr;
  public:
   static gap::generator<TypeNullUnspecifiedAttr> in(const Index &index);
-  static gap::generator<TypeNullUnspecifiedAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<TypeNullUnspecifiedAttr> by_id(const Index &, EntityId);
   static gap::generator<TypeNullUnspecifiedAttr> in(const Fragment &frag);
   static gap::generator<TypeNullUnspecifiedAttr> in(const File &file);
+  static gap::generator<TypeNullUnspecifiedAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::TYPE_NULL_UNSPECIFIED;
   }
+
+  static std::optional<TypeNullUnspecifiedAttr> by_id(const Index &, EntityId);
 
   static std::optional<TypeNullUnspecifiedAttr> from_base(const Attr &parent);
   inline static std::optional<TypeNullUnspecifiedAttr> from(const Attr &parent) {

@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class NoDerefAttr;
 class Token;
 class TypeAttr;
@@ -31,15 +32,16 @@ class MX_EXPORT NoDerefAttr : public TypeAttr {
   friend class Attr;
  public:
   static gap::generator<NoDerefAttr> in(const Index &index);
-  static gap::generator<NoDerefAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<NoDerefAttr> by_id(const Index &, EntityId);
   static gap::generator<NoDerefAttr> in(const Fragment &frag);
   static gap::generator<NoDerefAttr> in(const File &file);
+  static gap::generator<NoDerefAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_DEREF;
   }
+
+  static std::optional<NoDerefAttr> by_id(const Index &, EntityId);
 
   static std::optional<NoDerefAttr> from_base(const Attr &parent);
   inline static std::optional<NoDerefAttr> from(const Attr &parent) {

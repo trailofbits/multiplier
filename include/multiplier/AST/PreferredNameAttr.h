@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class PreferredNameAttr;
 class Token;
@@ -32,15 +33,16 @@ class MX_EXPORT PreferredNameAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<PreferredNameAttr> in(const Index &index);
-  static gap::generator<PreferredNameAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<PreferredNameAttr> by_id(const Index &, EntityId);
   static gap::generator<PreferredNameAttr> in(const Fragment &frag);
   static gap::generator<PreferredNameAttr> in(const File &file);
+  static gap::generator<PreferredNameAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::PREFERRED_NAME;
   }
+
+  static std::optional<PreferredNameAttr> by_id(const Index &, EntityId);
 
   static std::optional<PreferredNameAttr> from_base(const Attr &parent);
   inline static std::optional<PreferredNameAttr> from(const Attr &parent) {

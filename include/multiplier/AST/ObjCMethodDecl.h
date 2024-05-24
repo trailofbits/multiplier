@@ -19,6 +19,7 @@ class Fragment;
 class Index;
 class Reference;
 class Decl;
+class File;
 class ImplicitParamDecl;
 class NamedDecl;
 class ObjCInterfaceDecl;
@@ -42,11 +43,10 @@ class MX_EXPORT ObjCMethodDecl : public NamedDecl {
   friend class Decl;
  public:
   static gap::generator<ObjCMethodDecl> in(const Index &index);
-  static gap::generator<ObjCMethodDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ObjCMethodDecl> by_id(const Index &, EntityId);
   static gap::generator<ObjCMethodDecl> in(const Fragment &frag);
   static gap::generator<ObjCMethodDecl> in(const File &file);
+  static gap::generator<ObjCMethodDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<ObjCMethodDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<ObjCMethodDecl, ir::Operation>> in(const Compilation &tu);
@@ -66,6 +66,8 @@ class MX_EXPORT ObjCMethodDecl : public NamedDecl {
   ObjCMethodDecl canonical_declaration(void) const;
   std::optional<ObjCMethodDecl> definition(void) const;
   gap::generator<ObjCMethodDecl> redeclarations(void) const &;
+  static std::optional<ObjCMethodDecl> by_id(const Index &, EntityId);
+
   static std::optional<ObjCMethodDecl> from_base(const Decl &parent);
   inline static std::optional<ObjCMethodDecl> from(const Decl &parent) {
     return from_base(parent);

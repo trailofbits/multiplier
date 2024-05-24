@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class ObjCOwnershipAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT ObjCOwnershipAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ObjCOwnershipAttr> in(const Index &index);
-  static gap::generator<ObjCOwnershipAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ObjCOwnershipAttr> by_id(const Index &, EntityId);
   static gap::generator<ObjCOwnershipAttr> in(const Fragment &frag);
   static gap::generator<ObjCOwnershipAttr> in(const File &file);
+  static gap::generator<ObjCOwnershipAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_OWNERSHIP;
   }
+
+  static std::optional<ObjCOwnershipAttr> by_id(const Index &, EntityId);
 
   static std::optional<ObjCOwnershipAttr> from_base(const Attr &parent);
   inline static std::optional<ObjCOwnershipAttr> from(const Attr &parent) {

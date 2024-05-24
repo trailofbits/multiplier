@@ -18,6 +18,7 @@ class Index;
 class CXXRewrittenBinaryOperator;
 class Decl;
 class Expr;
+class File;
 class Stmt;
 class Token;
 class ValueStmt;
@@ -35,11 +36,10 @@ class MX_EXPORT CXXRewrittenBinaryOperator : public Expr {
   friend class Stmt;
  public:
   static gap::generator<CXXRewrittenBinaryOperator> in(const Index &index);
-  static gap::generator<CXXRewrittenBinaryOperator> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CXXRewrittenBinaryOperator> by_id(const Index &, EntityId);
   static gap::generator<CXXRewrittenBinaryOperator> in(const Fragment &frag);
   static gap::generator<CXXRewrittenBinaryOperator> in(const File &file);
+  static gap::generator<CXXRewrittenBinaryOperator> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<CXXRewrittenBinaryOperator> from(const ir::Operation &op);
   static gap::generator<std::pair<CXXRewrittenBinaryOperator, ir::Operation>> in(const Compilation &tu);
@@ -55,6 +55,8 @@ class MX_EXPORT CXXRewrittenBinaryOperator : public Expr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<CXXRewrittenBinaryOperator> by_id(const Index &, EntityId);
 
   static std::optional<CXXRewrittenBinaryOperator> from_base(const Stmt &parent);
   inline static std::optional<CXXRewrittenBinaryOperator> from(const Stmt &parent) {

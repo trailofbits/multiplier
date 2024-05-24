@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class SwiftImportAsNonGenericAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT SwiftImportAsNonGenericAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<SwiftImportAsNonGenericAttr> in(const Index &index);
-  static gap::generator<SwiftImportAsNonGenericAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<SwiftImportAsNonGenericAttr> by_id(const Index &, EntityId);
   static gap::generator<SwiftImportAsNonGenericAttr> in(const Fragment &frag);
   static gap::generator<SwiftImportAsNonGenericAttr> in(const File &file);
+  static gap::generator<SwiftImportAsNonGenericAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SWIFT_IMPORT_AS_NON_GENERIC;
   }
+
+  static std::optional<SwiftImportAsNonGenericAttr> by_id(const Index &, EntityId);
 
   static std::optional<SwiftImportAsNonGenericAttr> from_base(const Attr &parent);
   inline static std::optional<SwiftImportAsNonGenericAttr> from(const Attr &parent) {

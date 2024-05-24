@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Decl;
+class File;
 class ImplicitConceptSpecializationDecl;
 class Stmt;
 class TemplateArgument;
@@ -31,11 +32,10 @@ class MX_EXPORT ImplicitConceptSpecializationDecl : public Decl {
   friend class Decl;
  public:
   static gap::generator<ImplicitConceptSpecializationDecl> in(const Index &index);
-  static gap::generator<ImplicitConceptSpecializationDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ImplicitConceptSpecializationDecl> by_id(const Index &, EntityId);
   static gap::generator<ImplicitConceptSpecializationDecl> in(const Fragment &frag);
   static gap::generator<ImplicitConceptSpecializationDecl> in(const File &file);
+  static gap::generator<ImplicitConceptSpecializationDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<ImplicitConceptSpecializationDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<ImplicitConceptSpecializationDecl, ir::Operation>> in(const Compilation &tu);
@@ -55,6 +55,8 @@ class MX_EXPORT ImplicitConceptSpecializationDecl : public Decl {
   ImplicitConceptSpecializationDecl canonical_declaration(void) const;
   std::optional<ImplicitConceptSpecializationDecl> definition(void) const;
   gap::generator<ImplicitConceptSpecializationDecl> redeclarations(void) const &;
+  static std::optional<ImplicitConceptSpecializationDecl> by_id(const Index &, EntityId);
+
   static std::optional<ImplicitConceptSpecializationDecl> from_base(const Decl &parent);
   inline static std::optional<ImplicitConceptSpecializationDecl> from(const Decl &parent) {
     return from_base(parent);

@@ -8,6 +8,7 @@
 
 #include <multiplier/AST/ClassTemplateDecl.h>
 #include <multiplier/AST/Decl.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/AST/NamedDecl.h>
 #include <multiplier/AST/RedeclarableTemplateDecl.h>
 #include <multiplier/AST/Stmt.h>
@@ -29,6 +30,43 @@ static const DeclKind kClassTemplateDeclDerivedKinds[] = {
     ClassTemplateDecl::static_kind(),
 };
 }  // namespace
+
+gap::generator<ClassTemplateDecl> ClassTemplateDecl::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (DeclKind k : kClassTemplateDeclDerivedKinds) {
+    for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
+      if (std::optional<ClassTemplateDecl> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<ClassTemplateDecl> ClassTemplateDecl::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (DeclKind k : kClassTemplateDeclDerivedKinds) {
+      for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
+        if (std::optional<ClassTemplateDecl> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+gap::generator<ClassTemplateDecl> ClassTemplateDecl::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (DeclKind k : kClassTemplateDeclDerivedKinds) {
+    for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
+      if (std::optional<ClassTemplateDecl> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
 
 gap::generator<ClassTemplateDecl> ClassTemplateDecl::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -163,43 +201,6 @@ std::optional<ClassTemplateDecl> ClassTemplateDecl::from_base(const Decl &parent
       return reinterpret_cast<const ClassTemplateDecl &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<ClassTemplateDecl> ClassTemplateDecl::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (DeclKind k : kClassTemplateDeclDerivedKinds) {
-    for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<ClassTemplateDecl> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<ClassTemplateDecl> ClassTemplateDecl::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (DeclKind k : kClassTemplateDeclDerivedKinds) {
-    for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<ClassTemplateDecl> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<ClassTemplateDecl> ClassTemplateDecl::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (DeclKind k : kClassTemplateDeclDerivedKinds) {
-      for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<ClassTemplateDecl> e = from_base(std::move(eptr))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
   }
 }
 

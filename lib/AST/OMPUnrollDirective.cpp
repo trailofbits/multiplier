@@ -8,6 +8,7 @@
 
 #include <multiplier/AST/OMPUnrollDirective.h>
 #include <multiplier/AST/Decl.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/AST/OMPExecutableDirective.h>
 #include <multiplier/AST/OMPLoopBasedDirective.h>
 #include <multiplier/AST/OMPLoopTransformationDirective.h>
@@ -29,6 +30,43 @@ static const StmtKind kOMPUnrollDirectiveDerivedKinds[] = {
     OMPUnrollDirective::static_kind(),
 };
 }  // namespace
+
+gap::generator<OMPUnrollDirective> OMPUnrollDirective::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (StmtKind k : kOMPUnrollDirectiveDerivedKinds) {
+    for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
+      if (std::optional<OMPUnrollDirective> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<OMPUnrollDirective> OMPUnrollDirective::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (StmtKind k : kOMPUnrollDirectiveDerivedKinds) {
+      for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
+        if (std::optional<OMPUnrollDirective> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+gap::generator<OMPUnrollDirective> OMPUnrollDirective::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (StmtKind k : kOMPUnrollDirectiveDerivedKinds) {
+    for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
+      if (std::optional<OMPUnrollDirective> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
 
 gap::generator<OMPUnrollDirective> OMPUnrollDirective::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -134,43 +172,6 @@ std::optional<OMPUnrollDirective> OMPUnrollDirective::from_base(const Stmt &pare
       return reinterpret_cast<const OMPUnrollDirective &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<OMPUnrollDirective> OMPUnrollDirective::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (StmtKind k : kOMPUnrollDirectiveDerivedKinds) {
-    for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<OMPUnrollDirective> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<OMPUnrollDirective> OMPUnrollDirective::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (StmtKind k : kOMPUnrollDirectiveDerivedKinds) {
-    for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<OMPUnrollDirective> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<OMPUnrollDirective> OMPUnrollDirective::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (StmtKind k : kOMPUnrollDirectiveDerivedKinds) {
-      for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<OMPUnrollDirective> e = from_base(std::move(eptr))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
   }
 }
 

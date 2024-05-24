@@ -18,6 +18,7 @@ class BindingDecl;
 class Decl;
 class DeclaratorDecl;
 class DecompositionDecl;
+class File;
 class NamedDecl;
 class Stmt;
 class Token;
@@ -39,11 +40,10 @@ class MX_EXPORT DecompositionDecl : public VarDecl {
   friend class Decl;
  public:
   static gap::generator<DecompositionDecl> in(const Index &index);
-  static gap::generator<DecompositionDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<DecompositionDecl> by_id(const Index &, EntityId);
   static gap::generator<DecompositionDecl> in(const Fragment &frag);
   static gap::generator<DecompositionDecl> in(const File &file);
+  static gap::generator<DecompositionDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<DecompositionDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<DecompositionDecl, ir::Operation>> in(const Compilation &tu);
@@ -63,6 +63,8 @@ class MX_EXPORT DecompositionDecl : public VarDecl {
   DecompositionDecl canonical_declaration(void) const;
   std::optional<DecompositionDecl> definition(void) const;
   gap::generator<DecompositionDecl> redeclarations(void) const &;
+  static std::optional<DecompositionDecl> by_id(const Index &, EntityId);
+
   static std::optional<DecompositionDecl> from_base(const Decl &parent);
   inline static std::optional<DecompositionDecl> from(const Decl &parent) {
     return from_base(parent);

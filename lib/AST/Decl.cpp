@@ -62,6 +62,62 @@ std::shared_ptr<EntityProvider> Decl::entity_provider_of(const File &file_) {
   return file_.impl->ep;
 }
 
+gap::generator<Decl> Decl::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (DeclImplPtr eptr : ep->DeclsFor(ep)) {
+    co_yield Decl(std::move(eptr));
+  }
+}
+
+gap::generator<Decl> Decl::in(const Index &index, std::span<const DeclKind> kinds) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (DeclKind k : kinds) {
+    for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
+      co_yield Decl(std::move(eptr));
+    }
+  }
+}
+
+gap::generator<Decl> Decl::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (DeclImplPtr eptr : ep->DeclsFor(ep, frag_id)) {
+      co_yield Decl(std::move(eptr));
+    }
+  }
+}
+
+gap::generator<Decl> Decl::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (DeclImplPtr eptr : ep->DeclsFor(ep, frag_id)) {
+    co_yield Decl(std::move(eptr));
+  }
+}
+
+gap::generator<Decl> Decl::in(const Fragment &frag, std::span<const DeclKind> kinds) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (DeclKind k : kinds) {
+    for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
+      co_yield Decl(std::move(eptr));
+    }
+  }
+}
+
+gap::generator<Decl> Decl::in(const File &file, std::span<const DeclKind> kinds) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (DeclKind k : kinds) {
+      for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
+        co_yield Decl(std::move(eptr));
+      }
+    }
+  }
+}
+
 gap::generator<Decl> Decl::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = Decl::from(*ctx)) {
@@ -134,62 +190,6 @@ std::optional<Decl> Decl::by_id(const Index &index, EntityId eid) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
-}
-
-gap::generator<Decl> Decl::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (DeclImplPtr eptr : ep->DeclsFor(ep)) {
-    co_yield Decl(std::move(eptr));
-  }
-}
-
-gap::generator<Decl> Decl::in(const Index &index, std::span<const DeclKind> kinds) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (DeclKind k : kinds) {
-    for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      co_yield Decl(std::move(eptr));
-    }
-  }
-}
-
-gap::generator<Decl> Decl::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (DeclImplPtr eptr : ep->DeclsFor(ep, frag_id)) {
-      co_yield Decl(std::move(eptr));
-    }
-  }
-}
-
-gap::generator<Decl> Decl::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (DeclImplPtr eptr : ep->DeclsFor(ep, frag_id)) {
-    co_yield Decl(std::move(eptr));
-  }
-}
-
-gap::generator<Decl> Decl::in(const Fragment &frag, std::span<const DeclKind> kinds) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (DeclKind k : kinds) {
-    for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      co_yield Decl(std::move(eptr));
-    }
-  }
-}
-
-gap::generator<Decl> Decl::in(const File &file, std::span<const DeclKind> kinds) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (DeclKind k : kinds) {
-      for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        co_yield Decl(std::move(eptr));
-      }
-    }
-  }
 }
 
 std::optional<Decl> Decl::from(const Reference &r) {

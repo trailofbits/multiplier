@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class ContinueStmt;
 class Decl;
+class File;
 class Stmt;
 class Token;
 namespace ir {
@@ -30,11 +31,10 @@ class MX_EXPORT ContinueStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<ContinueStmt> in(const Index &index);
-  static gap::generator<ContinueStmt> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ContinueStmt> by_id(const Index &, EntityId);
   static gap::generator<ContinueStmt> in(const Fragment &frag);
   static gap::generator<ContinueStmt> in(const File &file);
+  static gap::generator<ContinueStmt> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<ContinueStmt> from(const ir::Operation &op);
   static gap::generator<std::pair<ContinueStmt, ir::Operation>> in(const Compilation &tu);
@@ -50,6 +50,8 @@ class MX_EXPORT ContinueStmt : public Stmt {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<ContinueStmt> by_id(const Index &, EntityId);
 
   static std::optional<ContinueStmt> from_base(const Stmt &parent);
   inline static std::optional<ContinueStmt> from(const Stmt &parent) {

@@ -32,11 +32,12 @@ class MX_EXPORT DependentAddressSpaceType : public Type {
   static gap::generator<DependentAddressSpaceType> in(const Index &index);
   static gap::generator<DependentAddressSpaceType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<DependentAddressSpaceType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::DEPENDENT_ADDRESS_SPACE;
   }
+
+  static std::optional<DependentAddressSpaceType> by_id(const Index &, EntityId);
 
   static std::optional<DependentAddressSpaceType> from_base(const Type &parent);
   inline static std::optional<DependentAddressSpaceType> from(const Type &parent) {

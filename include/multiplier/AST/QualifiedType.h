@@ -32,11 +32,12 @@ class MX_EXPORT QualifiedType : public Type {
   static gap::generator<QualifiedType> in(const Index &index);
   static gap::generator<QualifiedType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<QualifiedType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::QUALIFIED;
   }
+
+  static std::optional<QualifiedType> by_id(const Index &, EntityId);
 
   static std::optional<QualifiedType> from_base(const Type &parent);
   inline static std::optional<QualifiedType> from(const Type &parent) {

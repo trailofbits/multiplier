@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class ArmMveStrictPolymorphismAttr;
 class Attr;
+class File;
 class Token;
 class TypeAttr;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT ArmMveStrictPolymorphismAttr : public TypeAttr {
   friend class Attr;
  public:
   static gap::generator<ArmMveStrictPolymorphismAttr> in(const Index &index);
-  static gap::generator<ArmMveStrictPolymorphismAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ArmMveStrictPolymorphismAttr> by_id(const Index &, EntityId);
   static gap::generator<ArmMveStrictPolymorphismAttr> in(const Fragment &frag);
   static gap::generator<ArmMveStrictPolymorphismAttr> in(const File &file);
+  static gap::generator<ArmMveStrictPolymorphismAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ARM_MVE_STRICT_POLYMORPHISM;
   }
+
+  static std::optional<ArmMveStrictPolymorphismAttr> by_id(const Index &, EntityId);
 
   static std::optional<ArmMveStrictPolymorphismAttr> from_base(const Attr &parent);
   inline static std::optional<ArmMveStrictPolymorphismAttr> from(const Attr &parent) {

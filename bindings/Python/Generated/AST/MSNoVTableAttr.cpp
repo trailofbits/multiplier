@@ -189,6 +189,23 @@ static PyMethodDef gMethods[] = {
     PyDoc_STR("Wrapper for mx::MSNoVTableAttr::containing"),
   },
   {
+    "static_kind",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          (void) args;
+          while (num_args == 0) {
+
+            return ::mx::to_python(T::static_kind());
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'static_kind'";
+          return nullptr;
+        }),
+    METH_FASTCALL | METH_STATIC,
+    PyDoc_STR("Wrapper for mx::MSNoVTableAttr::static_kind"),
+  },
+  {
     "by_id",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
@@ -212,23 +229,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::MSNoVTableAttr::by_id"),
-  },
-  {
-    "static_kind",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          (void) args;
-          while (num_args == 0) {
-
-            return ::mx::to_python(T::static_kind());
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'static_kind'";
-          return nullptr;
-        }),
-    METH_FASTCALL | METH_STATIC,
-    PyDoc_STR("Wrapper for mx::MSNoVTableAttr::static_kind"),
   },
   {
     "from_base",

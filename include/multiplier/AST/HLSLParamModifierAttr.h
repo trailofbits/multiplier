@@ -16,6 +16,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class HLSLParamModifierAttr;
 class Token;
 class TypeAttr;
@@ -32,15 +33,16 @@ class MX_EXPORT HLSLParamModifierAttr : public TypeAttr {
   friend class Attr;
  public:
   static gap::generator<HLSLParamModifierAttr> in(const Index &index);
-  static gap::generator<HLSLParamModifierAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<HLSLParamModifierAttr> by_id(const Index &, EntityId);
   static gap::generator<HLSLParamModifierAttr> in(const Fragment &frag);
   static gap::generator<HLSLParamModifierAttr> in(const File &file);
+  static gap::generator<HLSLParamModifierAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::HLSL_PARAM_MODIFIER;
   }
+
+  static std::optional<HLSLParamModifierAttr> by_id(const Index &, EntityId);
 
   static std::optional<HLSLParamModifierAttr> from_base(const Attr &parent);
   inline static std::optional<HLSLParamModifierAttr> from(const Attr &parent) {

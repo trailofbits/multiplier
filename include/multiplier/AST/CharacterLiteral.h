@@ -18,6 +18,7 @@ class Index;
 class CharacterLiteral;
 class Decl;
 class Expr;
+class File;
 class Stmt;
 class Token;
 class ValueStmt;
@@ -35,11 +36,10 @@ class MX_EXPORT CharacterLiteral : public Expr {
   friend class Stmt;
  public:
   static gap::generator<CharacterLiteral> in(const Index &index);
-  static gap::generator<CharacterLiteral> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CharacterLiteral> by_id(const Index &, EntityId);
   static gap::generator<CharacterLiteral> in(const Fragment &frag);
   static gap::generator<CharacterLiteral> in(const File &file);
+  static gap::generator<CharacterLiteral> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<CharacterLiteral> from(const ir::Operation &op);
   static gap::generator<std::pair<CharacterLiteral, ir::Operation>> in(const Compilation &tu);
@@ -55,6 +55,8 @@ class MX_EXPORT CharacterLiteral : public Expr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<CharacterLiteral> by_id(const Index &, EntityId);
 
   static std::optional<CharacterLiteral> from_base(const Stmt &parent);
   inline static std::optional<CharacterLiteral> from(const Stmt &parent) {

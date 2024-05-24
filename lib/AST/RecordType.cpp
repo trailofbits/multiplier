@@ -25,6 +25,17 @@ static const TypeKind kRecordTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<RecordType> RecordType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kRecordTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<RecordType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<RecordType> RecordType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = RecordType::from(*ctx)) {
@@ -66,17 +77,6 @@ std::optional<RecordType> RecordType::from_base(const Type &parent) {
       return reinterpret_cast<const RecordType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<RecordType> RecordType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kRecordTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<RecordType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

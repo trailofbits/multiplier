@@ -25,6 +25,17 @@ static const TypeKind kBTFTagAttributedTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<BTFTagAttributedType> BTFTagAttributedType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kBTFTagAttributedTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<BTFTagAttributedType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<BTFTagAttributedType> BTFTagAttributedType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = BTFTagAttributedType::from(*ctx)) {
@@ -66,17 +77,6 @@ std::optional<BTFTagAttributedType> BTFTagAttributedType::from_base(const Type &
       return reinterpret_cast<const BTFTagAttributedType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<BTFTagAttributedType> BTFTagAttributedType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kBTFTagAttributedTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<BTFTagAttributedType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class Token;
 class WeakImportAttr;
@@ -31,15 +32,16 @@ class MX_EXPORT WeakImportAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<WeakImportAttr> in(const Index &index);
-  static gap::generator<WeakImportAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<WeakImportAttr> by_id(const Index &, EntityId);
   static gap::generator<WeakImportAttr> in(const Fragment &frag);
   static gap::generator<WeakImportAttr> in(const File &file);
+  static gap::generator<WeakImportAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::WEAK_IMPORT;
   }
+
+  static std::optional<WeakImportAttr> by_id(const Index &, EntityId);
 
   static std::optional<WeakImportAttr> from_base(const Attr &parent);
   inline static std::optional<WeakImportAttr> from(const Attr &parent) {

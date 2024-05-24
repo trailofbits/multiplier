@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Decl;
 class Expr;
+class File;
 class StaticAssertDecl;
 class Stmt;
 class Token;
@@ -31,11 +32,10 @@ class MX_EXPORT StaticAssertDecl : public Decl {
   friend class Decl;
  public:
   static gap::generator<StaticAssertDecl> in(const Index &index);
-  static gap::generator<StaticAssertDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<StaticAssertDecl> by_id(const Index &, EntityId);
   static gap::generator<StaticAssertDecl> in(const Fragment &frag);
   static gap::generator<StaticAssertDecl> in(const File &file);
+  static gap::generator<StaticAssertDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<StaticAssertDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<StaticAssertDecl, ir::Operation>> in(const Compilation &tu);
@@ -55,6 +55,8 @@ class MX_EXPORT StaticAssertDecl : public Decl {
   StaticAssertDecl canonical_declaration(void) const;
   std::optional<StaticAssertDecl> definition(void) const;
   gap::generator<StaticAssertDecl> redeclarations(void) const &;
+  static std::optional<StaticAssertDecl> by_id(const Index &, EntityId);
+
   static std::optional<StaticAssertDecl> from_base(const Decl &parent);
   inline static std::optional<StaticAssertDecl> from(const Decl &parent) {
     return from_base(parent);

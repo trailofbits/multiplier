@@ -37,59 +37,60 @@ void SerializeCXXCtorInitializer(const PendingFragment &pf, const EntityMapper &
   (void) es;
   (void) b;
   (void) e;
-  b.setVal0(e.IsBaseInitializer());
-  b.setVal1(e.IsMemberInitializer());
-  b.setVal2(e.IsAnyMemberInitializer());
-  b.setVal3(e.IsIndirectMemberInitializer());
-  b.setVal4(e.IsInClassMemberInitializer());
-  b.setVal5(e.IsDelegatingInitializer());
-  b.setVal6(e.IsPackExpansion());
-  auto v7 = e.IsBaseVirtual();
-  if (v7) {
-    b.setVal7(static_cast<bool>(v7.value()));
-    b.setVal8(true);
+  b.setVal0(es.ParentDeclId(e));
+  b.setVal1(e.IsBaseInitializer());
+  b.setVal2(e.IsMemberInitializer());
+  b.setVal3(e.IsAnyMemberInitializer());
+  b.setVal4(e.IsIndirectMemberInitializer());
+  b.setVal5(e.IsInClassMemberInitializer());
+  b.setVal6(e.IsDelegatingInitializer());
+  b.setVal7(e.IsPackExpansion());
+  auto v8 = e.IsBaseVirtual();
+  if (v8) {
+    b.setVal8(static_cast<bool>(v8.value()));
+    b.setVal9(true);
   } else {
-    b.setVal8(false);
+    b.setVal9(false);
   }
-  auto v9 = e.Member();
-  if (v9) {
-    auto id9 = es.EntityId(v9.value());
-    b.setVal9(id9);
-  } else {
-    b.setVal9(mx::kInvalidEntityId);
-  }
-  auto v10 = e.AnyMember();
+  auto v10 = e.Member();
   if (v10) {
     auto id10 = es.EntityId(v10.value());
     b.setVal10(id10);
   } else {
     b.setVal10(mx::kInvalidEntityId);
   }
-  auto v11 = e.IndirectMember();
+  auto v11 = e.AnyMember();
   if (v11) {
     auto id11 = es.EntityId(v11.value());
     b.setVal11(id11);
   } else {
     b.setVal11(mx::kInvalidEntityId);
   }
-  auto v12 = e.Initializer();
+  auto v12 = e.IndirectMember();
   if (v12) {
     auto id12 = es.EntityId(v12.value());
     b.setVal12(id12);
   } else {
     b.setVal12(mx::kInvalidEntityId);
   }
-  auto et13 = es.EntityId(e.EllipsisToken());
-  b.setVal13(et13);
-  auto et14 = es.EntityId(e.MemberToken());
+  auto v13 = e.Initializer();
+  if (v13) {
+    auto id13 = es.EntityId(v13.value());
+    b.setVal13(id13);
+  } else {
+    b.setVal13(mx::kInvalidEntityId);
+  }
+  auto et14 = es.EntityId(e.EllipsisToken());
   b.setVal14(et14);
-  auto et15 = es.EntityId(e.LeftAngleToken());
+  auto et15 = es.EntityId(e.MemberToken());
   b.setVal15(et15);
-  auto et16 = es.EntityId(e.RightAngleToken());
+  auto et16 = es.EntityId(e.LeftAngleToken());
   b.setVal16(et16);
-  auto p17 = es.EntityIds(e.Tokens());
-  b.setVal17(p17.first);
-  b.setVal18(p17.second);
+  auto et17 = es.EntityId(e.RightAngleToken());
+  b.setVal17(et17);
+  auto p18 = es.EntityIds(e.Tokens());
+  b.setVal18(p18.first);
+  b.setVal19(p18.second);
 }
 
 void SerializeDesignator(const PendingFragment &pf, const EntityMapper &es, mx::ast::Designator::Builder b, const pasta::Designator &e, const TokenTree *) {
@@ -130,25 +131,39 @@ void SerializeCXXBaseSpecifier(const PendingFragment &pf, const EntityMapper &es
   (void) b;
   (void) e;
   b.setVal0(es.ParentDeclId(e));
-  auto p1 = es.EntityIds(e.Tokens());
-  b.setVal1(p1.first);
-  b.setVal2(p1.second);
-  auto et3 = es.EntityId(e.BaseTypeToken());
-  b.setVal3(et3);
-  b.setVal4(e.IsVirtual());
-  b.setVal5(static_cast<unsigned char>(mx::FromPasta(e.BaseKind())));
-  b.setVal6(e.IsPackExpansion());
-  b.setVal7(e.ConstructorsAreInherited());
-  auto v8 = e.EllipsisToken();
-  if (v8) {
-    auto id8 = es.EntityId(v8.value());
-    b.setVal8(id8);
+  if (auto v1 = es.BaseOffset(e)) {
+    b.setVal2(true);
+    b.setVal1(v1.value());
   } else {
-    b.setVal8(mx::kInvalidEntityId);
+    b.setVal2(false);
+    b.setVal1(0u);
   }
-  b.setVal9(static_cast<unsigned char>(mx::FromPasta(e.SemanticAccessSpecifier())));
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.LexicalAccessSpecifier())));
-  b.setVal11(es.EntityId(e.BaseType()));
+  auto p4 = es.EntityIds(e.Tokens());
+  b.setVal4(p4.first);
+  b.setVal5(p4.second);
+  auto et6 = es.EntityId(e.BaseTypeToken());
+  b.setVal6(et6);
+  auto v7 = e.EllipsisToken();
+  if (v7) {
+    auto id7 = es.EntityId(v7.value());
+    b.setVal7(id7);
+  } else {
+    b.setVal7(mx::kInvalidEntityId);
+  }
+  b.setVal8(e.IsVirtual());
+  b.setVal9(e.IsPackExpansion());
+  b.setVal10(e.ConstructorsAreInherited());
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.BaseKind())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.SemanticAccessSpecifier())));
+  b.setVal13(static_cast<unsigned char>(mx::FromPasta(e.LexicalAccessSpecifier())));
+  b.setVal14(es.EntityId(e.BaseType()));
+  auto v15 = e.BaseClass();
+  if (v15) {
+    auto id15 = es.EntityId(v15.value());
+    b.setVal15(id15);
+  } else {
+    b.setVal15(mx::kInvalidEntityId);
+  }
 }
 
 void SerializeTemplateParameterList(const PendingFragment &pf, const EntityMapper &es, mx::ast::TemplateParameterList::Builder b, const pasta::TemplateParameterList &e, const TokenTree *) {
@@ -156,32 +171,33 @@ void SerializeTemplateParameterList(const PendingFragment &pf, const EntityMappe
   (void) es;
   (void) b;
   (void) e;
-  b.setVal0(e.Depth());
-  b.setVal1(e.HasUnexpandedParameterPack());
-  b.setVal2(e.HasParameterPack());
-  auto v3 = e.RequiresClause();
-  if (v3) {
-    auto id3 = es.EntityId(v3.value());
-    b.setVal3(id3);
+  b.setVal0(es.ParentDeclId(e));
+  b.setVal1(e.Depth());
+  b.setVal2(e.HasUnexpandedParameterPack());
+  b.setVal3(e.HasParameterPack());
+  auto v4 = e.RequiresClause();
+  if (v4) {
+    auto id4 = es.EntityId(v4.value());
+    b.setVal4(id4);
   } else {
-    b.setVal3(mx::kInvalidEntityId);
+    b.setVal4(mx::kInvalidEntityId);
   }
-  auto et4 = es.EntityId(e.TemplateKeywordToken());
-  b.setVal4(et4);
-  auto et5 = es.EntityId(e.LeftAngleToken());
+  auto et5 = es.EntityId(e.TemplateKeywordToken());
   b.setVal5(et5);
-  auto et6 = es.EntityId(e.RightAngleToken());
+  auto et6 = es.EntityId(e.LeftAngleToken());
   b.setVal6(et6);
-  auto p7 = es.EntityIds(e.Tokens());
-  b.setVal7(p7.first);
-  b.setVal8(p7.second);
+  auto et7 = es.EntityId(e.RightAngleToken());
+  b.setVal7(et7);
+  auto p8 = es.EntityIds(e.Tokens());
+  b.setVal8(p8.first);
+  b.setVal9(p8.second);
   do {
-    auto v9 = e.Parameters();
-    auto sv9 = b.initVal9(static_cast<unsigned>(v9.size()));
-    auto i9 = 0u;
-    for (const auto &e9 : v9) {
-      sv9.set(i9, es.EntityId(e9));
-      ++i9;
+    auto v10 = e.Parameters();
+    auto sv10 = b.initVal10(static_cast<unsigned>(v10.size()));
+    auto i10 = 0u;
+    for (const auto &e10 : v10) {
+      sv10.set(i10, es.EntityId(e10));
+      ++i10;
     }
   } while (false);
 }
@@ -704,16 +720,18 @@ void SerializeAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::A
   (void) es;
   (void) b;
   (void) e;
-  auto et0 = es.EntityId(e.Token());
-  b.setVal0(et0);
-  b.setVal1(e.IsImplicit());
-  b.setVal2(e.IsInherited());
-  b.setVal3(e.IsLateParsed());
-  b.setVal4(e.IsPackExpansion());
-  b.setVal5(static_cast<unsigned short>(mx::FromPasta(e.Kind())));
-  auto p6 = es.EntityIds(e.Tokens());
-  b.setVal6(p6.first);
-  b.setVal7(p6.second);
+  b.setVal0(es.ParentDeclId(e));
+  b.setVal1(es.ParentStmtId(e));
+  auto et2 = es.EntityId(e.Token());
+  b.setVal2(et2);
+  b.setVal3(e.IsImplicit());
+  b.setVal4(e.IsInherited());
+  b.setVal5(e.IsLateParsed());
+  b.setVal6(e.IsPackExpansion());
+  b.setVal7(static_cast<unsigned short>(mx::FromPasta(e.Kind())));
+  auto p8 = es.EntityIds(e.Tokens());
+  b.setVal8(p8.first);
+  b.setVal9(p8.second);
 }
 
 void SerializeAlignValueAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AlignValueAttr &e, const TokenTree *) {
@@ -722,7 +740,7 @@ void SerializeAlignValueAttr(const PendingFragment &pf, const EntityMapper &es, 
   (void) b;
   (void) e;
   SerializeAttr(pf, es, b, e, nullptr);
-  b.setVal8(es.EntityId(e.Alignment()));
+  b.setVal10(es.EntityId(e.Alignment()));
 }
 
 void SerializeAliasAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AliasAttr &e, const TokenTree *) {
@@ -731,9 +749,9 @@ void SerializeAliasAttr(const PendingFragment &pf, const EntityMapper &es, mx::a
   (void) b;
   (void) e;
   SerializeAttr(pf, es, b, e, nullptr);
-  auto v9 = e.Aliasee();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
+  auto v11 = e.Aliasee();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
 }
 
 void SerializeAbiTagAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AbiTagAttr &e, const TokenTree *) {
@@ -782,7 +800,7 @@ void SerializeOpenCLPrivateAddressSpaceAttr(const PendingFragment &pf, const Ent
   (void) b;
   (void) e;
   SerializeTypeAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
 void SerializeOpenCLLocalAddressSpaceAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLLocalAddressSpaceAttr &e, const TokenTree *) {
@@ -791,7 +809,7 @@ void SerializeOpenCLLocalAddressSpaceAttr(const PendingFragment &pf, const Entit
   (void) b;
   (void) e;
   SerializeTypeAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
 void SerializeOpenCLGlobalHostAddressSpaceAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLGlobalHostAddressSpaceAttr &e, const TokenTree *) {
@@ -816,7 +834,7 @@ void SerializeOpenCLGlobalAddressSpaceAttr(const PendingFragment &pf, const Enti
   (void) b;
   (void) e;
   SerializeTypeAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
 void SerializeOpenCLGenericAddressSpaceAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLGenericAddressSpaceAttr &e, const TokenTree *) {
@@ -825,7 +843,7 @@ void SerializeOpenCLGenericAddressSpaceAttr(const PendingFragment &pf, const Ent
   (void) b;
   (void) e;
   SerializeTypeAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
 void SerializeOpenCLConstantAddressSpaceAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLConstantAddressSpaceAttr &e, const TokenTree *) {
@@ -834,7 +852,7 @@ void SerializeOpenCLConstantAddressSpaceAttr(const PendingFragment &pf, const En
   (void) b;
   (void) e;
   SerializeTypeAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
 void SerializeObjCKindOfAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCKindOfAttr &e, const TokenTree *) {
@@ -875,13 +893,13 @@ void SerializeHLSLParamModifierAttr(const PendingFragment &pf, const EntityMappe
   (void) b;
   (void) e;
   SerializeTypeAttr(pf, es, b, e, nullptr);
-  b.setVal11(e.MergedSpelling());
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
-  b.setVal12(e.IsAnyIn());
-  b.setVal13(e.IsAnyOut());
-  b.setVal14(e.IsIn());
-  b.setVal15(e.IsInOut());
-  b.setVal16(e.IsOut());
+  b.setVal13(e.MergedSpelling());
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  b.setVal14(e.IsAnyIn());
+  b.setVal15(e.IsAnyOut());
+  b.setVal16(e.IsIn());
+  b.setVal17(e.IsInOut());
+  b.setVal18(e.IsOut());
 }
 
 void SerializeHLSLGroupSharedAddressSpaceAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::HLSLGroupSharedAddressSpaceAttr &e, const TokenTree *) {
@@ -906,9 +924,9 @@ void SerializeBTFTypeTagAttr(const PendingFragment &pf, const EntityMapper &es, 
   (void) b;
   (void) e;
   SerializeTypeAttr(pf, es, b, e, nullptr);
-  auto v9 = e.BTFTypeTag();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
+  auto v11 = e.BTFTypeTag();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
 }
 
 void SerializeArmStreamingCompatibleAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ArmStreamingCompatibleAttr &e, const TokenTree *) {
@@ -973,9 +991,9 @@ void SerializeAnnotateTypeAttr(const PendingFragment &pf, const EntityMapper &es
   (void) b;
   (void) e;
   SerializeTypeAttr(pf, es, b, e, nullptr);
-  auto v9 = e.Annotation();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
+  auto v11 = e.Annotation();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
 }
 
 void SerializeAddressSpaceAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AddressSpaceAttr &e, const TokenTree *) {
@@ -1048,8 +1066,8 @@ void SerializeSwiftVersionedRemovalAttr(const PendingFragment &pf, const EntityM
   (void) b;
   (void) e;
   SerializeAttr(pf, es, b, e, nullptr);
-  b.setVal17(static_cast<unsigned short>(mx::FromPasta(e.AttributeKindToRemove())));
-  b.setVal11(e.IsReplacedByActive());
+  b.setVal19(static_cast<unsigned short>(mx::FromPasta(e.AttributeKindToRemove())));
+  b.setVal13(e.IsReplacedByActive());
 }
 
 void SerializeSwiftVersionedAdditionAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftVersionedAdditionAttr &e, const TokenTree *) {
@@ -1058,8 +1076,8 @@ void SerializeSwiftVersionedAdditionAttr(const PendingFragment &pf, const Entity
   (void) b;
   (void) e;
   SerializeAttr(pf, es, b, e, nullptr);
-  b.setVal8(es.EntityId(e.AdditionalAttribute()));
-  b.setVal11(e.IsReplacedByActive());
+  b.setVal10(es.EntityId(e.AdditionalAttribute()));
+  b.setVal13(e.IsReplacedByActive());
 }
 
 void SerializeSwiftObjCMembersAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftObjCMembersAttr &e, const TokenTree *) {
@@ -1116,7 +1134,7 @@ void SerializeCodeAlignAttr(const PendingFragment &pf, const EntityMapper &es, m
   (void) b;
   (void) e;
   SerializeStmtAttr(pf, es, b, e, nullptr);
-  b.setVal8(es.EntityId(e.Alignment()));
+  b.setVal10(es.EntityId(e.Alignment()));
 }
 
 void SerializeUnlikelyAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::UnlikelyAttr &e, const TokenTree *) {
@@ -1149,10 +1167,10 @@ void SerializeOpenCLAccessAttr(const PendingFragment &pf, const EntityMapper &es
   (void) b;
   (void) e;
   SerializeAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
-  b.setVal11(e.IsReadOnly());
-  b.setVal12(e.IsReadWrite());
-  b.setVal13(e.IsWriteOnly());
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  b.setVal13(e.IsReadOnly());
+  b.setVal14(e.IsReadWrite());
+  b.setVal15(e.IsWriteOnly());
 }
 
 void SerializeObjCRuntimeVisibleAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCRuntimeVisibleAttr &e, const TokenTree *) {
@@ -1169,9 +1187,9 @@ void SerializeObjCRuntimeNameAttr(const PendingFragment &pf, const EntityMapper 
   (void) b;
   (void) e;
   SerializeAttr(pf, es, b, e, nullptr);
-  auto v9 = e.MetadataName();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
+  auto v11 = e.MetadataName();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
 }
 
 void SerializeObjCNonRuntimeProtocolAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCNonRuntimeProtocolAttr &e, const TokenTree *) {
@@ -1236,7 +1254,7 @@ void SerializeOMPReferencedVarAttr(const PendingFragment &pf, const EntityMapper
   (void) b;
   (void) e;
   SerializeAttr(pf, es, b, e, nullptr);
-  b.setVal8(es.EntityId(e.Reference()));
+  b.setVal10(es.EntityId(e.Reference()));
 }
 
 void SerializeOMPDeclareSimdDeclAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OMPDeclareSimdDeclAttr &e, const TokenTree *) {
@@ -1245,8 +1263,8 @@ void SerializeOMPDeclareSimdDeclAttr(const PendingFragment &pf, const EntityMapp
   (void) b;
   (void) e;
   SerializeAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.BranchState())));
-  b.setVal8(es.EntityId(e.Simdlen()));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.BranchState())));
+  b.setVal10(es.EntityId(e.Simdlen()));
 }
 
 void SerializeOMPCaptureKindAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OMPCaptureKindAttr &e, const TokenTree *) {
@@ -1287,15 +1305,15 @@ void SerializeLoopHintAttr(const PendingFragment &pf, const EntityMapper &es, mx
   (void) b;
   (void) e;
   SerializeAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.Option())));
-  b.setVal18(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
-  b.setVal19(static_cast<unsigned char>(mx::FromPasta(e.State())));
-  auto v8 = e.Value();
-  if (v8) {
-    auto id8 = es.EntityId(v8.value());
-    b.setVal8(id8);
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.Option())));
+  b.setVal20(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  b.setVal21(static_cast<unsigned char>(mx::FromPasta(e.State())));
+  auto v10 = e.Value();
+  if (v10) {
+    auto id10 = es.EntityId(v10.value());
+    b.setVal10(id10);
   } else {
-    b.setVal8(mx::kInvalidEntityId);
+    b.setVal10(mx::kInvalidEntityId);
   }
 }
 
@@ -1313,9 +1331,9 @@ void SerializeInitSegAttr(const PendingFragment &pf, const EntityMapper &es, mx:
   (void) b;
   (void) e;
   SerializeAttr(pf, es, b, e, nullptr);
-  auto v9 = e.Section();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
+  auto v11 = e.Section();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
 }
 
 void SerializeInheritableAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::InheritableAttr &e, const TokenTree *) {
@@ -1324,7 +1342,7 @@ void SerializeInheritableAttr(const PendingFragment &pf, const EntityMapper &es,
   (void) b;
   (void) e;
   SerializeAttr(pf, es, b, e, nullptr);
-  b.setVal11(e.ShouldInheritEvenIfAlreadyPresent());
+  b.setVal13(e.ShouldInheritEvenIfAlreadyPresent());
 }
 
 void SerializeIBOutletCollectionAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::IBOutletCollectionAttr &e, const TokenTree *) {
@@ -1333,8 +1351,8 @@ void SerializeIBOutletCollectionAttr(const PendingFragment &pf, const EntityMapp
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal8(es.EntityId(e.Interface()));
-  b.setVal20(es.EntityId(e.InterfaceToken()));
+  b.setVal10(es.EntityId(e.Interface()));
+  b.setVal22(es.EntityId(e.InterfaceToken()));
 }
 
 void SerializeIBOutletAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::IBOutletAttr &e, const TokenTree *) {
@@ -1367,7 +1385,7 @@ void SerializeHLSLShaderAttr(const PendingFragment &pf, const EntityMapper &es, 
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.Type())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.Type())));
 }
 
 void SerializeHLSLResourceBindingAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::HLSLResourceBindingAttr &e, const TokenTree *) {
@@ -1376,12 +1394,12 @@ void SerializeHLSLResourceBindingAttr(const PendingFragment &pf, const EntityMap
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  auto v9 = e.Slot();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
-  auto v21 = e.Space();
-  std::string s21(v21.data(), v21.size());
-  b.setVal21(s21);
+  auto v11 = e.Slot();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
+  auto v23 = e.Space();
+  std::string s23(v23.data(), v23.size());
+  b.setVal23(s23);
 }
 
 void SerializeHLSLResourceAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::HLSLResourceAttr &e, const TokenTree *) {
@@ -1390,7 +1408,7 @@ void SerializeHLSLResourceAttr(const PendingFragment &pf, const EntityMapper &es
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal12(e.IsROV());
+  b.setVal14(e.IsROV());
 }
 
 void SerializeHLSLNumThreadsAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::HLSLNumThreadsAttr &e, const TokenTree *) {
@@ -1447,7 +1465,7 @@ void SerializeGuardedByAttr(const PendingFragment &pf, const EntityMapper &es, m
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal8(es.EntityId(e.Argument()));
+  b.setVal10(es.EntityId(e.Argument()));
 }
 
 void SerializeGNUInlineAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::GNUInlineAttr &e, const TokenTree *) {
@@ -1464,7 +1482,7 @@ void SerializeFunctionReturnThunksAttr(const PendingFragment &pf, const EntityMa
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.ThunkType())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.ThunkType())));
 }
 
 void SerializeFormatAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::FormatAttr &e, const TokenTree *) {
@@ -1505,8 +1523,8 @@ void SerializeFinalAttr(const PendingFragment &pf, const EntityMapper &es, mx::a
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
-  b.setVal12(e.IsSpelledAsSealed());
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  b.setVal14(e.IsSpelledAsSealed());
 }
 
 void SerializeFastCallAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::FastCallAttr &e, const TokenTree *) {
@@ -1523,16 +1541,16 @@ void SerializeExternalSourceSymbolAttr(const PendingFragment &pf, const EntityMa
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  auto v9 = e.DefinedIn();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
-  b.setVal12(e.GeneratedDeclaration());
-  auto v21 = e.Language();
-  std::string s21(v21.data(), v21.size());
-  b.setVal21(s21);
-  auto v22 = e.USR();
-  std::string s22(v22.data(), v22.size());
-  b.setVal22(s22);
+  auto v11 = e.DefinedIn();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
+  b.setVal14(e.GeneratedDeclaration());
+  auto v23 = e.Language();
+  std::string s23(v23.data(), v23.size());
+  b.setVal23(s23);
+  auto v24 = e.USR();
+  std::string s24(v24.data(), v24.size());
+  b.setVal24(s24);
 }
 
 void SerializeExclusiveTrylockFunctionAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ExclusiveTrylockFunctionAttr &e, const TokenTree *) {
@@ -1541,7 +1559,7 @@ void SerializeExclusiveTrylockFunctionAttr(const PendingFragment &pf, const Enti
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal8(es.EntityId(e.SuccessValue()));
+  b.setVal10(es.EntityId(e.SuccessValue()));
 }
 
 void SerializeExcludeFromExplicitInstantiationAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ExcludeFromExplicitInstantiationAttr &e, const TokenTree *) {
@@ -1558,12 +1576,12 @@ void SerializeErrorAttr(const PendingFragment &pf, const EntityMapper &es, mx::a
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
-  auto v9 = e.UserDiagnostic();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
-  b.setVal12(e.IsError());
-  b.setVal13(e.IsWarning());
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  auto v11 = e.UserDiagnostic();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
+  b.setVal14(e.IsError());
+  b.setVal15(e.IsWarning());
 }
 
 void SerializeEnumExtensibilityAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::EnumExtensibilityAttr &e, const TokenTree *) {
@@ -1572,7 +1590,7 @@ void SerializeEnumExtensibilityAttr(const PendingFragment &pf, const EntityMappe
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.Extensibility())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.Extensibility())));
 }
 
 void SerializeEnforceTCBLeafAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::EnforceTCBLeafAttr &e, const TokenTree *) {
@@ -1581,9 +1599,9 @@ void SerializeEnforceTCBLeafAttr(const PendingFragment &pf, const EntityMapper &
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  auto v9 = e.TCBName();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
+  auto v11 = e.TCBName();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
 }
 
 void SerializeEnforceTCBAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::EnforceTCBAttr &e, const TokenTree *) {
@@ -1592,9 +1610,9 @@ void SerializeEnforceTCBAttr(const PendingFragment &pf, const EntityMapper &es, 
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  auto v9 = e.TCBName();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
+  auto v11 = e.TCBName();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
 }
 
 void SerializeEnableIfAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::EnableIfAttr &e, const TokenTree *) {
@@ -1603,10 +1621,10 @@ void SerializeEnableIfAttr(const PendingFragment &pf, const EntityMapper &es, mx
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal8(es.EntityId(e.Condition()));
-  auto v9 = e.Message();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
+  b.setVal10(es.EntityId(e.Condition()));
+  auto v11 = e.Message();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
 }
 
 void SerializeEmptyBasesAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::EmptyBasesAttr &e, const TokenTree *) {
@@ -1639,15 +1657,15 @@ void SerializeDiagnoseIfAttr(const PendingFragment &pf, const EntityMapper &es, 
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal12(e.ArgumentDependent());
-  b.setVal8(es.EntityId(e.Condition()));
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.DiagnosticType())));
-  auto v9 = e.Message();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
-  b.setVal20(es.EntityId(e.Parent()));
-  b.setVal13(e.IsError());
-  b.setVal14(e.IsWarning());
+  b.setVal14(e.ArgumentDependent());
+  b.setVal10(es.EntityId(e.Condition()));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.DiagnosticType())));
+  auto v11 = e.Message();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
+  b.setVal22(es.EntityId(e.Parent()));
+  b.setVal15(e.IsError());
+  b.setVal16(e.IsWarning());
 }
 
 void SerializeDiagnoseAsBuiltinAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DiagnoseAsBuiltinAttr &e, const TokenTree *) {
@@ -1656,7 +1674,7 @@ void SerializeDiagnoseAsBuiltinAttr(const PendingFragment &pf, const EntityMappe
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal8(es.EntityId(e.Function()));
+  b.setVal10(es.EntityId(e.Function()));
 }
 
 void SerializeDestructorAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DestructorAttr &e, const TokenTree *) {
@@ -1673,12 +1691,12 @@ void SerializeDeprecatedAttr(const PendingFragment &pf, const EntityMapper &es, 
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  auto v9 = e.Message();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
-  auto v21 = e.Replacement();
-  std::string s21(v21.data(), v21.size());
-  b.setVal21(s21);
+  auto v11 = e.Message();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
+  auto v23 = e.Replacement();
+  std::string s23(v23.data(), v23.size());
+  b.setVal23(s23);
 }
 
 void SerializeDeclOrStmtAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DeclOrStmtAttr &e, const TokenTree *) {
@@ -1695,8 +1713,8 @@ void SerializeAlwaysInlineAttr(const PendingFragment &pf, const EntityMapper &es
   (void) b;
   (void) e;
   SerializeDeclOrStmtAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
-  b.setVal12(e.IsClangAlwaysInline());
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  b.setVal14(e.IsClangAlwaysInline());
 }
 
 void SerializeSuppressAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SuppressAttr &e, const TokenTree *) {
@@ -1705,7 +1723,7 @@ void SerializeSuppressAttr(const PendingFragment &pf, const EntityMapper &es, mx
   (void) b;
   (void) e;
   SerializeDeclOrStmtAttr(pf, es, b, e, nullptr);
-  b.setVal12(e.IsGSL());
+  b.setVal14(e.IsGSL());
 }
 
 void SerializeNoMergeAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoMergeAttr &e, const TokenTree *) {
@@ -1722,7 +1740,7 @@ void SerializeNoInlineAttr(const PendingFragment &pf, const EntityMapper &es, mx
   (void) b;
   (void) e;
   SerializeDeclOrStmtAttr(pf, es, b, e, nullptr);
-  b.setVal12(e.IsClangNoInline());
+  b.setVal14(e.IsClangNoInline());
 }
 
 void SerializeDLLImportStaticLocalAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DLLImportStaticLocalAttr &e, const TokenTree *) {
@@ -1763,9 +1781,9 @@ void SerializeCountedByAttr(const PendingFragment &pf, const EntityMapper &es, m
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  auto p8 = es.EntityIds(e.CountedByFieldToken());
-  b.setVal8(p8.first);
-  b.setVal20(p8.second);
+  auto p10 = es.EntityIds(e.CountedByFieldToken());
+  b.setVal10(p10.first);
+  b.setVal22(p10.second);
 }
 
 void SerializeCoroWrapperAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CoroWrapperAttr &e, const TokenTree *) {
@@ -1838,7 +1856,7 @@ void SerializeConsumableAttr(const PendingFragment &pf, const EntityMapper &es, 
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.DefaultState())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.DefaultState())));
 }
 
 void SerializeConstructorAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ConstructorAttr &e, const TokenTree *) {
@@ -1855,8 +1873,8 @@ void SerializeConstInitAttr(const PendingFragment &pf, const EntityMapper &es, m
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
-  b.setVal12(e.IsConstinit());
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  b.setVal14(e.IsConstinit());
 }
 
 void SerializeConstAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ConstAttr &e, const TokenTree *) {
@@ -1889,9 +1907,9 @@ void SerializeCodeSegAttr(const PendingFragment &pf, const EntityMapper &es, mx:
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  auto v9 = e.Name();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
+  auto v11 = e.Name();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
 }
 
 void SerializeCodeModelAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CodeModelAttr &e, const TokenTree *) {
@@ -1916,7 +1934,7 @@ void SerializeCleanupAttr(const PendingFragment &pf, const EntityMapper &es, mx:
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal8(es.EntityId(e.FunctionDeclaration()));
+  b.setVal10(es.EntityId(e.FunctionDeclaration()));
 }
 
 void SerializeCapturedRecordAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CapturedRecordAttr &e, const TokenTree *) {
@@ -1933,11 +1951,11 @@ void SerializeCapabilityAttr(const PendingFragment &pf, const EntityMapper &es, 
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  auto v9 = e.Name();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
-  b.setVal12(e.IsShared());
+  auto v11 = e.Name();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  b.setVal14(e.IsShared());
 }
 
 void SerializeCallbackAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CallbackAttr &e, const TokenTree *) {
@@ -1962,7 +1980,7 @@ void SerializeCXX11NoReturnAttr(const PendingFragment &pf, const EntityMapper &e
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
 void SerializeCUDASharedAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CUDASharedAttr &e, const TokenTree *) {
@@ -1979,9 +1997,9 @@ void SerializeCUDALaunchBoundsAttr(const PendingFragment &pf, const EntityMapper
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal8(es.EntityId(e.MaxBlocks()));
-  b.setVal20(es.EntityId(e.MaxThreads()));
-  b.setVal23(es.EntityId(e.MinBlocks()));
+  b.setVal10(es.EntityId(e.MaxBlocks()));
+  b.setVal22(es.EntityId(e.MaxThreads()));
+  b.setVal25(es.EntityId(e.MinBlocks()));
 }
 
 void SerializeCUDAInvalidTargetAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CUDAInvalidTargetAttr &e, const TokenTree *) {
@@ -2094,7 +2112,7 @@ void SerializeCFGuardAttr(const PendingFragment &pf, const EntityMapper &es, mx:
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.Guard())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.Guard())));
 }
 
 void SerializeCFAuditedTransferAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CFAuditedTransferAttr &e, const TokenTree *) {
@@ -2135,7 +2153,7 @@ void SerializeBlocksAttr(const PendingFragment &pf, const EntityMapper &es, mx::
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.Type())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.Type())));
 }
 
 void SerializeBTFDeclTagAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::BTFDeclTagAttr &e, const TokenTree *) {
@@ -2144,9 +2162,9 @@ void SerializeBTFDeclTagAttr(const PendingFragment &pf, const EntityMapper &es, 
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  auto v9 = e.BTFDeclTag();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
+  auto v11 = e.BTFDeclTag();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
 }
 
 void SerializeBPFPreserveStaticOffsetAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::BPFPreserveStaticOffsetAttr &e, const TokenTree *) {
@@ -2179,14 +2197,14 @@ void SerializeAvailabilityAttr(const PendingFragment &pf, const EntityMapper &es
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  auto v9 = e.Message();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
-  auto v21 = e.Replacement();
-  std::string s21(v21.data(), v21.size());
-  b.setVal21(s21);
-  b.setVal12(e.Strict());
-  b.setVal13(e.Unavailable());
+  auto v11 = e.Message();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
+  auto v23 = e.Replacement();
+  std::string s23(v23.data(), v23.size());
+  b.setVal23(s23);
+  b.setVal14(e.Strict());
+  b.setVal15(e.Unavailable());
 }
 
 void SerializeAssumptionAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AssumptionAttr &e, const TokenTree *) {
@@ -2195,9 +2213,9 @@ void SerializeAssumptionAttr(const PendingFragment &pf, const EntityMapper &es, 
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  auto v9 = e.Assumption();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
+  auto v11 = e.Assumption();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
 }
 
 void SerializeAssumeAlignedAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AssumeAlignedAttr &e, const TokenTree *) {
@@ -2206,13 +2224,13 @@ void SerializeAssumeAlignedAttr(const PendingFragment &pf, const EntityMapper &e
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal8(es.EntityId(e.Alignment()));
-  auto v20 = e.Offset();
-  if (v20) {
-    auto id20 = es.EntityId(v20.value());
-    b.setVal20(id20);
+  b.setVal10(es.EntityId(e.Alignment()));
+  auto v22 = e.Offset();
+  if (v22) {
+    auto id22 = es.EntityId(v22.value());
+    b.setVal22(id22);
   } else {
-    b.setVal20(mx::kInvalidEntityId);
+    b.setVal22(mx::kInvalidEntityId);
   }
 }
 
@@ -2238,8 +2256,8 @@ void SerializeAssertCapabilityAttr(const PendingFragment &pf, const EntityMapper
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
-  b.setVal12(e.IsShared());
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  b.setVal14(e.IsShared());
 }
 
 void SerializeAsmLabelAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AsmLabelAttr &e, const TokenTree *) {
@@ -2248,10 +2266,10 @@ void SerializeAsmLabelAttr(const PendingFragment &pf, const EntityMapper &es, mx
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal12(e.IsLiteralLabel());
-  auto v9 = e.Label();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
+  b.setVal14(e.IsLiteralLabel());
+  auto v11 = e.Label();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
 }
 
 void SerializeArtificialAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ArtificialAttr &e, const TokenTree *) {
@@ -2268,8 +2286,8 @@ void SerializeArmNewAttr(const PendingFragment &pf, const EntityMapper &es, mx::
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal12(e.IsNewZA());
-  b.setVal13(e.IsNewZT0());
+  b.setVal14(e.IsNewZA());
+  b.setVal15(e.IsNewZT0());
 }
 
 void SerializeArmLocallyStreamingAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ArmLocallyStreamingAttr &e, const TokenTree *) {
@@ -2294,8 +2312,8 @@ void SerializeArgumentWithTypeTagAttr(const PendingFragment &pf, const EntityMap
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal12(e.IsPointer());
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  b.setVal14(e.IsPointer());
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
 void SerializeArcWeakrefUnavailableAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ArcWeakrefUnavailableAttr &e, const TokenTree *) {
@@ -2368,35 +2386,35 @@ void SerializeAlignedAttr(const PendingFragment &pf, const EntityMapper &es, mx:
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  auto v8 = e.AlignmentExpression();
-  if (v8) {
-    auto id8 = es.EntityId(v8.value());
-    b.setVal8(id8);
+  auto v10 = e.AlignmentExpression();
+  if (v10) {
+    auto id10 = es.EntityId(v10.value());
+    b.setVal10(id10);
   } else {
-    b.setVal8(mx::kInvalidEntityId);
+    b.setVal10(mx::kInvalidEntityId);
   }
-  auto v20 = e.AlignmentType();
-  if (v20) {
-    auto id20 = es.EntityId(v20.value());
-    b.setVal20(id20);
+  auto v22 = e.AlignmentType();
+  if (v22) {
+    auto id22 = es.EntityId(v22.value());
+    b.setVal22(id22);
   } else {
-    b.setVal20(mx::kInvalidEntityId);
+    b.setVal22(mx::kInvalidEntityId);
   }
-  auto v24 = e.CachedAlignmentValue();
-  if (v24) {
-    b.setVal24(static_cast<uint32_t>(v24.value()));
-    b.setVal12(true);
+  auto v26 = e.CachedAlignmentValue();
+  if (v26) {
+    b.setVal26(static_cast<uint32_t>(v26.value()));
+    b.setVal14(true);
   } else {
-    b.setVal12(false);
+    b.setVal14(false);
   }
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
-  b.setVal13(e.IsAlignas());
-  b.setVal14(e.IsAlignmentDependent());
-  b.setVal15(e.IsAlignmentErrorDependent());
-  b.setVal16(e.IsAlignmentExpression());
-  b.setVal25(e.IsC11());
-  b.setVal26(e.IsDeclspec());
-  b.setVal27(e.IsGNU());
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  b.setVal15(e.IsAlignas());
+  b.setVal16(e.IsAlignmentDependent());
+  b.setVal17(e.IsAlignmentErrorDependent());
+  b.setVal18(e.IsAlignmentExpression());
+  b.setVal27(e.IsC11());
+  b.setVal28(e.IsDeclspec());
+  b.setVal29(e.IsGNU());
 }
 
 void SerializeAlignNaturalAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AlignNaturalAttr &e, const TokenTree *) {
@@ -2437,9 +2455,9 @@ void SerializeAcquireHandleAttr(const PendingFragment &pf, const EntityMapper &e
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  auto v9 = e.HandleType();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
+  auto v11 = e.HandleType();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
 }
 
 void SerializeAcquireCapabilityAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AcquireCapabilityAttr &e, const TokenTree *) {
@@ -2448,8 +2466,8 @@ void SerializeAcquireCapabilityAttr(const PendingFragment &pf, const EntityMappe
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
-  b.setVal12(e.IsShared());
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  b.setVal14(e.IsShared());
 }
 
 void SerializeAVRSignalAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AVRSignalAttr &e, const TokenTree *) {
@@ -2474,7 +2492,7 @@ void SerializeARMInterruptAttr(const PendingFragment &pf, const EntityMapper &es
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.Interrupt())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.Interrupt())));
 }
 
 void SerializeAMDGPUWavesPerEUAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AMDGPUWavesPerEUAttr &e, const TokenTree *) {
@@ -2483,8 +2501,8 @@ void SerializeAMDGPUWavesPerEUAttr(const PendingFragment &pf, const EntityMapper
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal8(es.EntityId(e.Max()));
-  b.setVal20(es.EntityId(e.Min()));
+  b.setVal10(es.EntityId(e.Max()));
+  b.setVal22(es.EntityId(e.Min()));
 }
 
 void SerializeAMDGPUNumVGPRAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AMDGPUNumVGPRAttr &e, const TokenTree *) {
@@ -2517,8 +2535,8 @@ void SerializeAMDGPUFlatWorkGroupSizeAttr(const PendingFragment &pf, const Entit
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal8(es.EntityId(e.Max()));
-  b.setVal20(es.EntityId(e.Min()));
+  b.setVal10(es.EntityId(e.Max()));
+  b.setVal22(es.EntityId(e.Min()));
 }
 
 void SerializeAArch64VectorPcsAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AArch64VectorPcsAttr &e, const TokenTree *) {
@@ -2543,7 +2561,7 @@ void SerializeZeroCallUsedRegsAttr(const PendingFragment &pf, const EntityMapper
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.ZeroCallUsedRegs())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.ZeroCallUsedRegs())));
 }
 
 void SerializeXRayLogArgsAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::XRayLogArgsAttr &e, const TokenTree *) {
@@ -2560,9 +2578,9 @@ void SerializeXRayInstrumentAttr(const PendingFragment &pf, const EntityMapper &
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal12(e.AlwaysXRayInstrument());
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
-  b.setVal13(e.NeverXRayInstrument());
+  b.setVal14(e.AlwaysXRayInstrument());
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  b.setVal15(e.NeverXRayInstrument());
 }
 
 void SerializeX86ForceAlignArgPointerAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::X86ForceAlignArgPointerAttr &e, const TokenTree *) {
@@ -2587,9 +2605,9 @@ void SerializeWebAssemblyImportNameAttr(const PendingFragment &pf, const EntityM
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  auto v9 = e.ImportName();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
+  auto v11 = e.ImportName();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
 }
 
 void SerializeWebAssemblyImportModuleAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::WebAssemblyImportModuleAttr &e, const TokenTree *) {
@@ -2598,9 +2616,9 @@ void SerializeWebAssemblyImportModuleAttr(const PendingFragment &pf, const Entit
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  auto v9 = e.ImportModule();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
+  auto v11 = e.ImportModule();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
 }
 
 void SerializeWebAssemblyExportNameAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::WebAssemblyExportNameAttr &e, const TokenTree *) {
@@ -2609,9 +2627,9 @@ void SerializeWebAssemblyExportNameAttr(const PendingFragment &pf, const EntityM
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  auto v9 = e.ExportName();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
+  auto v11 = e.ExportName();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
 }
 
 void SerializeWeakRefAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::WeakRefAttr &e, const TokenTree *) {
@@ -2620,9 +2638,9 @@ void SerializeWeakRefAttr(const PendingFragment &pf, const EntityMapper &es, mx:
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  auto v9 = e.Aliasee();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
+  auto v11 = e.Aliasee();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
 }
 
 void SerializeWeakImportAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::WeakImportAttr &e, const TokenTree *) {
@@ -2647,11 +2665,11 @@ void SerializeWarnUnusedResultAttr(const PendingFragment &pf, const EntityMapper
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal12(e.IsCXX11NoDiscard());
-  auto v9 = e.Message();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  b.setVal14(e.IsCXX11NoDiscard());
+  auto v11 = e.Message();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
 void SerializeWarnUnusedAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::WarnUnusedAttr &e, const TokenTree *) {
@@ -2668,7 +2686,7 @@ void SerializeVisibilityAttr(const PendingFragment &pf, const EntityMapper &es, 
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.Visibility())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.Visibility())));
 }
 
 void SerializeVectorCallAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::VectorCallAttr &e, const TokenTree *) {
@@ -2685,8 +2703,8 @@ void SerializeVecTypeHintAttr(const PendingFragment &pf, const EntityMapper &es,
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal8(es.EntityId(e.TypeHint()));
-  b.setVal20(es.EntityId(e.TypeHintToken()));
+  b.setVal10(es.EntityId(e.TypeHint()));
+  b.setVal22(es.EntityId(e.TypeHintToken()));
 }
 
 void SerializeVecReturnAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::VecReturnAttr &e, const TokenTree *) {
@@ -2703,10 +2721,10 @@ void SerializeUuidAttr(const PendingFragment &pf, const EntityMapper &es, mx::as
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  auto v9 = e.Guid();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
-  b.setVal8(es.EntityId(e.GuidDeclaration()));
+  auto v11 = e.Guid();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
+  b.setVal10(es.EntityId(e.GuidDeclaration()));
 }
 
 void SerializeUsingIfExistsAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::UsingIfExistsAttr &e, const TokenTree *) {
@@ -2731,7 +2749,7 @@ void SerializeUnusedAttr(const PendingFragment &pf, const EntityMapper &es, mx::
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
 void SerializeUnsafeBufferUsageAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::UnsafeBufferUsageAttr &e, const TokenTree *) {
@@ -2756,10 +2774,10 @@ void SerializeUnavailableAttr(const PendingFragment &pf, const EntityMapper &es,
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.ImplicitReason())));
-  auto v9 = e.Message();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.ImplicitReason())));
+  auto v11 = e.Message();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
 }
 
 void SerializeTypeVisibilityAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TypeVisibilityAttr &e, const TokenTree *) {
@@ -2768,7 +2786,7 @@ void SerializeTypeVisibilityAttr(const PendingFragment &pf, const EntityMapper &
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.Visibility())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.Visibility())));
 }
 
 void SerializeTypeTagForDatatypeAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TypeTagForDatatypeAttr &e, const TokenTree *) {
@@ -2777,10 +2795,10 @@ void SerializeTypeTagForDatatypeAttr(const PendingFragment &pf, const EntityMapp
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal12(e.LayoutCompatible());
-  b.setVal8(es.EntityId(e.MatchingCType()));
-  b.setVal20(es.EntityId(e.MatchingCTypeToken()));
-  b.setVal13(e.MustBeNull());
+  b.setVal14(e.LayoutCompatible());
+  b.setVal10(es.EntityId(e.MatchingCType()));
+  b.setVal22(es.EntityId(e.MatchingCTypeToken()));
+  b.setVal15(e.MustBeNull());
 }
 
 void SerializeTryAcquireCapabilityAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TryAcquireCapabilityAttr &e, const TokenTree *) {
@@ -2789,9 +2807,9 @@ void SerializeTryAcquireCapabilityAttr(const PendingFragment &pf, const EntityMa
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
-  b.setVal8(es.EntityId(e.SuccessValue()));
-  b.setVal12(e.IsShared());
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  b.setVal10(es.EntityId(e.SuccessValue()));
+  b.setVal14(e.IsShared());
 }
 
 void SerializeTrivialABIAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TrivialABIAttr &e, const TokenTree *) {
@@ -2824,7 +2842,7 @@ void SerializeTestTypestateAttr(const PendingFragment &pf, const EntityMapper &e
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.TestState())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.TestState())));
 }
 
 void SerializeTargetVersionAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TargetVersionAttr &e, const TokenTree *) {
@@ -2833,13 +2851,13 @@ void SerializeTargetVersionAttr(const PendingFragment &pf, const EntityMapper &e
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  auto v9 = e.Name();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
-  auto v21 = e.NamesString();
-  std::string s21(v21.data(), v21.size());
-  b.setVal21(s21);
-  b.setVal12(e.IsDefaultVersion());
+  auto v11 = e.Name();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
+  auto v23 = e.NamesString();
+  std::string s23(v23.data(), v23.size());
+  b.setVal23(s23);
+  b.setVal14(e.IsDefaultVersion());
 }
 
 void SerializeTargetClonesAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TargetClonesAttr &e, const TokenTree *) {
@@ -2856,13 +2874,13 @@ void SerializeTargetAttr(const PendingFragment &pf, const EntityMapper &es, mx::
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  auto v9 = e.Architecture();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
-  auto v21 = e.FeaturesString();
-  std::string s21(v21.data(), v21.size());
-  b.setVal21(s21);
-  b.setVal12(e.IsDefaultVersion());
+  auto v11 = e.Architecture();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
+  auto v23 = e.FeaturesString();
+  std::string s23(v23.data(), v23.size());
+  b.setVal23(s23);
+  b.setVal14(e.IsDefaultVersion());
 }
 
 void SerializeTLSModelAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TLSModelAttr &e, const TokenTree *) {
@@ -2871,9 +2889,9 @@ void SerializeTLSModelAttr(const PendingFragment &pf, const EntityMapper &es, mx
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  auto v9 = e.Model();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
+  auto v11 = e.Model();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
 }
 
 void SerializeSysVABIAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SysVABIAttr &e, const TokenTree *) {
@@ -2898,8 +2916,8 @@ void SerializeSwiftNewTypeAttr(const PendingFragment &pf, const EntityMapper &es
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.NewtypeKind())));
-  b.setVal18(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.NewtypeKind())));
+  b.setVal20(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
 void SerializeSwiftNameAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftNameAttr &e, const TokenTree *) {
@@ -2908,9 +2926,9 @@ void SerializeSwiftNameAttr(const PendingFragment &pf, const EntityMapper &es, m
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  auto v9 = e.Name();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
+  auto v11 = e.Name();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
 }
 
 void SerializeSwiftImportPropertyAsAccessorsAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftImportPropertyAsAccessorsAttr &e, const TokenTree *) {
@@ -2935,7 +2953,7 @@ void SerializeSwiftErrorAttr(const PendingFragment &pf, const EntityMapper &es, 
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.Convention())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.Convention())));
 }
 
 void SerializeSwiftCallAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftCallAttr &e, const TokenTree *) {
@@ -2960,9 +2978,9 @@ void SerializeSwiftBridgeAttr(const PendingFragment &pf, const EntityMapper &es,
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  auto v9 = e.SwiftType();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
+  auto v11 = e.SwiftType();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
 }
 
 void SerializeSwiftAttrAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftAttrAttr &e, const TokenTree *) {
@@ -2971,9 +2989,9 @@ void SerializeSwiftAttrAttr(const PendingFragment &pf, const EntityMapper &es, m
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  auto v9 = e.Attribute();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
+  auto v11 = e.Attribute();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
 }
 
 void SerializeSwiftAsyncNameAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftAsyncNameAttr &e, const TokenTree *) {
@@ -2982,9 +3000,9 @@ void SerializeSwiftAsyncNameAttr(const PendingFragment &pf, const EntityMapper &
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  auto v9 = e.Name();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
+  auto v11 = e.Name();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
 }
 
 void SerializeSwiftAsyncErrorAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftAsyncErrorAttr &e, const TokenTree *) {
@@ -2993,7 +3011,7 @@ void SerializeSwiftAsyncErrorAttr(const PendingFragment &pf, const EntityMapper 
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.Convention())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.Convention())));
 }
 
 void SerializeSwiftAsyncCallAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftAsyncCallAttr &e, const TokenTree *) {
@@ -3010,7 +3028,7 @@ void SerializeSwiftAsyncAttr(const PendingFragment &pf, const EntityMapper &es, 
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.AttributeKind())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.AttributeKind())));
 }
 
 void SerializeStrictGuardStackCheckAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::StrictGuardStackCheckAttr &e, const TokenTree *) {
@@ -3059,7 +3077,7 @@ void SerializeSharedTrylockFunctionAttr(const PendingFragment &pf, const EntityM
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal8(es.EntityId(e.SuccessValue()));
+  b.setVal10(es.EntityId(e.SuccessValue()));
 }
 
 void SerializeSetTypestateAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SetTypestateAttr &e, const TokenTree *) {
@@ -3068,7 +3086,7 @@ void SerializeSetTypestateAttr(const PendingFragment &pf, const EntityMapper &es
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.NewState())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.NewState())));
 }
 
 void SerializeSentinelAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SentinelAttr &e, const TokenTree *) {
@@ -3093,10 +3111,10 @@ void SerializeSectionAttr(const PendingFragment &pf, const EntityMapper &es, mx:
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  auto v9 = e.Name();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  auto v11 = e.Name();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
 void SerializeScopedLockableAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ScopedLockableAttr &e, const TokenTree *) {
@@ -3145,7 +3163,7 @@ void SerializeReturnTypestateAttr(const PendingFragment &pf, const EntityMapper 
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.State())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.State())));
 }
 
 void SerializeRetainAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::RetainAttr &e, const TokenTree *) {
@@ -3162,7 +3180,7 @@ void SerializeRestrictAttr(const PendingFragment &pf, const EntityMapper &es, mx
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
 void SerializeRequiresCapabilityAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::RequiresCapabilityAttr &e, const TokenTree *) {
@@ -3171,8 +3189,8 @@ void SerializeRequiresCapabilityAttr(const PendingFragment &pf, const EntityMapp
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
-  b.setVal12(e.IsShared());
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  b.setVal14(e.IsShared());
 }
 
 void SerializeReqdWorkGroupSizeAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ReqdWorkGroupSizeAttr &e, const TokenTree *) {
@@ -3189,9 +3207,9 @@ void SerializeReleaseCapabilityAttr(const PendingFragment &pf, const EntityMappe
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
-  b.setVal12(e.IsGeneric());
-  b.setVal13(e.IsShared());
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  b.setVal14(e.IsGeneric());
+  b.setVal15(e.IsShared());
 }
 
 void SerializeReinitializesAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ReinitializesAttr &e, const TokenTree *) {
@@ -3232,7 +3250,7 @@ void SerializeRISCVInterruptAttr(const PendingFragment &pf, const EntityMapper &
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.Interrupt())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.Interrupt())));
 }
 
 void SerializePureAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PureAttr &e, const TokenTree *) {
@@ -3257,7 +3275,7 @@ void SerializePtGuardedByAttr(const PendingFragment &pf, const EntityMapper &es,
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal8(es.EntityId(e.Argument()));
+  b.setVal10(es.EntityId(e.Argument()));
 }
 
 void SerializePreserveMostAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PreserveMostAttr &e, const TokenTree *) {
@@ -3282,8 +3300,8 @@ void SerializePreferredTypeAttr(const PendingFragment &pf, const EntityMapper &e
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal8(es.EntityId(e.Type()));
-  b.setVal20(es.EntityId(e.TypeToken()));
+  b.setVal10(es.EntityId(e.Type()));
+  b.setVal22(es.EntityId(e.TypeToken()));
 }
 
 void SerializePreferredNameAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PreferredNameAttr &e, const TokenTree *) {
@@ -3292,8 +3310,8 @@ void SerializePreferredNameAttr(const PendingFragment &pf, const EntityMapper &e
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal8(es.EntityId(e.TypedefType()));
-  b.setVal20(es.EntityId(e.TypedefTypeToken()));
+  b.setVal10(es.EntityId(e.TypedefType()));
+  b.setVal22(es.EntityId(e.TypedefTypeToken()));
 }
 
 void SerializePragmaClangTextSectionAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PragmaClangTextSectionAttr &e, const TokenTree *) {
@@ -3302,9 +3320,9 @@ void SerializePragmaClangTextSectionAttr(const PendingFragment &pf, const Entity
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  auto v9 = e.Name();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
+  auto v11 = e.Name();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
 }
 
 void SerializePragmaClangRodataSectionAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PragmaClangRodataSectionAttr &e, const TokenTree *) {
@@ -3313,9 +3331,9 @@ void SerializePragmaClangRodataSectionAttr(const PendingFragment &pf, const Enti
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  auto v9 = e.Name();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
+  auto v11 = e.Name();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
 }
 
 void SerializePragmaClangRelroSectionAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PragmaClangRelroSectionAttr &e, const TokenTree *) {
@@ -3324,9 +3342,9 @@ void SerializePragmaClangRelroSectionAttr(const PendingFragment &pf, const Entit
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  auto v9 = e.Name();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
+  auto v11 = e.Name();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
 }
 
 void SerializePragmaClangDataSectionAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PragmaClangDataSectionAttr &e, const TokenTree *) {
@@ -3335,9 +3353,9 @@ void SerializePragmaClangDataSectionAttr(const PendingFragment &pf, const Entity
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  auto v9 = e.Name();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
+  auto v11 = e.Name();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
 }
 
 void SerializePragmaClangBSSSectionAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PragmaClangBSSSectionAttr &e, const TokenTree *) {
@@ -3346,9 +3364,9 @@ void SerializePragmaClangBSSSectionAttr(const PendingFragment &pf, const EntityM
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  auto v9 = e.Name();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
+  auto v11 = e.Name();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
 }
 
 void SerializePointerAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PointerAttr &e, const TokenTree *) {
@@ -3357,19 +3375,19 @@ void SerializePointerAttr(const PendingFragment &pf, const EntityMapper &es, mx:
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  auto v8 = e.DereferencedType();
-  if (v8) {
-    auto id8 = es.EntityId(v8.value());
-    b.setVal8(id8);
+  auto v10 = e.DereferencedType();
+  if (v10) {
+    auto id10 = es.EntityId(v10.value());
+    b.setVal10(id10);
   } else {
-    b.setVal8(mx::kInvalidEntityId);
+    b.setVal10(mx::kInvalidEntityId);
   }
-  auto v20 = e.DereferencedTypeToken();
-  if (v20) {
-    auto id20 = es.EntityId(v20.value());
-    b.setVal20(id20);
+  auto v22 = e.DereferencedTypeToken();
+  if (v22) {
+    auto id22 = es.EntityId(v22.value());
+    b.setVal22(id22);
   } else {
-    b.setVal20(mx::kInvalidEntityId);
+    b.setVal22(mx::kInvalidEntityId);
   }
 }
 
@@ -3379,7 +3397,7 @@ void SerializePcsAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.PCS())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.PCS())));
 }
 
 void SerializePatchableFunctionEntryAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PatchableFunctionEntryAttr &e, const TokenTree *) {
@@ -3404,7 +3422,7 @@ void SerializeParamTypestateAttr(const PendingFragment &pf, const EntityMapper &
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.ParameterState())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.ParameterState())));
 }
 
 void SerializePackedAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PackedAttr &e, const TokenTree *) {
@@ -3421,11 +3439,11 @@ void SerializeOwnershipAttr(const PendingFragment &pf, const EntityMapper &es, m
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.OwnKind())));
-  b.setVal18(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
-  b.setVal12(e.IsHolds());
-  b.setVal13(e.IsReturns());
-  b.setVal14(e.IsTakes());
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.OwnKind())));
+  b.setVal20(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  b.setVal14(e.IsHolds());
+  b.setVal15(e.IsReturns());
+  b.setVal16(e.IsTakes());
 }
 
 void SerializeOwnerAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OwnerAttr &e, const TokenTree *) {
@@ -3434,19 +3452,19 @@ void SerializeOwnerAttr(const PendingFragment &pf, const EntityMapper &es, mx::a
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  auto v8 = e.DereferencedType();
-  if (v8) {
-    auto id8 = es.EntityId(v8.value());
-    b.setVal8(id8);
+  auto v10 = e.DereferencedType();
+  if (v10) {
+    auto id10 = es.EntityId(v10.value());
+    b.setVal10(id10);
   } else {
-    b.setVal8(mx::kInvalidEntityId);
+    b.setVal10(mx::kInvalidEntityId);
   }
-  auto v20 = e.DereferencedTypeToken();
-  if (v20) {
-    auto id20 = es.EntityId(v20.value());
-    b.setVal20(id20);
+  auto v22 = e.DereferencedTypeToken();
+  if (v22) {
+    auto id22 = es.EntityId(v22.value());
+    b.setVal22(id22);
   } else {
-    b.setVal20(mx::kInvalidEntityId);
+    b.setVal22(mx::kInvalidEntityId);
   }
 }
 
@@ -3552,7 +3570,7 @@ void SerializeObjCMethodFamilyAttr(const PendingFragment &pf, const EntityMapper
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.Family())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.Family())));
 }
 
 void SerializeObjCIndependentClassAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCIndependentClassAttr &e, const TokenTree *) {
@@ -3665,7 +3683,7 @@ void SerializeOMPDeclareVariantAttr(const PendingFragment &pf, const EntityMappe
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal8(es.EntityId(e.VariantFuncReference()));
+  b.setVal10(es.EntityId(e.VariantFuncReference()));
 }
 
 void SerializeOMPDeclareTargetDeclAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OMPDeclareTargetDeclAttr &e, const TokenTree *) {
@@ -3674,10 +3692,10 @@ void SerializeOMPDeclareTargetDeclAttr(const PendingFragment &pf, const EntityMa
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.DevType())));
-  b.setVal12(e.Indirect());
-  b.setVal8(es.EntityId(e.IndirectExpression()));
-  b.setVal18(static_cast<unsigned char>(mx::FromPasta(e.MapType())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.DevType())));
+  b.setVal14(e.Indirect());
+  b.setVal10(es.EntityId(e.IndirectExpression()));
+  b.setVal20(static_cast<unsigned char>(mx::FromPasta(e.MapType())));
 }
 
 void SerializeOMPCaptureNoInitAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OMPCaptureNoInitAttr &e, const TokenTree *) {
@@ -3694,9 +3712,9 @@ void SerializeOMPAllocateDeclAttr(const PendingFragment &pf, const EntityMapper 
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal8(es.EntityId(e.Alignment()));
-  b.setVal20(es.EntityId(e.Allocator()));
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.AllocatorType())));
+  b.setVal10(es.EntityId(e.Alignment()));
+  b.setVal22(es.EntityId(e.Allocator()));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.AllocatorType())));
 }
 
 void SerializeNotTailCalledAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NotTailCalledAttr &e, const TokenTree *) {
@@ -3745,7 +3763,7 @@ void SerializeNoStackProtectorAttr(const PendingFragment &pf, const EntityMapper
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
 void SerializeNoSplitStackAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoSplitStackAttr &e, const TokenTree *) {
@@ -3770,7 +3788,7 @@ void SerializeNoSanitizeAttr(const PendingFragment &pf, const EntityMapper &es, 
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal12(e.HasCoverage());
+  b.setVal14(e.HasCoverage());
 }
 
 void SerializeNoReturnAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoReturnAttr &e, const TokenTree *) {
@@ -3923,7 +3941,7 @@ void SerializeMipsShortCallAttr(const PendingFragment &pf, const EntityMapper &e
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
 void SerializeMipsLongCallAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MipsLongCallAttr &e, const TokenTree *) {
@@ -3932,7 +3950,7 @@ void SerializeMipsLongCallAttr(const PendingFragment &pf, const EntityMapper &es
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
 void SerializeMipsInterruptAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MipsInterruptAttr &e, const TokenTree *) {
@@ -3941,7 +3959,7 @@ void SerializeMipsInterruptAttr(const PendingFragment &pf, const EntityMapper &e
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.Interrupt())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.Interrupt())));
 }
 
 void SerializeMips16Attr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::Mips16Attr &e, const TokenTree *) {
@@ -4006,7 +4024,7 @@ void SerializeMSVtorDispAttr(const PendingFragment &pf, const EntityMapper &es, 
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.VtorDispMode())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.VtorDispMode())));
 }
 
 void SerializeMSStructAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MSStructAttr &e, const TokenTree *) {
@@ -4039,9 +4057,9 @@ void SerializeMSInheritanceAttr(const PendingFragment &pf, const EntityMapper &e
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal12(e.BestCase());
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.InheritanceModel())));
-  b.setVal18(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  b.setVal14(e.BestCase());
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.InheritanceModel())));
+  b.setVal20(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
 void SerializeMSConstexprAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MSConstexprAttr &e, const TokenTree *) {
@@ -4106,7 +4124,7 @@ void SerializeLockReturnedAttr(const PendingFragment &pf, const EntityMapper &es
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal8(es.EntityId(e.Argument()));
+  b.setVal10(es.EntityId(e.Argument()));
 }
 
 void SerializeLifetimeBoundAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::LifetimeBoundAttr &e, const TokenTree *) {
@@ -4195,9 +4213,9 @@ void SerializeAnnotateAttr(const PendingFragment &pf, const EntityMapper &es, mx
   (void) b;
   (void) e;
   SerializeInheritableParamAttr(pf, es, b, e, nullptr);
-  auto v9 = e.Annotation();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
+  auto v11 = e.Annotation();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
 }
 
 void SerializeUseHandleAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::UseHandleAttr &e, const TokenTree *) {
@@ -4206,9 +4224,9 @@ void SerializeUseHandleAttr(const PendingFragment &pf, const EntityMapper &es, m
   (void) b;
   (void) e;
   SerializeInheritableParamAttr(pf, es, b, e, nullptr);
-  auto v9 = e.HandleType();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
+  auto v11 = e.HandleType();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
 }
 
 void SerializeReleaseHandleAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ReleaseHandleAttr &e, const TokenTree *) {
@@ -4217,9 +4235,9 @@ void SerializeReleaseHandleAttr(const PendingFragment &pf, const EntityMapper &e
   (void) b;
   (void) e;
   SerializeInheritableParamAttr(pf, es, b, e, nullptr);
-  auto v9 = e.HandleType();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
+  auto v11 = e.HandleType();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
 }
 
 void SerializePassObjectSizeAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PassObjectSizeAttr &e, const TokenTree *) {
@@ -4228,8 +4246,8 @@ void SerializePassObjectSizeAttr(const PendingFragment &pf, const EntityMapper &
   (void) b;
   (void) e;
   SerializeInheritableParamAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
-  b.setVal12(e.IsDynamic());
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  b.setVal14(e.IsDynamic());
 }
 
 void SerializeParameterABIAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ParameterABIAttr &e, const TokenTree *) {
@@ -4238,7 +4256,7 @@ void SerializeParameterABIAttr(const PendingFragment &pf, const EntityMapper &es
   (void) b;
   (void) e;
   SerializeInheritableParamAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.ABI())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.ABI())));
 }
 
 void SerializeSwiftIndirectResultAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftIndirectResultAttr &e, const TokenTree *) {
@@ -4303,9 +4321,9 @@ void SerializeIFuncAttr(const PendingFragment &pf, const EntityMapper &es, mx::a
   (void) b;
   (void) e;
   SerializeAttr(pf, es, b, e, nullptr);
-  auto v9 = e.Resolver();
-  std::string s9(v9.data(), v9.size());
-  b.setVal9(s9);
+  auto v11 = e.Resolver();
+  std::string s11(v11.data(), v11.size());
+  b.setVal11(s11);
 }
 
 void SerializeCalledOnceAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CalledOnceAttr &e, const TokenTree *) {
@@ -4322,7 +4340,7 @@ void SerializeBuiltinAliasAttr(const PendingFragment &pf, const EntityMapper &es
   (void) b;
   (void) e;
   SerializeAttr(pf, es, b, e, nullptr);
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
 }
 
 void SerializeType(const PendingFragment &pf, const EntityMapper &es, mx::ast::Type::Builder b, const pasta::Type &e, const TokenTree *) {

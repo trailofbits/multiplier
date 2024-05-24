@@ -17,6 +17,7 @@ class Index;
 class CoroutineSuspendExpr;
 class Decl;
 class Expr;
+class File;
 class OpaqueValueExpr;
 class Stmt;
 class Token;
@@ -35,11 +36,10 @@ class MX_EXPORT CoroutineSuspendExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<CoroutineSuspendExpr> in(const Index &index);
-  static gap::generator<CoroutineSuspendExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CoroutineSuspendExpr> by_id(const Index &, EntityId);
   static gap::generator<CoroutineSuspendExpr> in(const Fragment &frag);
   static gap::generator<CoroutineSuspendExpr> in(const File &file);
+  static gap::generator<CoroutineSuspendExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<CoroutineSuspendExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<CoroutineSuspendExpr, ir::Operation>> in(const Compilation &tu);
@@ -51,6 +51,8 @@ class MX_EXPORT CoroutineSuspendExpr : public Expr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<CoroutineSuspendExpr> by_id(const Index &, EntityId);
 
   static std::optional<CoroutineSuspendExpr> from_base(const Stmt &parent);
   inline static std::optional<CoroutineSuspendExpr> from(const Stmt &parent) {

@@ -18,6 +18,7 @@ class BlockDecl;
 class BlockExpr;
 class Decl;
 class Expr;
+class File;
 class FunctionProtoType;
 class Stmt;
 class Token;
@@ -36,11 +37,10 @@ class MX_EXPORT BlockExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<BlockExpr> in(const Index &index);
-  static gap::generator<BlockExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<BlockExpr> by_id(const Index &, EntityId);
   static gap::generator<BlockExpr> in(const Fragment &frag);
   static gap::generator<BlockExpr> in(const File &file);
+  static gap::generator<BlockExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<BlockExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<BlockExpr, ir::Operation>> in(const Compilation &tu);
@@ -56,6 +56,8 @@ class MX_EXPORT BlockExpr : public Expr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<BlockExpr> by_id(const Index &, EntityId);
 
   static std::optional<BlockExpr> from_base(const Stmt &parent);
   inline static std::optional<BlockExpr> from(const Stmt &parent) {

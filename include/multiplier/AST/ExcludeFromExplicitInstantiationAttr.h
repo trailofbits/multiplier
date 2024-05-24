@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Attr;
 class ExcludeFromExplicitInstantiationAttr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT ExcludeFromExplicitInstantiationAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ExcludeFromExplicitInstantiationAttr> in(const Index &index);
-  static gap::generator<ExcludeFromExplicitInstantiationAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ExcludeFromExplicitInstantiationAttr> by_id(const Index &, EntityId);
   static gap::generator<ExcludeFromExplicitInstantiationAttr> in(const Fragment &frag);
   static gap::generator<ExcludeFromExplicitInstantiationAttr> in(const File &file);
+  static gap::generator<ExcludeFromExplicitInstantiationAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::EXCLUDE_FROM_EXPLICIT_INSTANTIATION;
   }
+
+  static std::optional<ExcludeFromExplicitInstantiationAttr> by_id(const Index &, EntityId);
 
   static std::optional<ExcludeFromExplicitInstantiationAttr> from_base(const Attr &parent);
   inline static std::optional<ExcludeFromExplicitInstantiationAttr> from(const Attr &parent) {

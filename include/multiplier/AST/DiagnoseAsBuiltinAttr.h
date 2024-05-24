@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Attr;
 class DiagnoseAsBuiltinAttr;
+class File;
 class FunctionDecl;
 class InheritableAttr;
 class Token;
@@ -32,15 +33,16 @@ class MX_EXPORT DiagnoseAsBuiltinAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<DiagnoseAsBuiltinAttr> in(const Index &index);
-  static gap::generator<DiagnoseAsBuiltinAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<DiagnoseAsBuiltinAttr> by_id(const Index &, EntityId);
   static gap::generator<DiagnoseAsBuiltinAttr> in(const Fragment &frag);
   static gap::generator<DiagnoseAsBuiltinAttr> in(const File &file);
+  static gap::generator<DiagnoseAsBuiltinAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::DIAGNOSE_AS_BUILTIN;
   }
+
+  static std::optional<DiagnoseAsBuiltinAttr> by_id(const Index &, EntityId);
 
   static std::optional<DiagnoseAsBuiltinAttr> from_base(const Attr &parent);
   inline static std::optional<DiagnoseAsBuiltinAttr> from(const Attr &parent) {

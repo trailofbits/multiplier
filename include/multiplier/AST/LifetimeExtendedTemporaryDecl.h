@@ -17,6 +17,7 @@ class Fragment;
 class Index;
 class Decl;
 class Expr;
+class File;
 class LifetimeExtendedTemporaryDecl;
 class Stmt;
 class Token;
@@ -33,11 +34,10 @@ class MX_EXPORT LifetimeExtendedTemporaryDecl : public Decl {
   friend class Decl;
  public:
   static gap::generator<LifetimeExtendedTemporaryDecl> in(const Index &index);
-  static gap::generator<LifetimeExtendedTemporaryDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<LifetimeExtendedTemporaryDecl> by_id(const Index &, EntityId);
   static gap::generator<LifetimeExtendedTemporaryDecl> in(const Fragment &frag);
   static gap::generator<LifetimeExtendedTemporaryDecl> in(const File &file);
+  static gap::generator<LifetimeExtendedTemporaryDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<LifetimeExtendedTemporaryDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<LifetimeExtendedTemporaryDecl, ir::Operation>> in(const Compilation &tu);
@@ -57,6 +57,8 @@ class MX_EXPORT LifetimeExtendedTemporaryDecl : public Decl {
   LifetimeExtendedTemporaryDecl canonical_declaration(void) const;
   std::optional<LifetimeExtendedTemporaryDecl> definition(void) const;
   gap::generator<LifetimeExtendedTemporaryDecl> redeclarations(void) const &;
+  static std::optional<LifetimeExtendedTemporaryDecl> by_id(const Index &, EntityId);
+
   static std::optional<LifetimeExtendedTemporaryDecl> from_base(const Decl &parent);
   inline static std::optional<LifetimeExtendedTemporaryDecl> from(const Decl &parent) {
     return from_base(parent);

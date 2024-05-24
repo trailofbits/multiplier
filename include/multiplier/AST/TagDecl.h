@@ -17,6 +17,7 @@ class Fragment;
 class Index;
 class Reference;
 class Decl;
+class File;
 class NamedDecl;
 class Stmt;
 class TagDecl;
@@ -39,11 +40,10 @@ class MX_EXPORT TagDecl : public TypeDecl {
   friend class Decl;
  public:
   static gap::generator<TagDecl> in(const Index &index);
-  static gap::generator<TagDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<TagDecl> by_id(const Index &, EntityId);
   static gap::generator<TagDecl> in(const Fragment &frag);
   static gap::generator<TagDecl> in(const File &file);
+  static gap::generator<TagDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<TagDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<TagDecl, ir::Operation>> in(const Compilation &tu);
@@ -59,6 +59,8 @@ class MX_EXPORT TagDecl : public TypeDecl {
   TagDecl canonical_declaration(void) const;
   std::optional<TagDecl> definition(void) const;
   gap::generator<TagDecl> redeclarations(void) const &;
+  static std::optional<TagDecl> by_id(const Index &, EntityId);
+
   static std::optional<TagDecl> from_base(const Decl &parent);
   inline static std::optional<TagDecl> from(const Decl &parent) {
     return from_base(parent);

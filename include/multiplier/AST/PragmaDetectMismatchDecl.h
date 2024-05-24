@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Decl;
+class File;
 class PragmaDetectMismatchDecl;
 class Stmt;
 class Token;
@@ -30,11 +31,10 @@ class MX_EXPORT PragmaDetectMismatchDecl : public Decl {
   friend class Decl;
  public:
   static gap::generator<PragmaDetectMismatchDecl> in(const Index &index);
-  static gap::generator<PragmaDetectMismatchDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<PragmaDetectMismatchDecl> by_id(const Index &, EntityId);
   static gap::generator<PragmaDetectMismatchDecl> in(const Fragment &frag);
   static gap::generator<PragmaDetectMismatchDecl> in(const File &file);
+  static gap::generator<PragmaDetectMismatchDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<PragmaDetectMismatchDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<PragmaDetectMismatchDecl, ir::Operation>> in(const Compilation &tu);
@@ -54,6 +54,8 @@ class MX_EXPORT PragmaDetectMismatchDecl : public Decl {
   PragmaDetectMismatchDecl canonical_declaration(void) const;
   std::optional<PragmaDetectMismatchDecl> definition(void) const;
   gap::generator<PragmaDetectMismatchDecl> redeclarations(void) const &;
+  static std::optional<PragmaDetectMismatchDecl> by_id(const Index &, EntityId);
+
   static std::optional<PragmaDetectMismatchDecl> from_base(const Decl &parent);
   inline static std::optional<PragmaDetectMismatchDecl> from(const Decl &parent) {
     return from_base(parent);

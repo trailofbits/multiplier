@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Attr;
 class CUDAConstantAttr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT CUDAConstantAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<CUDAConstantAttr> in(const Index &index);
-  static gap::generator<CUDAConstantAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CUDAConstantAttr> by_id(const Index &, EntityId);
   static gap::generator<CUDAConstantAttr> in(const Fragment &frag);
   static gap::generator<CUDAConstantAttr> in(const File &file);
+  static gap::generator<CUDAConstantAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CUDA_CONSTANT;
   }
+
+  static std::optional<CUDAConstantAttr> by_id(const Index &, EntityId);
 
   static std::optional<CUDAConstantAttr> from_base(const Attr &parent);
   inline static std::optional<CUDAConstantAttr> from(const Attr &parent) {

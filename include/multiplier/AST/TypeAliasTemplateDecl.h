@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Decl;
+class File;
 class NamedDecl;
 class RedeclarableTemplateDecl;
 class Stmt;
@@ -36,11 +37,10 @@ class MX_EXPORT TypeAliasTemplateDecl : public RedeclarableTemplateDecl {
   friend class Decl;
  public:
   static gap::generator<TypeAliasTemplateDecl> in(const Index &index);
-  static gap::generator<TypeAliasTemplateDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<TypeAliasTemplateDecl> by_id(const Index &, EntityId);
   static gap::generator<TypeAliasTemplateDecl> in(const Fragment &frag);
   static gap::generator<TypeAliasTemplateDecl> in(const File &file);
+  static gap::generator<TypeAliasTemplateDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<TypeAliasTemplateDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<TypeAliasTemplateDecl, ir::Operation>> in(const Compilation &tu);
@@ -60,6 +60,8 @@ class MX_EXPORT TypeAliasTemplateDecl : public RedeclarableTemplateDecl {
   TypeAliasTemplateDecl canonical_declaration(void) const;
   std::optional<TypeAliasTemplateDecl> definition(void) const;
   gap::generator<TypeAliasTemplateDecl> redeclarations(void) const &;
+  static std::optional<TypeAliasTemplateDecl> by_id(const Index &, EntityId);
+
   static std::optional<TypeAliasTemplateDecl> from_base(const Decl &parent);
   inline static std::optional<TypeAliasTemplateDecl> from(const Decl &parent) {
     return from_base(parent);

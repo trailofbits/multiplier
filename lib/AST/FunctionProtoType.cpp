@@ -27,6 +27,17 @@ static const TypeKind kFunctionProtoTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<FunctionProtoType> FunctionProtoType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kFunctionProtoTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<FunctionProtoType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<FunctionProtoType> FunctionProtoType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = FunctionProtoType::from(*ctx)) {
@@ -68,17 +79,6 @@ std::optional<FunctionProtoType> FunctionProtoType::from_base(const Type &parent
       return reinterpret_cast<const FunctionProtoType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<FunctionProtoType> FunctionProtoType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kFunctionProtoTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<FunctionProtoType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

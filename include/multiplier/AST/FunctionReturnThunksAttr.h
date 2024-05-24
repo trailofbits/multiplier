@@ -16,6 +16,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class FunctionReturnThunksAttr;
 class InheritableAttr;
 class Token;
@@ -32,15 +33,16 @@ class MX_EXPORT FunctionReturnThunksAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<FunctionReturnThunksAttr> in(const Index &index);
-  static gap::generator<FunctionReturnThunksAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<FunctionReturnThunksAttr> by_id(const Index &, EntityId);
   static gap::generator<FunctionReturnThunksAttr> in(const Fragment &frag);
   static gap::generator<FunctionReturnThunksAttr> in(const File &file);
+  static gap::generator<FunctionReturnThunksAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::FUNCTION_RETURN_THUNKS;
   }
+
+  static std::optional<FunctionReturnThunksAttr> by_id(const Index &, EntityId);
 
   static std::optional<FunctionReturnThunksAttr> from_base(const Attr &parent);
   inline static std::optional<FunctionReturnThunksAttr> from(const Attr &parent) {

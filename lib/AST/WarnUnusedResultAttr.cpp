@@ -8,6 +8,7 @@
 
 #include <multiplier/AST/WarnUnusedResultAttr.h>
 #include <multiplier/AST/Attr.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/AST/InheritableAttr.h>
 #include <multiplier/Frontend/Token.h>
 
@@ -24,6 +25,43 @@ static const AttrKind kWarnUnusedResultAttrDerivedKinds[] = {
     WarnUnusedResultAttr::static_kind(),
 };
 }  // namespace
+
+gap::generator<WarnUnusedResultAttr> WarnUnusedResultAttr::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (AttrKind k : kWarnUnusedResultAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
+      if (std::optional<WarnUnusedResultAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<WarnUnusedResultAttr> WarnUnusedResultAttr::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (AttrKind k : kWarnUnusedResultAttrDerivedKinds) {
+      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+        if (std::optional<WarnUnusedResultAttr> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+gap::generator<WarnUnusedResultAttr> WarnUnusedResultAttr::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (AttrKind k : kWarnUnusedResultAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+      if (std::optional<WarnUnusedResultAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
 
 gap::generator<WarnUnusedResultAttr> WarnUnusedResultAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -69,43 +107,6 @@ std::optional<WarnUnusedResultAttr> WarnUnusedResultAttr::from_base(const Attr &
   }
 }
 
-gap::generator<WarnUnusedResultAttr> WarnUnusedResultAttr::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (AttrKind k : kWarnUnusedResultAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<WarnUnusedResultAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<WarnUnusedResultAttr> WarnUnusedResultAttr::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (AttrKind k : kWarnUnusedResultAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<WarnUnusedResultAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<WarnUnusedResultAttr> WarnUnusedResultAttr::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (AttrKind k : kWarnUnusedResultAttrDerivedKinds) {
-      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<WarnUnusedResultAttr> e = from_base(std::move(eptr))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
-  }
-}
-
 std::optional<WarnUnusedResultAttr> WarnUnusedResultAttr::from(const Reference &r) {
   return WarnUnusedResultAttr::from(r.as_attribute());
 }
@@ -125,16 +126,16 @@ std::optional<WarnUnusedResultAttr> WarnUnusedResultAttr::from(const TokenContex
 }
 
 bool WarnUnusedResultAttr::is_cxx11_no_discard(void) const {
-  return impl->reader.getVal12();
+  return impl->reader.getVal14();
 }
 
 std::string_view WarnUnusedResultAttr::message(void) const {
-  capnp::Text::Reader data = impl->reader.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal11();
   return std::string_view(data.cStr(), data.size());
 }
 
 WarnUnusedResultAttrSpelling WarnUnusedResultAttr::semantic_spelling(void) const {
-  return static_cast<WarnUnusedResultAttrSpelling>(impl->reader.getVal10());
+  return static_cast<WarnUnusedResultAttrSpelling>(impl->reader.getVal12());
 }
 
 #pragma GCC diagnostic pop

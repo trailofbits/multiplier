@@ -25,6 +25,17 @@ static const TypeKind kTypeOfExprTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<TypeOfExprType> TypeOfExprType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kTypeOfExprTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<TypeOfExprType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<TypeOfExprType> TypeOfExprType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = TypeOfExprType::from(*ctx)) {
@@ -66,17 +77,6 @@ std::optional<TypeOfExprType> TypeOfExprType::from_base(const Type &parent) {
       return reinterpret_cast<const TypeOfExprType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<TypeOfExprType> TypeOfExprType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kTypeOfExprTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<TypeOfExprType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

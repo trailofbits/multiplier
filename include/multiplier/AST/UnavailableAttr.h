@@ -16,6 +16,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class Token;
 class UnavailableAttr;
@@ -32,15 +33,16 @@ class MX_EXPORT UnavailableAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<UnavailableAttr> in(const Index &index);
-  static gap::generator<UnavailableAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<UnavailableAttr> by_id(const Index &, EntityId);
   static gap::generator<UnavailableAttr> in(const Fragment &frag);
   static gap::generator<UnavailableAttr> in(const File &file);
+  static gap::generator<UnavailableAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::UNAVAILABLE;
   }
+
+  static std::optional<UnavailableAttr> by_id(const Index &, EntityId);
 
   static std::optional<UnavailableAttr> from_base(const Attr &parent);
   inline static std::optional<UnavailableAttr> from(const Attr &parent) {

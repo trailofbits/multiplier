@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class Token;
 class Type;
@@ -32,15 +33,16 @@ class MX_EXPORT VecTypeHintAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<VecTypeHintAttr> in(const Index &index);
-  static gap::generator<VecTypeHintAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<VecTypeHintAttr> by_id(const Index &, EntityId);
   static gap::generator<VecTypeHintAttr> in(const Fragment &frag);
   static gap::generator<VecTypeHintAttr> in(const File &file);
+  static gap::generator<VecTypeHintAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::VEC_TYPE_HINT;
   }
+
+  static std::optional<VecTypeHintAttr> by_id(const Index &, EntityId);
 
   static std::optional<VecTypeHintAttr> from_base(const Attr &parent);
   inline static std::optional<VecTypeHintAttr> from(const Attr &parent) {

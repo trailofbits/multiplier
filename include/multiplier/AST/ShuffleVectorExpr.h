@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Decl;
 class Expr;
+class File;
 class ShuffleVectorExpr;
 class Stmt;
 class Token;
@@ -34,11 +35,10 @@ class MX_EXPORT ShuffleVectorExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<ShuffleVectorExpr> in(const Index &index);
-  static gap::generator<ShuffleVectorExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ShuffleVectorExpr> by_id(const Index &, EntityId);
   static gap::generator<ShuffleVectorExpr> in(const Fragment &frag);
   static gap::generator<ShuffleVectorExpr> in(const File &file);
+  static gap::generator<ShuffleVectorExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<ShuffleVectorExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<ShuffleVectorExpr, ir::Operation>> in(const Compilation &tu);
@@ -54,6 +54,8 @@ class MX_EXPORT ShuffleVectorExpr : public Expr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<ShuffleVectorExpr> by_id(const Index &, EntityId);
 
   static std::optional<ShuffleVectorExpr> from_base(const Stmt &parent);
   inline static std::optional<ShuffleVectorExpr> from(const Stmt &parent) {

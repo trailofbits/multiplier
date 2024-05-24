@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class GNUInlineAttr;
 class InheritableAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT GNUInlineAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<GNUInlineAttr> in(const Index &index);
-  static gap::generator<GNUInlineAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<GNUInlineAttr> by_id(const Index &, EntityId);
   static gap::generator<GNUInlineAttr> in(const Fragment &frag);
   static gap::generator<GNUInlineAttr> in(const File &file);
+  static gap::generator<GNUInlineAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::GNU_INLINE;
   }
+
+  static std::optional<GNUInlineAttr> by_id(const Index &, EntityId);
 
   static std::optional<GNUInlineAttr> from_base(const Attr &parent);
   inline static std::optional<GNUInlineAttr> from(const Attr &parent) {

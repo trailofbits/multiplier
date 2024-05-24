@@ -17,6 +17,7 @@ class Index;
 class AMDGPUWavesPerEUAttr;
 class Attr;
 class Expr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -32,15 +33,16 @@ class MX_EXPORT AMDGPUWavesPerEUAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<AMDGPUWavesPerEUAttr> in(const Index &index);
-  static gap::generator<AMDGPUWavesPerEUAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<AMDGPUWavesPerEUAttr> by_id(const Index &, EntityId);
   static gap::generator<AMDGPUWavesPerEUAttr> in(const Fragment &frag);
   static gap::generator<AMDGPUWavesPerEUAttr> in(const File &file);
+  static gap::generator<AMDGPUWavesPerEUAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::AMDGPU_WAVES_PER_EU;
   }
+
+  static std::optional<AMDGPUWavesPerEUAttr> by_id(const Index &, EntityId);
 
   static std::optional<AMDGPUWavesPerEUAttr> from_base(const Attr &parent);
   inline static std::optional<AMDGPUWavesPerEUAttr> from(const Attr &parent) {

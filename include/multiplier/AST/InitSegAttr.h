@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InitSegAttr;
 class Token;
 namespace ir {
@@ -29,15 +30,16 @@ class MX_EXPORT InitSegAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<InitSegAttr> in(const Index &index);
-  static gap::generator<InitSegAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<InitSegAttr> by_id(const Index &, EntityId);
   static gap::generator<InitSegAttr> in(const Fragment &frag);
   static gap::generator<InitSegAttr> in(const File &file);
+  static gap::generator<InitSegAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::INIT_SEG;
   }
+
+  static std::optional<InitSegAttr> by_id(const Index &, EntityId);
 
   static std::optional<InitSegAttr> from_base(const Attr &parent);
   inline static std::optional<InitSegAttr> from(const Attr &parent) {

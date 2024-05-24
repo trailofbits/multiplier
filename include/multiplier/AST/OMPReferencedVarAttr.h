@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Attr;
 class Expr;
+class File;
 class OMPReferencedVarAttr;
 class Token;
 namespace ir {
@@ -30,15 +31,16 @@ class MX_EXPORT OMPReferencedVarAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<OMPReferencedVarAttr> in(const Index &index);
-  static gap::generator<OMPReferencedVarAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<OMPReferencedVarAttr> by_id(const Index &, EntityId);
   static gap::generator<OMPReferencedVarAttr> in(const Fragment &frag);
   static gap::generator<OMPReferencedVarAttr> in(const File &file);
+  static gap::generator<OMPReferencedVarAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OMP_REFERENCED_VAR;
   }
+
+  static std::optional<OMPReferencedVarAttr> by_id(const Index &, EntityId);
 
   static std::optional<OMPReferencedVarAttr> from_base(const Attr &parent);
   inline static std::optional<OMPReferencedVarAttr> from(const Attr &parent) {

@@ -538,34 +538,36 @@ struct Type @0xd739e808bc1b3fd7{
 }
 
 struct Attr @0xe5b70746662da9f3{
-  val24 @0 :UInt32;
-  val10 @1 :UInt8;
-  val18 @2 :UInt8;
-  val19 @3 :UInt8;
+  val26 @0 :UInt32;
+  val12 @1 :UInt8;
+  val20 @2 :UInt8;
+  val21 @3 :UInt8;
   val0 @4 :UInt64;
-  val6 @5 :UInt64;
-  val7 @6 :UInt64;
+  val1 @5 :UInt64;
+  val2 @6 :UInt64;
   val8 @7 :UInt64;
-  val20 @8 :UInt64;
-  val23 @9 :UInt64;
-  val1 @10 :Bool;
-  val2 @11 :Bool;
+  val9 @8 :UInt64;
+  val10 @9 :UInt64;
+  val22 @10 :UInt64;
+  val25 @11 :UInt64;
   val3 @12 :Bool;
   val4 @13 :Bool;
-  val11 @14 :Bool;
-  val12 @15 :Bool;
+  val5 @14 :Bool;
+  val6 @15 :Bool;
   val13 @16 :Bool;
   val14 @17 :Bool;
   val15 @18 :Bool;
   val16 @19 :Bool;
-  val25 @20 :Bool;
-  val26 @21 :Bool;
+  val17 @20 :Bool;
+  val18 @21 :Bool;
   val27 @22 :Bool;
-  val9 @23 :Text;
-  val21 @24 :Text;
-  val22 @25 :Text;
-  val5 @26 :UInt16;
-  val17 @27 :UInt16;
+  val28 @23 :Bool;
+  val29 @24 :Bool;
+  val11 @25 :Text;
+  val23 @26 :Text;
+  val24 @27 :Text;
+  val7 @28 :UInt16;
+  val19 @29 :UInt16;
 }
 
 struct Macro @0xf88157fb8bf2eeff{
@@ -603,31 +605,36 @@ struct TemplateArgument @0xb5127dad01992f67{
 }
 
 struct TemplateParameterList @0xee0d4e6aba92fdde{
-  val9 @0 :List(UInt64);
-  val1 @1 :Bool;
-  val2 @2 :Bool;
-  val3 @3 :UInt64;
-  val4 @4 :UInt64;
-  val5 @5 :UInt64;
-  val6 @6 :UInt64;
-  val7 @7 :UInt64;
-  val8 @8 :UInt64;
-  val0 @9 :UInt32;
+  val10 @0 :List(UInt64);
+  val2 @1 :Bool;
+  val3 @2 :Bool;
+  val1 @3 :UInt32;
+  val0 @4 :UInt64;
+  val4 @5 :UInt64;
+  val5 @6 :UInt64;
+  val6 @7 :UInt64;
+  val7 @8 :UInt64;
+  val8 @9 :UInt64;
+  val9 @10 :UInt64;
 }
 
 struct CXXBaseSpecifier @0x8e0e4024ab6be99f{
-  val5 @0 :UInt8;
-  val9 @1 :UInt8;
-  val10 @2 :UInt8;
-  val4 @3 :Bool;
-  val6 @4 :Bool;
-  val7 @5 :Bool;
-  val0 @6 :UInt64;
-  val1 @7 :UInt64;
-  val2 @8 :UInt64;
-  val3 @9 :UInt64;
-  val8 @10 :UInt64;
-  val11 @11 :UInt64;
+  val11 @0 :UInt8;
+  val12 @1 :UInt8;
+  val13 @2 :UInt8;
+  val2 @3 :Bool;
+  val3 @4 :Bool;
+  val8 @5 :Bool;
+  val9 @6 :Bool;
+  val10 @7 :Bool;
+  val0 @8 :UInt64;
+  val1 @9 :UInt64;
+  val4 @10 :UInt64;
+  val5 @11 :UInt64;
+  val6 @12 :UInt64;
+  val7 @13 :UInt64;
+  val14 @14 :UInt64;
+  val15 @15 :UInt64;
 }
 
 struct Designator @0x8fa2d595d812339e{
@@ -647,24 +654,25 @@ struct Designator @0x8fa2d595d812339e{
 }
 
 struct CXXCtorInitializer @0x96ba2ce1a1157040{
-  val9 @0 :UInt64;
-  val10 @1 :UInt64;
-  val11 @2 :UInt64;
-  val12 @3 :UInt64;
-  val13 @4 :UInt64;
-  val14 @5 :UInt64;
-  val15 @6 :UInt64;
-  val16 @7 :UInt64;
-  val17 @8 :UInt64;
-  val18 @9 :UInt64;
-  val0 @10 :Bool;
-  val1 @11 :Bool;
-  val2 @12 :Bool;
-  val3 @13 :Bool;
-  val4 @14 :Bool;
-  val5 @15 :Bool;
-  val6 @16 :Bool;
-  val7 @17 :Bool;
-  val8 @18 :Bool;
+  val1 @0 :Bool;
+  val2 @1 :Bool;
+  val3 @2 :Bool;
+  val4 @3 :Bool;
+  val5 @4 :Bool;
+  val6 @5 :Bool;
+  val7 @6 :Bool;
+  val8 @7 :Bool;
+  val9 @8 :Bool;
+  val0 @9 :UInt64;
+  val10 @10 :UInt64;
+  val11 @11 :UInt64;
+  val12 @12 :UInt64;
+  val13 @13 :UInt64;
+  val14 @14 :UInt64;
+  val15 @15 :UInt64;
+  val16 @16 :UInt64;
+  val17 @17 :UInt64;
+  val18 @18 :UInt64;
+  val19 @19 :UInt64;
 }
 

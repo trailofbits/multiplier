@@ -18,6 +18,7 @@ class Reference;
 class BlockDecl;
 class CompoundStmt;
 class Decl;
+class File;
 class ParmVarDecl;
 class Stmt;
 class Token;
@@ -34,11 +35,10 @@ class MX_EXPORT BlockDecl : public Decl {
   friend class Decl;
  public:
   static gap::generator<BlockDecl> in(const Index &index);
-  static gap::generator<BlockDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<BlockDecl> by_id(const Index &, EntityId);
   static gap::generator<BlockDecl> in(const Fragment &frag);
   static gap::generator<BlockDecl> in(const File &file);
+  static gap::generator<BlockDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<BlockDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<BlockDecl, ir::Operation>> in(const Compilation &tu);
@@ -58,6 +58,8 @@ class MX_EXPORT BlockDecl : public Decl {
   BlockDecl canonical_declaration(void) const;
   std::optional<BlockDecl> definition(void) const;
   gap::generator<BlockDecl> redeclarations(void) const &;
+  static std::optional<BlockDecl> by_id(const Index &, EntityId);
+
   static std::optional<BlockDecl> from_base(const Decl &parent);
   inline static std::optional<BlockDecl> from(const Decl &parent) {
     return from_base(parent);

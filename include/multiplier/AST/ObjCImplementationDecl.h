@@ -17,6 +17,7 @@ class Index;
 class Reference;
 class CXXCtorInitializer;
 class Decl;
+class File;
 class NamedDecl;
 class ObjCContainerDecl;
 class ObjCImplDecl;
@@ -40,11 +41,10 @@ class MX_EXPORT ObjCImplementationDecl : public ObjCImplDecl {
   friend class Decl;
  public:
   static gap::generator<ObjCImplementationDecl> in(const Index &index);
-  static gap::generator<ObjCImplementationDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ObjCImplementationDecl> by_id(const Index &, EntityId);
   static gap::generator<ObjCImplementationDecl> in(const Fragment &frag);
   static gap::generator<ObjCImplementationDecl> in(const File &file);
+  static gap::generator<ObjCImplementationDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<ObjCImplementationDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<ObjCImplementationDecl, ir::Operation>> in(const Compilation &tu);
@@ -64,6 +64,8 @@ class MX_EXPORT ObjCImplementationDecl : public ObjCImplDecl {
   ObjCImplementationDecl canonical_declaration(void) const;
   std::optional<ObjCImplementationDecl> definition(void) const;
   gap::generator<ObjCImplementationDecl> redeclarations(void) const &;
+  static std::optional<ObjCImplementationDecl> by_id(const Index &, EntityId);
+
   static std::optional<ObjCImplementationDecl> from_base(const Decl &parent);
   inline static std::optional<ObjCImplementationDecl> from(const Decl &parent) {
     return from_base(parent);

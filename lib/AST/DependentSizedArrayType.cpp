@@ -27,6 +27,17 @@ static const TypeKind kDependentSizedArrayTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<DependentSizedArrayType> DependentSizedArrayType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kDependentSizedArrayTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<DependentSizedArrayType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<DependentSizedArrayType> DependentSizedArrayType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = DependentSizedArrayType::from(*ctx)) {
@@ -68,17 +79,6 @@ std::optional<DependentSizedArrayType> DependentSizedArrayType::from_base(const 
       return reinterpret_cast<const DependentSizedArrayType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<DependentSizedArrayType> DependentSizedArrayType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kDependentSizedArrayTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<DependentSizedArrayType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

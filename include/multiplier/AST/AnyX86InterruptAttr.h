@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class AnyX86InterruptAttr;
 class Attr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT AnyX86InterruptAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<AnyX86InterruptAttr> in(const Index &index);
-  static gap::generator<AnyX86InterruptAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<AnyX86InterruptAttr> by_id(const Index &, EntityId);
   static gap::generator<AnyX86InterruptAttr> in(const Fragment &frag);
   static gap::generator<AnyX86InterruptAttr> in(const File &file);
+  static gap::generator<AnyX86InterruptAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ANY_X86_INTERRUPT;
   }
+
+  static std::optional<AnyX86InterruptAttr> by_id(const Index &, EntityId);
 
   static std::optional<AnyX86InterruptAttr> from_base(const Attr &parent);
   inline static std::optional<AnyX86InterruptAttr> from(const Attr &parent) {

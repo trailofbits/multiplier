@@ -31,11 +31,12 @@ class MX_EXPORT PackExpansionType : public Type {
   static gap::generator<PackExpansionType> in(const Index &index);
   static gap::generator<PackExpansionType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<PackExpansionType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::PACK_EXPANSION;
   }
+
+  static std::optional<PackExpansionType> by_id(const Index &, EntityId);
 
   static std::optional<PackExpansionType> from_base(const Type &parent);
   inline static std::optional<PackExpansionType> from(const Type &parent) {

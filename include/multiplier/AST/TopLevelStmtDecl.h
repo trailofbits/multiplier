@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Decl;
+class File;
 class Stmt;
 class Token;
 class TopLevelStmtDecl;
@@ -30,11 +31,10 @@ class MX_EXPORT TopLevelStmtDecl : public Decl {
   friend class Decl;
  public:
   static gap::generator<TopLevelStmtDecl> in(const Index &index);
-  static gap::generator<TopLevelStmtDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<TopLevelStmtDecl> by_id(const Index &, EntityId);
   static gap::generator<TopLevelStmtDecl> in(const Fragment &frag);
   static gap::generator<TopLevelStmtDecl> in(const File &file);
+  static gap::generator<TopLevelStmtDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<TopLevelStmtDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<TopLevelStmtDecl, ir::Operation>> in(const Compilation &tu);
@@ -54,6 +54,8 @@ class MX_EXPORT TopLevelStmtDecl : public Decl {
   TopLevelStmtDecl canonical_declaration(void) const;
   std::optional<TopLevelStmtDecl> definition(void) const;
   gap::generator<TopLevelStmtDecl> redeclarations(void) const &;
+  static std::optional<TopLevelStmtDecl> by_id(const Index &, EntityId);
+
   static std::optional<TopLevelStmtDecl> from_base(const Decl &parent);
   inline static std::optional<TopLevelStmtDecl> from(const Decl &parent) {
     return from_base(parent);

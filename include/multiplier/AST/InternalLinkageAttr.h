@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class InternalLinkageAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT InternalLinkageAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<InternalLinkageAttr> in(const Index &index);
-  static gap::generator<InternalLinkageAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<InternalLinkageAttr> by_id(const Index &, EntityId);
   static gap::generator<InternalLinkageAttr> in(const Fragment &frag);
   static gap::generator<InternalLinkageAttr> in(const File &file);
+  static gap::generator<InternalLinkageAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::INTERNAL_LINKAGE;
   }
+
+  static std::optional<InternalLinkageAttr> by_id(const Index &, EntityId);
 
   static std::optional<InternalLinkageAttr> from_base(const Attr &parent);
   inline static std::optional<InternalLinkageAttr> from(const Attr &parent) {

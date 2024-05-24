@@ -17,6 +17,7 @@ class Index;
 class Decl;
 class DeclStmt;
 class Expr;
+class File;
 class Stmt;
 class Token;
 class VarDecl;
@@ -33,11 +34,10 @@ class MX_EXPORT WhileStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<WhileStmt> in(const Index &index);
-  static gap::generator<WhileStmt> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<WhileStmt> by_id(const Index &, EntityId);
   static gap::generator<WhileStmt> in(const Fragment &frag);
   static gap::generator<WhileStmt> in(const File &file);
+  static gap::generator<WhileStmt> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<WhileStmt> from(const ir::Operation &op);
   static gap::generator<std::pair<WhileStmt, ir::Operation>> in(const Compilation &tu);
@@ -53,6 +53,8 @@ class MX_EXPORT WhileStmt : public Stmt {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<WhileStmt> by_id(const Index &, EntityId);
 
   static std::optional<WhileStmt> from_base(const Stmt &parent);
   inline static std::optional<WhileStmt> from(const Stmt &parent) {

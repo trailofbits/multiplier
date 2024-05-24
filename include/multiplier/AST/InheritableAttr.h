@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -29,11 +30,12 @@ class MX_EXPORT InheritableAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<InheritableAttr> in(const Index &index);
-  static gap::generator<InheritableAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<InheritableAttr> by_id(const Index &, EntityId);
   static gap::generator<InheritableAttr> in(const Fragment &frag);
   static gap::generator<InheritableAttr> in(const File &file);
+  static gap::generator<InheritableAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
+
+  static std::optional<InheritableAttr> by_id(const Index &, EntityId);
 
   static std::optional<InheritableAttr> from_base(const Attr &parent);
   inline static std::optional<InheritableAttr> from(const Attr &parent) {

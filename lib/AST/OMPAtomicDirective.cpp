@@ -9,6 +9,7 @@
 #include <multiplier/AST/OMPAtomicDirective.h>
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/Expr.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/AST/OMPExecutableDirective.h>
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/Frontend/Token.h>
@@ -28,6 +29,43 @@ static const StmtKind kOMPAtomicDirectiveDerivedKinds[] = {
     OMPAtomicDirective::static_kind(),
 };
 }  // namespace
+
+gap::generator<OMPAtomicDirective> OMPAtomicDirective::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (StmtKind k : kOMPAtomicDirectiveDerivedKinds) {
+    for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
+      if (std::optional<OMPAtomicDirective> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<OMPAtomicDirective> OMPAtomicDirective::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (StmtKind k : kOMPAtomicDirectiveDerivedKinds) {
+      for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
+        if (std::optional<OMPAtomicDirective> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+gap::generator<OMPAtomicDirective> OMPAtomicDirective::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (StmtKind k : kOMPAtomicDirectiveDerivedKinds) {
+    for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
+      if (std::optional<OMPAtomicDirective> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
 
 gap::generator<OMPAtomicDirective> OMPAtomicDirective::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -133,43 +171,6 @@ std::optional<OMPAtomicDirective> OMPAtomicDirective::from_base(const Stmt &pare
       return reinterpret_cast<const OMPAtomicDirective &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<OMPAtomicDirective> OMPAtomicDirective::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (StmtKind k : kOMPAtomicDirectiveDerivedKinds) {
-    for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<OMPAtomicDirective> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<OMPAtomicDirective> OMPAtomicDirective::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (StmtKind k : kOMPAtomicDirectiveDerivedKinds) {
-    for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<OMPAtomicDirective> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<OMPAtomicDirective> OMPAtomicDirective::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (StmtKind k : kOMPAtomicDirectiveDerivedKinds) {
-      for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<OMPAtomicDirective> e = from_base(std::move(eptr))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
   }
 }
 

@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class AMDGPUNumVGPRAttr;
 class Attr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT AMDGPUNumVGPRAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<AMDGPUNumVGPRAttr> in(const Index &index);
-  static gap::generator<AMDGPUNumVGPRAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<AMDGPUNumVGPRAttr> by_id(const Index &, EntityId);
   static gap::generator<AMDGPUNumVGPRAttr> in(const Fragment &frag);
   static gap::generator<AMDGPUNumVGPRAttr> in(const File &file);
+  static gap::generator<AMDGPUNumVGPRAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::AMDGPU_NUM_VGPR;
   }
+
+  static std::optional<AMDGPUNumVGPRAttr> by_id(const Index &, EntityId);
 
   static std::optional<AMDGPUNumVGPRAttr> from_base(const Attr &parent);
   inline static std::optional<AMDGPUNumVGPRAttr> from(const Attr &parent) {

@@ -19,6 +19,7 @@ class Reference;
 class CXXMethodDecl;
 class Decl;
 class DeclaratorDecl;
+class File;
 class FunctionDecl;
 class NamedDecl;
 class Stmt;
@@ -41,11 +42,10 @@ class MX_EXPORT CXXMethodDecl : public FunctionDecl {
   friend class Decl;
  public:
   static gap::generator<CXXMethodDecl> in(const Index &index);
-  static gap::generator<CXXMethodDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CXXMethodDecl> by_id(const Index &, EntityId);
   static gap::generator<CXXMethodDecl> in(const Fragment &frag);
   static gap::generator<CXXMethodDecl> in(const File &file);
+  static gap::generator<CXXMethodDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<CXXMethodDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<CXXMethodDecl, ir::Operation>> in(const Compilation &tu);
@@ -65,6 +65,8 @@ class MX_EXPORT CXXMethodDecl : public FunctionDecl {
   CXXMethodDecl canonical_declaration(void) const;
   std::optional<CXXMethodDecl> definition(void) const;
   gap::generator<CXXMethodDecl> redeclarations(void) const &;
+  static std::optional<CXXMethodDecl> by_id(const Index &, EntityId);
+
   static std::optional<CXXMethodDecl> from_base(const Decl &parent);
   inline static std::optional<CXXMethodDecl> from(const Decl &parent) {
     return from_base(parent);

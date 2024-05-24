@@ -8,6 +8,7 @@
 
 #include <multiplier/AST/OMPTeamsGenericLoopDirective.h>
 #include <multiplier/AST/Decl.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/AST/OMPExecutableDirective.h>
 #include <multiplier/AST/OMPLoopBasedDirective.h>
 #include <multiplier/AST/OMPLoopDirective.h>
@@ -29,6 +30,43 @@ static const StmtKind kOMPTeamsGenericLoopDirectiveDerivedKinds[] = {
     OMPTeamsGenericLoopDirective::static_kind(),
 };
 }  // namespace
+
+gap::generator<OMPTeamsGenericLoopDirective> OMPTeamsGenericLoopDirective::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (StmtKind k : kOMPTeamsGenericLoopDirectiveDerivedKinds) {
+    for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
+      if (std::optional<OMPTeamsGenericLoopDirective> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<OMPTeamsGenericLoopDirective> OMPTeamsGenericLoopDirective::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (StmtKind k : kOMPTeamsGenericLoopDirectiveDerivedKinds) {
+      for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
+        if (std::optional<OMPTeamsGenericLoopDirective> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+gap::generator<OMPTeamsGenericLoopDirective> OMPTeamsGenericLoopDirective::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (StmtKind k : kOMPTeamsGenericLoopDirectiveDerivedKinds) {
+    for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
+      if (std::optional<OMPTeamsGenericLoopDirective> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
 
 gap::generator<OMPTeamsGenericLoopDirective> OMPTeamsGenericLoopDirective::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -134,43 +172,6 @@ std::optional<OMPTeamsGenericLoopDirective> OMPTeamsGenericLoopDirective::from_b
       return reinterpret_cast<const OMPTeamsGenericLoopDirective &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<OMPTeamsGenericLoopDirective> OMPTeamsGenericLoopDirective::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (StmtKind k : kOMPTeamsGenericLoopDirectiveDerivedKinds) {
-    for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<OMPTeamsGenericLoopDirective> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<OMPTeamsGenericLoopDirective> OMPTeamsGenericLoopDirective::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (StmtKind k : kOMPTeamsGenericLoopDirectiveDerivedKinds) {
-    for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<OMPTeamsGenericLoopDirective> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<OMPTeamsGenericLoopDirective> OMPTeamsGenericLoopDirective::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (StmtKind k : kOMPTeamsGenericLoopDirectiveDerivedKinds) {
-      for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<OMPTeamsGenericLoopDirective> e = from_base(std::move(eptr))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
   }
 }
 

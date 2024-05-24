@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Attr;
 class CoroReturnTypeAttr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT CoroReturnTypeAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<CoroReturnTypeAttr> in(const Index &index);
-  static gap::generator<CoroReturnTypeAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CoroReturnTypeAttr> by_id(const Index &, EntityId);
   static gap::generator<CoroReturnTypeAttr> in(const Fragment &frag);
   static gap::generator<CoroReturnTypeAttr> in(const File &file);
+  static gap::generator<CoroReturnTypeAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CORO_RETURN_TYPE;
   }
+
+  static std::optional<CoroReturnTypeAttr> by_id(const Index &, EntityId);
 
   static std::optional<CoroReturnTypeAttr> from_base(const Attr &parent);
   inline static std::optional<CoroReturnTypeAttr> from(const Attr &parent) {

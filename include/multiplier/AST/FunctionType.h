@@ -32,6 +32,7 @@ class MX_EXPORT FunctionType : public Type {
   static gap::generator<FunctionType> in(const Index &index);
   static gap::generator<FunctionType> containing(const Token &tok);
   bool contains(const Token &tok) const;
+
   static std::optional<FunctionType> by_id(const Index &, EntityId);
 
   static std::optional<FunctionType> from_base(const Type &parent);

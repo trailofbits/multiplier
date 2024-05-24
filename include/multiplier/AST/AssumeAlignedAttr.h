@@ -17,6 +17,7 @@ class Index;
 class AssumeAlignedAttr;
 class Attr;
 class Expr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -32,15 +33,16 @@ class MX_EXPORT AssumeAlignedAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<AssumeAlignedAttr> in(const Index &index);
-  static gap::generator<AssumeAlignedAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<AssumeAlignedAttr> by_id(const Index &, EntityId);
   static gap::generator<AssumeAlignedAttr> in(const Fragment &frag);
   static gap::generator<AssumeAlignedAttr> in(const File &file);
+  static gap::generator<AssumeAlignedAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ASSUME_ALIGNED;
   }
+
+  static std::optional<AssumeAlignedAttr> by_id(const Index &, EntityId);
 
   static std::optional<AssumeAlignedAttr> from_base(const Attr &parent);
   inline static std::optional<AssumeAlignedAttr> from(const Attr &parent) {

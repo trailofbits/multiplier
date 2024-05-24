@@ -32,11 +32,12 @@ class MX_EXPORT TypedefType : public Type {
   static gap::generator<TypedefType> in(const Index &index);
   static gap::generator<TypedefType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<TypedefType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::TYPEDEF;
   }
+
+  static std::optional<TypedefType> by_id(const Index &, EntityId);
 
   static std::optional<TypedefType> from_base(const Type &parent);
   inline static std::optional<TypedefType> from(const Type &parent) {

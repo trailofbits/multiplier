@@ -32,11 +32,12 @@ class MX_EXPORT BTFTagAttributedType : public Type {
   static gap::generator<BTFTagAttributedType> in(const Index &index);
   static gap::generator<BTFTagAttributedType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<BTFTagAttributedType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BTF_TAG_ATTRIBUTED;
   }
+
+  static std::optional<BTFTagAttributedType> by_id(const Index &, EntityId);
 
   static std::optional<BTFTagAttributedType> from_base(const Type &parent);
   inline static std::optional<BTFTagAttributedType> from(const Type &parent) {

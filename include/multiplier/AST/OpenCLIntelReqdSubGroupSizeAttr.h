@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class OpenCLIntelReqdSubGroupSizeAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT OpenCLIntelReqdSubGroupSizeAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<OpenCLIntelReqdSubGroupSizeAttr> in(const Index &index);
-  static gap::generator<OpenCLIntelReqdSubGroupSizeAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<OpenCLIntelReqdSubGroupSizeAttr> by_id(const Index &, EntityId);
   static gap::generator<OpenCLIntelReqdSubGroupSizeAttr> in(const Fragment &frag);
   static gap::generator<OpenCLIntelReqdSubGroupSizeAttr> in(const File &file);
+  static gap::generator<OpenCLIntelReqdSubGroupSizeAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OPEN_CL_INTEL_REQD_SUB_GROUP_SIZE;
   }
+
+  static std::optional<OpenCLIntelReqdSubGroupSizeAttr> by_id(const Index &, EntityId);
 
   static std::optional<OpenCLIntelReqdSubGroupSizeAttr> from_base(const Attr &parent);
   inline static std::optional<OpenCLIntelReqdSubGroupSizeAttr> from(const Attr &parent) {

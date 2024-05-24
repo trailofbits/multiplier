@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class DefineMacroDirective;
+class File;
 class Macro;
 class MacroArgument;
 class MacroExpansion;
@@ -31,12 +32,9 @@ class MX_EXPORT MacroExpansion : public MacroSubstitution {
   friend class MacroSubstitution;
   friend class Macro;
  public:
+  static gap::generator<MacroExpansion> in(const Index &index);
   static gap::generator<MacroExpansion> in(const Fragment &frag);
   static gap::generator<MacroExpansion> in(const File &file);
-
-  static gap::generator<MacroExpansion> in(const Index &index);
-  static std::optional<MacroExpansion> by_id(const Index &, EntityId);
-
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::EXPANSION;
   }
@@ -46,6 +44,8 @@ class MX_EXPORT MacroExpansion : public MacroSubstitution {
 
   static gap::generator<MacroExpansion> containing(const Token &token);
   bool contains(const Token &token);
+
+  static std::optional<MacroExpansion> by_id(const Index &, EntityId);
 
   static std::optional<MacroExpansion> from_base(const Macro &parent);
   inline static std::optional<MacroExpansion> from(const Macro &parent) {

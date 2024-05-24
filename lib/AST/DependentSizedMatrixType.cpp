@@ -26,6 +26,17 @@ static const TypeKind kDependentSizedMatrixTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<DependentSizedMatrixType> DependentSizedMatrixType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kDependentSizedMatrixTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<DependentSizedMatrixType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<DependentSizedMatrixType> DependentSizedMatrixType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = DependentSizedMatrixType::from(*ctx)) {
@@ -67,17 +78,6 @@ std::optional<DependentSizedMatrixType> DependentSizedMatrixType::from_base(cons
       return reinterpret_cast<const DependentSizedMatrixType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<DependentSizedMatrixType> DependentSizedMatrixType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kDependentSizedMatrixTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<DependentSizedMatrixType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

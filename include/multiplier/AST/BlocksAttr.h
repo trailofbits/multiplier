@@ -17,6 +17,7 @@ class Fragment;
 class Index;
 class Attr;
 class BlocksAttr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -32,15 +33,16 @@ class MX_EXPORT BlocksAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<BlocksAttr> in(const Index &index);
-  static gap::generator<BlocksAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<BlocksAttr> by_id(const Index &, EntityId);
   static gap::generator<BlocksAttr> in(const Fragment &frag);
   static gap::generator<BlocksAttr> in(const File &file);
+  static gap::generator<BlocksAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::BLOCKS;
   }
+
+  static std::optional<BlocksAttr> by_id(const Index &, EntityId);
 
   static std::optional<BlocksAttr> from_base(const Attr &parent);
   inline static std::optional<BlocksAttr> from(const Attr &parent) {

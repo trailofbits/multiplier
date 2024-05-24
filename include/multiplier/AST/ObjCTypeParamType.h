@@ -32,11 +32,12 @@ class MX_EXPORT ObjCTypeParamType : public Type {
   static gap::generator<ObjCTypeParamType> in(const Index &index);
   static gap::generator<ObjCTypeParamType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<ObjCTypeParamType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::OBJ_C_TYPE_PARAM;
   }
+
+  static std::optional<ObjCTypeParamType> by_id(const Index &, EntityId);
 
   static std::optional<ObjCTypeParamType> from_base(const Type &parent);
   inline static std::optional<ObjCTypeParamType> from(const Type &parent) {

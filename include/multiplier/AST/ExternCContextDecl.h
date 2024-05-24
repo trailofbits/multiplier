@@ -17,6 +17,7 @@ class Index;
 class Reference;
 class Decl;
 class ExternCContextDecl;
+class File;
 class Stmt;
 class Token;
 namespace ir {
@@ -31,11 +32,10 @@ class MX_EXPORT ExternCContextDecl : public Decl {
   friend class Decl;
  public:
   static gap::generator<ExternCContextDecl> in(const Index &index);
-  static gap::generator<ExternCContextDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ExternCContextDecl> by_id(const Index &, EntityId);
   static gap::generator<ExternCContextDecl> in(const Fragment &frag);
   static gap::generator<ExternCContextDecl> in(const File &file);
+  static gap::generator<ExternCContextDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<ExternCContextDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<ExternCContextDecl, ir::Operation>> in(const Compilation &tu);
@@ -55,6 +55,8 @@ class MX_EXPORT ExternCContextDecl : public Decl {
   ExternCContextDecl canonical_declaration(void) const;
   std::optional<ExternCContextDecl> definition(void) const;
   gap::generator<ExternCContextDecl> redeclarations(void) const &;
+  static std::optional<ExternCContextDecl> by_id(const Index &, EntityId);
+
   static std::optional<ExternCContextDecl> from_base(const Decl &parent);
   inline static std::optional<ExternCContextDecl> from(const Decl &parent) {
     return from_base(parent);

@@ -33,48 +33,6 @@ std::shared_ptr<EntityProvider> Macro::entity_provider_of(const File &file_) {
   return file_.impl->ep;
 }
 
-gap::generator<Macro> Macro::containing(const Macro &macro) {
-  for (auto impl = macro.parent(); impl; impl = impl->parent()) {
-    if (auto d = Macro::from(*impl)) {
-      co_yield *d;
-    }
-  }
-}
-
-bool Macro::contains(const Macro &macro) {
-  auto id_ = id();
-  for (auto &parent : Macro::containing(macro)) {
-    if (parent.id() == id_) { return true; }
-  }
-  return false;
-}
-
-bool Macro::contains(const Token &token) {
-  auto id_ = id();
-  for (auto &parent : Macro::containing(token)) {
-    if (parent.id() == id_) { return true; }
-  }
-  return false;
-}
-
-gap::generator<Macro> Macro::containing(const Token &token) {
-  for (auto m : Macro::containing_internal(token)) {
-    if (auto d = Macro::from(m)) {
-      co_yield *d;
-    }
-  }
-}
-
-std::optional<Macro> Macro::by_id(const Index &index, EntityId eid) {
-  VariantId vid = eid.Unpack();
-  if (std::holds_alternative<MacroId>(vid)) {
-    return index.macro(eid.Pack());
-  } else if (std::holds_alternative<InvalidId>(vid)) {
-    assert(eid.Pack() == kInvalidEntityId);
-  }
-  return std::nullopt;
-}
-
 gap::generator<Macro> Macro::in(const Index &index) {
   const EntityProviderPtr ep = entity_provider_of(index);
   for (MacroImplPtr eptr : ep->MacrosFor(ep)) {
@@ -129,6 +87,48 @@ gap::generator<Macro> Macro::in(const File &file, std::span<const MacroKind> kin
       }
     }
   }
+}
+
+gap::generator<Macro> Macro::containing(const Macro &macro) {
+  for (auto impl = macro.parent(); impl; impl = impl->parent()) {
+    if (auto d = Macro::from(*impl)) {
+      co_yield *d;
+    }
+  }
+}
+
+bool Macro::contains(const Macro &macro) {
+  auto id_ = id();
+  for (auto &parent : Macro::containing(macro)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+bool Macro::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : Macro::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+gap::generator<Macro> Macro::containing(const Token &token) {
+  for (auto m : Macro::containing_internal(token)) {
+    if (auto d = Macro::from(m)) {
+      co_yield *d;
+    }
+  }
+}
+
+std::optional<Macro> Macro::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<MacroId>(vid)) {
+    return index.macro(eid.Pack());
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
 }
 
 std::optional<Macro> Macro::from(const Reference &r) {

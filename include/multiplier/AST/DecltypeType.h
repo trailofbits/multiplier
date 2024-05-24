@@ -32,11 +32,12 @@ class MX_EXPORT DecltypeType : public Type {
   static gap::generator<DecltypeType> in(const Index &index);
   static gap::generator<DecltypeType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<DecltypeType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::DECLTYPE;
   }
+
+  static std::optional<DecltypeType> by_id(const Index &, EntityId);
 
   static std::optional<DecltypeType> from_base(const Type &parent);
   inline static std::optional<DecltypeType> from(const Type &parent) {

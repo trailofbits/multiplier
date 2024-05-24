@@ -16,6 +16,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class MipsInterruptAttr;
 class Token;
@@ -32,15 +33,16 @@ class MX_EXPORT MipsInterruptAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<MipsInterruptAttr> in(const Index &index);
-  static gap::generator<MipsInterruptAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<MipsInterruptAttr> by_id(const Index &, EntityId);
   static gap::generator<MipsInterruptAttr> in(const Fragment &frag);
   static gap::generator<MipsInterruptAttr> in(const File &file);
+  static gap::generator<MipsInterruptAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MIPS_INTERRUPT;
   }
+
+  static std::optional<MipsInterruptAttr> by_id(const Index &, EntityId);
 
   static std::optional<MipsInterruptAttr> from_base(const Attr &parent);
   inline static std::optional<MipsInterruptAttr> from(const Attr &parent) {

@@ -18,6 +18,7 @@ class CompoundStmt;
 class CoroutineBodyStmt;
 class Decl;
 class Expr;
+class File;
 class Stmt;
 class Token;
 class VarDecl;
@@ -33,11 +34,10 @@ class MX_EXPORT CoroutineBodyStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<CoroutineBodyStmt> in(const Index &index);
-  static gap::generator<CoroutineBodyStmt> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CoroutineBodyStmt> by_id(const Index &, EntityId);
   static gap::generator<CoroutineBodyStmt> in(const Fragment &frag);
   static gap::generator<CoroutineBodyStmt> in(const File &file);
+  static gap::generator<CoroutineBodyStmt> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<CoroutineBodyStmt> from(const ir::Operation &op);
   static gap::generator<std::pair<CoroutineBodyStmt, ir::Operation>> in(const Compilation &tu);
@@ -53,6 +53,8 @@ class MX_EXPORT CoroutineBodyStmt : public Stmt {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<CoroutineBodyStmt> by_id(const Index &, EntityId);
 
   static std::optional<CoroutineBodyStmt> from_base(const Stmt &parent);
   inline static std::optional<CoroutineBodyStmt> from(const Stmt &parent) {

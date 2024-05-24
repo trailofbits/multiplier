@@ -24,6 +24,17 @@ static const TypeKind kAtomicTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<AtomicType> AtomicType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kAtomicTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<AtomicType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<AtomicType> AtomicType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = AtomicType::from(*ctx)) {
@@ -65,17 +76,6 @@ std::optional<AtomicType> AtomicType::from_base(const Type &parent) {
       return reinterpret_cast<const AtomicType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<AtomicType> AtomicType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kAtomicTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<AtomicType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

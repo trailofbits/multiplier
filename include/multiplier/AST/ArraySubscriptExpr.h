@@ -17,6 +17,7 @@ class Index;
 class ArraySubscriptExpr;
 class Decl;
 class Expr;
+class File;
 class Stmt;
 class Token;
 class ValueStmt;
@@ -34,11 +35,10 @@ class MX_EXPORT ArraySubscriptExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<ArraySubscriptExpr> in(const Index &index);
-  static gap::generator<ArraySubscriptExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ArraySubscriptExpr> by_id(const Index &, EntityId);
   static gap::generator<ArraySubscriptExpr> in(const Fragment &frag);
   static gap::generator<ArraySubscriptExpr> in(const File &file);
+  static gap::generator<ArraySubscriptExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<ArraySubscriptExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<ArraySubscriptExpr, ir::Operation>> in(const Compilation &tu);
@@ -54,6 +54,8 @@ class MX_EXPORT ArraySubscriptExpr : public Expr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<ArraySubscriptExpr> by_id(const Index &, EntityId);
 
   static std::optional<ArraySubscriptExpr> from_base(const Stmt &parent);
   inline static std::optional<ArraySubscriptExpr> from(const Stmt &parent) {

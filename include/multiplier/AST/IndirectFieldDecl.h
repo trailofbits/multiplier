@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Decl;
 class FieldDecl;
+class File;
 class IndirectFieldDecl;
 class NamedDecl;
 class Stmt;
@@ -36,11 +37,10 @@ class MX_EXPORT IndirectFieldDecl : public ValueDecl {
   friend class Decl;
  public:
   static gap::generator<IndirectFieldDecl> in(const Index &index);
-  static gap::generator<IndirectFieldDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<IndirectFieldDecl> by_id(const Index &, EntityId);
   static gap::generator<IndirectFieldDecl> in(const Fragment &frag);
   static gap::generator<IndirectFieldDecl> in(const File &file);
+  static gap::generator<IndirectFieldDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<IndirectFieldDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<IndirectFieldDecl, ir::Operation>> in(const Compilation &tu);
@@ -60,6 +60,8 @@ class MX_EXPORT IndirectFieldDecl : public ValueDecl {
   IndirectFieldDecl canonical_declaration(void) const;
   std::optional<IndirectFieldDecl> definition(void) const;
   gap::generator<IndirectFieldDecl> redeclarations(void) const &;
+  static std::optional<IndirectFieldDecl> by_id(const Index &, EntityId);
+
   static std::optional<IndirectFieldDecl> from_base(const Decl &parent);
   inline static std::optional<IndirectFieldDecl> from(const Decl &parent) {
     return from_base(parent);

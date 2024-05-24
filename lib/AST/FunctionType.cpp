@@ -27,6 +27,17 @@ static const TypeKind kFunctionTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<FunctionType> FunctionType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kFunctionTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<FunctionType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<FunctionType> FunctionType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = FunctionType::from(*ctx)) {
@@ -69,17 +80,6 @@ std::optional<FunctionType> FunctionType::from_base(const Type &parent) {
       return reinterpret_cast<const FunctionType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<FunctionType> FunctionType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kFunctionTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<FunctionType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

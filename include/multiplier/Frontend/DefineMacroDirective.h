@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class DefineMacroDirective;
+class File;
 class Macro;
 class MacroDirective;
 class Token;
@@ -30,12 +31,9 @@ class MX_EXPORT DefineMacroDirective : public MacroDirective {
   friend class MacroDirective;
   friend class Macro;
  public:
+  static gap::generator<DefineMacroDirective> in(const Index &index);
   static gap::generator<DefineMacroDirective> in(const Fragment &frag);
   static gap::generator<DefineMacroDirective> in(const File &file);
-
-  static gap::generator<DefineMacroDirective> in(const Index &index);
-  static std::optional<DefineMacroDirective> by_id(const Index &, EntityId);
-
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::DEFINE_DIRECTIVE;
   }
@@ -45,6 +43,8 @@ class MX_EXPORT DefineMacroDirective : public MacroDirective {
 
   static gap::generator<DefineMacroDirective> containing(const Token &token);
   bool contains(const Token &token);
+
+  static std::optional<DefineMacroDirective> by_id(const Index &, EntityId);
 
   static std::optional<DefineMacroDirective> from_base(const Macro &parent);
   inline static std::optional<DefineMacroDirective> from(const Macro &parent) {

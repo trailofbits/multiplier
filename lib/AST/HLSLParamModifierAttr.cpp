@@ -8,6 +8,7 @@
 
 #include <multiplier/AST/HLSLParamModifierAttr.h>
 #include <multiplier/AST/Attr.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/TypeAttr.h>
 
@@ -24,6 +25,43 @@ static const AttrKind kHLSLParamModifierAttrDerivedKinds[] = {
     HLSLParamModifierAttr::static_kind(),
 };
 }  // namespace
+
+gap::generator<HLSLParamModifierAttr> HLSLParamModifierAttr::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (AttrKind k : kHLSLParamModifierAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
+      if (std::optional<HLSLParamModifierAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<HLSLParamModifierAttr> HLSLParamModifierAttr::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (AttrKind k : kHLSLParamModifierAttrDerivedKinds) {
+      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+        if (std::optional<HLSLParamModifierAttr> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+gap::generator<HLSLParamModifierAttr> HLSLParamModifierAttr::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (AttrKind k : kHLSLParamModifierAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+      if (std::optional<HLSLParamModifierAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
 
 gap::generator<HLSLParamModifierAttr> HLSLParamModifierAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -69,43 +107,6 @@ std::optional<HLSLParamModifierAttr> HLSLParamModifierAttr::from_base(const Attr
   }
 }
 
-gap::generator<HLSLParamModifierAttr> HLSLParamModifierAttr::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (AttrKind k : kHLSLParamModifierAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<HLSLParamModifierAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<HLSLParamModifierAttr> HLSLParamModifierAttr::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (AttrKind k : kHLSLParamModifierAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<HLSLParamModifierAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<HLSLParamModifierAttr> HLSLParamModifierAttr::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (AttrKind k : kHLSLParamModifierAttrDerivedKinds) {
-      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<HLSLParamModifierAttr> e = from_base(std::move(eptr))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
-  }
-}
-
 std::optional<HLSLParamModifierAttr> HLSLParamModifierAttr::from(const Reference &r) {
   return HLSLParamModifierAttr::from(r.as_attribute());
 }
@@ -125,31 +126,31 @@ std::optional<HLSLParamModifierAttr> HLSLParamModifierAttr::from(const TokenCont
 }
 
 bool HLSLParamModifierAttr::merged_spelling(void) const {
-  return impl->reader.getVal11();
-}
-
-HLSLParamModifierAttrSpelling HLSLParamModifierAttr::semantic_spelling(void) const {
-  return static_cast<HLSLParamModifierAttrSpelling>(impl->reader.getVal10());
-}
-
-bool HLSLParamModifierAttr::is_any_in(void) const {
-  return impl->reader.getVal12();
-}
-
-bool HLSLParamModifierAttr::is_any_out(void) const {
   return impl->reader.getVal13();
 }
 
-bool HLSLParamModifierAttr::is_in(void) const {
+HLSLParamModifierAttrSpelling HLSLParamModifierAttr::semantic_spelling(void) const {
+  return static_cast<HLSLParamModifierAttrSpelling>(impl->reader.getVal12());
+}
+
+bool HLSLParamModifierAttr::is_any_in(void) const {
   return impl->reader.getVal14();
 }
 
-bool HLSLParamModifierAttr::is_in_out(void) const {
+bool HLSLParamModifierAttr::is_any_out(void) const {
   return impl->reader.getVal15();
 }
 
-bool HLSLParamModifierAttr::is_out(void) const {
+bool HLSLParamModifierAttr::is_in(void) const {
   return impl->reader.getVal16();
+}
+
+bool HLSLParamModifierAttr::is_in_out(void) const {
+  return impl->reader.getVal17();
+}
+
+bool HLSLParamModifierAttr::is_out(void) const {
+  return impl->reader.getVal18();
 }
 
 #pragma GCC diagnostic pop

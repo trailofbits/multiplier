@@ -10,6 +10,7 @@
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/DeclaratorDecl.h>
 #include <multiplier/AST/Expr.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/AST/NamedDecl.h>
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/Frontend/Token.h>
@@ -31,6 +32,43 @@ static const DeclKind kNonTypeTemplateParmDeclDerivedKinds[] = {
     NonTypeTemplateParmDecl::static_kind(),
 };
 }  // namespace
+
+gap::generator<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (DeclKind k : kNonTypeTemplateParmDeclDerivedKinds) {
+    for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
+      if (std::optional<NonTypeTemplateParmDecl> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (DeclKind k : kNonTypeTemplateParmDeclDerivedKinds) {
+      for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
+        if (std::optional<NonTypeTemplateParmDecl> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+gap::generator<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (DeclKind k : kNonTypeTemplateParmDeclDerivedKinds) {
+    for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
+      if (std::optional<NonTypeTemplateParmDecl> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
 
 gap::generator<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -165,43 +203,6 @@ std::optional<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::from_base(const 
       return reinterpret_cast<const NonTypeTemplateParmDecl &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (DeclKind k : kNonTypeTemplateParmDeclDerivedKinds) {
-    for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<NonTypeTemplateParmDecl> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (DeclKind k : kNonTypeTemplateParmDeclDerivedKinds) {
-    for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<NonTypeTemplateParmDecl> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (DeclKind k : kNonTypeTemplateParmDeclDerivedKinds) {
-      for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<NonTypeTemplateParmDecl> e = from_base(std::move(eptr))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
   }
 }
 

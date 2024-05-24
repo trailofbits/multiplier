@@ -16,6 +16,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class SwiftVersionedRemovalAttr;
 class Token;
 namespace ir {
@@ -30,15 +31,16 @@ class MX_EXPORT SwiftVersionedRemovalAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<SwiftVersionedRemovalAttr> in(const Index &index);
-  static gap::generator<SwiftVersionedRemovalAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<SwiftVersionedRemovalAttr> by_id(const Index &, EntityId);
   static gap::generator<SwiftVersionedRemovalAttr> in(const Fragment &frag);
   static gap::generator<SwiftVersionedRemovalAttr> in(const File &file);
+  static gap::generator<SwiftVersionedRemovalAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SWIFT_VERSIONED_REMOVAL;
   }
+
+  static std::optional<SwiftVersionedRemovalAttr> by_id(const Index &, EntityId);
 
   static std::optional<SwiftVersionedRemovalAttr> from_base(const Attr &parent);
   inline static std::optional<SwiftVersionedRemovalAttr> from(const Attr &parent) {

@@ -3284,7 +3284,7 @@ void IndexCompileJobAction::Run(void) {
       << "Built AST for main source file " << main_file_path;
 
   TypeMapper tm(ast, context.id_store);
-  EntityMapper em(tm, context.codegen.IsEnabled());
+  EntityMapper em(ast, tm, context.codegen.IsEnabled());
 
   PersistParsedFiles(context, ast, em);
 

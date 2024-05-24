@@ -95,15 +95,14 @@ class MX_EXPORT Decl {
   gap::generator<Decl> redeclarations(void) const &;
   gap::generator<Decl> specializations(void) const &;
 
+  static gap::generator<Decl> in(const Index &index);
+  static gap::generator<Decl> in(const Fragment &frag);
+  static gap::generator<Decl> in(const File &file);
   static gap::generator<Decl> in(const Index &index, std::span<const DeclKind> kinds);
   static gap::generator<Decl> in(const Fragment &frag, std::span<const DeclKind> kinds);
   static gap::generator<Decl> in(const File &file, std::span<const DeclKind> kinds);
-  static gap::generator<Decl> in(const Index &index);
   static gap::generator<Decl> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<Decl> by_id(const Index &, EntityId);
-  static gap::generator<Decl> in(const Fragment &frag);
-  static gap::generator<Decl> in(const File &file);
 
   static std::optional<Decl> from(const ir::Operation &op);
   static gap::generator<std::pair<Decl, ir::Operation>> in(const Compilation &tu);
@@ -117,6 +116,8 @@ class MX_EXPORT Decl {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<Decl> by_id(const Index &, EntityId);
 
   inline static std::optional<Decl> from(const Decl &self) {
     return self;

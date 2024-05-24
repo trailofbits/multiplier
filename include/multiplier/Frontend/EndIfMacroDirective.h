@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class ConditionalMacroDirective;
 class EndIfMacroDirective;
+class File;
 class Macro;
 class MacroDirective;
 namespace ir {
@@ -31,12 +32,9 @@ class MX_EXPORT EndIfMacroDirective : public ConditionalMacroDirective {
   friend class MacroDirective;
   friend class Macro;
  public:
+  static gap::generator<EndIfMacroDirective> in(const Index &index);
   static gap::generator<EndIfMacroDirective> in(const Fragment &frag);
   static gap::generator<EndIfMacroDirective> in(const File &file);
-
-  static gap::generator<EndIfMacroDirective> in(const Index &index);
-  static std::optional<EndIfMacroDirective> by_id(const Index &, EntityId);
-
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::END_IF_DIRECTIVE;
   }
@@ -46,6 +44,8 @@ class MX_EXPORT EndIfMacroDirective : public ConditionalMacroDirective {
 
   static gap::generator<EndIfMacroDirective> containing(const Token &token);
   bool contains(const Token &token);
+
+  static std::optional<EndIfMacroDirective> by_id(const Index &, EntityId);
 
   static std::optional<EndIfMacroDirective> from_base(const Macro &parent);
   inline static std::optional<EndIfMacroDirective> from(const Macro &parent) {

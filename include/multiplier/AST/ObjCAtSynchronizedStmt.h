@@ -17,6 +17,7 @@ class Index;
 class CompoundStmt;
 class Decl;
 class Expr;
+class File;
 class ObjCAtSynchronizedStmt;
 class Stmt;
 class Token;
@@ -32,11 +33,10 @@ class MX_EXPORT ObjCAtSynchronizedStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<ObjCAtSynchronizedStmt> in(const Index &index);
-  static gap::generator<ObjCAtSynchronizedStmt> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ObjCAtSynchronizedStmt> by_id(const Index &, EntityId);
   static gap::generator<ObjCAtSynchronizedStmt> in(const Fragment &frag);
   static gap::generator<ObjCAtSynchronizedStmt> in(const File &file);
+  static gap::generator<ObjCAtSynchronizedStmt> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<ObjCAtSynchronizedStmt> from(const ir::Operation &op);
   static gap::generator<std::pair<ObjCAtSynchronizedStmt, ir::Operation>> in(const Compilation &tu);
@@ -52,6 +52,8 @@ class MX_EXPORT ObjCAtSynchronizedStmt : public Stmt {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<ObjCAtSynchronizedStmt> by_id(const Index &, EntityId);
 
   static std::optional<ObjCAtSynchronizedStmt> from_base(const Stmt &parent);
   inline static std::optional<ObjCAtSynchronizedStmt> from(const Stmt &parent) {

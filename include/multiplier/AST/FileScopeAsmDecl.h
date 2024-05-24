@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Decl;
+class File;
 class FileScopeAsmDecl;
 class Stmt;
 class StringLiteral;
@@ -31,11 +32,10 @@ class MX_EXPORT FileScopeAsmDecl : public Decl {
   friend class Decl;
  public:
   static gap::generator<FileScopeAsmDecl> in(const Index &index);
-  static gap::generator<FileScopeAsmDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<FileScopeAsmDecl> by_id(const Index &, EntityId);
   static gap::generator<FileScopeAsmDecl> in(const Fragment &frag);
   static gap::generator<FileScopeAsmDecl> in(const File &file);
+  static gap::generator<FileScopeAsmDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<FileScopeAsmDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<FileScopeAsmDecl, ir::Operation>> in(const Compilation &tu);
@@ -55,6 +55,8 @@ class MX_EXPORT FileScopeAsmDecl : public Decl {
   FileScopeAsmDecl canonical_declaration(void) const;
   std::optional<FileScopeAsmDecl> definition(void) const;
   gap::generator<FileScopeAsmDecl> redeclarations(void) const &;
+  static std::optional<FileScopeAsmDecl> by_id(const Index &, EntityId);
+
   static std::optional<FileScopeAsmDecl> from_base(const Decl &parent);
   inline static std::optional<FileScopeAsmDecl> from(const Decl &parent) {
     return from_base(parent);

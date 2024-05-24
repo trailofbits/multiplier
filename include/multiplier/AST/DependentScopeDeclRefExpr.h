@@ -17,6 +17,7 @@ class Index;
 class Decl;
 class DependentScopeDeclRefExpr;
 class Expr;
+class File;
 class Stmt;
 class Token;
 class ValueStmt;
@@ -34,11 +35,10 @@ class MX_EXPORT DependentScopeDeclRefExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<DependentScopeDeclRefExpr> in(const Index &index);
-  static gap::generator<DependentScopeDeclRefExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<DependentScopeDeclRefExpr> by_id(const Index &, EntityId);
   static gap::generator<DependentScopeDeclRefExpr> in(const Fragment &frag);
   static gap::generator<DependentScopeDeclRefExpr> in(const File &file);
+  static gap::generator<DependentScopeDeclRefExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<DependentScopeDeclRefExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<DependentScopeDeclRefExpr, ir::Operation>> in(const Compilation &tu);
@@ -54,6 +54,8 @@ class MX_EXPORT DependentScopeDeclRefExpr : public Expr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<DependentScopeDeclRefExpr> by_id(const Index &, EntityId);
 
   static std::optional<DependentScopeDeclRefExpr> from_base(const Stmt &parent);
   inline static std::optional<DependentScopeDeclRefExpr> from(const Stmt &parent) {

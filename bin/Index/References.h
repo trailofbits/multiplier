@@ -24,18 +24,16 @@ class EntityMapper;
 // `DeclRefExpr` which references `decl`, and then ascends up through the parent
 // links.
 gap::generator<mx::ReferenceRecord> EnumerateStmtToDeclReferences(
-    pasta::AST ast, const EntityMapper *em,
-    pasta::Stmt /* from_ */ stmt, pasta::Decl to_decl);
+    const EntityMapper *em, pasta::Stmt /* from_ */ stmt, pasta::Decl to_decl);
 
 // Get the reference kind for types referenced by a declaration.
 gap::generator<mx::ReferenceRecord> EnumerateDeclToTypeReferences(
-    pasta::AST ast, const EntityMapper *em,
-    pasta::Decl from_decl, pasta::Decl to_decl);
+    const EntityMapper *em, pasta::Decl from_decl, pasta::Decl to_decl);
 
 // Get the references for fields referenced by a designator.
 gap::generator<mx::ReferenceRecord> EnumerateDesignatorToDeclReferences(
-    pasta::AST ast, const EntityMapper *em,
-    pasta::Designator from_designator, pasta::Decl to_decl);
+    const EntityMapper *em, pasta::Designator from_designator,
+    pasta::Decl to_decl);
 
 // Try to find the `Decl` referenced by a particular `type`.
 std::optional<pasta::Decl> ReferencedDecl(const pasta::Type &type);

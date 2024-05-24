@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Decl;
 class Expr;
+class File;
 class OpaqueValueExpr;
 class Stmt;
 class Token;
@@ -34,11 +35,10 @@ class MX_EXPORT OpaqueValueExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<OpaqueValueExpr> in(const Index &index);
-  static gap::generator<OpaqueValueExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<OpaqueValueExpr> by_id(const Index &, EntityId);
   static gap::generator<OpaqueValueExpr> in(const Fragment &frag);
   static gap::generator<OpaqueValueExpr> in(const File &file);
+  static gap::generator<OpaqueValueExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<OpaqueValueExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<OpaqueValueExpr, ir::Operation>> in(const Compilation &tu);
@@ -54,6 +54,8 @@ class MX_EXPORT OpaqueValueExpr : public Expr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<OpaqueValueExpr> by_id(const Index &, EntityId);
 
   static std::optional<OpaqueValueExpr> from_base(const Stmt &parent);
   inline static std::optional<OpaqueValueExpr> from(const Stmt &parent) {

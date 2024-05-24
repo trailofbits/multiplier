@@ -25,6 +25,17 @@ static const TypeKind kDependentBitIntTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<DependentBitIntType> DependentBitIntType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kDependentBitIntTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<DependentBitIntType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<DependentBitIntType> DependentBitIntType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = DependentBitIntType::from(*ctx)) {
@@ -66,17 +77,6 @@ std::optional<DependentBitIntType> DependentBitIntType::from_base(const Type &pa
       return reinterpret_cast<const DependentBitIntType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<DependentBitIntType> DependentBitIntType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kDependentBitIntTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<DependentBitIntType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

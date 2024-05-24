@@ -17,6 +17,7 @@ class Index;
 class Decl;
 class DoStmt;
 class Expr;
+class File;
 class Stmt;
 class Token;
 namespace ir {
@@ -31,11 +32,10 @@ class MX_EXPORT DoStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<DoStmt> in(const Index &index);
-  static gap::generator<DoStmt> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<DoStmt> by_id(const Index &, EntityId);
   static gap::generator<DoStmt> in(const Fragment &frag);
   static gap::generator<DoStmt> in(const File &file);
+  static gap::generator<DoStmt> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<DoStmt> from(const ir::Operation &op);
   static gap::generator<std::pair<DoStmt, ir::Operation>> in(const Compilation &tu);
@@ -51,6 +51,8 @@ class MX_EXPORT DoStmt : public Stmt {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<DoStmt> by_id(const Index &, EntityId);
 
   static std::optional<DoStmt> from_base(const Stmt &parent);
   inline static std::optional<DoStmt> from(const Stmt &parent) {

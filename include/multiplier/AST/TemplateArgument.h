@@ -86,6 +86,14 @@ class MX_EXPORT TemplateArgument {
 
   PackedTemplateArgumentId id(void) const;
 
+  static gap::generator<TemplateArgument> in(const Index &index);
+  static gap::generator<TemplateArgument> in(const Fragment &frag);
+  static gap::generator<TemplateArgument> in(const File &file);
+  static gap::generator<TemplateArgument> containing(const Token &tok);
+  bool contains(const Token &tok) const;
+
+  static std::optional<TemplateArgument> by_id(const Index &, EntityId);
+
   inline static std::optional<TemplateArgument> from(const TemplateArgument &self) {
     return self;
   }

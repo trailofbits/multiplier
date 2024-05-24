@@ -32,11 +32,12 @@ class MX_EXPORT TemplateTypeParmType : public Type {
   static gap::generator<TemplateTypeParmType> in(const Index &index);
   static gap::generator<TemplateTypeParmType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<TemplateTypeParmType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::TEMPLATE_TYPE_PARM;
   }
+
+  static std::optional<TemplateTypeParmType> by_id(const Index &, EntityId);
 
   static std::optional<TemplateTypeParmType> from_base(const Type &parent);
   inline static std::optional<TemplateTypeParmType> from(const Type &parent) {

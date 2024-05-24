@@ -33,11 +33,12 @@ class MX_EXPORT ConstantMatrixType : public MatrixType {
   static gap::generator<ConstantMatrixType> in(const Index &index);
   static gap::generator<ConstantMatrixType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<ConstantMatrixType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::CONSTANT_MATRIX;
   }
+
+  static std::optional<ConstantMatrixType> by_id(const Index &, EntityId);
 
   static std::optional<ConstantMatrixType> from_base(const Type &parent);
   inline static std::optional<ConstantMatrixType> from(const Type &parent) {

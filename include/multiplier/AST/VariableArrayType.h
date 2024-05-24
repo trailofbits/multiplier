@@ -35,11 +35,12 @@ class MX_EXPORT VariableArrayType : public ArrayType {
   static gap::generator<VariableArrayType> in(const Index &index);
   static gap::generator<VariableArrayType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<VariableArrayType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::VARIABLE_ARRAY;
   }
+
+  static std::optional<VariableArrayType> by_id(const Index &, EntityId);
 
   static std::optional<VariableArrayType> from_base(const Type &parent);
   inline static std::optional<VariableArrayType> from(const Type &parent) {

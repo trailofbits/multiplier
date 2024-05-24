@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Decl;
+class File;
 class OMPExecutableDirective;
 class OMPTaskwaitDirective;
 class Stmt;
@@ -32,11 +33,10 @@ class MX_EXPORT OMPTaskwaitDirective : public OMPExecutableDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPTaskwaitDirective> in(const Index &index);
-  static gap::generator<OMPTaskwaitDirective> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<OMPTaskwaitDirective> by_id(const Index &, EntityId);
   static gap::generator<OMPTaskwaitDirective> in(const Fragment &frag);
   static gap::generator<OMPTaskwaitDirective> in(const File &file);
+  static gap::generator<OMPTaskwaitDirective> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<OMPTaskwaitDirective> from(const ir::Operation &op);
   static gap::generator<std::pair<OMPTaskwaitDirective, ir::Operation>> in(const Compilation &tu);
@@ -52,6 +52,8 @@ class MX_EXPORT OMPTaskwaitDirective : public OMPExecutableDirective {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<OMPTaskwaitDirective> by_id(const Index &, EntityId);
 
   static std::optional<OMPTaskwaitDirective> from_base(const Stmt &parent);
   inline static std::optional<OMPTaskwaitDirective> from(const Stmt &parent) {

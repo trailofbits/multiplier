@@ -32,6 +32,7 @@ class MX_EXPORT TagType : public Type {
   static gap::generator<TagType> in(const Index &index);
   static gap::generator<TagType> containing(const Token &tok);
   bool contains(const Token &tok) const;
+
   static std::optional<TagType> by_id(const Index &, EntityId);
 
   static std::optional<TagType> from_base(const Type &parent);

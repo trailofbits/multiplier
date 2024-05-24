@@ -20,6 +20,7 @@ class CXXRecordDecl;
 class CallExpr;
 class Decl;
 class Expr;
+class File;
 class Stmt;
 class Token;
 class Type;
@@ -39,11 +40,10 @@ class MX_EXPORT CXXMemberCallExpr : public CallExpr {
   friend class Stmt;
  public:
   static gap::generator<CXXMemberCallExpr> in(const Index &index);
-  static gap::generator<CXXMemberCallExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CXXMemberCallExpr> by_id(const Index &, EntityId);
   static gap::generator<CXXMemberCallExpr> in(const Fragment &frag);
   static gap::generator<CXXMemberCallExpr> in(const File &file);
+  static gap::generator<CXXMemberCallExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<CXXMemberCallExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<CXXMemberCallExpr, ir::Operation>> in(const Compilation &tu);
@@ -59,6 +59,8 @@ class MX_EXPORT CXXMemberCallExpr : public CallExpr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<CXXMemberCallExpr> by_id(const Index &, EntityId);
 
   static std::optional<CXXMemberCallExpr> from_base(const Stmt &parent);
   inline static std::optional<CXXMemberCallExpr> from(const Stmt &parent) {

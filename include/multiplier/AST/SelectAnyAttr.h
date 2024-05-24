@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class SelectAnyAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT SelectAnyAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<SelectAnyAttr> in(const Index &index);
-  static gap::generator<SelectAnyAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<SelectAnyAttr> by_id(const Index &, EntityId);
   static gap::generator<SelectAnyAttr> in(const Fragment &frag);
   static gap::generator<SelectAnyAttr> in(const File &file);
+  static gap::generator<SelectAnyAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SELECT_ANY;
   }
+
+  static std::optional<SelectAnyAttr> by_id(const Index &, EntityId);
 
   static std::optional<SelectAnyAttr> from_base(const Attr &parent);
   inline static std::optional<SelectAnyAttr> from(const Attr &parent) {

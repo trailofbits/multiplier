@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class SwiftObjCMembersAttr;
 class Token;
 namespace ir {
@@ -29,15 +30,16 @@ class MX_EXPORT SwiftObjCMembersAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<SwiftObjCMembersAttr> in(const Index &index);
-  static gap::generator<SwiftObjCMembersAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<SwiftObjCMembersAttr> by_id(const Index &, EntityId);
   static gap::generator<SwiftObjCMembersAttr> in(const Fragment &frag);
   static gap::generator<SwiftObjCMembersAttr> in(const File &file);
+  static gap::generator<SwiftObjCMembersAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SWIFT_OBJ_C_MEMBERS;
   }
+
+  static std::optional<SwiftObjCMembersAttr> by_id(const Index &, EntityId);
 
   static std::optional<SwiftObjCMembersAttr> from_base(const Attr &parent);
   inline static std::optional<SwiftObjCMembersAttr> from(const Attr &parent) {

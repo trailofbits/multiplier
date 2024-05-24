@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class ReturnsTwiceAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT ReturnsTwiceAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ReturnsTwiceAttr> in(const Index &index);
-  static gap::generator<ReturnsTwiceAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ReturnsTwiceAttr> by_id(const Index &, EntityId);
   static gap::generator<ReturnsTwiceAttr> in(const Fragment &frag);
   static gap::generator<ReturnsTwiceAttr> in(const File &file);
+  static gap::generator<ReturnsTwiceAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::RETURNS_TWICE;
   }
+
+  static std::optional<ReturnsTwiceAttr> by_id(const Index &, EntityId);
 
   static std::optional<ReturnsTwiceAttr> from_base(const Attr &parent);
   inline static std::optional<ReturnsTwiceAttr> from(const Attr &parent) {

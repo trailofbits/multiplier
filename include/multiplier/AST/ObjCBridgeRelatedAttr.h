@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class ObjCBridgeRelatedAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT ObjCBridgeRelatedAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ObjCBridgeRelatedAttr> in(const Index &index);
-  static gap::generator<ObjCBridgeRelatedAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ObjCBridgeRelatedAttr> by_id(const Index &, EntityId);
   static gap::generator<ObjCBridgeRelatedAttr> in(const Fragment &frag);
   static gap::generator<ObjCBridgeRelatedAttr> in(const File &file);
+  static gap::generator<ObjCBridgeRelatedAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_BRIDGE_RELATED;
   }
+
+  static std::optional<ObjCBridgeRelatedAttr> by_id(const Index &, EntityId);
 
   static std::optional<ObjCBridgeRelatedAttr> from_base(const Attr &parent);
   inline static std::optional<ObjCBridgeRelatedAttr> from(const Attr &parent) {

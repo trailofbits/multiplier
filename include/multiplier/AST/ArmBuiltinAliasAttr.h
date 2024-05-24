@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class ArmBuiltinAliasAttr;
 class Attr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT ArmBuiltinAliasAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ArmBuiltinAliasAttr> in(const Index &index);
-  static gap::generator<ArmBuiltinAliasAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ArmBuiltinAliasAttr> by_id(const Index &, EntityId);
   static gap::generator<ArmBuiltinAliasAttr> in(const Fragment &frag);
   static gap::generator<ArmBuiltinAliasAttr> in(const File &file);
+  static gap::generator<ArmBuiltinAliasAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ARM_BUILTIN_ALIAS;
   }
+
+  static std::optional<ArmBuiltinAliasAttr> by_id(const Index &, EntityId);
 
   static std::optional<ArmBuiltinAliasAttr> from_base(const Attr &parent);
   inline static std::optional<ArmBuiltinAliasAttr> from(const Attr &parent) {

@@ -8,6 +8,7 @@
 
 #include <multiplier/AST/PragmaDetectMismatchDecl.h>
 #include <multiplier/AST/Decl.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/Frontend/Token.h>
 
@@ -26,6 +27,43 @@ static const DeclKind kPragmaDetectMismatchDeclDerivedKinds[] = {
     PragmaDetectMismatchDecl::static_kind(),
 };
 }  // namespace
+
+gap::generator<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (DeclKind k : kPragmaDetectMismatchDeclDerivedKinds) {
+    for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
+      if (std::optional<PragmaDetectMismatchDecl> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (DeclKind k : kPragmaDetectMismatchDeclDerivedKinds) {
+      for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
+        if (std::optional<PragmaDetectMismatchDecl> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+gap::generator<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (DeclKind k : kPragmaDetectMismatchDeclDerivedKinds) {
+    for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
+      if (std::optional<PragmaDetectMismatchDecl> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
 
 gap::generator<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -160,43 +198,6 @@ std::optional<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::from_base(cons
       return reinterpret_cast<const PragmaDetectMismatchDecl &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (DeclKind k : kPragmaDetectMismatchDeclDerivedKinds) {
-    for (DeclImplPtr eptr : ep->DeclsFor(ep, k)) {
-      if (std::optional<PragmaDetectMismatchDecl> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (DeclKind k : kPragmaDetectMismatchDeclDerivedKinds) {
-    for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-      if (std::optional<PragmaDetectMismatchDecl> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (DeclKind k : kPragmaDetectMismatchDeclDerivedKinds) {
-      for (DeclImplPtr eptr : ep->DeclsFor(ep, k, frag_id)) {
-        if (std::optional<PragmaDetectMismatchDecl> e = from_base(std::move(eptr))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
   }
 }
 

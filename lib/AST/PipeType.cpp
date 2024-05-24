@@ -24,6 +24,17 @@ static const TypeKind kPipeTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<PipeType> PipeType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kPipeTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<PipeType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<PipeType> PipeType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = PipeType::from(*ctx)) {
@@ -65,17 +76,6 @@ std::optional<PipeType> PipeType::from_base(const Type &parent) {
       return reinterpret_cast<const PipeType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<PipeType> PipeType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kPipeTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<PipeType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

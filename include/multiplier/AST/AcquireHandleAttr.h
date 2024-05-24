@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class AcquireHandleAttr;
 class Attr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT AcquireHandleAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<AcquireHandleAttr> in(const Index &index);
-  static gap::generator<AcquireHandleAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<AcquireHandleAttr> by_id(const Index &, EntityId);
   static gap::generator<AcquireHandleAttr> in(const Fragment &frag);
   static gap::generator<AcquireHandleAttr> in(const File &file);
+  static gap::generator<AcquireHandleAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ACQUIRE_HANDLE;
   }
+
+  static std::optional<AcquireHandleAttr> by_id(const Index &, EntityId);
 
   static std::optional<AcquireHandleAttr> from_base(const Attr &parent);
   inline static std::optional<AcquireHandleAttr> from(const Attr &parent) {

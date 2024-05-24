@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class AnalyzerNoReturnAttr;
 class Attr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT AnalyzerNoReturnAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<AnalyzerNoReturnAttr> in(const Index &index);
-  static gap::generator<AnalyzerNoReturnAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<AnalyzerNoReturnAttr> by_id(const Index &, EntityId);
   static gap::generator<AnalyzerNoReturnAttr> in(const Fragment &frag);
   static gap::generator<AnalyzerNoReturnAttr> in(const File &file);
+  static gap::generator<AnalyzerNoReturnAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ANALYZER_NO_RETURN;
   }
+
+  static std::optional<AnalyzerNoReturnAttr> by_id(const Index &, EntityId);
 
   static std::optional<AnalyzerNoReturnAttr> from_base(const Attr &parent);
   inline static std::optional<AnalyzerNoReturnAttr> from(const Attr &parent) {

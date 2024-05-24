@@ -7,6 +7,7 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/Frontend/MacroParameterSubstitution.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/Frontend/Macro.h>
 #include <multiplier/Frontend/MacroParameter.h>
 #include <multiplier/Frontend/MacroSubstitution.h>
@@ -24,6 +25,43 @@ static const MacroKind kMacroParameterSubstitutionDerivedKinds[] = {
     MacroParameterSubstitution::static_kind(),
 };
 }  // namespace
+
+gap::generator<MacroParameterSubstitution> MacroParameterSubstitution::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (MacroKind k : kMacroParameterSubstitutionDerivedKinds) {
+    for (MacroImplPtr eptr : ep->MacrosFor(ep, k)) {
+      if (std::optional<MacroParameterSubstitution> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<MacroParameterSubstitution> MacroParameterSubstitution::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (MacroKind k : kMacroParameterSubstitutionDerivedKinds) {
+      for (MacroImplPtr eptr : ep->MacrosFor(ep, k, frag_id)) {
+        if (std::optional<MacroParameterSubstitution> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+gap::generator<MacroParameterSubstitution> MacroParameterSubstitution::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (MacroKind k : kMacroParameterSubstitutionDerivedKinds) {
+    for (MacroImplPtr eptr : ep->MacrosFor(ep, k, frag_id)) {
+      if (std::optional<MacroParameterSubstitution> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
 
 gap::generator<MacroParameterSubstitution> MacroParameterSubstitution::containing(const Macro &macro) {
   for (auto impl = macro.parent(); impl; impl = impl->parent()) {
@@ -82,43 +120,6 @@ std::optional<MacroParameterSubstitution> MacroParameterSubstitution::from_base(
       return reinterpret_cast<const MacroParameterSubstitution &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<MacroParameterSubstitution> MacroParameterSubstitution::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (MacroKind k : kMacroParameterSubstitutionDerivedKinds) {
-    for (MacroImplPtr eptr : ep->MacrosFor(ep, k)) {
-      if (std::optional<MacroParameterSubstitution> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<MacroParameterSubstitution> MacroParameterSubstitution::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (MacroKind k : kMacroParameterSubstitutionDerivedKinds) {
-    for (MacroImplPtr eptr : ep->MacrosFor(ep, k, frag_id)) {
-      if (std::optional<MacroParameterSubstitution> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<MacroParameterSubstitution> MacroParameterSubstitution::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (MacroKind k : kMacroParameterSubstitutionDerivedKinds) {
-      for (MacroImplPtr eptr : ep->MacrosFor(ep, k, frag_id)) {
-        if (std::optional<MacroParameterSubstitution> e = from_base(std::move(eptr))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
   }
 }
 

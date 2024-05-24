@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class ObjCExternallyRetainedAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT ObjCExternallyRetainedAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ObjCExternallyRetainedAttr> in(const Index &index);
-  static gap::generator<ObjCExternallyRetainedAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ObjCExternallyRetainedAttr> by_id(const Index &, EntityId);
   static gap::generator<ObjCExternallyRetainedAttr> in(const Fragment &frag);
   static gap::generator<ObjCExternallyRetainedAttr> in(const File &file);
+  static gap::generator<ObjCExternallyRetainedAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_EXTERNALLY_RETAINED;
   }
+
+  static std::optional<ObjCExternallyRetainedAttr> by_id(const Index &, EntityId);
 
   static std::optional<ObjCExternallyRetainedAttr> from_base(const Attr &parent);
   inline static std::optional<ObjCExternallyRetainedAttr> from(const Attr &parent) {

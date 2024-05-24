@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Decl;
 class Expr;
+class File;
 class ObjCInterfaceDecl;
 class ObjCMethodDecl;
 class ObjCPropertyDecl;
@@ -38,11 +39,10 @@ class MX_EXPORT ObjCPropertyRefExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<ObjCPropertyRefExpr> in(const Index &index);
-  static gap::generator<ObjCPropertyRefExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ObjCPropertyRefExpr> by_id(const Index &, EntityId);
   static gap::generator<ObjCPropertyRefExpr> in(const Fragment &frag);
   static gap::generator<ObjCPropertyRefExpr> in(const File &file);
+  static gap::generator<ObjCPropertyRefExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<ObjCPropertyRefExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<ObjCPropertyRefExpr, ir::Operation>> in(const Compilation &tu);
@@ -58,6 +58,8 @@ class MX_EXPORT ObjCPropertyRefExpr : public Expr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<ObjCPropertyRefExpr> by_id(const Index &, EntityId);
 
   static std::optional<ObjCPropertyRefExpr> from_base(const Stmt &parent);
   inline static std::optional<ObjCPropertyRefExpr> from(const Stmt &parent) {

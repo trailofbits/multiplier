@@ -8,6 +8,7 @@
 
 #include <multiplier/AST/SwiftAsyncNameAttr.h>
 #include <multiplier/AST/Attr.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/AST/InheritableAttr.h>
 #include <multiplier/Frontend/Token.h>
 
@@ -24,6 +25,43 @@ static const AttrKind kSwiftAsyncNameAttrDerivedKinds[] = {
     SwiftAsyncNameAttr::static_kind(),
 };
 }  // namespace
+
+gap::generator<SwiftAsyncNameAttr> SwiftAsyncNameAttr::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (AttrKind k : kSwiftAsyncNameAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
+      if (std::optional<SwiftAsyncNameAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<SwiftAsyncNameAttr> SwiftAsyncNameAttr::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (AttrKind k : kSwiftAsyncNameAttrDerivedKinds) {
+      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+        if (std::optional<SwiftAsyncNameAttr> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+gap::generator<SwiftAsyncNameAttr> SwiftAsyncNameAttr::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (AttrKind k : kSwiftAsyncNameAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+      if (std::optional<SwiftAsyncNameAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
 
 gap::generator<SwiftAsyncNameAttr> SwiftAsyncNameAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -69,43 +107,6 @@ std::optional<SwiftAsyncNameAttr> SwiftAsyncNameAttr::from_base(const Attr &pare
   }
 }
 
-gap::generator<SwiftAsyncNameAttr> SwiftAsyncNameAttr::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (AttrKind k : kSwiftAsyncNameAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<SwiftAsyncNameAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<SwiftAsyncNameAttr> SwiftAsyncNameAttr::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (AttrKind k : kSwiftAsyncNameAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<SwiftAsyncNameAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<SwiftAsyncNameAttr> SwiftAsyncNameAttr::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (AttrKind k : kSwiftAsyncNameAttrDerivedKinds) {
-      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<SwiftAsyncNameAttr> e = from_base(std::move(eptr))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
-  }
-}
-
 std::optional<SwiftAsyncNameAttr> SwiftAsyncNameAttr::from(const Reference &r) {
   return SwiftAsyncNameAttr::from(r.as_attribute());
 }
@@ -125,7 +126,7 @@ std::optional<SwiftAsyncNameAttr> SwiftAsyncNameAttr::from(const TokenContext &t
 }
 
 std::string_view SwiftAsyncNameAttr::name(void) const {
-  capnp::Text::Reader data = impl->reader.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal11();
   return std::string_view(data.cStr(), data.size());
 }
 

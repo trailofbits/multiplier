@@ -25,6 +25,17 @@ static const TypeKind kDecltypeTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<DecltypeType> DecltypeType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kDecltypeTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<DecltypeType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<DecltypeType> DecltypeType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = DecltypeType::from(*ctx)) {
@@ -66,17 +77,6 @@ std::optional<DecltypeType> DecltypeType::from_base(const Type &parent) {
       return reinterpret_cast<const DecltypeType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<DecltypeType> DecltypeType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kDecltypeTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<DecltypeType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

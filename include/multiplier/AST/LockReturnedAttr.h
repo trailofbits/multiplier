@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Attr;
 class Expr;
+class File;
 class InheritableAttr;
 class LockReturnedAttr;
 class Token;
@@ -32,15 +33,16 @@ class MX_EXPORT LockReturnedAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<LockReturnedAttr> in(const Index &index);
-  static gap::generator<LockReturnedAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<LockReturnedAttr> by_id(const Index &, EntityId);
   static gap::generator<LockReturnedAttr> in(const Fragment &frag);
   static gap::generator<LockReturnedAttr> in(const File &file);
+  static gap::generator<LockReturnedAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::LOCK_RETURNED;
   }
+
+  static std::optional<LockReturnedAttr> by_id(const Index &, EntityId);
 
   static std::optional<LockReturnedAttr> from_base(const Attr &parent);
   inline static std::optional<LockReturnedAttr> from(const Attr &parent) {

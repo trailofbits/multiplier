@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class LoaderUninitializedAttr;
 class Token;
 namespace ir {
@@ -29,15 +30,16 @@ class MX_EXPORT LoaderUninitializedAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<LoaderUninitializedAttr> in(const Index &index);
-  static gap::generator<LoaderUninitializedAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<LoaderUninitializedAttr> by_id(const Index &, EntityId);
   static gap::generator<LoaderUninitializedAttr> in(const Fragment &frag);
   static gap::generator<LoaderUninitializedAttr> in(const File &file);
+  static gap::generator<LoaderUninitializedAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::LOADER_UNINITIALIZED;
   }
+
+  static std::optional<LoaderUninitializedAttr> by_id(const Index &, EntityId);
 
   static std::optional<LoaderUninitializedAttr> from_base(const Attr &parent);
   inline static std::optional<LoaderUninitializedAttr> from(const Attr &parent) {

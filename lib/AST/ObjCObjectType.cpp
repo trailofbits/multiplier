@@ -27,6 +27,17 @@ static const TypeKind kObjCObjectTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<ObjCObjectType> ObjCObjectType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kObjCObjectTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<ObjCObjectType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<ObjCObjectType> ObjCObjectType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = ObjCObjectType::from(*ctx)) {
@@ -69,17 +80,6 @@ std::optional<ObjCObjectType> ObjCObjectType::from_base(const Type &parent) {
       return reinterpret_cast<const ObjCObjectType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<ObjCObjectType> ObjCObjectType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kObjCObjectTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<ObjCObjectType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

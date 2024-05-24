@@ -8,6 +8,7 @@
 
 #include <multiplier/AST/OMPCaptureKindAttr.h>
 #include <multiplier/AST/Attr.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/Frontend/Token.h>
 
 #include "../EntityProvider.h"
@@ -23,6 +24,43 @@ static const AttrKind kOMPCaptureKindAttrDerivedKinds[] = {
     OMPCaptureKindAttr::static_kind(),
 };
 }  // namespace
+
+gap::generator<OMPCaptureKindAttr> OMPCaptureKindAttr::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (AttrKind k : kOMPCaptureKindAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
+      if (std::optional<OMPCaptureKindAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<OMPCaptureKindAttr> OMPCaptureKindAttr::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (AttrKind k : kOMPCaptureKindAttrDerivedKinds) {
+      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+        if (std::optional<OMPCaptureKindAttr> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+gap::generator<OMPCaptureKindAttr> OMPCaptureKindAttr::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (AttrKind k : kOMPCaptureKindAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+      if (std::optional<OMPCaptureKindAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
 
 gap::generator<OMPCaptureKindAttr> OMPCaptureKindAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -65,43 +103,6 @@ std::optional<OMPCaptureKindAttr> OMPCaptureKindAttr::from_base(const Attr &pare
       return reinterpret_cast<const OMPCaptureKindAttr &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<OMPCaptureKindAttr> OMPCaptureKindAttr::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (AttrKind k : kOMPCaptureKindAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<OMPCaptureKindAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<OMPCaptureKindAttr> OMPCaptureKindAttr::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (AttrKind k : kOMPCaptureKindAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<OMPCaptureKindAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<OMPCaptureKindAttr> OMPCaptureKindAttr::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (AttrKind k : kOMPCaptureKindAttrDerivedKinds) {
-      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<OMPCaptureKindAttr> e = from_base(std::move(eptr))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
   }
 }
 

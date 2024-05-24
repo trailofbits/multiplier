@@ -25,6 +25,17 @@ static const TypeKind kDependentVectorTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<DependentVectorType> DependentVectorType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kDependentVectorTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<DependentVectorType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<DependentVectorType> DependentVectorType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = DependentVectorType::from(*ctx)) {
@@ -66,17 +77,6 @@ std::optional<DependentVectorType> DependentVectorType::from_base(const Type &pa
       return reinterpret_cast<const DependentVectorType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<DependentVectorType> DependentVectorType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kDependentVectorTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<DependentVectorType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Decl;
+class File;
 class ObjCAtFinallyStmt;
 class Stmt;
 class Token;
@@ -30,11 +31,10 @@ class MX_EXPORT ObjCAtFinallyStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<ObjCAtFinallyStmt> in(const Index &index);
-  static gap::generator<ObjCAtFinallyStmt> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ObjCAtFinallyStmt> by_id(const Index &, EntityId);
   static gap::generator<ObjCAtFinallyStmt> in(const Fragment &frag);
   static gap::generator<ObjCAtFinallyStmt> in(const File &file);
+  static gap::generator<ObjCAtFinallyStmt> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<ObjCAtFinallyStmt> from(const ir::Operation &op);
   static gap::generator<std::pair<ObjCAtFinallyStmt, ir::Operation>> in(const Compilation &tu);
@@ -50,6 +50,8 @@ class MX_EXPORT ObjCAtFinallyStmt : public Stmt {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<ObjCAtFinallyStmt> by_id(const Index &, EntityId);
 
   static std::optional<ObjCAtFinallyStmt> from_base(const Stmt &parent);
   inline static std::optional<ObjCAtFinallyStmt> from(const Stmt &parent) {

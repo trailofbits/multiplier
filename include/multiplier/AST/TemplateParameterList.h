@@ -44,6 +44,7 @@ class Value;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT TemplateParameterList {
  public:
+  std::optional<Decl> parent_declaration(void) const;
  protected:
   friend class Attr;
   friend class Decl;
@@ -82,6 +83,14 @@ class MX_EXPORT TemplateParameterList {
   }
 
   PackedTemplateParameterListId id(void) const;
+
+  static gap::generator<TemplateParameterList> in(const Index &index);
+  static gap::generator<TemplateParameterList> in(const Fragment &frag);
+  static gap::generator<TemplateParameterList> in(const File &file);
+  static gap::generator<TemplateParameterList> containing(const Token &tok);
+  bool contains(const Token &tok) const;
+
+  static std::optional<TemplateParameterList> by_id(const Index &, EntityId);
 
   inline static std::optional<TemplateParameterList> from(const TemplateParameterList &self) {
     return self;

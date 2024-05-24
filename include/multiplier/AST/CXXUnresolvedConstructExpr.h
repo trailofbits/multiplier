@@ -17,6 +17,7 @@ class Index;
 class CXXUnresolvedConstructExpr;
 class Decl;
 class Expr;
+class File;
 class Stmt;
 class Token;
 class Type;
@@ -35,11 +36,10 @@ class MX_EXPORT CXXUnresolvedConstructExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<CXXUnresolvedConstructExpr> in(const Index &index);
-  static gap::generator<CXXUnresolvedConstructExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CXXUnresolvedConstructExpr> by_id(const Index &, EntityId);
   static gap::generator<CXXUnresolvedConstructExpr> in(const Fragment &frag);
   static gap::generator<CXXUnresolvedConstructExpr> in(const File &file);
+  static gap::generator<CXXUnresolvedConstructExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<CXXUnresolvedConstructExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<CXXUnresolvedConstructExpr, ir::Operation>> in(const Compilation &tu);
@@ -55,6 +55,8 @@ class MX_EXPORT CXXUnresolvedConstructExpr : public Expr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<CXXUnresolvedConstructExpr> by_id(const Index &, EntityId);
 
   static std::optional<CXXUnresolvedConstructExpr> from_base(const Stmt &parent);
   inline static std::optional<CXXUnresolvedConstructExpr> from(const Stmt &parent) {

@@ -32,11 +32,12 @@ class MX_EXPORT BuiltinType : public Type {
   static gap::generator<BuiltinType> in(const Index &index);
   static gap::generator<BuiltinType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<BuiltinType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BUILTIN;
   }
+
+  static std::optional<BuiltinType> by_id(const Index &, EntityId);
 
   static std::optional<BuiltinType> from_base(const Type &parent);
   inline static std::optional<BuiltinType> from(const Type &parent) {

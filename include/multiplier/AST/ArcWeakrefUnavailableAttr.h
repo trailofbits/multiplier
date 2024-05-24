@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class ArcWeakrefUnavailableAttr;
 class Attr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT ArcWeakrefUnavailableAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ArcWeakrefUnavailableAttr> in(const Index &index);
-  static gap::generator<ArcWeakrefUnavailableAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ArcWeakrefUnavailableAttr> by_id(const Index &, EntityId);
   static gap::generator<ArcWeakrefUnavailableAttr> in(const Fragment &frag);
   static gap::generator<ArcWeakrefUnavailableAttr> in(const File &file);
+  static gap::generator<ArcWeakrefUnavailableAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ARC_WEAKREF_UNAVAILABLE;
   }
+
+  static std::optional<ArcWeakrefUnavailableAttr> by_id(const Index &, EntityId);
 
   static std::optional<ArcWeakrefUnavailableAttr> from_base(const Attr &parent);
   inline static std::optional<ArcWeakrefUnavailableAttr> from(const Attr &parent) {

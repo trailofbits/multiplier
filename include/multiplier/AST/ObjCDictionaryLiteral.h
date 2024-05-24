@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Decl;
 class Expr;
+class File;
 class ObjCDictionaryLiteral;
 class ObjCMethodDecl;
 class Stmt;
@@ -35,11 +36,10 @@ class MX_EXPORT ObjCDictionaryLiteral : public Expr {
   friend class Stmt;
  public:
   static gap::generator<ObjCDictionaryLiteral> in(const Index &index);
-  static gap::generator<ObjCDictionaryLiteral> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ObjCDictionaryLiteral> by_id(const Index &, EntityId);
   static gap::generator<ObjCDictionaryLiteral> in(const Fragment &frag);
   static gap::generator<ObjCDictionaryLiteral> in(const File &file);
+  static gap::generator<ObjCDictionaryLiteral> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<ObjCDictionaryLiteral> from(const ir::Operation &op);
   static gap::generator<std::pair<ObjCDictionaryLiteral, ir::Operation>> in(const Compilation &tu);
@@ -55,6 +55,8 @@ class MX_EXPORT ObjCDictionaryLiteral : public Expr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<ObjCDictionaryLiteral> by_id(const Index &, EntityId);
 
   static std::optional<ObjCDictionaryLiteral> from_base(const Stmt &parent);
   inline static std::optional<ObjCDictionaryLiteral> from(const Stmt &parent) {

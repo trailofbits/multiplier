@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Decl;
 class Expr;
+class File;
 class NamedDecl;
 class SizeOfPackExpr;
 class Stmt;
@@ -36,11 +37,10 @@ class MX_EXPORT SizeOfPackExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<SizeOfPackExpr> in(const Index &index);
-  static gap::generator<SizeOfPackExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<SizeOfPackExpr> by_id(const Index &, EntityId);
   static gap::generator<SizeOfPackExpr> in(const Fragment &frag);
   static gap::generator<SizeOfPackExpr> in(const File &file);
+  static gap::generator<SizeOfPackExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<SizeOfPackExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<SizeOfPackExpr, ir::Operation>> in(const Compilation &tu);
@@ -56,6 +56,8 @@ class MX_EXPORT SizeOfPackExpr : public Expr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<SizeOfPackExpr> by_id(const Index &, EntityId);
 
   static std::optional<SizeOfPackExpr> from_base(const Stmt &parent);
   inline static std::optional<SizeOfPackExpr> from(const Stmt &parent) {

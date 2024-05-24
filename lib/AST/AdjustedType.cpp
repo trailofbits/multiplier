@@ -26,6 +26,17 @@ static const TypeKind kAdjustedTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<AdjustedType> AdjustedType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kAdjustedTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<AdjustedType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<AdjustedType> AdjustedType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = AdjustedType::from(*ctx)) {
@@ -68,17 +79,6 @@ std::optional<AdjustedType> AdjustedType::from_base(const Type &parent) {
       return reinterpret_cast<const AdjustedType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<AdjustedType> AdjustedType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kAdjustedTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<AdjustedType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

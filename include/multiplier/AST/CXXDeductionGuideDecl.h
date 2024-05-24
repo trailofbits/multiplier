@@ -20,6 +20,7 @@ class CXXConstructorDecl;
 class CXXDeductionGuideDecl;
 class Decl;
 class DeclaratorDecl;
+class File;
 class FunctionDecl;
 class NamedDecl;
 class Stmt;
@@ -42,11 +43,10 @@ class MX_EXPORT CXXDeductionGuideDecl : public FunctionDecl {
   friend class Decl;
  public:
   static gap::generator<CXXDeductionGuideDecl> in(const Index &index);
-  static gap::generator<CXXDeductionGuideDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CXXDeductionGuideDecl> by_id(const Index &, EntityId);
   static gap::generator<CXXDeductionGuideDecl> in(const Fragment &frag);
   static gap::generator<CXXDeductionGuideDecl> in(const File &file);
+  static gap::generator<CXXDeductionGuideDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<CXXDeductionGuideDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<CXXDeductionGuideDecl, ir::Operation>> in(const Compilation &tu);
@@ -66,6 +66,8 @@ class MX_EXPORT CXXDeductionGuideDecl : public FunctionDecl {
   CXXDeductionGuideDecl canonical_declaration(void) const;
   std::optional<CXXDeductionGuideDecl> definition(void) const;
   gap::generator<CXXDeductionGuideDecl> redeclarations(void) const &;
+  static std::optional<CXXDeductionGuideDecl> by_id(const Index &, EntityId);
+
   static std::optional<CXXDeductionGuideDecl> from_base(const Decl &parent);
   inline static std::optional<CXXDeductionGuideDecl> from(const Decl &parent) {
     return from_base(parent);

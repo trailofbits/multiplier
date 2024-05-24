@@ -25,6 +25,17 @@ static const TypeKind kUsingTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<UsingType> UsingType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kUsingTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<UsingType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<UsingType> UsingType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = UsingType::from(*ctx)) {
@@ -66,17 +77,6 @@ std::optional<UsingType> UsingType::from_base(const Type &parent) {
       return reinterpret_cast<const UsingType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<UsingType> UsingType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kUsingTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<UsingType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

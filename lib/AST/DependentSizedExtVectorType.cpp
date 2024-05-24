@@ -25,6 +25,17 @@ static const TypeKind kDependentSizedExtVectorTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<DependentSizedExtVectorType> DependentSizedExtVectorType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kDependentSizedExtVectorTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<DependentSizedExtVectorType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<DependentSizedExtVectorType> DependentSizedExtVectorType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = DependentSizedExtVectorType::from(*ctx)) {
@@ -66,17 +77,6 @@ std::optional<DependentSizedExtVectorType> DependentSizedExtVectorType::from_bas
       return reinterpret_cast<const DependentSizedExtVectorType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<DependentSizedExtVectorType> DependentSizedExtVectorType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kDependentSizedExtVectorTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<DependentSizedExtVectorType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

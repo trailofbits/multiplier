@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class Token;
 class WorkGroupSizeHintAttr;
@@ -31,15 +32,16 @@ class MX_EXPORT WorkGroupSizeHintAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<WorkGroupSizeHintAttr> in(const Index &index);
-  static gap::generator<WorkGroupSizeHintAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<WorkGroupSizeHintAttr> by_id(const Index &, EntityId);
   static gap::generator<WorkGroupSizeHintAttr> in(const Fragment &frag);
   static gap::generator<WorkGroupSizeHintAttr> in(const File &file);
+  static gap::generator<WorkGroupSizeHintAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::WORK_GROUP_SIZE_HINT;
   }
+
+  static std::optional<WorkGroupSizeHintAttr> by_id(const Index &, EntityId);
 
   static std::optional<WorkGroupSizeHintAttr> from_base(const Attr &parent);
   inline static std::optional<WorkGroupSizeHintAttr> from(const Attr &parent) {
