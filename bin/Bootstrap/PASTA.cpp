@@ -2419,7 +2419,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << i << ", MX_APPLY_FUNC, _, uint64_t, NthCXXBaseSpecifier)\n"; 
 
       class_os
-          << "std::optional<uint64_t> offset_in_bits(void) const;\n";
+          << "  std::optional<uint64_t> offset_in_bits(void) const;\n";
 
       lib_cpp_os
           << "std::optional<uint64_t> CXXBaseSpecifier::offset_in_bits(void) const {\n"

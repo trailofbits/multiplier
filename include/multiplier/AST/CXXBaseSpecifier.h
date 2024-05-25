@@ -47,7 +47,7 @@ class Value;
 class MX_EXPORT CXXBaseSpecifier {
  public:
   std::optional<Decl> parent_declaration(void) const;
-std::optional<uint64_t> offset_in_bits(void) const;
+  std::optional<uint64_t> offset_in_bits(void) const;
  protected:
   friend class Attr;
   friend class Decl;
