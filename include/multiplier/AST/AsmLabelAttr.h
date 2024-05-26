@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class AsmLabelAttr;
 class Attr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT AsmLabelAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<AsmLabelAttr> in(const Index &index);
-  static gap::generator<AsmLabelAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<AsmLabelAttr> by_id(const Index &, EntityId);
   static gap::generator<AsmLabelAttr> in(const Fragment &frag);
   static gap::generator<AsmLabelAttr> in(const File &file);
+  static gap::generator<AsmLabelAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ASM_LABEL;
   }
+
+  static std::optional<AsmLabelAttr> by_id(const Index &, EntityId);
 
   static std::optional<AsmLabelAttr> from_base(const Attr &parent);
   inline static std::optional<AsmLabelAttr> from(const Attr &parent) {

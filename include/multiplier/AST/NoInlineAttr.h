@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Attr;
 class DeclOrStmtAttr;
+class File;
 class InheritableAttr;
 class NoInlineAttr;
 class Token;
@@ -33,15 +34,16 @@ class MX_EXPORT NoInlineAttr : public DeclOrStmtAttr {
   friend class Attr;
  public:
   static gap::generator<NoInlineAttr> in(const Index &index);
-  static gap::generator<NoInlineAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<NoInlineAttr> by_id(const Index &, EntityId);
   static gap::generator<NoInlineAttr> in(const Fragment &frag);
   static gap::generator<NoInlineAttr> in(const File &file);
+  static gap::generator<NoInlineAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_INLINE;
   }
+
+  static std::optional<NoInlineAttr> by_id(const Index &, EntityId);
 
   static std::optional<NoInlineAttr> from_base(const Attr &parent);
   inline static std::optional<NoInlineAttr> from(const Attr &parent) {

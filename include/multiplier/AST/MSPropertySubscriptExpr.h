@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Decl;
 class Expr;
+class File;
 class MSPropertySubscriptExpr;
 class Stmt;
 class Token;
@@ -34,11 +35,10 @@ class MX_EXPORT MSPropertySubscriptExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<MSPropertySubscriptExpr> in(const Index &index);
-  static gap::generator<MSPropertySubscriptExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<MSPropertySubscriptExpr> by_id(const Index &, EntityId);
   static gap::generator<MSPropertySubscriptExpr> in(const Fragment &frag);
   static gap::generator<MSPropertySubscriptExpr> in(const File &file);
+  static gap::generator<MSPropertySubscriptExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<MSPropertySubscriptExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<MSPropertySubscriptExpr, ir::Operation>> in(const Compilation &tu);
@@ -54,6 +54,8 @@ class MX_EXPORT MSPropertySubscriptExpr : public Expr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<MSPropertySubscriptExpr> by_id(const Index &, EntityId);
 
   static std::optional<MSPropertySubscriptExpr> from_base(const Stmt &parent);
   inline static std::optional<MSPropertySubscriptExpr> from(const Stmt &parent) {

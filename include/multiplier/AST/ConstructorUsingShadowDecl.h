@@ -17,6 +17,7 @@ class Index;
 class CXXRecordDecl;
 class ConstructorUsingShadowDecl;
 class Decl;
+class File;
 class NamedDecl;
 class Stmt;
 class Token;
@@ -35,11 +36,10 @@ class MX_EXPORT ConstructorUsingShadowDecl : public UsingShadowDecl {
   friend class Decl;
  public:
   static gap::generator<ConstructorUsingShadowDecl> in(const Index &index);
-  static gap::generator<ConstructorUsingShadowDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ConstructorUsingShadowDecl> by_id(const Index &, EntityId);
   static gap::generator<ConstructorUsingShadowDecl> in(const Fragment &frag);
   static gap::generator<ConstructorUsingShadowDecl> in(const File &file);
+  static gap::generator<ConstructorUsingShadowDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<ConstructorUsingShadowDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<ConstructorUsingShadowDecl, ir::Operation>> in(const Compilation &tu);
@@ -59,6 +59,8 @@ class MX_EXPORT ConstructorUsingShadowDecl : public UsingShadowDecl {
   ConstructorUsingShadowDecl canonical_declaration(void) const;
   std::optional<ConstructorUsingShadowDecl> definition(void) const;
   gap::generator<ConstructorUsingShadowDecl> redeclarations(void) const &;
+  static std::optional<ConstructorUsingShadowDecl> by_id(const Index &, EntityId);
+
   static std::optional<ConstructorUsingShadowDecl> from_base(const Decl &parent);
   inline static std::optional<ConstructorUsingShadowDecl> from(const Decl &parent) {
     return from_base(parent);

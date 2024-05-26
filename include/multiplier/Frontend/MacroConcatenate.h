@@ -14,6 +14,7 @@ namespace mx {
 class EntityProvider;
 class Fragment;
 class Index;
+class File;
 class Macro;
 class MacroConcatenate;
 class MacroSubstitution;
@@ -29,12 +30,9 @@ class MX_EXPORT MacroConcatenate : public MacroSubstitution {
   friend class MacroSubstitution;
   friend class Macro;
  public:
+  static gap::generator<MacroConcatenate> in(const Index &index);
   static gap::generator<MacroConcatenate> in(const Fragment &frag);
   static gap::generator<MacroConcatenate> in(const File &file);
-
-  static gap::generator<MacroConcatenate> in(const Index &index);
-  static std::optional<MacroConcatenate> by_id(const Index &, EntityId);
-
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::CONCATENATE;
   }
@@ -44,6 +42,8 @@ class MX_EXPORT MacroConcatenate : public MacroSubstitution {
 
   static gap::generator<MacroConcatenate> containing(const Token &token);
   bool contains(const Token &token);
+
+  static std::optional<MacroConcatenate> by_id(const Index &, EntityId);
 
   static std::optional<MacroConcatenate> from_base(const Macro &parent);
   inline static std::optional<MacroConcatenate> from(const Macro &parent) {

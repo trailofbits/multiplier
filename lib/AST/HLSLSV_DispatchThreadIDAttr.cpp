@@ -8,6 +8,7 @@
 
 #include <multiplier/AST/HLSLSV_DispatchThreadIDAttr.h>
 #include <multiplier/AST/Attr.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/AST/HLSLAnnotationAttr.h>
 #include <multiplier/AST/InheritableAttr.h>
 #include <multiplier/Frontend/Token.h>
@@ -25,6 +26,43 @@ static const AttrKind kHLSLSV_DispatchThreadIDAttrDerivedKinds[] = {
     HLSLSV_DispatchThreadIDAttr::static_kind(),
 };
 }  // namespace
+
+gap::generator<HLSLSV_DispatchThreadIDAttr> HLSLSV_DispatchThreadIDAttr::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (AttrKind k : kHLSLSV_DispatchThreadIDAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
+      if (std::optional<HLSLSV_DispatchThreadIDAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<HLSLSV_DispatchThreadIDAttr> HLSLSV_DispatchThreadIDAttr::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (AttrKind k : kHLSLSV_DispatchThreadIDAttrDerivedKinds) {
+      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+        if (std::optional<HLSLSV_DispatchThreadIDAttr> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+gap::generator<HLSLSV_DispatchThreadIDAttr> HLSLSV_DispatchThreadIDAttr::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (AttrKind k : kHLSLSV_DispatchThreadIDAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+      if (std::optional<HLSLSV_DispatchThreadIDAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
 
 gap::generator<HLSLSV_DispatchThreadIDAttr> HLSLSV_DispatchThreadIDAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -67,43 +105,6 @@ std::optional<HLSLSV_DispatchThreadIDAttr> HLSLSV_DispatchThreadIDAttr::from_bas
       return reinterpret_cast<const HLSLSV_DispatchThreadIDAttr &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<HLSLSV_DispatchThreadIDAttr> HLSLSV_DispatchThreadIDAttr::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (AttrKind k : kHLSLSV_DispatchThreadIDAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<HLSLSV_DispatchThreadIDAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<HLSLSV_DispatchThreadIDAttr> HLSLSV_DispatchThreadIDAttr::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (AttrKind k : kHLSLSV_DispatchThreadIDAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<HLSLSV_DispatchThreadIDAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<HLSLSV_DispatchThreadIDAttr> HLSLSV_DispatchThreadIDAttr::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (AttrKind k : kHLSLSV_DispatchThreadIDAttrDerivedKinds) {
-      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<HLSLSV_DispatchThreadIDAttr> e = from_base(std::move(eptr))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
   }
 }
 

@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class HLSLResourceBindingAttr;
 class InheritableAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT HLSLResourceBindingAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<HLSLResourceBindingAttr> in(const Index &index);
-  static gap::generator<HLSLResourceBindingAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<HLSLResourceBindingAttr> by_id(const Index &, EntityId);
   static gap::generator<HLSLResourceBindingAttr> in(const Fragment &frag);
   static gap::generator<HLSLResourceBindingAttr> in(const File &file);
+  static gap::generator<HLSLResourceBindingAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::HLSL_RESOURCE_BINDING;
   }
+
+  static std::optional<HLSLResourceBindingAttr> by_id(const Index &, EntityId);
 
   static std::optional<HLSLResourceBindingAttr> from_base(const Attr &parent);
   inline static std::optional<HLSLResourceBindingAttr> from(const Attr &parent) {

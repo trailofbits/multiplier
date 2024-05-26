@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class AnnotateAttr;
 class Attr;
+class File;
 class InheritableAttr;
 class InheritableParamAttr;
 class Token;
@@ -33,15 +34,16 @@ class MX_EXPORT AnnotateAttr : public InheritableParamAttr {
   friend class Attr;
  public:
   static gap::generator<AnnotateAttr> in(const Index &index);
-  static gap::generator<AnnotateAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<AnnotateAttr> by_id(const Index &, EntityId);
   static gap::generator<AnnotateAttr> in(const Fragment &frag);
   static gap::generator<AnnotateAttr> in(const File &file);
+  static gap::generator<AnnotateAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ANNOTATE;
   }
+
+  static std::optional<AnnotateAttr> by_id(const Index &, EntityId);
 
   static std::optional<AnnotateAttr> from_base(const Attr &parent);
   inline static std::optional<AnnotateAttr> from(const Attr &parent) {

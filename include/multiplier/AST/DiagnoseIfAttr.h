@@ -18,6 +18,7 @@ class Index;
 class Attr;
 class DiagnoseIfAttr;
 class Expr;
+class File;
 class InheritableAttr;
 class NamedDecl;
 class Token;
@@ -34,15 +35,16 @@ class MX_EXPORT DiagnoseIfAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<DiagnoseIfAttr> in(const Index &index);
-  static gap::generator<DiagnoseIfAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<DiagnoseIfAttr> by_id(const Index &, EntityId);
   static gap::generator<DiagnoseIfAttr> in(const Fragment &frag);
   static gap::generator<DiagnoseIfAttr> in(const File &file);
+  static gap::generator<DiagnoseIfAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::DIAGNOSE_IF;
   }
+
+  static std::optional<DiagnoseIfAttr> by_id(const Index &, EntityId);
 
   static std::optional<DiagnoseIfAttr> from_base(const Attr &parent);
   inline static std::optional<DiagnoseIfAttr> from(const Attr &parent) {

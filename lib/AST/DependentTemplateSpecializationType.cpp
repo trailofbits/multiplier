@@ -26,6 +26,17 @@ static const TypeKind kDependentTemplateSpecializationTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<DependentTemplateSpecializationType> DependentTemplateSpecializationType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kDependentTemplateSpecializationTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<DependentTemplateSpecializationType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<DependentTemplateSpecializationType> DependentTemplateSpecializationType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = DependentTemplateSpecializationType::from(*ctx)) {
@@ -67,17 +78,6 @@ std::optional<DependentTemplateSpecializationType> DependentTemplateSpecializati
       return reinterpret_cast<const DependentTemplateSpecializationType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<DependentTemplateSpecializationType> DependentTemplateSpecializationType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kDependentTemplateSpecializationTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<DependentTemplateSpecializationType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

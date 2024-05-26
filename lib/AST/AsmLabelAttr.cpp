@@ -8,6 +8,7 @@
 
 #include <multiplier/AST/AsmLabelAttr.h>
 #include <multiplier/AST/Attr.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/AST/InheritableAttr.h>
 #include <multiplier/Frontend/Token.h>
 
@@ -24,6 +25,43 @@ static const AttrKind kAsmLabelAttrDerivedKinds[] = {
     AsmLabelAttr::static_kind(),
 };
 }  // namespace
+
+gap::generator<AsmLabelAttr> AsmLabelAttr::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (AttrKind k : kAsmLabelAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
+      if (std::optional<AsmLabelAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<AsmLabelAttr> AsmLabelAttr::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (AttrKind k : kAsmLabelAttrDerivedKinds) {
+      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+        if (std::optional<AsmLabelAttr> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+gap::generator<AsmLabelAttr> AsmLabelAttr::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (AttrKind k : kAsmLabelAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+      if (std::optional<AsmLabelAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
 
 gap::generator<AsmLabelAttr> AsmLabelAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -69,43 +107,6 @@ std::optional<AsmLabelAttr> AsmLabelAttr::from_base(const Attr &parent) {
   }
 }
 
-gap::generator<AsmLabelAttr> AsmLabelAttr::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (AttrKind k : kAsmLabelAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<AsmLabelAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<AsmLabelAttr> AsmLabelAttr::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (AttrKind k : kAsmLabelAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<AsmLabelAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<AsmLabelAttr> AsmLabelAttr::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (AttrKind k : kAsmLabelAttrDerivedKinds) {
-      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<AsmLabelAttr> e = from_base(std::move(eptr))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
-  }
-}
-
 std::optional<AsmLabelAttr> AsmLabelAttr::from(const Reference &r) {
   return AsmLabelAttr::from(r.as_attribute());
 }
@@ -125,11 +126,11 @@ std::optional<AsmLabelAttr> AsmLabelAttr::from(const TokenContext &t) {
 }
 
 bool AsmLabelAttr::is_literal_label(void) const {
-  return impl->reader.getVal12();
+  return impl->reader.getVal14();
 }
 
 std::string_view AsmLabelAttr::label(void) const {
-  capnp::Text::Reader data = impl->reader.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal11();
   return std::string_view(data.cStr(), data.size());
 }
 

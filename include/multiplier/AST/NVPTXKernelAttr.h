@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class NVPTXKernelAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT NVPTXKernelAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<NVPTXKernelAttr> in(const Index &index);
-  static gap::generator<NVPTXKernelAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<NVPTXKernelAttr> by_id(const Index &, EntityId);
   static gap::generator<NVPTXKernelAttr> in(const Fragment &frag);
   static gap::generator<NVPTXKernelAttr> in(const File &file);
+  static gap::generator<NVPTXKernelAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NVPTX_KERNEL;
   }
+
+  static std::optional<NVPTXKernelAttr> by_id(const Index &, EntityId);
 
   static std::optional<NVPTXKernelAttr> from_base(const Attr &parent);
   inline static std::optional<NVPTXKernelAttr> from(const Attr &parent) {

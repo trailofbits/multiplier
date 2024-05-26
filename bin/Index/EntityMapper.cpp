@@ -9,6 +9,7 @@
 #include <cassert>
 #include <glog/logging.h>
 #include <pasta/AST/AST.h>
+#include <pasta/AST/Decl.h>
 #include <pasta/AST/Forward.h>
 #include <pasta/AST/Token.h>
 #include <pasta/Util/File.h>
@@ -22,7 +23,9 @@
 #pragma clang diagnostic ignored "-Wunused-parameter"
 #pragma clang diagnostic ignored "-Wshadow"
 #pragma clang diagnostic ignored "-Wcast-align"
+#include <clang/AST/ASTContext.h>
 #include <clang/AST/DeclBase.h>
+#include <clang/AST/RecordLayout.h>
 #pragma clang diagnostic pop
 
 #include "TypeMapper.h"
@@ -46,46 +49,6 @@ mx::RawEntityId EntityMapper::ParentStmtId(const void *entity) const {
   } else {
     return mx::kInvalidEntityId;
   }
-}
-
-mx::RawEntityId EntityMapper::ParentDeclId(const pasta::Decl &entity) const {
-  return ParentDeclId(RawEntity(entity));
-}
-
-mx::RawEntityId EntityMapper::ParentDeclId(const pasta::Stmt &entity) const {
-  return ParentDeclId(RawEntity(entity));
-}
-
-mx::RawEntityId EntityMapper::ParentDeclId(const pasta::Designator &entity) const {
-  return ParentDeclId(RawEntity(entity));
-}
-
-mx::RawEntityId EntityMapper::ParentDeclId(const pasta::TemplateArgument &entity) const {
-  return ParentDeclId(RawEntity(entity));
-}
-
-mx::RawEntityId EntityMapper::ParentDeclId(const pasta::TemplateParameterList &entity) const {
-  return ParentDeclId(RawEntity(entity));
-}
-
-mx::RawEntityId EntityMapper::ParentDeclId(const pasta::CXXBaseSpecifier &entity) const {
-  return ParentDeclId(RawEntity(entity));
-}
-
-mx::RawEntityId EntityMapper::ParentStmtId(const pasta::Decl &entity) const {
-  return ParentStmtId(RawEntity(entity));
-}
-
-mx::RawEntityId EntityMapper::ParentStmtId(const pasta::Stmt &entity) const {
-  return ParentStmtId(RawEntity(entity));
-}
-
-mx::RawEntityId EntityMapper::ParentStmtId(const pasta::Designator &entity) const {
-  return ParentStmtId(RawEntity(entity));
-}
-
-mx::RawEntityId EntityMapper::ParentStmtId(const pasta::TemplateArgument &entity) const {
-  return ParentStmtId(RawEntity(entity));
 }
 
 mx::RawEntityId EntityMapper::EntityId(const void *entity) const {
@@ -334,17 +297,8 @@ mx::RawEntityId EntityMapper::EntityIdOfType(
 }
 
 std::optional<const pasta::Decl> EntityMapper::ParentDecl(
-    const pasta::AST &ast, const pasta::Decl &entity) const {
-  if (auto it = parent_decls.find(RawEntity(entity));
-      it != parent_decls.end() && it->second) {
-    return ast.Adopt(static_cast<const clang::Decl *>(it->second));
-  }
-  return std::nullopt;
-}
-
-std::optional<const pasta::Decl> EntityMapper::ParentDecl(
-    const pasta::AST &ast, const pasta::Stmt &entity) const {
-  if (auto it = parent_decls.find(RawEntity(entity));
+    const void *entity) const {
+  if (auto it = parent_decls.find(entity);
       it != parent_decls.end() && it->second) {
     return ast.Adopt(static_cast<const clang::Decl *>(it->second));
   }
@@ -352,17 +306,8 @@ std::optional<const pasta::Decl> EntityMapper::ParentDecl(
 }
 
 std::optional<const pasta::Stmt> EntityMapper::ParentStmt(
-    const pasta::AST &ast, const pasta::Decl &entity) const {
-  if (auto it = parent_stmts.find(RawEntity(entity));
-      it != parent_stmts.end() && it->second) {
-    return ast.Adopt(static_cast<const clang::Stmt *>(it->second));
-  }
-  return std::nullopt;
-}
-
-std::optional<const pasta::Stmt> EntityMapper::ParentStmt(
-    const pasta::AST &ast, const pasta::Stmt &entity) const {
-  if (auto it = parent_stmts.find(RawEntity(entity));
+    const void *entity) const {
+  if (auto it = parent_stmts.find(entity);
       it != parent_stmts.end() && it->second) {
     return ast.Adopt(static_cast<const clang::Stmt *>(it->second));
   }
@@ -436,6 +381,49 @@ void EntityMapper::ResetForFragment(void) {
   parent_stmt_ids.clear();
   parent_decls.clear();
   parent_stmts.clear();
+}
+
+// Offset in bits of the base class within the derived class.
+std::optional<uint64_t> EntityMapper::BaseOffset(
+    const pasta::CXXBaseSpecifier &spec) const {
+
+  auto base_class = spec.BaseClass();
+  if (!base_class) {
+    return std::nullopt;
+  }
+
+  auto parent_decl_it = parent_decls.find(RawEntity(spec));
+  if (parent_decl_it == parent_decls.end()) {
+    return std::nullopt;
+  }
+
+  auto parent_decl = reinterpret_cast<const clang::Decl *>(
+      parent_decl_it->second);
+
+  auto parent_record = clang::dyn_cast<clang::CXXRecordDecl>(parent_decl);
+  if (!parent_record) {
+    return std::nullopt;
+  }
+
+  // CXXRecord layout is only valid if the definition is complete and it is
+  // not templated. If either case is true return null.
+  auto def = parent_record->getDefinition();
+  if (!def || def->isInvalidDecl() || !def->isCompleteDefinition() ||
+      def->isTemplated()) {
+    return std::nullopt;
+  }
+
+  auto &ast_context = def->getASTContext();
+  auto char_bits = ast_context.getCharWidth();
+  auto &layout = ast_context.getASTRecordLayout(def);
+  auto base_record = reinterpret_cast<const clang::CXXRecordDecl *>(
+      base_class->RawDecl());
+
+  auto offset = spec.IsVirtual() ?
+                layout.getVBaseClassOffset(base_record) :
+                layout.getBaseClassOffset(base_record);
+
+  return static_cast<uint64_t>(offset.getQuantity()) * char_bits;
 }
 
 }  // namespace indexer

@@ -17,6 +17,7 @@ class Index;
 class Decl;
 class EnumConstantDecl;
 class Expr;
+class File;
 class NamedDecl;
 class Stmt;
 class Token;
@@ -35,11 +36,10 @@ class MX_EXPORT EnumConstantDecl : public ValueDecl {
   friend class Decl;
  public:
   static gap::generator<EnumConstantDecl> in(const Index &index);
-  static gap::generator<EnumConstantDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<EnumConstantDecl> by_id(const Index &, EntityId);
   static gap::generator<EnumConstantDecl> in(const Fragment &frag);
   static gap::generator<EnumConstantDecl> in(const File &file);
+  static gap::generator<EnumConstantDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<EnumConstantDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<EnumConstantDecl, ir::Operation>> in(const Compilation &tu);
@@ -59,6 +59,8 @@ class MX_EXPORT EnumConstantDecl : public ValueDecl {
   EnumConstantDecl canonical_declaration(void) const;
   std::optional<EnumConstantDecl> definition(void) const;
   gap::generator<EnumConstantDecl> redeclarations(void) const &;
+  static std::optional<EnumConstantDecl> by_id(const Index &, EntityId);
+
   static std::optional<EnumConstantDecl> from_base(const Decl &parent);
   inline static std::optional<EnumConstantDecl> from(const Decl &parent) {
     return from_base(parent);

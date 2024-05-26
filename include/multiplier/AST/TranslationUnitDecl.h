@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Reference;
 class Decl;
+class File;
 class Stmt;
 class Token;
 class TranslationUnitDecl;
@@ -31,11 +32,10 @@ class MX_EXPORT TranslationUnitDecl : public Decl {
   friend class Decl;
  public:
   static gap::generator<TranslationUnitDecl> in(const Index &index);
-  static gap::generator<TranslationUnitDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<TranslationUnitDecl> by_id(const Index &, EntityId);
   static gap::generator<TranslationUnitDecl> in(const Fragment &frag);
   static gap::generator<TranslationUnitDecl> in(const File &file);
+  static gap::generator<TranslationUnitDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<TranslationUnitDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<TranslationUnitDecl, ir::Operation>> in(const Compilation &tu);
@@ -55,6 +55,8 @@ class MX_EXPORT TranslationUnitDecl : public Decl {
   TranslationUnitDecl canonical_declaration(void) const;
   std::optional<TranslationUnitDecl> definition(void) const;
   gap::generator<TranslationUnitDecl> redeclarations(void) const &;
+  static std::optional<TranslationUnitDecl> by_id(const Index &, EntityId);
+
   static std::optional<TranslationUnitDecl> from_base(const Decl &parent);
   inline static std::optional<TranslationUnitDecl> from(const Decl &parent) {
     return from_base(parent);

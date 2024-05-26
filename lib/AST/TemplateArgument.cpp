@@ -56,6 +56,57 @@ std::shared_ptr<EntityProvider> TemplateArgument::entity_provider_of(const File 
   return file_.impl->ep;
 }
 
+gap::generator<TemplateArgument> TemplateArgument::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TemplateArgumentImplPtr eptr : ep->TemplateArgumentsFor(ep)) {
+    co_yield TemplateArgument(std::move(eptr));
+  }
+}
+
+gap::generator<TemplateArgument> TemplateArgument::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (TemplateArgumentImplPtr eptr : ep->TemplateArgumentsFor(ep, frag_id)) {
+      co_yield TemplateArgument(std::move(eptr));
+    }
+  }
+}
+
+gap::generator<TemplateArgument> TemplateArgument::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (TemplateArgumentImplPtr eptr : ep->TemplateArgumentsFor(ep, frag_id)) {
+    co_yield TemplateArgument(std::move(eptr));
+  }
+}
+
+gap::generator<TemplateArgument> TemplateArgument::containing(const Token &tok) {
+  for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+    if (auto d = TemplateArgument::from(*ctx)) {
+      co_yield *d;
+    }
+  }
+}
+
+bool TemplateArgument::contains(const Token &tok) const {
+  auto id_ = id();
+  for (auto &parent : TemplateArgument::containing(tok)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+std::optional<TemplateArgument> TemplateArgument::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<TemplateArgumentId>(vid)) {
+    return index.template_argument(eid.Pack());
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 std::optional<TemplateArgument> TemplateArgument::from(const Reference &r) {
   return r.as_template_argument();
 }

@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Attr;
 class CUDADeviceAttr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT CUDADeviceAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<CUDADeviceAttr> in(const Index &index);
-  static gap::generator<CUDADeviceAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CUDADeviceAttr> by_id(const Index &, EntityId);
   static gap::generator<CUDADeviceAttr> in(const Fragment &frag);
   static gap::generator<CUDADeviceAttr> in(const File &file);
+  static gap::generator<CUDADeviceAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CUDA_DEVICE;
   }
+
+  static std::optional<CUDADeviceAttr> by_id(const Index &, EntityId);
 
   static std::optional<CUDADeviceAttr> from_base(const Attr &parent);
   inline static std::optional<CUDADeviceAttr> from(const Attr &parent) {

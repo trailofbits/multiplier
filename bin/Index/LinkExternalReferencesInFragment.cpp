@@ -51,7 +51,7 @@ static void AddDeclReferenceFrom(
 template <typename EntityId, typename EntityKindListMap,
           typename ReferenceEnumerator>
 static void AddDeclReferencesFrom(
-    const pasta::AST &ast, mx::DatabaseWriter &database,
+    mx::DatabaseWriter &database,
     const PendingFragment &pf,
     const EntityKindListMap &entities,
     ReferenceEnumerator enumerate_records) {
@@ -70,7 +70,7 @@ static void AddDeclReferencesFrom(
     }
 
     for (auto to_entity : DeclReferencesFrom(from_entity)) {
-      for (auto record : enumerate_records(ast, &(pf.em), from_entity,
+      for (auto record : enumerate_records(&(pf.em), from_entity,
                                            to_entity)) {
         database.AddAsync(record);
       }
@@ -405,7 +405,7 @@ static void AddTemplateSpecializations(
 // Identify all unique entity IDs referenced by this fragment,
 // and map them to the fragment ID in the data store.
 void LinkExternalReferencesInFragment(
-    const pasta::AST &ast, mx::DatabaseWriter &database,
+    mx::DatabaseWriter &database,
     const PendingFragment &pf) {
 
   const EntityMapper &em = pf.em;
@@ -414,14 +414,14 @@ void LinkExternalReferencesInFragment(
   //            expressed in types. In PASTA, we don't present Clang's
   //            `TypeLoc`s, so we need to instead go through the types to find
   //            which ones are explicitly referenced.
-  AddDeclReferencesFrom<mx::DeclId>(ast, database, pf, pf.decls_to_serialize,
+  AddDeclReferencesFrom<mx::DeclId>(database, pf, pf.decls_to_serialize,
                                     EnumerateDeclToTypeReferences);
 
-  AddDeclReferencesFrom<mx::StmtId>(ast, database, pf, pf.stmts_to_serialize,
+  AddDeclReferencesFrom<mx::StmtId>(database, pf, pf.stmts_to_serialize,
                                     EnumerateStmtToDeclReferences);
 
   AddDeclReferencesFrom<mx::DesignatorId>(
-      ast, database, pf, pf.designators_to_serialize,
+      database, pf, pf.designators_to_serialize,
       EnumerateDesignatorToDeclReferences);
 
   for (const auto &spec : pf.cxx_base_specifiers_to_serialize) {

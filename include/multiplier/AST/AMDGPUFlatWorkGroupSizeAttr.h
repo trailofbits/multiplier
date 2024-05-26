@@ -17,6 +17,7 @@ class Index;
 class AMDGPUFlatWorkGroupSizeAttr;
 class Attr;
 class Expr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -32,15 +33,16 @@ class MX_EXPORT AMDGPUFlatWorkGroupSizeAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<AMDGPUFlatWorkGroupSizeAttr> in(const Index &index);
-  static gap::generator<AMDGPUFlatWorkGroupSizeAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<AMDGPUFlatWorkGroupSizeAttr> by_id(const Index &, EntityId);
   static gap::generator<AMDGPUFlatWorkGroupSizeAttr> in(const Fragment &frag);
   static gap::generator<AMDGPUFlatWorkGroupSizeAttr> in(const File &file);
+  static gap::generator<AMDGPUFlatWorkGroupSizeAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::AMDGPU_FLAT_WORK_GROUP_SIZE;
   }
+
+  static std::optional<AMDGPUFlatWorkGroupSizeAttr> by_id(const Index &, EntityId);
 
   static std::optional<AMDGPUFlatWorkGroupSizeAttr> from_base(const Attr &parent);
   inline static std::optional<AMDGPUFlatWorkGroupSizeAttr> from(const Attr &parent) {

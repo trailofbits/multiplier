@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class AnnotateTypeAttr;
 class Attr;
+class File;
 class Token;
 class TypeAttr;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT AnnotateTypeAttr : public TypeAttr {
   friend class Attr;
  public:
   static gap::generator<AnnotateTypeAttr> in(const Index &index);
-  static gap::generator<AnnotateTypeAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<AnnotateTypeAttr> by_id(const Index &, EntityId);
   static gap::generator<AnnotateTypeAttr> in(const Fragment &frag);
   static gap::generator<AnnotateTypeAttr> in(const File &file);
+  static gap::generator<AnnotateTypeAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ANNOTATE_TYPE;
   }
+
+  static std::optional<AnnotateTypeAttr> by_id(const Index &, EntityId);
 
   static std::optional<AnnotateTypeAttr> from_base(const Attr &parent);
   inline static std::optional<AnnotateTypeAttr> from(const Attr &parent) {

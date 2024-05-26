@@ -8,6 +8,7 @@
 
 #include <multiplier/AST/BuiltinAliasAttr.h>
 #include <multiplier/AST/Attr.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/Frontend/Token.h>
 
 #include "../EntityProvider.h"
@@ -23,6 +24,43 @@ static const AttrKind kBuiltinAliasAttrDerivedKinds[] = {
     BuiltinAliasAttr::static_kind(),
 };
 }  // namespace
+
+gap::generator<BuiltinAliasAttr> BuiltinAliasAttr::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (AttrKind k : kBuiltinAliasAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
+      if (std::optional<BuiltinAliasAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<BuiltinAliasAttr> BuiltinAliasAttr::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (AttrKind k : kBuiltinAliasAttrDerivedKinds) {
+      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+        if (std::optional<BuiltinAliasAttr> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+gap::generator<BuiltinAliasAttr> BuiltinAliasAttr::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (AttrKind k : kBuiltinAliasAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+      if (std::optional<BuiltinAliasAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
 
 gap::generator<BuiltinAliasAttr> BuiltinAliasAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -68,43 +106,6 @@ std::optional<BuiltinAliasAttr> BuiltinAliasAttr::from_base(const Attr &parent) 
   }
 }
 
-gap::generator<BuiltinAliasAttr> BuiltinAliasAttr::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (AttrKind k : kBuiltinAliasAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<BuiltinAliasAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<BuiltinAliasAttr> BuiltinAliasAttr::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (AttrKind k : kBuiltinAliasAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<BuiltinAliasAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<BuiltinAliasAttr> BuiltinAliasAttr::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (AttrKind k : kBuiltinAliasAttrDerivedKinds) {
-      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<BuiltinAliasAttr> e = from_base(std::move(eptr))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
-  }
-}
-
 std::optional<BuiltinAliasAttr> BuiltinAliasAttr::from(const Reference &r) {
   return BuiltinAliasAttr::from(r.as_attribute());
 }
@@ -124,7 +125,7 @@ std::optional<BuiltinAliasAttr> BuiltinAliasAttr::from(const TokenContext &t) {
 }
 
 BuiltinAliasAttrSpelling BuiltinAliasAttr::semantic_spelling(void) const {
-  return static_cast<BuiltinAliasAttrSpelling>(impl->reader.getVal10());
+  return static_cast<BuiltinAliasAttrSpelling>(impl->reader.getVal12());
 }
 
 #pragma GCC diagnostic pop

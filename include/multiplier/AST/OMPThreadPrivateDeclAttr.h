@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class OMPThreadPrivateDeclAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT OMPThreadPrivateDeclAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<OMPThreadPrivateDeclAttr> in(const Index &index);
-  static gap::generator<OMPThreadPrivateDeclAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<OMPThreadPrivateDeclAttr> by_id(const Index &, EntityId);
   static gap::generator<OMPThreadPrivateDeclAttr> in(const Fragment &frag);
   static gap::generator<OMPThreadPrivateDeclAttr> in(const File &file);
+  static gap::generator<OMPThreadPrivateDeclAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OMP_THREAD_PRIVATE_DECL;
   }
+
+  static std::optional<OMPThreadPrivateDeclAttr> by_id(const Index &, EntityId);
 
   static std::optional<OMPThreadPrivateDeclAttr> from_base(const Attr &parent);
   inline static std::optional<OMPThreadPrivateDeclAttr> from(const Attr &parent) {

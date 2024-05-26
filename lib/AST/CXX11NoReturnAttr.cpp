@@ -8,6 +8,7 @@
 
 #include <multiplier/AST/CXX11NoReturnAttr.h>
 #include <multiplier/AST/Attr.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/AST/InheritableAttr.h>
 #include <multiplier/Frontend/Token.h>
 
@@ -24,6 +25,43 @@ static const AttrKind kCXX11NoReturnAttrDerivedKinds[] = {
     CXX11NoReturnAttr::static_kind(),
 };
 }  // namespace
+
+gap::generator<CXX11NoReturnAttr> CXX11NoReturnAttr::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (AttrKind k : kCXX11NoReturnAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
+      if (std::optional<CXX11NoReturnAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<CXX11NoReturnAttr> CXX11NoReturnAttr::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (AttrKind k : kCXX11NoReturnAttrDerivedKinds) {
+      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+        if (std::optional<CXX11NoReturnAttr> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+gap::generator<CXX11NoReturnAttr> CXX11NoReturnAttr::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (AttrKind k : kCXX11NoReturnAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+      if (std::optional<CXX11NoReturnAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
 
 gap::generator<CXX11NoReturnAttr> CXX11NoReturnAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -69,43 +107,6 @@ std::optional<CXX11NoReturnAttr> CXX11NoReturnAttr::from_base(const Attr &parent
   }
 }
 
-gap::generator<CXX11NoReturnAttr> CXX11NoReturnAttr::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (AttrKind k : kCXX11NoReturnAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<CXX11NoReturnAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<CXX11NoReturnAttr> CXX11NoReturnAttr::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (AttrKind k : kCXX11NoReturnAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<CXX11NoReturnAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<CXX11NoReturnAttr> CXX11NoReturnAttr::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (AttrKind k : kCXX11NoReturnAttrDerivedKinds) {
-      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<CXX11NoReturnAttr> e = from_base(std::move(eptr))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
-  }
-}
-
 std::optional<CXX11NoReturnAttr> CXX11NoReturnAttr::from(const Reference &r) {
   return CXX11NoReturnAttr::from(r.as_attribute());
 }
@@ -125,7 +126,7 @@ std::optional<CXX11NoReturnAttr> CXX11NoReturnAttr::from(const TokenContext &t) 
 }
 
 CXX11NoReturnAttrSpelling CXX11NoReturnAttr::semantic_spelling(void) const {
-  return static_cast<CXX11NoReturnAttrSpelling>(impl->reader.getVal10());
+  return static_cast<CXX11NoReturnAttrSpelling>(impl->reader.getVal12());
 }
 
 #pragma GCC diagnostic pop

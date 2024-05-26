@@ -31,6 +31,7 @@ class MX_EXPORT ReferenceType : public Type {
   static gap::generator<ReferenceType> in(const Index &index);
   static gap::generator<ReferenceType> containing(const Token &tok);
   bool contains(const Token &tok) const;
+
   static std::optional<ReferenceType> by_id(const Index &, EntityId);
 
   static std::optional<ReferenceType> from_base(const Type &parent);

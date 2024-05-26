@@ -17,6 +17,7 @@ class Index;
 class Reference;
 class Decl;
 class Expr;
+class File;
 class NamedDecl;
 class OMPDeclarativeDirectiveValueDecl;
 class OMPDeclareMapperDecl;
@@ -38,11 +39,10 @@ class MX_EXPORT OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
   friend class Decl;
  public:
   static gap::generator<OMPDeclareMapperDecl> in(const Index &index);
-  static gap::generator<OMPDeclareMapperDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<OMPDeclareMapperDecl> by_id(const Index &, EntityId);
   static gap::generator<OMPDeclareMapperDecl> in(const Fragment &frag);
   static gap::generator<OMPDeclareMapperDecl> in(const File &file);
+  static gap::generator<OMPDeclareMapperDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<OMPDeclareMapperDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<OMPDeclareMapperDecl, ir::Operation>> in(const Compilation &tu);
@@ -62,6 +62,8 @@ class MX_EXPORT OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
   OMPDeclareMapperDecl canonical_declaration(void) const;
   std::optional<OMPDeclareMapperDecl> definition(void) const;
   gap::generator<OMPDeclareMapperDecl> redeclarations(void) const &;
+  static std::optional<OMPDeclareMapperDecl> by_id(const Index &, EntityId);
+
   static std::optional<OMPDeclareMapperDecl> from_base(const Decl &parent);
   inline static std::optional<OMPDeclareMapperDecl> from(const Decl &parent) {
     return from_base(parent);

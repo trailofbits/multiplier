@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Decl;
+class File;
 class OMPExecutableDirective;
 class OMPOrderedDirective;
 class Stmt;
@@ -32,11 +33,10 @@ class MX_EXPORT OMPOrderedDirective : public OMPExecutableDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPOrderedDirective> in(const Index &index);
-  static gap::generator<OMPOrderedDirective> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<OMPOrderedDirective> by_id(const Index &, EntityId);
   static gap::generator<OMPOrderedDirective> in(const Fragment &frag);
   static gap::generator<OMPOrderedDirective> in(const File &file);
+  static gap::generator<OMPOrderedDirective> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<OMPOrderedDirective> from(const ir::Operation &op);
   static gap::generator<std::pair<OMPOrderedDirective, ir::Operation>> in(const Compilation &tu);
@@ -52,6 +52,8 @@ class MX_EXPORT OMPOrderedDirective : public OMPExecutableDirective {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<OMPOrderedDirective> by_id(const Index &, EntityId);
 
   static std::optional<OMPOrderedDirective> from_base(const Stmt &parent);
   inline static std::optional<OMPOrderedDirective> from(const Stmt &parent) {

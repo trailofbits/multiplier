@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Attr;
 class CUDADeviceBuiltinSurfaceTypeAttr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT CUDADeviceBuiltinSurfaceTypeAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<CUDADeviceBuiltinSurfaceTypeAttr> in(const Index &index);
-  static gap::generator<CUDADeviceBuiltinSurfaceTypeAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CUDADeviceBuiltinSurfaceTypeAttr> by_id(const Index &, EntityId);
   static gap::generator<CUDADeviceBuiltinSurfaceTypeAttr> in(const Fragment &frag);
   static gap::generator<CUDADeviceBuiltinSurfaceTypeAttr> in(const File &file);
+  static gap::generator<CUDADeviceBuiltinSurfaceTypeAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CUDA_DEVICE_BUILTIN_SURFACE_TYPE;
   }
+
+  static std::optional<CUDADeviceBuiltinSurfaceTypeAttr> by_id(const Index &, EntityId);
 
   static std::optional<CUDADeviceBuiltinSurfaceTypeAttr> from_base(const Attr &parent);
   inline static std::optional<CUDADeviceBuiltinSurfaceTypeAttr> from(const Attr &parent) {

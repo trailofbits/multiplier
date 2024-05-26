@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Decl;
+class File;
 class NamedDecl;
 class Stmt;
 class Token;
@@ -34,11 +35,10 @@ class MX_EXPORT UnnamedGlobalConstantDecl : public ValueDecl {
   friend class Decl;
  public:
   static gap::generator<UnnamedGlobalConstantDecl> in(const Index &index);
-  static gap::generator<UnnamedGlobalConstantDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<UnnamedGlobalConstantDecl> by_id(const Index &, EntityId);
   static gap::generator<UnnamedGlobalConstantDecl> in(const Fragment &frag);
   static gap::generator<UnnamedGlobalConstantDecl> in(const File &file);
+  static gap::generator<UnnamedGlobalConstantDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<UnnamedGlobalConstantDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<UnnamedGlobalConstantDecl, ir::Operation>> in(const Compilation &tu);
@@ -58,6 +58,8 @@ class MX_EXPORT UnnamedGlobalConstantDecl : public ValueDecl {
   UnnamedGlobalConstantDecl canonical_declaration(void) const;
   std::optional<UnnamedGlobalConstantDecl> definition(void) const;
   gap::generator<UnnamedGlobalConstantDecl> redeclarations(void) const &;
+  static std::optional<UnnamedGlobalConstantDecl> by_id(const Index &, EntityId);
+
   static std::optional<UnnamedGlobalConstantDecl> from_base(const Decl &parent);
   inline static std::optional<UnnamedGlobalConstantDecl> from(const Decl &parent) {
     return from_base(parent);

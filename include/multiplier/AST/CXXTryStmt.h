@@ -18,6 +18,7 @@ class CXXCatchStmt;
 class CXXTryStmt;
 class CompoundStmt;
 class Decl;
+class File;
 class Stmt;
 class Token;
 namespace ir {
@@ -32,11 +33,10 @@ class MX_EXPORT CXXTryStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<CXXTryStmt> in(const Index &index);
-  static gap::generator<CXXTryStmt> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CXXTryStmt> by_id(const Index &, EntityId);
   static gap::generator<CXXTryStmt> in(const Fragment &frag);
   static gap::generator<CXXTryStmt> in(const File &file);
+  static gap::generator<CXXTryStmt> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<CXXTryStmt> from(const ir::Operation &op);
   static gap::generator<std::pair<CXXTryStmt, ir::Operation>> in(const Compilation &tu);
@@ -52,6 +52,8 @@ class MX_EXPORT CXXTryStmt : public Stmt {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<CXXTryStmt> by_id(const Index &, EntityId);
 
   static std::optional<CXXTryStmt> from_base(const Stmt &parent);
   inline static std::optional<CXXTryStmt> from(const Stmt &parent) {

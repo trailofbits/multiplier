@@ -79,6 +79,62 @@ std::optional<Decl> Stmt::referenced_declaration(void) const {
   return std::nullopt;
 }
 
+gap::generator<Stmt> Stmt::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (StmtImplPtr eptr : ep->StmtsFor(ep)) {
+    co_yield Stmt(std::move(eptr));
+  }
+}
+
+gap::generator<Stmt> Stmt::in(const Index &index, std::span<const StmtKind> kinds) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (StmtKind k : kinds) {
+    for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
+      co_yield Stmt(std::move(eptr));
+    }
+  }
+}
+
+gap::generator<Stmt> Stmt::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (StmtImplPtr eptr : ep->StmtsFor(ep, frag_id)) {
+      co_yield Stmt(std::move(eptr));
+    }
+  }
+}
+
+gap::generator<Stmt> Stmt::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (StmtImplPtr eptr : ep->StmtsFor(ep, frag_id)) {
+    co_yield Stmt(std::move(eptr));
+  }
+}
+
+gap::generator<Stmt> Stmt::in(const Fragment &frag, std::span<const StmtKind> kinds) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (StmtKind k : kinds) {
+    for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
+      co_yield Stmt(std::move(eptr));
+    }
+  }
+}
+
+gap::generator<Stmt> Stmt::in(const File &file, std::span<const StmtKind> kinds) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (StmtKind k : kinds) {
+      for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
+        co_yield Stmt(std::move(eptr));
+      }
+    }
+  }
+}
+
 gap::generator<Stmt> Stmt::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = Stmt::from(*ctx)) {
@@ -151,62 +207,6 @@ std::optional<Stmt> Stmt::by_id(const Index &index, EntityId eid) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
-}
-
-gap::generator<Stmt> Stmt::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (StmtImplPtr eptr : ep->StmtsFor(ep)) {
-    co_yield Stmt(std::move(eptr));
-  }
-}
-
-gap::generator<Stmt> Stmt::in(const Index &index, std::span<const StmtKind> kinds) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (StmtKind k : kinds) {
-    for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      co_yield Stmt(std::move(eptr));
-    }
-  }
-}
-
-gap::generator<Stmt> Stmt::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (StmtImplPtr eptr : ep->StmtsFor(ep, frag_id)) {
-      co_yield Stmt(std::move(eptr));
-    }
-  }
-}
-
-gap::generator<Stmt> Stmt::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (StmtImplPtr eptr : ep->StmtsFor(ep, frag_id)) {
-    co_yield Stmt(std::move(eptr));
-  }
-}
-
-gap::generator<Stmt> Stmt::in(const Fragment &frag, std::span<const StmtKind> kinds) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (StmtKind k : kinds) {
-    for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      co_yield Stmt(std::move(eptr));
-    }
-  }
-}
-
-gap::generator<Stmt> Stmt::in(const File &file, std::span<const StmtKind> kinds) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (StmtKind k : kinds) {
-      for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        co_yield Stmt(std::move(eptr));
-      }
-    }
-  }
 }
 
 std::optional<Stmt> Stmt::from(const Reference &r) {

@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class InitPriorityAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT InitPriorityAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<InitPriorityAttr> in(const Index &index);
-  static gap::generator<InitPriorityAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<InitPriorityAttr> by_id(const Index &, EntityId);
   static gap::generator<InitPriorityAttr> in(const Fragment &frag);
   static gap::generator<InitPriorityAttr> in(const File &file);
+  static gap::generator<InitPriorityAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::INIT_PRIORITY;
   }
+
+  static std::optional<InitPriorityAttr> by_id(const Index &, EntityId);
 
   static std::optional<InitPriorityAttr> from_base(const Attr &parent);
   inline static std::optional<InitPriorityAttr> from(const Attr &parent) {

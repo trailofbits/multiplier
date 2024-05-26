@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class ObjCGCAttr;
 class Token;
 class TypeAttr;
@@ -31,15 +32,16 @@ class MX_EXPORT ObjCGCAttr : public TypeAttr {
   friend class Attr;
  public:
   static gap::generator<ObjCGCAttr> in(const Index &index);
-  static gap::generator<ObjCGCAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ObjCGCAttr> by_id(const Index &, EntityId);
   static gap::generator<ObjCGCAttr> in(const Fragment &frag);
   static gap::generator<ObjCGCAttr> in(const File &file);
+  static gap::generator<ObjCGCAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_CGC;
   }
+
+  static std::optional<ObjCGCAttr> by_id(const Index &, EntityId);
 
   static std::optional<ObjCGCAttr> from_base(const Attr &parent);
   inline static std::optional<ObjCGCAttr> from(const Attr &parent) {

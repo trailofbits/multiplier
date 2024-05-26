@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Decl;
 class DeclaratorDecl;
+class File;
 class NamedDecl;
 class OMPCapturedExprDecl;
 class Stmt;
@@ -38,11 +39,10 @@ class MX_EXPORT OMPCapturedExprDecl : public VarDecl {
   friend class Decl;
  public:
   static gap::generator<OMPCapturedExprDecl> in(const Index &index);
-  static gap::generator<OMPCapturedExprDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<OMPCapturedExprDecl> by_id(const Index &, EntityId);
   static gap::generator<OMPCapturedExprDecl> in(const Fragment &frag);
   static gap::generator<OMPCapturedExprDecl> in(const File &file);
+  static gap::generator<OMPCapturedExprDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<OMPCapturedExprDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<OMPCapturedExprDecl, ir::Operation>> in(const Compilation &tu);
@@ -62,6 +62,8 @@ class MX_EXPORT OMPCapturedExprDecl : public VarDecl {
   OMPCapturedExprDecl canonical_declaration(void) const;
   std::optional<OMPCapturedExprDecl> definition(void) const;
   gap::generator<OMPCapturedExprDecl> redeclarations(void) const &;
+  static std::optional<OMPCapturedExprDecl> by_id(const Index &, EntityId);
+
   static std::optional<OMPCapturedExprDecl> from_base(const Decl &parent);
   inline static std::optional<OMPCapturedExprDecl> from(const Decl &parent) {
     return from_base(parent);

@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class InheritableParamAttr;
 class ParameterABIAttr;
@@ -35,15 +36,16 @@ class MX_EXPORT SwiftContextAttr : public ParameterABIAttr {
   friend class Attr;
  public:
   static gap::generator<SwiftContextAttr> in(const Index &index);
-  static gap::generator<SwiftContextAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<SwiftContextAttr> by_id(const Index &, EntityId);
   static gap::generator<SwiftContextAttr> in(const Fragment &frag);
   static gap::generator<SwiftContextAttr> in(const File &file);
+  static gap::generator<SwiftContextAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SWIFT_CONTEXT;
   }
+
+  static std::optional<SwiftContextAttr> by_id(const Index &, EntityId);
 
   static std::optional<SwiftContextAttr> from_base(const Attr &parent);
   inline static std::optional<SwiftContextAttr> from(const Attr &parent) {

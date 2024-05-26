@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Reference;
 class Decl;
+class File;
 class NamedDecl;
 class NamespaceDecl;
 class Stmt;
@@ -33,11 +34,10 @@ class MX_EXPORT NamespaceDecl : public NamedDecl {
   friend class Decl;
  public:
   static gap::generator<NamespaceDecl> in(const Index &index);
-  static gap::generator<NamespaceDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<NamespaceDecl> by_id(const Index &, EntityId);
   static gap::generator<NamespaceDecl> in(const Fragment &frag);
   static gap::generator<NamespaceDecl> in(const File &file);
+  static gap::generator<NamespaceDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<NamespaceDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<NamespaceDecl, ir::Operation>> in(const Compilation &tu);
@@ -57,6 +57,8 @@ class MX_EXPORT NamespaceDecl : public NamedDecl {
   NamespaceDecl canonical_declaration(void) const;
   std::optional<NamespaceDecl> definition(void) const;
   gap::generator<NamespaceDecl> redeclarations(void) const &;
+  static std::optional<NamespaceDecl> by_id(const Index &, EntityId);
+
   static std::optional<NamespaceDecl> from_base(const Decl &parent);
   inline static std::optional<NamespaceDecl> from(const Decl &parent) {
     return from_base(parent);

@@ -8,6 +8,7 @@
 
 #include <multiplier/AST/UuidAttr.h>
 #include <multiplier/AST/Attr.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/AST/InheritableAttr.h>
 #include <multiplier/AST/MSGuidDecl.h>
 #include <multiplier/Frontend/Token.h>
@@ -25,6 +26,43 @@ static const AttrKind kUuidAttrDerivedKinds[] = {
     UuidAttr::static_kind(),
 };
 }  // namespace
+
+gap::generator<UuidAttr> UuidAttr::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (AttrKind k : kUuidAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
+      if (std::optional<UuidAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<UuidAttr> UuidAttr::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (AttrKind k : kUuidAttrDerivedKinds) {
+      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+        if (std::optional<UuidAttr> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+gap::generator<UuidAttr> UuidAttr::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (AttrKind k : kUuidAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+      if (std::optional<UuidAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
 
 gap::generator<UuidAttr> UuidAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -70,43 +108,6 @@ std::optional<UuidAttr> UuidAttr::from_base(const Attr &parent) {
   }
 }
 
-gap::generator<UuidAttr> UuidAttr::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (AttrKind k : kUuidAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<UuidAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<UuidAttr> UuidAttr::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (AttrKind k : kUuidAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<UuidAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<UuidAttr> UuidAttr::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (AttrKind k : kUuidAttrDerivedKinds) {
-      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<UuidAttr> e = from_base(std::move(eptr))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
-  }
-}
-
 std::optional<UuidAttr> UuidAttr::from(const Reference &r) {
   return UuidAttr::from(r.as_attribute());
 }
@@ -126,12 +127,12 @@ std::optional<UuidAttr> UuidAttr::from(const TokenContext &t) {
 }
 
 std::string_view UuidAttr::guid(void) const {
-  capnp::Text::Reader data = impl->reader.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal11();
   return std::string_view(data.cStr(), data.size());
 }
 
 MSGuidDecl UuidAttr::guid_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal8();
+  RawEntityId eid = impl->reader.getVal10();
   return MSGuidDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 

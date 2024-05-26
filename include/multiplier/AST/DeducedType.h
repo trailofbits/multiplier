@@ -31,6 +31,7 @@ class MX_EXPORT DeducedType : public Type {
   static gap::generator<DeducedType> in(const Index &index);
   static gap::generator<DeducedType> containing(const Token &tok);
   bool contains(const Token &tok) const;
+
   static std::optional<DeducedType> by_id(const Index &, EntityId);
 
   static std::optional<DeducedType> from_base(const Type &parent);

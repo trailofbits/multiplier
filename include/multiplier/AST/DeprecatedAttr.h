@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Attr;
 class DeprecatedAttr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT DeprecatedAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<DeprecatedAttr> in(const Index &index);
-  static gap::generator<DeprecatedAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<DeprecatedAttr> by_id(const Index &, EntityId);
   static gap::generator<DeprecatedAttr> in(const Fragment &frag);
   static gap::generator<DeprecatedAttr> in(const File &file);
+  static gap::generator<DeprecatedAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::DEPRECATED;
   }
+
+  static std::optional<DeprecatedAttr> by_id(const Index &, EntityId);
 
   static std::optional<DeprecatedAttr> from_base(const Attr &parent);
   inline static std::optional<DeprecatedAttr> from(const Attr &parent) {

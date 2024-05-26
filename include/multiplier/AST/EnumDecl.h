@@ -18,6 +18,7 @@ class Reference;
 class Decl;
 class EnumConstantDecl;
 class EnumDecl;
+class File;
 class NamedDecl;
 class Stmt;
 class TagDecl;
@@ -40,11 +41,10 @@ class MX_EXPORT EnumDecl : public TagDecl {
   friend class Decl;
  public:
   static gap::generator<EnumDecl> in(const Index &index);
-  static gap::generator<EnumDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<EnumDecl> by_id(const Index &, EntityId);
   static gap::generator<EnumDecl> in(const Fragment &frag);
   static gap::generator<EnumDecl> in(const File &file);
+  static gap::generator<EnumDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<EnumDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<EnumDecl, ir::Operation>> in(const Compilation &tu);
@@ -64,6 +64,8 @@ class MX_EXPORT EnumDecl : public TagDecl {
   EnumDecl canonical_declaration(void) const;
   std::optional<EnumDecl> definition(void) const;
   gap::generator<EnumDecl> redeclarations(void) const &;
+  static std::optional<EnumDecl> by_id(const Index &, EntityId);
+
   static std::optional<EnumDecl> from_base(const Decl &parent);
   inline static std::optional<EnumDecl> from(const Decl &parent) {
     return from_base(parent);

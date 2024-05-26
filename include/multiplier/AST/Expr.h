@@ -19,6 +19,7 @@ class Index;
 class Decl;
 class Expr;
 class FieldDecl;
+class File;
 class ObjCPropertyRefExpr;
 class Stmt;
 class Token;
@@ -37,11 +38,10 @@ class MX_EXPORT Expr : public ValueStmt {
   friend class Stmt;
  public:
   static gap::generator<Expr> in(const Index &index);
-  static gap::generator<Expr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<Expr> by_id(const Index &, EntityId);
   static gap::generator<Expr> in(const Fragment &frag);
   static gap::generator<Expr> in(const File &file);
+  static gap::generator<Expr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<Expr> from(const ir::Operation &op);
   static gap::generator<std::pair<Expr, ir::Operation>> in(const Compilation &tu);
@@ -53,6 +53,8 @@ class MX_EXPORT Expr : public ValueStmt {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<Expr> by_id(const Index &, EntityId);
 
   static std::optional<Expr> from_base(const Stmt &parent);
   inline static std::optional<Expr> from(const Stmt &parent) {

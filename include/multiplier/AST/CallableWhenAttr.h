@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Attr;
 class CallableWhenAttr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT CallableWhenAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<CallableWhenAttr> in(const Index &index);
-  static gap::generator<CallableWhenAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CallableWhenAttr> by_id(const Index &, EntityId);
   static gap::generator<CallableWhenAttr> in(const Fragment &frag);
   static gap::generator<CallableWhenAttr> in(const File &file);
+  static gap::generator<CallableWhenAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CALLABLE_WHEN;
   }
+
+  static std::optional<CallableWhenAttr> by_id(const Index &, EntityId);
 
   static std::optional<CallableWhenAttr> from_base(const Attr &parent);
   inline static std::optional<CallableWhenAttr> from(const Attr &parent) {

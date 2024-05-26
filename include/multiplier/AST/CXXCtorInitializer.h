@@ -45,6 +45,7 @@ class Value;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT CXXCtorInitializer {
  public:
+  std::optional<Decl> parent_declaration(void) const;
  protected:
   friend class Attr;
   friend class Decl;
@@ -83,6 +84,14 @@ class MX_EXPORT CXXCtorInitializer {
   }
 
   PackedCXXCtorInitializerId id(void) const;
+
+  static gap::generator<CXXCtorInitializer> in(const Index &index);
+  static gap::generator<CXXCtorInitializer> in(const Fragment &frag);
+  static gap::generator<CXXCtorInitializer> in(const File &file);
+  static gap::generator<CXXCtorInitializer> containing(const Token &tok);
+  bool contains(const Token &tok) const;
+
+  static std::optional<CXXCtorInitializer> by_id(const Index &, EntityId);
 
   inline static std::optional<CXXCtorInitializer> from(const CXXCtorInitializer &self) {
     return self;

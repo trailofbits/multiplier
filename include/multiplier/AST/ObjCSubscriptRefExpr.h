@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Decl;
 class Expr;
+class File;
 class ObjCMethodDecl;
 class ObjCSubscriptRefExpr;
 class Stmt;
@@ -35,11 +36,10 @@ class MX_EXPORT ObjCSubscriptRefExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<ObjCSubscriptRefExpr> in(const Index &index);
-  static gap::generator<ObjCSubscriptRefExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ObjCSubscriptRefExpr> by_id(const Index &, EntityId);
   static gap::generator<ObjCSubscriptRefExpr> in(const Fragment &frag);
   static gap::generator<ObjCSubscriptRefExpr> in(const File &file);
+  static gap::generator<ObjCSubscriptRefExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<ObjCSubscriptRefExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<ObjCSubscriptRefExpr, ir::Operation>> in(const Compilation &tu);
@@ -55,6 +55,8 @@ class MX_EXPORT ObjCSubscriptRefExpr : public Expr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<ObjCSubscriptRefExpr> by_id(const Index &, EntityId);
 
   static std::optional<ObjCSubscriptRefExpr> from_base(const Stmt &parent);
   inline static std::optional<ObjCSubscriptRefExpr> from(const Stmt &parent) {

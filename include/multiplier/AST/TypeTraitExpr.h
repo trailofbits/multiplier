@@ -17,6 +17,7 @@ class Fragment;
 class Index;
 class Decl;
 class Expr;
+class File;
 class Stmt;
 class Token;
 class Type;
@@ -36,11 +37,10 @@ class MX_EXPORT TypeTraitExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<TypeTraitExpr> in(const Index &index);
-  static gap::generator<TypeTraitExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<TypeTraitExpr> by_id(const Index &, EntityId);
   static gap::generator<TypeTraitExpr> in(const Fragment &frag);
   static gap::generator<TypeTraitExpr> in(const File &file);
+  static gap::generator<TypeTraitExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<TypeTraitExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<TypeTraitExpr, ir::Operation>> in(const Compilation &tu);
@@ -56,6 +56,8 @@ class MX_EXPORT TypeTraitExpr : public Expr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<TypeTraitExpr> by_id(const Index &, EntityId);
 
   static std::optional<TypeTraitExpr> from_base(const Stmt &parent);
   inline static std::optional<TypeTraitExpr> from(const Stmt &parent) {

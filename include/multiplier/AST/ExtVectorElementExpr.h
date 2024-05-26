@@ -17,6 +17,7 @@ class Index;
 class Decl;
 class Expr;
 class ExtVectorElementExpr;
+class File;
 class Stmt;
 class Token;
 class ValueStmt;
@@ -34,11 +35,10 @@ class MX_EXPORT ExtVectorElementExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<ExtVectorElementExpr> in(const Index &index);
-  static gap::generator<ExtVectorElementExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ExtVectorElementExpr> by_id(const Index &, EntityId);
   static gap::generator<ExtVectorElementExpr> in(const Fragment &frag);
   static gap::generator<ExtVectorElementExpr> in(const File &file);
+  static gap::generator<ExtVectorElementExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<ExtVectorElementExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<ExtVectorElementExpr, ir::Operation>> in(const Compilation &tu);
@@ -54,6 +54,8 @@ class MX_EXPORT ExtVectorElementExpr : public Expr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<ExtVectorElementExpr> by_id(const Index &, EntityId);
 
   static std::optional<ExtVectorElementExpr> from_base(const Stmt &parent);
   inline static std::optional<ExtVectorElementExpr> from(const Stmt &parent) {

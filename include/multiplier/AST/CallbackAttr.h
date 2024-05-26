@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Attr;
 class CallbackAttr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT CallbackAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<CallbackAttr> in(const Index &index);
-  static gap::generator<CallbackAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CallbackAttr> by_id(const Index &, EntityId);
   static gap::generator<CallbackAttr> in(const Fragment &frag);
   static gap::generator<CallbackAttr> in(const File &file);
+  static gap::generator<CallbackAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CALLBACK;
   }
+
+  static std::optional<CallbackAttr> by_id(const Index &, EntityId);
 
   static std::optional<CallbackAttr> from_base(const Attr &parent);
   inline static std::optional<CallbackAttr> from(const Attr &parent) {

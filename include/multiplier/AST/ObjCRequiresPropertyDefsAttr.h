@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class ObjCRequiresPropertyDefsAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT ObjCRequiresPropertyDefsAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ObjCRequiresPropertyDefsAttr> in(const Index &index);
-  static gap::generator<ObjCRequiresPropertyDefsAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ObjCRequiresPropertyDefsAttr> by_id(const Index &, EntityId);
   static gap::generator<ObjCRequiresPropertyDefsAttr> in(const Fragment &frag);
   static gap::generator<ObjCRequiresPropertyDefsAttr> in(const File &file);
+  static gap::generator<ObjCRequiresPropertyDefsAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_REQUIRES_PROPERTY_DEFS;
   }
+
+  static std::optional<ObjCRequiresPropertyDefsAttr> by_id(const Index &, EntityId);
 
   static std::optional<ObjCRequiresPropertyDefsAttr> from_base(const Attr &parent);
   inline static std::optional<ObjCRequiresPropertyDefsAttr> from(const Attr &parent) {

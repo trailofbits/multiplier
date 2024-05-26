@@ -17,6 +17,7 @@ class Index;
 class Attr;
 class CodeAlignAttr;
 class Expr;
+class File;
 class StmtAttr;
 class Token;
 namespace ir {
@@ -32,15 +33,16 @@ class MX_EXPORT CodeAlignAttr : public StmtAttr {
   friend class Attr;
  public:
   static gap::generator<CodeAlignAttr> in(const Index &index);
-  static gap::generator<CodeAlignAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CodeAlignAttr> by_id(const Index &, EntityId);
   static gap::generator<CodeAlignAttr> in(const Fragment &frag);
   static gap::generator<CodeAlignAttr> in(const File &file);
+  static gap::generator<CodeAlignAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CODE_ALIGN;
   }
+
+  static std::optional<CodeAlignAttr> by_id(const Index &, EntityId);
 
   static std::optional<CodeAlignAttr> from_base(const Attr &parent);
   inline static std::optional<CodeAlignAttr> from(const Attr &parent) {

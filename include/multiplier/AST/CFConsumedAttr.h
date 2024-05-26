@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Attr;
 class CFConsumedAttr;
+class File;
 class InheritableAttr;
 class InheritableParamAttr;
 class Token;
@@ -33,15 +34,16 @@ class MX_EXPORT CFConsumedAttr : public InheritableParamAttr {
   friend class Attr;
  public:
   static gap::generator<CFConsumedAttr> in(const Index &index);
-  static gap::generator<CFConsumedAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CFConsumedAttr> by_id(const Index &, EntityId);
   static gap::generator<CFConsumedAttr> in(const Fragment &frag);
   static gap::generator<CFConsumedAttr> in(const File &file);
+  static gap::generator<CFConsumedAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CF_CONSUMED;
   }
+
+  static std::optional<CFConsumedAttr> by_id(const Index &, EntityId);
 
   static std::optional<CFConsumedAttr> from_base(const Attr &parent);
   inline static std::optional<CFConsumedAttr> from(const Attr &parent) {

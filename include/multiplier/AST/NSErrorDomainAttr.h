@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class NSErrorDomainAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT NSErrorDomainAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<NSErrorDomainAttr> in(const Index &index);
-  static gap::generator<NSErrorDomainAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<NSErrorDomainAttr> by_id(const Index &, EntityId);
   static gap::generator<NSErrorDomainAttr> in(const Fragment &frag);
   static gap::generator<NSErrorDomainAttr> in(const File &file);
+  static gap::generator<NSErrorDomainAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NS_ERROR_DOMAIN;
   }
+
+  static std::optional<NSErrorDomainAttr> by_id(const Index &, EntityId);
 
   static std::optional<NSErrorDomainAttr> from_base(const Attr &parent);
   inline static std::optional<NSErrorDomainAttr> from(const Attr &parent) {

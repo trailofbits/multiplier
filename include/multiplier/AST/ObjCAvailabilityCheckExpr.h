@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Decl;
 class Expr;
+class File;
 class ObjCAvailabilityCheckExpr;
 class Stmt;
 class Token;
@@ -34,11 +35,10 @@ class MX_EXPORT ObjCAvailabilityCheckExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<ObjCAvailabilityCheckExpr> in(const Index &index);
-  static gap::generator<ObjCAvailabilityCheckExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ObjCAvailabilityCheckExpr> by_id(const Index &, EntityId);
   static gap::generator<ObjCAvailabilityCheckExpr> in(const Fragment &frag);
   static gap::generator<ObjCAvailabilityCheckExpr> in(const File &file);
+  static gap::generator<ObjCAvailabilityCheckExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<ObjCAvailabilityCheckExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<ObjCAvailabilityCheckExpr, ir::Operation>> in(const Compilation &tu);
@@ -54,6 +54,8 @@ class MX_EXPORT ObjCAvailabilityCheckExpr : public Expr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<ObjCAvailabilityCheckExpr> by_id(const Index &, EntityId);
 
   static std::optional<ObjCAvailabilityCheckExpr> from_base(const Stmt &parent);
   inline static std::optional<ObjCAvailabilityCheckExpr> from(const Stmt &parent) {

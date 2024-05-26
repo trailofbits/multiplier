@@ -32,11 +32,12 @@ class MX_EXPORT DependentBitIntType : public Type {
   static gap::generator<DependentBitIntType> in(const Index &index);
   static gap::generator<DependentBitIntType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<DependentBitIntType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::DEPENDENT_BIT_INT;
   }
+
+  static std::optional<DependentBitIntType> by_id(const Index &, EntityId);
 
   static std::optional<DependentBitIntType> from_base(const Type &parent);
   inline static std::optional<DependentBitIntType> from(const Type &parent) {

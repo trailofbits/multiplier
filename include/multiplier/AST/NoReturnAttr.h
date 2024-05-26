@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class NoReturnAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT NoReturnAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<NoReturnAttr> in(const Index &index);
-  static gap::generator<NoReturnAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<NoReturnAttr> by_id(const Index &, EntityId);
   static gap::generator<NoReturnAttr> in(const Fragment &frag);
   static gap::generator<NoReturnAttr> in(const File &file);
+  static gap::generator<NoReturnAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_RETURN;
   }
+
+  static std::optional<NoReturnAttr> by_id(const Index &, EntityId);
 
   static std::optional<NoReturnAttr> from_base(const Attr &parent);
   inline static std::optional<NoReturnAttr> from(const Attr &parent) {

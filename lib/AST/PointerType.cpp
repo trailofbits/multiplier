@@ -24,6 +24,17 @@ static const TypeKind kPointerTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<PointerType> PointerType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kPointerTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<PointerType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<PointerType> PointerType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = PointerType::from(*ctx)) {
@@ -65,17 +76,6 @@ std::optional<PointerType> PointerType::from_base(const Type &parent) {
       return reinterpret_cast<const PointerType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<PointerType> PointerType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kPointerTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<PointerType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

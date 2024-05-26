@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Decl;
+class File;
 class NamedDecl;
 class ObjCCompatibleAliasDecl;
 class ObjCInterfaceDecl;
@@ -33,11 +34,10 @@ class MX_EXPORT ObjCCompatibleAliasDecl : public NamedDecl {
   friend class Decl;
  public:
   static gap::generator<ObjCCompatibleAliasDecl> in(const Index &index);
-  static gap::generator<ObjCCompatibleAliasDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ObjCCompatibleAliasDecl> by_id(const Index &, EntityId);
   static gap::generator<ObjCCompatibleAliasDecl> in(const Fragment &frag);
   static gap::generator<ObjCCompatibleAliasDecl> in(const File &file);
+  static gap::generator<ObjCCompatibleAliasDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<ObjCCompatibleAliasDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<ObjCCompatibleAliasDecl, ir::Operation>> in(const Compilation &tu);
@@ -57,6 +57,8 @@ class MX_EXPORT ObjCCompatibleAliasDecl : public NamedDecl {
   ObjCCompatibleAliasDecl canonical_declaration(void) const;
   std::optional<ObjCCompatibleAliasDecl> definition(void) const;
   gap::generator<ObjCCompatibleAliasDecl> redeclarations(void) const &;
+  static std::optional<ObjCCompatibleAliasDecl> by_id(const Index &, EntityId);
+
   static std::optional<ObjCCompatibleAliasDecl> from_base(const Decl &parent);
   inline static std::optional<ObjCCompatibleAliasDecl> from(const Decl &parent) {
     return from_base(parent);

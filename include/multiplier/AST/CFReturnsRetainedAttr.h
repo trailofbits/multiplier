@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Attr;
 class CFReturnsRetainedAttr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT CFReturnsRetainedAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<CFReturnsRetainedAttr> in(const Index &index);
-  static gap::generator<CFReturnsRetainedAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CFReturnsRetainedAttr> by_id(const Index &, EntityId);
   static gap::generator<CFReturnsRetainedAttr> in(const Fragment &frag);
   static gap::generator<CFReturnsRetainedAttr> in(const File &file);
+  static gap::generator<CFReturnsRetainedAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CF_RETURNS_RETAINED;
   }
+
+  static std::optional<CFReturnsRetainedAttr> by_id(const Index &, EntityId);
 
   static std::optional<CFReturnsRetainedAttr> from_base(const Attr &parent);
   inline static std::optional<CFReturnsRetainedAttr> from(const Attr &parent) {

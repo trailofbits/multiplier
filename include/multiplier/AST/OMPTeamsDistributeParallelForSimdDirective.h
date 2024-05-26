@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Decl;
+class File;
 class OMPExecutableDirective;
 class OMPLoopBasedDirective;
 class OMPLoopDirective;
@@ -36,11 +37,10 @@ class MX_EXPORT OMPTeamsDistributeParallelForSimdDirective : public OMPLoopDirec
   friend class Stmt;
  public:
   static gap::generator<OMPTeamsDistributeParallelForSimdDirective> in(const Index &index);
-  static gap::generator<OMPTeamsDistributeParallelForSimdDirective> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<OMPTeamsDistributeParallelForSimdDirective> by_id(const Index &, EntityId);
   static gap::generator<OMPTeamsDistributeParallelForSimdDirective> in(const Fragment &frag);
   static gap::generator<OMPTeamsDistributeParallelForSimdDirective> in(const File &file);
+  static gap::generator<OMPTeamsDistributeParallelForSimdDirective> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<OMPTeamsDistributeParallelForSimdDirective> from(const ir::Operation &op);
   static gap::generator<std::pair<OMPTeamsDistributeParallelForSimdDirective, ir::Operation>> in(const Compilation &tu);
@@ -56,6 +56,8 @@ class MX_EXPORT OMPTeamsDistributeParallelForSimdDirective : public OMPLoopDirec
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<OMPTeamsDistributeParallelForSimdDirective> by_id(const Index &, EntityId);
 
   static std::optional<OMPTeamsDistributeParallelForSimdDirective> from_base(const Stmt &parent);
   inline static std::optional<OMPTeamsDistributeParallelForSimdDirective> from(const Stmt &parent) {

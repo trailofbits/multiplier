@@ -25,6 +25,17 @@ static const TypeKind kConstantMatrixTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<ConstantMatrixType> ConstantMatrixType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kConstantMatrixTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<ConstantMatrixType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<ConstantMatrixType> ConstantMatrixType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = ConstantMatrixType::from(*ctx)) {
@@ -66,17 +77,6 @@ std::optional<ConstantMatrixType> ConstantMatrixType::from_base(const Type &pare
       return reinterpret_cast<const ConstantMatrixType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<ConstantMatrixType> ConstantMatrixType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kConstantMatrixTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<ConstantMatrixType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

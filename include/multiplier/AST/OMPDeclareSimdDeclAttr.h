@@ -17,6 +17,7 @@ class Fragment;
 class Index;
 class Attr;
 class Expr;
+class File;
 class OMPDeclareSimdDeclAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT OMPDeclareSimdDeclAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<OMPDeclareSimdDeclAttr> in(const Index &index);
-  static gap::generator<OMPDeclareSimdDeclAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<OMPDeclareSimdDeclAttr> by_id(const Index &, EntityId);
   static gap::generator<OMPDeclareSimdDeclAttr> in(const Fragment &frag);
   static gap::generator<OMPDeclareSimdDeclAttr> in(const File &file);
+  static gap::generator<OMPDeclareSimdDeclAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OMP_DECLARE_SIMD_DECL;
   }
+
+  static std::optional<OMPDeclareSimdDeclAttr> by_id(const Index &, EntityId);
 
   static std::optional<OMPDeclareSimdDeclAttr> from_base(const Attr &parent);
   inline static std::optional<OMPDeclareSimdDeclAttr> from(const Attr &parent) {

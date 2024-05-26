@@ -18,6 +18,7 @@ class Index;
 class AlwaysInlineAttr;
 class Attr;
 class DeclOrStmtAttr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -34,15 +35,16 @@ class MX_EXPORT AlwaysInlineAttr : public DeclOrStmtAttr {
   friend class Attr;
  public:
   static gap::generator<AlwaysInlineAttr> in(const Index &index);
-  static gap::generator<AlwaysInlineAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<AlwaysInlineAttr> by_id(const Index &, EntityId);
   static gap::generator<AlwaysInlineAttr> in(const Fragment &frag);
   static gap::generator<AlwaysInlineAttr> in(const File &file);
+  static gap::generator<AlwaysInlineAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ALWAYS_INLINE;
   }
+
+  static std::optional<AlwaysInlineAttr> by_id(const Index &, EntityId);
 
   static std::optional<AlwaysInlineAttr> from_base(const Attr &parent);
   inline static std::optional<AlwaysInlineAttr> from(const Attr &parent) {

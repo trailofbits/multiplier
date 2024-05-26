@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Attr;
 class CoroWrapperAttr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT CoroWrapperAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<CoroWrapperAttr> in(const Index &index);
-  static gap::generator<CoroWrapperAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CoroWrapperAttr> by_id(const Index &, EntityId);
   static gap::generator<CoroWrapperAttr> in(const Fragment &frag);
   static gap::generator<CoroWrapperAttr> in(const File &file);
+  static gap::generator<CoroWrapperAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CORO_WRAPPER;
   }
+
+  static std::optional<CoroWrapperAttr> by_id(const Index &, EntityId);
 
   static std::optional<CoroWrapperAttr> from_base(const Attr &parent);
   inline static std::optional<CoroWrapperAttr> from(const Attr &parent) {

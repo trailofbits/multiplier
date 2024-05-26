@@ -949,6 +949,21 @@ class Macro(multiplier.Entity):
 
   @overload
   @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.Macro]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.Macro]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.Macro]:
+    ...
+
+  @overload
+  @staticmethod
   def IN(index: multiplier.Index, kinds: Sequence[multiplier.frontend.MacroKind]) -> Iterable[multiplier.frontend.Macro]:
     ...
 
@@ -964,31 +979,16 @@ class Macro(multiplier.Entity):
 
   @overload
   @staticmethod
-  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.Macro]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.Macro]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.Macro]:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.Macro]:
-    ...
-
-  @overload
-  @staticmethod
   def containing(macro: multiplier.frontend.Macro) -> Iterable[multiplier.frontend.Macro]:
     ...
 
   @overload
   @staticmethod
   def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.Macro]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.Macro]:
     ...
 
   @overload
@@ -1024,21 +1024,17 @@ class MacroSubstitution(multiplier.frontend.Macro):
 
   @overload
   @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.MacroSubstitution]:
+    ...
+
+  @overload
+  @staticmethod
   def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.MacroSubstitution]:
     ...
 
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.MacroSubstitution]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.MacroSubstitution]:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroSubstitution]:
     ...
 
   @staticmethod
@@ -1053,6 +1049,10 @@ class MacroSubstitution(multiplier.frontend.Macro):
   @overload
   @staticmethod
   def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.MacroSubstitution]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroSubstitution]:
     ...
 
   @staticmethod
@@ -1089,21 +1089,17 @@ class MacroConcatenate(multiplier.frontend.MacroSubstitution):
 
   @overload
   @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.MacroConcatenate]:
+    ...
+
+  @overload
+  @staticmethod
   def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.MacroConcatenate]:
     ...
 
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.MacroConcatenate]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.MacroConcatenate]:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroConcatenate]:
     ...
 
   @staticmethod
@@ -1118,6 +1114,10 @@ class MacroConcatenate(multiplier.frontend.MacroSubstitution):
   @overload
   @staticmethod
   def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.MacroConcatenate]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroConcatenate]:
     ...
 
   @staticmethod
@@ -1154,21 +1154,17 @@ class MacroStringify(multiplier.frontend.MacroSubstitution):
 
   @overload
   @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.MacroStringify]:
+    ...
+
+  @overload
+  @staticmethod
   def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.MacroStringify]:
     ...
 
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.MacroStringify]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.MacroStringify]:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroStringify]:
     ...
 
   @staticmethod
@@ -1183,6 +1179,10 @@ class MacroStringify(multiplier.frontend.MacroSubstitution):
   @overload
   @staticmethod
   def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.MacroStringify]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroStringify]:
     ...
 
   @staticmethod
@@ -1222,21 +1222,17 @@ class MacroExpansion(multiplier.frontend.MacroSubstitution):
 
   @overload
   @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.MacroExpansion]:
+    ...
+
+  @overload
+  @staticmethod
   def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.MacroExpansion]:
     ...
 
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.MacroExpansion]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.MacroExpansion]:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroExpansion]:
     ...
 
   @staticmethod
@@ -1251,6 +1247,10 @@ class MacroExpansion(multiplier.frontend.MacroSubstitution):
   @overload
   @staticmethod
   def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.MacroExpansion]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroExpansion]:
     ...
 
   @staticmethod
@@ -1291,21 +1291,17 @@ class MacroParameterSubstitution(multiplier.frontend.MacroSubstitution):
 
   @overload
   @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.MacroParameterSubstitution]:
+    ...
+
+  @overload
+  @staticmethod
   def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.MacroParameterSubstitution]:
     ...
 
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.MacroParameterSubstitution]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.MacroParameterSubstitution]:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroParameterSubstitution]:
     ...
 
   @staticmethod
@@ -1320,6 +1316,10 @@ class MacroParameterSubstitution(multiplier.frontend.MacroSubstitution):
   @overload
   @staticmethod
   def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.MacroParameterSubstitution]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroParameterSubstitution]:
     ...
 
   @staticmethod
@@ -1356,21 +1356,17 @@ class MacroVAOpt(multiplier.frontend.Macro):
 
   @overload
   @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.MacroVAOpt]:
+    ...
+
+  @overload
+  @staticmethod
   def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.MacroVAOpt]:
     ...
 
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.MacroVAOpt]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.MacroVAOpt]:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroVAOpt]:
     ...
 
   @staticmethod
@@ -1385,6 +1381,10 @@ class MacroVAOpt(multiplier.frontend.Macro):
   @overload
   @staticmethod
   def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.MacroVAOpt]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroVAOpt]:
     ...
 
   @staticmethod
@@ -1420,21 +1420,17 @@ class MacroVAOptArgument(multiplier.frontend.Macro):
 
   @overload
   @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.MacroVAOptArgument]:
+    ...
+
+  @overload
+  @staticmethod
   def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.MacroVAOptArgument]:
     ...
 
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.MacroVAOptArgument]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.MacroVAOptArgument]:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroVAOptArgument]:
     ...
 
   @staticmethod
@@ -1449,6 +1445,10 @@ class MacroVAOptArgument(multiplier.frontend.Macro):
   @overload
   @staticmethod
   def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.MacroVAOptArgument]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroVAOptArgument]:
     ...
 
   @staticmethod
@@ -1486,21 +1486,17 @@ class MacroArgument(multiplier.frontend.Macro):
 
   @overload
   @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.MacroArgument]:
+    ...
+
+  @overload
+  @staticmethod
   def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.MacroArgument]:
     ...
 
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.MacroArgument]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.MacroArgument]:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroArgument]:
     ...
 
   @staticmethod
@@ -1515,6 +1511,10 @@ class MacroArgument(multiplier.frontend.Macro):
   @overload
   @staticmethod
   def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.MacroArgument]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroArgument]:
     ...
 
   @staticmethod
@@ -1553,21 +1553,17 @@ class MacroParameter(multiplier.frontend.Macro):
 
   @overload
   @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.MacroParameter]:
+    ...
+
+  @overload
+  @staticmethod
   def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.MacroParameter]:
     ...
 
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.MacroParameter]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.MacroParameter]:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroParameter]:
     ...
 
   @staticmethod
@@ -1582,6 +1578,10 @@ class MacroParameter(multiplier.frontend.Macro):
   @overload
   @staticmethod
   def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.MacroParameter]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroParameter]:
     ...
 
   @staticmethod
@@ -1619,6 +1619,11 @@ class MacroDirective(multiplier.frontend.Macro):
 
   @overload
   @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.MacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
   def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.MacroDirective]:
     ...
 
@@ -1629,21 +1634,16 @@ class MacroDirective(multiplier.frontend.Macro):
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.MacroDirective]:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroDirective]:
-    ...
-
-  @overload
-  @staticmethod
   def containing(macro: multiplier.frontend.Macro) -> Iterable[multiplier.frontend.MacroDirective]:
     ...
 
   @overload
   @staticmethod
   def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.MacroDirective]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.MacroDirective]:
     ...
 
   @staticmethod
@@ -1684,21 +1684,17 @@ class DefineMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.DefineMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
   def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.DefineMacroDirective]:
     ...
 
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.DefineMacroDirective]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.DefineMacroDirective]:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.DefineMacroDirective]:
     ...
 
   @staticmethod
@@ -1713,6 +1709,10 @@ class DefineMacroDirective(multiplier.frontend.MacroDirective):
   @overload
   @staticmethod
   def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.DefineMacroDirective]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.DefineMacroDirective]:
     ...
 
   @staticmethod
@@ -1748,21 +1748,17 @@ class PragmaMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.PragmaMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
   def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.PragmaMacroDirective]:
     ...
 
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.PragmaMacroDirective]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.PragmaMacroDirective]:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.PragmaMacroDirective]:
     ...
 
   @staticmethod
@@ -1777,6 +1773,10 @@ class PragmaMacroDirective(multiplier.frontend.MacroDirective):
   @overload
   @staticmethod
   def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.PragmaMacroDirective]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.PragmaMacroDirective]:
     ...
 
   @staticmethod
@@ -1812,21 +1812,17 @@ class UndefineMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.UndefineMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
   def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.UndefineMacroDirective]:
     ...
 
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.UndefineMacroDirective]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.UndefineMacroDirective]:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.UndefineMacroDirective]:
     ...
 
   @staticmethod
@@ -1841,6 +1837,10 @@ class UndefineMacroDirective(multiplier.frontend.MacroDirective):
   @overload
   @staticmethod
   def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.UndefineMacroDirective]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.UndefineMacroDirective]:
     ...
 
   @staticmethod
@@ -1876,21 +1876,17 @@ class OtherMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.OtherMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
   def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.OtherMacroDirective]:
     ...
 
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.OtherMacroDirective]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.OtherMacroDirective]:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.OtherMacroDirective]:
     ...
 
   @staticmethod
@@ -1905,6 +1901,10 @@ class OtherMacroDirective(multiplier.frontend.MacroDirective):
   @overload
   @staticmethod
   def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.OtherMacroDirective]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.OtherMacroDirective]:
     ...
 
   @staticmethod
@@ -1940,6 +1940,11 @@ class ConditionalMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.ConditionalMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
   def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.ConditionalMacroDirective]:
     ...
 
@@ -1950,21 +1955,16 @@ class ConditionalMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.ConditionalMacroDirective]:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.ConditionalMacroDirective]:
-    ...
-
-  @overload
-  @staticmethod
   def containing(macro: multiplier.frontend.Macro) -> Iterable[multiplier.frontend.ConditionalMacroDirective]:
     ...
 
   @overload
   @staticmethod
   def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.ConditionalMacroDirective]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.ConditionalMacroDirective]:
     ...
 
   @staticmethod
@@ -2000,21 +2000,17 @@ class EndIfMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.EndIfMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
   def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.EndIfMacroDirective]:
     ...
 
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.EndIfMacroDirective]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.EndIfMacroDirective]:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.EndIfMacroDirective]:
     ...
 
   @staticmethod
@@ -2029,6 +2025,10 @@ class EndIfMacroDirective(multiplier.frontend.ConditionalMacroDirective):
   @overload
   @staticmethod
   def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.EndIfMacroDirective]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.EndIfMacroDirective]:
     ...
 
   @staticmethod
@@ -2064,21 +2064,17 @@ class ElseMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.ElseMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
   def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.ElseMacroDirective]:
     ...
 
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.ElseMacroDirective]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.ElseMacroDirective]:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.ElseMacroDirective]:
     ...
 
   @staticmethod
@@ -2093,6 +2089,10 @@ class ElseMacroDirective(multiplier.frontend.ConditionalMacroDirective):
   @overload
   @staticmethod
   def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.ElseMacroDirective]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.ElseMacroDirective]:
     ...
 
   @staticmethod
@@ -2128,21 +2128,17 @@ class ElseIfNotDefinedMacroDirective(multiplier.frontend.ConditionalMacroDirecti
 
   @overload
   @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
   def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
     ...
 
   @staticmethod
@@ -2157,6 +2153,10 @@ class ElseIfNotDefinedMacroDirective(multiplier.frontend.ConditionalMacroDirecti
   @overload
   @staticmethod
   def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
     ...
 
   @staticmethod
@@ -2192,21 +2192,17 @@ class ElseIfDefinedMacroDirective(multiplier.frontend.ConditionalMacroDirective)
 
   @overload
   @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.ElseIfDefinedMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
   def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.ElseIfDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.ElseIfDefinedMacroDirective]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.ElseIfDefinedMacroDirective]:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.ElseIfDefinedMacroDirective]:
     ...
 
   @staticmethod
@@ -2221,6 +2217,10 @@ class ElseIfDefinedMacroDirective(multiplier.frontend.ConditionalMacroDirective)
   @overload
   @staticmethod
   def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.ElseIfDefinedMacroDirective]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.ElseIfDefinedMacroDirective]:
     ...
 
   @staticmethod
@@ -2256,21 +2256,17 @@ class ElseIfMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.ElseIfMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
   def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.ElseIfMacroDirective]:
     ...
 
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.ElseIfMacroDirective]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.ElseIfMacroDirective]:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.ElseIfMacroDirective]:
     ...
 
   @staticmethod
@@ -2285,6 +2281,10 @@ class ElseIfMacroDirective(multiplier.frontend.ConditionalMacroDirective):
   @overload
   @staticmethod
   def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.ElseIfMacroDirective]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.ElseIfMacroDirective]:
     ...
 
   @staticmethod
@@ -2320,21 +2320,17 @@ class IfNotDefinedMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.IfNotDefinedMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
   def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.IfNotDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.IfNotDefinedMacroDirective]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.IfNotDefinedMacroDirective]:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.IfNotDefinedMacroDirective]:
     ...
 
   @staticmethod
@@ -2349,6 +2345,10 @@ class IfNotDefinedMacroDirective(multiplier.frontend.ConditionalMacroDirective):
   @overload
   @staticmethod
   def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.IfNotDefinedMacroDirective]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.IfNotDefinedMacroDirective]:
     ...
 
   @staticmethod
@@ -2384,21 +2384,17 @@ class IfDefinedMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.IfDefinedMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
   def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.IfDefinedMacroDirective]:
     ...
 
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.IfDefinedMacroDirective]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.IfDefinedMacroDirective]:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.IfDefinedMacroDirective]:
     ...
 
   @staticmethod
@@ -2413,6 +2409,10 @@ class IfDefinedMacroDirective(multiplier.frontend.ConditionalMacroDirective):
   @overload
   @staticmethod
   def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.IfDefinedMacroDirective]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.IfDefinedMacroDirective]:
     ...
 
   @staticmethod
@@ -2448,21 +2448,17 @@ class IfMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.IfMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
   def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.IfMacroDirective]:
     ...
 
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.IfMacroDirective]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.IfMacroDirective]:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.IfMacroDirective]:
     ...
 
   @staticmethod
@@ -2477,6 +2473,10 @@ class IfMacroDirective(multiplier.frontend.ConditionalMacroDirective):
   @overload
   @staticmethod
   def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.IfMacroDirective]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.IfMacroDirective]:
     ...
 
   @staticmethod
@@ -2513,6 +2513,11 @@ class IncludeLikeMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.IncludeLikeMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
   def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.IncludeLikeMacroDirective]:
     ...
 
@@ -2523,21 +2528,16 @@ class IncludeLikeMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.IncludeLikeMacroDirective]:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.IncludeLikeMacroDirective]:
-    ...
-
-  @overload
-  @staticmethod
   def containing(macro: multiplier.frontend.Macro) -> Iterable[multiplier.frontend.IncludeLikeMacroDirective]:
     ...
 
   @overload
   @staticmethod
   def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.IncludeLikeMacroDirective]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.IncludeLikeMacroDirective]:
     ...
 
   @staticmethod
@@ -2573,21 +2573,17 @@ class ImportMacroDirective(multiplier.frontend.IncludeLikeMacroDirective):
 
   @overload
   @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.ImportMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
   def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.ImportMacroDirective]:
     ...
 
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.ImportMacroDirective]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.ImportMacroDirective]:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.ImportMacroDirective]:
     ...
 
   @staticmethod
@@ -2602,6 +2598,10 @@ class ImportMacroDirective(multiplier.frontend.IncludeLikeMacroDirective):
   @overload
   @staticmethod
   def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.ImportMacroDirective]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.ImportMacroDirective]:
     ...
 
   @staticmethod
@@ -2637,21 +2637,17 @@ class IncludeMacrosMacroDirective(multiplier.frontend.IncludeLikeMacroDirective)
 
   @overload
   @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.IncludeMacrosMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
   def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.IncludeMacrosMacroDirective]:
     ...
 
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.IncludeMacrosMacroDirective]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.IncludeMacrosMacroDirective]:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.IncludeMacrosMacroDirective]:
     ...
 
   @staticmethod
@@ -2666,6 +2662,10 @@ class IncludeMacrosMacroDirective(multiplier.frontend.IncludeLikeMacroDirective)
   @overload
   @staticmethod
   def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.IncludeMacrosMacroDirective]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.IncludeMacrosMacroDirective]:
     ...
 
   @staticmethod
@@ -2701,21 +2701,17 @@ class IncludeNextMacroDirective(multiplier.frontend.IncludeLikeMacroDirective):
 
   @overload
   @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.IncludeNextMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
   def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.IncludeNextMacroDirective]:
     ...
 
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.IncludeNextMacroDirective]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.IncludeNextMacroDirective]:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.IncludeNextMacroDirective]:
     ...
 
   @staticmethod
@@ -2730,6 +2726,10 @@ class IncludeNextMacroDirective(multiplier.frontend.IncludeLikeMacroDirective):
   @overload
   @staticmethod
   def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.IncludeNextMacroDirective]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.IncludeNextMacroDirective]:
     ...
 
   @staticmethod
@@ -2765,21 +2765,17 @@ class IncludeMacroDirective(multiplier.frontend.IncludeLikeMacroDirective):
 
   @overload
   @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.IncludeMacroDirective]:
+    ...
+
+  @overload
+  @staticmethod
   def IN(frag: multiplier.Fragment) -> Iterable[multiplier.frontend.IncludeMacroDirective]:
     ...
 
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Iterable[multiplier.frontend.IncludeMacroDirective]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(index: multiplier.Index) -> Iterable[multiplier.frontend.IncludeMacroDirective]:
-    ...
-
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.IncludeMacroDirective]:
     ...
 
   @staticmethod
@@ -2794,6 +2790,10 @@ class IncludeMacroDirective(multiplier.frontend.IncludeLikeMacroDirective):
   @overload
   @staticmethod
   def containing(token: multiplier.frontend.Token) -> Iterable[multiplier.frontend.IncludeMacroDirective]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.frontend.IncludeMacroDirective]:
     ...
 
   @staticmethod

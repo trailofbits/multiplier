@@ -8,6 +8,7 @@
 
 #include <multiplier/AST/InheritableAttr.h>
 #include <multiplier/AST/Attr.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/AArch64SVEPcsAttr.h>
 #include <multiplier/AST/AArch64VectorPcsAttr.h>
@@ -675,6 +676,43 @@ static const AttrKind kInheritableAttrDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<InheritableAttr> InheritableAttr::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (AttrKind k : kInheritableAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
+      if (std::optional<InheritableAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<InheritableAttr> InheritableAttr::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (AttrKind k : kInheritableAttrDerivedKinds) {
+      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+        if (std::optional<InheritableAttr> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+gap::generator<InheritableAttr> InheritableAttr::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (AttrKind k : kInheritableAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+      if (std::optional<InheritableAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<InheritableAttr> InheritableAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = InheritableAttr::from(*ctx)) {
@@ -1044,43 +1082,6 @@ std::optional<InheritableAttr> InheritableAttr::from_base(const Attr &parent) {
   }
 }
 
-gap::generator<InheritableAttr> InheritableAttr::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (AttrKind k : kInheritableAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<InheritableAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<InheritableAttr> InheritableAttr::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (AttrKind k : kInheritableAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<InheritableAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<InheritableAttr> InheritableAttr::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (AttrKind k : kInheritableAttrDerivedKinds) {
-      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<InheritableAttr> e = from_base(std::move(eptr))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
-  }
-}
-
 std::optional<InheritableAttr> InheritableAttr::from(const Reference &r) {
   return InheritableAttr::from(r.as_attribute());
 }
@@ -1100,7 +1101,7 @@ std::optional<InheritableAttr> InheritableAttr::from(const TokenContext &t) {
 }
 
 bool InheritableAttr::should_inherit_even_if_already_present(void) const {
-  return impl->reader.getVal11();
+  return impl->reader.getVal13();
 }
 
 #pragma GCC diagnostic pop

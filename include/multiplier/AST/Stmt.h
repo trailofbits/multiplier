@@ -86,15 +86,14 @@ class MX_EXPORT Stmt {
   std::optional<PackedDeclId> referenced_declaration_id(void) const;
   std::optional<Decl> referenced_declaration(void) const;
 
+  static gap::generator<Stmt> in(const Index &index);
+  static gap::generator<Stmt> in(const Fragment &frag);
+  static gap::generator<Stmt> in(const File &file);
   static gap::generator<Stmt> in(const Index &index, std::span<const StmtKind> kinds);
   static gap::generator<Stmt> in(const Fragment &frag, std::span<const StmtKind> kinds);
   static gap::generator<Stmt> in(const File &file, std::span<const StmtKind> kinds);
-  static gap::generator<Stmt> in(const Index &index);
   static gap::generator<Stmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<Stmt> by_id(const Index &, EntityId);
-  static gap::generator<Stmt> in(const Fragment &frag);
-  static gap::generator<Stmt> in(const File &file);
 
   static std::optional<Stmt> from(const ir::Operation &op);
   static gap::generator<std::pair<Stmt, ir::Operation>> in(const Compilation &tu);
@@ -108,6 +107,8 @@ class MX_EXPORT Stmt {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<Stmt> by_id(const Index &, EntityId);
 
   inline static std::optional<Stmt> from(const Stmt &self) {
     return self;

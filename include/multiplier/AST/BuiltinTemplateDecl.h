@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class BuiltinTemplateDecl;
 class Decl;
+class File;
 class NamedDecl;
 class Stmt;
 class TemplateDecl;
@@ -34,11 +35,10 @@ class MX_EXPORT BuiltinTemplateDecl : public TemplateDecl {
   friend class Decl;
  public:
   static gap::generator<BuiltinTemplateDecl> in(const Index &index);
-  static gap::generator<BuiltinTemplateDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<BuiltinTemplateDecl> by_id(const Index &, EntityId);
   static gap::generator<BuiltinTemplateDecl> in(const Fragment &frag);
   static gap::generator<BuiltinTemplateDecl> in(const File &file);
+  static gap::generator<BuiltinTemplateDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<BuiltinTemplateDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<BuiltinTemplateDecl, ir::Operation>> in(const Compilation &tu);
@@ -58,6 +58,8 @@ class MX_EXPORT BuiltinTemplateDecl : public TemplateDecl {
   BuiltinTemplateDecl canonical_declaration(void) const;
   std::optional<BuiltinTemplateDecl> definition(void) const;
   gap::generator<BuiltinTemplateDecl> redeclarations(void) const &;
+  static std::optional<BuiltinTemplateDecl> by_id(const Index &, EntityId);
+
   static std::optional<BuiltinTemplateDecl> from_base(const Decl &parent);
   inline static std::optional<BuiltinTemplateDecl> from(const Decl &parent) {
     return from_base(parent);

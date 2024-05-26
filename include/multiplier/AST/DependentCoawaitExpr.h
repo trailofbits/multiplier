@@ -17,6 +17,7 @@ class Index;
 class Decl;
 class DependentCoawaitExpr;
 class Expr;
+class File;
 class Stmt;
 class Token;
 class UnresolvedLookupExpr;
@@ -35,11 +36,10 @@ class MX_EXPORT DependentCoawaitExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<DependentCoawaitExpr> in(const Index &index);
-  static gap::generator<DependentCoawaitExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<DependentCoawaitExpr> by_id(const Index &, EntityId);
   static gap::generator<DependentCoawaitExpr> in(const Fragment &frag);
   static gap::generator<DependentCoawaitExpr> in(const File &file);
+  static gap::generator<DependentCoawaitExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<DependentCoawaitExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<DependentCoawaitExpr, ir::Operation>> in(const Compilation &tu);
@@ -55,6 +55,8 @@ class MX_EXPORT DependentCoawaitExpr : public Expr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<DependentCoawaitExpr> by_id(const Index &, EntityId);
 
   static std::optional<DependentCoawaitExpr> from_base(const Stmt &parent);
   inline static std::optional<DependentCoawaitExpr> from(const Stmt &parent) {

@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class CompoundStmt;
 class Decl;
+class File;
 class MSDependentExistsStmt;
 class Stmt;
 class Token;
@@ -31,11 +32,10 @@ class MX_EXPORT MSDependentExistsStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<MSDependentExistsStmt> in(const Index &index);
-  static gap::generator<MSDependentExistsStmt> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<MSDependentExistsStmt> by_id(const Index &, EntityId);
   static gap::generator<MSDependentExistsStmt> in(const Fragment &frag);
   static gap::generator<MSDependentExistsStmt> in(const File &file);
+  static gap::generator<MSDependentExistsStmt> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<MSDependentExistsStmt> from(const ir::Operation &op);
   static gap::generator<std::pair<MSDependentExistsStmt, ir::Operation>> in(const Compilation &tu);
@@ -51,6 +51,8 @@ class MX_EXPORT MSDependentExistsStmt : public Stmt {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<MSDependentExistsStmt> by_id(const Index &, EntityId);
 
   static std::optional<MSDependentExistsStmt> from_base(const Stmt &parent);
   inline static std::optional<MSDependentExistsStmt> from(const Stmt &parent) {

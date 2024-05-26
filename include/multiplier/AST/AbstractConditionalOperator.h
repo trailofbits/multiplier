@@ -17,6 +17,7 @@ class Index;
 class AbstractConditionalOperator;
 class Decl;
 class Expr;
+class File;
 class Stmt;
 class Token;
 class ValueStmt;
@@ -34,11 +35,10 @@ class MX_EXPORT AbstractConditionalOperator : public Expr {
   friend class Stmt;
  public:
   static gap::generator<AbstractConditionalOperator> in(const Index &index);
-  static gap::generator<AbstractConditionalOperator> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<AbstractConditionalOperator> by_id(const Index &, EntityId);
   static gap::generator<AbstractConditionalOperator> in(const Fragment &frag);
   static gap::generator<AbstractConditionalOperator> in(const File &file);
+  static gap::generator<AbstractConditionalOperator> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<AbstractConditionalOperator> from(const ir::Operation &op);
   static gap::generator<std::pair<AbstractConditionalOperator, ir::Operation>> in(const Compilation &tu);
@@ -50,6 +50,8 @@ class MX_EXPORT AbstractConditionalOperator : public Expr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<AbstractConditionalOperator> by_id(const Index &, EntityId);
 
   static std::optional<AbstractConditionalOperator> from_base(const Stmt &parent);
   inline static std::optional<AbstractConditionalOperator> from(const Stmt &parent) {

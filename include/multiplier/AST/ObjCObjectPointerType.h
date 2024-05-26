@@ -35,11 +35,12 @@ class MX_EXPORT ObjCObjectPointerType : public Type {
   static gap::generator<ObjCObjectPointerType> in(const Index &index);
   static gap::generator<ObjCObjectPointerType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<ObjCObjectPointerType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::OBJ_C_OBJECT_POINTER;
   }
+
+  static std::optional<ObjCObjectPointerType> by_id(const Index &, EntityId);
 
   static std::optional<ObjCObjectPointerType> from_base(const Type &parent);
   inline static std::optional<ObjCObjectPointerType> from(const Type &parent) {

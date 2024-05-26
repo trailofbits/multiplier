@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class MaxFieldAlignmentAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT MaxFieldAlignmentAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<MaxFieldAlignmentAttr> in(const Index &index);
-  static gap::generator<MaxFieldAlignmentAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<MaxFieldAlignmentAttr> by_id(const Index &, EntityId);
   static gap::generator<MaxFieldAlignmentAttr> in(const Fragment &frag);
   static gap::generator<MaxFieldAlignmentAttr> in(const File &file);
+  static gap::generator<MaxFieldAlignmentAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MAX_FIELD_ALIGNMENT;
   }
+
+  static std::optional<MaxFieldAlignmentAttr> by_id(const Index &, EntityId);
 
   static std::optional<MaxFieldAlignmentAttr> from_base(const Attr &parent);
   inline static std::optional<MaxFieldAlignmentAttr> from(const Attr &parent) {

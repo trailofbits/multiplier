@@ -18,6 +18,7 @@ class CXXConstructExpr;
 class CXXTemporaryObjectExpr;
 class Decl;
 class Expr;
+class File;
 class Stmt;
 class Token;
 class ValueStmt;
@@ -36,11 +37,10 @@ class MX_EXPORT CXXTemporaryObjectExpr : public CXXConstructExpr {
   friend class Stmt;
  public:
   static gap::generator<CXXTemporaryObjectExpr> in(const Index &index);
-  static gap::generator<CXXTemporaryObjectExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CXXTemporaryObjectExpr> by_id(const Index &, EntityId);
   static gap::generator<CXXTemporaryObjectExpr> in(const Fragment &frag);
   static gap::generator<CXXTemporaryObjectExpr> in(const File &file);
+  static gap::generator<CXXTemporaryObjectExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<CXXTemporaryObjectExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<CXXTemporaryObjectExpr, ir::Operation>> in(const Compilation &tu);
@@ -56,6 +56,8 @@ class MX_EXPORT CXXTemporaryObjectExpr : public CXXConstructExpr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<CXXTemporaryObjectExpr> by_id(const Index &, EntityId);
 
   static std::optional<CXXTemporaryObjectExpr> from_base(const Stmt &parent);
   inline static std::optional<CXXTemporaryObjectExpr> from(const Stmt &parent) {

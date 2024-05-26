@@ -27,6 +27,17 @@ static const TypeKind kVariableArrayTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<VariableArrayType> VariableArrayType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kVariableArrayTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<VariableArrayType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<VariableArrayType> VariableArrayType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = VariableArrayType::from(*ctx)) {
@@ -68,17 +79,6 @@ std::optional<VariableArrayType> VariableArrayType::from_base(const Type &parent
       return reinterpret_cast<const VariableArrayType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<VariableArrayType> VariableArrayType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kVariableArrayTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<VariableArrayType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

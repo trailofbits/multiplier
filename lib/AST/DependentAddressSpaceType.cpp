@@ -25,6 +25,17 @@ static const TypeKind kDependentAddressSpaceTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<DependentAddressSpaceType> DependentAddressSpaceType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kDependentAddressSpaceTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<DependentAddressSpaceType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<DependentAddressSpaceType> DependentAddressSpaceType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = DependentAddressSpaceType::from(*ctx)) {
@@ -66,17 +77,6 @@ std::optional<DependentAddressSpaceType> DependentAddressSpaceType::from_base(co
       return reinterpret_cast<const DependentAddressSpaceType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<DependentAddressSpaceType> DependentAddressSpaceType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kDependentAddressSpaceTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<DependentAddressSpaceType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

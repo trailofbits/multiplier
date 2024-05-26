@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Decl;
+class File;
 class OMPExecutableDirective;
 class OMPLoopBasedDirective;
 class OMPLoopTransformationDirective;
@@ -36,11 +37,10 @@ class MX_EXPORT OMPUnrollDirective : public OMPLoopTransformationDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPUnrollDirective> in(const Index &index);
-  static gap::generator<OMPUnrollDirective> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<OMPUnrollDirective> by_id(const Index &, EntityId);
   static gap::generator<OMPUnrollDirective> in(const Fragment &frag);
   static gap::generator<OMPUnrollDirective> in(const File &file);
+  static gap::generator<OMPUnrollDirective> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<OMPUnrollDirective> from(const ir::Operation &op);
   static gap::generator<std::pair<OMPUnrollDirective, ir::Operation>> in(const Compilation &tu);
@@ -56,6 +56,8 @@ class MX_EXPORT OMPUnrollDirective : public OMPLoopTransformationDirective {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<OMPUnrollDirective> by_id(const Index &, EntityId);
 
   static std::optional<OMPUnrollDirective> from_base(const Stmt &parent);
   inline static std::optional<OMPUnrollDirective> from(const Stmt &parent) {

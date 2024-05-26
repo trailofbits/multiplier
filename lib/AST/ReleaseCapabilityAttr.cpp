@@ -8,6 +8,7 @@
 
 #include <multiplier/AST/ReleaseCapabilityAttr.h>
 #include <multiplier/AST/Attr.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/AST/InheritableAttr.h>
 #include <multiplier/Frontend/Token.h>
 
@@ -24,6 +25,43 @@ static const AttrKind kReleaseCapabilityAttrDerivedKinds[] = {
     ReleaseCapabilityAttr::static_kind(),
 };
 }  // namespace
+
+gap::generator<ReleaseCapabilityAttr> ReleaseCapabilityAttr::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (AttrKind k : kReleaseCapabilityAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
+      if (std::optional<ReleaseCapabilityAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<ReleaseCapabilityAttr> ReleaseCapabilityAttr::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (AttrKind k : kReleaseCapabilityAttrDerivedKinds) {
+      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+        if (std::optional<ReleaseCapabilityAttr> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+gap::generator<ReleaseCapabilityAttr> ReleaseCapabilityAttr::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (AttrKind k : kReleaseCapabilityAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+      if (std::optional<ReleaseCapabilityAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
 
 gap::generator<ReleaseCapabilityAttr> ReleaseCapabilityAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -69,43 +107,6 @@ std::optional<ReleaseCapabilityAttr> ReleaseCapabilityAttr::from_base(const Attr
   }
 }
 
-gap::generator<ReleaseCapabilityAttr> ReleaseCapabilityAttr::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (AttrKind k : kReleaseCapabilityAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<ReleaseCapabilityAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<ReleaseCapabilityAttr> ReleaseCapabilityAttr::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (AttrKind k : kReleaseCapabilityAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<ReleaseCapabilityAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<ReleaseCapabilityAttr> ReleaseCapabilityAttr::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (AttrKind k : kReleaseCapabilityAttrDerivedKinds) {
-      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<ReleaseCapabilityAttr> e = from_base(std::move(eptr))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
-  }
-}
-
 std::optional<ReleaseCapabilityAttr> ReleaseCapabilityAttr::from(const Reference &r) {
   return ReleaseCapabilityAttr::from(r.as_attribute());
 }
@@ -125,15 +126,15 @@ std::optional<ReleaseCapabilityAttr> ReleaseCapabilityAttr::from(const TokenCont
 }
 
 ReleaseCapabilityAttrSpelling ReleaseCapabilityAttr::semantic_spelling(void) const {
-  return static_cast<ReleaseCapabilityAttrSpelling>(impl->reader.getVal10());
+  return static_cast<ReleaseCapabilityAttrSpelling>(impl->reader.getVal12());
 }
 
 bool ReleaseCapabilityAttr::is_generic(void) const {
-  return impl->reader.getVal12();
+  return impl->reader.getVal14();
 }
 
 bool ReleaseCapabilityAttr::is_shared(void) const {
-  return impl->reader.getVal13();
+  return impl->reader.getVal15();
 }
 
 #pragma GCC diagnostic pop

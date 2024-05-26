@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class LayoutVersionAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT LayoutVersionAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<LayoutVersionAttr> in(const Index &index);
-  static gap::generator<LayoutVersionAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<LayoutVersionAttr> by_id(const Index &, EntityId);
   static gap::generator<LayoutVersionAttr> in(const Fragment &frag);
   static gap::generator<LayoutVersionAttr> in(const File &file);
+  static gap::generator<LayoutVersionAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::LAYOUT_VERSION;
   }
+
+  static std::optional<LayoutVersionAttr> by_id(const Index &, EntityId);
 
   static std::optional<LayoutVersionAttr> from_base(const Attr &parent);
   inline static std::optional<LayoutVersionAttr> from(const Attr &parent) {

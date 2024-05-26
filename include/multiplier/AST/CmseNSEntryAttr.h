@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Attr;
 class CmseNSEntryAttr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT CmseNSEntryAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<CmseNSEntryAttr> in(const Index &index);
-  static gap::generator<CmseNSEntryAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CmseNSEntryAttr> by_id(const Index &, EntityId);
   static gap::generator<CmseNSEntryAttr> in(const Fragment &frag);
   static gap::generator<CmseNSEntryAttr> in(const File &file);
+  static gap::generator<CmseNSEntryAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CMSE_NS_ENTRY;
   }
+
+  static std::optional<CmseNSEntryAttr> by_id(const Index &, EntityId);
 
   static std::optional<CmseNSEntryAttr> from_base(const Attr &parent);
   inline static std::optional<CmseNSEntryAttr> from(const Attr &parent) {

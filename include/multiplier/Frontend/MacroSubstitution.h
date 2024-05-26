@@ -14,6 +14,7 @@ namespace mx {
 class EntityProvider;
 class Fragment;
 class Index;
+class File;
 class Macro;
 class MacroSubstitution;
 class Token;
@@ -28,12 +29,9 @@ class MX_EXPORT MacroSubstitution : public Macro {
   friend class FragmentImpl;
   friend class Macro;
  public:
+  static gap::generator<MacroSubstitution> in(const Index &index);
   static gap::generator<MacroSubstitution> in(const Fragment &frag);
   static gap::generator<MacroSubstitution> in(const File &file);
-
-  static gap::generator<MacroSubstitution> in(const Index &index);
-  static std::optional<MacroSubstitution> by_id(const Index &, EntityId);
-
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::SUBSTITUTION;
   }
@@ -43,6 +41,8 @@ class MX_EXPORT MacroSubstitution : public Macro {
 
   static gap::generator<MacroSubstitution> containing(const Token &token);
   bool contains(const Token &token);
+
+  static std::optional<MacroSubstitution> by_id(const Index &, EntityId);
 
   static std::optional<MacroSubstitution> from_base(const Macro &parent);
   inline static std::optional<MacroSubstitution> from(const Macro &parent) {

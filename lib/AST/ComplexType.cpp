@@ -24,6 +24,17 @@ static const TypeKind kComplexTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<ComplexType> ComplexType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kComplexTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<ComplexType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<ComplexType> ComplexType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = ComplexType::from(*ctx)) {
@@ -65,17 +76,6 @@ std::optional<ComplexType> ComplexType::from_base(const Type &parent) {
       return reinterpret_cast<const ComplexType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<ComplexType> ComplexType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kComplexTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<ComplexType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

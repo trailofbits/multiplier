@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class NoBuiltinAttr;
 class Token;
 namespace ir {
@@ -29,15 +30,16 @@ class MX_EXPORT NoBuiltinAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<NoBuiltinAttr> in(const Index &index);
-  static gap::generator<NoBuiltinAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<NoBuiltinAttr> by_id(const Index &, EntityId);
   static gap::generator<NoBuiltinAttr> in(const Fragment &frag);
   static gap::generator<NoBuiltinAttr> in(const File &file);
+  static gap::generator<NoBuiltinAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NO_BUILTIN;
   }
+
+  static std::optional<NoBuiltinAttr> by_id(const Index &, EntityId);
 
   static std::optional<NoBuiltinAttr> from_base(const Attr &parent);
   inline static std::optional<NoBuiltinAttr> from(const Attr &parent) {

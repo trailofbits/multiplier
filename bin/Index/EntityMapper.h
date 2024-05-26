@@ -11,6 +11,7 @@
 #include "Util.h"
 
 namespace pasta {
+class AST;
 class File;
 }  // namespace pasta
 namespace indexer {
@@ -25,6 +26,8 @@ using NestedFragmentIntervals = interval_tree::IntervalTree<
 // Provides entity IDs and offsets to the serialization code.
 class EntityMapper final {
  public:
+  const pasta::AST &ast;
+
   // Set of all top-level declarations (from the perspective of fragments).
   std::unordered_set<const void *> top_level_decls;
 
@@ -72,24 +75,24 @@ class EntityMapper final {
   // entity IDs for all `Decl`s and `Stmt`s and such to be global.
   const bool generate_source_ir;
 
-  inline explicit EntityMapper(TypeMapper &tm_, bool generate_source_ir_)
-      : tm(tm_),
+  inline explicit EntityMapper(const pasta::AST &ast_,
+                               TypeMapper &tm_, bool generate_source_ir_)
+      : ast(ast_),
+        tm(tm_),
         generate_source_ir(generate_source_ir_) {}
 
   mx::RawEntityId ParentDeclId(const void *) const;
   mx::RawEntityId ParentStmtId(const void *) const;
 
-  mx::RawEntityId ParentDeclId(const pasta::Decl &entity) const;
-  mx::RawEntityId ParentDeclId(const pasta::Stmt &entity) const;
-  mx::RawEntityId ParentDeclId(const pasta::Designator &entity) const;
-  mx::RawEntityId ParentDeclId(const pasta::TemplateArgument &entity) const;
-  mx::RawEntityId ParentDeclId(const pasta::TemplateParameterList &entity) const;
-  mx::RawEntityId ParentDeclId(const pasta::CXXBaseSpecifier &entity) const;
+  template <typename Entity>
+  inline mx::RawEntityId ParentDeclId(const Entity &entity) const {
+    return ParentDeclId(RawEntity(entity));
+  }
 
-  mx::RawEntityId ParentStmtId(const pasta::Decl &entity) const;
-  mx::RawEntityId ParentStmtId(const pasta::Stmt &entity) const;
-  mx::RawEntityId ParentStmtId(const pasta::Designator &entity) const;
-  mx::RawEntityId ParentStmtId(const pasta::TemplateArgument &entity) const;
+  template <typename Entity>
+  inline mx::RawEntityId ParentStmtId(const Entity &entity) const {
+    return ParentStmtId(RawEntity(entity));
+  }
 
   inline mx::RawEntityId EntityId(std::nullptr_t entity) const noexcept {
     return mx::kInvalidEntityId;
@@ -147,14 +150,20 @@ class EntityMapper final {
     return mx::EntityId(this->EntityId(entity)).Extract<IdType>();
   }
 
-  std::optional<const pasta::Decl> ParentDecl(
-      const pasta::AST &ast, const pasta::Decl &entity) const;
-  std::optional<const pasta::Decl> ParentDecl(
-      const pasta::AST &ast, const pasta::Stmt &entity) const;
-  std::optional<const pasta::Stmt> ParentStmt(
-      const pasta::AST &ast, const pasta::Decl &entity) const;
-  std::optional<const pasta::Stmt> ParentStmt(
-      const pasta::AST &ast, const pasta::Stmt &entity) const;
+  template <typename Entity>
+  inline std::optional<const pasta::Decl> ParentDecl(
+      const Entity &entity) const {
+    return ParentDecl(RawEntity(entity));
+  }
+
+  template <typename Entity>
+  inline std::optional<const pasta::Stmt> ParentStmt(
+      const Entity &entity) const {
+    return ParentStmt(RawEntity(entity));
+  }
+
+  std::optional<const pasta::Decl> ParentDecl(const void *entity) const;
+  std::optional<const pasta::Stmt> ParentStmt(const void *entity) const;
 
   void ResetForFragment(void);
 
@@ -173,6 +182,9 @@ class EntityMapper final {
   // ID of the parent fragment.
   mx::RawEntityId ParentFragmentId(
       const void *parent_entity, const std::vector<pasta::Decl> &decls) const;
+
+  // Offset in bits of the base class within the derived class.
+  std::optional<uint64_t> BaseOffset(const pasta::CXXBaseSpecifier &spec) const;
 };
 
 }  // namespace indexer

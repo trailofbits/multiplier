@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Decl;
 class Expr;
+class File;
 class OffsetOfExpr;
 class Stmt;
 class Token;
@@ -34,11 +35,10 @@ class MX_EXPORT OffsetOfExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<OffsetOfExpr> in(const Index &index);
-  static gap::generator<OffsetOfExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<OffsetOfExpr> by_id(const Index &, EntityId);
   static gap::generator<OffsetOfExpr> in(const Fragment &frag);
   static gap::generator<OffsetOfExpr> in(const File &file);
+  static gap::generator<OffsetOfExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<OffsetOfExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<OffsetOfExpr, ir::Operation>> in(const Compilation &tu);
@@ -54,6 +54,8 @@ class MX_EXPORT OffsetOfExpr : public Expr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<OffsetOfExpr> by_id(const Index &, EntityId);
 
   static std::optional<OffsetOfExpr> from_base(const Stmt &parent);
   inline static std::optional<OffsetOfExpr> from(const Stmt &parent) {

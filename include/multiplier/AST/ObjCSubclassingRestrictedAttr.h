@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class ObjCSubclassingRestrictedAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT ObjCSubclassingRestrictedAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ObjCSubclassingRestrictedAttr> in(const Index &index);
-  static gap::generator<ObjCSubclassingRestrictedAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ObjCSubclassingRestrictedAttr> by_id(const Index &, EntityId);
   static gap::generator<ObjCSubclassingRestrictedAttr> in(const Fragment &frag);
   static gap::generator<ObjCSubclassingRestrictedAttr> in(const File &file);
+  static gap::generator<ObjCSubclassingRestrictedAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_SUBCLASSING_RESTRICTED;
   }
+
+  static std::optional<ObjCSubclassingRestrictedAttr> by_id(const Index &, EntityId);
 
   static std::optional<ObjCSubclassingRestrictedAttr> from_base(const Attr &parent);
   inline static std::optional<ObjCSubclassingRestrictedAttr> from(const Attr &parent) {

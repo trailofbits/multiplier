@@ -24,6 +24,17 @@ static const TypeKind kUnaryTransformTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<UnaryTransformType> UnaryTransformType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kUnaryTransformTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<UnaryTransformType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<UnaryTransformType> UnaryTransformType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = UnaryTransformType::from(*ctx)) {
@@ -65,17 +76,6 @@ std::optional<UnaryTransformType> UnaryTransformType::from_base(const Type &pare
       return reinterpret_cast<const UnaryTransformType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<UnaryTransformType> UnaryTransformType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kUnaryTransformTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<UnaryTransformType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

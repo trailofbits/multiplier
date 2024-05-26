@@ -31,6 +31,17 @@ static const TypeKind kArrayTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<ArrayType> ArrayType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kArrayTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<ArrayType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<ArrayType> ArrayType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = ArrayType::from(*ctx)) {
@@ -75,17 +86,6 @@ std::optional<ArrayType> ArrayType::from_base(const Type &parent) {
       return reinterpret_cast<const ArrayType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<ArrayType> ArrayType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kArrayTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<ArrayType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

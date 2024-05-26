@@ -34,11 +34,12 @@ class MX_EXPORT ObjCInterfaceType : public ObjCObjectType {
   static gap::generator<ObjCInterfaceType> in(const Index &index);
   static gap::generator<ObjCInterfaceType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<ObjCInterfaceType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::OBJ_C_INTERFACE;
   }
+
+  static std::optional<ObjCInterfaceType> by_id(const Index &, EntityId);
 
   static std::optional<ObjCInterfaceType> from_base(const Type &parent);
   inline static std::optional<ObjCInterfaceType> from(const Type &parent) {

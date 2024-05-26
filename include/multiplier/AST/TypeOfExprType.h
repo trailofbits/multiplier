@@ -33,11 +33,12 @@ class MX_EXPORT TypeOfExprType : public Type {
   static gap::generator<TypeOfExprType> in(const Index &index);
   static gap::generator<TypeOfExprType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<TypeOfExprType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::TYPE_OF_EXPR;
   }
+
+  static std::optional<TypeOfExprType> by_id(const Index &, EntityId);
 
   static std::optional<TypeOfExprType> from_base(const Type &parent);
   inline static std::optional<TypeOfExprType> from(const Type &parent) {

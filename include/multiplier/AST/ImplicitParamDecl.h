@@ -17,6 +17,7 @@ class Fragment;
 class Index;
 class Decl;
 class DeclaratorDecl;
+class File;
 class ImplicitParamDecl;
 class NamedDecl;
 class Stmt;
@@ -39,11 +40,10 @@ class MX_EXPORT ImplicitParamDecl : public VarDecl {
   friend class Decl;
  public:
   static gap::generator<ImplicitParamDecl> in(const Index &index);
-  static gap::generator<ImplicitParamDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ImplicitParamDecl> by_id(const Index &, EntityId);
   static gap::generator<ImplicitParamDecl> in(const Fragment &frag);
   static gap::generator<ImplicitParamDecl> in(const File &file);
+  static gap::generator<ImplicitParamDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<ImplicitParamDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<ImplicitParamDecl, ir::Operation>> in(const Compilation &tu);
@@ -63,6 +63,8 @@ class MX_EXPORT ImplicitParamDecl : public VarDecl {
   ImplicitParamDecl canonical_declaration(void) const;
   std::optional<ImplicitParamDecl> definition(void) const;
   gap::generator<ImplicitParamDecl> redeclarations(void) const &;
+  static std::optional<ImplicitParamDecl> by_id(const Index &, EntityId);
+
   static std::optional<ImplicitParamDecl> from_base(const Decl &parent);
   inline static std::optional<ImplicitParamDecl> from(const Decl &parent) {
     return from_base(parent);

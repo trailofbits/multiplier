@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Attr;
 class CFAuditedTransferAttr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT CFAuditedTransferAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<CFAuditedTransferAttr> in(const Index &index);
-  static gap::generator<CFAuditedTransferAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CFAuditedTransferAttr> by_id(const Index &, EntityId);
   static gap::generator<CFAuditedTransferAttr> in(const Fragment &frag);
   static gap::generator<CFAuditedTransferAttr> in(const File &file);
+  static gap::generator<CFAuditedTransferAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CF_AUDITED_TRANSFER;
   }
+
+  static std::optional<CFAuditedTransferAttr> by_id(const Index &, EntityId);
 
   static std::optional<CFAuditedTransferAttr> from_base(const Attr &parent);
   inline static std::optional<CFAuditedTransferAttr> from(const Attr &parent) {

@@ -1,133 +1,53 @@
-# Multiplier
+# _Multiplier_ finds more bugs faster
 
-Multiplier is a code auditing productivity multiplier. It...
+Multiplier provides precise and comprehensive code understanding capabilities.
+It does so by saving build artifacts into a database, and then making them
+persistently accessible using a C++ or Python API.
 
- * Comprehensively indexes code (this repository)
- * Provides a C++ API to access indexed code (this repository)
- * Provides a Python API to access indexed code ([py-multiplier](https://github.com/trailofbits/py-multiplier))
- * Provides a GUI for browsing indexed code ([qt-multiplier](https://github.com/trailofbits/qt-multiplier))
+Multiplier emphasizes the ability to unique identify *all* entities in a build
+process, including individual tokens, AST nodes, and intermediate
+representations. With Multiplier, an analyst can identify code patterns of
+interest over one of the representations, and then accurately relay results back
+to humans in a readable form, or to follow-on scripts via entity IDs.
 
-## Pre-built releases
+Multiplier's APIs are extensive, and often provide as-good or better-than
+compiler-level quality information, but linked at a whole-program granularity.
+We like to say that with its APIs, *you can get everywhere from anywhere*.
 
-You probably want pre-built releases of Multiplier, including its GUI. Hop over to
-the [qt-multiplier releases](https://github.com/trailofbits/qt-multiplier/releases) page
-to download those. The releases come with Multiplier's indexer, headers, libraries, etc.
-built in.
-
-Another place to find pre-built releases is [package-multiplier](https://github.com/trailofbits/package-multiplier/releases).
-These releases mostly focus on meeting deliverables for the DARPA V-SPELLS program.
-
-## Building Multiplier
-
-### Step 0
-
-Going forward, we assume the environment variable `WORKSPACE_DIR` dir represents
-the directory where everything goes.
-
-### Step 1
-
-#### macOS
-
-##### XCode
-
-Make sure that you have an up-to-date XCode. At a command line, you should be able
-to run `clang --version` and see something like this:
-
-```shell
-% clang --version
-Apple clang version 13.1.6 (clang-1316.0.21.2.3)
-Target: x86_64-apple-darwin21.4.0
-Thread model: posix
-InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
-```
-
-If you don't see that, then try the following:
-
-```shell
-xcode-select --install
-```
-
-This will pop open some dialogs and you should click "Install". After installing,
-try running the following command:
-
-```shell
-% xcode-select -p
-/Applications/Xcode.app/Contents/Developer
-```
-
-It is worth it to try opening XCode (the app). Sometimes opening the GUI triggers
-further downloads and installs, which you should do. It is likely that you will
-need to re-do this step after each OS update/upgrade.
-
-If you already had XCode installed, and perhaps had it configured for iOS development
-or something like that, then you should open up the XCode app, open its "Preferences"
-menu, go to the "Locations" tab, and then modify the path for "Command Line Tools."
-
-##### Build tools
-
-Make sure that you have an up-to-date CMake build and Ninja build. On macOS, you
-can [install Homebrew](https://brew.sh/) and run the following:
-
-```shell
-brew install ninja cmake graphviz xdot
-```
-
-An alternative is to [download](https://cmake.org/download/) and install CMake from
-the official website.
-
-#### Linux
-
-```shell
-sudo apt-get update
-sudo apt-get install build-essential ninja-build cmake graphviz xdot gcc g++
-```
-
-### Step 2
-
-Set up your environment.
-
-```shell
-mkdir -p "${WORKSPACE_DIR}/build"
-mkdir -p "${WORKSPACE_DIR}/src"
-mkdir -p "${WORKSPACE_DIR}/install"
-```
-
-Set virtual environment for Python:
-
-```shell
-if [[ ! -f "${WORKSPACE_DIR}/install/bin/activate" ]]; then
-  python3 -m venv "${WORKSPACE_DIR}/install"
-fi
-source "${WORKSPACE_DIR}/install/bin/activate"
-```
-
-### Step 3: Download and build Multiplier
-
-**Note:** Multiplier will download and build most/all of its dependencies during
-CMake's configuration stage, unless you specify otherwise.
-
-```shell
-cd "${WORKSPACE_DIR}/src"
-git clone git@github.com:trailofbits/multiplier.git
-```
-
-```shell
-mkdir -p "${WORKSPACE_DIR}/build/multiplier"
-cd "${WORKSPACE_DIR}/build/multiplier"
-cmake \
-  -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_INSTALL_PREFIX="${WORKSPACE_DIR}/install" \
-  -DMX_ENABLE_BOOTSTRAP=OFF \
-  -DMX_BOOTSTRAP_VAST=OFF \
-  -DMX_BOOTSTRAP_PASTA=OFF \
-  -DMX_ENABLE_RE2=ON \
-  -DMX_ENABLE_INSTALL=ON \
-  -GNinja \
-  "${WORKSPACE_DIR}/src/multiplier"
-
-ninja install
-```
+* About
+  * [How do other indexers work](docs/other-indexers.md), and why the normal way of indexing code is insufficient for C/C++ 
+  * [Why Multiplier?](docs/why-multiplier.md) What analysis challenges does Multiplier solve?
+* Usage
+  * [Getting and building the code](docs/BUILD.md)
+  * [Installing a pre-built release](docs/INSTALLING.md)
+  * [How to index a codebase](docs/INDEXING.md)
+* Included tools
+  * [Find function calls inside macro argument lists](docs/mx-find-calls-in-macro-expansions.md)
+  * [Find possible divergent representations](docs/mx-find-divergent-candidates.md)
+  * [Find uses of `copy_to_user` in the Linux kernel that overwrite flexible array members](docs/mx-find-flexible-user-copies.md)
+  * [Find data structures containing self-referential pointers, such as linked lists and trees](docs/mx-find-linked-structures.md)
+  * [Find "sketchy" casts flowing to function arguments and to return sites](docs/mx-find-sketchy-casts.md)
+  * [Extract an entity, e.g. a function, and all of its dependencies into a file](docs/mx-harness.md)
+  * [Highlight a specific entity within its surrounding code](docs/mx-highlight-entity.md)
+  * [Print a call graph](docs/mx-print-call-graph.md)
+  * [Print the reference graph](docs/mx-print-reference-graph.md)
+  * [Print a graph relating source code, macros, parsed tokens, and AST nodes](docs/mx-print-token-graph.md)
+  * [Print the taint graph given a taint source, and treating memory dereferences as taint sinks](docs/mx-taint-entity.md)
+* Included utilities
+  * [Find entities in the database given a symbol name](docs/mx-find-symbol.md)
+  * [List all indexed files](docs/mx-list-files.md)
+  * [List all indexed functions](docs/mx-list-functions.md)
+  * [List all indexed macros](docs/mx-list-macros.md)
+  * [List all redeclarations of a given entity](docs/mx-list-redeclarations.md)
+  * [List all indexed structures/unions/classes/enums](docs/mx-list-structures.md)
+  * [List all indexed variables](docs/mx-list-variables.md)
+  * [Search the code with regular expressions](docs/mx-regex-query.md)
+* Writeups
+  * [PHP variant analysis](docs/php-variant-analysis.md)
 
 # License
 
-This research was developed with funding from the Defense Advanced Research Projects Agency (DARPA). The views, opinions and/or findings expressed are those of the author and should not be interpreted as representing the official views or policies of the Department of Defense or the U.S. Government.
+This research was developed with funding from the Defense Advanced Research
+Projects Agency (DARPA). The views, opinions and/or findings expressed are those
+of the author and should not be interpreted as representing the official views
+or policies of the Department of Defense or the U.S. Government.

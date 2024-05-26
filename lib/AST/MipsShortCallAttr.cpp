@@ -8,6 +8,7 @@
 
 #include <multiplier/AST/MipsShortCallAttr.h>
 #include <multiplier/AST/Attr.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/AST/InheritableAttr.h>
 #include <multiplier/Frontend/Token.h>
 
@@ -24,6 +25,43 @@ static const AttrKind kMipsShortCallAttrDerivedKinds[] = {
     MipsShortCallAttr::static_kind(),
 };
 }  // namespace
+
+gap::generator<MipsShortCallAttr> MipsShortCallAttr::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (AttrKind k : kMipsShortCallAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
+      if (std::optional<MipsShortCallAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<MipsShortCallAttr> MipsShortCallAttr::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (AttrKind k : kMipsShortCallAttrDerivedKinds) {
+      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+        if (std::optional<MipsShortCallAttr> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+gap::generator<MipsShortCallAttr> MipsShortCallAttr::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (AttrKind k : kMipsShortCallAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+      if (std::optional<MipsShortCallAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
 
 gap::generator<MipsShortCallAttr> MipsShortCallAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -69,43 +107,6 @@ std::optional<MipsShortCallAttr> MipsShortCallAttr::from_base(const Attr &parent
   }
 }
 
-gap::generator<MipsShortCallAttr> MipsShortCallAttr::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (AttrKind k : kMipsShortCallAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<MipsShortCallAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<MipsShortCallAttr> MipsShortCallAttr::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (AttrKind k : kMipsShortCallAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<MipsShortCallAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<MipsShortCallAttr> MipsShortCallAttr::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (AttrKind k : kMipsShortCallAttrDerivedKinds) {
-      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<MipsShortCallAttr> e = from_base(std::move(eptr))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
-  }
-}
-
 std::optional<MipsShortCallAttr> MipsShortCallAttr::from(const Reference &r) {
   return MipsShortCallAttr::from(r.as_attribute());
 }
@@ -125,7 +126,7 @@ std::optional<MipsShortCallAttr> MipsShortCallAttr::from(const TokenContext &t) 
 }
 
 MipsShortCallAttrSpelling MipsShortCallAttr::semantic_spelling(void) const {
-  return static_cast<MipsShortCallAttrSpelling>(impl->reader.getVal10());
+  return static_cast<MipsShortCallAttrSpelling>(impl->reader.getVal12());
 }
 
 #pragma GCC diagnostic pop

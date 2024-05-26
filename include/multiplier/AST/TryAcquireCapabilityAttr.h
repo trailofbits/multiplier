@@ -17,6 +17,7 @@ class Fragment;
 class Index;
 class Attr;
 class Expr;
+class File;
 class InheritableAttr;
 class Token;
 class TryAcquireCapabilityAttr;
@@ -33,15 +34,16 @@ class MX_EXPORT TryAcquireCapabilityAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<TryAcquireCapabilityAttr> in(const Index &index);
-  static gap::generator<TryAcquireCapabilityAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<TryAcquireCapabilityAttr> by_id(const Index &, EntityId);
   static gap::generator<TryAcquireCapabilityAttr> in(const Fragment &frag);
   static gap::generator<TryAcquireCapabilityAttr> in(const File &file);
+  static gap::generator<TryAcquireCapabilityAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::TRY_ACQUIRE_CAPABILITY;
   }
+
+  static std::optional<TryAcquireCapabilityAttr> by_id(const Index &, EntityId);
 
   static std::optional<TryAcquireCapabilityAttr> from_base(const Attr &parent);
   inline static std::optional<TryAcquireCapabilityAttr> from(const Attr &parent) {

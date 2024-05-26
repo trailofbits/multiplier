@@ -464,6 +464,7 @@ static mx::RawEntityId VisitStmt(const EntityMapper &em,
       }
       break;
     case pasta::StmtKind::kSwitchStmt:
+    case pasta::StmtKind::kMSAsmStmt:
       if (token_kind == pasta::TokenKind::kLBrace ||
           token_kind == pasta::TokenKind::kRBrace) {
         return raw_stmt;
@@ -475,15 +476,26 @@ static mx::RawEntityId VisitStmt(const EntityMapper &em,
     case pasta::StmtKind::kWhileStmt:
     case pasta::StmtKind::kDoStmt:
     case pasta::StmtKind::kForStmt:
+    case pasta::StmtKind::kGCCAsmStmt:
+    case pasta::StmtKind::kCXXForRangeStmt:
     case pasta::StmtKind::kCXXCatchStmt:
+    case pasta::StmtKind::kUnaryExprOrTypeTraitExpr:
       if (token_kind == pasta::TokenKind::kLParenthesis ||
           token_kind == pasta::TokenKind::kRParenthesis) {
         return raw_stmt;
       }
       break;
+    case pasta::StmtKind::kCoroutineBodyStmt:
     case pasta::StmtKind::kCompoundStmt:
       if (token_kind == pasta::TokenKind::kLBrace ||
           token_kind == pasta::TokenKind::kRBrace) {
+        return raw_stmt;
+      }
+      break;
+    case pasta::StmtKind::kLambdaExpr:
+    case pasta::StmtKind::kArraySubscriptExpr:
+      if (token_kind == pasta::TokenKind::kLSquare ||
+          token_kind == pasta::TokenKind::kRSquare) {
         return raw_stmt;
       }
       break;
@@ -499,7 +511,7 @@ static mx::RawEntityId VisitStmt(const EntityMapper &em,
 // have token data, and will accept an in-name-only match.
 static bool TokenMatchesDecl(
     pasta::TokenKind tk, const void *raw_token, const pasta::Decl &decl,
-    std::string_view token_data);
+    std::string_view token_data, int depth);
 
 // Try to match some token data against a `clang::TemplateName`.
 static mx::RawEntityId VisitTemplateName(
@@ -510,7 +522,7 @@ static mx::RawEntityId VisitTemplateName(
     auto decl = ast.Adopt(
         reinterpret_cast<const clang::Decl *>(raw_tpl));
     if (TokenMatchesDecl(pasta::TokenKind::kIdentifier, nullptr,
-                         decl, tok_data)) {
+                         decl, tok_data, 1)) {
       return em.EntityId(decl);
     }
   }
@@ -528,7 +540,7 @@ static mx::RawEntityId VisitTemplateName(
 // doesn't wrap `clang::TypeLoc`s, though.
 mx::RawEntityId VisitType(
     const EntityMapper &em, const pasta::Type &type, std::string_view tok_data,
-    int context_depth) {
+    int depth) {
 
   if (auto typedef_type = pasta::TypedefType::From(type)) {
     auto typedef_decl = typedef_type->Declaration();
@@ -539,13 +551,13 @@ mx::RawEntityId VisitType(
   } else if (auto tag_type = pasta::TagType::From(type)) {
     auto tag_decl = tag_type->Declaration();
     if (TokenMatchesDecl(pasta::TokenKind::kIdentifier, nullptr,
-                         tag_decl, tok_data)) {
+                         tag_decl, tok_data, depth)) {
       return em.EntityId(tag_decl);
     }
 
   } else if (auto spec = pasta::TemplateSpecializationType::From(type)) {
-    if (!context_depth && spec->IsSugared()) {
-      auto eid = VisitType(em, spec->Desugar(), tok_data, context_depth);
+    if (!depth && spec->IsSugared()) {
+      auto eid = VisitType(em, spec->Desugar(), tok_data, depth);
       if (eid != mx::kInvalidEntityId) {
         return eid;
       }
@@ -561,7 +573,7 @@ mx::RawEntityId VisitType(
 
     if (auto decl = param->Declaration()) {
       if (TokenMatchesDecl(pasta::TokenKind::kIdentifier, nullptr,
-                           decl.value(), tok_data)) {
+                           decl.value(), tok_data, depth)) {
         return em.EntityId(decl.value());
       }
     }
@@ -575,14 +587,14 @@ mx::RawEntityId VisitType(
   } else if (auto inj_type = pasta::InjectedClassNameType::From(type)) {
     auto decl = inj_type->Declaration();
     if (TokenMatchesDecl(pasta::TokenKind::kIdentifier, nullptr,
-                         decl, tok_data)) {
+                         decl, tok_data, depth)) {
       return em.EntityId(decl);
     }
 
-    if (!context_depth) {
+    if (!depth) {
       auto tst = inj_type->InjectedSpecializationType();
       if (tst != type) {
-        return VisitType(em, tst, tok_data, context_depth);
+        return VisitType(em, tst, tok_data, depth);
       }
     }
 
@@ -600,21 +612,35 @@ mx::RawEntityId VisitType(
   // //
   // // XREF: https://github.com/trailofbits/multiplier/issues/344.
   // } else if (auto func_type = pasta::FunctionProtoType::From(type);
-  //            func_type && !context_depth) {
+  //            func_type && !depth) {
   //   return type.RawType();
-  } else if (!context_depth) {
+  } else if (!depth) {
+
+    if ((tok_data == "(" || tok_data == ")")) {
+      switch (type.Kind()) {
+        case pasta::TypeKind::kAtomic:
+        case pasta::TypeKind::kDecltype:
+        case pasta::TypeKind::kDependentBitInt:
+        case pasta::TypeKind::kBitInt:
+        case pasta::TypeKind::kTypeOf:
+        case pasta::TypeKind::kTypeOfExpr:
+          return em.EntityId(type);
+        default:
+          break;
+      }
+    }
+
     if (auto unqual_type = type.UnqualifiedType(); unqual_type != type) {
-      return VisitType(em, unqual_type, tok_data, context_depth);
+      return VisitType(em, unqual_type, tok_data, depth);
 
     } else if (auto elaborated_type = pasta::ElaboratedType::From(type)) {
-      return VisitType(em, elaborated_type->NamedType(), tok_data,
-                       context_depth);
+      return VisitType(em, elaborated_type->NamedType(), tok_data, depth);
 
     } else if (auto deduced_type = pasta::DeducedType::From(type)) {
       if (deduced_type->IsDeduced()) {
         auto resolved_type = deduced_type->ResolvedType();
         if (resolved_type) {
-          return VisitType(em, resolved_type.value(), tok_data, context_depth);
+          return VisitType(em, resolved_type.value(), tok_data, depth);
         }
       }
     }
@@ -942,8 +968,14 @@ static std::string_view NameWithoutTilde(const std::string &name,
 // the raw parsed token and want an exact match, whereas other times we only
 // have token data, and will accept an in-name-only match.
 bool TokenMatchesDecl(pasta::TokenKind tk, const void *raw_token,
-                      const pasta::Decl &decl, std::string_view token_data) {
-  auto is_cxx_destructor = decl.Kind() == pasta::DeclKind::kCXXDestructor;
+                      const pasta::Decl &decl, std::string_view token_data,
+                      int depth) {
+  auto dk = decl.Kind();
+  auto is_cxx_constructor = dk == pasta::DeclKind::kCXXConstructor;
+  auto is_cxx_destructor = dk == pasta::DeclKind::kCXXDestructor;
+  if (depth) {
+    return false;
+  }
 
   if (auto func = pasta::FunctionDecl::From(decl)) {
 
@@ -960,6 +992,12 @@ bool TokenMatchesDecl(pasta::TokenKind tk, const void *raw_token,
     // Match the `~` in a destructor name to the destructor.
     if (tk == pasta::TokenKind::kTilde && is_cxx_destructor) {
       return true;
+    }
+    
+    // See if the name matches the class name.
+    if (is_cxx_constructor || is_cxx_destructor) {
+      const auto &method = reinterpret_cast<const pasta::CXXMethodDecl &>(decl);
+      return method.Parent().Name() == token_data;
     }
   }
 
@@ -991,25 +1029,25 @@ bool TokenMatchesDecl(pasta::TokenKind tk, const void *raw_token,
 
 static mx::RawEntityId VisitTemplateArgument(
     const EntityMapper &em, const pasta::TemplateArgument &arg,
-    std::string_view tok_data) {
+    std::string_view tok_data, int depth) {
 
   switch (arg.Kind()) {
     case pasta::TemplateArgumentKind::kType:
       if (auto t = arg.Type()) {
-        return VisitType(em, t.value(), tok_data, 0u);
+        return VisitType(em, t.value(), tok_data, depth);
       }
       break;
 
     case pasta::TemplateArgumentKind::kDeclaration:
       if (auto d = arg.Declaration()) {
         if (TokenMatchesDecl(pasta::TokenKind::kIdentifier, nullptr, d.value(),
-                             tok_data)) {
+                             tok_data, depth)) {
           return em.EntityId(d.value());
         }
       }
 
       if (auto t = arg.ParameterTypeForDeclaration()) {
-        return VisitType(em, t.value(), tok_data, 0u);
+        return VisitType(em, t.value(), tok_data, depth);
       }
       break;
 
@@ -1188,7 +1226,7 @@ mx::RawEntityId RelatedEntityIdToPrintedToken(
           break;
         }
 
-        if (TokenMatchesDecl(tk, self, decl.value(), token_data)) {
+        if (TokenMatchesDecl(tk, self, decl.value(), token_data, depth)) {
           related_entity = RawEntity(decl.value());
         }
         break;
@@ -1225,7 +1263,7 @@ mx::RawEntityId RelatedEntityIdToPrintedToken(
       case pasta::TokenContextKind::kTemplateArgument:
         if (is_identifier) {
           if (auto a = pasta::TemplateArgument::From(context)) {
-            auto eid = VisitTemplateArgument(em, a.value(), token_data);
+            auto eid = VisitTemplateArgument(em, a.value(), token_data, depth);
             if (eid != mx::kInvalidEntityId) {
               return eid;
             }

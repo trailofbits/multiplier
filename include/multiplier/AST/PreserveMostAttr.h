@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class PreserveMostAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT PreserveMostAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<PreserveMostAttr> in(const Index &index);
-  static gap::generator<PreserveMostAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<PreserveMostAttr> by_id(const Index &, EntityId);
   static gap::generator<PreserveMostAttr> in(const Fragment &frag);
   static gap::generator<PreserveMostAttr> in(const File &file);
+  static gap::generator<PreserveMostAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::PRESERVE_MOST;
   }
+
+  static std::optional<PreserveMostAttr> by_id(const Index &, EntityId);
 
   static std::optional<PreserveMostAttr> from_base(const Attr &parent);
   inline static std::optional<PreserveMostAttr> from(const Attr &parent) {

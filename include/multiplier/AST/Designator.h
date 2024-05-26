@@ -84,6 +84,14 @@ class MX_EXPORT Designator {
 
   PackedDesignatorId id(void) const;
 
+  static gap::generator<Designator> in(const Index &index);
+  static gap::generator<Designator> in(const Fragment &frag);
+  static gap::generator<Designator> in(const File &file);
+  static gap::generator<Designator> containing(const Token &tok);
+  bool contains(const Token &tok) const;
+
+  static std::optional<Designator> by_id(const Index &, EntityId);
+
   inline static std::optional<Designator> from(const Designator &self) {
     return self;
   }

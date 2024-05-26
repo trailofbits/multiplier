@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Attr;
 class DLLImportAttr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT DLLImportAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<DLLImportAttr> in(const Index &index);
-  static gap::generator<DLLImportAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<DLLImportAttr> by_id(const Index &, EntityId);
   static gap::generator<DLLImportAttr> in(const Fragment &frag);
   static gap::generator<DLLImportAttr> in(const File &file);
+  static gap::generator<DLLImportAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::DLL_IMPORT;
   }
+
+  static std::optional<DLLImportAttr> by_id(const Index &, EntityId);
 
   static std::optional<DLLImportAttr> from_base(const Attr &parent);
   inline static std::optional<DLLImportAttr> from(const Attr &parent) {

@@ -18,6 +18,7 @@ class BinaryOperator;
 class CompoundAssignOperator;
 class Decl;
 class Expr;
+class File;
 class Stmt;
 class Token;
 class Type;
@@ -37,11 +38,10 @@ class MX_EXPORT CompoundAssignOperator : public BinaryOperator {
   friend class Stmt;
  public:
   static gap::generator<CompoundAssignOperator> in(const Index &index);
-  static gap::generator<CompoundAssignOperator> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CompoundAssignOperator> by_id(const Index &, EntityId);
   static gap::generator<CompoundAssignOperator> in(const Fragment &frag);
   static gap::generator<CompoundAssignOperator> in(const File &file);
+  static gap::generator<CompoundAssignOperator> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<CompoundAssignOperator> from(const ir::Operation &op);
   static gap::generator<std::pair<CompoundAssignOperator, ir::Operation>> in(const Compilation &tu);
@@ -57,6 +57,8 @@ class MX_EXPORT CompoundAssignOperator : public BinaryOperator {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<CompoundAssignOperator> by_id(const Index &, EntityId);
 
   static std::optional<CompoundAssignOperator> from_base(const Stmt &parent);
   inline static std::optional<CompoundAssignOperator> from(const Stmt &parent) {

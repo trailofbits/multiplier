@@ -212,12 +212,13 @@ void SerializePendingFragment(mx::rpc::Fragment::Builder &fb,
                               const PendingFragment &pf) {
   const EntityMapper &em = pf.em;
 
+#ifndef NDEBUG
   // Used to check if an entity ID is new.
   std::unordered_set<mx::RawEntityId> seen_eids;
   auto is_new_eid = [&seen_eids] (mx::RawEntityId eid) {
     return seen_eids.emplace(eid).second;
   };
-  (void) is_new_eid;
+#endif
 
   // Serialize a list of entities.
   auto serialize_list = [&] (auto list_builder, const auto &list,

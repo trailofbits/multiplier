@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class ObjCRootClassAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT ObjCRootClassAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ObjCRootClassAttr> in(const Index &index);
-  static gap::generator<ObjCRootClassAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ObjCRootClassAttr> by_id(const Index &, EntityId);
   static gap::generator<ObjCRootClassAttr> in(const Fragment &frag);
   static gap::generator<ObjCRootClassAttr> in(const File &file);
+  static gap::generator<ObjCRootClassAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_ROOT_CLASS;
   }
+
+  static std::optional<ObjCRootClassAttr> by_id(const Index &, EntityId);
 
   static std::optional<ObjCRootClassAttr> from_base(const Attr &parent);
   inline static std::optional<ObjCRootClassAttr> from(const Attr &parent) {

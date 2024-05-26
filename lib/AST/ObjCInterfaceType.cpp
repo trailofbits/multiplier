@@ -26,6 +26,17 @@ static const TypeKind kObjCInterfaceTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<ObjCInterfaceType> ObjCInterfaceType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kObjCInterfaceTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<ObjCInterfaceType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<ObjCInterfaceType> ObjCInterfaceType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = ObjCInterfaceType::from(*ctx)) {
@@ -67,17 +78,6 @@ std::optional<ObjCInterfaceType> ObjCInterfaceType::from_base(const Type &parent
       return reinterpret_cast<const ObjCInterfaceType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<ObjCInterfaceType> ObjCInterfaceType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kObjCInterfaceTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<ObjCInterfaceType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

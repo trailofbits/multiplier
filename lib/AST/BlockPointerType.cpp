@@ -24,6 +24,17 @@ static const TypeKind kBlockPointerTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<BlockPointerType> BlockPointerType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kBlockPointerTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<BlockPointerType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<BlockPointerType> BlockPointerType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = BlockPointerType::from(*ctx)) {
@@ -65,17 +76,6 @@ std::optional<BlockPointerType> BlockPointerType::from_base(const Type &parent) 
       return reinterpret_cast<const BlockPointerType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<BlockPointerType> BlockPointerType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kBlockPointerTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<BlockPointerType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

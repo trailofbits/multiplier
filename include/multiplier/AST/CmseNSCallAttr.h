@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Attr;
 class CmseNSCallAttr;
+class File;
 class Token;
 class TypeAttr;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT CmseNSCallAttr : public TypeAttr {
   friend class Attr;
  public:
   static gap::generator<CmseNSCallAttr> in(const Index &index);
-  static gap::generator<CmseNSCallAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CmseNSCallAttr> by_id(const Index &, EntityId);
   static gap::generator<CmseNSCallAttr> in(const Fragment &frag);
   static gap::generator<CmseNSCallAttr> in(const File &file);
+  static gap::generator<CmseNSCallAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CMSE_NS_CALL;
   }
+
+  static std::optional<CmseNSCallAttr> by_id(const Index &, EntityId);
 
   static std::optional<CmseNSCallAttr> from_base(const Attr &parent);
   inline static std::optional<CmseNSCallAttr> from(const Attr &parent) {

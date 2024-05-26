@@ -9,6 +9,7 @@
 #include <multiplier/AST/LoopHintAttr.h>
 #include <multiplier/AST/Attr.h>
 #include <multiplier/AST/Expr.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/Frontend/Token.h>
 
 #include "../EntityProvider.h"
@@ -24,6 +25,43 @@ static const AttrKind kLoopHintAttrDerivedKinds[] = {
     LoopHintAttr::static_kind(),
 };
 }  // namespace
+
+gap::generator<LoopHintAttr> LoopHintAttr::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (AttrKind k : kLoopHintAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
+      if (std::optional<LoopHintAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<LoopHintAttr> LoopHintAttr::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (AttrKind k : kLoopHintAttrDerivedKinds) {
+      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+        if (std::optional<LoopHintAttr> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+gap::generator<LoopHintAttr> LoopHintAttr::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (AttrKind k : kLoopHintAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+      if (std::optional<LoopHintAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
 
 gap::generator<LoopHintAttr> LoopHintAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -69,43 +107,6 @@ std::optional<LoopHintAttr> LoopHintAttr::from_base(const Attr &parent) {
   }
 }
 
-gap::generator<LoopHintAttr> LoopHintAttr::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (AttrKind k : kLoopHintAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<LoopHintAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<LoopHintAttr> LoopHintAttr::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (AttrKind k : kLoopHintAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<LoopHintAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<LoopHintAttr> LoopHintAttr::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (AttrKind k : kLoopHintAttrDerivedKinds) {
-      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<LoopHintAttr> e = from_base(std::move(eptr))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
-  }
-}
-
 std::optional<LoopHintAttr> LoopHintAttr::from(const Reference &r) {
   return LoopHintAttr::from(r.as_attribute());
 }
@@ -125,20 +126,20 @@ std::optional<LoopHintAttr> LoopHintAttr::from(const TokenContext &t) {
 }
 
 LoopHintAttrOptionType LoopHintAttr::option(void) const {
-  return static_cast<LoopHintAttrOptionType>(impl->reader.getVal10());
+  return static_cast<LoopHintAttrOptionType>(impl->reader.getVal12());
 }
 
 LoopHintAttrSpelling LoopHintAttr::semantic_spelling(void) const {
-  return static_cast<LoopHintAttrSpelling>(impl->reader.getVal18());
+  return static_cast<LoopHintAttrSpelling>(impl->reader.getVal20());
 }
 
 LoopHintAttrLoopHintState LoopHintAttr::state(void) const {
-  return static_cast<LoopHintAttrLoopHintState>(impl->reader.getVal19());
+  return static_cast<LoopHintAttrLoopHintState>(impl->reader.getVal21());
 }
 
 std::optional<Expr> LoopHintAttr::value(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal8();
+    RawEntityId eid = impl->reader.getVal10();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }

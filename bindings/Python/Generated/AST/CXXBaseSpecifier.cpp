@@ -123,6 +123,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "offset_in_bits",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->offset_in_bits());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXBaseSpecifier::offset_in_bits"),
+    nullptr,
+  },
+  {
     "id",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -153,6 +163,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "ellipsis_token",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->ellipsis_token());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXBaseSpecifier::ellipsis_token"),
+    nullptr,
+  },
+  {
     "is_virtual",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -160,16 +180,6 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::CXXBaseSpecifier::is_virtual"),
-    nullptr,
-  },
-  {
-    "base_kind",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->base_kind());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::CXXBaseSpecifier::base_kind"),
     nullptr,
   },
   {
@@ -193,13 +203,13 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "ellipsis_token",
+    "base_kind",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->ellipsis_token());
+          return ::mx::to_python(T_cast(self)->base_kind());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::CXXBaseSpecifier::ellipsis_token"),
+    PyDoc_STR("Wrapper for mx::CXXBaseSpecifier::base_kind"),
     nullptr,
   },
   {
@@ -232,6 +242,16 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::CXXBaseSpecifier::base_type"),
     nullptr,
   },
+  {
+    "base_class",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->base_class());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXBaseSpecifier::base_class"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace
@@ -254,6 +274,89 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::CXXBaseSpecifier::static_category"),
+  },
+  {
+    "IN",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<mx::Index>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(T::in(arg_0.value()));
+          }
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<mx::Fragment>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(T::in(arg_0.value()));
+          }
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<mx::File>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(T::in(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'IN'";
+          return nullptr;
+        }),
+    METH_FASTCALL | METH_STATIC,
+    PyDoc_STR("Wrapper for mx::CXXBaseSpecifier::in"),
+  },
+  {
+    "containing",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<mx::Token>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(T::containing(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'containing'";
+          return nullptr;
+        }),
+    METH_FASTCALL | METH_STATIC,
+    PyDoc_STR("Wrapper for mx::CXXBaseSpecifier::containing"),
+  },
+  {
+    "by_id",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          (void) args;
+          while (num_args == 2) {
+            auto arg_0 = ::mx::from_python<mx::Index>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+            auto arg_1 = ::mx::from_python<EntityId>(args[1]);
+            if (!arg_1.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(T::by_id(arg_0.value(), std::move(arg_1.value())));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'by_id'";
+          return nullptr;
+        }),
+    METH_FASTCALL | METH_STATIC,
+    PyDoc_STR("Wrapper for mx::CXXBaseSpecifier::by_id"),
   },
   {
     "FROM",
@@ -307,6 +410,28 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::CXXBaseSpecifier::from"),
+  },
+  {
+    "contains",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          T *obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<mx::Token>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->contains(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'contains'";
+          return nullptr;
+        }),
+    METH_FASTCALL,
+    PyDoc_STR("Wrapper for mx::CXXBaseSpecifier::contains"),
   },
   {}  // Sentinel.
 };

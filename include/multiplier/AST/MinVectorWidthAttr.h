@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class MinVectorWidthAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT MinVectorWidthAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<MinVectorWidthAttr> in(const Index &index);
-  static gap::generator<MinVectorWidthAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<MinVectorWidthAttr> by_id(const Index &, EntityId);
   static gap::generator<MinVectorWidthAttr> in(const Fragment &frag);
   static gap::generator<MinVectorWidthAttr> in(const File &file);
+  static gap::generator<MinVectorWidthAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MIN_VECTOR_WIDTH;
   }
+
+  static std::optional<MinVectorWidthAttr> by_id(const Index &, EntityId);
 
   static std::optional<MinVectorWidthAttr> from_base(const Attr &parent);
   inline static std::optional<MinVectorWidthAttr> from(const Attr &parent) {

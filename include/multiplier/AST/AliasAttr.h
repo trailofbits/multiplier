@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class AliasAttr;
 class Attr;
+class File;
 class Token;
 namespace ir {
 class Operation;
@@ -29,15 +30,16 @@ class MX_EXPORT AliasAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<AliasAttr> in(const Index &index);
-  static gap::generator<AliasAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<AliasAttr> by_id(const Index &, EntityId);
   static gap::generator<AliasAttr> in(const Fragment &frag);
   static gap::generator<AliasAttr> in(const File &file);
+  static gap::generator<AliasAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ALIAS;
   }
+
+  static std::optional<AliasAttr> by_id(const Index &, EntityId);
 
   static std::optional<AliasAttr> from_base(const Attr &parent);
   inline static std::optional<AliasAttr> from(const Attr &parent) {

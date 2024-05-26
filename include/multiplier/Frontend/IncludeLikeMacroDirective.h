@@ -30,17 +30,16 @@ class MX_EXPORT IncludeLikeMacroDirective : public MacroDirective {
   friend class MacroDirective;
   friend class Macro;
  public:
+  static gap::generator<IncludeLikeMacroDirective> in(const Index &index);
   static gap::generator<IncludeLikeMacroDirective> in(const Fragment &frag);
   static gap::generator<IncludeLikeMacroDirective> in(const File &file);
-
-  static gap::generator<IncludeLikeMacroDirective> in(const Index &index);
-  static std::optional<IncludeLikeMacroDirective> by_id(const Index &, EntityId);
-
   static gap::generator<IncludeLikeMacroDirective> containing(const Macro &macro);
   bool contains(const Macro &macro);
 
   static gap::generator<IncludeLikeMacroDirective> containing(const Token &token);
   bool contains(const Token &token);
+
+  static std::optional<IncludeLikeMacroDirective> by_id(const Index &, EntityId);
 
   static std::optional<IncludeLikeMacroDirective> from_base(const Macro &parent);
   inline static std::optional<IncludeLikeMacroDirective> from(const Macro &parent) {

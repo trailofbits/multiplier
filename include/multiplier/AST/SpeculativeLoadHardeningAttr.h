@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class SpeculativeLoadHardeningAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT SpeculativeLoadHardeningAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<SpeculativeLoadHardeningAttr> in(const Index &index);
-  static gap::generator<SpeculativeLoadHardeningAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<SpeculativeLoadHardeningAttr> by_id(const Index &, EntityId);
   static gap::generator<SpeculativeLoadHardeningAttr> in(const Fragment &frag);
   static gap::generator<SpeculativeLoadHardeningAttr> in(const File &file);
+  static gap::generator<SpeculativeLoadHardeningAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SPECULATIVE_LOAD_HARDENING;
   }
+
+  static std::optional<SpeculativeLoadHardeningAttr> by_id(const Index &, EntityId);
 
   static std::optional<SpeculativeLoadHardeningAttr> from_base(const Attr &parent);
   inline static std::optional<SpeculativeLoadHardeningAttr> from(const Attr &parent) {

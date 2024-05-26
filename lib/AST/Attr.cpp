@@ -21,6 +21,26 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
+std::optional<Decl> Attr::parent_declaration(void) const {
+  if (auto id = impl->reader.getVal0(); id != kInvalidEntityId) {
+    if (auto eptr = impl->ep->DeclFor(impl->ep, id)) {
+      return Decl(std::move(eptr));
+    }
+    assert(false);
+  }
+  return std::nullopt;
+}
+
+std::optional<Stmt> Attr::parent_statement(void) const {
+  if (auto id = impl->reader.getVal1(); id != kInvalidEntityId) {
+    if (auto eptr = impl->ep->StmtFor(impl->ep, id)) {
+      return Stmt(std::move(eptr));
+    }
+    assert(false);
+  }
+  return std::nullopt;
+}
+
 std::shared_ptr<EntityProvider> Attr::entity_provider_of(const Index &index_) {
   return index_.impl;
 }
@@ -31,32 +51,6 @@ std::shared_ptr<EntityProvider> Attr::entity_provider_of(const Fragment &frag_) 
 
 std::shared_ptr<EntityProvider> Attr::entity_provider_of(const File &file_) {
   return file_.impl->ep;
-}
-
-gap::generator<Attr> Attr::containing(const Token &tok) {
-  for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-    if (auto d = Attr::from(*ctx)) {
-      co_yield *d;
-    }
-  }
-}
-
-bool Attr::contains(const Token &tok) const {
-  auto id_ = id();
-  for (auto &parent : Attr::containing(tok)) {
-    if (parent.id() == id_) { return true; }
-  }
-  return false;
-}
-
-std::optional<Attr> Attr::by_id(const Index &index, EntityId eid) {
-  VariantId vid = eid.Unpack();
-  if (std::holds_alternative<AttrId>(vid)) {
-    return index.attribute(eid.Pack());
-  } else if (std::holds_alternative<InvalidId>(vid)) {
-    assert(eid.Pack() == kInvalidEntityId);
-  }
-  return std::nullopt;
 }
 
 gap::generator<Attr> Attr::in(const Index &index) {
@@ -115,6 +109,32 @@ gap::generator<Attr> Attr::in(const File &file, std::span<const AttrKind> kinds)
   }
 }
 
+gap::generator<Attr> Attr::containing(const Token &tok) {
+  for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+    if (auto d = Attr::from(*ctx)) {
+      co_yield *d;
+    }
+  }
+}
+
+bool Attr::contains(const Token &tok) const {
+  auto id_ = id();
+  for (auto &parent : Attr::containing(tok)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+std::optional<Attr> Attr::by_id(const Index &index, EntityId eid) {
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<AttrId>(vid)) {
+    return index.attribute(eid.Pack());
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(eid.Pack() == kInvalidEntityId);
+  }
+  return std::nullopt;
+}
+
 std::optional<Attr> Attr::from(const Reference &r) {
   return r.as_attribute();
 }
@@ -131,31 +151,31 @@ std::optional<Attr> Attr::from(const TokenContext &t) {
 }
 
 Token Attr::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal0());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal2());
 }
 
 bool Attr::is_implicit(void) const {
-  return impl->reader.getVal1();
-}
-
-bool Attr::is_inherited(void) const {
-  return impl->reader.getVal2();
-}
-
-bool Attr::is_late_parsed(void) const {
   return impl->reader.getVal3();
 }
 
-bool Attr::is_pack_expansion(void) const {
+bool Attr::is_inherited(void) const {
   return impl->reader.getVal4();
 }
 
+bool Attr::is_late_parsed(void) const {
+  return impl->reader.getVal5();
+}
+
+bool Attr::is_pack_expansion(void) const {
+  return impl->reader.getVal6();
+}
+
 AttrKind Attr::kind(void) const {
-  return static_cast<AttrKind>(impl->reader.getVal5());
+  return static_cast<AttrKind>(impl->reader.getVal7());
 }
 
 TokenRange Attr::tokens(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal6(), impl->reader.getVal7());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal8(), impl->reader.getVal9());
 }
 
 #pragma GCC diagnostic pop

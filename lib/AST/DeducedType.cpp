@@ -27,6 +27,17 @@ static const TypeKind kDeducedTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<DeducedType> DeducedType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kDeducedTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<DeducedType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<DeducedType> DeducedType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = DeducedType::from(*ctx)) {
@@ -69,17 +80,6 @@ std::optional<DeducedType> DeducedType::from_base(const Type &parent) {
       return reinterpret_cast<const DeducedType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<DeducedType> DeducedType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kDeducedTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<DeducedType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

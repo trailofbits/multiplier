@@ -16,6 +16,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class Token;
 class TypeVisibilityAttr;
@@ -32,15 +33,16 @@ class MX_EXPORT TypeVisibilityAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<TypeVisibilityAttr> in(const Index &index);
-  static gap::generator<TypeVisibilityAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<TypeVisibilityAttr> by_id(const Index &, EntityId);
   static gap::generator<TypeVisibilityAttr> in(const Fragment &frag);
   static gap::generator<TypeVisibilityAttr> in(const File &file);
+  static gap::generator<TypeVisibilityAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::TYPE_VISIBILITY;
   }
+
+  static std::optional<TypeVisibilityAttr> by_id(const Index &, EntityId);
 
   static std::optional<TypeVisibilityAttr> from_base(const Attr &parent);
   inline static std::optional<TypeVisibilityAttr> from(const Attr &parent) {

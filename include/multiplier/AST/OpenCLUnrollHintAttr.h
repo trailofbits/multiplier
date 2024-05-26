@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class OpenCLUnrollHintAttr;
 class StmtAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT OpenCLUnrollHintAttr : public StmtAttr {
   friend class Attr;
  public:
   static gap::generator<OpenCLUnrollHintAttr> in(const Index &index);
-  static gap::generator<OpenCLUnrollHintAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<OpenCLUnrollHintAttr> by_id(const Index &, EntityId);
   static gap::generator<OpenCLUnrollHintAttr> in(const Fragment &frag);
   static gap::generator<OpenCLUnrollHintAttr> in(const File &file);
+  static gap::generator<OpenCLUnrollHintAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OPEN_CL_UNROLL_HINT;
   }
+
+  static std::optional<OpenCLUnrollHintAttr> by_id(const Index &, EntityId);
 
   static std::optional<OpenCLUnrollHintAttr> from_base(const Attr &parent);
   inline static std::optional<OpenCLUnrollHintAttr> from(const Attr &parent) {

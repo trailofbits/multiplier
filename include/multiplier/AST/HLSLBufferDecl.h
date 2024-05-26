@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Decl;
+class File;
 class HLSLBufferDecl;
 class NamedDecl;
 class Stmt;
@@ -32,11 +33,10 @@ class MX_EXPORT HLSLBufferDecl : public NamedDecl {
   friend class Decl;
  public:
   static gap::generator<HLSLBufferDecl> in(const Index &index);
-  static gap::generator<HLSLBufferDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<HLSLBufferDecl> by_id(const Index &, EntityId);
   static gap::generator<HLSLBufferDecl> in(const Fragment &frag);
   static gap::generator<HLSLBufferDecl> in(const File &file);
+  static gap::generator<HLSLBufferDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<HLSLBufferDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<HLSLBufferDecl, ir::Operation>> in(const Compilation &tu);
@@ -56,6 +56,8 @@ class MX_EXPORT HLSLBufferDecl : public NamedDecl {
   HLSLBufferDecl canonical_declaration(void) const;
   std::optional<HLSLBufferDecl> definition(void) const;
   gap::generator<HLSLBufferDecl> redeclarations(void) const &;
+  static std::optional<HLSLBufferDecl> by_id(const Index &, EntityId);
+
   static std::optional<HLSLBufferDecl> from_base(const Decl &parent);
   inline static std::optional<HLSLBufferDecl> from(const Decl &parent) {
     return from_base(parent);

@@ -19,6 +19,7 @@ class CastExpr;
 class Decl;
 class ExplicitCastExpr;
 class Expr;
+class File;
 class Stmt;
 class Token;
 class ValueStmt;
@@ -38,11 +39,10 @@ class MX_EXPORT BuiltinBitCastExpr : public ExplicitCastExpr {
   friend class Stmt;
  public:
   static gap::generator<BuiltinBitCastExpr> in(const Index &index);
-  static gap::generator<BuiltinBitCastExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<BuiltinBitCastExpr> by_id(const Index &, EntityId);
   static gap::generator<BuiltinBitCastExpr> in(const Fragment &frag);
   static gap::generator<BuiltinBitCastExpr> in(const File &file);
+  static gap::generator<BuiltinBitCastExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<BuiltinBitCastExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<BuiltinBitCastExpr, ir::Operation>> in(const Compilation &tu);
@@ -58,6 +58,8 @@ class MX_EXPORT BuiltinBitCastExpr : public ExplicitCastExpr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<BuiltinBitCastExpr> by_id(const Index &, EntityId);
 
   static std::optional<BuiltinBitCastExpr> from_base(const Stmt &parent);
   inline static std::optional<BuiltinBitCastExpr> from(const Stmt &parent) {

@@ -785,62 +785,37 @@ EntityId::EntityId(FileTokenId id) {
 
 #pragma GCC diagnostic pop
 
-// Return the fragment offset from an entity ID. Returns `~0u` if it's not
-// a fragment-specific entity ID.
-std::optional<EntityOffset> FragmentOffsetFromEntityId(RawEntityId id) {
-  PackedEntityId packed = {};
-  packed.opaque = id;
-  if (!packed.entity_or_other.is_fragment_entity) {
-    return std::nullopt;
-  }
-
-  if (packed.small_or_big.is_big) {
-    return static_cast<EntityOffset>(packed.big_entity.offset);
-  } else {
-    return static_cast<EntityOffset>(packed.small_entity.offset);
-  }
-}
-
-// Returns the fragment ID corresponding with a fragment-specific entity ID.
-std::optional<PackedFragmentId> FragmentIdFromEntityId(RawEntityId id) {
-  PackedEntityId packed = {};
-  packed.opaque = id;
-
-  if (!packed.entity_or_other.is_fragment_entity) {
-    if (packed.other.kind == static_cast<uint64_t>(OtherKind::kFragment) &&
-        packed.other.opaque) {
-      return FragmentId(packed.other.opaque);
-    }
-
-    return std::nullopt;
-  }
-
-  if (packed.small_or_big.is_big) {
-    return FragmentId(packed.big_entity.fragment_id);
-  } else {
-    return FragmentId(packed.small_entity.fragment_id + kMaxBigFragmentId);
-  }
-}
-
-// Returns the Type ID corresponding with a type-specific entity ID.
-std::optional<PackedTypeId> TypeIdFromEntityId(RawEntityId id) {
-
-  // Note: The function takes the `RawEntityId` and unpack them to check
-  //       if it is of type `TypeId` or `TypeTokenId`. If yes then return
-  //       or `TypeId` from that else return the nullopt.
-  auto unpacked = EntityId(id).Unpack();
-  if (std::holds_alternative<TypeId>(unpacked)) {
-    return std::get<TypeId>(unpacked);
-
-  } else if (std::holds_alternative<TypeTokenId>(unpacked)) {
-    auto token_id = std::get<TypeTokenId>(unpacked);
-    return TypeId(token_id);
-  }
-
-  return std::nullopt;
-}
-
 namespace {
+
+struct IDFragment {
+  inline int operator()(InvalidId) const noexcept { return mx::kInvalidEntityId; }
+  inline int operator()(FileId) const noexcept { return mx::kInvalidEntityId; }
+  inline int operator()(FileTokenId) const noexcept { return mx::kInvalidEntityId; }
+  inline int operator()(CompilationId) const noexcept { return mx::kInvalidEntityId; }
+  inline int operator()(OperationId) const noexcept { return mx::kInvalidEntityId; }
+  inline int operator()(TypeId) const noexcept { return mx::kInvalidEntityId; }
+  inline int operator()(TypeTokenId) const noexcept { return mx::kInvalidEntityId; }
+
+  template <typename T>
+  inline int operator()(T t) const noexcept {
+    return static_cast<int>(t.fragment_id);
+  }
+};
+
+struct IDFragmentOffset {
+  inline int operator()(InvalidId) const noexcept { return mx::kInvalidEntityId; }
+  inline int operator()(FileId) const noexcept { return mx::kInvalidEntityId; }
+  inline int operator()(FileTokenId) const noexcept { return mx::kInvalidEntityId; }
+  inline int operator()(CompilationId) const noexcept { return mx::kInvalidEntityId; }
+  inline int operator()(OperationId) const noexcept { return mx::kInvalidEntityId; }
+  inline int operator()(TypeId) const noexcept { return mx::kInvalidEntityId; }
+  inline int operator()(TypeTokenId) const noexcept { return mx::kInvalidEntityId; }
+
+  template <typename T>
+  inline int operator()(T t) const noexcept {
+    return static_cast<int>(t.offset);
+  }
+};
 
 struct IDKind {
   inline int operator()(InvalidId) const noexcept { return -1; }
@@ -926,6 +901,66 @@ struct IDCategory {
 };
 
 }  // namespace
+
+
+// Return the fragment offset from an entity ID. Returns `~0u` if it's not
+// a fragment-specific entity ID.
+std::optional<EntityOffset> FragmentOffsetFromEntityId(RawEntityId id) {
+  PackedEntityId packed = {};
+  packed.opaque = id;
+  if (!packed.entity_or_other.is_fragment_entity) {
+    return std::nullopt;
+  }
+
+  if (packed.small_or_big.is_big) {
+    return static_cast<EntityOffset>(packed.big_entity.offset);
+  } else {
+    return static_cast<EntityOffset>(packed.small_entity.offset);
+  }
+}
+
+// Returns the fragment ID corresponding with a fragment-specific entity ID.
+std::optional<PackedFragmentId> FragmentIdFromEntityId(RawEntityId id) {
+  RawEntityId fragment_index = mx::kInvalidEntityId;
+  PackedEntityId packed = {};
+  packed.opaque = id;
+
+  if (!packed.entity_or_other.is_fragment_entity) {
+    if (packed.other.kind == static_cast<uint64_t>(OtherKind::kFragment) &&
+        packed.other.opaque) {
+      fragment_index = packed.other.opaque;
+    }
+  } else if (packed.small_or_big.is_big) {
+    fragment_index = packed.big_entity.fragment_id;
+  } else {
+    fragment_index = packed.small_entity.fragment_id + kMaxBigFragmentId;
+  }
+
+  assert(fragment_index == std::visit<mx::RawEntityId>(IDFragment{}, EntityId(id).Unpack()));
+  if (fragment_index == mx::kInvalidEntityId) {
+    return std::nullopt;
+  }
+
+  return mx::FragmentId(fragment_index);
+}
+
+// Returns the Type ID corresponding with a type-specific entity ID.
+std::optional<PackedTypeId> TypeIdFromEntityId(RawEntityId id) {
+
+  // Note: The function takes the `RawEntityId` and unpack them to check
+  //       if it is of type `TypeId` or `TypeTokenId`. If yes then return
+  //       or `TypeId` from that else return the nullopt.
+  auto unpacked = EntityId(id).Unpack();
+  if (std::holds_alternative<TypeId>(unpacked)) {
+    return std::get<TypeId>(unpacked);
+
+  } else if (std::holds_alternative<TypeTokenId>(unpacked)) {
+    auto token_id = std::get<TypeTokenId>(unpacked);
+    return TypeId(token_id);
+  }
+
+  return std::nullopt;
+}
 
 // Returns the kind of an entity as an undifferentiated integer.
 int KindFromEntityId(RawEntityId id) {

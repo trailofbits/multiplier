@@ -17,6 +17,7 @@ class Index;
 class CXXRecordDecl;
 class Decl;
 class Expr;
+class File;
 class NamedDecl;
 class OverloadExpr;
 class Stmt;
@@ -36,11 +37,10 @@ class MX_EXPORT OverloadExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<OverloadExpr> in(const Index &index);
-  static gap::generator<OverloadExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<OverloadExpr> by_id(const Index &, EntityId);
   static gap::generator<OverloadExpr> in(const Fragment &frag);
   static gap::generator<OverloadExpr> in(const File &file);
+  static gap::generator<OverloadExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<OverloadExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<OverloadExpr, ir::Operation>> in(const Compilation &tu);
@@ -52,6 +52,8 @@ class MX_EXPORT OverloadExpr : public Expr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<OverloadExpr> by_id(const Index &, EntityId);
 
   static std::optional<OverloadExpr> from_base(const Stmt &parent);
   inline static std::optional<OverloadExpr> from(const Stmt &parent) {

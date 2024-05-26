@@ -17,6 +17,7 @@ class Fragment;
 class Index;
 class Decl;
 class Expr;
+class File;
 class ObjCIvarDecl;
 class ObjCMethodDecl;
 class ObjCPropertyDecl;
@@ -35,11 +36,10 @@ class MX_EXPORT ObjCPropertyImplDecl : public Decl {
   friend class Decl;
  public:
   static gap::generator<ObjCPropertyImplDecl> in(const Index &index);
-  static gap::generator<ObjCPropertyImplDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ObjCPropertyImplDecl> by_id(const Index &, EntityId);
   static gap::generator<ObjCPropertyImplDecl> in(const Fragment &frag);
   static gap::generator<ObjCPropertyImplDecl> in(const File &file);
+  static gap::generator<ObjCPropertyImplDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<ObjCPropertyImplDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<ObjCPropertyImplDecl, ir::Operation>> in(const Compilation &tu);
@@ -59,6 +59,8 @@ class MX_EXPORT ObjCPropertyImplDecl : public Decl {
   ObjCPropertyImplDecl canonical_declaration(void) const;
   std::optional<ObjCPropertyImplDecl> definition(void) const;
   gap::generator<ObjCPropertyImplDecl> redeclarations(void) const &;
+  static std::optional<ObjCPropertyImplDecl> by_id(const Index &, EntityId);
+
   static std::optional<ObjCPropertyImplDecl> from_base(const Decl &parent);
   inline static std::optional<ObjCPropertyImplDecl> from(const Decl &parent) {
     return from_base(parent);

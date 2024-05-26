@@ -19,6 +19,7 @@ class CastExpr;
 class Decl;
 class ExplicitCastExpr;
 class Expr;
+class File;
 class Stmt;
 class Token;
 class ValueStmt;
@@ -38,11 +39,10 @@ class MX_EXPORT CXXFunctionalCastExpr : public ExplicitCastExpr {
   friend class Stmt;
  public:
   static gap::generator<CXXFunctionalCastExpr> in(const Index &index);
-  static gap::generator<CXXFunctionalCastExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CXXFunctionalCastExpr> by_id(const Index &, EntityId);
   static gap::generator<CXXFunctionalCastExpr> in(const Fragment &frag);
   static gap::generator<CXXFunctionalCastExpr> in(const File &file);
+  static gap::generator<CXXFunctionalCastExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<CXXFunctionalCastExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<CXXFunctionalCastExpr, ir::Operation>> in(const Compilation &tu);
@@ -58,6 +58,8 @@ class MX_EXPORT CXXFunctionalCastExpr : public ExplicitCastExpr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<CXXFunctionalCastExpr> by_id(const Index &, EntityId);
 
   static std::optional<CXXFunctionalCastExpr> from_base(const Stmt &parent);
   inline static std::optional<CXXFunctionalCastExpr> from(const Stmt &parent) {

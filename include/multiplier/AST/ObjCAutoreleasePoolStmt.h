@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Decl;
+class File;
 class ObjCAutoreleasePoolStmt;
 class Stmt;
 class Token;
@@ -30,11 +31,10 @@ class MX_EXPORT ObjCAutoreleasePoolStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<ObjCAutoreleasePoolStmt> in(const Index &index);
-  static gap::generator<ObjCAutoreleasePoolStmt> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ObjCAutoreleasePoolStmt> by_id(const Index &, EntityId);
   static gap::generator<ObjCAutoreleasePoolStmt> in(const Fragment &frag);
   static gap::generator<ObjCAutoreleasePoolStmt> in(const File &file);
+  static gap::generator<ObjCAutoreleasePoolStmt> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<ObjCAutoreleasePoolStmt> from(const ir::Operation &op);
   static gap::generator<std::pair<ObjCAutoreleasePoolStmt, ir::Operation>> in(const Compilation &tu);
@@ -50,6 +50,8 @@ class MX_EXPORT ObjCAutoreleasePoolStmt : public Stmt {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<ObjCAutoreleasePoolStmt> by_id(const Index &, EntityId);
 
   static std::optional<ObjCAutoreleasePoolStmt> from_base(const Stmt &parent);
   inline static std::optional<ObjCAutoreleasePoolStmt> from(const Stmt &parent) {

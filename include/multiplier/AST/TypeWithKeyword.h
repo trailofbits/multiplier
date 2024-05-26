@@ -32,6 +32,7 @@ class MX_EXPORT TypeWithKeyword : public Type {
   static gap::generator<TypeWithKeyword> in(const Index &index);
   static gap::generator<TypeWithKeyword> containing(const Token &tok);
   bool contains(const Token &tok) const;
+
   static std::optional<TypeWithKeyword> by_id(const Index &, EntityId);
 
   static std::optional<TypeWithKeyword> from_base(const Type &parent);

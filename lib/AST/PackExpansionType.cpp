@@ -24,6 +24,17 @@ static const TypeKind kPackExpansionTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<PackExpansionType> PackExpansionType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kPackExpansionTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<PackExpansionType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<PackExpansionType> PackExpansionType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = PackExpansionType::from(*ctx)) {
@@ -65,17 +76,6 @@ std::optional<PackExpansionType> PackExpansionType::from_base(const Type &parent
       return reinterpret_cast<const PackExpansionType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<PackExpansionType> PackExpansionType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kPackExpansionTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<PackExpansionType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

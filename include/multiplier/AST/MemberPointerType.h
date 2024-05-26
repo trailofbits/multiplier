@@ -31,11 +31,12 @@ class MX_EXPORT MemberPointerType : public Type {
   static gap::generator<MemberPointerType> in(const Index &index);
   static gap::generator<MemberPointerType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<MemberPointerType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::MEMBER_POINTER;
   }
+
+  static std::optional<MemberPointerType> by_id(const Index &, EntityId);
 
   static std::optional<MemberPointerType> from_base(const Type &parent);
   inline static std::optional<MemberPointerType> from(const Type &parent) {

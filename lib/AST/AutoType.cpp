@@ -27,6 +27,17 @@ static const TypeKind kAutoTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<AutoType> AutoType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kAutoTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<AutoType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<AutoType> AutoType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = AutoType::from(*ctx)) {
@@ -68,17 +79,6 @@ std::optional<AutoType> AutoType::from_base(const Type &parent) {
       return reinterpret_cast<const AutoType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<AutoType> AutoType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kAutoTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<AutoType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

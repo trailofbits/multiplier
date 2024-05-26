@@ -5498,6 +5498,7 @@ class PseudoKind(IntEnum):
   CXX_CTOR_INITIALIZER = 4
 
 class CXXCtorInitializer(multiplier.Entity):
+  parent_declaration: Optional[multiplier.ast.Decl]
   is_base_initializer: bool
   is_member_initializer: bool
   is_any_member_initializer: bool
@@ -5518,6 +5519,29 @@ class CXXCtorInitializer(multiplier.Entity):
 
   @staticmethod
   def static_category() -> multiplier.EntityCategory:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.ast.CXXCtorInitializer]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.ast.CXXCtorInitializer]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.ast.CXXCtorInitializer]:
+    ...
+
+  @staticmethod
+  def containing(tok: multiplier.frontend.Token) -> Iterable[multiplier.ast.CXXCtorInitializer]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXCtorInitializer]:
     ...
 
   @overload
@@ -5545,6 +5569,9 @@ class CXXCtorInitializer(multiplier.Entity):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXCtorInitializer]:
     ...
 
+  def contains(self, tok: multiplier.frontend.Token) -> bool:
+    ...
+
 class Designator(multiplier.Entity):
   parent_declaration: Optional[multiplier.ast.Decl]
   parent_statement: Optional[multiplier.ast.Stmt]
@@ -5561,6 +5588,29 @@ class Designator(multiplier.Entity):
 
   @staticmethod
   def static_category() -> multiplier.EntityCategory:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.ast.Designator]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.ast.Designator]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.ast.Designator]:
+    ...
+
+  @staticmethod
+  def containing(tok: multiplier.frontend.Token) -> Iterable[multiplier.ast.Designator]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.Designator]:
     ...
 
   @overload
@@ -5588,21 +5638,49 @@ class Designator(multiplier.Entity):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.Designator]:
     ...
 
+  def contains(self, tok: multiplier.frontend.Token) -> bool:
+    ...
+
 class CXXBaseSpecifier(multiplier.Entity):
   parent_declaration: Optional[multiplier.ast.Decl]
+  offset_in_bits: Optional[int]
   tokens: multiplier.frontend.TokenRange
   base_type_token: multiplier.frontend.Token
+  ellipsis_token: multiplier.frontend.Token
   is_virtual: bool
-  base_kind: multiplier.ast.TagTypeKind
   is_pack_expansion: bool
   constructors_are_inherited: bool
-  ellipsis_token: multiplier.frontend.Token
+  base_kind: multiplier.ast.TagTypeKind
   semantic_access_specifier: multiplier.ast.AccessSpecifier
   lexical_access_specifier: multiplier.ast.AccessSpecifier
   base_type: multiplier.ast.Type
+  base_class: Optional[multiplier.ast.CXXRecordDecl]
 
   @staticmethod
   def static_category() -> multiplier.EntityCategory:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.ast.CXXBaseSpecifier]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.ast.CXXBaseSpecifier]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.ast.CXXBaseSpecifier]:
+    ...
+
+  @staticmethod
+  def containing(tok: multiplier.frontend.Token) -> Iterable[multiplier.ast.CXXBaseSpecifier]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXBaseSpecifier]:
     ...
 
   @overload
@@ -5630,7 +5708,11 @@ class CXXBaseSpecifier(multiplier.Entity):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXBaseSpecifier]:
     ...
 
+  def contains(self, tok: multiplier.frontend.Token) -> bool:
+    ...
+
 class TemplateParameterList(multiplier.Entity):
+  parent_declaration: Optional[multiplier.ast.Decl]
   depth: int
   has_unexpanded_parameter_pack: bool
   has_parameter_pack: bool
@@ -5644,6 +5726,29 @@ class TemplateParameterList(multiplier.Entity):
 
   @staticmethod
   def static_category() -> multiplier.EntityCategory:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.ast.TemplateParameterList]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.ast.TemplateParameterList]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.ast.TemplateParameterList]:
+    ...
+
+  @staticmethod
+  def containing(tok: multiplier.frontend.Token) -> Iterable[multiplier.ast.TemplateParameterList]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TemplateParameterList]:
     ...
 
   @overload
@@ -5669,6 +5774,9 @@ class TemplateParameterList(multiplier.Entity):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.TemplateParameterList]:
+    ...
+
+  def contains(self, tok: multiplier.frontend.Token) -> bool:
     ...
 
   def nth_parameter(self, n: int) -> Optional[multiplier.ast.NamedDecl]:
@@ -5697,6 +5805,29 @@ class TemplateArgument(multiplier.Entity):
 
   @overload
   @staticmethod
+  def IN(index: multiplier.Index) -> Iterable[multiplier.ast.TemplateArgument]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(frag: multiplier.Fragment) -> Iterable[multiplier.ast.TemplateArgument]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(file: multiplier.frontend.File) -> Iterable[multiplier.ast.TemplateArgument]:
+    ...
+
+  @staticmethod
+  def containing(tok: multiplier.frontend.Token) -> Iterable[multiplier.ast.TemplateArgument]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TemplateArgument]:
+    ...
+
+  @overload
+  @staticmethod
   def FROM(self: multiplier.ast.TemplateArgument) -> Optional[multiplier.ast.TemplateArgument]:
     ...
 
@@ -5720,10 +5851,15 @@ class TemplateArgument(multiplier.Entity):
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.TemplateArgument]:
     ...
 
+  def contains(self, tok: multiplier.frontend.Token) -> bool:
+    ...
+
   def nth_pack_argument(self, n: int) -> Optional[multiplier.ast.TemplateArgument]:
     ...
 
 class Attr(multiplier.Entity):
+  parent_declaration: Optional[multiplier.ast.Decl]
+  parent_statement: Optional[multiplier.ast.Stmt]
   token: multiplier.frontend.Token
   is_implicit: bool
   is_inherited: bool
@@ -5734,21 +5870,6 @@ class Attr(multiplier.Entity):
 
   @staticmethod
   def static_category() -> multiplier.EntityCategory:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(index: multiplier.Index, kinds: Sequence[multiplier.ast.AttrKind]) -> Iterable[multiplier.ast.Attr]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(frag: multiplier.Fragment, kinds: Sequence[multiplier.ast.AttrKind]) -> Iterable[multiplier.ast.Attr]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(file: multiplier.frontend.File, kinds: Sequence[multiplier.ast.AttrKind]) -> Iterable[multiplier.ast.Attr]:
     ...
 
   @overload
@@ -5764,6 +5885,21 @@ class Attr(multiplier.Entity):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Iterable[multiplier.ast.Attr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(index: multiplier.Index, kinds: Sequence[multiplier.ast.AttrKind]) -> Iterable[multiplier.ast.Attr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(frag: multiplier.Fragment, kinds: Sequence[multiplier.ast.AttrKind]) -> Iterable[multiplier.ast.Attr]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(file: multiplier.frontend.File, kinds: Sequence[multiplier.ast.AttrKind]) -> Iterable[multiplier.ast.Attr]:
     ...
 
   @staticmethod
@@ -5825,11 +5961,11 @@ class AlignValueAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AlignValueAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AlignValueAttr]:
     ...
 
   @staticmethod
@@ -5887,11 +6023,11 @@ class AliasAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AliasAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AliasAttr]:
     ...
 
   @staticmethod
@@ -5948,11 +6084,11 @@ class AbiTagAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AbiTagAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AbiTagAttr]:
     ...
 
   @staticmethod
@@ -6066,11 +6202,11 @@ class SPtrAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SPtrAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SPtrAttr]:
     ...
 
   @staticmethod
@@ -6127,11 +6263,11 @@ class Ptr64Attr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.Ptr64Attr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.Ptr64Attr]:
     ...
 
   @staticmethod
@@ -6188,11 +6324,11 @@ class Ptr32Attr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.Ptr32Attr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.Ptr32Attr]:
     ...
 
   @staticmethod
@@ -6250,11 +6386,11 @@ class OpenCLPrivateAddressSpaceAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpenCLPrivateAddressSpaceAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpenCLPrivateAddressSpaceAttr]:
     ...
 
   @staticmethod
@@ -6312,11 +6448,11 @@ class OpenCLLocalAddressSpaceAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpenCLLocalAddressSpaceAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpenCLLocalAddressSpaceAttr]:
     ...
 
   @staticmethod
@@ -6373,11 +6509,11 @@ class OpenCLGlobalHostAddressSpaceAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpenCLGlobalHostAddressSpaceAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpenCLGlobalHostAddressSpaceAttr]:
     ...
 
   @staticmethod
@@ -6434,11 +6570,11 @@ class OpenCLGlobalDeviceAddressSpaceAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpenCLGlobalDeviceAddressSpaceAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpenCLGlobalDeviceAddressSpaceAttr]:
     ...
 
   @staticmethod
@@ -6496,11 +6632,11 @@ class OpenCLGlobalAddressSpaceAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpenCLGlobalAddressSpaceAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpenCLGlobalAddressSpaceAttr]:
     ...
 
   @staticmethod
@@ -6558,11 +6694,11 @@ class OpenCLGenericAddressSpaceAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpenCLGenericAddressSpaceAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpenCLGenericAddressSpaceAttr]:
     ...
 
   @staticmethod
@@ -6620,11 +6756,11 @@ class OpenCLConstantAddressSpaceAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpenCLConstantAddressSpaceAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpenCLConstantAddressSpaceAttr]:
     ...
 
   @staticmethod
@@ -6681,11 +6817,11 @@ class ObjCKindOfAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCKindOfAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCKindOfAttr]:
     ...
 
   @staticmethod
@@ -6742,11 +6878,11 @@ class ObjCInertUnsafeUnretainedAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCInertUnsafeUnretainedAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCInertUnsafeUnretainedAttr]:
     ...
 
   @staticmethod
@@ -6803,11 +6939,11 @@ class ObjCGCAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCGCAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCGCAttr]:
     ...
 
   @staticmethod
@@ -6864,11 +7000,11 @@ class NoDerefAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoDerefAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoDerefAttr]:
     ...
 
   @staticmethod
@@ -6932,11 +7068,11 @@ class HLSLParamModifierAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.HLSLParamModifierAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.HLSLParamModifierAttr]:
     ...
 
   @staticmethod
@@ -6993,11 +7129,11 @@ class HLSLGroupSharedAddressSpaceAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.HLSLGroupSharedAddressSpaceAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.HLSLGroupSharedAddressSpaceAttr]:
     ...
 
   @staticmethod
@@ -7054,11 +7190,11 @@ class CmseNSCallAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CmseNSCallAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CmseNSCallAttr]:
     ...
 
   @staticmethod
@@ -7116,11 +7252,11 @@ class BTFTypeTagAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BTFTypeTagAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BTFTypeTagAttr]:
     ...
 
   @staticmethod
@@ -7177,11 +7313,11 @@ class ArmStreamingCompatibleAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArmStreamingCompatibleAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArmStreamingCompatibleAttr]:
     ...
 
   @staticmethod
@@ -7238,11 +7374,11 @@ class ArmStreamingAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArmStreamingAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArmStreamingAttr]:
     ...
 
   @staticmethod
@@ -7299,11 +7435,11 @@ class ArmPreservesAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArmPreservesAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArmPreservesAttr]:
     ...
 
   @staticmethod
@@ -7360,11 +7496,11 @@ class ArmOutAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArmOutAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArmOutAttr]:
     ...
 
   @staticmethod
@@ -7421,11 +7557,11 @@ class ArmMveStrictPolymorphismAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArmMveStrictPolymorphismAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArmMveStrictPolymorphismAttr]:
     ...
 
   @staticmethod
@@ -7482,11 +7618,11 @@ class ArmInOutAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArmInOutAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArmInOutAttr]:
     ...
 
   @staticmethod
@@ -7543,11 +7679,11 @@ class ArmInAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArmInAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArmInAttr]:
     ...
 
   @staticmethod
@@ -7605,11 +7741,11 @@ class AnnotateTypeAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AnnotateTypeAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AnnotateTypeAttr]:
     ...
 
   @staticmethod
@@ -7666,11 +7802,11 @@ class AddressSpaceAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AddressSpaceAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AddressSpaceAttr]:
     ...
 
   @staticmethod
@@ -7727,11 +7863,11 @@ class WebAssemblyFuncrefAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.WebAssemblyFuncrefAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.WebAssemblyFuncrefAttr]:
     ...
 
   @staticmethod
@@ -7788,11 +7924,11 @@ class UPtrAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UPtrAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UPtrAttr]:
     ...
 
   @staticmethod
@@ -7849,11 +7985,11 @@ class TypeNullableResultAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeNullableResultAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeNullableResultAttr]:
     ...
 
   @staticmethod
@@ -7910,11 +8046,11 @@ class TypeNullableAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeNullableAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeNullableAttr]:
     ...
 
   @staticmethod
@@ -7971,11 +8107,11 @@ class TypeNullUnspecifiedAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeNullUnspecifiedAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeNullUnspecifiedAttr]:
     ...
 
   @staticmethod
@@ -8032,11 +8168,11 @@ class TypeNonNullAttr(multiplier.ast.TypeAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeNonNullAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeNonNullAttr]:
     ...
 
   @staticmethod
@@ -8093,11 +8229,11 @@ class ThreadAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ThreadAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ThreadAttr]:
     ...
 
   @staticmethod
@@ -8156,11 +8292,11 @@ class SwiftVersionedRemovalAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftVersionedRemovalAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftVersionedRemovalAttr]:
     ...
 
   @staticmethod
@@ -8219,11 +8355,11 @@ class SwiftVersionedAdditionAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftVersionedAdditionAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftVersionedAdditionAttr]:
     ...
 
   @staticmethod
@@ -8280,11 +8416,11 @@ class SwiftObjCMembersAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftObjCMembersAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftObjCMembersAttr]:
     ...
 
   @staticmethod
@@ -8398,11 +8534,11 @@ class OpenCLUnrollHintAttr(multiplier.ast.StmtAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpenCLUnrollHintAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpenCLUnrollHintAttr]:
     ...
 
   @staticmethod
@@ -8459,11 +8595,11 @@ class MustTailAttr(multiplier.ast.StmtAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MustTailAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MustTailAttr]:
     ...
 
   @staticmethod
@@ -8520,11 +8656,11 @@ class LikelyAttr(multiplier.ast.StmtAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LikelyAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LikelyAttr]:
     ...
 
   @staticmethod
@@ -8581,11 +8717,11 @@ class FallThroughAttr(multiplier.ast.StmtAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FallThroughAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FallThroughAttr]:
     ...
 
   @staticmethod
@@ -8643,11 +8779,11 @@ class CodeAlignAttr(multiplier.ast.StmtAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CodeAlignAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CodeAlignAttr]:
     ...
 
   @staticmethod
@@ -8704,11 +8840,11 @@ class UnlikelyAttr(multiplier.ast.StmtAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnlikelyAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnlikelyAttr]:
     ...
 
   @staticmethod
@@ -8765,11 +8901,11 @@ class RenderScriptKernelAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RenderScriptKernelAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RenderScriptKernelAttr]:
     ...
 
   @staticmethod
@@ -8826,11 +8962,11 @@ class OverloadableAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OverloadableAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OverloadableAttr]:
     ...
 
   @staticmethod
@@ -8891,11 +9027,11 @@ class OpenCLAccessAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpenCLAccessAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpenCLAccessAttr]:
     ...
 
   @staticmethod
@@ -8952,11 +9088,11 @@ class ObjCRuntimeVisibleAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCRuntimeVisibleAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCRuntimeVisibleAttr]:
     ...
 
   @staticmethod
@@ -9014,11 +9150,11 @@ class ObjCRuntimeNameAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCRuntimeNameAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCRuntimeNameAttr]:
     ...
 
   @staticmethod
@@ -9075,11 +9211,11 @@ class ObjCNonRuntimeProtocolAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCNonRuntimeProtocolAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCNonRuntimeProtocolAttr]:
     ...
 
   @staticmethod
@@ -9136,11 +9272,11 @@ class ObjCNonLazyClassAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCNonLazyClassAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCNonLazyClassAttr]:
     ...
 
   @staticmethod
@@ -9197,11 +9333,11 @@ class ObjCDirectMembersAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCDirectMembersAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCDirectMembersAttr]:
     ...
 
   @staticmethod
@@ -9258,11 +9394,11 @@ class ObjCDirectAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCDirectAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCDirectAttr]:
     ...
 
   @staticmethod
@@ -9319,11 +9455,11 @@ class ObjCDesignatedInitializerAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCDesignatedInitializerAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCDesignatedInitializerAttr]:
     ...
 
   @staticmethod
@@ -9380,11 +9516,11 @@ class ObjCClassStubAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCClassStubAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCClassStubAttr]:
     ...
 
   @staticmethod
@@ -9441,11 +9577,11 @@ class ObjCBoxableAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCBoxableAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCBoxableAttr]:
     ...
 
   @staticmethod
@@ -9503,11 +9639,11 @@ class OMPReferencedVarAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPReferencedVarAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPReferencedVarAttr]:
     ...
 
   @staticmethod
@@ -9566,11 +9702,11 @@ class OMPDeclareSimdDeclAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDeclareSimdDeclAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDeclareSimdDeclAttr]:
     ...
 
   @staticmethod
@@ -9627,11 +9763,11 @@ class OMPCaptureKindAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPCaptureKindAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPCaptureKindAttr]:
     ...
 
   @staticmethod
@@ -9688,11 +9824,11 @@ class NoEscapeAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoEscapeAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoEscapeAttr]:
     ...
 
   @staticmethod
@@ -9749,11 +9885,11 @@ class NoBuiltinAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoBuiltinAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoBuiltinAttr]:
     ...
 
   @staticmethod
@@ -9810,11 +9946,11 @@ class ModeAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ModeAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ModeAttr]:
     ...
 
   @staticmethod
@@ -9875,11 +10011,11 @@ class LoopHintAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LoopHintAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LoopHintAttr]:
     ...
 
   @staticmethod
@@ -9936,11 +10072,11 @@ class LoaderUninitializedAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LoaderUninitializedAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LoaderUninitializedAttr]:
     ...
 
   @staticmethod
@@ -9998,11 +10134,11 @@ class InitSegAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.InitSegAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.InitSegAttr]:
     ...
 
   @staticmethod
@@ -10119,11 +10255,11 @@ class IBOutletCollectionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.IBOutletCollectionAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.IBOutletCollectionAttr]:
     ...
 
   @staticmethod
@@ -10180,11 +10316,11 @@ class IBOutletAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.IBOutletAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.IBOutletAttr]:
     ...
 
   @staticmethod
@@ -10241,11 +10377,11 @@ class IBActionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.IBActionAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.IBActionAttr]:
     ...
 
   @staticmethod
@@ -10302,11 +10438,11 @@ class HotAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.HotAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.HotAttr]:
     ...
 
   @staticmethod
@@ -10364,11 +10500,11 @@ class HLSLShaderAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.HLSLShaderAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.HLSLShaderAttr]:
     ...
 
   @staticmethod
@@ -10427,11 +10563,11 @@ class HLSLResourceBindingAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.HLSLResourceBindingAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.HLSLResourceBindingAttr]:
     ...
 
   @staticmethod
@@ -10489,11 +10625,11 @@ class HLSLResourceAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.HLSLResourceAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.HLSLResourceAttr]:
     ...
 
   @staticmethod
@@ -10550,11 +10686,11 @@ class HLSLNumThreadsAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.HLSLNumThreadsAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.HLSLNumThreadsAttr]:
     ...
 
   @staticmethod
@@ -10668,11 +10804,11 @@ class HLSLSV_GroupIndexAttr(multiplier.ast.HLSLAnnotationAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.HLSLSV_GroupIndexAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.HLSLSV_GroupIndexAttr]:
     ...
 
   @staticmethod
@@ -10729,11 +10865,11 @@ class HLSLSV_DispatchThreadIDAttr(multiplier.ast.HLSLAnnotationAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.HLSLSV_DispatchThreadIDAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.HLSLSV_DispatchThreadIDAttr]:
     ...
 
   @staticmethod
@@ -10790,11 +10926,11 @@ class HIPManagedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.HIPManagedAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.HIPManagedAttr]:
     ...
 
   @staticmethod
@@ -10851,11 +10987,11 @@ class GuardedVarAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.GuardedVarAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.GuardedVarAttr]:
     ...
 
   @staticmethod
@@ -10913,11 +11049,11 @@ class GuardedByAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.GuardedByAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.GuardedByAttr]:
     ...
 
   @staticmethod
@@ -10974,11 +11110,11 @@ class GNUInlineAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.GNUInlineAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.GNUInlineAttr]:
     ...
 
   @staticmethod
@@ -11036,11 +11172,11 @@ class FunctionReturnThunksAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FunctionReturnThunksAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FunctionReturnThunksAttr]:
     ...
 
   @staticmethod
@@ -11097,11 +11233,11 @@ class FormatAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FormatAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FormatAttr]:
     ...
 
   @staticmethod
@@ -11158,11 +11294,11 @@ class FormatArgAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FormatArgAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FormatArgAttr]:
     ...
 
   @staticmethod
@@ -11219,11 +11355,11 @@ class FlattenAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FlattenAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FlattenAttr]:
     ...
 
   @staticmethod
@@ -11280,11 +11416,11 @@ class FlagEnumAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FlagEnumAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FlagEnumAttr]:
     ...
 
   @staticmethod
@@ -11343,11 +11479,11 @@ class FinalAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FinalAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FinalAttr]:
     ...
 
   @staticmethod
@@ -11404,11 +11540,11 @@ class FastCallAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FastCallAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FastCallAttr]:
     ...
 
   @staticmethod
@@ -11469,11 +11605,11 @@ class ExternalSourceSymbolAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ExternalSourceSymbolAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ExternalSourceSymbolAttr]:
     ...
 
   @staticmethod
@@ -11531,11 +11667,11 @@ class ExclusiveTrylockFunctionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ExclusiveTrylockFunctionAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ExclusiveTrylockFunctionAttr]:
     ...
 
   @staticmethod
@@ -11592,11 +11728,11 @@ class ExcludeFromExplicitInstantiationAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ExcludeFromExplicitInstantiationAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ExcludeFromExplicitInstantiationAttr]:
     ...
 
   @staticmethod
@@ -11657,11 +11793,11 @@ class ErrorAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ErrorAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ErrorAttr]:
     ...
 
   @staticmethod
@@ -11719,11 +11855,11 @@ class EnumExtensibilityAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.EnumExtensibilityAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.EnumExtensibilityAttr]:
     ...
 
   @staticmethod
@@ -11781,11 +11917,11 @@ class EnforceTCBLeafAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.EnforceTCBLeafAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.EnforceTCBLeafAttr]:
     ...
 
   @staticmethod
@@ -11843,11 +11979,11 @@ class EnforceTCBAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.EnforceTCBAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.EnforceTCBAttr]:
     ...
 
   @staticmethod
@@ -11906,11 +12042,11 @@ class EnableIfAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.EnableIfAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.EnableIfAttr]:
     ...
 
   @staticmethod
@@ -11967,11 +12103,11 @@ class EmptyBasesAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.EmptyBasesAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.EmptyBasesAttr]:
     ...
 
   @staticmethod
@@ -12028,11 +12164,11 @@ class DisableTailCallsAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DisableTailCallsAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DisableTailCallsAttr]:
     ...
 
   @staticmethod
@@ -12089,11 +12225,11 @@ class DisableSanitizerInstrumentationAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DisableSanitizerInstrumentationAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DisableSanitizerInstrumentationAttr]:
     ...
 
   @staticmethod
@@ -12157,11 +12293,11 @@ class DiagnoseIfAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DiagnoseIfAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DiagnoseIfAttr]:
     ...
 
   @staticmethod
@@ -12219,11 +12355,11 @@ class DiagnoseAsBuiltinAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DiagnoseAsBuiltinAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DiagnoseAsBuiltinAttr]:
     ...
 
   @staticmethod
@@ -12280,11 +12416,11 @@ class DestructorAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DestructorAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DestructorAttr]:
     ...
 
   @staticmethod
@@ -12343,11 +12479,11 @@ class DeprecatedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DeprecatedAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DeprecatedAttr]:
     ...
 
   @staticmethod
@@ -12463,11 +12599,11 @@ class AlwaysInlineAttr(multiplier.ast.DeclOrStmtAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AlwaysInlineAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AlwaysInlineAttr]:
     ...
 
   @staticmethod
@@ -12525,11 +12661,11 @@ class SuppressAttr(multiplier.ast.DeclOrStmtAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SuppressAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SuppressAttr]:
     ...
 
   @staticmethod
@@ -12586,11 +12722,11 @@ class NoMergeAttr(multiplier.ast.DeclOrStmtAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoMergeAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoMergeAttr]:
     ...
 
   @staticmethod
@@ -12648,11 +12784,11 @@ class NoInlineAttr(multiplier.ast.DeclOrStmtAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoInlineAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoInlineAttr]:
     ...
 
   @staticmethod
@@ -12709,11 +12845,11 @@ class DLLImportStaticLocalAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DLLImportStaticLocalAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DLLImportStaticLocalAttr]:
     ...
 
   @staticmethod
@@ -12770,11 +12906,11 @@ class DLLImportAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DLLImportAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DLLImportAttr]:
     ...
 
   @staticmethod
@@ -12831,11 +12967,11 @@ class DLLExportStaticLocalAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DLLExportStaticLocalAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DLLExportStaticLocalAttr]:
     ...
 
   @staticmethod
@@ -12892,11 +13028,11 @@ class DLLExportAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DLLExportAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DLLExportAttr]:
     ...
 
   @staticmethod
@@ -12954,11 +13090,11 @@ class CountedByAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CountedByAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CountedByAttr]:
     ...
 
   @staticmethod
@@ -13015,11 +13151,11 @@ class CoroWrapperAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CoroWrapperAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CoroWrapperAttr]:
     ...
 
   @staticmethod
@@ -13076,11 +13212,11 @@ class CoroReturnTypeAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CoroReturnTypeAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CoroReturnTypeAttr]:
     ...
 
   @staticmethod
@@ -13137,11 +13273,11 @@ class CoroOnlyDestroyWhenCompleteAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CoroOnlyDestroyWhenCompleteAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CoroOnlyDestroyWhenCompleteAttr]:
     ...
 
   @staticmethod
@@ -13198,11 +13334,11 @@ class CoroLifetimeBoundAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CoroLifetimeBoundAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CoroLifetimeBoundAttr]:
     ...
 
   @staticmethod
@@ -13259,11 +13395,11 @@ class CoroDisableLifetimeBoundAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CoroDisableLifetimeBoundAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CoroDisableLifetimeBoundAttr]:
     ...
 
   @staticmethod
@@ -13320,11 +13456,11 @@ class ConvergentAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConvergentAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConvergentAttr]:
     ...
 
   @staticmethod
@@ -13381,11 +13517,11 @@ class ConsumableSetOnReadAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConsumableSetOnReadAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConsumableSetOnReadAttr]:
     ...
 
   @staticmethod
@@ -13442,11 +13578,11 @@ class ConsumableAutoCastAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConsumableAutoCastAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConsumableAutoCastAttr]:
     ...
 
   @staticmethod
@@ -13504,11 +13640,11 @@ class ConsumableAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConsumableAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConsumableAttr]:
     ...
 
   @staticmethod
@@ -13565,11 +13701,11 @@ class ConstructorAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConstructorAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConstructorAttr]:
     ...
 
   @staticmethod
@@ -13628,11 +13764,11 @@ class ConstInitAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConstInitAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConstInitAttr]:
     ...
 
   @staticmethod
@@ -13689,11 +13825,11 @@ class ConstAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConstAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConstAttr]:
     ...
 
   @staticmethod
@@ -13750,11 +13886,11 @@ class CommonAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CommonAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CommonAttr]:
     ...
 
   @staticmethod
@@ -13811,11 +13947,11 @@ class ColdAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ColdAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ColdAttr]:
     ...
 
   @staticmethod
@@ -13873,11 +14009,11 @@ class CodeSegAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CodeSegAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CodeSegAttr]:
     ...
 
   @staticmethod
@@ -13934,11 +14070,11 @@ class CodeModelAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CodeModelAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CodeModelAttr]:
     ...
 
   @staticmethod
@@ -13995,11 +14131,11 @@ class CmseNSEntryAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CmseNSEntryAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CmseNSEntryAttr]:
     ...
 
   @staticmethod
@@ -14057,11 +14193,11 @@ class CleanupAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CleanupAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CleanupAttr]:
     ...
 
   @staticmethod
@@ -14118,11 +14254,11 @@ class CapturedRecordAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CapturedRecordAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CapturedRecordAttr]:
     ...
 
   @staticmethod
@@ -14182,11 +14318,11 @@ class CapabilityAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CapabilityAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CapabilityAttr]:
     ...
 
   @staticmethod
@@ -14243,11 +14379,11 @@ class CallbackAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CallbackAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CallbackAttr]:
     ...
 
   @staticmethod
@@ -14304,11 +14440,11 @@ class CallableWhenAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CallableWhenAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CallableWhenAttr]:
     ...
 
   @staticmethod
@@ -14366,11 +14502,11 @@ class CXX11NoReturnAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXX11NoReturnAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXX11NoReturnAttr]:
     ...
 
   @staticmethod
@@ -14427,11 +14563,11 @@ class CUDASharedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CUDASharedAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CUDASharedAttr]:
     ...
 
   @staticmethod
@@ -14491,11 +14627,11 @@ class CUDALaunchBoundsAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CUDALaunchBoundsAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CUDALaunchBoundsAttr]:
     ...
 
   @staticmethod
@@ -14552,11 +14688,11 @@ class CUDAInvalidTargetAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CUDAInvalidTargetAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CUDAInvalidTargetAttr]:
     ...
 
   @staticmethod
@@ -14613,11 +14749,11 @@ class CUDAHostAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CUDAHostAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CUDAHostAttr]:
     ...
 
   @staticmethod
@@ -14674,11 +14810,11 @@ class CUDAGlobalAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CUDAGlobalAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CUDAGlobalAttr]:
     ...
 
   @staticmethod
@@ -14735,11 +14871,11 @@ class CUDADeviceBuiltinTextureTypeAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CUDADeviceBuiltinTextureTypeAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CUDADeviceBuiltinTextureTypeAttr]:
     ...
 
   @staticmethod
@@ -14796,11 +14932,11 @@ class CUDADeviceBuiltinSurfaceTypeAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CUDADeviceBuiltinSurfaceTypeAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CUDADeviceBuiltinSurfaceTypeAttr]:
     ...
 
   @staticmethod
@@ -14857,11 +14993,11 @@ class CUDADeviceAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CUDADeviceAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CUDADeviceAttr]:
     ...
 
   @staticmethod
@@ -14918,11 +15054,11 @@ class CUDAConstantAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CUDAConstantAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CUDAConstantAttr]:
     ...
 
   @staticmethod
@@ -14979,11 +15115,11 @@ class CPUSpecificAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CPUSpecificAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CPUSpecificAttr]:
     ...
 
   @staticmethod
@@ -15040,11 +15176,11 @@ class CPUDispatchAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CPUDispatchAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CPUDispatchAttr]:
     ...
 
   @staticmethod
@@ -15101,11 +15237,11 @@ class CFUnknownTransferAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CFUnknownTransferAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CFUnknownTransferAttr]:
     ...
 
   @staticmethod
@@ -15162,11 +15298,11 @@ class CFReturnsRetainedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CFReturnsRetainedAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CFReturnsRetainedAttr]:
     ...
 
   @staticmethod
@@ -15223,11 +15359,11 @@ class CFReturnsNotRetainedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CFReturnsNotRetainedAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CFReturnsNotRetainedAttr]:
     ...
 
   @staticmethod
@@ -15284,11 +15420,11 @@ class CFICanonicalJumpTableAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CFICanonicalJumpTableAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CFICanonicalJumpTableAttr]:
     ...
 
   @staticmethod
@@ -15346,11 +15482,11 @@ class CFGuardAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CFGuardAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CFGuardAttr]:
     ...
 
   @staticmethod
@@ -15407,11 +15543,11 @@ class CFAuditedTransferAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CFAuditedTransferAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CFAuditedTransferAttr]:
     ...
 
   @staticmethod
@@ -15468,11 +15604,11 @@ class CDeclAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CDeclAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CDeclAttr]:
     ...
 
   @staticmethod
@@ -15529,11 +15665,11 @@ class C11NoReturnAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.C11NoReturnAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.C11NoReturnAttr]:
     ...
 
   @staticmethod
@@ -15590,11 +15726,11 @@ class BuiltinAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BuiltinAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BuiltinAttr]:
     ...
 
   @staticmethod
@@ -15652,11 +15788,11 @@ class BlocksAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BlocksAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BlocksAttr]:
     ...
 
   @staticmethod
@@ -15714,11 +15850,11 @@ class BTFDeclTagAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BTFDeclTagAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BTFDeclTagAttr]:
     ...
 
   @staticmethod
@@ -15775,11 +15911,11 @@ class BPFPreserveStaticOffsetAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BPFPreserveStaticOffsetAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BPFPreserveStaticOffsetAttr]:
     ...
 
   @staticmethod
@@ -15836,11 +15972,11 @@ class BPFPreserveAccessIndexAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BPFPreserveAccessIndexAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BPFPreserveAccessIndexAttr]:
     ...
 
   @staticmethod
@@ -15897,11 +16033,11 @@ class AvailableOnlyInDefaultEvalMethodAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AvailableOnlyInDefaultEvalMethodAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AvailableOnlyInDefaultEvalMethodAttr]:
     ...
 
   @staticmethod
@@ -15962,11 +16098,11 @@ class AvailabilityAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AvailabilityAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AvailabilityAttr]:
     ...
 
   @staticmethod
@@ -16024,11 +16160,11 @@ class AssumptionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AssumptionAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AssumptionAttr]:
     ...
 
   @staticmethod
@@ -16087,11 +16223,11 @@ class AssumeAlignedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AssumeAlignedAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AssumeAlignedAttr]:
     ...
 
   @staticmethod
@@ -16148,11 +16284,11 @@ class AssertSharedLockAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AssertSharedLockAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AssertSharedLockAttr]:
     ...
 
   @staticmethod
@@ -16209,11 +16345,11 @@ class AssertExclusiveLockAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AssertExclusiveLockAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AssertExclusiveLockAttr]:
     ...
 
   @staticmethod
@@ -16272,11 +16408,11 @@ class AssertCapabilityAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AssertCapabilityAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AssertCapabilityAttr]:
     ...
 
   @staticmethod
@@ -16335,11 +16471,11 @@ class AsmLabelAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AsmLabelAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AsmLabelAttr]:
     ...
 
   @staticmethod
@@ -16396,11 +16532,11 @@ class ArtificialAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArtificialAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArtificialAttr]:
     ...
 
   @staticmethod
@@ -16459,11 +16595,11 @@ class ArmNewAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArmNewAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArmNewAttr]:
     ...
 
   @staticmethod
@@ -16520,11 +16656,11 @@ class ArmLocallyStreamingAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArmLocallyStreamingAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArmLocallyStreamingAttr]:
     ...
 
   @staticmethod
@@ -16581,11 +16717,11 @@ class ArmBuiltinAliasAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArmBuiltinAliasAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArmBuiltinAliasAttr]:
     ...
 
   @staticmethod
@@ -16644,11 +16780,11 @@ class ArgumentWithTypeTagAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArgumentWithTypeTagAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArgumentWithTypeTagAttr]:
     ...
 
   @staticmethod
@@ -16705,11 +16841,11 @@ class ArcWeakrefUnavailableAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArcWeakrefUnavailableAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArcWeakrefUnavailableAttr]:
     ...
 
   @staticmethod
@@ -16766,11 +16902,11 @@ class AnyX86NoCfCheckAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AnyX86NoCfCheckAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AnyX86NoCfCheckAttr]:
     ...
 
   @staticmethod
@@ -16827,11 +16963,11 @@ class AnyX86NoCallerSavedRegistersAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AnyX86NoCallerSavedRegistersAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AnyX86NoCallerSavedRegistersAttr]:
     ...
 
   @staticmethod
@@ -16888,11 +17024,11 @@ class AnyX86InterruptAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AnyX86InterruptAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AnyX86InterruptAttr]:
     ...
 
   @staticmethod
@@ -16949,11 +17085,11 @@ class AnalyzerNoReturnAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AnalyzerNoReturnAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AnalyzerNoReturnAttr]:
     ...
 
   @staticmethod
@@ -17010,11 +17146,11 @@ class AlwaysDestroyAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AlwaysDestroyAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AlwaysDestroyAttr]:
     ...
 
   @staticmethod
@@ -17071,11 +17207,11 @@ class AllocSizeAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AllocSizeAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AllocSizeAttr]:
     ...
 
   @staticmethod
@@ -17132,11 +17268,11 @@ class AllocAlignAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AllocAlignAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AllocAlignAttr]:
     ...
 
   @staticmethod
@@ -17204,11 +17340,11 @@ class AlignedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AlignedAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AlignedAttr]:
     ...
 
   @staticmethod
@@ -17265,11 +17401,11 @@ class AlignNaturalAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AlignNaturalAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AlignNaturalAttr]:
     ...
 
   @staticmethod
@@ -17326,11 +17462,11 @@ class AlignMac68kAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AlignMac68kAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AlignMac68kAttr]:
     ...
 
   @staticmethod
@@ -17387,11 +17523,11 @@ class AcquiredBeforeAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AcquiredBeforeAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AcquiredBeforeAttr]:
     ...
 
   @staticmethod
@@ -17448,11 +17584,11 @@ class AcquiredAfterAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AcquiredAfterAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AcquiredAfterAttr]:
     ...
 
   @staticmethod
@@ -17510,11 +17646,11 @@ class AcquireHandleAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AcquireHandleAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AcquireHandleAttr]:
     ...
 
   @staticmethod
@@ -17573,11 +17709,11 @@ class AcquireCapabilityAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AcquireCapabilityAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AcquireCapabilityAttr]:
     ...
 
   @staticmethod
@@ -17634,11 +17770,11 @@ class AVRSignalAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AVRSignalAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AVRSignalAttr]:
     ...
 
   @staticmethod
@@ -17695,11 +17831,11 @@ class AVRInterruptAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AVRInterruptAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AVRInterruptAttr]:
     ...
 
   @staticmethod
@@ -17757,11 +17893,11 @@ class ARMInterruptAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ARMInterruptAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ARMInterruptAttr]:
     ...
 
   @staticmethod
@@ -17820,11 +17956,11 @@ class AMDGPUWavesPerEUAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AMDGPUWavesPerEUAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AMDGPUWavesPerEUAttr]:
     ...
 
   @staticmethod
@@ -17881,11 +18017,11 @@ class AMDGPUNumVGPRAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AMDGPUNumVGPRAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AMDGPUNumVGPRAttr]:
     ...
 
   @staticmethod
@@ -17942,11 +18078,11 @@ class AMDGPUNumSGPRAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AMDGPUNumSGPRAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AMDGPUNumSGPRAttr]:
     ...
 
   @staticmethod
@@ -18003,11 +18139,11 @@ class AMDGPUKernelCallAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AMDGPUKernelCallAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AMDGPUKernelCallAttr]:
     ...
 
   @staticmethod
@@ -18066,11 +18202,11 @@ class AMDGPUFlatWorkGroupSizeAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AMDGPUFlatWorkGroupSizeAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AMDGPUFlatWorkGroupSizeAttr]:
     ...
 
   @staticmethod
@@ -18127,11 +18263,11 @@ class AArch64VectorPcsAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AArch64VectorPcsAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AArch64VectorPcsAttr]:
     ...
 
   @staticmethod
@@ -18188,11 +18324,11 @@ class AArch64SVEPcsAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AArch64SVEPcsAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AArch64SVEPcsAttr]:
     ...
 
   @staticmethod
@@ -18250,11 +18386,11 @@ class ZeroCallUsedRegsAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ZeroCallUsedRegsAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ZeroCallUsedRegsAttr]:
     ...
 
   @staticmethod
@@ -18311,11 +18447,11 @@ class XRayLogArgsAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.XRayLogArgsAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.XRayLogArgsAttr]:
     ...
 
   @staticmethod
@@ -18375,11 +18511,11 @@ class XRayInstrumentAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.XRayInstrumentAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.XRayInstrumentAttr]:
     ...
 
   @staticmethod
@@ -18436,11 +18572,11 @@ class X86ForceAlignArgPointerAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.X86ForceAlignArgPointerAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.X86ForceAlignArgPointerAttr]:
     ...
 
   @staticmethod
@@ -18497,11 +18633,11 @@ class WorkGroupSizeHintAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.WorkGroupSizeHintAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.WorkGroupSizeHintAttr]:
     ...
 
   @staticmethod
@@ -18559,11 +18695,11 @@ class WebAssemblyImportNameAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.WebAssemblyImportNameAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.WebAssemblyImportNameAttr]:
     ...
 
   @staticmethod
@@ -18621,11 +18757,11 @@ class WebAssemblyImportModuleAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.WebAssemblyImportModuleAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.WebAssemblyImportModuleAttr]:
     ...
 
   @staticmethod
@@ -18683,11 +18819,11 @@ class WebAssemblyExportNameAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.WebAssemblyExportNameAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.WebAssemblyExportNameAttr]:
     ...
 
   @staticmethod
@@ -18745,11 +18881,11 @@ class WeakRefAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.WeakRefAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.WeakRefAttr]:
     ...
 
   @staticmethod
@@ -18806,11 +18942,11 @@ class WeakImportAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.WeakImportAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.WeakImportAttr]:
     ...
 
   @staticmethod
@@ -18867,11 +19003,11 @@ class WeakAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.WeakAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.WeakAttr]:
     ...
 
   @staticmethod
@@ -18931,11 +19067,11 @@ class WarnUnusedResultAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.WarnUnusedResultAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.WarnUnusedResultAttr]:
     ...
 
   @staticmethod
@@ -18992,11 +19128,11 @@ class WarnUnusedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.WarnUnusedAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.WarnUnusedAttr]:
     ...
 
   @staticmethod
@@ -19054,11 +19190,11 @@ class VisibilityAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.VisibilityAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.VisibilityAttr]:
     ...
 
   @staticmethod
@@ -19115,11 +19251,11 @@ class VectorCallAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.VectorCallAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.VectorCallAttr]:
     ...
 
   @staticmethod
@@ -19178,11 +19314,11 @@ class VecTypeHintAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.VecTypeHintAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.VecTypeHintAttr]:
     ...
 
   @staticmethod
@@ -19239,11 +19375,11 @@ class VecReturnAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.VecReturnAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.VecReturnAttr]:
     ...
 
   @staticmethod
@@ -19302,11 +19438,11 @@ class UuidAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UuidAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UuidAttr]:
     ...
 
   @staticmethod
@@ -19363,11 +19499,11 @@ class UsingIfExistsAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UsingIfExistsAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UsingIfExistsAttr]:
     ...
 
   @staticmethod
@@ -19424,11 +19560,11 @@ class UsedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UsedAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UsedAttr]:
     ...
 
   @staticmethod
@@ -19486,11 +19622,11 @@ class UnusedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnusedAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnusedAttr]:
     ...
 
   @staticmethod
@@ -19547,11 +19683,11 @@ class UnsafeBufferUsageAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnsafeBufferUsageAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnsafeBufferUsageAttr]:
     ...
 
   @staticmethod
@@ -19608,11 +19744,11 @@ class UninitializedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UninitializedAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UninitializedAttr]:
     ...
 
   @staticmethod
@@ -19671,11 +19807,11 @@ class UnavailableAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnavailableAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnavailableAttr]:
     ...
 
   @staticmethod
@@ -19733,11 +19869,11 @@ class TypeVisibilityAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeVisibilityAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeVisibilityAttr]:
     ...
 
   @staticmethod
@@ -19798,11 +19934,11 @@ class TypeTagForDatatypeAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeTagForDatatypeAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeTagForDatatypeAttr]:
     ...
 
   @staticmethod
@@ -19862,11 +19998,11 @@ class TryAcquireCapabilityAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TryAcquireCapabilityAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TryAcquireCapabilityAttr]:
     ...
 
   @staticmethod
@@ -19923,11 +20059,11 @@ class TrivialABIAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TrivialABIAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TrivialABIAttr]:
     ...
 
   @staticmethod
@@ -19984,11 +20120,11 @@ class TransparentUnionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TransparentUnionAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TransparentUnionAttr]:
     ...
 
   @staticmethod
@@ -20045,11 +20181,11 @@ class ThisCallAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ThisCallAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ThisCallAttr]:
     ...
 
   @staticmethod
@@ -20107,11 +20243,11 @@ class TestTypestateAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TestTypestateAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TestTypestateAttr]:
     ...
 
   @staticmethod
@@ -20171,11 +20307,11 @@ class TargetVersionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TargetVersionAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TargetVersionAttr]:
     ...
 
   @staticmethod
@@ -20232,11 +20368,11 @@ class TargetClonesAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TargetClonesAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TargetClonesAttr]:
     ...
 
   @staticmethod
@@ -20296,11 +20432,11 @@ class TargetAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TargetAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TargetAttr]:
     ...
 
   @staticmethod
@@ -20358,11 +20494,11 @@ class TLSModelAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TLSModelAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TLSModelAttr]:
     ...
 
   @staticmethod
@@ -20419,11 +20555,11 @@ class SysVABIAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SysVABIAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SysVABIAttr]:
     ...
 
   @staticmethod
@@ -20480,11 +20616,11 @@ class SwiftPrivateAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftPrivateAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftPrivateAttr]:
     ...
 
   @staticmethod
@@ -20543,11 +20679,11 @@ class SwiftNewTypeAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftNewTypeAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftNewTypeAttr]:
     ...
 
   @staticmethod
@@ -20605,11 +20741,11 @@ class SwiftNameAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftNameAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftNameAttr]:
     ...
 
   @staticmethod
@@ -20666,11 +20802,11 @@ class SwiftImportPropertyAsAccessorsAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftImportPropertyAsAccessorsAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftImportPropertyAsAccessorsAttr]:
     ...
 
   @staticmethod
@@ -20727,11 +20863,11 @@ class SwiftImportAsNonGenericAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftImportAsNonGenericAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftImportAsNonGenericAttr]:
     ...
 
   @staticmethod
@@ -20789,11 +20925,11 @@ class SwiftErrorAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftErrorAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftErrorAttr]:
     ...
 
   @staticmethod
@@ -20850,11 +20986,11 @@ class SwiftCallAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftCallAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftCallAttr]:
     ...
 
   @staticmethod
@@ -20911,11 +21047,11 @@ class SwiftBridgedTypedefAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftBridgedTypedefAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftBridgedTypedefAttr]:
     ...
 
   @staticmethod
@@ -20973,11 +21109,11 @@ class SwiftBridgeAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftBridgeAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftBridgeAttr]:
     ...
 
   @staticmethod
@@ -21035,11 +21171,11 @@ class SwiftAttrAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftAttrAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftAttrAttr]:
     ...
 
   @staticmethod
@@ -21097,11 +21233,11 @@ class SwiftAsyncNameAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftAsyncNameAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftAsyncNameAttr]:
     ...
 
   @staticmethod
@@ -21159,11 +21295,11 @@ class SwiftAsyncErrorAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftAsyncErrorAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftAsyncErrorAttr]:
     ...
 
   @staticmethod
@@ -21220,11 +21356,11 @@ class SwiftAsyncCallAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftAsyncCallAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftAsyncCallAttr]:
     ...
 
   @staticmethod
@@ -21282,11 +21418,11 @@ class SwiftAsyncAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftAsyncAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftAsyncAttr]:
     ...
 
   @staticmethod
@@ -21343,11 +21479,11 @@ class StrictGuardStackCheckAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.StrictGuardStackCheckAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.StrictGuardStackCheckAttr]:
     ...
 
   @staticmethod
@@ -21404,11 +21540,11 @@ class StrictFPAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.StrictFPAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.StrictFPAttr]:
     ...
 
   @staticmethod
@@ -21465,11 +21601,11 @@ class StdCallAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.StdCallAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.StdCallAttr]:
     ...
 
   @staticmethod
@@ -21526,11 +21662,11 @@ class StandaloneDebugAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.StandaloneDebugAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.StandaloneDebugAttr]:
     ...
 
   @staticmethod
@@ -21587,11 +21723,11 @@ class SpeculativeLoadHardeningAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SpeculativeLoadHardeningAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SpeculativeLoadHardeningAttr]:
     ...
 
   @staticmethod
@@ -21649,11 +21785,11 @@ class SharedTrylockFunctionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SharedTrylockFunctionAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SharedTrylockFunctionAttr]:
     ...
 
   @staticmethod
@@ -21711,11 +21847,11 @@ class SetTypestateAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SetTypestateAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SetTypestateAttr]:
     ...
 
   @staticmethod
@@ -21772,11 +21908,11 @@ class SentinelAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SentinelAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SentinelAttr]:
     ...
 
   @staticmethod
@@ -21833,11 +21969,11 @@ class SelectAnyAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SelectAnyAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SelectAnyAttr]:
     ...
 
   @staticmethod
@@ -21896,11 +22032,11 @@ class SectionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SectionAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SectionAttr]:
     ...
 
   @staticmethod
@@ -21957,11 +22093,11 @@ class ScopedLockableAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ScopedLockableAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ScopedLockableAttr]:
     ...
 
   @staticmethod
@@ -22018,11 +22154,11 @@ class SYCLSpecialClassAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SYCLSpecialClassAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SYCLSpecialClassAttr]:
     ...
 
   @staticmethod
@@ -22079,11 +22215,11 @@ class SYCLKernelAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SYCLKernelAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SYCLKernelAttr]:
     ...
 
   @staticmethod
@@ -22140,11 +22276,11 @@ class ReturnsTwiceAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ReturnsTwiceAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ReturnsTwiceAttr]:
     ...
 
   @staticmethod
@@ -22201,11 +22337,11 @@ class ReturnsNonNullAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ReturnsNonNullAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ReturnsNonNullAttr]:
     ...
 
   @staticmethod
@@ -22263,11 +22399,11 @@ class ReturnTypestateAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ReturnTypestateAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ReturnTypestateAttr]:
     ...
 
   @staticmethod
@@ -22324,11 +22460,11 @@ class RetainAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RetainAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RetainAttr]:
     ...
 
   @staticmethod
@@ -22386,11 +22522,11 @@ class RestrictAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RestrictAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RestrictAttr]:
     ...
 
   @staticmethod
@@ -22449,11 +22585,11 @@ class RequiresCapabilityAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RequiresCapabilityAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RequiresCapabilityAttr]:
     ...
 
   @staticmethod
@@ -22510,11 +22646,11 @@ class ReqdWorkGroupSizeAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ReqdWorkGroupSizeAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ReqdWorkGroupSizeAttr]:
     ...
 
   @staticmethod
@@ -22574,11 +22710,11 @@ class ReleaseCapabilityAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ReleaseCapabilityAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ReleaseCapabilityAttr]:
     ...
 
   @staticmethod
@@ -22635,11 +22771,11 @@ class ReinitializesAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ReinitializesAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ReinitializesAttr]:
     ...
 
   @staticmethod
@@ -22696,11 +22832,11 @@ class RegCallAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RegCallAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RegCallAttr]:
     ...
 
   @staticmethod
@@ -22757,11 +22893,11 @@ class ReadOnlyPlacementAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ReadOnlyPlacementAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ReadOnlyPlacementAttr]:
     ...
 
   @staticmethod
@@ -22818,11 +22954,11 @@ class RandomizeLayoutAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RandomizeLayoutAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RandomizeLayoutAttr]:
     ...
 
   @staticmethod
@@ -22880,11 +23016,11 @@ class RISCVInterruptAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RISCVInterruptAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RISCVInterruptAttr]:
     ...
 
   @staticmethod
@@ -22941,11 +23077,11 @@ class PureAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PureAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PureAttr]:
     ...
 
   @staticmethod
@@ -23002,11 +23138,11 @@ class PtGuardedVarAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PtGuardedVarAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PtGuardedVarAttr]:
     ...
 
   @staticmethod
@@ -23064,11 +23200,11 @@ class PtGuardedByAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PtGuardedByAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PtGuardedByAttr]:
     ...
 
   @staticmethod
@@ -23125,11 +23261,11 @@ class PreserveMostAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PreserveMostAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PreserveMostAttr]:
     ...
 
   @staticmethod
@@ -23186,11 +23322,11 @@ class PreserveAllAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PreserveAllAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PreserveAllAttr]:
     ...
 
   @staticmethod
@@ -23249,11 +23385,11 @@ class PreferredTypeAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PreferredTypeAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PreferredTypeAttr]:
     ...
 
   @staticmethod
@@ -23312,11 +23448,11 @@ class PreferredNameAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PreferredNameAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PreferredNameAttr]:
     ...
 
   @staticmethod
@@ -23374,11 +23510,11 @@ class PragmaClangTextSectionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PragmaClangTextSectionAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PragmaClangTextSectionAttr]:
     ...
 
   @staticmethod
@@ -23436,11 +23572,11 @@ class PragmaClangRodataSectionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PragmaClangRodataSectionAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PragmaClangRodataSectionAttr]:
     ...
 
   @staticmethod
@@ -23498,11 +23634,11 @@ class PragmaClangRelroSectionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PragmaClangRelroSectionAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PragmaClangRelroSectionAttr]:
     ...
 
   @staticmethod
@@ -23560,11 +23696,11 @@ class PragmaClangDataSectionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PragmaClangDataSectionAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PragmaClangDataSectionAttr]:
     ...
 
   @staticmethod
@@ -23622,11 +23758,11 @@ class PragmaClangBSSSectionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PragmaClangBSSSectionAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PragmaClangBSSSectionAttr]:
     ...
 
   @staticmethod
@@ -23685,11 +23821,11 @@ class PointerAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PointerAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PointerAttr]:
     ...
 
   @staticmethod
@@ -23747,11 +23883,11 @@ class PcsAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PcsAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PcsAttr]:
     ...
 
   @staticmethod
@@ -23808,11 +23944,11 @@ class PatchableFunctionEntryAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PatchableFunctionEntryAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PatchableFunctionEntryAttr]:
     ...
 
   @staticmethod
@@ -23869,11 +24005,11 @@ class PascalAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PascalAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PascalAttr]:
     ...
 
   @staticmethod
@@ -23931,11 +24067,11 @@ class ParamTypestateAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ParamTypestateAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ParamTypestateAttr]:
     ...
 
   @staticmethod
@@ -23992,11 +24128,11 @@ class PackedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PackedAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PackedAttr]:
     ...
 
   @staticmethod
@@ -24058,11 +24194,11 @@ class OwnershipAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OwnershipAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OwnershipAttr]:
     ...
 
   @staticmethod
@@ -24121,11 +24257,11 @@ class OwnerAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OwnerAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OwnerAttr]:
     ...
 
   @staticmethod
@@ -24182,11 +24318,11 @@ class OverrideAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OverrideAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OverrideAttr]:
     ...
 
   @staticmethod
@@ -24243,11 +24379,11 @@ class OptimizeNoneAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OptimizeNoneAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OptimizeNoneAttr]:
     ...
 
   @staticmethod
@@ -24304,11 +24440,11 @@ class OpenCLKernelAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpenCLKernelAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpenCLKernelAttr]:
     ...
 
   @staticmethod
@@ -24365,11 +24501,11 @@ class OpenCLIntelReqdSubGroupSizeAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpenCLIntelReqdSubGroupSizeAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpenCLIntelReqdSubGroupSizeAttr]:
     ...
 
   @staticmethod
@@ -24426,11 +24562,11 @@ class ObjCSubclassingRestrictedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCSubclassingRestrictedAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCSubclassingRestrictedAttr]:
     ...
 
   @staticmethod
@@ -24487,11 +24623,11 @@ class ObjCRootClassAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCRootClassAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCRootClassAttr]:
     ...
 
   @staticmethod
@@ -24548,11 +24684,11 @@ class ObjCReturnsInnerPointerAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCReturnsInnerPointerAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCReturnsInnerPointerAttr]:
     ...
 
   @staticmethod
@@ -24609,11 +24745,11 @@ class ObjCRequiresSuperAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCRequiresSuperAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCRequiresSuperAttr]:
     ...
 
   @staticmethod
@@ -24670,11 +24806,11 @@ class ObjCRequiresPropertyDefsAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCRequiresPropertyDefsAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCRequiresPropertyDefsAttr]:
     ...
 
   @staticmethod
@@ -24731,11 +24867,11 @@ class ObjCPreciseLifetimeAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCPreciseLifetimeAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCPreciseLifetimeAttr]:
     ...
 
   @staticmethod
@@ -24792,11 +24928,11 @@ class ObjCOwnershipAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCOwnershipAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCOwnershipAttr]:
     ...
 
   @staticmethod
@@ -24853,11 +24989,11 @@ class ObjCNSObjectAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCNSObjectAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCNSObjectAttr]:
     ...
 
   @staticmethod
@@ -24915,11 +25051,11 @@ class ObjCMethodFamilyAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCMethodFamilyAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCMethodFamilyAttr]:
     ...
 
   @staticmethod
@@ -24976,11 +25112,11 @@ class ObjCIndependentClassAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCIndependentClassAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCIndependentClassAttr]:
     ...
 
   @staticmethod
@@ -25037,11 +25173,11 @@ class ObjCExternallyRetainedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCExternallyRetainedAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCExternallyRetainedAttr]:
     ...
 
   @staticmethod
@@ -25098,11 +25234,11 @@ class ObjCExplicitProtocolImplAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCExplicitProtocolImplAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCExplicitProtocolImplAttr]:
     ...
 
   @staticmethod
@@ -25159,11 +25295,11 @@ class ObjCExceptionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCExceptionAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCExceptionAttr]:
     ...
 
   @staticmethod
@@ -25220,11 +25356,11 @@ class ObjCBridgeRelatedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCBridgeRelatedAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCBridgeRelatedAttr]:
     ...
 
   @staticmethod
@@ -25281,11 +25417,11 @@ class ObjCBridgeMutableAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCBridgeMutableAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCBridgeMutableAttr]:
     ...
 
   @staticmethod
@@ -25342,11 +25478,11 @@ class ObjCBridgeAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCBridgeAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCBridgeAttr]:
     ...
 
   @staticmethod
@@ -25403,11 +25539,11 @@ class OSReturnsRetainedOnZeroAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OSReturnsRetainedOnZeroAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OSReturnsRetainedOnZeroAttr]:
     ...
 
   @staticmethod
@@ -25464,11 +25600,11 @@ class OSReturnsRetainedOnNonZeroAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OSReturnsRetainedOnNonZeroAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OSReturnsRetainedOnNonZeroAttr]:
     ...
 
   @staticmethod
@@ -25525,11 +25661,11 @@ class OSReturnsRetainedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OSReturnsRetainedAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OSReturnsRetainedAttr]:
     ...
 
   @staticmethod
@@ -25586,11 +25722,11 @@ class OSReturnsNotRetainedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OSReturnsNotRetainedAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OSReturnsNotRetainedAttr]:
     ...
 
   @staticmethod
@@ -25647,11 +25783,11 @@ class OSConsumesThisAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OSConsumesThisAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OSConsumesThisAttr]:
     ...
 
   @staticmethod
@@ -25708,11 +25844,11 @@ class OMPThreadPrivateDeclAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPThreadPrivateDeclAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPThreadPrivateDeclAttr]:
     ...
 
   @staticmethod
@@ -25770,11 +25906,11 @@ class OMPDeclareVariantAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDeclareVariantAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDeclareVariantAttr]:
     ...
 
   @staticmethod
@@ -25835,11 +25971,11 @@ class OMPDeclareTargetDeclAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDeclareTargetDeclAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDeclareTargetDeclAttr]:
     ...
 
   @staticmethod
@@ -25896,11 +26032,11 @@ class OMPCaptureNoInitAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPCaptureNoInitAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPCaptureNoInitAttr]:
     ...
 
   @staticmethod
@@ -25960,11 +26096,11 @@ class OMPAllocateDeclAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPAllocateDeclAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPAllocateDeclAttr]:
     ...
 
   @staticmethod
@@ -26021,11 +26157,11 @@ class NotTailCalledAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NotTailCalledAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NotTailCalledAttr]:
     ...
 
   @staticmethod
@@ -26082,11 +26218,11 @@ class NoUwtableAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoUwtableAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoUwtableAttr]:
     ...
 
   @staticmethod
@@ -26143,11 +26279,11 @@ class NoUniqueAddressAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoUniqueAddressAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoUniqueAddressAttr]:
     ...
 
   @staticmethod
@@ -26204,11 +26340,11 @@ class NoThrowAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoThrowAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoThrowAttr]:
     ...
 
   @staticmethod
@@ -26265,11 +26401,11 @@ class NoThreadSafetyAnalysisAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoThreadSafetyAnalysisAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoThreadSafetyAnalysisAttr]:
     ...
 
   @staticmethod
@@ -26327,11 +26463,11 @@ class NoStackProtectorAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoStackProtectorAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoStackProtectorAttr]:
     ...
 
   @staticmethod
@@ -26388,11 +26524,11 @@ class NoSplitStackAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoSplitStackAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoSplitStackAttr]:
     ...
 
   @staticmethod
@@ -26449,11 +26585,11 @@ class NoSpeculativeLoadHardeningAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoSpeculativeLoadHardeningAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoSpeculativeLoadHardeningAttr]:
     ...
 
   @staticmethod
@@ -26511,11 +26647,11 @@ class NoSanitizeAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoSanitizeAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoSanitizeAttr]:
     ...
 
   @staticmethod
@@ -26572,11 +26708,11 @@ class NoReturnAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoReturnAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoReturnAttr]:
     ...
 
   @staticmethod
@@ -26633,11 +26769,11 @@ class NoRandomizeLayoutAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoRandomizeLayoutAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoRandomizeLayoutAttr]:
     ...
 
   @staticmethod
@@ -26694,11 +26830,11 @@ class NoProfileFunctionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoProfileFunctionAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoProfileFunctionAttr]:
     ...
 
   @staticmethod
@@ -26755,11 +26891,11 @@ class NoMips16Attr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoMips16Attr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoMips16Attr]:
     ...
 
   @staticmethod
@@ -26816,11 +26952,11 @@ class NoMicroMipsAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoMicroMipsAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoMicroMipsAttr]:
     ...
 
   @staticmethod
@@ -26877,11 +27013,11 @@ class NoInstrumentFunctionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoInstrumentFunctionAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoInstrumentFunctionAttr]:
     ...
 
   @staticmethod
@@ -26938,11 +27074,11 @@ class NoDuplicateAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoDuplicateAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoDuplicateAttr]:
     ...
 
   @staticmethod
@@ -26999,11 +27135,11 @@ class NoDestroyAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoDestroyAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoDestroyAttr]:
     ...
 
   @staticmethod
@@ -27060,11 +27196,11 @@ class NoDebugAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoDebugAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoDebugAttr]:
     ...
 
   @staticmethod
@@ -27121,11 +27257,11 @@ class NoCommonAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoCommonAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoCommonAttr]:
     ...
 
   @staticmethod
@@ -27182,11 +27318,11 @@ class NoAliasAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoAliasAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoAliasAttr]:
     ...
 
   @staticmethod
@@ -27243,11 +27379,11 @@ class NakedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NakedAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NakedAttr]:
     ...
 
   @staticmethod
@@ -27304,11 +27440,11 @@ class NVPTXKernelAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NVPTXKernelAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NVPTXKernelAttr]:
     ...
 
   @staticmethod
@@ -27365,11 +27501,11 @@ class NSReturnsRetainedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NSReturnsRetainedAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NSReturnsRetainedAttr]:
     ...
 
   @staticmethod
@@ -27426,11 +27562,11 @@ class NSReturnsNotRetainedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NSReturnsNotRetainedAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NSReturnsNotRetainedAttr]:
     ...
 
   @staticmethod
@@ -27487,11 +27623,11 @@ class NSReturnsAutoreleasedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NSReturnsAutoreleasedAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NSReturnsAutoreleasedAttr]:
     ...
 
   @staticmethod
@@ -27548,11 +27684,11 @@ class NSErrorDomainAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NSErrorDomainAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NSErrorDomainAttr]:
     ...
 
   @staticmethod
@@ -27609,11 +27745,11 @@ class NSConsumesSelfAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NSConsumesSelfAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NSConsumesSelfAttr]:
     ...
 
   @staticmethod
@@ -27671,11 +27807,11 @@ class MipsShortCallAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MipsShortCallAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MipsShortCallAttr]:
     ...
 
   @staticmethod
@@ -27733,11 +27869,11 @@ class MipsLongCallAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MipsLongCallAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MipsLongCallAttr]:
     ...
 
   @staticmethod
@@ -27795,11 +27931,11 @@ class MipsInterruptAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MipsInterruptAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MipsInterruptAttr]:
     ...
 
   @staticmethod
@@ -27856,11 +27992,11 @@ class Mips16Attr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.Mips16Attr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.Mips16Attr]:
     ...
 
   @staticmethod
@@ -27917,11 +28053,11 @@ class MinVectorWidthAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MinVectorWidthAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MinVectorWidthAttr]:
     ...
 
   @staticmethod
@@ -27978,11 +28114,11 @@ class MinSizeAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MinSizeAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MinSizeAttr]:
     ...
 
   @staticmethod
@@ -28039,11 +28175,11 @@ class MicroMipsAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MicroMipsAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MicroMipsAttr]:
     ...
 
   @staticmethod
@@ -28100,11 +28236,11 @@ class MaybeUndefAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MaybeUndefAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MaybeUndefAttr]:
     ...
 
   @staticmethod
@@ -28161,11 +28297,11 @@ class MayAliasAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MayAliasAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MayAliasAttr]:
     ...
 
   @staticmethod
@@ -28222,11 +28358,11 @@ class MaxFieldAlignmentAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MaxFieldAlignmentAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MaxFieldAlignmentAttr]:
     ...
 
   @staticmethod
@@ -28284,11 +28420,11 @@ class MSVtorDispAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSVtorDispAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSVtorDispAttr]:
     ...
 
   @staticmethod
@@ -28345,11 +28481,11 @@ class MSStructAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSStructAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSStructAttr]:
     ...
 
   @staticmethod
@@ -28406,11 +28542,11 @@ class MSP430InterruptAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSP430InterruptAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSP430InterruptAttr]:
     ...
 
   @staticmethod
@@ -28467,11 +28603,11 @@ class MSNoVTableAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSNoVTableAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSNoVTableAttr]:
     ...
 
   @staticmethod
@@ -28531,11 +28667,11 @@ class MSInheritanceAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSInheritanceAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSInheritanceAttr]:
     ...
 
   @staticmethod
@@ -28592,11 +28728,11 @@ class MSConstexprAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSConstexprAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSConstexprAttr]:
     ...
 
   @staticmethod
@@ -28653,11 +28789,11 @@ class MSAllocatorAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSAllocatorAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSAllocatorAttr]:
     ...
 
   @staticmethod
@@ -28714,11 +28850,11 @@ class MSABIAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSABIAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSABIAttr]:
     ...
 
   @staticmethod
@@ -28775,11 +28911,11 @@ class MIGServerRoutineAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MIGServerRoutineAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MIGServerRoutineAttr]:
     ...
 
   @staticmethod
@@ -28836,11 +28972,11 @@ class M68kRTDAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.M68kRTDAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.M68kRTDAttr]:
     ...
 
   @staticmethod
@@ -28897,11 +29033,11 @@ class M68kInterruptAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.M68kInterruptAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.M68kInterruptAttr]:
     ...
 
   @staticmethod
@@ -28958,11 +29094,11 @@ class LocksExcludedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LocksExcludedAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LocksExcludedAttr]:
     ...
 
   @staticmethod
@@ -29020,11 +29156,11 @@ class LockReturnedAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LockReturnedAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LockReturnedAttr]:
     ...
 
   @staticmethod
@@ -29081,11 +29217,11 @@ class LifetimeBoundAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LifetimeBoundAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LifetimeBoundAttr]:
     ...
 
   @staticmethod
@@ -29142,11 +29278,11 @@ class LeafAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LeafAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LeafAttr]:
     ...
 
   @staticmethod
@@ -29203,11 +29339,11 @@ class LayoutVersionAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LayoutVersionAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LayoutVersionAttr]:
     ...
 
   @staticmethod
@@ -29264,11 +29400,11 @@ class LTOVisibilityPublicAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LTOVisibilityPublicAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LTOVisibilityPublicAttr]:
     ...
 
   @staticmethod
@@ -29325,11 +29461,11 @@ class InternalLinkageAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.InternalLinkageAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.InternalLinkageAttr]:
     ...
 
   @staticmethod
@@ -29386,11 +29522,11 @@ class IntelOclBiccAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.IntelOclBiccAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.IntelOclBiccAttr]:
     ...
 
   @staticmethod
@@ -29447,11 +29583,11 @@ class InitPriorityAttr(multiplier.ast.InheritableAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.InitPriorityAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.InitPriorityAttr]:
     ...
 
   @staticmethod
@@ -29565,11 +29701,11 @@ class CarriesDependencyAttr(multiplier.ast.InheritableParamAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CarriesDependencyAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CarriesDependencyAttr]:
     ...
 
   @staticmethod
@@ -29626,11 +29762,11 @@ class CFConsumedAttr(multiplier.ast.InheritableParamAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CFConsumedAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CFConsumedAttr]:
     ...
 
   @staticmethod
@@ -29688,11 +29824,11 @@ class AnnotateAttr(multiplier.ast.InheritableParamAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AnnotateAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AnnotateAttr]:
     ...
 
   @staticmethod
@@ -29750,11 +29886,11 @@ class UseHandleAttr(multiplier.ast.InheritableParamAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UseHandleAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UseHandleAttr]:
     ...
 
   @staticmethod
@@ -29812,11 +29948,11 @@ class ReleaseHandleAttr(multiplier.ast.InheritableParamAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ReleaseHandleAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ReleaseHandleAttr]:
     ...
 
   @staticmethod
@@ -29875,11 +30011,11 @@ class PassObjectSizeAttr(multiplier.ast.InheritableParamAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PassObjectSizeAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PassObjectSizeAttr]:
     ...
 
   @staticmethod
@@ -29994,11 +30130,11 @@ class SwiftIndirectResultAttr(multiplier.ast.ParameterABIAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftIndirectResultAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftIndirectResultAttr]:
     ...
 
   @staticmethod
@@ -30055,11 +30191,11 @@ class SwiftErrorResultAttr(multiplier.ast.ParameterABIAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftErrorResultAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftErrorResultAttr]:
     ...
 
   @staticmethod
@@ -30116,11 +30252,11 @@ class SwiftContextAttr(multiplier.ast.ParameterABIAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftContextAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftContextAttr]:
     ...
 
   @staticmethod
@@ -30177,11 +30313,11 @@ class SwiftAsyncContextAttr(multiplier.ast.ParameterABIAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftAsyncContextAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwiftAsyncContextAttr]:
     ...
 
   @staticmethod
@@ -30238,11 +30374,11 @@ class OSConsumedAttr(multiplier.ast.InheritableParamAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OSConsumedAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OSConsumedAttr]:
     ...
 
   @staticmethod
@@ -30299,11 +30435,11 @@ class NonNullAttr(multiplier.ast.InheritableParamAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NonNullAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NonNullAttr]:
     ...
 
   @staticmethod
@@ -30360,11 +30496,11 @@ class NSConsumedAttr(multiplier.ast.InheritableParamAttr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NSConsumedAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NSConsumedAttr]:
     ...
 
   @staticmethod
@@ -30422,11 +30558,11 @@ class IFuncAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.IFuncAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.IFuncAttr]:
     ...
 
   @staticmethod
@@ -30483,11 +30619,11 @@ class CalledOnceAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CalledOnceAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CalledOnceAttr]:
     ...
 
   @staticmethod
@@ -30545,11 +30681,11 @@ class BuiltinAliasAttr(multiplier.ast.Attr):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BuiltinAliasAttr]:
+  def static_kind() -> multiplier.ast.AttrKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.AttrKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BuiltinAliasAttr]:
     ...
 
   @staticmethod
@@ -30610,12 +30746,12 @@ class Type(multiplier.Entity):
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index, kinds: Sequence[multiplier.ast.TypeKind]) -> Iterable[multiplier.ast.Type]:
+  def IN(index: multiplier.Index) -> Iterable[multiplier.ast.Type]:
     ...
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index) -> Iterable[multiplier.ast.Type]:
+  def IN(index: multiplier.Index, kinds: Sequence[multiplier.ast.TypeKind]) -> Iterable[multiplier.ast.Type]:
     ...
 
   @staticmethod
@@ -30668,11 +30804,11 @@ class TemplateTypeParmType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TemplateTypeParmType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TemplateTypeParmType]:
     ...
 
   @staticmethod
@@ -30724,11 +30860,11 @@ class TemplateSpecializationType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TemplateSpecializationType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TemplateSpecializationType]:
     ...
 
   @staticmethod
@@ -30827,11 +30963,11 @@ class RecordType(multiplier.ast.TagType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RecordType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RecordType]:
     ...
 
   @staticmethod
@@ -30878,11 +31014,11 @@ class EnumType(multiplier.ast.TagType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.EnumType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.EnumType]:
     ...
 
   @staticmethod
@@ -30933,11 +31069,11 @@ class SubstTemplateTypeParmType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SubstTemplateTypeParmType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SubstTemplateTypeParmType]:
     ...
 
   @staticmethod
@@ -30987,11 +31123,11 @@ class SubstTemplateTypeParmPackType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SubstTemplateTypeParmPackType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SubstTemplateTypeParmPackType]:
     ...
 
   @staticmethod
@@ -31088,11 +31224,11 @@ class RValueReferenceType(multiplier.ast.ReferenceType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RValueReferenceType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RValueReferenceType]:
     ...
 
   @staticmethod
@@ -31139,11 +31275,11 @@ class LValueReferenceType(multiplier.ast.ReferenceType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LValueReferenceType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LValueReferenceType]:
     ...
 
   @staticmethod
@@ -31225,11 +31361,11 @@ class QualifiedType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.QualifiedType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.QualifiedType]:
     ...
 
   @staticmethod
@@ -31277,11 +31413,11 @@ class PointerType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PointerType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PointerType]:
     ...
 
   @staticmethod
@@ -31330,11 +31466,11 @@ class PipeType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PipeType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PipeType]:
     ...
 
   @staticmethod
@@ -31382,11 +31518,11 @@ class ParenType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ParenType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ParenType]:
     ...
 
   @staticmethod
@@ -31434,11 +31570,11 @@ class PackExpansionType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PackExpansionType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PackExpansionType]:
     ...
 
   @staticmethod
@@ -31486,11 +31622,11 @@ class ObjCTypeParamType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCTypeParamType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCTypeParamType]:
     ...
 
   @staticmethod
@@ -31557,11 +31693,11 @@ class ObjCObjectType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCObjectType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCObjectType]:
     ...
 
   @staticmethod
@@ -31611,11 +31747,11 @@ class ObjCInterfaceType(multiplier.ast.ObjCObjectType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCInterfaceType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCInterfaceType]:
     ...
 
   @staticmethod
@@ -31681,11 +31817,11 @@ class ObjCObjectPointerType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCObjectPointerType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCObjectPointerType]:
     ...
 
   @staticmethod
@@ -31745,11 +31881,11 @@ class MemberPointerType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MemberPointerType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MemberPointerType]:
     ...
 
   @staticmethod
@@ -31846,11 +31982,11 @@ class DependentSizedMatrixType(multiplier.ast.MatrixType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DependentSizedMatrixType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DependentSizedMatrixType]:
     ...
 
   @staticmethod
@@ -31896,11 +32032,11 @@ class ConstantMatrixType(multiplier.ast.MatrixType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConstantMatrixType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConstantMatrixType]:
     ...
 
   @staticmethod
@@ -31949,11 +32085,11 @@ class MacroQualifiedType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MacroQualifiedType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MacroQualifiedType]:
     ...
 
   @staticmethod
@@ -32003,11 +32139,11 @@ class InjectedClassNameType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.InjectedClassNameType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.InjectedClassNameType]:
     ...
 
   @staticmethod
@@ -32130,11 +32266,11 @@ class FunctionProtoType(multiplier.ast.FunctionType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FunctionProtoType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FunctionProtoType]:
     ...
 
   @staticmethod
@@ -32187,11 +32323,11 @@ class FunctionNoProtoType(multiplier.ast.FunctionType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FunctionNoProtoType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FunctionNoProtoType]:
     ...
 
   @staticmethod
@@ -32242,11 +32378,11 @@ class DependentVectorType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DependentVectorType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DependentVectorType]:
     ...
 
   @staticmethod
@@ -32296,11 +32432,11 @@ class DependentSizedExtVectorType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DependentSizedExtVectorType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DependentSizedExtVectorType]:
     ...
 
   @staticmethod
@@ -32350,11 +32486,11 @@ class DependentBitIntType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DependentBitIntType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DependentBitIntType]:
     ...
 
   @staticmethod
@@ -32404,11 +32540,11 @@ class DependentAddressSpaceType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DependentAddressSpaceType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DependentAddressSpaceType]:
     ...
 
   @staticmethod
@@ -32503,11 +32639,11 @@ class DeducedTemplateSpecializationType(multiplier.ast.DeducedType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DeducedTemplateSpecializationType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DeducedTemplateSpecializationType]:
     ...
 
   @staticmethod
@@ -32560,11 +32696,11 @@ class AutoType(multiplier.ast.DeducedType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AutoType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AutoType]:
     ...
 
   @staticmethod
@@ -32616,11 +32752,11 @@ class DecltypeType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DecltypeType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DecltypeType]:
     ...
 
   @staticmethod
@@ -32668,11 +32804,11 @@ class ComplexType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ComplexType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ComplexType]:
     ...
 
   @staticmethod
@@ -32726,11 +32862,11 @@ class BuiltinType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BuiltinType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BuiltinType]:
     ...
 
   @staticmethod
@@ -32778,11 +32914,11 @@ class BlockPointerType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BlockPointerType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BlockPointerType]:
     ...
 
   @staticmethod
@@ -32831,11 +32967,11 @@ class BitIntType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BitIntType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BitIntType]:
     ...
 
   @staticmethod
@@ -32884,11 +33020,11 @@ class BTFTagAttributedType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BTFTagAttributedType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BTFTagAttributedType]:
     ...
 
   @staticmethod
@@ -32945,11 +33081,11 @@ class AttributedType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AttributedType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AttributedType]:
     ...
 
   @staticmethod
@@ -32997,11 +33133,11 @@ class AtomicType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AtomicType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AtomicType]:
     ...
 
   @staticmethod
@@ -33100,11 +33236,11 @@ class VariableArrayType(multiplier.ast.ArrayType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.VariableArrayType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.VariableArrayType]:
     ...
 
   @staticmethod
@@ -33151,11 +33287,11 @@ class IncompleteArrayType(multiplier.ast.ArrayType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.IncompleteArrayType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.IncompleteArrayType]:
     ...
 
   @staticmethod
@@ -33206,11 +33342,11 @@ class DependentSizedArrayType(multiplier.ast.ArrayType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DependentSizedArrayType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DependentSizedArrayType]:
     ...
 
   @staticmethod
@@ -33258,11 +33394,11 @@ class ConstantArrayType(multiplier.ast.ArrayType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConstantArrayType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConstantArrayType]:
     ...
 
   @staticmethod
@@ -33311,11 +33447,11 @@ class AdjustedType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AdjustedType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AdjustedType]:
     ...
 
   @staticmethod
@@ -33362,11 +33498,11 @@ class DecayedType(multiplier.ast.AdjustedType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DecayedType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DecayedType]:
     ...
 
   @staticmethod
@@ -33462,11 +33598,11 @@ class ElaboratedType(multiplier.ast.TypeWithKeyword):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ElaboratedType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ElaboratedType]:
     ...
 
   @staticmethod
@@ -33515,11 +33651,11 @@ class DependentTemplateSpecializationType(multiplier.ast.TypeWithKeyword):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DependentTemplateSpecializationType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DependentTemplateSpecializationType]:
     ...
 
   @staticmethod
@@ -33569,11 +33705,11 @@ class DependentNameType(multiplier.ast.TypeWithKeyword):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DependentNameType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DependentNameType]:
     ...
 
   @staticmethod
@@ -33622,11 +33758,11 @@ class VectorType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.VectorType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.VectorType]:
     ...
 
   @staticmethod
@@ -33672,11 +33808,11 @@ class ExtVectorType(multiplier.ast.VectorType):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ExtVectorType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ExtVectorType]:
     ...
 
   @staticmethod
@@ -33726,11 +33862,11 @@ class UsingType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UsingType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UsingType]:
     ...
 
   @staticmethod
@@ -33778,11 +33914,11 @@ class UnresolvedUsingType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnresolvedUsingType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnresolvedUsingType]:
     ...
 
   @staticmethod
@@ -33832,11 +33968,11 @@ class UnaryTransformType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnaryTransformType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnaryTransformType]:
     ...
 
   @staticmethod
@@ -33885,11 +34021,11 @@ class TypedefType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypedefType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypedefType]:
     ...
 
   @staticmethod
@@ -33938,11 +34074,11 @@ class TypeOfType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeOfType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeOfType]:
     ...
 
   @staticmethod
@@ -33991,11 +34127,11 @@ class TypeOfExprType(multiplier.ast.Type):
     ...
 
   @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeOfExprType]:
+  def static_kind() -> multiplier.ast.TypeKind:
     ...
 
   @staticmethod
-  def static_kind() -> multiplier.ast.TypeKind:
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeOfExprType]:
     ...
 
   @staticmethod
@@ -34047,21 +34183,6 @@ class Stmt(multiplier.Entity):
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index, kinds: Sequence[multiplier.ast.StmtKind]) -> Iterable[multiplier.ast.Stmt]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(frag: multiplier.Fragment, kinds: Sequence[multiplier.ast.StmtKind]) -> Iterable[multiplier.ast.Stmt]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(file: multiplier.frontend.File, kinds: Sequence[multiplier.ast.StmtKind]) -> Iterable[multiplier.ast.Stmt]:
-    ...
-
-  @overload
-  @staticmethod
   def IN(index: multiplier.Index) -> Iterable[multiplier.ast.Stmt]:
     ...
 
@@ -34073,6 +34194,21 @@ class Stmt(multiplier.Entity):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Iterable[multiplier.ast.Stmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(index: multiplier.Index, kinds: Sequence[multiplier.ast.StmtKind]) -> Iterable[multiplier.ast.Stmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(frag: multiplier.Fragment, kinds: Sequence[multiplier.ast.StmtKind]) -> Iterable[multiplier.ast.Stmt]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(file: multiplier.frontend.File, kinds: Sequence[multiplier.ast.StmtKind]) -> Iterable[multiplier.ast.Stmt]:
     ...
 
   @overload
@@ -34110,10 +34246,6 @@ class Stmt(multiplier.Entity):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.Stmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.Stmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.Stmt]:
@@ -34142,6 +34274,10 @@ class Stmt(multiplier.Entity):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.Stmt]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.Stmt]:
     ...
 
 class SEHTryStmt(multiplier.ast.Stmt):
@@ -34197,10 +34333,6 @@ class SEHTryStmt(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.SEHTryStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SEHTryStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.SEHTryStmt]:
@@ -34233,6 +34365,10 @@ class SEHTryStmt(multiplier.ast.Stmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SEHTryStmt]:
     ...
 
   @staticmethod
@@ -34287,10 +34423,6 @@ class SEHLeaveStmt(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.SEHLeaveStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SEHLeaveStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.SEHLeaveStmt]:
@@ -34323,6 +34455,10 @@ class SEHLeaveStmt(multiplier.ast.Stmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SEHLeaveStmt]:
     ...
 
   @staticmethod
@@ -34378,10 +34514,6 @@ class SEHFinallyStmt(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.SEHFinallyStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SEHFinallyStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.SEHFinallyStmt]:
@@ -34414,6 +34546,10 @@ class SEHFinallyStmt(multiplier.ast.Stmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SEHFinallyStmt]:
     ...
 
   @staticmethod
@@ -34470,10 +34606,6 @@ class SEHExceptStmt(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.SEHExceptStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SEHExceptStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.SEHExceptStmt]:
@@ -34506,6 +34638,10 @@ class SEHExceptStmt(multiplier.ast.Stmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SEHExceptStmt]:
     ...
 
   @staticmethod
@@ -34562,10 +34698,6 @@ class ReturnStmt(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ReturnStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ReturnStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ReturnStmt]:
@@ -34598,6 +34730,10 @@ class ReturnStmt(multiplier.ast.Stmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ReturnStmt]:
     ...
 
   @staticmethod
@@ -34656,10 +34792,6 @@ class ObjCForCollectionStmt(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCForCollectionStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCForCollectionStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCForCollectionStmt]:
@@ -34692,6 +34824,10 @@ class ObjCForCollectionStmt(multiplier.ast.Stmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCForCollectionStmt]:
     ...
 
   @staticmethod
@@ -34747,10 +34883,6 @@ class ObjCAutoreleasePoolStmt(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCAutoreleasePoolStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCAutoreleasePoolStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCAutoreleasePoolStmt]:
@@ -34783,6 +34915,10 @@ class ObjCAutoreleasePoolStmt(multiplier.ast.Stmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCAutoreleasePoolStmt]:
     ...
 
   @staticmethod
@@ -34841,10 +34977,6 @@ class ObjCAtTryStmt(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCAtTryStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCAtTryStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCAtTryStmt]:
@@ -34877,6 +35009,10 @@ class ObjCAtTryStmt(multiplier.ast.Stmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCAtTryStmt]:
     ...
 
   @staticmethod
@@ -34935,10 +35071,6 @@ class ObjCAtThrowStmt(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCAtThrowStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCAtThrowStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCAtThrowStmt]:
@@ -34971,6 +35103,10 @@ class ObjCAtThrowStmt(multiplier.ast.Stmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCAtThrowStmt]:
     ...
 
   @staticmethod
@@ -35027,10 +35163,6 @@ class ObjCAtSynchronizedStmt(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCAtSynchronizedStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCAtSynchronizedStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCAtSynchronizedStmt]:
@@ -35063,6 +35195,10 @@ class ObjCAtSynchronizedStmt(multiplier.ast.Stmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCAtSynchronizedStmt]:
     ...
 
   @staticmethod
@@ -35118,10 +35254,6 @@ class ObjCAtFinallyStmt(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCAtFinallyStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCAtFinallyStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCAtFinallyStmt]:
@@ -35154,6 +35286,10 @@ class ObjCAtFinallyStmt(multiplier.ast.Stmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCAtFinallyStmt]:
     ...
 
   @staticmethod
@@ -35212,10 +35348,6 @@ class ObjCAtCatchStmt(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCAtCatchStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCAtCatchStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCAtCatchStmt]:
@@ -35248,6 +35380,10 @@ class ObjCAtCatchStmt(multiplier.ast.Stmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCAtCatchStmt]:
     ...
 
   @staticmethod
@@ -35307,10 +35443,6 @@ class OMPExecutableDirective(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPExecutableDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPExecutableDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPExecutableDirective]:
@@ -35339,6 +35471,10 @@ class OMPExecutableDirective(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPExecutableDirective]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPExecutableDirective]:
     ...
 
   @staticmethod
@@ -35392,10 +35528,6 @@ class OMPErrorDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPErrorDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPErrorDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPErrorDirective]:
@@ -35428,6 +35560,10 @@ class OMPErrorDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPErrorDirective]:
     ...
 
   @staticmethod
@@ -35482,10 +35618,6 @@ class OMPDispatchDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPDispatchDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDispatchDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPDispatchDirective]:
@@ -35518,6 +35650,10 @@ class OMPDispatchDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDispatchDirective]:
     ...
 
   @staticmethod
@@ -35571,10 +35707,6 @@ class OMPDepobjDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPDepobjDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDepobjDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPDepobjDirective]:
@@ -35607,6 +35739,10 @@ class OMPDepobjDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDepobjDirective]:
     ...
 
   @staticmethod
@@ -35660,10 +35796,6 @@ class OMPCriticalDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPCriticalDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPCriticalDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPCriticalDirective]:
@@ -35696,6 +35828,10 @@ class OMPCriticalDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPCriticalDirective]:
     ...
 
   @staticmethod
@@ -35749,10 +35885,6 @@ class OMPCancellationPointDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPCancellationPointDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPCancellationPointDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPCancellationPointDirective]:
@@ -35785,6 +35917,10 @@ class OMPCancellationPointDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPCancellationPointDirective]:
     ...
 
   @staticmethod
@@ -35838,10 +35974,6 @@ class OMPCancelDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPCancelDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPCancelDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPCancelDirective]:
@@ -35874,6 +36006,10 @@ class OMPCancelDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPCancelDirective]:
     ...
 
   @staticmethod
@@ -35927,10 +36063,6 @@ class OMPBarrierDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPBarrierDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPBarrierDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPBarrierDirective]:
@@ -35963,6 +36095,10 @@ class OMPBarrierDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPBarrierDirective]:
     ...
 
   @staticmethod
@@ -36026,10 +36162,6 @@ class OMPAtomicDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPAtomicDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPAtomicDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPAtomicDirective]:
@@ -36062,6 +36194,10 @@ class OMPAtomicDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPAtomicDirective]:
     ...
 
   @staticmethod
@@ -36115,10 +36251,6 @@ class OMPTeamsDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPTeamsDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTeamsDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPTeamsDirective]:
@@ -36151,6 +36283,10 @@ class OMPTeamsDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTeamsDirective]:
     ...
 
   @staticmethod
@@ -36204,10 +36340,6 @@ class OMPTaskyieldDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPTaskyieldDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTaskyieldDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPTaskyieldDirective]:
@@ -36240,6 +36372,10 @@ class OMPTaskyieldDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTaskyieldDirective]:
     ...
 
   @staticmethod
@@ -36293,10 +36429,6 @@ class OMPTaskwaitDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPTaskwaitDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTaskwaitDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPTaskwaitDirective]:
@@ -36329,6 +36461,10 @@ class OMPTaskwaitDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTaskwaitDirective]:
     ...
 
   @staticmethod
@@ -36383,10 +36519,6 @@ class OMPTaskgroupDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPTaskgroupDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTaskgroupDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPTaskgroupDirective]:
@@ -36419,6 +36551,10 @@ class OMPTaskgroupDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTaskgroupDirective]:
     ...
 
   @staticmethod
@@ -36473,10 +36609,6 @@ class OMPTaskDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPTaskDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTaskDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPTaskDirective]:
@@ -36509,6 +36641,10 @@ class OMPTaskDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTaskDirective]:
     ...
 
   @staticmethod
@@ -36562,10 +36698,6 @@ class OMPTargetUpdateDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPTargetUpdateDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetUpdateDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPTargetUpdateDirective]:
@@ -36598,6 +36730,10 @@ class OMPTargetUpdateDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetUpdateDirective]:
     ...
 
   @staticmethod
@@ -36651,10 +36787,6 @@ class OMPTargetTeamsDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPTargetTeamsDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetTeamsDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPTargetTeamsDirective]:
@@ -36687,6 +36819,10 @@ class OMPTargetTeamsDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetTeamsDirective]:
     ...
 
   @staticmethod
@@ -36742,10 +36878,6 @@ class OMPTargetParallelDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPTargetParallelDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetParallelDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPTargetParallelDirective]:
@@ -36778,6 +36910,10 @@ class OMPTargetParallelDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetParallelDirective]:
     ...
 
   @staticmethod
@@ -36831,10 +36967,6 @@ class OMPTargetExitDataDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPTargetExitDataDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetExitDataDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPTargetExitDataDirective]:
@@ -36867,6 +36999,10 @@ class OMPTargetExitDataDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetExitDataDirective]:
     ...
 
   @staticmethod
@@ -36920,10 +37056,6 @@ class OMPTargetEnterDataDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPTargetEnterDataDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetEnterDataDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPTargetEnterDataDirective]:
@@ -36956,6 +37088,10 @@ class OMPTargetEnterDataDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetEnterDataDirective]:
     ...
 
   @staticmethod
@@ -37009,10 +37145,6 @@ class OMPTargetDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPTargetDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPTargetDirective]:
@@ -37045,6 +37177,10 @@ class OMPTargetDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetDirective]:
     ...
 
   @staticmethod
@@ -37098,10 +37234,6 @@ class OMPTargetDataDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPTargetDataDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetDataDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPTargetDataDirective]:
@@ -37134,6 +37266,10 @@ class OMPTargetDataDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetDataDirective]:
     ...
 
   @staticmethod
@@ -37187,10 +37323,6 @@ class OMPSingleDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPSingleDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPSingleDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPSingleDirective]:
@@ -37223,6 +37355,10 @@ class OMPSingleDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPSingleDirective]:
     ...
 
   @staticmethod
@@ -37278,10 +37414,6 @@ class OMPSectionsDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPSectionsDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPSectionsDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPSectionsDirective]:
@@ -37314,6 +37446,10 @@ class OMPSectionsDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPSectionsDirective]:
     ...
 
   @staticmethod
@@ -37368,10 +37504,6 @@ class OMPSectionDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPSectionDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPSectionDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPSectionDirective]:
@@ -37404,6 +37536,10 @@ class OMPSectionDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPSectionDirective]:
     ...
 
   @staticmethod
@@ -37457,10 +37593,6 @@ class OMPScopeDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPScopeDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPScopeDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPScopeDirective]:
@@ -37493,6 +37625,10 @@ class OMPScopeDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPScopeDirective]:
     ...
 
   @staticmethod
@@ -37546,10 +37682,6 @@ class OMPScanDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPScanDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPScanDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPScanDirective]:
@@ -37582,6 +37714,10 @@ class OMPScanDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPScanDirective]:
     ...
 
   @staticmethod
@@ -37637,10 +37773,6 @@ class OMPParallelSectionsDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPParallelSectionsDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPParallelSectionsDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPParallelSectionsDirective]:
@@ -37673,6 +37805,10 @@ class OMPParallelSectionsDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPParallelSectionsDirective]:
     ...
 
   @staticmethod
@@ -37727,10 +37863,6 @@ class OMPParallelMasterDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPParallelMasterDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPParallelMasterDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPParallelMasterDirective]:
@@ -37763,6 +37895,10 @@ class OMPParallelMasterDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPParallelMasterDirective]:
     ...
 
   @staticmethod
@@ -37817,10 +37953,6 @@ class OMPParallelMaskedDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPParallelMaskedDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPParallelMaskedDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPParallelMaskedDirective]:
@@ -37853,6 +37985,10 @@ class OMPParallelMaskedDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPParallelMaskedDirective]:
     ...
 
   @staticmethod
@@ -37908,10 +38044,6 @@ class OMPParallelDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPParallelDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPParallelDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPParallelDirective]:
@@ -37944,6 +38076,10 @@ class OMPParallelDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPParallelDirective]:
     ...
 
   @staticmethod
@@ -37997,10 +38133,6 @@ class OMPOrderedDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPOrderedDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPOrderedDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPOrderedDirective]:
@@ -38033,6 +38165,10 @@ class OMPOrderedDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPOrderedDirective]:
     ...
 
   @staticmethod
@@ -38087,10 +38223,6 @@ class OMPMetaDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPMetaDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPMetaDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPMetaDirective]:
@@ -38123,6 +38255,10 @@ class OMPMetaDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPMetaDirective]:
     ...
 
   @staticmethod
@@ -38176,10 +38312,6 @@ class OMPMasterDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPMasterDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPMasterDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPMasterDirective]:
@@ -38212,6 +38344,10 @@ class OMPMasterDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPMasterDirective]:
     ...
 
   @staticmethod
@@ -38265,10 +38401,6 @@ class OMPMaskedDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPMaskedDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPMaskedDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPMaskedDirective]:
@@ -38301,6 +38433,10 @@ class OMPMaskedDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPMaskedDirective]:
     ...
 
   @staticmethod
@@ -38354,10 +38490,6 @@ class OMPLoopBasedDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPLoopBasedDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPLoopBasedDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPLoopBasedDirective]:
@@ -38386,6 +38518,10 @@ class OMPLoopBasedDirective(multiplier.ast.OMPExecutableDirective):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPLoopBasedDirective]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPLoopBasedDirective]:
     ...
 
   @staticmethod
@@ -38441,10 +38577,6 @@ class OMPLoopTransformationDirective(multiplier.ast.OMPLoopBasedDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPLoopTransformationDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPLoopTransformationDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPLoopTransformationDirective]:
@@ -38473,6 +38605,10 @@ class OMPLoopTransformationDirective(multiplier.ast.OMPLoopBasedDirective):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPLoopTransformationDirective]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPLoopTransformationDirective]:
     ...
 
   @staticmethod
@@ -38526,10 +38662,6 @@ class OMPUnrollDirective(multiplier.ast.OMPLoopTransformationDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPUnrollDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPUnrollDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPUnrollDirective]:
@@ -38562,6 +38694,10 @@ class OMPUnrollDirective(multiplier.ast.OMPLoopTransformationDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPUnrollDirective]:
     ...
 
   @staticmethod
@@ -38615,10 +38751,6 @@ class OMPTileDirective(multiplier.ast.OMPLoopTransformationDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPTileDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTileDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPTileDirective]:
@@ -38651,6 +38783,10 @@ class OMPTileDirective(multiplier.ast.OMPLoopTransformationDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTileDirective]:
     ...
 
   @staticmethod
@@ -38749,10 +38885,6 @@ class OMPLoopDirective(multiplier.ast.OMPLoopBasedDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPLoopDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPLoopDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPLoopDirective]:
@@ -38781,6 +38913,10 @@ class OMPLoopDirective(multiplier.ast.OMPLoopBasedDirective):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPLoopDirective]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPLoopDirective]:
     ...
 
   @staticmethod
@@ -38858,10 +38994,6 @@ class OMPGenericLoopDirective(multiplier.ast.OMPLoopDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPGenericLoopDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPGenericLoopDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPGenericLoopDirective]:
@@ -38894,6 +39026,10 @@ class OMPGenericLoopDirective(multiplier.ast.OMPLoopDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPGenericLoopDirective]:
     ...
 
   @staticmethod
@@ -38947,10 +39083,6 @@ class OMPForSimdDirective(multiplier.ast.OMPLoopDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPForSimdDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPForSimdDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPForSimdDirective]:
@@ -38983,6 +39115,10 @@ class OMPForSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPForSimdDirective]:
     ...
 
   @staticmethod
@@ -39038,10 +39174,6 @@ class OMPForDirective(multiplier.ast.OMPLoopDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPForDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPForDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPForDirective]:
@@ -39074,6 +39206,10 @@ class OMPForDirective(multiplier.ast.OMPLoopDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPForDirective]:
     ...
 
   @staticmethod
@@ -39127,10 +39263,6 @@ class OMPDistributeSimdDirective(multiplier.ast.OMPLoopDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPDistributeSimdDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDistributeSimdDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPDistributeSimdDirective]:
@@ -39163,6 +39295,10 @@ class OMPDistributeSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDistributeSimdDirective]:
     ...
 
   @staticmethod
@@ -39216,10 +39352,6 @@ class OMPDistributeParallelForSimdDirective(multiplier.ast.OMPLoopDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPDistributeParallelForSimdDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDistributeParallelForSimdDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPDistributeParallelForSimdDirective]:
@@ -39252,6 +39384,10 @@ class OMPDistributeParallelForSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDistributeParallelForSimdDirective]:
     ...
 
   @staticmethod
@@ -39307,10 +39443,6 @@ class OMPDistributeParallelForDirective(multiplier.ast.OMPLoopDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPDistributeParallelForDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDistributeParallelForDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPDistributeParallelForDirective]:
@@ -39343,6 +39475,10 @@ class OMPDistributeParallelForDirective(multiplier.ast.OMPLoopDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDistributeParallelForDirective]:
     ...
 
   @staticmethod
@@ -39396,10 +39532,6 @@ class OMPDistributeDirective(multiplier.ast.OMPLoopDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPDistributeDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDistributeDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPDistributeDirective]:
@@ -39432,6 +39564,10 @@ class OMPDistributeDirective(multiplier.ast.OMPLoopDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDistributeDirective]:
     ...
 
   @staticmethod
@@ -39485,10 +39621,6 @@ class OMPTeamsGenericLoopDirective(multiplier.ast.OMPLoopDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPTeamsGenericLoopDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTeamsGenericLoopDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPTeamsGenericLoopDirective]:
@@ -39521,6 +39653,10 @@ class OMPTeamsGenericLoopDirective(multiplier.ast.OMPLoopDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTeamsGenericLoopDirective]:
     ...
 
   @staticmethod
@@ -39574,10 +39710,6 @@ class OMPTeamsDistributeSimdDirective(multiplier.ast.OMPLoopDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPTeamsDistributeSimdDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTeamsDistributeSimdDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPTeamsDistributeSimdDirective]:
@@ -39610,6 +39742,10 @@ class OMPTeamsDistributeSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTeamsDistributeSimdDirective]:
     ...
 
   @staticmethod
@@ -39663,10 +39799,6 @@ class OMPTeamsDistributeParallelForSimdDirective(multiplier.ast.OMPLoopDirective
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPTeamsDistributeParallelForSimdDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTeamsDistributeParallelForSimdDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPTeamsDistributeParallelForSimdDirective]:
@@ -39699,6 +39831,10 @@ class OMPTeamsDistributeParallelForSimdDirective(multiplier.ast.OMPLoopDirective
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTeamsDistributeParallelForSimdDirective]:
     ...
 
   @staticmethod
@@ -39754,10 +39890,6 @@ class OMPTeamsDistributeParallelForDirective(multiplier.ast.OMPLoopDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPTeamsDistributeParallelForDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTeamsDistributeParallelForDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPTeamsDistributeParallelForDirective]:
@@ -39790,6 +39922,10 @@ class OMPTeamsDistributeParallelForDirective(multiplier.ast.OMPLoopDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTeamsDistributeParallelForDirective]:
     ...
 
   @staticmethod
@@ -39843,10 +39979,6 @@ class OMPTeamsDistributeDirective(multiplier.ast.OMPLoopDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPTeamsDistributeDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTeamsDistributeDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPTeamsDistributeDirective]:
@@ -39879,6 +40011,10 @@ class OMPTeamsDistributeDirective(multiplier.ast.OMPLoopDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTeamsDistributeDirective]:
     ...
 
   @staticmethod
@@ -39932,10 +40068,6 @@ class OMPTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPTaskLoopSimdDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTaskLoopSimdDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPTaskLoopSimdDirective]:
@@ -39968,6 +40100,10 @@ class OMPTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTaskLoopSimdDirective]:
     ...
 
   @staticmethod
@@ -40022,10 +40158,6 @@ class OMPTaskLoopDirective(multiplier.ast.OMPLoopDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPTaskLoopDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTaskLoopDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPTaskLoopDirective]:
@@ -40058,6 +40190,10 @@ class OMPTaskLoopDirective(multiplier.ast.OMPLoopDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTaskLoopDirective]:
     ...
 
   @staticmethod
@@ -40111,10 +40247,6 @@ class OMPTargetTeamsGenericLoopDirective(multiplier.ast.OMPLoopDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPTargetTeamsGenericLoopDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetTeamsGenericLoopDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPTargetTeamsGenericLoopDirective]:
@@ -40147,6 +40279,10 @@ class OMPTargetTeamsGenericLoopDirective(multiplier.ast.OMPLoopDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetTeamsGenericLoopDirective]:
     ...
 
   @staticmethod
@@ -40200,10 +40336,6 @@ class OMPTargetTeamsDistributeSimdDirective(multiplier.ast.OMPLoopDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPTargetTeamsDistributeSimdDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetTeamsDistributeSimdDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPTargetTeamsDistributeSimdDirective]:
@@ -40236,6 +40368,10 @@ class OMPTargetTeamsDistributeSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetTeamsDistributeSimdDirective]:
     ...
 
   @staticmethod
@@ -40289,10 +40425,6 @@ class OMPTargetTeamsDistributeParallelForSimdDirective(multiplier.ast.OMPLoopDir
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPTargetTeamsDistributeParallelForSimdDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetTeamsDistributeParallelForSimdDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPTargetTeamsDistributeParallelForSimdDirective]:
@@ -40325,6 +40457,10 @@ class OMPTargetTeamsDistributeParallelForSimdDirective(multiplier.ast.OMPLoopDir
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetTeamsDistributeParallelForSimdDirective]:
     ...
 
   @staticmethod
@@ -40380,10 +40516,6 @@ class OMPTargetTeamsDistributeParallelForDirective(multiplier.ast.OMPLoopDirecti
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPTargetTeamsDistributeParallelForDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetTeamsDistributeParallelForDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPTargetTeamsDistributeParallelForDirective]:
@@ -40416,6 +40548,10 @@ class OMPTargetTeamsDistributeParallelForDirective(multiplier.ast.OMPLoopDirecti
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetTeamsDistributeParallelForDirective]:
     ...
 
   @staticmethod
@@ -40469,10 +40605,6 @@ class OMPTargetTeamsDistributeDirective(multiplier.ast.OMPLoopDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPTargetTeamsDistributeDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetTeamsDistributeDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPTargetTeamsDistributeDirective]:
@@ -40505,6 +40637,10 @@ class OMPTargetTeamsDistributeDirective(multiplier.ast.OMPLoopDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetTeamsDistributeDirective]:
     ...
 
   @staticmethod
@@ -40558,10 +40694,6 @@ class OMPTargetSimdDirective(multiplier.ast.OMPLoopDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPTargetSimdDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetSimdDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPTargetSimdDirective]:
@@ -40594,6 +40726,10 @@ class OMPTargetSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetSimdDirective]:
     ...
 
   @staticmethod
@@ -40647,10 +40783,6 @@ class OMPTargetParallelGenericLoopDirective(multiplier.ast.OMPLoopDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPTargetParallelGenericLoopDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetParallelGenericLoopDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPTargetParallelGenericLoopDirective]:
@@ -40683,6 +40815,10 @@ class OMPTargetParallelGenericLoopDirective(multiplier.ast.OMPLoopDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetParallelGenericLoopDirective]:
     ...
 
   @staticmethod
@@ -40736,10 +40872,6 @@ class OMPTargetParallelForSimdDirective(multiplier.ast.OMPLoopDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPTargetParallelForSimdDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetParallelForSimdDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPTargetParallelForSimdDirective]:
@@ -40772,6 +40904,10 @@ class OMPTargetParallelForSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetParallelForSimdDirective]:
     ...
 
   @staticmethod
@@ -40827,10 +40963,6 @@ class OMPTargetParallelForDirective(multiplier.ast.OMPLoopDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPTargetParallelForDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetParallelForDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPTargetParallelForDirective]:
@@ -40863,6 +40995,10 @@ class OMPTargetParallelForDirective(multiplier.ast.OMPLoopDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPTargetParallelForDirective]:
     ...
 
   @staticmethod
@@ -40916,10 +41052,6 @@ class OMPSimdDirective(multiplier.ast.OMPLoopDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPSimdDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPSimdDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPSimdDirective]:
@@ -40952,6 +41084,10 @@ class OMPSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPSimdDirective]:
     ...
 
   @staticmethod
@@ -41005,10 +41141,6 @@ class OMPParallelMasterTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPParallelMasterTaskLoopSimdDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPParallelMasterTaskLoopSimdDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPParallelMasterTaskLoopSimdDirective]:
@@ -41041,6 +41173,10 @@ class OMPParallelMasterTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPParallelMasterTaskLoopSimdDirective]:
     ...
 
   @staticmethod
@@ -41095,10 +41231,6 @@ class OMPParallelMasterTaskLoopDirective(multiplier.ast.OMPLoopDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPParallelMasterTaskLoopDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPParallelMasterTaskLoopDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPParallelMasterTaskLoopDirective]:
@@ -41131,6 +41263,10 @@ class OMPParallelMasterTaskLoopDirective(multiplier.ast.OMPLoopDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPParallelMasterTaskLoopDirective]:
     ...
 
   @staticmethod
@@ -41184,10 +41320,6 @@ class OMPParallelMaskedTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPParallelMaskedTaskLoopSimdDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPParallelMaskedTaskLoopSimdDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPParallelMaskedTaskLoopSimdDirective]:
@@ -41220,6 +41352,10 @@ class OMPParallelMaskedTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPParallelMaskedTaskLoopSimdDirective]:
     ...
 
   @staticmethod
@@ -41274,10 +41410,6 @@ class OMPParallelMaskedTaskLoopDirective(multiplier.ast.OMPLoopDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPParallelMaskedTaskLoopDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPParallelMaskedTaskLoopDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPParallelMaskedTaskLoopDirective]:
@@ -41310,6 +41442,10 @@ class OMPParallelMaskedTaskLoopDirective(multiplier.ast.OMPLoopDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPParallelMaskedTaskLoopDirective]:
     ...
 
   @staticmethod
@@ -41363,10 +41499,6 @@ class OMPParallelGenericLoopDirective(multiplier.ast.OMPLoopDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPParallelGenericLoopDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPParallelGenericLoopDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPParallelGenericLoopDirective]:
@@ -41399,6 +41531,10 @@ class OMPParallelGenericLoopDirective(multiplier.ast.OMPLoopDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPParallelGenericLoopDirective]:
     ...
 
   @staticmethod
@@ -41452,10 +41588,6 @@ class OMPParallelForSimdDirective(multiplier.ast.OMPLoopDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPParallelForSimdDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPParallelForSimdDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPParallelForSimdDirective]:
@@ -41488,6 +41620,10 @@ class OMPParallelForSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPParallelForSimdDirective]:
     ...
 
   @staticmethod
@@ -41543,10 +41679,6 @@ class OMPParallelForDirective(multiplier.ast.OMPLoopDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPParallelForDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPParallelForDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPParallelForDirective]:
@@ -41579,6 +41711,10 @@ class OMPParallelForDirective(multiplier.ast.OMPLoopDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPParallelForDirective]:
     ...
 
   @staticmethod
@@ -41632,10 +41768,6 @@ class OMPMasterTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPMasterTaskLoopSimdDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPMasterTaskLoopSimdDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPMasterTaskLoopSimdDirective]:
@@ -41668,6 +41800,10 @@ class OMPMasterTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPMasterTaskLoopSimdDirective]:
     ...
 
   @staticmethod
@@ -41722,10 +41858,6 @@ class OMPMasterTaskLoopDirective(multiplier.ast.OMPLoopDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPMasterTaskLoopDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPMasterTaskLoopDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPMasterTaskLoopDirective]:
@@ -41758,6 +41890,10 @@ class OMPMasterTaskLoopDirective(multiplier.ast.OMPLoopDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPMasterTaskLoopDirective]:
     ...
 
   @staticmethod
@@ -41811,10 +41947,6 @@ class OMPMaskedTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPMaskedTaskLoopSimdDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPMaskedTaskLoopSimdDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPMaskedTaskLoopSimdDirective]:
@@ -41847,6 +41979,10 @@ class OMPMaskedTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPMaskedTaskLoopSimdDirective]:
     ...
 
   @staticmethod
@@ -41901,10 +42037,6 @@ class OMPMaskedTaskLoopDirective(multiplier.ast.OMPLoopDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPMaskedTaskLoopDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPMaskedTaskLoopDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPMaskedTaskLoopDirective]:
@@ -41937,6 +42069,10 @@ class OMPMaskedTaskLoopDirective(multiplier.ast.OMPLoopDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPMaskedTaskLoopDirective]:
     ...
 
   @staticmethod
@@ -41990,10 +42126,6 @@ class OMPInteropDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPInteropDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPInteropDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPInteropDirective]:
@@ -42026,6 +42158,10 @@ class OMPInteropDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPInteropDirective]:
     ...
 
   @staticmethod
@@ -42079,10 +42215,6 @@ class OMPFlushDirective(multiplier.ast.OMPExecutableDirective):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPFlushDirective]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPFlushDirective]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPFlushDirective]:
@@ -42115,6 +42247,10 @@ class OMPFlushDirective(multiplier.ast.OMPExecutableDirective):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPFlushDirective]:
     ...
 
   @staticmethod
@@ -42172,10 +42308,6 @@ class OMPCanonicalLoop(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPCanonicalLoop]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPCanonicalLoop]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPCanonicalLoop]:
@@ -42208,6 +42340,10 @@ class OMPCanonicalLoop(multiplier.ast.Stmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPCanonicalLoop]:
     ...
 
   @staticmethod
@@ -42263,10 +42399,6 @@ class NullStmt(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.NullStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NullStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.NullStmt]:
@@ -42299,6 +42431,10 @@ class NullStmt(multiplier.ast.Stmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NullStmt]:
     ...
 
   @staticmethod
@@ -42356,10 +42492,6 @@ class MSDependentExistsStmt(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.MSDependentExistsStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSDependentExistsStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.MSDependentExistsStmt]:
@@ -42392,6 +42524,10 @@ class MSDependentExistsStmt(multiplier.ast.Stmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSDependentExistsStmt]:
     ...
 
   @staticmethod
@@ -42449,10 +42585,6 @@ class IndirectGotoStmt(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.IndirectGotoStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.IndirectGotoStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.IndirectGotoStmt]:
@@ -42485,6 +42617,10 @@ class IndirectGotoStmt(multiplier.ast.Stmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.IndirectGotoStmt]:
     ...
 
   @staticmethod
@@ -42558,10 +42694,6 @@ class IfStmt(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.IfStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.IfStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.IfStmt]:
@@ -42594,6 +42726,10 @@ class IfStmt(multiplier.ast.Stmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.IfStmt]:
     ...
 
   @staticmethod
@@ -42650,10 +42786,6 @@ class GotoStmt(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.GotoStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.GotoStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.GotoStmt]:
@@ -42686,6 +42818,10 @@ class GotoStmt(multiplier.ast.Stmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.GotoStmt]:
     ...
 
   @staticmethod
@@ -42748,10 +42884,6 @@ class ForStmt(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ForStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ForStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ForStmt]:
@@ -42784,6 +42916,10 @@ class ForStmt(multiplier.ast.Stmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ForStmt]:
     ...
 
   @staticmethod
@@ -42842,10 +42978,6 @@ class DoStmt(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.DoStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DoStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.DoStmt]:
@@ -42878,6 +43010,10 @@ class DoStmt(multiplier.ast.Stmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DoStmt]:
     ...
 
   @staticmethod
@@ -42935,10 +43071,6 @@ class DeclStmt(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.DeclStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DeclStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.DeclStmt]:
@@ -42971,6 +43103,10 @@ class DeclStmt(multiplier.ast.Stmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DeclStmt]:
     ...
 
   @staticmethod
@@ -43045,10 +43181,6 @@ class CoroutineBodyStmt(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CoroutineBodyStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CoroutineBodyStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CoroutineBodyStmt]:
@@ -43081,6 +43213,10 @@ class CoroutineBodyStmt(multiplier.ast.Stmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CoroutineBodyStmt]:
     ...
 
   @staticmethod
@@ -43141,10 +43277,6 @@ class CoreturnStmt(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CoreturnStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CoreturnStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CoreturnStmt]:
@@ -43177,6 +43309,10 @@ class CoreturnStmt(multiplier.ast.Stmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CoreturnStmt]:
     ...
 
   @staticmethod
@@ -43231,10 +43367,6 @@ class ContinueStmt(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ContinueStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ContinueStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ContinueStmt]:
@@ -43267,6 +43399,10 @@ class ContinueStmt(multiplier.ast.Stmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ContinueStmt]:
     ...
 
   @staticmethod
@@ -43324,10 +43460,6 @@ class CompoundStmt(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CompoundStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CompoundStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CompoundStmt]:
@@ -43360,6 +43492,10 @@ class CompoundStmt(multiplier.ast.Stmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CompoundStmt]:
     ...
 
   @staticmethod
@@ -43417,10 +43553,6 @@ class CapturedStmt(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CapturedStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CapturedStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CapturedStmt]:
@@ -43453,6 +43585,10 @@ class CapturedStmt(multiplier.ast.Stmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CapturedStmt]:
     ...
 
   @staticmethod
@@ -43510,10 +43646,6 @@ class CXXTryStmt(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXTryStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXTryStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXTryStmt]:
@@ -43546,6 +43678,10 @@ class CXXTryStmt(multiplier.ast.Stmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXTryStmt]:
     ...
 
   @staticmethod
@@ -43616,10 +43752,6 @@ class CXXForRangeStmt(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXForRangeStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXForRangeStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXForRangeStmt]:
@@ -43652,6 +43784,10 @@ class CXXForRangeStmt(multiplier.ast.Stmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXForRangeStmt]:
     ...
 
   @staticmethod
@@ -43709,10 +43845,6 @@ class CXXCatchStmt(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXCatchStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXCatchStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXCatchStmt]:
@@ -43745,6 +43877,10 @@ class CXXCatchStmt(multiplier.ast.Stmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXCatchStmt]:
     ...
 
   @staticmethod
@@ -43799,10 +43935,6 @@ class BreakStmt(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.BreakStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BreakStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.BreakStmt]:
@@ -43835,6 +43967,10 @@ class BreakStmt(multiplier.ast.Stmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BreakStmt]:
     ...
 
   @staticmethod
@@ -43903,10 +44039,6 @@ class AsmStmt(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.AsmStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AsmStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.AsmStmt]:
@@ -43935,6 +44067,10 @@ class AsmStmt(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.AsmStmt]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AsmStmt]:
     ...
 
   @staticmethod
@@ -44006,10 +44142,6 @@ class MSAsmStmt(multiplier.ast.AsmStmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.MSAsmStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSAsmStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.MSAsmStmt]:
@@ -44042,6 +44174,10 @@ class MSAsmStmt(multiplier.ast.AsmStmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSAsmStmt]:
     ...
 
   @staticmethod
@@ -44114,10 +44250,6 @@ class GCCAsmStmt(multiplier.ast.AsmStmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.GCCAsmStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.GCCAsmStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.GCCAsmStmt]:
@@ -44150,6 +44282,10 @@ class GCCAsmStmt(multiplier.ast.AsmStmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.GCCAsmStmt]:
     ...
 
   @staticmethod
@@ -44226,10 +44362,6 @@ class WhileStmt(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.WhileStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.WhileStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.WhileStmt]:
@@ -44262,6 +44394,10 @@ class WhileStmt(multiplier.ast.Stmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.WhileStmt]:
     ...
 
   @staticmethod
@@ -44316,10 +44452,6 @@ class ValueStmt(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ValueStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ValueStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ValueStmt]:
@@ -44348,6 +44480,10 @@ class ValueStmt(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ValueStmt]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ValueStmt]:
     ...
 
   @staticmethod
@@ -44406,10 +44542,6 @@ class LabelStmt(multiplier.ast.ValueStmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.LabelStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LabelStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.LabelStmt]:
@@ -44442,6 +44574,10 @@ class LabelStmt(multiplier.ast.ValueStmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LabelStmt]:
     ...
 
   @staticmethod
@@ -44535,10 +44671,6 @@ class Expr(multiplier.ast.ValueStmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.Expr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.Expr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.Expr]:
@@ -44567,6 +44699,10 @@ class Expr(multiplier.ast.ValueStmt):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.Expr]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.Expr]:
     ...
 
   @staticmethod
@@ -44622,10 +44758,6 @@ class DesignatedInitUpdateExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.DesignatedInitUpdateExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DesignatedInitUpdateExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.DesignatedInitUpdateExpr]:
@@ -44658,6 +44790,10 @@ class DesignatedInitUpdateExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DesignatedInitUpdateExpr]:
     ...
 
   @staticmethod
@@ -44720,10 +44856,6 @@ class DesignatedInitExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.DesignatedInitExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DesignatedInitExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.DesignatedInitExpr]:
@@ -44756,6 +44888,10 @@ class DesignatedInitExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DesignatedInitExpr]:
     ...
 
   @staticmethod
@@ -44820,10 +44956,6 @@ class DependentScopeDeclRefExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.DependentScopeDeclRefExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DependentScopeDeclRefExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.DependentScopeDeclRefExpr]:
@@ -44856,6 +44988,10 @@ class DependentScopeDeclRefExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DependentScopeDeclRefExpr]:
     ...
 
   @staticmethod
@@ -44912,10 +45048,6 @@ class DependentCoawaitExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.DependentCoawaitExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DependentCoawaitExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.DependentCoawaitExpr]:
@@ -44948,6 +45080,10 @@ class DependentCoawaitExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DependentCoawaitExpr]:
     ...
 
   @staticmethod
@@ -45012,10 +45148,6 @@ class DeclRefExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.DeclRefExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DeclRefExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.DeclRefExpr]:
@@ -45048,6 +45180,10 @@ class DeclRefExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DeclRefExpr]:
     ...
 
   @staticmethod
@@ -45108,10 +45244,6 @@ class CoroutineSuspendExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CoroutineSuspendExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CoroutineSuspendExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CoroutineSuspendExpr]:
@@ -45140,6 +45272,10 @@ class CoroutineSuspendExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CoroutineSuspendExpr]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CoroutineSuspendExpr]:
     ...
 
   @staticmethod
@@ -45194,10 +45330,6 @@ class CoawaitExpr(multiplier.ast.CoroutineSuspendExpr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CoawaitExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CoawaitExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CoawaitExpr]:
@@ -45230,6 +45362,10 @@ class CoawaitExpr(multiplier.ast.CoroutineSuspendExpr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CoawaitExpr]:
     ...
 
   @staticmethod
@@ -45283,10 +45419,6 @@ class CoyieldExpr(multiplier.ast.CoroutineSuspendExpr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CoyieldExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CoyieldExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CoyieldExpr]:
@@ -45319,6 +45451,10 @@ class CoyieldExpr(multiplier.ast.CoroutineSuspendExpr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CoyieldExpr]:
     ...
 
   @staticmethod
@@ -45375,10 +45511,6 @@ class ConvertVectorExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ConvertVectorExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConvertVectorExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ConvertVectorExpr]:
@@ -45411,6 +45543,10 @@ class ConvertVectorExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConvertVectorExpr]:
     ...
 
   @staticmethod
@@ -45472,10 +45608,6 @@ class ConceptSpecializationExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ConceptSpecializationExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConceptSpecializationExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ConceptSpecializationExpr]:
@@ -45508,6 +45640,10 @@ class ConceptSpecializationExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConceptSpecializationExpr]:
     ...
 
   @staticmethod
@@ -45567,10 +45703,6 @@ class CompoundLiteralExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CompoundLiteralExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CompoundLiteralExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CompoundLiteralExpr]:
@@ -45603,6 +45735,10 @@ class CompoundLiteralExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CompoundLiteralExpr]:
     ...
 
   @staticmethod
@@ -45664,10 +45800,6 @@ class ChooseExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ChooseExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ChooseExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ChooseExpr]:
@@ -45700,6 +45832,10 @@ class ChooseExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ChooseExpr]:
     ...
 
   @staticmethod
@@ -45755,10 +45891,6 @@ class CharacterLiteral(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CharacterLiteral]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CharacterLiteral]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CharacterLiteral]:
@@ -45791,6 +45923,10 @@ class CharacterLiteral(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CharacterLiteral]:
     ...
 
   @staticmethod
@@ -45852,10 +45988,6 @@ class CastExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CastExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CastExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CastExpr]:
@@ -45884,6 +46016,10 @@ class CastExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CastExpr]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CastExpr]:
     ...
 
   @staticmethod
@@ -45938,10 +46074,6 @@ class ImplicitCastExpr(multiplier.ast.CastExpr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ImplicitCastExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ImplicitCastExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ImplicitCastExpr]:
@@ -45974,6 +46106,10 @@ class ImplicitCastExpr(multiplier.ast.CastExpr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ImplicitCastExpr]:
     ...
 
   @staticmethod
@@ -46028,10 +46164,6 @@ class ExplicitCastExpr(multiplier.ast.CastExpr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ExplicitCastExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ExplicitCastExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ExplicitCastExpr]:
@@ -46060,6 +46192,10 @@ class ExplicitCastExpr(multiplier.ast.CastExpr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ExplicitCastExpr]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ExplicitCastExpr]:
     ...
 
   @staticmethod
@@ -46117,10 +46253,6 @@ class CXXNamedCastExpr(multiplier.ast.ExplicitCastExpr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXNamedCastExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXNamedCastExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXNamedCastExpr]:
@@ -46149,6 +46281,10 @@ class CXXNamedCastExpr(multiplier.ast.ExplicitCastExpr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.CXXNamedCastExpr]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXNamedCastExpr]:
     ...
 
   @staticmethod
@@ -46203,10 +46339,6 @@ class CXXDynamicCastExpr(multiplier.ast.CXXNamedCastExpr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXDynamicCastExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXDynamicCastExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXDynamicCastExpr]:
@@ -46239,6 +46371,10 @@ class CXXDynamicCastExpr(multiplier.ast.CXXNamedCastExpr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXDynamicCastExpr]:
     ...
 
   @staticmethod
@@ -46292,10 +46428,6 @@ class CXXConstCastExpr(multiplier.ast.CXXNamedCastExpr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXConstCastExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXConstCastExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXConstCastExpr]:
@@ -46328,6 +46460,10 @@ class CXXConstCastExpr(multiplier.ast.CXXNamedCastExpr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXConstCastExpr]:
     ...
 
   @staticmethod
@@ -46381,10 +46517,6 @@ class CXXAddrspaceCastExpr(multiplier.ast.CXXNamedCastExpr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXAddrspaceCastExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXAddrspaceCastExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXAddrspaceCastExpr]:
@@ -46417,6 +46549,10 @@ class CXXAddrspaceCastExpr(multiplier.ast.CXXNamedCastExpr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXAddrspaceCastExpr]:
     ...
 
   @staticmethod
@@ -46470,10 +46606,6 @@ class CXXStaticCastExpr(multiplier.ast.CXXNamedCastExpr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXStaticCastExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXStaticCastExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXStaticCastExpr]:
@@ -46506,6 +46638,10 @@ class CXXStaticCastExpr(multiplier.ast.CXXNamedCastExpr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXStaticCastExpr]:
     ...
 
   @staticmethod
@@ -46559,10 +46695,6 @@ class CXXReinterpretCastExpr(multiplier.ast.CXXNamedCastExpr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXReinterpretCastExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXReinterpretCastExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXReinterpretCastExpr]:
@@ -46595,6 +46727,10 @@ class CXXReinterpretCastExpr(multiplier.ast.CXXNamedCastExpr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXReinterpretCastExpr]:
     ...
 
   @staticmethod
@@ -46651,10 +46787,6 @@ class CXXFunctionalCastExpr(multiplier.ast.ExplicitCastExpr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXFunctionalCastExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXFunctionalCastExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXFunctionalCastExpr]:
@@ -46687,6 +46819,10 @@ class CXXFunctionalCastExpr(multiplier.ast.ExplicitCastExpr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXFunctionalCastExpr]:
     ...
 
   @staticmethod
@@ -46742,10 +46878,6 @@ class CStyleCastExpr(multiplier.ast.ExplicitCastExpr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CStyleCastExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CStyleCastExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CStyleCastExpr]:
@@ -46778,6 +46910,10 @@ class CStyleCastExpr(multiplier.ast.ExplicitCastExpr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CStyleCastExpr]:
     ...
 
   @staticmethod
@@ -46831,10 +46967,6 @@ class BuiltinBitCastExpr(multiplier.ast.ExplicitCastExpr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.BuiltinBitCastExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BuiltinBitCastExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.BuiltinBitCastExpr]:
@@ -46867,6 +46999,10 @@ class BuiltinBitCastExpr(multiplier.ast.ExplicitCastExpr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BuiltinBitCastExpr]:
     ...
 
   @staticmethod
@@ -46924,10 +47060,6 @@ class ObjCBridgedCastExpr(multiplier.ast.ExplicitCastExpr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCBridgedCastExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCBridgedCastExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCBridgedCastExpr]:
@@ -46960,6 +47092,10 @@ class ObjCBridgedCastExpr(multiplier.ast.ExplicitCastExpr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCBridgedCastExpr]:
     ...
 
   @staticmethod
@@ -47029,10 +47165,6 @@ class CallExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CallExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CallExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CallExpr]:
@@ -47065,6 +47197,10 @@ class CallExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CallExpr]:
     ...
 
   @staticmethod
@@ -47126,10 +47262,6 @@ class CXXOperatorCallExpr(multiplier.ast.CallExpr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXOperatorCallExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXOperatorCallExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXOperatorCallExpr]:
@@ -47162,6 +47294,10 @@ class CXXOperatorCallExpr(multiplier.ast.CallExpr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXOperatorCallExpr]:
     ...
 
   @staticmethod
@@ -47219,10 +47355,6 @@ class CXXMemberCallExpr(multiplier.ast.CallExpr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXMemberCallExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXMemberCallExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXMemberCallExpr]:
@@ -47255,6 +47387,10 @@ class CXXMemberCallExpr(multiplier.ast.CallExpr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXMemberCallExpr]:
     ...
 
   @staticmethod
@@ -47309,10 +47445,6 @@ class CUDAKernelCallExpr(multiplier.ast.CallExpr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CUDAKernelCallExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CUDAKernelCallExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CUDAKernelCallExpr]:
@@ -47345,6 +47477,10 @@ class CUDAKernelCallExpr(multiplier.ast.CallExpr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CUDAKernelCallExpr]:
     ...
 
   @staticmethod
@@ -47401,10 +47537,6 @@ class UserDefinedLiteral(multiplier.ast.CallExpr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.UserDefinedLiteral]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UserDefinedLiteral]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.UserDefinedLiteral]:
@@ -47437,6 +47569,10 @@ class UserDefinedLiteral(multiplier.ast.CallExpr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UserDefinedLiteral]:
     ...
 
   @staticmethod
@@ -47495,10 +47631,6 @@ class CXXUuidofExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXUuidofExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXUuidofExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXUuidofExpr]:
@@ -47531,6 +47663,10 @@ class CXXUuidofExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXUuidofExpr]:
     ...
 
   @staticmethod
@@ -47590,10 +47726,6 @@ class CXXUnresolvedConstructExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXUnresolvedConstructExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXUnresolvedConstructExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXUnresolvedConstructExpr]:
@@ -47626,6 +47758,10 @@ class CXXUnresolvedConstructExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXUnresolvedConstructExpr]:
     ...
 
   @staticmethod
@@ -47688,10 +47824,6 @@ class CXXTypeidExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXTypeidExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXTypeidExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXTypeidExpr]:
@@ -47724,6 +47856,10 @@ class CXXTypeidExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXTypeidExpr]:
     ...
 
   @staticmethod
@@ -47780,10 +47916,6 @@ class CXXThrowExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXThrowExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXThrowExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXThrowExpr]:
@@ -47816,6 +47948,10 @@ class CXXThrowExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXThrowExpr]:
     ...
 
   @staticmethod
@@ -47871,10 +48007,6 @@ class CXXThisExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXThisExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXThisExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXThisExpr]:
@@ -47907,6 +48039,10 @@ class CXXThisExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXThisExpr]:
     ...
 
   @staticmethod
@@ -47961,10 +48097,6 @@ class CXXStdInitializerListExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXStdInitializerListExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXStdInitializerListExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXStdInitializerListExpr]:
@@ -47997,6 +48129,10 @@ class CXXStdInitializerListExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXStdInitializerListExpr]:
     ...
 
   @staticmethod
@@ -48051,10 +48187,6 @@ class CXXScalarValueInitExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXScalarValueInitExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXScalarValueInitExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXScalarValueInitExpr]:
@@ -48087,6 +48219,10 @@ class CXXScalarValueInitExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXScalarValueInitExpr]:
     ...
 
   @staticmethod
@@ -48150,10 +48286,6 @@ class CXXRewrittenBinaryOperator(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXRewrittenBinaryOperator]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXRewrittenBinaryOperator]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXRewrittenBinaryOperator]:
@@ -48186,6 +48318,10 @@ class CXXRewrittenBinaryOperator(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXRewrittenBinaryOperator]:
     ...
 
   @staticmethod
@@ -48247,10 +48383,6 @@ class CXXPseudoDestructorExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXPseudoDestructorExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXPseudoDestructorExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXPseudoDestructorExpr]:
@@ -48283,6 +48415,10 @@ class CXXPseudoDestructorExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXPseudoDestructorExpr]:
     ...
 
   @staticmethod
@@ -48339,10 +48475,6 @@ class CXXParenListInitExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXParenListInitExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXParenListInitExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXParenListInitExpr]:
@@ -48375,6 +48507,10 @@ class CXXParenListInitExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXParenListInitExpr]:
     ...
 
   @staticmethod
@@ -48429,10 +48565,6 @@ class CXXNullPtrLiteralExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXNullPtrLiteralExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXNullPtrLiteralExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXNullPtrLiteralExpr]:
@@ -48465,6 +48597,10 @@ class CXXNullPtrLiteralExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXNullPtrLiteralExpr]:
     ...
 
   @staticmethod
@@ -48520,10 +48656,6 @@ class CXXNoexceptExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXNoexceptExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXNoexceptExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXNoexceptExpr]:
@@ -48556,6 +48688,10 @@ class CXXNoexceptExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXNoexceptExpr]:
     ...
 
   @staticmethod
@@ -48626,10 +48762,6 @@ class CXXNewExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXNewExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXNewExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXNewExpr]:
@@ -48662,6 +48794,10 @@ class CXXNewExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXNewExpr]:
     ...
 
   @staticmethod
@@ -48723,10 +48859,6 @@ class CXXInheritedCtorInitExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXInheritedCtorInitExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXInheritedCtorInitExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXInheritedCtorInitExpr]:
@@ -48759,6 +48891,10 @@ class CXXInheritedCtorInitExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXInheritedCtorInitExpr]:
     ...
 
   @staticmethod
@@ -48823,10 +48959,6 @@ class CXXFoldExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXFoldExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXFoldExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXFoldExpr]:
@@ -48859,6 +48991,10 @@ class CXXFoldExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXFoldExpr]:
     ...
 
   @staticmethod
@@ -48924,10 +49060,6 @@ class CXXDependentScopeMemberExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXDependentScopeMemberExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXDependentScopeMemberExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXDependentScopeMemberExpr]:
@@ -48960,6 +49092,10 @@ class CXXDependentScopeMemberExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXDependentScopeMemberExpr]:
     ...
 
   @staticmethod
@@ -49020,10 +49156,6 @@ class CXXDeleteExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXDeleteExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXDeleteExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXDeleteExpr]:
@@ -49056,6 +49188,10 @@ class CXXDeleteExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXDeleteExpr]:
     ...
 
   @staticmethod
@@ -49114,10 +49250,6 @@ class CXXDefaultInitExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXDefaultInitExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXDefaultInitExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXDefaultInitExpr]:
@@ -49150,6 +49282,10 @@ class CXXDefaultInitExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXDefaultInitExpr]:
     ...
 
   @staticmethod
@@ -49208,10 +49344,6 @@ class CXXDefaultArgExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXDefaultArgExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXDefaultArgExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXDefaultArgExpr]:
@@ -49244,6 +49376,10 @@ class CXXDefaultArgExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXDefaultArgExpr]:
     ...
 
   @staticmethod
@@ -49309,10 +49445,6 @@ class CXXConstructExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXConstructExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXConstructExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXConstructExpr]:
@@ -49345,6 +49477,10 @@ class CXXConstructExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXConstructExpr]:
     ...
 
   @staticmethod
@@ -49401,10 +49537,6 @@ class CXXTemporaryObjectExpr(multiplier.ast.CXXConstructExpr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXTemporaryObjectExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXTemporaryObjectExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXTemporaryObjectExpr]:
@@ -49437,6 +49569,10 @@ class CXXTemporaryObjectExpr(multiplier.ast.CXXConstructExpr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXTemporaryObjectExpr]:
     ...
 
   @staticmethod
@@ -49492,10 +49628,6 @@ class CXXBoolLiteralExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXBoolLiteralExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXBoolLiteralExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXBoolLiteralExpr]:
@@ -49528,6 +49660,10 @@ class CXXBoolLiteralExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXBoolLiteralExpr]:
     ...
 
   @staticmethod
@@ -49582,10 +49718,6 @@ class CXXBindTemporaryExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXBindTemporaryExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXBindTemporaryExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXBindTemporaryExpr]:
@@ -49618,6 +49750,10 @@ class CXXBindTemporaryExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXBindTemporaryExpr]:
     ...
 
   @staticmethod
@@ -49675,10 +49811,6 @@ class BlockExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.BlockExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BlockExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.BlockExpr]:
@@ -49711,6 +49843,10 @@ class BlockExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BlockExpr]:
     ...
 
   @staticmethod
@@ -49783,10 +49919,6 @@ class BinaryOperator(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.BinaryOperator]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BinaryOperator]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.BinaryOperator]:
@@ -49819,6 +49951,10 @@ class BinaryOperator(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BinaryOperator]:
     ...
 
   @staticmethod
@@ -49874,10 +50010,6 @@ class CompoundAssignOperator(multiplier.ast.BinaryOperator):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CompoundAssignOperator]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CompoundAssignOperator]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CompoundAssignOperator]:
@@ -49910,6 +50042,10 @@ class CompoundAssignOperator(multiplier.ast.BinaryOperator):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CompoundAssignOperator]:
     ...
 
   @staticmethod
@@ -49980,10 +50116,6 @@ class AtomicExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.AtomicExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AtomicExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.AtomicExpr]:
@@ -50016,6 +50148,10 @@ class AtomicExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AtomicExpr]:
     ...
 
   @staticmethod
@@ -50075,10 +50211,6 @@ class AsTypeExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.AsTypeExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AsTypeExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.AsTypeExpr]:
@@ -50111,6 +50243,10 @@ class AsTypeExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AsTypeExpr]:
     ...
 
   @staticmethod
@@ -50167,10 +50303,6 @@ class ArrayTypeTraitExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ArrayTypeTraitExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArrayTypeTraitExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ArrayTypeTraitExpr]:
@@ -50203,6 +50335,10 @@ class ArrayTypeTraitExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArrayTypeTraitExpr]:
     ...
 
   @staticmethod
@@ -50261,10 +50397,6 @@ class ArraySubscriptExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ArraySubscriptExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArraySubscriptExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ArraySubscriptExpr]:
@@ -50297,6 +50429,10 @@ class ArraySubscriptExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArraySubscriptExpr]:
     ...
 
   @staticmethod
@@ -50352,10 +50488,6 @@ class ArrayInitLoopExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ArrayInitLoopExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArrayInitLoopExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ArrayInitLoopExpr]:
@@ -50388,6 +50520,10 @@ class ArrayInitLoopExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArrayInitLoopExpr]:
     ...
 
   @staticmethod
@@ -50441,10 +50577,6 @@ class ArrayInitIndexExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ArrayInitIndexExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArrayInitIndexExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ArrayInitIndexExpr]:
@@ -50477,6 +50609,10 @@ class ArrayInitIndexExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ArrayInitIndexExpr]:
     ...
 
   @staticmethod
@@ -50533,10 +50669,6 @@ class AddrLabelExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.AddrLabelExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AddrLabelExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.AddrLabelExpr]:
@@ -50569,6 +50701,10 @@ class AddrLabelExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AddrLabelExpr]:
     ...
 
   @staticmethod
@@ -50627,10 +50763,6 @@ class AbstractConditionalOperator(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.AbstractConditionalOperator]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AbstractConditionalOperator]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.AbstractConditionalOperator]:
@@ -50659,6 +50791,10 @@ class AbstractConditionalOperator(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.AbstractConditionalOperator]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AbstractConditionalOperator]:
     ...
 
   @staticmethod
@@ -50714,10 +50850,6 @@ class ConditionalOperator(multiplier.ast.AbstractConditionalOperator):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ConditionalOperator]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConditionalOperator]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ConditionalOperator]:
@@ -50750,6 +50882,10 @@ class ConditionalOperator(multiplier.ast.AbstractConditionalOperator):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConditionalOperator]:
     ...
 
   @staticmethod
@@ -50805,10 +50941,6 @@ class BinaryConditionalOperator(multiplier.ast.AbstractConditionalOperator):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.BinaryConditionalOperator]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BinaryConditionalOperator]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.BinaryConditionalOperator]:
@@ -50841,6 +50973,10 @@ class BinaryConditionalOperator(multiplier.ast.AbstractConditionalOperator):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BinaryConditionalOperator]:
     ...
 
   @staticmethod
@@ -50898,10 +51034,6 @@ class VAArgExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.VAArgExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.VAArgExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.VAArgExpr]:
@@ -50934,6 +51066,10 @@ class VAArgExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.VAArgExpr]:
     ...
 
   @staticmethod
@@ -50998,10 +51134,6 @@ class UnaryOperator(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.UnaryOperator]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnaryOperator]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.UnaryOperator]:
@@ -51034,6 +51166,10 @@ class UnaryOperator(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnaryOperator]:
     ...
 
   @staticmethod
@@ -51094,10 +51230,6 @@ class UnaryExprOrTypeTraitExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.UnaryExprOrTypeTraitExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnaryExprOrTypeTraitExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.UnaryExprOrTypeTraitExpr]:
@@ -51130,6 +51262,10 @@ class UnaryExprOrTypeTraitExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnaryExprOrTypeTraitExpr]:
     ...
 
   @staticmethod
@@ -51183,10 +51319,6 @@ class TypoExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.TypoExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypoExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.TypoExpr]:
@@ -51219,6 +51351,10 @@ class TypoExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypoExpr]:
     ...
 
   @staticmethod
@@ -51276,10 +51412,6 @@ class TypeTraitExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.TypeTraitExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeTraitExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.TypeTraitExpr]:
@@ -51312,6 +51444,10 @@ class TypeTraitExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeTraitExpr]:
     ...
 
   @staticmethod
@@ -51371,10 +51507,6 @@ class SubstNonTypeTemplateParmPackExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.SubstNonTypeTemplateParmPackExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SubstNonTypeTemplateParmPackExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.SubstNonTypeTemplateParmPackExpr]:
@@ -51407,6 +51539,10 @@ class SubstNonTypeTemplateParmPackExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SubstNonTypeTemplateParmPackExpr]:
     ...
 
   @staticmethod
@@ -51467,10 +51603,6 @@ class SubstNonTypeTemplateParmExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.SubstNonTypeTemplateParmExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SubstNonTypeTemplateParmExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.SubstNonTypeTemplateParmExpr]:
@@ -51503,6 +51635,10 @@ class SubstNonTypeTemplateParmExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SubstNonTypeTemplateParmExpr]:
     ...
 
   @staticmethod
@@ -51568,10 +51704,6 @@ class StringLiteral(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.StringLiteral]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.StringLiteral]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.StringLiteral]:
@@ -51604,6 +51736,10 @@ class StringLiteral(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.StringLiteral]:
     ...
 
   @staticmethod
@@ -51660,10 +51796,6 @@ class StmtExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.StmtExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.StmtExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.StmtExpr]:
@@ -51696,6 +51828,10 @@ class StmtExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.StmtExpr]:
     ...
 
   @staticmethod
@@ -51753,10 +51889,6 @@ class SourceLocExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.SourceLocExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SourceLocExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.SourceLocExpr]:
@@ -51789,6 +51921,10 @@ class SourceLocExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SourceLocExpr]:
     ...
 
   @staticmethod
@@ -51849,10 +51985,6 @@ class SizeOfPackExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.SizeOfPackExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SizeOfPackExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.SizeOfPackExpr]:
@@ -51885,6 +52017,10 @@ class SizeOfPackExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SizeOfPackExpr]:
     ...
 
   @staticmethod
@@ -51940,10 +52076,6 @@ class ShuffleVectorExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ShuffleVectorExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ShuffleVectorExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ShuffleVectorExpr]:
@@ -51976,6 +52108,10 @@ class ShuffleVectorExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ShuffleVectorExpr]:
     ...
 
   @staticmethod
@@ -52033,10 +52169,6 @@ class SYCLUniqueStableNameExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.SYCLUniqueStableNameExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SYCLUniqueStableNameExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.SYCLUniqueStableNameExpr]:
@@ -52069,6 +52201,10 @@ class SYCLUniqueStableNameExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SYCLUniqueStableNameExpr]:
     ...
 
   @staticmethod
@@ -52129,10 +52265,6 @@ class RequiresExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.RequiresExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RequiresExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.RequiresExpr]:
@@ -52165,6 +52297,10 @@ class RequiresExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RequiresExpr]:
     ...
 
   @staticmethod
@@ -52223,10 +52359,6 @@ class RecoveryExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.RecoveryExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RecoveryExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.RecoveryExpr]:
@@ -52259,6 +52391,10 @@ class RecoveryExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RecoveryExpr]:
     ...
 
   @staticmethod
@@ -52321,10 +52457,6 @@ class PseudoObjectExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.PseudoObjectExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PseudoObjectExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.PseudoObjectExpr]:
@@ -52357,6 +52489,10 @@ class PseudoObjectExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PseudoObjectExpr]:
     ...
 
   @staticmethod
@@ -52421,10 +52557,6 @@ class PredefinedExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.PredefinedExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PredefinedExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.PredefinedExpr]:
@@ -52457,6 +52589,10 @@ class PredefinedExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PredefinedExpr]:
     ...
 
   @staticmethod
@@ -52514,10 +52650,6 @@ class ParenListExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ParenListExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ParenListExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ParenListExpr]:
@@ -52550,6 +52682,10 @@ class ParenListExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ParenListExpr]:
     ...
 
   @staticmethod
@@ -52609,10 +52745,6 @@ class ParenExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ParenExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ParenExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ParenExpr]:
@@ -52645,6 +52777,10 @@ class ParenExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ParenExpr]:
     ...
 
   @staticmethod
@@ -52700,10 +52836,6 @@ class PackExpansionExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.PackExpansionExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PackExpansionExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.PackExpansionExpr]:
@@ -52736,6 +52868,10 @@ class PackExpansionExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PackExpansionExpr]:
     ...
 
   @staticmethod
@@ -52798,10 +52934,6 @@ class OverloadExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OverloadExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OverloadExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OverloadExpr]:
@@ -52830,6 +52962,10 @@ class OverloadExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OverloadExpr]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OverloadExpr]:
     ...
 
   @staticmethod
@@ -52892,10 +53028,6 @@ class UnresolvedMemberExpr(multiplier.ast.OverloadExpr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.UnresolvedMemberExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnresolvedMemberExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.UnresolvedMemberExpr]:
@@ -52928,6 +53060,10 @@ class UnresolvedMemberExpr(multiplier.ast.OverloadExpr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnresolvedMemberExpr]:
     ...
 
   @staticmethod
@@ -52983,10 +53119,6 @@ class UnresolvedLookupExpr(multiplier.ast.OverloadExpr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.UnresolvedLookupExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnresolvedLookupExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.UnresolvedLookupExpr]:
@@ -53019,6 +53151,10 @@ class UnresolvedLookupExpr(multiplier.ast.OverloadExpr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnresolvedLookupExpr]:
     ...
 
   @staticmethod
@@ -53075,10 +53211,6 @@ class OpaqueValueExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OpaqueValueExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpaqueValueExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OpaqueValueExpr]:
@@ -53111,6 +53243,10 @@ class OpaqueValueExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OpaqueValueExpr]:
     ...
 
   @staticmethod
@@ -53166,10 +53302,6 @@ class OffsetOfExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OffsetOfExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OffsetOfExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OffsetOfExpr]:
@@ -53202,6 +53334,10 @@ class OffsetOfExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OffsetOfExpr]:
     ...
 
   @staticmethod
@@ -53260,10 +53396,6 @@ class ObjCSubscriptRefExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCSubscriptRefExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCSubscriptRefExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCSubscriptRefExpr]:
@@ -53296,6 +53428,10 @@ class ObjCSubscriptRefExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCSubscriptRefExpr]:
     ...
 
   @staticmethod
@@ -53351,10 +53487,6 @@ class ObjCStringLiteral(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCStringLiteral]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCStringLiteral]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCStringLiteral]:
@@ -53387,6 +53519,10 @@ class ObjCStringLiteral(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCStringLiteral]:
     ...
 
   @staticmethod
@@ -53442,10 +53578,6 @@ class ObjCSelectorExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCSelectorExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCSelectorExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCSelectorExpr]:
@@ -53478,6 +53610,10 @@ class ObjCSelectorExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCSelectorExpr]:
     ...
 
   @staticmethod
@@ -53535,10 +53671,6 @@ class ObjCProtocolExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCProtocolExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCProtocolExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCProtocolExpr]:
@@ -53571,6 +53703,10 @@ class ObjCProtocolExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCProtocolExpr]:
     ...
 
   @staticmethod
@@ -53640,10 +53776,6 @@ class ObjCPropertyRefExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCPropertyRefExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCPropertyRefExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCPropertyRefExpr]:
@@ -53676,6 +53808,10 @@ class ObjCPropertyRefExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCPropertyRefExpr]:
     ...
 
   @staticmethod
@@ -53751,10 +53887,6 @@ class ObjCMessageExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCMessageExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCMessageExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCMessageExpr]:
@@ -53787,6 +53919,10 @@ class ObjCMessageExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCMessageExpr]:
     ...
 
   @staticmethod
@@ -53852,10 +53988,6 @@ class ObjCIvarRefExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCIvarRefExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCIvarRefExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCIvarRefExpr]:
@@ -53888,6 +54020,10 @@ class ObjCIvarRefExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCIvarRefExpr]:
     ...
 
   @staticmethod
@@ -53946,10 +54082,6 @@ class ObjCIsaExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCIsaExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCIsaExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCIsaExpr]:
@@ -53982,6 +54114,10 @@ class ObjCIsaExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCIsaExpr]:
     ...
 
   @staticmethod
@@ -54037,10 +54173,6 @@ class ObjCIndirectCopyRestoreExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCIndirectCopyRestoreExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCIndirectCopyRestoreExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCIndirectCopyRestoreExpr]:
@@ -54073,6 +54205,10 @@ class ObjCIndirectCopyRestoreExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCIndirectCopyRestoreExpr]:
     ...
 
   @staticmethod
@@ -54129,10 +54265,6 @@ class ObjCEncodeExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCEncodeExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCEncodeExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCEncodeExpr]:
@@ -54165,6 +54297,10 @@ class ObjCEncodeExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCEncodeExpr]:
     ...
 
   @staticmethod
@@ -54219,10 +54355,6 @@ class ObjCDictionaryLiteral(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCDictionaryLiteral]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCDictionaryLiteral]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCDictionaryLiteral]:
@@ -54255,6 +54387,10 @@ class ObjCDictionaryLiteral(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCDictionaryLiteral]:
     ...
 
   @staticmethod
@@ -54312,10 +54448,6 @@ class ObjCBoxedExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCBoxedExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCBoxedExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCBoxedExpr]:
@@ -54348,6 +54480,10 @@ class ObjCBoxedExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCBoxedExpr]:
     ...
 
   @staticmethod
@@ -54403,10 +54539,6 @@ class ObjCBoolLiteralExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCBoolLiteralExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCBoolLiteralExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCBoolLiteralExpr]:
@@ -54439,6 +54571,10 @@ class ObjCBoolLiteralExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCBoolLiteralExpr]:
     ...
 
   @staticmethod
@@ -54493,10 +54629,6 @@ class ObjCAvailabilityCheckExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCAvailabilityCheckExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCAvailabilityCheckExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCAvailabilityCheckExpr]:
@@ -54529,6 +54661,10 @@ class ObjCAvailabilityCheckExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCAvailabilityCheckExpr]:
     ...
 
   @staticmethod
@@ -54585,10 +54721,6 @@ class ObjCArrayLiteral(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCArrayLiteral]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCArrayLiteral]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCArrayLiteral]:
@@ -54621,6 +54753,10 @@ class ObjCArrayLiteral(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCArrayLiteral]:
     ...
 
   @staticmethod
@@ -54680,10 +54816,6 @@ class OMPIteratorExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPIteratorExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPIteratorExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPIteratorExpr]:
@@ -54716,6 +54848,10 @@ class OMPIteratorExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPIteratorExpr]:
     ...
 
   @staticmethod
@@ -54774,10 +54910,6 @@ class OMPArrayShapingExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPArrayShapingExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPArrayShapingExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPArrayShapingExpr]:
@@ -54810,6 +54942,10 @@ class OMPArrayShapingExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPArrayShapingExpr]:
     ...
 
   @staticmethod
@@ -54873,10 +55009,6 @@ class OMPArraySectionExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPArraySectionExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPArraySectionExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPArraySectionExpr]:
@@ -54909,6 +55041,10 @@ class OMPArraySectionExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPArraySectionExpr]:
     ...
 
   @staticmethod
@@ -54962,10 +55098,6 @@ class NoInitExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.NoInitExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoInitExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.NoInitExpr]:
@@ -54998,6 +55130,10 @@ class NoInitExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NoInitExpr]:
     ...
 
   @staticmethod
@@ -55065,10 +55201,6 @@ class MemberExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.MemberExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MemberExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.MemberExpr]:
@@ -55101,6 +55233,10 @@ class MemberExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MemberExpr]:
     ...
 
   @staticmethod
@@ -55159,10 +55295,6 @@ class MatrixSubscriptExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.MatrixSubscriptExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MatrixSubscriptExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.MatrixSubscriptExpr]:
@@ -55195,6 +55327,10 @@ class MatrixSubscriptExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MatrixSubscriptExpr]:
     ...
 
   @staticmethod
@@ -55254,10 +55390,6 @@ class MaterializeTemporaryExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.MaterializeTemporaryExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MaterializeTemporaryExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.MaterializeTemporaryExpr]:
@@ -55290,6 +55422,10 @@ class MaterializeTemporaryExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MaterializeTemporaryExpr]:
     ...
 
   @staticmethod
@@ -55346,10 +55482,6 @@ class MSPropertySubscriptExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.MSPropertySubscriptExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSPropertySubscriptExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.MSPropertySubscriptExpr]:
@@ -55382,6 +55514,10 @@ class MSPropertySubscriptExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSPropertySubscriptExpr]:
     ...
 
   @staticmethod
@@ -55440,10 +55576,6 @@ class MSPropertyRefExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.MSPropertyRefExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSPropertyRefExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.MSPropertyRefExpr]:
@@ -55476,6 +55608,10 @@ class MSPropertyRefExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSPropertyRefExpr]:
     ...
 
   @staticmethod
@@ -55545,10 +55681,6 @@ class LambdaExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.LambdaExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LambdaExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.LambdaExpr]:
@@ -55581,6 +55713,10 @@ class LambdaExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LambdaExpr]:
     ...
 
   @staticmethod
@@ -55638,10 +55774,6 @@ class IntegerLiteral(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.IntegerLiteral]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.IntegerLiteral]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.IntegerLiteral]:
@@ -55674,6 +55806,10 @@ class IntegerLiteral(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.IntegerLiteral]:
     ...
 
   @staticmethod
@@ -55743,10 +55879,6 @@ class InitListExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.InitListExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.InitListExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.InitListExpr]:
@@ -55779,6 +55911,10 @@ class InitListExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.InitListExpr]:
     ...
 
   @staticmethod
@@ -55835,10 +55971,6 @@ class ImplicitValueInitExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ImplicitValueInitExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ImplicitValueInitExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ImplicitValueInitExpr]:
@@ -55871,6 +56003,10 @@ class ImplicitValueInitExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ImplicitValueInitExpr]:
     ...
 
   @staticmethod
@@ -55925,10 +56061,6 @@ class ImaginaryLiteral(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ImaginaryLiteral]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ImaginaryLiteral]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ImaginaryLiteral]:
@@ -55961,6 +56093,10 @@ class ImaginaryLiteral(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ImaginaryLiteral]:
     ...
 
   @staticmethod
@@ -56025,10 +56161,6 @@ class GenericSelectionExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.GenericSelectionExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.GenericSelectionExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.GenericSelectionExpr]:
@@ -56061,6 +56193,10 @@ class GenericSelectionExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.GenericSelectionExpr]:
     ...
 
   @staticmethod
@@ -56118,10 +56254,6 @@ class GNUNullExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.GNUNullExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.GNUNullExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.GNUNullExpr]:
@@ -56154,6 +56286,10 @@ class GNUNullExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.GNUNullExpr]:
     ...
 
   @staticmethod
@@ -56211,10 +56347,6 @@ class FunctionParmPackExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.FunctionParmPackExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FunctionParmPackExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.FunctionParmPackExpr]:
@@ -56247,6 +56379,10 @@ class FunctionParmPackExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FunctionParmPackExpr]:
     ...
 
   @staticmethod
@@ -56304,10 +56440,6 @@ class FullExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.FullExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FullExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.FullExpr]:
@@ -56336,6 +56468,10 @@ class FullExpr(multiplier.ast.Expr):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.FullExpr]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FullExpr]:
     ...
 
   @staticmethod
@@ -56390,10 +56526,6 @@ class ExprWithCleanups(multiplier.ast.FullExpr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ExprWithCleanups]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ExprWithCleanups]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ExprWithCleanups]:
@@ -56426,6 +56558,10 @@ class ExprWithCleanups(multiplier.ast.FullExpr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ExprWithCleanups]:
     ...
 
   @staticmethod
@@ -56482,10 +56618,6 @@ class ConstantExpr(multiplier.ast.FullExpr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ConstantExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConstantExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ConstantExpr]:
@@ -56518,6 +56650,10 @@ class ConstantExpr(multiplier.ast.FullExpr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConstantExpr]:
     ...
 
   @staticmethod
@@ -56573,10 +56709,6 @@ class FloatingLiteral(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.FloatingLiteral]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FloatingLiteral]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.FloatingLiteral]:
@@ -56609,6 +56741,10 @@ class FloatingLiteral(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FloatingLiteral]:
     ...
 
   @staticmethod
@@ -56663,10 +56799,6 @@ class FixedPointLiteral(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.FixedPointLiteral]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FixedPointLiteral]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.FixedPointLiteral]:
@@ -56699,6 +56831,10 @@ class FixedPointLiteral(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FixedPointLiteral]:
     ...
 
   @staticmethod
@@ -56756,10 +56892,6 @@ class ExtVectorElementExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ExtVectorElementExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ExtVectorElementExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ExtVectorElementExpr]:
@@ -56792,6 +56924,10 @@ class ExtVectorElementExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ExtVectorElementExpr]:
     ...
 
   @staticmethod
@@ -56848,10 +56984,6 @@ class ExpressionTraitExpr(multiplier.ast.Expr):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ExpressionTraitExpr]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ExpressionTraitExpr]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ExpressionTraitExpr]:
@@ -56884,6 +57016,10 @@ class ExpressionTraitExpr(multiplier.ast.Expr):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ExpressionTraitExpr]:
     ...
 
   @staticmethod
@@ -56941,10 +57077,6 @@ class AttributedStmt(multiplier.ast.ValueStmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.AttributedStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AttributedStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.AttributedStmt]:
@@ -56977,6 +57109,10 @@ class AttributedStmt(multiplier.ast.ValueStmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AttributedStmt]:
     ...
 
   @staticmethod
@@ -57045,10 +57181,6 @@ class SwitchStmt(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.SwitchStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwitchStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.SwitchStmt]:
@@ -57081,6 +57213,10 @@ class SwitchStmt(multiplier.ast.Stmt):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwitchStmt]:
     ...
 
   @staticmethod
@@ -57138,10 +57274,6 @@ class SwitchCase(multiplier.ast.Stmt):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.SwitchCase]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwitchCase]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.SwitchCase]:
@@ -57170,6 +57302,10 @@ class SwitchCase(multiplier.ast.Stmt):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.SwitchCase]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.SwitchCase]:
     ...
 
   @staticmethod
@@ -57224,10 +57360,6 @@ class DefaultStmt(multiplier.ast.SwitchCase):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.DefaultStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DefaultStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.DefaultStmt]:
@@ -57260,6 +57392,10 @@ class DefaultStmt(multiplier.ast.SwitchCase):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DefaultStmt]:
     ...
 
   @staticmethod
@@ -57318,10 +57454,6 @@ class CaseStmt(multiplier.ast.SwitchCase):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CaseStmt]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CaseStmt]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CaseStmt]:
@@ -57354,6 +57486,10 @@ class CaseStmt(multiplier.ast.SwitchCase):
 
   @staticmethod
   def static_kind() -> multiplier.ast.StmtKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CaseStmt]:
     ...
 
   @staticmethod
@@ -57409,21 +57545,6 @@ class Decl(multiplier.Entity):
 
   @overload
   @staticmethod
-  def IN(index: multiplier.Index, kinds: Sequence[multiplier.ast.DeclKind]) -> Iterable[multiplier.ast.Decl]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(frag: multiplier.Fragment, kinds: Sequence[multiplier.ast.DeclKind]) -> Iterable[multiplier.ast.Decl]:
-    ...
-
-  @overload
-  @staticmethod
-  def IN(file: multiplier.frontend.File, kinds: Sequence[multiplier.ast.DeclKind]) -> Iterable[multiplier.ast.Decl]:
-    ...
-
-  @overload
-  @staticmethod
   def IN(index: multiplier.Index) -> Iterable[multiplier.ast.Decl]:
     ...
 
@@ -57435,6 +57556,21 @@ class Decl(multiplier.Entity):
   @overload
   @staticmethod
   def IN(file: multiplier.frontend.File) -> Iterable[multiplier.ast.Decl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(index: multiplier.Index, kinds: Sequence[multiplier.ast.DeclKind]) -> Iterable[multiplier.ast.Decl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(frag: multiplier.Fragment, kinds: Sequence[multiplier.ast.DeclKind]) -> Iterable[multiplier.ast.Decl]:
+    ...
+
+  @overload
+  @staticmethod
+  def IN(file: multiplier.frontend.File, kinds: Sequence[multiplier.ast.DeclKind]) -> Iterable[multiplier.ast.Decl]:
     ...
 
   @overload
@@ -57472,10 +57608,6 @@ class Decl(multiplier.Entity):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.Decl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.Decl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.Decl]:
@@ -57504,6 +57636,10 @@ class Decl(multiplier.Entity):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.Decl]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.Decl]:
     ...
 
   def nth_attribute(self, n: int) -> Optional[multiplier.ast.Attr]:
@@ -57564,10 +57700,6 @@ class CapturedDecl(multiplier.ast.Decl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CapturedDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CapturedDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CapturedDecl]:
@@ -57600,6 +57732,10 @@ class CapturedDecl(multiplier.ast.Decl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CapturedDecl]:
     ...
 
   @staticmethod
@@ -57675,10 +57811,6 @@ class BlockDecl(multiplier.ast.Decl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.BlockDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BlockDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.BlockDecl]:
@@ -57711,6 +57843,10 @@ class BlockDecl(multiplier.ast.Decl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BlockDecl]:
     ...
 
   @staticmethod
@@ -57775,10 +57911,6 @@ class AccessSpecDecl(multiplier.ast.Decl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.AccessSpecDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AccessSpecDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.AccessSpecDecl]:
@@ -57811,6 +57943,10 @@ class AccessSpecDecl(multiplier.ast.Decl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.AccessSpecDecl]:
     ...
 
   @staticmethod
@@ -57867,10 +58003,6 @@ class OMPDeclarativeDirectiveDecl(multiplier.ast.Decl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPDeclarativeDirectiveDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDeclarativeDirectiveDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPDeclarativeDirectiveDecl]:
@@ -57899,6 +58031,10 @@ class OMPDeclarativeDirectiveDecl(multiplier.ast.Decl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPDeclarativeDirectiveDecl]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDeclarativeDirectiveDecl]:
     ...
 
   @staticmethod
@@ -57957,10 +58093,6 @@ class OMPThreadPrivateDecl(multiplier.ast.OMPDeclarativeDirectiveDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPThreadPrivateDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPThreadPrivateDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPThreadPrivateDecl]:
@@ -57993,6 +58125,10 @@ class OMPThreadPrivateDecl(multiplier.ast.OMPDeclarativeDirectiveDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPThreadPrivateDecl]:
     ...
 
   @staticmethod
@@ -58052,10 +58188,6 @@ class OMPRequiresDecl(multiplier.ast.OMPDeclarativeDirectiveDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPRequiresDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPRequiresDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPRequiresDecl]:
@@ -58088,6 +58220,10 @@ class OMPRequiresDecl(multiplier.ast.OMPDeclarativeDirectiveDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPRequiresDecl]:
     ...
 
   @staticmethod
@@ -58146,10 +58282,6 @@ class OMPAllocateDecl(multiplier.ast.OMPDeclarativeDirectiveDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPAllocateDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPAllocateDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPAllocateDecl]:
@@ -58182,6 +58314,10 @@ class OMPAllocateDecl(multiplier.ast.OMPDeclarativeDirectiveDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPAllocateDecl]:
     ...
 
   @staticmethod
@@ -58242,10 +58378,6 @@ class TranslationUnitDecl(multiplier.ast.Decl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.TranslationUnitDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TranslationUnitDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.TranslationUnitDecl]:
@@ -58278,6 +58410,10 @@ class TranslationUnitDecl(multiplier.ast.Decl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TranslationUnitDecl]:
     ...
 
   @staticmethod
@@ -58336,10 +58472,6 @@ class TopLevelStmtDecl(multiplier.ast.Decl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.TopLevelStmtDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TopLevelStmtDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.TopLevelStmtDecl]:
@@ -58372,6 +58504,10 @@ class TopLevelStmtDecl(multiplier.ast.Decl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TopLevelStmtDecl]:
     ...
 
   @staticmethod
@@ -58432,10 +58568,6 @@ class StaticAssertDecl(multiplier.ast.Decl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.StaticAssertDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.StaticAssertDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.StaticAssertDecl]:
@@ -58468,6 +58600,10 @@ class StaticAssertDecl(multiplier.ast.Decl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.StaticAssertDecl]:
     ...
 
   @staticmethod
@@ -58525,10 +58661,6 @@ class RequiresExprBodyDecl(multiplier.ast.Decl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.RequiresExprBodyDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RequiresExprBodyDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.RequiresExprBodyDecl]:
@@ -58561,6 +58693,10 @@ class RequiresExprBodyDecl(multiplier.ast.Decl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RequiresExprBodyDecl]:
     ...
 
   @staticmethod
@@ -58619,10 +58755,6 @@ class PragmaDetectMismatchDecl(multiplier.ast.Decl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.PragmaDetectMismatchDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PragmaDetectMismatchDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.PragmaDetectMismatchDecl]:
@@ -58655,6 +58787,10 @@ class PragmaDetectMismatchDecl(multiplier.ast.Decl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PragmaDetectMismatchDecl]:
     ...
 
   @staticmethod
@@ -58713,10 +58849,6 @@ class PragmaCommentDecl(multiplier.ast.Decl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.PragmaCommentDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PragmaCommentDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.PragmaCommentDecl]:
@@ -58749,6 +58881,10 @@ class PragmaCommentDecl(multiplier.ast.Decl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.PragmaCommentDecl]:
     ...
 
   @staticmethod
@@ -58814,10 +58950,6 @@ class ObjCPropertyImplDecl(multiplier.ast.Decl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCPropertyImplDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCPropertyImplDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCPropertyImplDecl]:
@@ -58850,6 +58982,10 @@ class ObjCPropertyImplDecl(multiplier.ast.Decl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCPropertyImplDecl]:
     ...
 
   @staticmethod
@@ -58919,10 +59055,6 @@ class NamedDecl(multiplier.ast.Decl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.NamedDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NamedDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.NamedDecl]:
@@ -58951,6 +59083,10 @@ class NamedDecl(multiplier.ast.Decl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.NamedDecl]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NamedDecl]:
     ...
 
   @staticmethod
@@ -59015,10 +59151,6 @@ class LabelDecl(multiplier.ast.NamedDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.LabelDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LabelDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.LabelDecl]:
@@ -59051,6 +59183,10 @@ class LabelDecl(multiplier.ast.NamedDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LabelDecl]:
     ...
 
   @staticmethod
@@ -59111,10 +59247,6 @@ class HLSLBufferDecl(multiplier.ast.NamedDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.HLSLBufferDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.HLSLBufferDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.HLSLBufferDecl]:
@@ -59147,6 +59279,10 @@ class HLSLBufferDecl(multiplier.ast.NamedDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.HLSLBufferDecl]:
     ...
 
   @staticmethod
@@ -59205,10 +59341,6 @@ class BaseUsingDecl(multiplier.ast.NamedDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.BaseUsingDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BaseUsingDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.BaseUsingDecl]:
@@ -59237,6 +59369,10 @@ class BaseUsingDecl(multiplier.ast.NamedDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.BaseUsingDecl]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BaseUsingDecl]:
     ...
 
   @staticmethod
@@ -59300,10 +59436,6 @@ class UsingEnumDecl(multiplier.ast.BaseUsingDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.UsingEnumDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UsingEnumDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.UsingEnumDecl]:
@@ -59336,6 +59468,10 @@ class UsingEnumDecl(multiplier.ast.BaseUsingDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UsingEnumDecl]:
     ...
 
   @staticmethod
@@ -59395,10 +59531,6 @@ class UsingDecl(multiplier.ast.BaseUsingDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.UsingDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UsingDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.UsingDecl]:
@@ -59431,6 +59563,10 @@ class UsingDecl(multiplier.ast.BaseUsingDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UsingDecl]:
     ...
 
   @staticmethod
@@ -59491,10 +59627,6 @@ class ValueDecl(multiplier.ast.NamedDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ValueDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ValueDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ValueDecl]:
@@ -59523,6 +59655,10 @@ class ValueDecl(multiplier.ast.NamedDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ValueDecl]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ValueDecl]:
     ...
 
   @staticmethod
@@ -59583,10 +59719,6 @@ class UnresolvedUsingValueDecl(multiplier.ast.ValueDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.UnresolvedUsingValueDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnresolvedUsingValueDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.UnresolvedUsingValueDecl]:
@@ -59619,6 +59751,10 @@ class UnresolvedUsingValueDecl(multiplier.ast.ValueDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnresolvedUsingValueDecl]:
     ...
 
   @staticmethod
@@ -59675,10 +59811,6 @@ class UnnamedGlobalConstantDecl(multiplier.ast.ValueDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.UnnamedGlobalConstantDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnnamedGlobalConstantDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.UnnamedGlobalConstantDecl]:
@@ -59711,6 +59843,10 @@ class UnnamedGlobalConstantDecl(multiplier.ast.ValueDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnnamedGlobalConstantDecl]:
     ...
 
   @staticmethod
@@ -59767,10 +59903,6 @@ class TemplateParamObjectDecl(multiplier.ast.ValueDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.TemplateParamObjectDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TemplateParamObjectDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.TemplateParamObjectDecl]:
@@ -59803,6 +59935,10 @@ class TemplateParamObjectDecl(multiplier.ast.ValueDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TemplateParamObjectDecl]:
     ...
 
   @staticmethod
@@ -59867,10 +60003,6 @@ class OMPDeclareReductionDecl(multiplier.ast.ValueDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPDeclareReductionDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDeclareReductionDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPDeclareReductionDecl]:
@@ -59903,6 +60035,10 @@ class OMPDeclareReductionDecl(multiplier.ast.ValueDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDeclareReductionDecl]:
     ...
 
   @staticmethod
@@ -59959,10 +60095,6 @@ class MSGuidDecl(multiplier.ast.ValueDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.MSGuidDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSGuidDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.MSGuidDecl]:
@@ -59995,6 +60127,10 @@ class MSGuidDecl(multiplier.ast.ValueDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSGuidDecl]:
     ...
 
   @staticmethod
@@ -60054,10 +60190,6 @@ class IndirectFieldDecl(multiplier.ast.ValueDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.IndirectFieldDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.IndirectFieldDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.IndirectFieldDecl]:
@@ -60090,6 +60222,10 @@ class IndirectFieldDecl(multiplier.ast.ValueDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.IndirectFieldDecl]:
     ...
 
   @staticmethod
@@ -60147,10 +60283,6 @@ class EnumConstantDecl(multiplier.ast.ValueDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.EnumConstantDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.EnumConstantDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.EnumConstantDecl]:
@@ -60183,6 +60315,10 @@ class EnumConstantDecl(multiplier.ast.ValueDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.EnumConstantDecl]:
     ...
 
   @staticmethod
@@ -60246,10 +60382,6 @@ class DeclaratorDecl(multiplier.ast.ValueDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.DeclaratorDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DeclaratorDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.DeclaratorDecl]:
@@ -60278,6 +60410,10 @@ class DeclaratorDecl(multiplier.ast.ValueDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.DeclaratorDecl]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DeclaratorDecl]:
     ...
 
   @staticmethod
@@ -60380,10 +60516,6 @@ class VarDecl(multiplier.ast.DeclaratorDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.VarDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.VarDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.VarDecl]:
@@ -60416,6 +60548,10 @@ class VarDecl(multiplier.ast.DeclaratorDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.VarDecl]:
     ...
 
   @staticmethod
@@ -60486,10 +60622,6 @@ class ParmVarDecl(multiplier.ast.VarDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ParmVarDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ParmVarDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ParmVarDecl]:
@@ -60522,6 +60654,10 @@ class ParmVarDecl(multiplier.ast.VarDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ParmVarDecl]:
     ...
 
   @staticmethod
@@ -60578,10 +60714,6 @@ class OMPCapturedExprDecl(multiplier.ast.VarDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPCapturedExprDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPCapturedExprDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPCapturedExprDecl]:
@@ -60614,6 +60746,10 @@ class OMPCapturedExprDecl(multiplier.ast.VarDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPCapturedExprDecl]:
     ...
 
   @staticmethod
@@ -60671,10 +60807,6 @@ class ImplicitParamDecl(multiplier.ast.VarDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ImplicitParamDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ImplicitParamDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ImplicitParamDecl]:
@@ -60707,6 +60839,10 @@ class ImplicitParamDecl(multiplier.ast.VarDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ImplicitParamDecl]:
     ...
 
   @staticmethod
@@ -60765,10 +60901,6 @@ class DecompositionDecl(multiplier.ast.VarDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.DecompositionDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DecompositionDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.DecompositionDecl]:
@@ -60801,6 +60933,10 @@ class DecompositionDecl(multiplier.ast.VarDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.DecompositionDecl]:
     ...
 
   @staticmethod
@@ -60869,10 +61005,6 @@ class VarTemplateSpecializationDecl(multiplier.ast.VarDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.VarTemplateSpecializationDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.VarTemplateSpecializationDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.VarTemplateSpecializationDecl]:
@@ -60905,6 +61037,10 @@ class VarTemplateSpecializationDecl(multiplier.ast.VarDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.VarTemplateSpecializationDecl]:
     ...
 
   @staticmethod
@@ -60966,10 +61102,6 @@ class VarTemplatePartialSpecializationDecl(multiplier.ast.VarTemplateSpecializat
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.VarTemplatePartialSpecializationDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.VarTemplatePartialSpecializationDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.VarTemplatePartialSpecializationDecl]:
@@ -61002,6 +61134,10 @@ class VarTemplatePartialSpecializationDecl(multiplier.ast.VarTemplateSpecializat
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.VarTemplatePartialSpecializationDecl]:
     ...
 
   @staticmethod
@@ -61068,10 +61204,6 @@ class NonTypeTemplateParmDecl(multiplier.ast.DeclaratorDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.NonTypeTemplateParmDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NonTypeTemplateParmDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.NonTypeTemplateParmDecl]:
@@ -61104,6 +61236,10 @@ class NonTypeTemplateParmDecl(multiplier.ast.DeclaratorDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NonTypeTemplateParmDecl]:
     ...
 
   @staticmethod
@@ -61165,10 +61301,6 @@ class MSPropertyDecl(multiplier.ast.DeclaratorDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.MSPropertyDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSPropertyDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.MSPropertyDecl]:
@@ -61201,6 +61333,10 @@ class MSPropertyDecl(multiplier.ast.DeclaratorDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.MSPropertyDecl]:
     ...
 
   @staticmethod
@@ -61338,10 +61474,6 @@ class FunctionDecl(multiplier.ast.DeclaratorDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.FunctionDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FunctionDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.FunctionDecl]:
@@ -61374,6 +61506,10 @@ class FunctionDecl(multiplier.ast.DeclaratorDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FunctionDecl]:
     ...
 
   @staticmethod
@@ -61454,10 +61590,6 @@ class CXXMethodDecl(multiplier.ast.FunctionDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXMethodDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXMethodDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXMethodDecl]:
@@ -61490,6 +61622,10 @@ class CXXMethodDecl(multiplier.ast.FunctionDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXMethodDecl]:
     ...
 
   @staticmethod
@@ -61551,10 +61687,6 @@ class CXXDestructorDecl(multiplier.ast.CXXMethodDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXDestructorDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXDestructorDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXDestructorDecl]:
@@ -61587,6 +61719,10 @@ class CXXDestructorDecl(multiplier.ast.CXXMethodDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXDestructorDecl]:
     ...
 
   @staticmethod
@@ -61646,10 +61782,6 @@ class CXXConversionDecl(multiplier.ast.CXXMethodDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXConversionDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXConversionDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXConversionDecl]:
@@ -61682,6 +61814,10 @@ class CXXConversionDecl(multiplier.ast.CXXMethodDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXConversionDecl]:
     ...
 
   @staticmethod
@@ -61746,10 +61882,6 @@ class CXXConstructorDecl(multiplier.ast.CXXMethodDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXConstructorDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXConstructorDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXConstructorDecl]:
@@ -61782,6 +61914,10 @@ class CXXConstructorDecl(multiplier.ast.CXXMethodDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXConstructorDecl]:
     ...
 
   @staticmethod
@@ -61845,10 +61981,6 @@ class CXXDeductionGuideDecl(multiplier.ast.FunctionDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXDeductionGuideDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXDeductionGuideDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXDeductionGuideDecl]:
@@ -61881,6 +62013,10 @@ class CXXDeductionGuideDecl(multiplier.ast.FunctionDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXDeductionGuideDecl]:
     ...
 
   @staticmethod
@@ -61952,10 +62088,6 @@ class FieldDecl(multiplier.ast.DeclaratorDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.FieldDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FieldDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.FieldDecl]:
@@ -61988,6 +62120,10 @@ class FieldDecl(multiplier.ast.DeclaratorDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FieldDecl]:
     ...
 
   @staticmethod
@@ -62049,10 +62185,6 @@ class ObjCIvarDecl(multiplier.ast.FieldDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCIvarDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCIvarDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCIvarDecl]:
@@ -62085,6 +62217,10 @@ class ObjCIvarDecl(multiplier.ast.FieldDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCIvarDecl]:
     ...
 
   @staticmethod
@@ -62141,10 +62277,6 @@ class ObjCAtDefsFieldDecl(multiplier.ast.FieldDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCAtDefsFieldDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCAtDefsFieldDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCAtDefsFieldDecl]:
@@ -62177,6 +62309,10 @@ class ObjCAtDefsFieldDecl(multiplier.ast.FieldDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCAtDefsFieldDecl]:
     ...
 
   @staticmethod
@@ -62236,10 +62372,6 @@ class BindingDecl(multiplier.ast.ValueDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.BindingDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BindingDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.BindingDecl]:
@@ -62272,6 +62404,10 @@ class BindingDecl(multiplier.ast.ValueDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BindingDecl]:
     ...
 
   @staticmethod
@@ -62328,10 +62464,6 @@ class OMPDeclarativeDirectiveValueDecl(multiplier.ast.ValueDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPDeclarativeDirectiveValueDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDeclarativeDirectiveValueDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPDeclarativeDirectiveValueDecl]:
@@ -62360,6 +62492,10 @@ class OMPDeclarativeDirectiveValueDecl(multiplier.ast.ValueDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.OMPDeclarativeDirectiveValueDecl]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDeclarativeDirectiveValueDecl]:
     ...
 
   @staticmethod
@@ -62418,10 +62554,6 @@ class OMPDeclareMapperDecl(multiplier.ast.OMPDeclarativeDirectiveValueDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.OMPDeclareMapperDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDeclareMapperDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.OMPDeclareMapperDecl]:
@@ -62454,6 +62586,10 @@ class OMPDeclareMapperDecl(multiplier.ast.OMPDeclarativeDirectiveValueDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.OMPDeclareMapperDecl]:
     ...
 
   @staticmethod
@@ -62513,10 +62649,6 @@ class UsingShadowDecl(multiplier.ast.NamedDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.UsingShadowDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UsingShadowDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.UsingShadowDecl]:
@@ -62549,6 +62681,10 @@ class UsingShadowDecl(multiplier.ast.NamedDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UsingShadowDecl]:
     ...
 
   @staticmethod
@@ -62610,10 +62746,6 @@ class ConstructorUsingShadowDecl(multiplier.ast.UsingShadowDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ConstructorUsingShadowDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConstructorUsingShadowDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ConstructorUsingShadowDecl]:
@@ -62646,6 +62778,10 @@ class ConstructorUsingShadowDecl(multiplier.ast.UsingShadowDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConstructorUsingShadowDecl]:
     ...
 
   @staticmethod
@@ -62704,10 +62840,6 @@ class UsingPackDecl(multiplier.ast.NamedDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.UsingPackDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UsingPackDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.UsingPackDecl]:
@@ -62740,6 +62872,10 @@ class UsingPackDecl(multiplier.ast.NamedDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UsingPackDecl]:
     ...
 
   @staticmethod
@@ -62804,10 +62940,6 @@ class UsingDirectiveDecl(multiplier.ast.NamedDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.UsingDirectiveDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UsingDirectiveDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.UsingDirectiveDecl]:
@@ -62840,6 +62972,10 @@ class UsingDirectiveDecl(multiplier.ast.NamedDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UsingDirectiveDecl]:
     ...
 
   @staticmethod
@@ -62896,10 +63032,6 @@ class UnresolvedUsingIfExistsDecl(multiplier.ast.NamedDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.UnresolvedUsingIfExistsDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnresolvedUsingIfExistsDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.UnresolvedUsingIfExistsDecl]:
@@ -62932,6 +63064,10 @@ class UnresolvedUsingIfExistsDecl(multiplier.ast.NamedDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnresolvedUsingIfExistsDecl]:
     ...
 
   @staticmethod
@@ -62989,10 +63125,6 @@ class TypeDecl(multiplier.ast.NamedDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.TypeDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.TypeDecl]:
@@ -63021,6 +63153,10 @@ class TypeDecl(multiplier.ast.NamedDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.TypeDecl]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeDecl]:
     ...
 
   @staticmethod
@@ -63086,10 +63222,6 @@ class TemplateTypeParmDecl(multiplier.ast.TypeDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.TemplateTypeParmDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TemplateTypeParmDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.TemplateTypeParmDecl]:
@@ -63122,6 +63254,10 @@ class TemplateTypeParmDecl(multiplier.ast.TypeDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TemplateTypeParmDecl]:
     ...
 
   @staticmethod
@@ -63200,10 +63336,6 @@ class TagDecl(multiplier.ast.TypeDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.TagDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TagDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.TagDecl]:
@@ -63232,6 +63364,10 @@ class TagDecl(multiplier.ast.TypeDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.TagDecl]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TagDecl]:
     ...
 
   @staticmethod
@@ -63317,10 +63453,6 @@ class RecordDecl(multiplier.ast.TagDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.RecordDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RecordDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.RecordDecl]:
@@ -63353,6 +63485,10 @@ class RecordDecl(multiplier.ast.TagDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RecordDecl]:
     ...
 
   @staticmethod
@@ -63536,10 +63672,6 @@ class CXXRecordDecl(multiplier.ast.RecordDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.CXXRecordDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXRecordDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.CXXRecordDecl]:
@@ -63572,6 +63704,10 @@ class CXXRecordDecl(multiplier.ast.RecordDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.CXXRecordDecl]:
     ...
 
   @staticmethod
@@ -63640,10 +63776,6 @@ class ClassTemplateSpecializationDecl(multiplier.ast.CXXRecordDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ClassTemplateSpecializationDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ClassTemplateSpecializationDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ClassTemplateSpecializationDecl]:
@@ -63676,6 +63808,10 @@ class ClassTemplateSpecializationDecl(multiplier.ast.CXXRecordDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ClassTemplateSpecializationDecl]:
     ...
 
   @staticmethod
@@ -63738,10 +63874,6 @@ class ClassTemplatePartialSpecializationDecl(multiplier.ast.ClassTemplateSpecial
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ClassTemplatePartialSpecializationDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ClassTemplatePartialSpecializationDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ClassTemplatePartialSpecializationDecl]:
@@ -63774,6 +63906,10 @@ class ClassTemplatePartialSpecializationDecl(multiplier.ast.ClassTemplateSpecial
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ClassTemplatePartialSpecializationDecl]:
     ...
 
   @staticmethod
@@ -63842,10 +63978,6 @@ class EnumDecl(multiplier.ast.TagDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.EnumDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.EnumDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.EnumDecl]:
@@ -63878,6 +64010,10 @@ class EnumDecl(multiplier.ast.TagDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.EnumDecl]:
     ...
 
   @staticmethod
@@ -63941,10 +64077,6 @@ class UnresolvedUsingTypenameDecl(multiplier.ast.TypeDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.UnresolvedUsingTypenameDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnresolvedUsingTypenameDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.UnresolvedUsingTypenameDecl]:
@@ -63977,6 +64109,10 @@ class UnresolvedUsingTypenameDecl(multiplier.ast.TypeDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.UnresolvedUsingTypenameDecl]:
     ...
 
   @staticmethod
@@ -64037,10 +64173,6 @@ class TypedefNameDecl(multiplier.ast.TypeDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.TypedefNameDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypedefNameDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.TypedefNameDecl]:
@@ -64069,6 +64201,10 @@ class TypedefNameDecl(multiplier.ast.TypeDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.TypedefNameDecl]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypedefNameDecl]:
     ...
 
   @staticmethod
@@ -64125,10 +64261,6 @@ class TypedefDecl(multiplier.ast.TypedefNameDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.TypedefDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypedefDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.TypedefDecl]:
@@ -64161,6 +64293,10 @@ class TypedefDecl(multiplier.ast.TypedefNameDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypedefDecl]:
     ...
 
   @staticmethod
@@ -64218,10 +64354,6 @@ class TypeAliasDecl(multiplier.ast.TypedefNameDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.TypeAliasDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeAliasDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.TypeAliasDecl]:
@@ -64254,6 +64386,10 @@ class TypeAliasDecl(multiplier.ast.TypedefNameDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeAliasDecl]:
     ...
 
   @staticmethod
@@ -64314,10 +64450,6 @@ class ObjCTypeParamDecl(multiplier.ast.TypedefNameDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCTypeParamDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCTypeParamDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCTypeParamDecl]:
@@ -64350,6 +64482,10 @@ class ObjCTypeParamDecl(multiplier.ast.TypedefNameDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCTypeParamDecl]:
     ...
 
   @staticmethod
@@ -64410,10 +64546,6 @@ class TemplateDecl(multiplier.ast.NamedDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.TemplateDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TemplateDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.TemplateDecl]:
@@ -64442,6 +64574,10 @@ class TemplateDecl(multiplier.ast.NamedDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.TemplateDecl]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TemplateDecl]:
     ...
 
   @staticmethod
@@ -64499,10 +64635,6 @@ class RedeclarableTemplateDecl(multiplier.ast.TemplateDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.RedeclarableTemplateDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RedeclarableTemplateDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.RedeclarableTemplateDecl]:
@@ -64531,6 +64663,10 @@ class RedeclarableTemplateDecl(multiplier.ast.TemplateDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.RedeclarableTemplateDecl]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.RedeclarableTemplateDecl]:
     ...
 
   @staticmethod
@@ -64589,10 +64725,6 @@ class FunctionTemplateDecl(multiplier.ast.RedeclarableTemplateDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.FunctionTemplateDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FunctionTemplateDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.FunctionTemplateDecl]:
@@ -64625,6 +64757,10 @@ class FunctionTemplateDecl(multiplier.ast.RedeclarableTemplateDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FunctionTemplateDecl]:
     ...
 
   @staticmethod
@@ -64682,10 +64818,6 @@ class ClassTemplateDecl(multiplier.ast.RedeclarableTemplateDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ClassTemplateDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ClassTemplateDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ClassTemplateDecl]:
@@ -64718,6 +64850,10 @@ class ClassTemplateDecl(multiplier.ast.RedeclarableTemplateDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ClassTemplateDecl]:
     ...
 
   @staticmethod
@@ -64775,10 +64911,6 @@ class VarTemplateDecl(multiplier.ast.RedeclarableTemplateDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.VarTemplateDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.VarTemplateDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.VarTemplateDecl]:
@@ -64811,6 +64943,10 @@ class VarTemplateDecl(multiplier.ast.RedeclarableTemplateDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.VarTemplateDecl]:
     ...
 
   @staticmethod
@@ -64867,10 +65003,6 @@ class TypeAliasTemplateDecl(multiplier.ast.RedeclarableTemplateDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.TypeAliasTemplateDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeAliasTemplateDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.TypeAliasTemplateDecl]:
@@ -64903,6 +65035,10 @@ class TypeAliasTemplateDecl(multiplier.ast.RedeclarableTemplateDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TypeAliasTemplateDecl]:
     ...
 
   @staticmethod
@@ -64961,10 +65097,6 @@ class ConceptDecl(multiplier.ast.TemplateDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ConceptDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConceptDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ConceptDecl]:
@@ -64997,6 +65129,10 @@ class ConceptDecl(multiplier.ast.TemplateDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ConceptDecl]:
     ...
 
   @staticmethod
@@ -65053,10 +65189,6 @@ class BuiltinTemplateDecl(multiplier.ast.TemplateDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.BuiltinTemplateDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BuiltinTemplateDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.BuiltinTemplateDecl]:
@@ -65089,6 +65221,10 @@ class BuiltinTemplateDecl(multiplier.ast.TemplateDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.BuiltinTemplateDecl]:
     ...
 
   @staticmethod
@@ -65150,10 +65286,6 @@ class TemplateTemplateParmDecl(multiplier.ast.TemplateDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.TemplateTemplateParmDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TemplateTemplateParmDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.TemplateTemplateParmDecl]:
@@ -65186,6 +65318,10 @@ class TemplateTemplateParmDecl(multiplier.ast.TemplateDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.TemplateTemplateParmDecl]:
     ...
 
   @staticmethod
@@ -65260,10 +65396,6 @@ class ObjCPropertyDecl(multiplier.ast.NamedDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCPropertyDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCPropertyDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCPropertyDecl]:
@@ -65296,6 +65428,10 @@ class ObjCPropertyDecl(multiplier.ast.NamedDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCPropertyDecl]:
     ...
 
   @staticmethod
@@ -65386,10 +65522,6 @@ class ObjCMethodDecl(multiplier.ast.NamedDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCMethodDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCMethodDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCMethodDecl]:
@@ -65422,6 +65554,10 @@ class ObjCMethodDecl(multiplier.ast.NamedDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCMethodDecl]:
     ...
 
   @staticmethod
@@ -65499,10 +65635,6 @@ class ObjCContainerDecl(multiplier.ast.NamedDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCContainerDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCContainerDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCContainerDecl]:
@@ -65531,6 +65663,10 @@ class ObjCContainerDecl(multiplier.ast.NamedDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCContainerDecl]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCContainerDecl]:
     ...
 
   @staticmethod
@@ -65618,10 +65754,6 @@ class ObjCCategoryDecl(multiplier.ast.ObjCContainerDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCCategoryDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCCategoryDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCCategoryDecl]:
@@ -65654,6 +65786,10 @@ class ObjCCategoryDecl(multiplier.ast.ObjCContainerDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCCategoryDecl]:
     ...
 
   @staticmethod
@@ -65727,10 +65863,6 @@ class ObjCProtocolDecl(multiplier.ast.ObjCContainerDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCProtocolDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCProtocolDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCProtocolDecl]:
@@ -65763,6 +65895,10 @@ class ObjCProtocolDecl(multiplier.ast.ObjCContainerDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCProtocolDecl]:
     ...
 
   @staticmethod
@@ -65855,10 +65991,6 @@ class ObjCInterfaceDecl(multiplier.ast.ObjCContainerDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCInterfaceDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCInterfaceDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCInterfaceDecl]:
@@ -65891,6 +66023,10 @@ class ObjCInterfaceDecl(multiplier.ast.ObjCContainerDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCInterfaceDecl]:
     ...
 
   @staticmethod
@@ -65974,10 +66110,6 @@ class ObjCImplDecl(multiplier.ast.ObjCContainerDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCImplDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCImplDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCImplDecl]:
@@ -66006,6 +66138,10 @@ class ObjCImplDecl(multiplier.ast.ObjCContainerDecl):
   @overload
   @staticmethod
   def FROM(t: multiplier.frontend.TokenContext) -> Optional[multiplier.ast.ObjCImplDecl]:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCImplDecl]:
     ...
 
   @staticmethod
@@ -66067,10 +66203,6 @@ class ObjCCategoryImplDecl(multiplier.ast.ObjCImplDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCCategoryImplDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCCategoryImplDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCCategoryImplDecl]:
@@ -66103,6 +66235,10 @@ class ObjCCategoryImplDecl(multiplier.ast.ObjCImplDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCCategoryImplDecl]:
     ...
 
   @staticmethod
@@ -66170,10 +66306,6 @@ class ObjCImplementationDecl(multiplier.ast.ObjCImplDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCImplementationDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCImplementationDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCImplementationDecl]:
@@ -66206,6 +66338,10 @@ class ObjCImplementationDecl(multiplier.ast.ObjCImplDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCImplementationDecl]:
     ...
 
   @staticmethod
@@ -66269,10 +66405,6 @@ class ObjCCompatibleAliasDecl(multiplier.ast.NamedDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ObjCCompatibleAliasDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCCompatibleAliasDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ObjCCompatibleAliasDecl]:
@@ -66305,6 +66437,10 @@ class ObjCCompatibleAliasDecl(multiplier.ast.NamedDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ObjCCompatibleAliasDecl]:
     ...
 
   @staticmethod
@@ -66366,10 +66502,6 @@ class NamespaceDecl(multiplier.ast.NamedDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.NamespaceDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NamespaceDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.NamespaceDecl]:
@@ -66402,6 +66534,10 @@ class NamespaceDecl(multiplier.ast.NamedDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NamespaceDecl]:
     ...
 
   @staticmethod
@@ -66463,10 +66599,6 @@ class NamespaceAliasDecl(multiplier.ast.NamedDecl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.NamespaceAliasDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NamespaceAliasDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.NamespaceAliasDecl]:
@@ -66499,6 +66631,10 @@ class NamespaceAliasDecl(multiplier.ast.NamedDecl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.NamespaceAliasDecl]:
     ...
 
   @staticmethod
@@ -66560,10 +66696,6 @@ class LinkageSpecDecl(multiplier.ast.Decl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.LinkageSpecDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LinkageSpecDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.LinkageSpecDecl]:
@@ -66596,6 +66728,10 @@ class LinkageSpecDecl(multiplier.ast.Decl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LinkageSpecDecl]:
     ...
 
   @staticmethod
@@ -66656,10 +66792,6 @@ class LifetimeExtendedTemporaryDecl(multiplier.ast.Decl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.LifetimeExtendedTemporaryDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LifetimeExtendedTemporaryDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.LifetimeExtendedTemporaryDecl]:
@@ -66692,6 +66824,10 @@ class LifetimeExtendedTemporaryDecl(multiplier.ast.Decl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.LifetimeExtendedTemporaryDecl]:
     ...
 
   @staticmethod
@@ -66750,10 +66886,6 @@ class ImportDecl(multiplier.ast.Decl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ImportDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ImportDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ImportDecl]:
@@ -66786,6 +66918,10 @@ class ImportDecl(multiplier.ast.Decl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ImportDecl]:
     ...
 
   @staticmethod
@@ -66847,10 +66983,6 @@ class ImplicitConceptSpecializationDecl(multiplier.ast.Decl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ImplicitConceptSpecializationDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ImplicitConceptSpecializationDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ImplicitConceptSpecializationDecl]:
@@ -66883,6 +67015,10 @@ class ImplicitConceptSpecializationDecl(multiplier.ast.Decl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ImplicitConceptSpecializationDecl]:
     ...
 
   @staticmethod
@@ -66947,10 +67083,6 @@ class FriendTemplateDecl(multiplier.ast.Decl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.FriendTemplateDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FriendTemplateDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.FriendTemplateDecl]:
@@ -66983,6 +67115,10 @@ class FriendTemplateDecl(multiplier.ast.Decl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FriendTemplateDecl]:
     ...
 
   @staticmethod
@@ -67048,10 +67184,6 @@ class FriendDecl(multiplier.ast.Decl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.FriendDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FriendDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.FriendDecl]:
@@ -67084,6 +67216,10 @@ class FriendDecl(multiplier.ast.Decl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FriendDecl]:
     ...
 
   @staticmethod
@@ -67146,10 +67282,6 @@ class FileScopeAsmDecl(multiplier.ast.Decl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.FileScopeAsmDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FileScopeAsmDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.FileScopeAsmDecl]:
@@ -67182,6 +67314,10 @@ class FileScopeAsmDecl(multiplier.ast.Decl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.FileScopeAsmDecl]:
     ...
 
   @staticmethod
@@ -67239,10 +67375,6 @@ class ExternCContextDecl(multiplier.ast.Decl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ExternCContextDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ExternCContextDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ExternCContextDecl]:
@@ -67275,6 +67407,10 @@ class ExternCContextDecl(multiplier.ast.Decl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ExternCContextDecl]:
     ...
 
   @staticmethod
@@ -67335,10 +67471,6 @@ class ExportDecl(multiplier.ast.Decl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.ExportDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ExportDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.ExportDecl]:
@@ -67371,6 +67503,10 @@ class ExportDecl(multiplier.ast.Decl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.ExportDecl]:
     ...
 
   @staticmethod
@@ -67427,10 +67563,6 @@ class EmptyDecl(multiplier.ast.Decl):
   def containing(stmt: Optional[multiplier.ast.Stmt]) -> Iterable[multiplier.ast.EmptyDecl]:
     ...
 
-  @staticmethod
-  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.EmptyDecl]:
-    ...
-
   @overload
   @staticmethod
   def FROM(op: multiplier.ir.Operation) -> Optional[multiplier.ast.EmptyDecl]:
@@ -67463,6 +67595,10 @@ class EmptyDecl(multiplier.ast.Decl):
 
   @staticmethod
   def static_kind() -> multiplier.ast.DeclKind:
+    ...
+
+  @staticmethod
+  def by_id(arg_0: multiplier.Index, arg_1: int) -> Optional[multiplier.ast.EmptyDecl]:
     ...
 
   @staticmethod

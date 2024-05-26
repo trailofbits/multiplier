@@ -32,11 +32,12 @@ class MX_EXPORT TemplateSpecializationType : public Type {
   static gap::generator<TemplateSpecializationType> in(const Index &index);
   static gap::generator<TemplateSpecializationType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<TemplateSpecializationType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::TEMPLATE_SPECIALIZATION;
   }
+
+  static std::optional<TemplateSpecializationType> by_id(const Index &, EntityId);
 
   static std::optional<TemplateSpecializationType> from_base(const Type &parent);
   inline static std::optional<TemplateSpecializationType> from(const Type &parent) {

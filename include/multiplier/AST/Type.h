@@ -85,10 +85,11 @@ class MX_EXPORT Type {
   TokenRange tokens(void) const;
 
  public:
-  static gap::generator<Type> in(const Index &index, std::span<const TypeKind> kinds);
   static gap::generator<Type> in(const Index &index);
+  static gap::generator<Type> in(const Index &index, std::span<const TypeKind> kinds);
   static gap::generator<Type> containing(const Token &tok);
   bool contains(const Token &tok) const;
+
   static std::optional<Type> by_id(const Index &, EntityId);
 
   inline static std::optional<Type> from(const Type &self) {

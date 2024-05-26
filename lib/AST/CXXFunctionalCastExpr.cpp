@@ -11,6 +11,7 @@
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/ExplicitCastExpr.h>
 #include <multiplier/AST/Expr.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/ValueStmt.h>
@@ -30,6 +31,43 @@ static const StmtKind kCXXFunctionalCastExprDerivedKinds[] = {
     CXXFunctionalCastExpr::static_kind(),
 };
 }  // namespace
+
+gap::generator<CXXFunctionalCastExpr> CXXFunctionalCastExpr::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (StmtKind k : kCXXFunctionalCastExprDerivedKinds) {
+    for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
+      if (std::optional<CXXFunctionalCastExpr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<CXXFunctionalCastExpr> CXXFunctionalCastExpr::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (StmtKind k : kCXXFunctionalCastExprDerivedKinds) {
+      for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
+        if (std::optional<CXXFunctionalCastExpr> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+gap::generator<CXXFunctionalCastExpr> CXXFunctionalCastExpr::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (StmtKind k : kCXXFunctionalCastExprDerivedKinds) {
+    for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
+      if (std::optional<CXXFunctionalCastExpr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
 
 gap::generator<CXXFunctionalCastExpr> CXXFunctionalCastExpr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -135,43 +173,6 @@ std::optional<CXXFunctionalCastExpr> CXXFunctionalCastExpr::from_base(const Stmt
       return reinterpret_cast<const CXXFunctionalCastExpr &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<CXXFunctionalCastExpr> CXXFunctionalCastExpr::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (StmtKind k : kCXXFunctionalCastExprDerivedKinds) {
-    for (StmtImplPtr eptr : ep->StmtsFor(ep, k)) {
-      if (std::optional<CXXFunctionalCastExpr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<CXXFunctionalCastExpr> CXXFunctionalCastExpr::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (StmtKind k : kCXXFunctionalCastExprDerivedKinds) {
-    for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-      if (std::optional<CXXFunctionalCastExpr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<CXXFunctionalCastExpr> CXXFunctionalCastExpr::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (StmtKind k : kCXXFunctionalCastExprDerivedKinds) {
-      for (StmtImplPtr eptr : ep->StmtsFor(ep, k, frag_id)) {
-        if (std::optional<CXXFunctionalCastExpr> e = from_base(std::move(eptr))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
   }
 }
 

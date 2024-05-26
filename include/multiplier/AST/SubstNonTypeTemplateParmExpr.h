@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Decl;
 class Expr;
+class File;
 class NonTypeTemplateParmDecl;
 class Stmt;
 class SubstNonTypeTemplateParmExpr;
@@ -36,11 +37,10 @@ class MX_EXPORT SubstNonTypeTemplateParmExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<SubstNonTypeTemplateParmExpr> in(const Index &index);
-  static gap::generator<SubstNonTypeTemplateParmExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<SubstNonTypeTemplateParmExpr> by_id(const Index &, EntityId);
   static gap::generator<SubstNonTypeTemplateParmExpr> in(const Fragment &frag);
   static gap::generator<SubstNonTypeTemplateParmExpr> in(const File &file);
+  static gap::generator<SubstNonTypeTemplateParmExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<SubstNonTypeTemplateParmExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<SubstNonTypeTemplateParmExpr, ir::Operation>> in(const Compilation &tu);
@@ -56,6 +56,8 @@ class MX_EXPORT SubstNonTypeTemplateParmExpr : public Expr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<SubstNonTypeTemplateParmExpr> by_id(const Index &, EntityId);
 
   static std::optional<SubstNonTypeTemplateParmExpr> from_base(const Stmt &parent);
   inline static std::optional<SubstNonTypeTemplateParmExpr> from(const Stmt &parent) {

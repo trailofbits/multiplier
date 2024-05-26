@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class ThreadAttr;
 class Token;
 namespace ir {
@@ -29,15 +30,16 @@ class MX_EXPORT ThreadAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<ThreadAttr> in(const Index &index);
-  static gap::generator<ThreadAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ThreadAttr> by_id(const Index &, EntityId);
   static gap::generator<ThreadAttr> in(const Fragment &frag);
   static gap::generator<ThreadAttr> in(const File &file);
+  static gap::generator<ThreadAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::THREAD;
   }
+
+  static std::optional<ThreadAttr> by_id(const Index &, EntityId);
 
   static std::optional<ThreadAttr> from_base(const Attr &parent);
   inline static std::optional<ThreadAttr> from(const Attr &parent) {

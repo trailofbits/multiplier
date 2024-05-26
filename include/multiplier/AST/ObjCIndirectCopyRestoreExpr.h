@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Decl;
 class Expr;
+class File;
 class ObjCIndirectCopyRestoreExpr;
 class Stmt;
 class Token;
@@ -34,11 +35,10 @@ class MX_EXPORT ObjCIndirectCopyRestoreExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<ObjCIndirectCopyRestoreExpr> in(const Index &index);
-  static gap::generator<ObjCIndirectCopyRestoreExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ObjCIndirectCopyRestoreExpr> by_id(const Index &, EntityId);
   static gap::generator<ObjCIndirectCopyRestoreExpr> in(const Fragment &frag);
   static gap::generator<ObjCIndirectCopyRestoreExpr> in(const File &file);
+  static gap::generator<ObjCIndirectCopyRestoreExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<ObjCIndirectCopyRestoreExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<ObjCIndirectCopyRestoreExpr, ir::Operation>> in(const Compilation &tu);
@@ -54,6 +54,8 @@ class MX_EXPORT ObjCIndirectCopyRestoreExpr : public Expr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<ObjCIndirectCopyRestoreExpr> by_id(const Index &, EntityId);
 
   static std::optional<ObjCIndirectCopyRestoreExpr> from_base(const Stmt &parent);
   inline static std::optional<ObjCIndirectCopyRestoreExpr> from(const Stmt &parent) {

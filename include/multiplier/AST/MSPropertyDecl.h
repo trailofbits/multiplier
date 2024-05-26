@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Decl;
 class DeclaratorDecl;
+class File;
 class MSPropertyDecl;
 class NamedDecl;
 class Stmt;
@@ -36,11 +37,10 @@ class MX_EXPORT MSPropertyDecl : public DeclaratorDecl {
   friend class Decl;
  public:
   static gap::generator<MSPropertyDecl> in(const Index &index);
-  static gap::generator<MSPropertyDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<MSPropertyDecl> by_id(const Index &, EntityId);
   static gap::generator<MSPropertyDecl> in(const Fragment &frag);
   static gap::generator<MSPropertyDecl> in(const File &file);
+  static gap::generator<MSPropertyDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<MSPropertyDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<MSPropertyDecl, ir::Operation>> in(const Compilation &tu);
@@ -60,6 +60,8 @@ class MX_EXPORT MSPropertyDecl : public DeclaratorDecl {
   MSPropertyDecl canonical_declaration(void) const;
   std::optional<MSPropertyDecl> definition(void) const;
   gap::generator<MSPropertyDecl> redeclarations(void) const &;
+  static std::optional<MSPropertyDecl> by_id(const Index &, EntityId);
+
   static std::optional<MSPropertyDecl> from_base(const Decl &parent);
   inline static std::optional<MSPropertyDecl> from(const Decl &parent) {
     return from_base(parent);

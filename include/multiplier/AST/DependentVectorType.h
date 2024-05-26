@@ -33,11 +33,12 @@ class MX_EXPORT DependentVectorType : public Type {
   static gap::generator<DependentVectorType> in(const Index &index);
   static gap::generator<DependentVectorType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<DependentVectorType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::DEPENDENT_VECTOR;
   }
+
+  static std::optional<DependentVectorType> by_id(const Index &, EntityId);
 
   static std::optional<DependentVectorType> from_base(const Type &parent);
   inline static std::optional<DependentVectorType> from(const Type &parent) {

@@ -31,11 +31,12 @@ class MX_EXPORT BitIntType : public Type {
   static gap::generator<BitIntType> in(const Index &index);
   static gap::generator<BitIntType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<BitIntType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::BIT_INT;
   }
+
+  static std::optional<BitIntType> by_id(const Index &, EntityId);
 
   static std::optional<BitIntType> from_base(const Type &parent);
   inline static std::optional<BitIntType> from(const Type &parent) {

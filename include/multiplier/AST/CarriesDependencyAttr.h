@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Attr;
 class CarriesDependencyAttr;
+class File;
 class InheritableAttr;
 class InheritableParamAttr;
 class Token;
@@ -33,15 +34,16 @@ class MX_EXPORT CarriesDependencyAttr : public InheritableParamAttr {
   friend class Attr;
  public:
   static gap::generator<CarriesDependencyAttr> in(const Index &index);
-  static gap::generator<CarriesDependencyAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CarriesDependencyAttr> by_id(const Index &, EntityId);
   static gap::generator<CarriesDependencyAttr> in(const Fragment &frag);
   static gap::generator<CarriesDependencyAttr> in(const File &file);
+  static gap::generator<CarriesDependencyAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CARRIES_DEPENDENCY;
   }
+
+  static std::optional<CarriesDependencyAttr> by_id(const Index &, EntityId);
 
   static std::optional<CarriesDependencyAttr> from_base(const Attr &parent);
   inline static std::optional<CarriesDependencyAttr> from(const Attr &parent) {

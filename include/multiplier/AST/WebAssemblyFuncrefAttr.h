@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class Token;
 class TypeAttr;
 class WebAssemblyFuncrefAttr;
@@ -31,15 +32,16 @@ class MX_EXPORT WebAssemblyFuncrefAttr : public TypeAttr {
   friend class Attr;
  public:
   static gap::generator<WebAssemblyFuncrefAttr> in(const Index &index);
-  static gap::generator<WebAssemblyFuncrefAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<WebAssemblyFuncrefAttr> by_id(const Index &, EntityId);
   static gap::generator<WebAssemblyFuncrefAttr> in(const Fragment &frag);
   static gap::generator<WebAssemblyFuncrefAttr> in(const File &file);
+  static gap::generator<WebAssemblyFuncrefAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::WEB_ASSEMBLY_FUNCREF;
   }
+
+  static std::optional<WebAssemblyFuncrefAttr> by_id(const Index &, EntityId);
 
   static std::optional<WebAssemblyFuncrefAttr> from_base(const Attr &parent);
   inline static std::optional<WebAssemblyFuncrefAttr> from(const Attr &parent) {

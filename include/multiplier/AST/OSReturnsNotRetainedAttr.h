@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class OSReturnsNotRetainedAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT OSReturnsNotRetainedAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<OSReturnsNotRetainedAttr> in(const Index &index);
-  static gap::generator<OSReturnsNotRetainedAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<OSReturnsNotRetainedAttr> by_id(const Index &, EntityId);
   static gap::generator<OSReturnsNotRetainedAttr> in(const Fragment &frag);
   static gap::generator<OSReturnsNotRetainedAttr> in(const File &file);
+  static gap::generator<OSReturnsNotRetainedAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OS_RETURNS_NOT_RETAINED;
   }
+
+  static std::optional<OSReturnsNotRetainedAttr> by_id(const Index &, EntityId);
 
   static std::optional<OSReturnsNotRetainedAttr> from_base(const Attr &parent);
   inline static std::optional<OSReturnsNotRetainedAttr> from(const Attr &parent) {

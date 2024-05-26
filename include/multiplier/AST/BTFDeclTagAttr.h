@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Attr;
 class BTFDeclTagAttr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT BTFDeclTagAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<BTFDeclTagAttr> in(const Index &index);
-  static gap::generator<BTFDeclTagAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<BTFDeclTagAttr> by_id(const Index &, EntityId);
   static gap::generator<BTFDeclTagAttr> in(const Fragment &frag);
   static gap::generator<BTFDeclTagAttr> in(const File &file);
+  static gap::generator<BTFDeclTagAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::BTF_DECL_TAG;
   }
+
+  static std::optional<BTFDeclTagAttr> by_id(const Index &, EntityId);
 
   static std::optional<BTFDeclTagAttr> from_base(const Attr &parent);
   inline static std::optional<BTFDeclTagAttr> from(const Attr &parent) {

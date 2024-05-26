@@ -31,11 +31,12 @@ class MX_EXPORT PipeType : public Type {
   static gap::generator<PipeType> in(const Index &index);
   static gap::generator<PipeType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<PipeType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::PIPE;
   }
+
+  static std::optional<PipeType> by_id(const Index &, EntityId);
 
   static std::optional<PipeType> from_base(const Type &parent);
   inline static std::optional<PipeType> from(const Type &parent) {

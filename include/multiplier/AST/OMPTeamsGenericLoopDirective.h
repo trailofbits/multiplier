@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Decl;
+class File;
 class OMPExecutableDirective;
 class OMPLoopBasedDirective;
 class OMPLoopDirective;
@@ -36,11 +37,10 @@ class MX_EXPORT OMPTeamsGenericLoopDirective : public OMPLoopDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPTeamsGenericLoopDirective> in(const Index &index);
-  static gap::generator<OMPTeamsGenericLoopDirective> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<OMPTeamsGenericLoopDirective> by_id(const Index &, EntityId);
   static gap::generator<OMPTeamsGenericLoopDirective> in(const Fragment &frag);
   static gap::generator<OMPTeamsGenericLoopDirective> in(const File &file);
+  static gap::generator<OMPTeamsGenericLoopDirective> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<OMPTeamsGenericLoopDirective> from(const ir::Operation &op);
   static gap::generator<std::pair<OMPTeamsGenericLoopDirective, ir::Operation>> in(const Compilation &tu);
@@ -56,6 +56,8 @@ class MX_EXPORT OMPTeamsGenericLoopDirective : public OMPLoopDirective {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<OMPTeamsGenericLoopDirective> by_id(const Index &, EntityId);
 
   static std::optional<OMPTeamsGenericLoopDirective> from_base(const Stmt &parent);
   inline static std::optional<OMPTeamsGenericLoopDirective> from(const Stmt &parent) {

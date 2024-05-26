@@ -33,6 +33,22 @@ std::shared_ptr<EntityProvider> Type::entity_provider_of(const File &file_) {
   return file_.impl->ep;
 }
 
+gap::generator<Type> Type::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeImplPtr eptr : ep->TypesFor(ep)) {
+    co_yield Type(std::move(eptr));
+  }
+}
+
+gap::generator<Type> Type::in(const Index &index, std::span<const TypeKind> kinds) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      co_yield Type(std::move(eptr));
+    }
+  }
+}
+
 gap::generator<Type> Type::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = Type::from(*ctx)) {
@@ -57,22 +73,6 @@ std::optional<Type> Type::by_id(const Index &index, EntityId eid) {
     assert(eid.Pack() == kInvalidEntityId);
   }
   return std::nullopt;
-}
-
-gap::generator<Type> Type::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeImplPtr eptr : ep->TypesFor(ep)) {
-    co_yield Type(std::move(eptr));
-  }
-}
-
-gap::generator<Type> Type::in(const Index &index, std::span<const TypeKind> kinds) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      co_yield Type(std::move(eptr));
-    }
-  }
 }
 
 std::optional<Type> Type::from(const Reference &r) {

@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Decl;
 class Expr;
+class File;
 class GNUNullExpr;
 class Stmt;
 class Token;
@@ -34,11 +35,10 @@ class MX_EXPORT GNUNullExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<GNUNullExpr> in(const Index &index);
-  static gap::generator<GNUNullExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<GNUNullExpr> by_id(const Index &, EntityId);
   static gap::generator<GNUNullExpr> in(const Fragment &frag);
   static gap::generator<GNUNullExpr> in(const File &file);
+  static gap::generator<GNUNullExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<GNUNullExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<GNUNullExpr, ir::Operation>> in(const Compilation &tu);
@@ -54,6 +54,8 @@ class MX_EXPORT GNUNullExpr : public Expr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<GNUNullExpr> by_id(const Index &, EntityId);
 
   static std::optional<GNUNullExpr> from_base(const Stmt &parent);
   inline static std::optional<GNUNullExpr> from(const Stmt &parent) {

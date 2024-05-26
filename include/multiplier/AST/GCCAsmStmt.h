@@ -17,6 +17,7 @@ class Index;
 class AddrLabelExpr;
 class AsmStmt;
 class Decl;
+class File;
 class GCCAsmStmt;
 class Stmt;
 class StringLiteral;
@@ -34,11 +35,10 @@ class MX_EXPORT GCCAsmStmt : public AsmStmt {
   friend class Stmt;
  public:
   static gap::generator<GCCAsmStmt> in(const Index &index);
-  static gap::generator<GCCAsmStmt> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<GCCAsmStmt> by_id(const Index &, EntityId);
   static gap::generator<GCCAsmStmt> in(const Fragment &frag);
   static gap::generator<GCCAsmStmt> in(const File &file);
+  static gap::generator<GCCAsmStmt> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<GCCAsmStmt> from(const ir::Operation &op);
   static gap::generator<std::pair<GCCAsmStmt, ir::Operation>> in(const Compilation &tu);
@@ -54,6 +54,8 @@ class MX_EXPORT GCCAsmStmt : public AsmStmt {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<GCCAsmStmt> by_id(const Index &, EntityId);
 
   static std::optional<GCCAsmStmt> from_base(const Stmt &parent);
   inline static std::optional<GCCAsmStmt> from(const Stmt &parent) {

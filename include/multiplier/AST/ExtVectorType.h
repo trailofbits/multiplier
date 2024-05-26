@@ -33,11 +33,12 @@ class MX_EXPORT ExtVectorType : public VectorType {
   static gap::generator<ExtVectorType> in(const Index &index);
   static gap::generator<ExtVectorType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<ExtVectorType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::EXT_VECTOR;
   }
+
+  static std::optional<ExtVectorType> by_id(const Index &, EntityId);
 
   static std::optional<ExtVectorType> from_base(const Type &parent);
   inline static std::optional<ExtVectorType> from(const Type &parent) {

@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Decl;
 class Expr;
+class File;
 class OMPDeclarativeDirectiveDecl;
 class OMPThreadPrivateDecl;
 class Stmt;
@@ -33,11 +34,10 @@ class MX_EXPORT OMPThreadPrivateDecl : public OMPDeclarativeDirectiveDecl {
   friend class Decl;
  public:
   static gap::generator<OMPThreadPrivateDecl> in(const Index &index);
-  static gap::generator<OMPThreadPrivateDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<OMPThreadPrivateDecl> by_id(const Index &, EntityId);
   static gap::generator<OMPThreadPrivateDecl> in(const Fragment &frag);
   static gap::generator<OMPThreadPrivateDecl> in(const File &file);
+  static gap::generator<OMPThreadPrivateDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<OMPThreadPrivateDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<OMPThreadPrivateDecl, ir::Operation>> in(const Compilation &tu);
@@ -57,6 +57,8 @@ class MX_EXPORT OMPThreadPrivateDecl : public OMPDeclarativeDirectiveDecl {
   OMPThreadPrivateDecl canonical_declaration(void) const;
   std::optional<OMPThreadPrivateDecl> definition(void) const;
   gap::generator<OMPThreadPrivateDecl> redeclarations(void) const &;
+  static std::optional<OMPThreadPrivateDecl> by_id(const Index &, EntityId);
+
   static std::optional<OMPThreadPrivateDecl> from_base(const Decl &parent);
   inline static std::optional<OMPThreadPrivateDecl> from(const Decl &parent) {
     return from_base(parent);

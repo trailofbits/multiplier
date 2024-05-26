@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class TLSModelAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT TLSModelAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<TLSModelAttr> in(const Index &index);
-  static gap::generator<TLSModelAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<TLSModelAttr> by_id(const Index &, EntityId);
   static gap::generator<TLSModelAttr> in(const Fragment &frag);
   static gap::generator<TLSModelAttr> in(const File &file);
+  static gap::generator<TLSModelAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::TLS_MODEL;
   }
+
+  static std::optional<TLSModelAttr> by_id(const Index &, EntityId);
 
   static std::optional<TLSModelAttr> from_base(const Attr &parent);
   inline static std::optional<TLSModelAttr> from(const Attr &parent) {

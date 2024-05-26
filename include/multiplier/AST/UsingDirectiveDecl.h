@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Decl;
+class File;
 class NamedDecl;
 class NamespaceDecl;
 class Stmt;
@@ -33,11 +34,10 @@ class MX_EXPORT UsingDirectiveDecl : public NamedDecl {
   friend class Decl;
  public:
   static gap::generator<UsingDirectiveDecl> in(const Index &index);
-  static gap::generator<UsingDirectiveDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<UsingDirectiveDecl> by_id(const Index &, EntityId);
   static gap::generator<UsingDirectiveDecl> in(const Fragment &frag);
   static gap::generator<UsingDirectiveDecl> in(const File &file);
+  static gap::generator<UsingDirectiveDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<UsingDirectiveDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<UsingDirectiveDecl, ir::Operation>> in(const Compilation &tu);
@@ -57,6 +57,8 @@ class MX_EXPORT UsingDirectiveDecl : public NamedDecl {
   UsingDirectiveDecl canonical_declaration(void) const;
   std::optional<UsingDirectiveDecl> definition(void) const;
   gap::generator<UsingDirectiveDecl> redeclarations(void) const &;
+  static std::optional<UsingDirectiveDecl> by_id(const Index &, EntityId);
+
   static std::optional<UsingDirectiveDecl> from_base(const Decl &parent);
   inline static std::optional<UsingDirectiveDecl> from(const Decl &parent) {
     return from_base(parent);

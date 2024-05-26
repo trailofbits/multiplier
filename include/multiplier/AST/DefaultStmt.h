@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Decl;
 class DefaultStmt;
+class File;
 class Stmt;
 class SwitchCase;
 class Token;
@@ -32,11 +33,10 @@ class MX_EXPORT DefaultStmt : public SwitchCase {
   friend class Stmt;
  public:
   static gap::generator<DefaultStmt> in(const Index &index);
-  static gap::generator<DefaultStmt> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<DefaultStmt> by_id(const Index &, EntityId);
   static gap::generator<DefaultStmt> in(const Fragment &frag);
   static gap::generator<DefaultStmt> in(const File &file);
+  static gap::generator<DefaultStmt> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<DefaultStmt> from(const ir::Operation &op);
   static gap::generator<std::pair<DefaultStmt, ir::Operation>> in(const Compilation &tu);
@@ -52,6 +52,8 @@ class MX_EXPORT DefaultStmt : public SwitchCase {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<DefaultStmt> by_id(const Index &, EntityId);
 
   static std::optional<DefaultStmt> from_base(const Stmt &parent);
   inline static std::optional<DefaultStmt> from(const Stmt &parent) {

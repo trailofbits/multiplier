@@ -24,6 +24,17 @@ static const TypeKind kTypeOfTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<TypeOfType> TypeOfType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kTypeOfTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<TypeOfType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<TypeOfType> TypeOfType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = TypeOfType::from(*ctx)) {
@@ -65,17 +76,6 @@ std::optional<TypeOfType> TypeOfType::from_base(const Type &parent) {
       return reinterpret_cast<const TypeOfType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<TypeOfType> TypeOfType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kTypeOfTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<TypeOfType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

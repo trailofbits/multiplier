@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class IntelOclBiccAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT IntelOclBiccAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<IntelOclBiccAttr> in(const Index &index);
-  static gap::generator<IntelOclBiccAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<IntelOclBiccAttr> by_id(const Index &, EntityId);
   static gap::generator<IntelOclBiccAttr> in(const Fragment &frag);
   static gap::generator<IntelOclBiccAttr> in(const File &file);
+  static gap::generator<IntelOclBiccAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::INTEL_OCL_BICC;
   }
+
+  static std::optional<IntelOclBiccAttr> by_id(const Index &, EntityId);
 
   static std::optional<IntelOclBiccAttr> from_base(const Attr &parent);
   inline static std::optional<IntelOclBiccAttr> from(const Attr &parent) {

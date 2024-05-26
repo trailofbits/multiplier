@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Attr;
 class CoroLifetimeBoundAttr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT CoroLifetimeBoundAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<CoroLifetimeBoundAttr> in(const Index &index);
-  static gap::generator<CoroLifetimeBoundAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CoroLifetimeBoundAttr> by_id(const Index &, EntityId);
   static gap::generator<CoroLifetimeBoundAttr> in(const Fragment &frag);
   static gap::generator<CoroLifetimeBoundAttr> in(const File &file);
+  static gap::generator<CoroLifetimeBoundAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CORO_LIFETIME_BOUND;
   }
+
+  static std::optional<CoroLifetimeBoundAttr> by_id(const Index &, EntityId);
 
   static std::optional<CoroLifetimeBoundAttr> from_base(const Attr &parent);
   inline static std::optional<CoroLifetimeBoundAttr> from(const Attr &parent) {

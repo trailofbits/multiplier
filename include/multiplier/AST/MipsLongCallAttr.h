@@ -16,6 +16,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class MipsLongCallAttr;
 class Token;
@@ -32,15 +33,16 @@ class MX_EXPORT MipsLongCallAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<MipsLongCallAttr> in(const Index &index);
-  static gap::generator<MipsLongCallAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<MipsLongCallAttr> by_id(const Index &, EntityId);
   static gap::generator<MipsLongCallAttr> in(const Fragment &frag);
   static gap::generator<MipsLongCallAttr> in(const File &file);
+  static gap::generator<MipsLongCallAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::MIPS_LONG_CALL;
   }
+
+  static std::optional<MipsLongCallAttr> by_id(const Index &, EntityId);
 
   static std::optional<MipsLongCallAttr> from_base(const Attr &parent);
   inline static std::optional<MipsLongCallAttr> from(const Attr &parent) {

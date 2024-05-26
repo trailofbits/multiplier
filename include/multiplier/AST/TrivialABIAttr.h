@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class Token;
 class TrivialABIAttr;
@@ -31,15 +32,16 @@ class MX_EXPORT TrivialABIAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<TrivialABIAttr> in(const Index &index);
-  static gap::generator<TrivialABIAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<TrivialABIAttr> by_id(const Index &, EntityId);
   static gap::generator<TrivialABIAttr> in(const Fragment &frag);
   static gap::generator<TrivialABIAttr> in(const File &file);
+  static gap::generator<TrivialABIAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::TRIVIAL_ABI;
   }
+
+  static std::optional<TrivialABIAttr> by_id(const Index &, EntityId);
 
   static std::optional<TrivialABIAttr> from_base(const Attr &parent);
   inline static std::optional<TrivialABIAttr> from(const Attr &parent) {

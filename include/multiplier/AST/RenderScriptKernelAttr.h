@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class RenderScriptKernelAttr;
 class Token;
 namespace ir {
@@ -29,15 +30,16 @@ class MX_EXPORT RenderScriptKernelAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<RenderScriptKernelAttr> in(const Index &index);
-  static gap::generator<RenderScriptKernelAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<RenderScriptKernelAttr> by_id(const Index &, EntityId);
   static gap::generator<RenderScriptKernelAttr> in(const Fragment &frag);
   static gap::generator<RenderScriptKernelAttr> in(const File &file);
+  static gap::generator<RenderScriptKernelAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::RENDER_SCRIPT_KERNEL;
   }
+
+  static std::optional<RenderScriptKernelAttr> by_id(const Index &, EntityId);
 
   static std::optional<RenderScriptKernelAttr> from_base(const Attr &parent);
   inline static std::optional<RenderScriptKernelAttr> from(const Attr &parent) {

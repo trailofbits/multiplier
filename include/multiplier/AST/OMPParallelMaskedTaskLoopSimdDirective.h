@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Decl;
+class File;
 class OMPExecutableDirective;
 class OMPLoopBasedDirective;
 class OMPLoopDirective;
@@ -36,11 +37,10 @@ class MX_EXPORT OMPParallelMaskedTaskLoopSimdDirective : public OMPLoopDirective
   friend class Stmt;
  public:
   static gap::generator<OMPParallelMaskedTaskLoopSimdDirective> in(const Index &index);
-  static gap::generator<OMPParallelMaskedTaskLoopSimdDirective> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<OMPParallelMaskedTaskLoopSimdDirective> by_id(const Index &, EntityId);
   static gap::generator<OMPParallelMaskedTaskLoopSimdDirective> in(const Fragment &frag);
   static gap::generator<OMPParallelMaskedTaskLoopSimdDirective> in(const File &file);
+  static gap::generator<OMPParallelMaskedTaskLoopSimdDirective> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<OMPParallelMaskedTaskLoopSimdDirective> from(const ir::Operation &op);
   static gap::generator<std::pair<OMPParallelMaskedTaskLoopSimdDirective, ir::Operation>> in(const Compilation &tu);
@@ -56,6 +56,8 @@ class MX_EXPORT OMPParallelMaskedTaskLoopSimdDirective : public OMPLoopDirective
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<OMPParallelMaskedTaskLoopSimdDirective> by_id(const Index &, EntityId);
 
   static std::optional<OMPParallelMaskedTaskLoopSimdDirective> from_base(const Stmt &parent);
   inline static std::optional<OMPParallelMaskedTaskLoopSimdDirective> from(const Stmt &parent) {

@@ -18,6 +18,7 @@ class Index;
 class Decl;
 class DeclaratorDecl;
 class Expr;
+class File;
 class NamedDecl;
 class ParmVarDecl;
 class Stmt;
@@ -42,11 +43,10 @@ class MX_EXPORT ParmVarDecl : public VarDecl {
   friend class Decl;
  public:
   static gap::generator<ParmVarDecl> in(const Index &index);
-  static gap::generator<ParmVarDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ParmVarDecl> by_id(const Index &, EntityId);
   static gap::generator<ParmVarDecl> in(const Fragment &frag);
   static gap::generator<ParmVarDecl> in(const File &file);
+  static gap::generator<ParmVarDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<ParmVarDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<ParmVarDecl, ir::Operation>> in(const Compilation &tu);
@@ -66,6 +66,8 @@ class MX_EXPORT ParmVarDecl : public VarDecl {
   ParmVarDecl canonical_declaration(void) const;
   std::optional<ParmVarDecl> definition(void) const;
   gap::generator<ParmVarDecl> redeclarations(void) const &;
+  static std::optional<ParmVarDecl> by_id(const Index &, EntityId);
+
   static std::optional<ParmVarDecl> from_base(const Decl &parent);
   inline static std::optional<ParmVarDecl> from(const Decl &parent) {
     return from_base(parent);

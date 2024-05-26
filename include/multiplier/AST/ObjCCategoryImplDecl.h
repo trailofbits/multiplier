@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Reference;
 class Decl;
+class File;
 class NamedDecl;
 class ObjCCategoryDecl;
 class ObjCCategoryImplDecl;
@@ -38,11 +39,10 @@ class MX_EXPORT ObjCCategoryImplDecl : public ObjCImplDecl {
   friend class Decl;
  public:
   static gap::generator<ObjCCategoryImplDecl> in(const Index &index);
-  static gap::generator<ObjCCategoryImplDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ObjCCategoryImplDecl> by_id(const Index &, EntityId);
   static gap::generator<ObjCCategoryImplDecl> in(const Fragment &frag);
   static gap::generator<ObjCCategoryImplDecl> in(const File &file);
+  static gap::generator<ObjCCategoryImplDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<ObjCCategoryImplDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<ObjCCategoryImplDecl, ir::Operation>> in(const Compilation &tu);
@@ -62,6 +62,8 @@ class MX_EXPORT ObjCCategoryImplDecl : public ObjCImplDecl {
   ObjCCategoryImplDecl canonical_declaration(void) const;
   std::optional<ObjCCategoryImplDecl> definition(void) const;
   gap::generator<ObjCCategoryImplDecl> redeclarations(void) const &;
+  static std::optional<ObjCCategoryImplDecl> by_id(const Index &, EntityId);
+
   static std::optional<ObjCCategoryImplDecl> from_base(const Decl &parent);
   inline static std::optional<ObjCCategoryImplDecl> from(const Decl &parent) {
     return from_base(parent);

@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class BreakStmt;
 class Decl;
+class File;
 class Stmt;
 class Token;
 namespace ir {
@@ -30,11 +31,10 @@ class MX_EXPORT BreakStmt : public Stmt {
   friend class Stmt;
  public:
   static gap::generator<BreakStmt> in(const Index &index);
-  static gap::generator<BreakStmt> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<BreakStmt> by_id(const Index &, EntityId);
   static gap::generator<BreakStmt> in(const Fragment &frag);
   static gap::generator<BreakStmt> in(const File &file);
+  static gap::generator<BreakStmt> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<BreakStmt> from(const ir::Operation &op);
   static gap::generator<std::pair<BreakStmt, ir::Operation>> in(const Compilation &tu);
@@ -50,6 +50,8 @@ class MX_EXPORT BreakStmt : public Stmt {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<BreakStmt> by_id(const Index &, EntityId);
 
   static std::optional<BreakStmt> from_base(const Stmt &parent);
   inline static std::optional<BreakStmt> from(const Stmt &parent) {

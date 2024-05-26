@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Decl;
 class Expr;
+class File;
 class PseudoObjectExpr;
 class Stmt;
 class Token;
@@ -34,11 +35,10 @@ class MX_EXPORT PseudoObjectExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<PseudoObjectExpr> in(const Index &index);
-  static gap::generator<PseudoObjectExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<PseudoObjectExpr> by_id(const Index &, EntityId);
   static gap::generator<PseudoObjectExpr> in(const Fragment &frag);
   static gap::generator<PseudoObjectExpr> in(const File &file);
+  static gap::generator<PseudoObjectExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<PseudoObjectExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<PseudoObjectExpr, ir::Operation>> in(const Compilation &tu);
@@ -54,6 +54,8 @@ class MX_EXPORT PseudoObjectExpr : public Expr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<PseudoObjectExpr> by_id(const Index &, EntityId);
 
   static std::optional<PseudoObjectExpr> from_base(const Stmt &parent);
   inline static std::optional<PseudoObjectExpr> from(const Stmt &parent) {

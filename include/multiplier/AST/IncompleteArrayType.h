@@ -33,11 +33,12 @@ class MX_EXPORT IncompleteArrayType : public ArrayType {
   static gap::generator<IncompleteArrayType> in(const Index &index);
   static gap::generator<IncompleteArrayType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<IncompleteArrayType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::INCOMPLETE_ARRAY;
   }
+
+  static std::optional<IncompleteArrayType> by_id(const Index &, EntityId);
 
   static std::optional<IncompleteArrayType> from_base(const Type &parent);
   inline static std::optional<IncompleteArrayType> from(const Type &parent) {

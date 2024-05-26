@@ -25,6 +25,17 @@ static const TypeKind kUnresolvedUsingTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<UnresolvedUsingType> UnresolvedUsingType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kUnresolvedUsingTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<UnresolvedUsingType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<UnresolvedUsingType> UnresolvedUsingType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = UnresolvedUsingType::from(*ctx)) {
@@ -66,17 +77,6 @@ std::optional<UnresolvedUsingType> UnresolvedUsingType::from_base(const Type &pa
       return reinterpret_cast<const UnresolvedUsingType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<UnresolvedUsingType> UnresolvedUsingType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kUnresolvedUsingTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<UnresolvedUsingType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

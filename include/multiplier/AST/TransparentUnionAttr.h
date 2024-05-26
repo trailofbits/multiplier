@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class Token;
 class TransparentUnionAttr;
@@ -31,15 +32,16 @@ class MX_EXPORT TransparentUnionAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<TransparentUnionAttr> in(const Index &index);
-  static gap::generator<TransparentUnionAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<TransparentUnionAttr> by_id(const Index &, EntityId);
   static gap::generator<TransparentUnionAttr> in(const Fragment &frag);
   static gap::generator<TransparentUnionAttr> in(const File &file);
+  static gap::generator<TransparentUnionAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::TRANSPARENT_UNION;
   }
+
+  static std::optional<TransparentUnionAttr> by_id(const Index &, EntityId);
 
   static std::optional<TransparentUnionAttr> from_base(const Attr &parent);
   inline static std::optional<TransparentUnionAttr> from(const Attr &parent) {

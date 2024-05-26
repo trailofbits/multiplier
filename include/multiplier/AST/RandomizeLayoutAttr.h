@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class RandomizeLayoutAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT RandomizeLayoutAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<RandomizeLayoutAttr> in(const Index &index);
-  static gap::generator<RandomizeLayoutAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<RandomizeLayoutAttr> by_id(const Index &, EntityId);
   static gap::generator<RandomizeLayoutAttr> in(const Fragment &frag);
   static gap::generator<RandomizeLayoutAttr> in(const File &file);
+  static gap::generator<RandomizeLayoutAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::RANDOMIZE_LAYOUT;
   }
+
+  static std::optional<RandomizeLayoutAttr> by_id(const Index &, EntityId);
 
   static std::optional<RandomizeLayoutAttr> from_base(const Attr &parent);
   inline static std::optional<RandomizeLayoutAttr> from(const Attr &parent) {

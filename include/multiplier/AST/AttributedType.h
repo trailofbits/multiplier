@@ -34,11 +34,12 @@ class MX_EXPORT AttributedType : public Type {
   static gap::generator<AttributedType> in(const Index &index);
   static gap::generator<AttributedType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<AttributedType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::ATTRIBUTED;
   }
+
+  static std::optional<AttributedType> by_id(const Index &, EntityId);
 
   static std::optional<AttributedType> from_base(const Type &parent);
   inline static std::optional<AttributedType> from(const Type &parent) {

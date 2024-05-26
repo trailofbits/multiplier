@@ -19,6 +19,7 @@ class CXXRecordDecl;
 class ClassTemplatePartialSpecializationDecl;
 class ClassTemplateSpecializationDecl;
 class Decl;
+class File;
 class NamedDecl;
 class RecordDecl;
 class Stmt;
@@ -45,11 +46,10 @@ class MX_EXPORT ClassTemplatePartialSpecializationDecl : public ClassTemplateSpe
   friend class Decl;
  public:
   static gap::generator<ClassTemplatePartialSpecializationDecl> in(const Index &index);
-  static gap::generator<ClassTemplatePartialSpecializationDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ClassTemplatePartialSpecializationDecl> by_id(const Index &, EntityId);
   static gap::generator<ClassTemplatePartialSpecializationDecl> in(const Fragment &frag);
   static gap::generator<ClassTemplatePartialSpecializationDecl> in(const File &file);
+  static gap::generator<ClassTemplatePartialSpecializationDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<ClassTemplatePartialSpecializationDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<ClassTemplatePartialSpecializationDecl, ir::Operation>> in(const Compilation &tu);
@@ -69,6 +69,8 @@ class MX_EXPORT ClassTemplatePartialSpecializationDecl : public ClassTemplateSpe
   ClassTemplatePartialSpecializationDecl canonical_declaration(void) const;
   std::optional<ClassTemplatePartialSpecializationDecl> definition(void) const;
   gap::generator<ClassTemplatePartialSpecializationDecl> redeclarations(void) const &;
+  static std::optional<ClassTemplatePartialSpecializationDecl> by_id(const Index &, EntityId);
+
   static std::optional<ClassTemplatePartialSpecializationDecl> from_base(const Decl &parent);
   inline static std::optional<ClassTemplatePartialSpecializationDecl> from(const Decl &parent) {
     return from_base(parent);

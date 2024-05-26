@@ -16,6 +16,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class RISCVInterruptAttr;
 class Token;
@@ -32,15 +33,16 @@ class MX_EXPORT RISCVInterruptAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<RISCVInterruptAttr> in(const Index &index);
-  static gap::generator<RISCVInterruptAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<RISCVInterruptAttr> by_id(const Index &, EntityId);
   static gap::generator<RISCVInterruptAttr> in(const Fragment &frag);
   static gap::generator<RISCVInterruptAttr> in(const File &file);
+  static gap::generator<RISCVInterruptAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::RISCV_INTERRUPT;
   }
+
+  static std::optional<RISCVInterruptAttr> by_id(const Index &, EntityId);
 
   static std::optional<RISCVInterruptAttr> from_base(const Attr &parent);
   inline static std::optional<RISCVInterruptAttr> from(const Attr &parent) {

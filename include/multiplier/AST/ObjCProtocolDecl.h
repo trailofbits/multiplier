@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Reference;
 class Decl;
+class File;
 class NamedDecl;
 class ObjCContainerDecl;
 class ObjCProtocolDecl;
@@ -36,11 +37,10 @@ class MX_EXPORT ObjCProtocolDecl : public ObjCContainerDecl {
   friend class Decl;
  public:
   static gap::generator<ObjCProtocolDecl> in(const Index &index);
-  static gap::generator<ObjCProtocolDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ObjCProtocolDecl> by_id(const Index &, EntityId);
   static gap::generator<ObjCProtocolDecl> in(const Fragment &frag);
   static gap::generator<ObjCProtocolDecl> in(const File &file);
+  static gap::generator<ObjCProtocolDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<ObjCProtocolDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<ObjCProtocolDecl, ir::Operation>> in(const Compilation &tu);
@@ -60,6 +60,8 @@ class MX_EXPORT ObjCProtocolDecl : public ObjCContainerDecl {
   ObjCProtocolDecl canonical_declaration(void) const;
   std::optional<ObjCProtocolDecl> definition(void) const;
   gap::generator<ObjCProtocolDecl> redeclarations(void) const &;
+  static std::optional<ObjCProtocolDecl> by_id(const Index &, EntityId);
+
   static std::optional<ObjCProtocolDecl> from_base(const Decl &parent);
   inline static std::optional<ObjCProtocolDecl> from(const Decl &parent) {
     return from_base(parent);

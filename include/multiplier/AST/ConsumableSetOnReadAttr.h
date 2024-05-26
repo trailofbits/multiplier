@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Attr;
 class ConsumableSetOnReadAttr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT ConsumableSetOnReadAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ConsumableSetOnReadAttr> in(const Index &index);
-  static gap::generator<ConsumableSetOnReadAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ConsumableSetOnReadAttr> by_id(const Index &, EntityId);
   static gap::generator<ConsumableSetOnReadAttr> in(const Fragment &frag);
   static gap::generator<ConsumableSetOnReadAttr> in(const File &file);
+  static gap::generator<ConsumableSetOnReadAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CONSUMABLE_SET_ON_READ;
   }
+
+  static std::optional<ConsumableSetOnReadAttr> by_id(const Index &, EntityId);
 
   static std::optional<ConsumableSetOnReadAttr> from_base(const Attr &parent);
   inline static std::optional<ConsumableSetOnReadAttr> from(const Attr &parent) {

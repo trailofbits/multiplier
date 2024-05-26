@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class InheritableParamAttr;
 class Token;
@@ -33,15 +34,16 @@ class MX_EXPORT UseHandleAttr : public InheritableParamAttr {
   friend class Attr;
  public:
   static gap::generator<UseHandleAttr> in(const Index &index);
-  static gap::generator<UseHandleAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<UseHandleAttr> by_id(const Index &, EntityId);
   static gap::generator<UseHandleAttr> in(const Fragment &frag);
   static gap::generator<UseHandleAttr> in(const File &file);
+  static gap::generator<UseHandleAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::USE_HANDLE;
   }
+
+  static std::optional<UseHandleAttr> by_id(const Index &, EntityId);
 
   static std::optional<UseHandleAttr> from_base(const Attr &parent);
   inline static std::optional<UseHandleAttr> from(const Attr &parent) {

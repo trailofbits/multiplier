@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Attr;
 class EnforceTCBLeafAttr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT EnforceTCBLeafAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<EnforceTCBLeafAttr> in(const Index &index);
-  static gap::generator<EnforceTCBLeafAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<EnforceTCBLeafAttr> by_id(const Index &, EntityId);
   static gap::generator<EnforceTCBLeafAttr> in(const Fragment &frag);
   static gap::generator<EnforceTCBLeafAttr> in(const File &file);
+  static gap::generator<EnforceTCBLeafAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ENFORCE_TCB_LEAF;
   }
+
+  static std::optional<EnforceTCBLeafAttr> by_id(const Index &, EntityId);
 
   static std::optional<EnforceTCBLeafAttr> from_base(const Attr &parent);
   inline static std::optional<EnforceTCBLeafAttr> from(const Attr &parent) {

@@ -32,6 +32,7 @@ class MX_EXPORT ArrayType : public Type {
   static gap::generator<ArrayType> in(const Index &index);
   static gap::generator<ArrayType> containing(const Token &tok);
   bool contains(const Token &tok) const;
+
   static std::optional<ArrayType> by_id(const Index &, EntityId);
 
   static std::optional<ArrayType> from_base(const Type &parent);

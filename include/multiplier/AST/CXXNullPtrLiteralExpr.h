@@ -17,6 +17,7 @@ class Index;
 class CXXNullPtrLiteralExpr;
 class Decl;
 class Expr;
+class File;
 class Stmt;
 class Token;
 class ValueStmt;
@@ -34,11 +35,10 @@ class MX_EXPORT CXXNullPtrLiteralExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<CXXNullPtrLiteralExpr> in(const Index &index);
-  static gap::generator<CXXNullPtrLiteralExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CXXNullPtrLiteralExpr> by_id(const Index &, EntityId);
   static gap::generator<CXXNullPtrLiteralExpr> in(const Fragment &frag);
   static gap::generator<CXXNullPtrLiteralExpr> in(const File &file);
+  static gap::generator<CXXNullPtrLiteralExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<CXXNullPtrLiteralExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<CXXNullPtrLiteralExpr, ir::Operation>> in(const Compilation &tu);
@@ -54,6 +54,8 @@ class MX_EXPORT CXXNullPtrLiteralExpr : public Expr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<CXXNullPtrLiteralExpr> by_id(const Index &, EntityId);
 
   static std::optional<CXXNullPtrLiteralExpr> from_base(const Stmt &parent);
   inline static std::optional<CXXNullPtrLiteralExpr> from(const Stmt &parent) {

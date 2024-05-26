@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Attr;
 class CPUSpecificAttr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT CPUSpecificAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<CPUSpecificAttr> in(const Index &index);
-  static gap::generator<CPUSpecificAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CPUSpecificAttr> by_id(const Index &, EntityId);
   static gap::generator<CPUSpecificAttr> in(const Fragment &frag);
   static gap::generator<CPUSpecificAttr> in(const File &file);
+  static gap::generator<CPUSpecificAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CPU_SPECIFIC;
   }
+
+  static std::optional<CPUSpecificAttr> by_id(const Index &, EntityId);
 
   static std::optional<CPUSpecificAttr> from_base(const Attr &parent);
   inline static std::optional<CPUSpecificAttr> from(const Attr &parent) {

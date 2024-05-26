@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class AssertExclusiveLockAttr;
 class Attr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT AssertExclusiveLockAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<AssertExclusiveLockAttr> in(const Index &index);
-  static gap::generator<AssertExclusiveLockAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<AssertExclusiveLockAttr> by_id(const Index &, EntityId);
   static gap::generator<AssertExclusiveLockAttr> in(const Fragment &frag);
   static gap::generator<AssertExclusiveLockAttr> in(const File &file);
+  static gap::generator<AssertExclusiveLockAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ASSERT_EXCLUSIVE_LOCK;
   }
+
+  static std::optional<AssertExclusiveLockAttr> by_id(const Index &, EntityId);
 
   static std::optional<AssertExclusiveLockAttr> from_base(const Attr &parent);
   inline static std::optional<AssertExclusiveLockAttr> from(const Attr &parent) {

@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Decl;
 class Expr;
+class File;
 class OMPExecutableDirective;
 class OMPLoopBasedDirective;
 class OMPLoopDirective;
@@ -37,11 +38,10 @@ class MX_EXPORT OMPParallelForDirective : public OMPLoopDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPParallelForDirective> in(const Index &index);
-  static gap::generator<OMPParallelForDirective> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<OMPParallelForDirective> by_id(const Index &, EntityId);
   static gap::generator<OMPParallelForDirective> in(const Fragment &frag);
   static gap::generator<OMPParallelForDirective> in(const File &file);
+  static gap::generator<OMPParallelForDirective> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<OMPParallelForDirective> from(const ir::Operation &op);
   static gap::generator<std::pair<OMPParallelForDirective, ir::Operation>> in(const Compilation &tu);
@@ -57,6 +57,8 @@ class MX_EXPORT OMPParallelForDirective : public OMPLoopDirective {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<OMPParallelForDirective> by_id(const Index &, EntityId);
 
   static std::optional<OMPParallelForDirective> from_base(const Stmt &parent);
   inline static std::optional<OMPParallelForDirective> from(const Stmt &parent) {

@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class AMDGPUKernelCallAttr;
 class Attr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT AMDGPUKernelCallAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<AMDGPUKernelCallAttr> in(const Index &index);
-  static gap::generator<AMDGPUKernelCallAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<AMDGPUKernelCallAttr> by_id(const Index &, EntityId);
   static gap::generator<AMDGPUKernelCallAttr> in(const Fragment &frag);
   static gap::generator<AMDGPUKernelCallAttr> in(const File &file);
+  static gap::generator<AMDGPUKernelCallAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::AMDGPU_KERNEL_CALL;
   }
+
+  static std::optional<AMDGPUKernelCallAttr> by_id(const Index &, EntityId);
 
   static std::optional<AMDGPUKernelCallAttr> from_base(const Attr &parent);
   inline static std::optional<AMDGPUKernelCallAttr> from(const Attr &parent) {

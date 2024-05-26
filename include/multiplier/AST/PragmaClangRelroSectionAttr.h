@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class PragmaClangRelroSectionAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT PragmaClangRelroSectionAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<PragmaClangRelroSectionAttr> in(const Index &index);
-  static gap::generator<PragmaClangRelroSectionAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<PragmaClangRelroSectionAttr> by_id(const Index &, EntityId);
   static gap::generator<PragmaClangRelroSectionAttr> in(const Fragment &frag);
   static gap::generator<PragmaClangRelroSectionAttr> in(const File &file);
+  static gap::generator<PragmaClangRelroSectionAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::PRAGMA_CLANG_RELRO_SECTION;
   }
+
+  static std::optional<PragmaClangRelroSectionAttr> by_id(const Index &, EntityId);
 
   static std::optional<PragmaClangRelroSectionAttr> from_base(const Attr &parent);
   inline static std::optional<PragmaClangRelroSectionAttr> from(const Attr &parent) {

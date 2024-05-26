@@ -34,11 +34,12 @@ class MX_EXPORT DependentSizedMatrixType : public MatrixType {
   static gap::generator<DependentSizedMatrixType> in(const Index &index);
   static gap::generator<DependentSizedMatrixType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<DependentSizedMatrixType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::DEPENDENT_SIZED_MATRIX;
   }
+
+  static std::optional<DependentSizedMatrixType> by_id(const Index &, EntityId);
 
   static std::optional<DependentSizedMatrixType> from_base(const Type &parent);
   inline static std::optional<DependentSizedMatrixType> from(const Type &parent) {

@@ -33,11 +33,12 @@ class MX_EXPORT DecayedType : public AdjustedType {
   static gap::generator<DecayedType> in(const Index &index);
   static gap::generator<DecayedType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<DecayedType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::DECAYED;
   }
+
+  static std::optional<DecayedType> by_id(const Index &, EntityId);
 
   static std::optional<DecayedType> from_base(const Type &parent);
   inline static std::optional<DecayedType> from(const Type &parent) {

@@ -17,6 +17,7 @@ class Index;
 class Attr;
 class ExclusiveTrylockFunctionAttr;
 class Expr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -32,15 +33,16 @@ class MX_EXPORT ExclusiveTrylockFunctionAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ExclusiveTrylockFunctionAttr> in(const Index &index);
-  static gap::generator<ExclusiveTrylockFunctionAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ExclusiveTrylockFunctionAttr> by_id(const Index &, EntityId);
   static gap::generator<ExclusiveTrylockFunctionAttr> in(const Fragment &frag);
   static gap::generator<ExclusiveTrylockFunctionAttr> in(const File &file);
+  static gap::generator<ExclusiveTrylockFunctionAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::EXCLUSIVE_TRYLOCK_FUNCTION;
   }
+
+  static std::optional<ExclusiveTrylockFunctionAttr> by_id(const Index &, EntityId);
 
   static std::optional<ExclusiveTrylockFunctionAttr> from_base(const Attr &parent);
   inline static std::optional<ExclusiveTrylockFunctionAttr> from(const Attr &parent) {

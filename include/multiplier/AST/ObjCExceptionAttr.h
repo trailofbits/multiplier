@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class ObjCExceptionAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT ObjCExceptionAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<ObjCExceptionAttr> in(const Index &index);
-  static gap::generator<ObjCExceptionAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ObjCExceptionAttr> by_id(const Index &, EntityId);
   static gap::generator<ObjCExceptionAttr> in(const Fragment &frag);
   static gap::generator<ObjCExceptionAttr> in(const File &file);
+  static gap::generator<ObjCExceptionAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OBJ_C_EXCEPTION;
   }
+
+  static std::optional<ObjCExceptionAttr> by_id(const Index &, EntityId);
 
   static std::optional<ObjCExceptionAttr> from_base(const Attr &parent);
   inline static std::optional<ObjCExceptionAttr> from(const Attr &parent) {

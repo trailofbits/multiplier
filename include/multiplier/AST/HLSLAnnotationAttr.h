@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class HLSLAnnotationAttr;
 class InheritableAttr;
 class Token;
@@ -31,11 +32,12 @@ class MX_EXPORT HLSLAnnotationAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<HLSLAnnotationAttr> in(const Index &index);
-  static gap::generator<HLSLAnnotationAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<HLSLAnnotationAttr> by_id(const Index &, EntityId);
   static gap::generator<HLSLAnnotationAttr> in(const Fragment &frag);
   static gap::generator<HLSLAnnotationAttr> in(const File &file);
+  static gap::generator<HLSLAnnotationAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
+
+  static std::optional<HLSLAnnotationAttr> by_id(const Index &, EntityId);
 
   static std::optional<HLSLAnnotationAttr> from_base(const Attr &parent);
   inline static std::optional<HLSLAnnotationAttr> from(const Attr &parent) {

@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class StrictFPAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT StrictFPAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<StrictFPAttr> in(const Index &index);
-  static gap::generator<StrictFPAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<StrictFPAttr> by_id(const Index &, EntityId);
   static gap::generator<StrictFPAttr> in(const Fragment &frag);
   static gap::generator<StrictFPAttr> in(const File &file);
+  static gap::generator<StrictFPAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::STRICT_FP;
   }
+
+  static std::optional<StrictFPAttr> by_id(const Index &, EntityId);
 
   static std::optional<StrictFPAttr> from_base(const Attr &parent);
   inline static std::optional<StrictFPAttr> from(const Attr &parent) {

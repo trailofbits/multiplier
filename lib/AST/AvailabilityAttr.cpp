@@ -8,6 +8,7 @@
 
 #include <multiplier/AST/AvailabilityAttr.h>
 #include <multiplier/AST/Attr.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/AST/InheritableAttr.h>
 #include <multiplier/Frontend/Token.h>
 
@@ -24,6 +25,43 @@ static const AttrKind kAvailabilityAttrDerivedKinds[] = {
     AvailabilityAttr::static_kind(),
 };
 }  // namespace
+
+gap::generator<AvailabilityAttr> AvailabilityAttr::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (AttrKind k : kAvailabilityAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
+      if (std::optional<AvailabilityAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<AvailabilityAttr> AvailabilityAttr::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (AttrKind k : kAvailabilityAttrDerivedKinds) {
+      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+        if (std::optional<AvailabilityAttr> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+gap::generator<AvailabilityAttr> AvailabilityAttr::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (AttrKind k : kAvailabilityAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+      if (std::optional<AvailabilityAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
 
 gap::generator<AvailabilityAttr> AvailabilityAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -69,43 +107,6 @@ std::optional<AvailabilityAttr> AvailabilityAttr::from_base(const Attr &parent) 
   }
 }
 
-gap::generator<AvailabilityAttr> AvailabilityAttr::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (AttrKind k : kAvailabilityAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<AvailabilityAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<AvailabilityAttr> AvailabilityAttr::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (AttrKind k : kAvailabilityAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<AvailabilityAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<AvailabilityAttr> AvailabilityAttr::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (AttrKind k : kAvailabilityAttrDerivedKinds) {
-      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<AvailabilityAttr> e = from_base(std::move(eptr))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
-  }
-}
-
 std::optional<AvailabilityAttr> AvailabilityAttr::from(const Reference &r) {
   return AvailabilityAttr::from(r.as_attribute());
 }
@@ -125,21 +126,21 @@ std::optional<AvailabilityAttr> AvailabilityAttr::from(const TokenContext &t) {
 }
 
 std::string_view AvailabilityAttr::message(void) const {
-  capnp::Text::Reader data = impl->reader.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal11();
   return std::string_view(data.cStr(), data.size());
 }
 
 std::string_view AvailabilityAttr::replacement(void) const {
-  capnp::Text::Reader data = impl->reader.getVal21();
+  capnp::Text::Reader data = impl->reader.getVal23();
   return std::string_view(data.cStr(), data.size());
 }
 
 bool AvailabilityAttr::strict(void) const {
-  return impl->reader.getVal12();
+  return impl->reader.getVal14();
 }
 
 bool AvailabilityAttr::unavailable(void) const {
-  return impl->reader.getVal13();
+  return impl->reader.getVal15();
 }
 
 #pragma GCC diagnostic pop

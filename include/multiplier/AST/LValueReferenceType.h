@@ -33,11 +33,12 @@ class MX_EXPORT LValueReferenceType : public ReferenceType {
   static gap::generator<LValueReferenceType> in(const Index &index);
   static gap::generator<LValueReferenceType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<LValueReferenceType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::L_VALUE_REFERENCE;
   }
+
+  static std::optional<LValueReferenceType> by_id(const Index &, EntityId);
 
   static std::optional<LValueReferenceType> from_base(const Type &parent);
   inline static std::optional<LValueReferenceType> from(const Type &parent) {

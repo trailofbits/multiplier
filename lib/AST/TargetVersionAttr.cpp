@@ -8,6 +8,7 @@
 
 #include <multiplier/AST/TargetVersionAttr.h>
 #include <multiplier/AST/Attr.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/AST/InheritableAttr.h>
 #include <multiplier/Frontend/Token.h>
 
@@ -24,6 +25,43 @@ static const AttrKind kTargetVersionAttrDerivedKinds[] = {
     TargetVersionAttr::static_kind(),
 };
 }  // namespace
+
+gap::generator<TargetVersionAttr> TargetVersionAttr::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (AttrKind k : kTargetVersionAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
+      if (std::optional<TargetVersionAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<TargetVersionAttr> TargetVersionAttr::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (AttrKind k : kTargetVersionAttrDerivedKinds) {
+      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+        if (std::optional<TargetVersionAttr> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+gap::generator<TargetVersionAttr> TargetVersionAttr::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (AttrKind k : kTargetVersionAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+      if (std::optional<TargetVersionAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
 
 gap::generator<TargetVersionAttr> TargetVersionAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -69,43 +107,6 @@ std::optional<TargetVersionAttr> TargetVersionAttr::from_base(const Attr &parent
   }
 }
 
-gap::generator<TargetVersionAttr> TargetVersionAttr::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (AttrKind k : kTargetVersionAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<TargetVersionAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<TargetVersionAttr> TargetVersionAttr::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (AttrKind k : kTargetVersionAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<TargetVersionAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<TargetVersionAttr> TargetVersionAttr::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (AttrKind k : kTargetVersionAttrDerivedKinds) {
-      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<TargetVersionAttr> e = from_base(std::move(eptr))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
-  }
-}
-
 std::optional<TargetVersionAttr> TargetVersionAttr::from(const Reference &r) {
   return TargetVersionAttr::from(r.as_attribute());
 }
@@ -125,17 +126,17 @@ std::optional<TargetVersionAttr> TargetVersionAttr::from(const TokenContext &t) 
 }
 
 std::string_view TargetVersionAttr::name(void) const {
-  capnp::Text::Reader data = impl->reader.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal11();
   return std::string_view(data.cStr(), data.size());
 }
 
 std::string_view TargetVersionAttr::names_string(void) const {
-  capnp::Text::Reader data = impl->reader.getVal21();
+  capnp::Text::Reader data = impl->reader.getVal23();
   return std::string_view(data.cStr(), data.size());
 }
 
 bool TargetVersionAttr::is_default_version(void) const {
-  return impl->reader.getVal12();
+  return impl->reader.getVal14();
 }
 
 #pragma GCC diagnostic pop

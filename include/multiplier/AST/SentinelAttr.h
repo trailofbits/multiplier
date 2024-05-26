@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class SentinelAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT SentinelAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<SentinelAttr> in(const Index &index);
-  static gap::generator<SentinelAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<SentinelAttr> by_id(const Index &, EntityId);
   static gap::generator<SentinelAttr> in(const Fragment &frag);
   static gap::generator<SentinelAttr> in(const File &file);
+  static gap::generator<SentinelAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SENTINEL;
   }
+
+  static std::optional<SentinelAttr> by_id(const Index &, EntityId);
 
   static std::optional<SentinelAttr> from_base(const Attr &parent);
   inline static std::optional<SentinelAttr> from(const Attr &parent) {

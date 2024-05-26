@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Decl;
 class Expr;
+class File;
 class ObjCSelectorExpr;
 class Stmt;
 class Token;
@@ -34,11 +35,10 @@ class MX_EXPORT ObjCSelectorExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<ObjCSelectorExpr> in(const Index &index);
-  static gap::generator<ObjCSelectorExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ObjCSelectorExpr> by_id(const Index &, EntityId);
   static gap::generator<ObjCSelectorExpr> in(const Fragment &frag);
   static gap::generator<ObjCSelectorExpr> in(const File &file);
+  static gap::generator<ObjCSelectorExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<ObjCSelectorExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<ObjCSelectorExpr, ir::Operation>> in(const Compilation &tu);
@@ -54,6 +54,8 @@ class MX_EXPORT ObjCSelectorExpr : public Expr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<ObjCSelectorExpr> by_id(const Index &, EntityId);
 
   static std::optional<ObjCSelectorExpr> from_base(const Stmt &parent);
   inline static std::optional<ObjCSelectorExpr> from(const Stmt &parent) {

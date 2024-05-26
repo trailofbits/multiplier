@@ -9,6 +9,7 @@
 #include <multiplier/AST/OMPDeclareTargetDeclAttr.h>
 #include <multiplier/AST/Attr.h>
 #include <multiplier/AST/Expr.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/AST/InheritableAttr.h>
 #include <multiplier/Frontend/Token.h>
 
@@ -25,6 +26,43 @@ static const AttrKind kOMPDeclareTargetDeclAttrDerivedKinds[] = {
     OMPDeclareTargetDeclAttr::static_kind(),
 };
 }  // namespace
+
+gap::generator<OMPDeclareTargetDeclAttr> OMPDeclareTargetDeclAttr::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (AttrKind k : kOMPDeclareTargetDeclAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
+      if (std::optional<OMPDeclareTargetDeclAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<OMPDeclareTargetDeclAttr> OMPDeclareTargetDeclAttr::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (AttrKind k : kOMPDeclareTargetDeclAttrDerivedKinds) {
+      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+        if (std::optional<OMPDeclareTargetDeclAttr> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+gap::generator<OMPDeclareTargetDeclAttr> OMPDeclareTargetDeclAttr::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (AttrKind k : kOMPDeclareTargetDeclAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+      if (std::optional<OMPDeclareTargetDeclAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
 
 gap::generator<OMPDeclareTargetDeclAttr> OMPDeclareTargetDeclAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -70,43 +108,6 @@ std::optional<OMPDeclareTargetDeclAttr> OMPDeclareTargetDeclAttr::from_base(cons
   }
 }
 
-gap::generator<OMPDeclareTargetDeclAttr> OMPDeclareTargetDeclAttr::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (AttrKind k : kOMPDeclareTargetDeclAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<OMPDeclareTargetDeclAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<OMPDeclareTargetDeclAttr> OMPDeclareTargetDeclAttr::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (AttrKind k : kOMPDeclareTargetDeclAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<OMPDeclareTargetDeclAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<OMPDeclareTargetDeclAttr> OMPDeclareTargetDeclAttr::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (AttrKind k : kOMPDeclareTargetDeclAttrDerivedKinds) {
-      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<OMPDeclareTargetDeclAttr> e = from_base(std::move(eptr))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
-  }
-}
-
 std::optional<OMPDeclareTargetDeclAttr> OMPDeclareTargetDeclAttr::from(const Reference &r) {
   return OMPDeclareTargetDeclAttr::from(r.as_attribute());
 }
@@ -126,20 +127,20 @@ std::optional<OMPDeclareTargetDeclAttr> OMPDeclareTargetDeclAttr::from(const Tok
 }
 
 OMPDeclareTargetDeclAttrDevTypeTy OMPDeclareTargetDeclAttr::dev_type(void) const {
-  return static_cast<OMPDeclareTargetDeclAttrDevTypeTy>(impl->reader.getVal10());
+  return static_cast<OMPDeclareTargetDeclAttrDevTypeTy>(impl->reader.getVal12());
 }
 
 bool OMPDeclareTargetDeclAttr::indirect(void) const {
-  return impl->reader.getVal12();
+  return impl->reader.getVal14();
 }
 
 Expr OMPDeclareTargetDeclAttr::indirect_expression(void) const {
-  RawEntityId eid = impl->reader.getVal8();
+  RawEntityId eid = impl->reader.getVal10();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 OMPDeclareTargetDeclAttrMapTypeTy OMPDeclareTargetDeclAttr::map_type(void) const {
-  return static_cast<OMPDeclareTargetDeclAttrMapTypeTy>(impl->reader.getVal18());
+  return static_cast<OMPDeclareTargetDeclAttrMapTypeTy>(impl->reader.getVal20());
 }
 
 #pragma GCC diagnostic pop

@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Attr;
 class Expr;
+class File;
 class InheritableAttr;
 class SharedTrylockFunctionAttr;
 class Token;
@@ -32,15 +33,16 @@ class MX_EXPORT SharedTrylockFunctionAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<SharedTrylockFunctionAttr> in(const Index &index);
-  static gap::generator<SharedTrylockFunctionAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<SharedTrylockFunctionAttr> by_id(const Index &, EntityId);
   static gap::generator<SharedTrylockFunctionAttr> in(const Fragment &frag);
   static gap::generator<SharedTrylockFunctionAttr> in(const File &file);
+  static gap::generator<SharedTrylockFunctionAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SHARED_TRYLOCK_FUNCTION;
   }
+
+  static std::optional<SharedTrylockFunctionAttr> by_id(const Index &, EntityId);
 
   static std::optional<SharedTrylockFunctionAttr> from_base(const Attr &parent);
   inline static std::optional<SharedTrylockFunctionAttr> from(const Attr &parent) {

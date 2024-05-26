@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Decl;
+class File;
 class OMPCancellationPointDirective;
 class OMPExecutableDirective;
 class Stmt;
@@ -32,11 +33,10 @@ class MX_EXPORT OMPCancellationPointDirective : public OMPExecutableDirective {
   friend class Stmt;
  public:
   static gap::generator<OMPCancellationPointDirective> in(const Index &index);
-  static gap::generator<OMPCancellationPointDirective> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<OMPCancellationPointDirective> by_id(const Index &, EntityId);
   static gap::generator<OMPCancellationPointDirective> in(const Fragment &frag);
   static gap::generator<OMPCancellationPointDirective> in(const File &file);
+  static gap::generator<OMPCancellationPointDirective> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<OMPCancellationPointDirective> from(const ir::Operation &op);
   static gap::generator<std::pair<OMPCancellationPointDirective, ir::Operation>> in(const Compilation &tu);
@@ -52,6 +52,8 @@ class MX_EXPORT OMPCancellationPointDirective : public OMPExecutableDirective {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<OMPCancellationPointDirective> by_id(const Index &, EntityId);
 
   static std::optional<OMPCancellationPointDirective> from_base(const Stmt &parent);
   inline static std::optional<OMPCancellationPointDirective> from(const Stmt &parent) {

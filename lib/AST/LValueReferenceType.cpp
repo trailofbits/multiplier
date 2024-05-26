@@ -25,6 +25,17 @@ static const TypeKind kLValueReferenceTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<LValueReferenceType> LValueReferenceType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kLValueReferenceTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<LValueReferenceType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<LValueReferenceType> LValueReferenceType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = LValueReferenceType::from(*ctx)) {
@@ -66,17 +77,6 @@ std::optional<LValueReferenceType> LValueReferenceType::from_base(const Type &pa
       return reinterpret_cast<const LValueReferenceType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<LValueReferenceType> LValueReferenceType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kLValueReferenceTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<LValueReferenceType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

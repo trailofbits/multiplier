@@ -18,6 +18,7 @@ class Fragment;
 class Index;
 class Attr;
 class Expr;
+class File;
 class InheritableAttr;
 class OMPDeclareTargetDeclAttr;
 class Token;
@@ -34,15 +35,16 @@ class MX_EXPORT OMPDeclareTargetDeclAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<OMPDeclareTargetDeclAttr> in(const Index &index);
-  static gap::generator<OMPDeclareTargetDeclAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<OMPDeclareTargetDeclAttr> by_id(const Index &, EntityId);
   static gap::generator<OMPDeclareTargetDeclAttr> in(const Fragment &frag);
   static gap::generator<OMPDeclareTargetDeclAttr> in(const File &file);
+  static gap::generator<OMPDeclareTargetDeclAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OMP_DECLARE_TARGET_DECL;
   }
+
+  static std::optional<OMPDeclareTargetDeclAttr> by_id(const Index &, EntityId);
 
   static std::optional<OMPDeclareTargetDeclAttr> from_base(const Attr &parent);
   inline static std::optional<OMPDeclareTargetDeclAttr> from(const Attr &parent) {

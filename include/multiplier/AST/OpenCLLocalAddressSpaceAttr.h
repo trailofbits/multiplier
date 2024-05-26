@@ -16,6 +16,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class OpenCLLocalAddressSpaceAttr;
 class Token;
 class TypeAttr;
@@ -32,15 +33,16 @@ class MX_EXPORT OpenCLLocalAddressSpaceAttr : public TypeAttr {
   friend class Attr;
  public:
   static gap::generator<OpenCLLocalAddressSpaceAttr> in(const Index &index);
-  static gap::generator<OpenCLLocalAddressSpaceAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<OpenCLLocalAddressSpaceAttr> by_id(const Index &, EntityId);
   static gap::generator<OpenCLLocalAddressSpaceAttr> in(const Fragment &frag);
   static gap::generator<OpenCLLocalAddressSpaceAttr> in(const File &file);
+  static gap::generator<OpenCLLocalAddressSpaceAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OPEN_CL_LOCAL_ADDRESS_SPACE;
   }
+
+  static std::optional<OpenCLLocalAddressSpaceAttr> by_id(const Index &, EntityId);
 
   static std::optional<OpenCLLocalAddressSpaceAttr> from_base(const Attr &parent);
   inline static std::optional<OpenCLLocalAddressSpaceAttr> from(const Attr &parent) {

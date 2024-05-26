@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Attr;
 class CalledOnceAttr;
+class File;
 class Token;
 namespace ir {
 class Operation;
@@ -29,15 +30,16 @@ class MX_EXPORT CalledOnceAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<CalledOnceAttr> in(const Index &index);
-  static gap::generator<CalledOnceAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CalledOnceAttr> by_id(const Index &, EntityId);
   static gap::generator<CalledOnceAttr> in(const Fragment &frag);
   static gap::generator<CalledOnceAttr> in(const File &file);
+  static gap::generator<CalledOnceAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::CALLED_ONCE;
   }
+
+  static std::optional<CalledOnceAttr> by_id(const Index &, EntityId);
 
   static std::optional<CalledOnceAttr> from_base(const Attr &parent);
   inline static std::optional<CalledOnceAttr> from(const Attr &parent) {

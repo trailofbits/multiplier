@@ -25,6 +25,17 @@ static const TypeKind kFunctionNoProtoTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<FunctionNoProtoType> FunctionNoProtoType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kFunctionNoProtoTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<FunctionNoProtoType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<FunctionNoProtoType> FunctionNoProtoType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = FunctionNoProtoType::from(*ctx)) {
@@ -66,17 +77,6 @@ std::optional<FunctionNoProtoType> FunctionNoProtoType::from_base(const Type &pa
       return reinterpret_cast<const FunctionNoProtoType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<FunctionNoProtoType> FunctionNoProtoType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kFunctionNoProtoTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<FunctionNoProtoType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

@@ -17,6 +17,7 @@ class Index;
 class Reference;
 class CapturedDecl;
 class Decl;
+class File;
 class ImplicitParamDecl;
 class Stmt;
 class Token;
@@ -32,11 +33,10 @@ class MX_EXPORT CapturedDecl : public Decl {
   friend class Decl;
  public:
   static gap::generator<CapturedDecl> in(const Index &index);
-  static gap::generator<CapturedDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CapturedDecl> by_id(const Index &, EntityId);
   static gap::generator<CapturedDecl> in(const Fragment &frag);
   static gap::generator<CapturedDecl> in(const File &file);
+  static gap::generator<CapturedDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<CapturedDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<CapturedDecl, ir::Operation>> in(const Compilation &tu);
@@ -56,6 +56,8 @@ class MX_EXPORT CapturedDecl : public Decl {
   CapturedDecl canonical_declaration(void) const;
   std::optional<CapturedDecl> definition(void) const;
   gap::generator<CapturedDecl> redeclarations(void) const &;
+  static std::optional<CapturedDecl> by_id(const Index &, EntityId);
+
   static std::optional<CapturedDecl> from_base(const Decl &parent);
   inline static std::optional<CapturedDecl> from(const Decl &parent) {
     return from_base(parent);

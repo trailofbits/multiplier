@@ -26,6 +26,17 @@ static const TypeKind kSubstTemplateTypeParmTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<SubstTemplateTypeParmType> SubstTemplateTypeParmType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kSubstTemplateTypeParmTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<SubstTemplateTypeParmType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<SubstTemplateTypeParmType> SubstTemplateTypeParmType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = SubstTemplateTypeParmType::from(*ctx)) {
@@ -67,17 +78,6 @@ std::optional<SubstTemplateTypeParmType> SubstTemplateTypeParmType::from_base(co
       return reinterpret_cast<const SubstTemplateTypeParmType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<SubstTemplateTypeParmType> SubstTemplateTypeParmType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kSubstTemplateTypeParmTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<SubstTemplateTypeParmType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

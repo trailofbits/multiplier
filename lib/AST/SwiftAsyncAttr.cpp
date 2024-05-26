@@ -8,6 +8,7 @@
 
 #include <multiplier/AST/SwiftAsyncAttr.h>
 #include <multiplier/AST/Attr.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/AST/InheritableAttr.h>
 #include <multiplier/Frontend/Token.h>
 
@@ -24,6 +25,43 @@ static const AttrKind kSwiftAsyncAttrDerivedKinds[] = {
     SwiftAsyncAttr::static_kind(),
 };
 }  // namespace
+
+gap::generator<SwiftAsyncAttr> SwiftAsyncAttr::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (AttrKind k : kSwiftAsyncAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
+      if (std::optional<SwiftAsyncAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<SwiftAsyncAttr> SwiftAsyncAttr::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (AttrKind k : kSwiftAsyncAttrDerivedKinds) {
+      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+        if (std::optional<SwiftAsyncAttr> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+gap::generator<SwiftAsyncAttr> SwiftAsyncAttr::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (AttrKind k : kSwiftAsyncAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+      if (std::optional<SwiftAsyncAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
 
 gap::generator<SwiftAsyncAttr> SwiftAsyncAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -69,43 +107,6 @@ std::optional<SwiftAsyncAttr> SwiftAsyncAttr::from_base(const Attr &parent) {
   }
 }
 
-gap::generator<SwiftAsyncAttr> SwiftAsyncAttr::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (AttrKind k : kSwiftAsyncAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<SwiftAsyncAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<SwiftAsyncAttr> SwiftAsyncAttr::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (AttrKind k : kSwiftAsyncAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<SwiftAsyncAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<SwiftAsyncAttr> SwiftAsyncAttr::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (AttrKind k : kSwiftAsyncAttrDerivedKinds) {
-      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<SwiftAsyncAttr> e = from_base(std::move(eptr))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
-  }
-}
-
 std::optional<SwiftAsyncAttr> SwiftAsyncAttr::from(const Reference &r) {
   return SwiftAsyncAttr::from(r.as_attribute());
 }
@@ -125,7 +126,7 @@ std::optional<SwiftAsyncAttr> SwiftAsyncAttr::from(const TokenContext &t) {
 }
 
 SwiftAsyncAttrKind SwiftAsyncAttr::attribute_kind(void) const {
-  return static_cast<SwiftAsyncAttrKind>(impl->reader.getVal10());
+  return static_cast<SwiftAsyncAttrKind>(impl->reader.getVal12());
 }
 
 #pragma GCC diagnostic pop

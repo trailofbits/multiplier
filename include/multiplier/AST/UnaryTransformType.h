@@ -32,11 +32,12 @@ class MX_EXPORT UnaryTransformType : public Type {
   static gap::generator<UnaryTransformType> in(const Index &index);
   static gap::generator<UnaryTransformType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<UnaryTransformType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::UNARY_TRANSFORM;
   }
+
+  static std::optional<UnaryTransformType> by_id(const Index &, EntityId);
 
   static std::optional<UnaryTransformType> from_base(const Type &parent);
   inline static std::optional<UnaryTransformType> from(const Type &parent) {

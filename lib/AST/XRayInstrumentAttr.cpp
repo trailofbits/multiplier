@@ -8,6 +8,7 @@
 
 #include <multiplier/AST/XRayInstrumentAttr.h>
 #include <multiplier/AST/Attr.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/AST/InheritableAttr.h>
 #include <multiplier/Frontend/Token.h>
 
@@ -24,6 +25,43 @@ static const AttrKind kXRayInstrumentAttrDerivedKinds[] = {
     XRayInstrumentAttr::static_kind(),
 };
 }  // namespace
+
+gap::generator<XRayInstrumentAttr> XRayInstrumentAttr::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (AttrKind k : kXRayInstrumentAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
+      if (std::optional<XRayInstrumentAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<XRayInstrumentAttr> XRayInstrumentAttr::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (AttrKind k : kXRayInstrumentAttrDerivedKinds) {
+      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+        if (std::optional<XRayInstrumentAttr> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+gap::generator<XRayInstrumentAttr> XRayInstrumentAttr::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (AttrKind k : kXRayInstrumentAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+      if (std::optional<XRayInstrumentAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
 
 gap::generator<XRayInstrumentAttr> XRayInstrumentAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -69,43 +107,6 @@ std::optional<XRayInstrumentAttr> XRayInstrumentAttr::from_base(const Attr &pare
   }
 }
 
-gap::generator<XRayInstrumentAttr> XRayInstrumentAttr::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (AttrKind k : kXRayInstrumentAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<XRayInstrumentAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<XRayInstrumentAttr> XRayInstrumentAttr::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (AttrKind k : kXRayInstrumentAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<XRayInstrumentAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<XRayInstrumentAttr> XRayInstrumentAttr::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (AttrKind k : kXRayInstrumentAttrDerivedKinds) {
-      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<XRayInstrumentAttr> e = from_base(std::move(eptr))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
-  }
-}
-
 std::optional<XRayInstrumentAttr> XRayInstrumentAttr::from(const Reference &r) {
   return XRayInstrumentAttr::from(r.as_attribute());
 }
@@ -125,15 +126,15 @@ std::optional<XRayInstrumentAttr> XRayInstrumentAttr::from(const TokenContext &t
 }
 
 bool XRayInstrumentAttr::always_x_ray_instrument(void) const {
-  return impl->reader.getVal12();
+  return impl->reader.getVal14();
 }
 
 XRayInstrumentAttrSpelling XRayInstrumentAttr::semantic_spelling(void) const {
-  return static_cast<XRayInstrumentAttrSpelling>(impl->reader.getVal10());
+  return static_cast<XRayInstrumentAttrSpelling>(impl->reader.getVal12());
 }
 
 bool XRayInstrumentAttr::never_x_ray_instrument(void) const {
-  return impl->reader.getVal13();
+  return impl->reader.getVal15();
 }
 
 #pragma GCC diagnostic pop

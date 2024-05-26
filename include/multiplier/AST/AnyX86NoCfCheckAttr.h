@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class AnyX86NoCfCheckAttr;
 class Attr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT AnyX86NoCfCheckAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<AnyX86NoCfCheckAttr> in(const Index &index);
-  static gap::generator<AnyX86NoCfCheckAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<AnyX86NoCfCheckAttr> by_id(const Index &, EntityId);
   static gap::generator<AnyX86NoCfCheckAttr> in(const Fragment &frag);
   static gap::generator<AnyX86NoCfCheckAttr> in(const File &file);
+  static gap::generator<AnyX86NoCfCheckAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ANY_X86_NO_CF_CHECK;
   }
+
+  static std::optional<AnyX86NoCfCheckAttr> by_id(const Index &, EntityId);
 
   static std::optional<AnyX86NoCfCheckAttr> from_base(const Attr &parent);
   inline static std::optional<AnyX86NoCfCheckAttr> from(const Attr &parent) {

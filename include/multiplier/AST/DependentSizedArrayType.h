@@ -35,11 +35,12 @@ class MX_EXPORT DependentSizedArrayType : public ArrayType {
   static gap::generator<DependentSizedArrayType> in(const Index &index);
   static gap::generator<DependentSizedArrayType> containing(const Token &tok);
   bool contains(const Token &tok) const;
-  static std::optional<DependentSizedArrayType> by_id(const Index &, EntityId);
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::DEPENDENT_SIZED_ARRAY;
   }
+
+  static std::optional<DependentSizedArrayType> by_id(const Index &, EntityId);
 
   static std::optional<DependentSizedArrayType> from_base(const Type &parent);
   inline static std::optional<DependentSizedArrayType> from(const Type &parent) {

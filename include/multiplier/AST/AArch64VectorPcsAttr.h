@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class AArch64VectorPcsAttr;
 class Attr;
+class File;
 class InheritableAttr;
 class Token;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT AArch64VectorPcsAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<AArch64VectorPcsAttr> in(const Index &index);
-  static gap::generator<AArch64VectorPcsAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<AArch64VectorPcsAttr> by_id(const Index &, EntityId);
   static gap::generator<AArch64VectorPcsAttr> in(const Fragment &frag);
   static gap::generator<AArch64VectorPcsAttr> in(const File &file);
+  static gap::generator<AArch64VectorPcsAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::A_ARCH64_VECTOR_PCS;
   }
+
+  static std::optional<AArch64VectorPcsAttr> by_id(const Index &, EntityId);
 
   static std::optional<AArch64VectorPcsAttr> from_base(const Attr &parent);
   inline static std::optional<AArch64VectorPcsAttr> from(const Attr &parent) {

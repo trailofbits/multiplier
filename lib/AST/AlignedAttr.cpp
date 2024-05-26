@@ -9,6 +9,7 @@
 #include <multiplier/AST/AlignedAttr.h>
 #include <multiplier/AST/Attr.h>
 #include <multiplier/AST/Expr.h>
+#include <multiplier/Frontend/File.h>
 #include <multiplier/AST/InheritableAttr.h>
 #include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/Type.h>
@@ -26,6 +27,43 @@ static const AttrKind kAlignedAttrDerivedKinds[] = {
     AlignedAttr::static_kind(),
 };
 }  // namespace
+
+gap::generator<AlignedAttr> AlignedAttr::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (AttrKind k : kAlignedAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
+      if (std::optional<AlignedAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
+gap::generator<AlignedAttr> AlignedAttr::in(const File &file) {
+  const EntityProviderPtr ep = entity_provider_of(file);
+  PackedFileId file_id = file.id();
+  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
+    for (AttrKind k : kAlignedAttrDerivedKinds) {
+      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+        if (std::optional<AlignedAttr> e = from_base(std::move(eptr))) {
+          co_yield std::move(e.value());
+        }
+      }
+    }
+  }
+}
+
+gap::generator<AlignedAttr> AlignedAttr::in(const Fragment &frag) {
+  const EntityProviderPtr ep = entity_provider_of(frag);
+  PackedFragmentId frag_id = frag.id();
+  for (AttrKind k : kAlignedAttrDerivedKinds) {
+    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
+      if (std::optional<AlignedAttr> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
 
 gap::generator<AlignedAttr> AlignedAttr::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
@@ -71,43 +109,6 @@ std::optional<AlignedAttr> AlignedAttr::from_base(const Attr &parent) {
   }
 }
 
-gap::generator<AlignedAttr> AlignedAttr::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (AttrKind k : kAlignedAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k)) {
-      if (std::optional<AlignedAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<AlignedAttr> AlignedAttr::in(const Fragment &frag) {
-  const EntityProviderPtr ep = entity_provider_of(frag);
-  PackedFragmentId frag_id = frag.id();
-  for (AttrKind k : kAlignedAttrDerivedKinds) {
-    for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-      if (std::optional<AlignedAttr> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
-  }
-}
-
-gap::generator<AlignedAttr> AlignedAttr::in(const File &file) {
-  const EntityProviderPtr ep = entity_provider_of(file);
-  PackedFileId file_id = file.id();
-  for (PackedFragmentId frag_id : ep->ListFragmentsInFile(ep, file_id)) {
-    for (AttrKind k : kAlignedAttrDerivedKinds) {
-      for (AttrImplPtr eptr : ep->AttrsFor(ep, k, frag_id)) {
-        if (std::optional<AlignedAttr> e = from_base(std::move(eptr))) {
-          co_yield std::move(e.value());
-        }
-      }
-    }
-  }
-}
-
 std::optional<AlignedAttr> AlignedAttr::from(const Reference &r) {
   return AlignedAttr::from(r.as_attribute());
 }
@@ -128,7 +129,7 @@ std::optional<AlignedAttr> AlignedAttr::from(const TokenContext &t) {
 
 std::optional<Expr> AlignedAttr::alignment_expression(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal8();
+    RawEntityId eid = impl->reader.getVal10();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -141,7 +142,7 @@ std::optional<Expr> AlignedAttr::alignment_expression(void) const {
 
 std::optional<Type> AlignedAttr::alignment_type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal20();
+    RawEntityId eid = impl->reader.getVal22();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -153,44 +154,44 @@ std::optional<Type> AlignedAttr::alignment_type(void) const {
 }
 
 std::optional<uint32_t> AlignedAttr::cached_alignment_value(void) const {
-  if (!impl->reader.getVal12()) {
+  if (!impl->reader.getVal14()) {
     return std::nullopt;
   } else {
-    return static_cast<uint32_t>(impl->reader.getVal24());
+    return static_cast<uint32_t>(impl->reader.getVal26());
   }
   return std::nullopt;
 }
 
 AlignedAttrSpelling AlignedAttr::semantic_spelling(void) const {
-  return static_cast<AlignedAttrSpelling>(impl->reader.getVal10());
+  return static_cast<AlignedAttrSpelling>(impl->reader.getVal12());
 }
 
 bool AlignedAttr::is_alignas(void) const {
-  return impl->reader.getVal13();
-}
-
-bool AlignedAttr::is_alignment_dependent(void) const {
-  return impl->reader.getVal14();
-}
-
-bool AlignedAttr::is_alignment_error_dependent(void) const {
   return impl->reader.getVal15();
 }
 
-bool AlignedAttr::is_alignment_expression(void) const {
+bool AlignedAttr::is_alignment_dependent(void) const {
   return impl->reader.getVal16();
 }
 
+bool AlignedAttr::is_alignment_error_dependent(void) const {
+  return impl->reader.getVal17();
+}
+
+bool AlignedAttr::is_alignment_expression(void) const {
+  return impl->reader.getVal18();
+}
+
 bool AlignedAttr::is_c11(void) const {
-  return impl->reader.getVal25();
+  return impl->reader.getVal27();
 }
 
 bool AlignedAttr::is_declspec(void) const {
-  return impl->reader.getVal26();
+  return impl->reader.getVal28();
 }
 
 bool AlignedAttr::is_gnu(void) const {
-  return impl->reader.getVal27();
+  return impl->reader.getVal29();
 }
 
 #pragma GCC diagnostic pop

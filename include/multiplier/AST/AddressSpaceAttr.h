@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class AddressSpaceAttr;
 class Attr;
+class File;
 class Token;
 class TypeAttr;
 namespace ir {
@@ -31,15 +32,16 @@ class MX_EXPORT AddressSpaceAttr : public TypeAttr {
   friend class Attr;
  public:
   static gap::generator<AddressSpaceAttr> in(const Index &index);
-  static gap::generator<AddressSpaceAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<AddressSpaceAttr> by_id(const Index &, EntityId);
   static gap::generator<AddressSpaceAttr> in(const Fragment &frag);
   static gap::generator<AddressSpaceAttr> in(const File &file);
+  static gap::generator<AddressSpaceAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ADDRESS_SPACE;
   }
+
+  static std::optional<AddressSpaceAttr> by_id(const Index &, EntityId);
 
   static std::optional<AddressSpaceAttr> from_base(const Attr &parent);
   inline static std::optional<AddressSpaceAttr> from(const Attr &parent) {

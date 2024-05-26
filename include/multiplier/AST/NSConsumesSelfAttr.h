@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class NSConsumesSelfAttr;
 class Token;
@@ -31,15 +32,16 @@ class MX_EXPORT NSConsumesSelfAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<NSConsumesSelfAttr> in(const Index &index);
-  static gap::generator<NSConsumesSelfAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<NSConsumesSelfAttr> by_id(const Index &, EntityId);
   static gap::generator<NSConsumesSelfAttr> in(const Fragment &frag);
   static gap::generator<NSConsumesSelfAttr> in(const File &file);
+  static gap::generator<NSConsumesSelfAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::NS_CONSUMES_SELF;
   }
+
+  static std::optional<NSConsumesSelfAttr> by_id(const Index &, EntityId);
 
   static std::optional<NSConsumesSelfAttr> from_base(const Attr &parent);
   inline static std::optional<NSConsumesSelfAttr> from(const Attr &parent) {

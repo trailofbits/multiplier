@@ -17,6 +17,7 @@ class Fragment;
 class Index;
 class Reference;
 class Decl;
+class File;
 class LinkageSpecDecl;
 class Stmt;
 class Token;
@@ -32,11 +33,10 @@ class MX_EXPORT LinkageSpecDecl : public Decl {
   friend class Decl;
  public:
   static gap::generator<LinkageSpecDecl> in(const Index &index);
-  static gap::generator<LinkageSpecDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<LinkageSpecDecl> by_id(const Index &, EntityId);
   static gap::generator<LinkageSpecDecl> in(const Fragment &frag);
   static gap::generator<LinkageSpecDecl> in(const File &file);
+  static gap::generator<LinkageSpecDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<LinkageSpecDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<LinkageSpecDecl, ir::Operation>> in(const Compilation &tu);
@@ -56,6 +56,8 @@ class MX_EXPORT LinkageSpecDecl : public Decl {
   LinkageSpecDecl canonical_declaration(void) const;
   std::optional<LinkageSpecDecl> definition(void) const;
   gap::generator<LinkageSpecDecl> redeclarations(void) const &;
+  static std::optional<LinkageSpecDecl> by_id(const Index &, EntityId);
+
   static std::optional<LinkageSpecDecl> from_base(const Decl &parent);
   inline static std::optional<LinkageSpecDecl> from(const Decl &parent) {
     return from_base(parent);

@@ -18,6 +18,7 @@ class Index;
 class CXXFoldExpr;
 class Decl;
 class Expr;
+class File;
 class Stmt;
 class Token;
 class UnresolvedLookupExpr;
@@ -36,11 +37,10 @@ class MX_EXPORT CXXFoldExpr : public Expr {
   friend class Stmt;
  public:
   static gap::generator<CXXFoldExpr> in(const Index &index);
-  static gap::generator<CXXFoldExpr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<CXXFoldExpr> by_id(const Index &, EntityId);
   static gap::generator<CXXFoldExpr> in(const Fragment &frag);
   static gap::generator<CXXFoldExpr> in(const File &file);
+  static gap::generator<CXXFoldExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<CXXFoldExpr> from(const ir::Operation &op);
   static gap::generator<std::pair<CXXFoldExpr, ir::Operation>> in(const Compilation &tu);
@@ -56,6 +56,8 @@ class MX_EXPORT CXXFoldExpr : public Expr {
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  static std::optional<CXXFoldExpr> by_id(const Index &, EntityId);
 
   static std::optional<CXXFoldExpr> from_base(const Stmt &parent);
   inline static std::optional<CXXFoldExpr> from(const Stmt &parent) {

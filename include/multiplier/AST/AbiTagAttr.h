@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class AbiTagAttr;
 class Attr;
+class File;
 class Token;
 namespace ir {
 class Operation;
@@ -29,15 +30,16 @@ class MX_EXPORT AbiTagAttr : public Attr {
   friend class Attr;
  public:
   static gap::generator<AbiTagAttr> in(const Index &index);
-  static gap::generator<AbiTagAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<AbiTagAttr> by_id(const Index &, EntityId);
   static gap::generator<AbiTagAttr> in(const Fragment &frag);
   static gap::generator<AbiTagAttr> in(const File &file);
+  static gap::generator<AbiTagAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::ABI_TAG;
   }
+
+  static std::optional<AbiTagAttr> by_id(const Index &, EntityId);
 
   static std::optional<AbiTagAttr> from_base(const Attr &parent);
   inline static std::optional<AbiTagAttr> from(const Attr &parent) {

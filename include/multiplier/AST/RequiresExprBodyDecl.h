@@ -16,6 +16,7 @@ class Fragment;
 class Index;
 class Reference;
 class Decl;
+class File;
 class RequiresExprBodyDecl;
 class Stmt;
 class Token;
@@ -31,11 +32,10 @@ class MX_EXPORT RequiresExprBodyDecl : public Decl {
   friend class Decl;
  public:
   static gap::generator<RequiresExprBodyDecl> in(const Index &index);
-  static gap::generator<RequiresExprBodyDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<RequiresExprBodyDecl> by_id(const Index &, EntityId);
   static gap::generator<RequiresExprBodyDecl> in(const Fragment &frag);
   static gap::generator<RequiresExprBodyDecl> in(const File &file);
+  static gap::generator<RequiresExprBodyDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<RequiresExprBodyDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<RequiresExprBodyDecl, ir::Operation>> in(const Compilation &tu);
@@ -55,6 +55,8 @@ class MX_EXPORT RequiresExprBodyDecl : public Decl {
   RequiresExprBodyDecl canonical_declaration(void) const;
   std::optional<RequiresExprBodyDecl> definition(void) const;
   gap::generator<RequiresExprBodyDecl> redeclarations(void) const &;
+  static std::optional<RequiresExprBodyDecl> by_id(const Index &, EntityId);
+
   static std::optional<RequiresExprBodyDecl> from_base(const Decl &parent);
   inline static std::optional<RequiresExprBodyDecl> from(const Decl &parent) {
     return from_base(parent);

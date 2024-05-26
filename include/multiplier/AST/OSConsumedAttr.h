@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class InheritableParamAttr;
 class OSConsumedAttr;
@@ -33,15 +34,16 @@ class MX_EXPORT OSConsumedAttr : public InheritableParamAttr {
   friend class Attr;
  public:
   static gap::generator<OSConsumedAttr> in(const Index &index);
-  static gap::generator<OSConsumedAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<OSConsumedAttr> by_id(const Index &, EntityId);
   static gap::generator<OSConsumedAttr> in(const Fragment &frag);
   static gap::generator<OSConsumedAttr> in(const File &file);
+  static gap::generator<OSConsumedAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::OS_CONSUMED;
   }
+
+  static std::optional<OSConsumedAttr> by_id(const Index &, EntityId);
 
   static std::optional<OSConsumedAttr> from_base(const Attr &parent);
   inline static std::optional<OSConsumedAttr> from(const Attr &parent) {

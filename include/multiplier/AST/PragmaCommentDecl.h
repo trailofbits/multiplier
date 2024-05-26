@@ -16,6 +16,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Decl;
+class File;
 class PragmaCommentDecl;
 class Stmt;
 class Token;
@@ -31,11 +32,10 @@ class MX_EXPORT PragmaCommentDecl : public Decl {
   friend class Decl;
  public:
   static gap::generator<PragmaCommentDecl> in(const Index &index);
-  static gap::generator<PragmaCommentDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<PragmaCommentDecl> by_id(const Index &, EntityId);
   static gap::generator<PragmaCommentDecl> in(const Fragment &frag);
   static gap::generator<PragmaCommentDecl> in(const File &file);
+  static gap::generator<PragmaCommentDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<PragmaCommentDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<PragmaCommentDecl, ir::Operation>> in(const Compilation &tu);
@@ -55,6 +55,8 @@ class MX_EXPORT PragmaCommentDecl : public Decl {
   PragmaCommentDecl canonical_declaration(void) const;
   std::optional<PragmaCommentDecl> definition(void) const;
   gap::generator<PragmaCommentDecl> redeclarations(void) const &;
+  static std::optional<PragmaCommentDecl> by_id(const Index &, EntityId);
+
   static std::optional<PragmaCommentDecl> from_base(const Decl &parent);
   inline static std::optional<PragmaCommentDecl> from(const Decl &parent) {
     return from_base(parent);

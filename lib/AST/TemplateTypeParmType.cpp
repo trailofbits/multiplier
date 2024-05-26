@@ -25,6 +25,17 @@ static const TypeKind kTemplateTypeParmTypeDerivedKinds[] = {
 };
 }  // namespace
 
+gap::generator<TemplateTypeParmType> TemplateTypeParmType::in(const Index &index) {
+  const EntityProviderPtr ep = entity_provider_of(index);
+  for (TypeKind k : kTemplateTypeParmTypeDerivedKinds) {
+    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
+      if (std::optional<TemplateTypeParmType> e = from_base(std::move(eptr))) {
+        co_yield std::move(e.value());
+      }
+    }
+  }
+}
+
 gap::generator<TemplateTypeParmType> TemplateTypeParmType::containing(const Token &tok) {
   for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
     if (auto d = TemplateTypeParmType::from(*ctx)) {
@@ -66,17 +77,6 @@ std::optional<TemplateTypeParmType> TemplateTypeParmType::from_base(const Type &
       return reinterpret_cast<const TemplateTypeParmType &>(parent);
     default:
       return std::nullopt;
-  }
-}
-
-gap::generator<TemplateTypeParmType> TemplateTypeParmType::in(const Index &index) {
-  const EntityProviderPtr ep = entity_provider_of(index);
-  for (TypeKind k : kTemplateTypeParmTypeDerivedKinds) {
-    for (TypeImplPtr eptr : ep->TypesFor(ep, k)) {
-      if (std::optional<TemplateTypeParmType> e = from_base(std::move(eptr))) {
-        co_yield std::move(e.value());
-      }
-    }
   }
 }
 

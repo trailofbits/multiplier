@@ -15,6 +15,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Decl;
+class File;
 class ImportDecl;
 class Stmt;
 class Token;
@@ -31,11 +32,10 @@ class MX_EXPORT ImportDecl : public Decl {
   friend class Decl;
  public:
   static gap::generator<ImportDecl> in(const Index &index);
-  static gap::generator<ImportDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<ImportDecl> by_id(const Index &, EntityId);
   static gap::generator<ImportDecl> in(const Fragment &frag);
   static gap::generator<ImportDecl> in(const File &file);
+  static gap::generator<ImportDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<ImportDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<ImportDecl, ir::Operation>> in(const Compilation &tu);
@@ -55,6 +55,8 @@ class MX_EXPORT ImportDecl : public Decl {
   ImportDecl canonical_declaration(void) const;
   std::optional<ImportDecl> definition(void) const;
   gap::generator<ImportDecl> redeclarations(void) const &;
+  static std::optional<ImportDecl> by_id(const Index &, EntityId);
+
   static std::optional<ImportDecl> from_base(const Decl &parent);
   inline static std::optional<ImportDecl> from(const Decl &parent) {
     return from_base(parent);

@@ -17,6 +17,7 @@ class Index;
 class Decl;
 class DeclaratorDecl;
 class Expr;
+class File;
 class NamedDecl;
 class NonTypeTemplateParmDecl;
 class Stmt;
@@ -38,11 +39,10 @@ class MX_EXPORT NonTypeTemplateParmDecl : public DeclaratorDecl {
   friend class Decl;
  public:
   static gap::generator<NonTypeTemplateParmDecl> in(const Index &index);
-  static gap::generator<NonTypeTemplateParmDecl> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<NonTypeTemplateParmDecl> by_id(const Index &, EntityId);
   static gap::generator<NonTypeTemplateParmDecl> in(const Fragment &frag);
   static gap::generator<NonTypeTemplateParmDecl> in(const File &file);
+  static gap::generator<NonTypeTemplateParmDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static std::optional<NonTypeTemplateParmDecl> from(const ir::Operation &op);
   static gap::generator<std::pair<NonTypeTemplateParmDecl, ir::Operation>> in(const Compilation &tu);
@@ -62,6 +62,8 @@ class MX_EXPORT NonTypeTemplateParmDecl : public DeclaratorDecl {
   NonTypeTemplateParmDecl canonical_declaration(void) const;
   std::optional<NonTypeTemplateParmDecl> definition(void) const;
   gap::generator<NonTypeTemplateParmDecl> redeclarations(void) const &;
+  static std::optional<NonTypeTemplateParmDecl> by_id(const Index &, EntityId);
+
   static std::optional<NonTypeTemplateParmDecl> from_base(const Decl &parent);
   inline static std::optional<NonTypeTemplateParmDecl> from(const Decl &parent) {
     return from_base(parent);

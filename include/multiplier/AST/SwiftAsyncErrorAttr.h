@@ -16,6 +16,7 @@ class EntityProvider;
 class Fragment;
 class Index;
 class Attr;
+class File;
 class InheritableAttr;
 class SwiftAsyncErrorAttr;
 class Token;
@@ -32,15 +33,16 @@ class MX_EXPORT SwiftAsyncErrorAttr : public InheritableAttr {
   friend class Attr;
  public:
   static gap::generator<SwiftAsyncErrorAttr> in(const Index &index);
-  static gap::generator<SwiftAsyncErrorAttr> containing(const Token &tok);
-  bool contains(const Token &tok) const;
-  static std::optional<SwiftAsyncErrorAttr> by_id(const Index &, EntityId);
   static gap::generator<SwiftAsyncErrorAttr> in(const Fragment &frag);
   static gap::generator<SwiftAsyncErrorAttr> in(const File &file);
+  static gap::generator<SwiftAsyncErrorAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SWIFT_ASYNC_ERROR;
   }
+
+  static std::optional<SwiftAsyncErrorAttr> by_id(const Index &, EntityId);
 
   static std::optional<SwiftAsyncErrorAttr> from_base(const Attr &parent);
   inline static std::optional<SwiftAsyncErrorAttr> from(const Attr &parent) {
