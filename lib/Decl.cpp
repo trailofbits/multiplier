@@ -17,6 +17,7 @@
 #include <multiplier/AST/TemplateArgument.h>
 #include <multiplier/AST/VarTemplateDecl.h>
 #include <multiplier/AST/VarTemplatePartialSpecializationDecl.h>
+#include <multiplier/Frontend/MacroSubstitution.h>
 #include <multiplier/Index.h>
 
 #include "Fragment.h"
@@ -744,6 +745,24 @@ TokenRange NamedDecl::qualified_name(
   RenderQualifiedNameInto(*tr, *this, options);
   auto num_tokens = static_cast<unsigned>(tr->token_ids.size());
   return TokenRange(std::move(tr), 0u, num_tokens);
+}
+
+gap::generator<Decl> Decl::containing(const MacroSubstitution sub) {
+  for (auto tok : sub.generate_expansion_tokens()) {
+    VariantEntity entity = tok.related_entity();
+    if (std::holds_alternative<Decl>(entity)) {
+      auto d = std::get<Decl>(entity);
+      co_yield d;
+    }
+  }
+}
+
+gap::generator<Decl> Decl::containing(const std::optional<MacroSubstitution> &macro) {
+  if (macro.has_value()) {
+    for (auto d : containing(macro.value())) {
+      co_yield d;
+    }
+  }
 }
 
 }  // namespace mx

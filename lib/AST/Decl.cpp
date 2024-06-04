@@ -11,6 +11,7 @@
 #include <multiplier/AST/Attr.h>
 #include <multiplier/AST/ExternalSourceSymbolAttr.h>
 #include <multiplier/Frontend/File.h>
+#include <multiplier/Frontend/MacroSubstitution.h>
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/Frontend/Token.h>
 

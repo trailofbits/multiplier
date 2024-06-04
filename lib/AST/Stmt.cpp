@@ -10,6 +10,7 @@
 #include "../Reference.h"
 #include <multiplier/AST/Decl.h>
 #include <multiplier/Frontend/File.h>
+#include <multiplier/Frontend/MacroSubstitution.h>
 #include <multiplier/Frontend/Token.h>
 
 #include <multiplier/IR/HighLevel/Operation.h>

@@ -7,6 +7,7 @@
 #include "Stmt.h"
 
 #include <multiplier/Index.h>
+#include <multiplier/Frontend/MacroSubstitution.h>
 
 #include "Fragment.h"
 #include "Reference.h"
@@ -49,6 +50,24 @@ std::optional<CastExpr> CallExpr::casted_return_value(void) const {
     }
   }
   return std::nullopt;
+}
+
+gap::generator<Stmt> Stmt::containing(const MacroSubstitution sub) {
+  for (auto tok : sub.generate_expansion_tokens()) {
+    VariantEntity entity = tok.related_entity();
+    if (std::holds_alternative<Stmt>(entity)) {
+      auto s = std::get<Stmt>(entity);
+      co_yield s;
+    }
+  }
+}
+
+gap::generator<Stmt> containing(const std::optional<MacroSubstitution> &sub) {
+  if (sub.has_value()) {
+    for (auto s : containing(sub.value())) {
+      co_yield s;
+    }
+  }
 }
 
 }  // namespace mx
