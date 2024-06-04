@@ -1496,6 +1496,21 @@ TokenRange TokenRange::create(std::vector<CustomToken> tokens) {
   return TokenRange(std::move(reader), 0u, num_tokens);
 }
 
+TokenRange TokenRange::create(const Token &first, const Token &last) {
+  if (!first.impl || !last.impl) {
+    return TokenRange();
+  }
+
+  // if first and last token are not in order, create TokenRange
+  // from the first token only
+  if (first.impl != last.impl || first.offset > last.offset) {
+    return TokenRange(first);
+  }
+  // Create a token range from first token to the offset of last token
+  return TokenRange(first.impl, static_cast<EntityOffset>(first.offset),
+                    static_cast<EntityOffset>(last.offset + 1u));
+}
+
 bool TokenRange::operator==(const TokenRange &that) const noexcept {
   if (num_tokens == that.num_tokens && index == that.index) {
     if (impl && that.impl) {

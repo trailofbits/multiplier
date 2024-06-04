@@ -52,20 +52,27 @@ std::optional<CastExpr> CallExpr::casted_return_value(void) const {
   return std::nullopt;
 }
 
-gap::generator<Stmt> Stmt::containing(const MacroSubstitution sub) {
-  for (auto tok : sub.generate_expansion_tokens()) {
+gap::generator<Stmt> Stmt::overlapping_macro(const MacroSubstitution sub) {
+  auto first = sub.first_fully_substituted_token().parsed_token();
+  auto last = sub.last_fully_substituted_token().parsed_token();
+  std::vector<Stmt> entities;
+  auto substituted_tokens = TokenRange::create(first, last);
+  for (auto tok : substituted_tokens) {
     VariantEntity entity = tok.related_entity();
     if (std::holds_alternative<Stmt>(entity)) {
-      auto s = std::get<Stmt>(entity);
-      co_yield s;
+      auto stmt = std::get<Stmt>(entity);
+      if ( auto it = std::find(entities.begin(), entities.end(), stmt); it == entities.end()) {
+        entities.emplace_back(stmt);
+        co_yield stmt;
+      }
     }
   }
 }
 
-gap::generator<Stmt> containing(const std::optional<MacroSubstitution> &sub) {
+gap::generator<Stmt> overlapping_macro(const std::optional<MacroSubstitution> &sub) {
   if (sub.has_value()) {
-    for (auto s : containing(sub.value())) {
-      co_yield s;
+    for (auto stmt : overlapping_macro(sub.value())) {
+      co_yield stmt;
     }
   }
 }

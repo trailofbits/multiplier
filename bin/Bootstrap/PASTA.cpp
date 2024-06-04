@@ -2537,9 +2537,9 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       class_os
         << "  static gap::generator<" << class_name
-        << "> containing(const MacroSubstitution sub);\n"
+        << "> overlapping_macro(const MacroSubstitution sub);\n"
         << "  static gap::generator<" << class_name
-        << "> containing(const std::optional<MacroSubstitution> &sub);\n\n";
+        << "> overlapping_macro(const std::optional<MacroSubstitution> &sub);\n\n";
 
 
       seen_methods->emplace("uses");  // Manual.
@@ -2571,9 +2571,9 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       class_os
         << "  static gap::generator<" << class_name
-        << "> containing(const MacroSubstitution sub);\n"
+        << "> overlapping_macro(const MacroSubstitution sub);\n"
         << "  static gap::generator<" << class_name
-        << "> containing(const std::optional<MacroSubstitution> &sub);\n\n";
+        << "> overlapping_macro(const std::optional<MacroSubstitution> &sub);\n\n";
 
       // `Stmt::referenced_declaration`.
       const auto ref = storage.AddMethod("UInt64");

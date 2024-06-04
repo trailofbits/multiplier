@@ -98,8 +98,8 @@ class MX_EXPORT Decl {
   gap::generator<Decl> redeclarations(void) const &;
   gap::generator<Decl> specializations(void) const &;
 
-  static gap::generator<Decl> containing(const MacroSubstitution sub);
-  static gap::generator<Decl> containing(const std::optional<MacroSubstitution> &sub);
+  static gap::generator<Decl> overlapping_macro(const MacroSubstitution sub);
+  static gap::generator<Decl> overlapping_macro(const std::optional<MacroSubstitution> &sub);
 
   static gap::generator<Decl> in(const Index &index);
   static gap::generator<Decl> in(const Fragment &frag);

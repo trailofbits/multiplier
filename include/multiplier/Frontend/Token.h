@@ -297,6 +297,7 @@ class MX_EXPORT TokenRange {
   TokenRange &operator=(TokenRange &&) noexcept = default;
 
   static TokenRange create(std::vector<CustomToken> tokens);
+  static TokenRange create(const Token &first, const Token &last);
 
   bool operator==(const TokenRange &that) const noexcept;
   bool operator!=(const TokenRange &that) const noexcept = default;

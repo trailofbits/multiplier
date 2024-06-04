@@ -5,6 +5,7 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include "Decl.h"
+#include <iostream>
 
 #include <multiplier/AST/ClassTemplateDecl.h>
 #include <multiplier/AST/ClassTemplatePartialSpecializationDecl.h>
@@ -747,20 +748,27 @@ TokenRange NamedDecl::qualified_name(
   return TokenRange(std::move(tr), 0u, num_tokens);
 }
 
-gap::generator<Decl> Decl::containing(const MacroSubstitution sub) {
-  for (auto tok : sub.generate_expansion_tokens()) {
+gap::generator<Decl> Decl::overlapping_macro(const MacroSubstitution sub) {
+  auto first = sub.first_fully_substituted_token().parsed_token();
+  auto last = sub.last_fully_substituted_token().parsed_token();
+  std::vector<Decl> entities;
+  auto substituted_tokens = TokenRange::create(first, last);
+  for (auto tok : substituted_tokens) {
     VariantEntity entity = tok.related_entity();
     if (std::holds_alternative<Decl>(entity)) {
-      auto d = std::get<Decl>(entity);
-      co_yield d;
+      auto decl = std::get<Decl>(entity);
+      if ( auto it = std::find(entities.begin(), entities.end(), decl); it == entities.end()) {
+        entities.emplace_back(decl);
+        co_yield decl;
+      }
     }
   }
 }
 
-gap::generator<Decl> Decl::containing(const std::optional<MacroSubstitution> &macro) {
+gap::generator<Decl> Decl::overlapping_macro(const std::optional<MacroSubstitution> &macro) {
   if (macro.has_value()) {
-    for (auto d : containing(macro.value())) {
-      co_yield d;
+    for (auto decl : overlapping_macro(macro.value())) {
+      co_yield decl;
     }
   }
 }

@@ -89,8 +89,8 @@ class MX_EXPORT Stmt {
   std::optional<PackedDeclId> referenced_declaration_id(void) const;
   std::optional<Decl> referenced_declaration(void) const;
 
-  static gap::generator<Stmt> containing(const MacroSubstitution sub);
-  static gap::generator<Stmt> containing(const std::optional<MacroSubstitution> &sub);
+  static gap::generator<Stmt> overlapping_macro(const MacroSubstitution sub);
+  static gap::generator<Stmt> overlapping_macro(const std::optional<MacroSubstitution> &sub);
 
   static gap::generator<Stmt> in(const Index &index);
   static gap::generator<Stmt> in(const Fragment &frag);
