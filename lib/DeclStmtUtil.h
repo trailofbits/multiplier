@@ -75,6 +75,24 @@ static gap::generator<T> EntityOverlapping(const mx::MacroSubstitution sub) {
   }
 }
 
+template <typename T>
+static std::optional<T> EntityCovering(const mx::MacroSubstitution &sub) {
+  auto [first, last] = get_macro_substitution_boundaries(sub);
+  if (!first || !last) {
+    return std::nullopt;
+  }
+
+  // Get the overlapping entities and check if both first and last token fall
+  // in the declaration/statments token range
+  for (auto entity : EntityOverlapping<T>(sub)) {
+    if (!entity.tokens().index_of(first) || !entity.tokens().index_of(last)) {
+      continue;
+    }
+    return entity;
+  }
+  return std::nullopt;
+}
+
 }  // namespace
 
 } // namespace mx

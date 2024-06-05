@@ -762,20 +762,7 @@ gap::generator<Decl> Decl::overlapping(const std::optional<MacroSubstitution> &m
 }
 
 std::optional<Decl> Decl::covering(const MacroSubstitution &sub) {
-  auto [first, last] = get_macro_substitution_boundaries(sub);
-  if (!first || !last) {
-    return std::nullopt;
-  }
-
-  // Get the overlapping entities and check if both first and last token fall
-  // in the declaration token range
-  for (auto decl : EntityOverlapping<Decl>(sub)) {
-    if (!decl.tokens().index_of(first) || !decl.tokens().index_of(last)) {
-      continue;
-    }
-    return decl;
-  }
-  return std::nullopt;
+  return EntityCovering<Decl>(sub);
 }
 
 std::optional<Decl> Decl::covering(const std::optional<MacroSubstitution> &macro) {
