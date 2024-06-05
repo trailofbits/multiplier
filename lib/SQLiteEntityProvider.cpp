@@ -679,7 +679,7 @@ SQLiteEntityProvider::SpecificReferences(
     const Ptr &self, RawEntityId raw_id, RawEntityId kind_id,
     EntityProvider::ReferenceDirection dir, bool get_redecls) & {
 
-  const Ptr self_ = self;
+  Ptr self_ = self;
   ImplPtr context = impl.Lock();
   sqlite::Statement &get_references = (dir == EntityProvider::kReferenceTo ?
                                        context->get_specific_references_to :

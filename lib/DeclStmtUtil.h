@@ -20,15 +20,15 @@ namespace mx {
 namespace {
 
 static inline
-std::tuple<Token, Token> get_macro_substitution_boundaries(
+std::pair<Token, Token> ParsedSusbstitutionBoundaries(
     const mx::MacroSubstitution &sub) {
-  return std::make_tuple(sub.first_fully_substituted_token().parsed_token(),
+  return std::make_pair(sub.first_fully_substituted_token().parsed_token(),
                           sub.last_fully_substituted_token().parsed_token());
 }
 
 template <typename T>
 static gap::generator<T> EntityOverlapping(const mx::MacroSubstitution sub) {
-  auto [first, last] = get_macro_substitution_boundaries(sub);
+  auto [first, last] = ParsedSusbstitutionBoundaries(sub);
   if (!first || !last) {
     co_return;
   }
@@ -77,7 +77,7 @@ static gap::generator<T> EntityOverlapping(const mx::MacroSubstitution sub) {
 
 template <typename T>
 static std::optional<T> EntityCovering(const mx::MacroSubstitution &sub) {
-  auto [first, last] = get_macro_substitution_boundaries(sub);
+  auto [first, last] = ParsedSusbstitutionBoundaries(sub);
   if (!first || !last) {
     return std::nullopt;
   }

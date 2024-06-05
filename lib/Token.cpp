@@ -1497,18 +1497,22 @@ TokenRange TokenRange::create(std::vector<CustomToken> tokens) {
 }
 
 TokenRange TokenRange::create(const Token &first, const Token &last) {
-  if (!first.impl || !last.impl) {
+  // if token readers are null or they have different reader, return
+  // empty token range
+  if (!first.impl || !last.impl || first.impl != last.impl) {
     return TokenRange();
   }
 
-  // if first and last token are not in order, create TokenRange
-  // from the first token only
-  if (first.impl != last.impl || first.offset > last.offset) {
-    return TokenRange(first);
+  // If tokens are macro token, don't create a token range from it. They
+  // may not be in the order.
+  if (std::holds_alternative<MacroTokenId>(first.id().Unpack())||
+      std::holds_alternative<MacroTokenId>(last.id().Unpack())) {
+    return TokenRange();
   }
-  // Create a token range from first token to the offset of last token
-  return TokenRange(first.impl, static_cast<EntityOffset>(first.offset),
-                    static_cast<EntityOffset>(last.offset + 1u));
+
+  auto start = std::min(first.offset, last.offset);
+  auto end = std::max(first.offset, last.offset);
+  return TokenRange(first.impl, start, (end - start) + 1u);
 }
 
 bool TokenRange::operator==(const TokenRange &that) const noexcept {

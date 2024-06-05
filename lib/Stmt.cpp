@@ -59,7 +59,8 @@ gap::generator<Stmt> Stmt::overlapping(const MacroSubstitution &sub) {
 
 gap::generator<Stmt> overlapping(const std::optional<MacroSubstitution> &sub) {
   if (sub.has_value()) {
-    for (auto stmt : overlapping(sub.value())) {
+    auto overlapping_stmts = overlapping(sub.value());
+    for (auto stmt : overlapping_stmts) {
       co_yield stmt;
     }
   }
