@@ -12,6 +12,7 @@
 #include "Fragment.h"
 #include "Reference.h"
 #include "Types.h"
+#include "DeclStmtUtil.h"
 
 namespace mx {
 
@@ -52,29 +53,35 @@ std::optional<CastExpr> CallExpr::casted_return_value(void) const {
   return std::nullopt;
 }
 
-gap::generator<Stmt> Stmt::overlapping_macro(const MacroSubstitution sub) {
-  auto first = sub.first_fully_substituted_token().parsed_token();
-  auto last = sub.last_fully_substituted_token().parsed_token();
-  std::vector<Stmt> entities;
-  auto substituted_tokens = TokenRange::create(first, last);
-  for (auto tok : substituted_tokens) {
-    VariantEntity entity = tok.related_entity();
-    if (std::holds_alternative<Stmt>(entity)) {
-      auto stmt = std::get<Stmt>(entity);
-      if ( auto it = std::find(entities.begin(), entities.end(), stmt); it == entities.end()) {
-        entities.emplace_back(stmt);
-        co_yield stmt;
-      }
+gap::generator<Stmt> Stmt::overlapping(const MacroSubstitution sub) {
+  return EntityOverlapping<Stmt>(sub);
+}
+
+gap::generator<Stmt> overlapping(const std::optional<MacroSubstitution> &sub) {
+  if (sub.has_value()) {
+    for (auto stmt : overlapping(sub.value())) {
+      co_yield stmt;
     }
   }
 }
 
-gap::generator<Stmt> overlapping_macro(const std::optional<MacroSubstitution> &sub) {
-  if (sub.has_value()) {
-    for (auto stmt : overlapping_macro(sub.value())) {
-      co_yield stmt;
+std::optional<Stmt> Stmt::covering(const MacroSubstitution sub) {
+  auto first = sub.first_fully_substituted_token().parsed_token();
+  auto last = sub.last_fully_substituted_token().parsed_token();
+  for (auto stmt : EntityOverlapping<Stmt>(sub)) {
+    if (!stmt.tokens().index_of(first) || !stmt.tokens().index_of(last)) {
+      continue;
     }
+    return stmt;
   }
+  return std::nullopt;
+}
+
+std::optional<Stmt> Stmt::covering(const std::optional<MacroSubstitution> &macro) {
+  if (macro.has_value()) {
+    return covering(macro.value());
+  }
+  return std::nullopt;
 }
 
 }  // namespace mx

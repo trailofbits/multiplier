@@ -22,8 +22,6 @@
 #include "../Iterator.h"
 #include "../Frontend/TokenContext.h"
 
-#include <multiplier/Frontend/MacroSubstitution.h>
-
 #include <multiplier/AST/AvailabilityResult.h>
 #include <multiplier/AST/DeclCategory.h>
 #include <multiplier/AST/DeclFriendObjectKind.h>
@@ -98,8 +96,11 @@ class MX_EXPORT Decl {
   gap::generator<Decl> redeclarations(void) const &;
   gap::generator<Decl> specializations(void) const &;
 
-  static gap::generator<Decl> overlapping_macro(const MacroSubstitution sub);
-  static gap::generator<Decl> overlapping_macro(const std::optional<MacroSubstitution> &sub);
+  static gap::generator<Decl> overlapping(const MacroSubstitution sub);
+  static gap::generator<Decl> overlapping(const std::optional<MacroSubstitution> &sub);
+
+  static std::optional<Decl> covering(const MacroSubstitution sub);
+  static std::optional<Decl> covering(const std::optional<MacroSubstitution> &sub);
 
   static gap::generator<Decl> in(const Index &index);
   static gap::generator<Decl> in(const Fragment &frag);

@@ -13,9 +13,9 @@
 #include <multiplier/AST.h>
 #include <multiplier/Frontend.h>
 
-void PrintDeclInMacroSubstitution(const mx::Fragment &fragment, const mx::Macro &macro) {
+void PrintDeclOverlappingMacroSubstitution(const mx::Fragment &fragment, const mx::Macro &macro) {
   if (auto sub = mx::MacroSubstitution::from(macro)) {
-    for (auto decl : mx::Decl::overlapping_macro(sub.value())) {
+    for (auto decl : mx::Decl::overlapping(sub.value())) {
       std::cout
         << fragment.id() << "\t\t"
         << decl.id() << "\t\t"
@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
       for (mx::PreprocessedEntity node : fragment->preprocessed_code()) {
         if (std::holds_alternative<mx::Macro>(node)) {
           const mx::Macro &macro = std::get<mx::Macro>(node);
-          PrintDeclInMacroSubstitution(fragment.value(), macro);
+          PrintDeclOverlappingMacroSubstitution(fragment.value(), macro);
         }
       }
     }

@@ -2048,11 +2048,6 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "#include \"../Frontend/TokenContext.h\"\n\n";
   }
 
-  if (class_name == "Decl" || class_name == "Stmt") {
-    os
-        << "#include <multiplier/Frontend/MacroSubstitution.h>\n\n";
-  }
-
   if (is_frontend_type) {
     frontend_h_os << "#include \"" << dir_name << '/' << class_name << ".h\"\n";
   } else {
@@ -2537,9 +2532,13 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       class_os
         << "  static gap::generator<" << class_name
-        << "> overlapping_macro(const MacroSubstitution sub);\n"
+        << "> overlapping(const MacroSubstitution sub);\n"
         << "  static gap::generator<" << class_name
-        << "> overlapping_macro(const std::optional<MacroSubstitution> &sub);\n\n";
+        << "> overlapping(const std::optional<MacroSubstitution> &sub);\n\n"
+        << "  static std::optional<" << class_name
+        << "> covering(const MacroSubstitution sub);\n"
+        << "  static std::optional<" << class_name
+        << "> covering(const std::optional<MacroSubstitution> &sub);\n\n";
 
 
       seen_methods->emplace("uses");  // Manual.
@@ -2571,9 +2570,13 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       class_os
         << "  static gap::generator<" << class_name
-        << "> overlapping_macro(const MacroSubstitution sub);\n"
+        << "> overlapping(const MacroSubstitution sub);\n"
         << "  static gap::generator<" << class_name
-        << "> overlapping_macro(const std::optional<MacroSubstitution> &sub);\n\n";
+        << "> overlapping(const std::optional<MacroSubstitution> &sub);\n\n"
+        << "  static std::optional<" << class_name
+        << "> covering(const MacroSubstitution sub);\n"
+        << "  static std::optional<" << class_name
+        << "> covering(const std::optional<MacroSubstitution> &sub);\n\n";
 
       // `Stmt::referenced_declaration`.
       const auto ref = storage.AddMethod("UInt64");

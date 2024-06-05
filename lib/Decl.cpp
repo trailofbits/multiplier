@@ -25,6 +25,7 @@
 #include "Reference.h"
 #include "Types.h"
 #include "Util.h"
+#include "DeclStmtUtil.h"
 
 namespace mx {
 namespace {
@@ -748,29 +749,35 @@ TokenRange NamedDecl::qualified_name(
   return TokenRange(std::move(tr), 0u, num_tokens);
 }
 
-gap::generator<Decl> Decl::overlapping_macro(const MacroSubstitution sub) {
-  auto first = sub.first_fully_substituted_token().parsed_token();
-  auto last = sub.last_fully_substituted_token().parsed_token();
-  std::vector<Decl> entities;
-  auto substituted_tokens = TokenRange::create(first, last);
-  for (auto tok : substituted_tokens) {
-    VariantEntity entity = tok.related_entity();
-    if (std::holds_alternative<Decl>(entity)) {
-      auto decl = std::get<Decl>(entity);
-      if ( auto it = std::find(entities.begin(), entities.end(), decl); it == entities.end()) {
-        entities.emplace_back(decl);
-        co_yield decl;
-      }
+gap::generator<Decl> Decl::overlapping(const MacroSubstitution sub) {
+  return EntityOverlapping<Decl>(sub);
+}
+
+gap::generator<Decl> Decl::overlapping(const std::optional<MacroSubstitution> &macro) {
+  if (macro.has_value()) {
+    for (auto decl : overlapping(macro.value())) {
+      co_yield decl;
     }
   }
 }
 
-gap::generator<Decl> Decl::overlapping_macro(const std::optional<MacroSubstitution> &macro) {
-  if (macro.has_value()) {
-    for (auto decl : overlapping_macro(macro.value())) {
-      co_yield decl;
+std::optional<Decl> Decl::covering(const MacroSubstitution sub) {
+  auto first = sub.first_fully_substituted_token().parsed_token();
+  auto last = sub.last_fully_substituted_token().parsed_token();
+  for (auto decl : EntityOverlapping<Decl>(sub)) {
+    if (!decl.tokens().index_of(first) || !decl.tokens().index_of(last)) {
+      continue;
     }
+    return decl;
   }
+  return std::nullopt;
+}
+
+std::optional<Decl> Decl::covering(const std::optional<MacroSubstitution> &macro) {
+  if (macro.has_value()) {
+    return covering(macro.value());
+  }
+  return std::nullopt;
 }
 
 }  // namespace mx
