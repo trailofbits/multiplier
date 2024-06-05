@@ -755,7 +755,8 @@ gap::generator<Decl> Decl::overlapping(const MacroSubstitution &sub) {
 
 gap::generator<Decl> Decl::overlapping(const std::optional<MacroSubstitution> &macro) {
   if (macro.has_value()) {
-    for (auto decl : overlapping(macro.value())) {
+    auto overlapping_decls = overlapping(macro.value());
+    for (auto decl : overlapping_decls) {
       co_yield decl;
     }
   }
