@@ -9,6 +9,7 @@
 #include <memory>
 #include <optional>
 
+#include "../Entity.h"
 #include "../Types.h"
 
 namespace mx {
