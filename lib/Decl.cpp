@@ -749,7 +749,7 @@ TokenRange NamedDecl::qualified_name(
   return TokenRange(std::move(tr), 0u, num_tokens);
 }
 
-gap::generator<Decl> Decl::overlapping(const MacroSubstitution sub) {
+gap::generator<Decl> Decl::overlapping(const MacroSubstitution &sub) {
   return EntityOverlapping<Decl>(sub);
 }
 
@@ -761,9 +761,14 @@ gap::generator<Decl> Decl::overlapping(const std::optional<MacroSubstitution> &m
   }
 }
 
-std::optional<Decl> Decl::covering(const MacroSubstitution sub) {
-  auto first = sub.first_fully_substituted_token().parsed_token();
-  auto last = sub.last_fully_substituted_token().parsed_token();
+std::optional<Decl> Decl::covering(const MacroSubstitution &sub) {
+  auto [first, last] = get_macro_substitution_boundaries(sub);
+  if (!first || !last) {
+    return std::nullopt;
+  }
+
+  // Get the overlapping entities and check if both first and last token fall
+  // in the declaration token range
   for (auto decl : EntityOverlapping<Decl>(sub)) {
     if (!decl.tokens().index_of(first) || !decl.tokens().index_of(last)) {
       continue;

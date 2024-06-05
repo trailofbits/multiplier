@@ -2532,11 +2532,11 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       class_os
         << "  static gap::generator<" << class_name
-        << "> overlapping(const MacroSubstitution sub);\n"
+        << "> overlapping(const MacroSubstitution &sub);\n"
         << "  static gap::generator<" << class_name
         << "> overlapping(const std::optional<MacroSubstitution> &sub);\n\n"
         << "  static std::optional<" << class_name
-        << "> covering(const MacroSubstitution sub);\n"
+        << "> covering(const MacroSubstitution &sub);\n"
         << "  static std::optional<" << class_name
         << "> covering(const std::optional<MacroSubstitution> &sub);\n\n";
 
@@ -2570,11 +2570,11 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       class_os
         << "  static gap::generator<" << class_name
-        << "> overlapping(const MacroSubstitution sub);\n"
+        << "> overlapping(const MacroSubstitution &sub);\n"
         << "  static gap::generator<" << class_name
         << "> overlapping(const std::optional<MacroSubstitution> &sub);\n\n"
         << "  static std::optional<" << class_name
-        << "> covering(const MacroSubstitution sub);\n"
+        << "> covering(const MacroSubstitution &sub);\n"
         << "  static std::optional<" << class_name
         << "> covering(const std::optional<MacroSubstitution> &sub);\n\n";
 

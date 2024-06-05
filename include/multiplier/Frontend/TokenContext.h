@@ -80,6 +80,9 @@ class MX_EXPORT TokenContext {
     return offset;
   }
 
+  // Return this TokenContext as a `VariantEntity`.
+  VariantEntity as_variant(void) const noexcept;
+
 #define MX_FORWARD_DECLARE_GETTER(ns_path, type_name, lower_name, enum_name, category) \
     std::optional<ns_path type_name> as_ ## lower_name(void) const;
 

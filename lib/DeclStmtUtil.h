@@ -9,6 +9,7 @@
 #include <multiplier/Entity.h>
 #include <multiplier/Frontend/MacroSubstitution.h>
 #include <multiplier/Frontend/Token.h>
+#include <tuple>
 
 #include "Fragment.h"
 #include "Token.h"
@@ -18,31 +19,16 @@ namespace mx {
 
 namespace {
 
-template <typename T>
-VariantEntity get_entity_as_variant(std::optional<TokenContext> ctx);
-
-template <>
-VariantEntity get_entity_as_variant<Decl>(std::optional<TokenContext> ctx) {
-  auto maybe_entity = ctx->as_declaration();
-  if (maybe_entity) {
-    return std::move(maybe_entity.value());
-  }
-  return NotAnEntity{};
-}
-
-template <>
-VariantEntity get_entity_as_variant<Stmt>(std::optional<TokenContext> ctx) {
-  auto maybe_entity = ctx->as_statement();
-  if (maybe_entity) {
-    return std::move(maybe_entity.value());
-  }
-  return NotAnEntity{};
+static inline
+std::tuple<Token, Token> get_macro_substitution_boundaries(
+    const mx::MacroSubstitution &sub) {
+  return std::make_tuple(sub.first_fully_substituted_token().parsed_token(),
+                          sub.last_fully_substituted_token().parsed_token());
 }
 
 template <typename T>
-static gap::generator<T> EntityOverlapping(mx::MacroSubstitution sub) {
-  auto first = sub.first_fully_substituted_token().parsed_token();
-  auto last = sub.last_fully_substituted_token().parsed_token();
+static gap::generator<T> EntityOverlapping(const mx::MacroSubstitution sub) {
+  auto [first, last] = get_macro_substitution_boundaries(sub);
   if (!first || !last) {
     co_return;
   }
@@ -67,7 +53,7 @@ static gap::generator<T> EntityOverlapping(mx::MacroSubstitution sub) {
     for (auto context = expansion_tok.context(); 
             context; context = context->parent()) {
 
-      auto variant = get_entity_as_variant<T>(context);
+      auto variant = context->as_variant();
       if (!std::holds_alternative<T>(variant)) {
         continue;
       }

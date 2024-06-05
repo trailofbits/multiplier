@@ -53,7 +53,7 @@ std::optional<CastExpr> CallExpr::casted_return_value(void) const {
   return std::nullopt;
 }
 
-gap::generator<Stmt> Stmt::overlapping(const MacroSubstitution sub) {
+gap::generator<Stmt> Stmt::overlapping(const MacroSubstitution &sub) {
   return EntityOverlapping<Stmt>(sub);
 }
 
@@ -65,9 +65,14 @@ gap::generator<Stmt> overlapping(const std::optional<MacroSubstitution> &sub) {
   }
 }
 
-std::optional<Stmt> Stmt::covering(const MacroSubstitution sub) {
-  auto first = sub.first_fully_substituted_token().parsed_token();
-  auto last = sub.last_fully_substituted_token().parsed_token();
+std::optional<Stmt> Stmt::covering(const MacroSubstitution &sub) {
+  auto [first, last] = get_macro_substitution_boundaries(sub);
+  if (!first || !last) {
+    return std::nullopt;
+  }
+
+  // Get the overlapping entities and check if both first and last token fall
+  // in the statement token range
   for (auto stmt : EntityOverlapping<Stmt>(sub)) {
     if (!stmt.tokens().index_of(first) || !stmt.tokens().index_of(last)) {
       continue;

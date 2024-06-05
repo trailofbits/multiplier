@@ -48,9 +48,8 @@ int main(int argc, char *argv[]) {
       }
 
       for (mx::PreprocessedEntity node : fragment->preprocessed_code()) {
-        if (std::holds_alternative<mx::Macro>(node)) {
-          const mx::Macro &macro = std::get<mx::Macro>(node);
-          PrintDeclOverlappingMacroSubstitution(fragment.value(), macro);
+        if (auto macro = std::get_if<mx::Macro>(&node)) {
+          PrintDeclOverlappingMacroSubstitution(fragment.value(), *macro);
         }
       }
     }
