@@ -640,6 +640,7 @@ class TokenContext(object):
   entity_id: int
   has_parent: bool
   index_in_fragment: int
+  as_variant: multiplier.Entity
   as_declaration: Optional[multiplier.ast.Decl]
   as_statement: Optional[multiplier.ast.Stmt]
   as_attribute: Optional[multiplier.ast.Attr]
@@ -786,8 +787,14 @@ class TokenRange(object, Sequence[Token], Iterable[Token]):
   file_tokens: multiplier.frontend.TokenRange
   strip_whitespace: multiplier.frontend.TokenRange
 
+  @overload
   @staticmethod
   def create(tokens: Sequence[multiplier.frontend.UserToken | multiplier.frontend.Token]) -> multiplier.frontend.TokenRange:
+    ...
+
+  @overload
+  @staticmethod
+  def create(first: multiplier.frontend.Token, last: multiplier.frontend.Token) -> multiplier.frontend.TokenRange:
     ...
 
   def slice(self, start_index: int, end_index: int) -> multiplier.frontend.TokenRange:

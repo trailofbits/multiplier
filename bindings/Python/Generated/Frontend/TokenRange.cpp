@@ -201,6 +201,18 @@ static PyMethodDef gMethods[] = {
 
             return ::mx::to_python(T::create(std::move(arg_0.value())));
           }
+          while (num_args == 2) {
+            auto arg_0 = ::mx::from_python<mx::Token>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+            auto arg_1 = ::mx::from_python<mx::Token>(args[1]);
+            if (!arg_1.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(T::create(arg_0.value(), arg_1.value()));
+          }
 
           PyErrorStreamer(PyExc_TypeError)
               << "Invalid arguments passed to 'create'";
