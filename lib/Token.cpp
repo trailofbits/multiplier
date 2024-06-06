@@ -1505,10 +1505,10 @@ TokenRange TokenRange::create(const Token &first, const Token &last) {
 
   // If tokens are macro token, don't create a token range from it. They
   // may not be in the order.
-  if (std::holds_alternative<MacroTokenId>(first.id().Unpack())||
-      std::holds_alternative<MacroTokenId>(last.id().Unpack())) {
+  if (auto reader = dynamic_cast<const ReadMacroTokensFromFragment*>(first.impl.get())) {
     return TokenRange();
   }
+
 
   auto start = std::min(first.offset, last.offset);
   auto end = std::max(first.offset, last.offset);
