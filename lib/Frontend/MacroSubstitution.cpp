@@ -16,6 +16,7 @@
 #include <multiplier/Frontend/MacroStringify.h>
 
 #include "../EntityProvider.h"
+#include "../Fragment.h"
 #include "../Macro.h"
 
 namespace mx {
@@ -200,6 +201,12 @@ Token MacroSubstitution::name_or_operator(void) const {
     return impl->ep->TokenFor(impl->ep, eid);
   }
   return Token();
+}
+
+TokenRange MacroSubstitution::parsed_tokens(void) const {
+  return TokenRange::create(
+      first_fully_substituted_token().parsed_token(),
+      last_fully_substituted_token().parsed_token());
 }
 
 #pragma GCC diagnostic pop

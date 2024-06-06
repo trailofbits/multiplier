@@ -3921,6 +3921,21 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "  std::optional<CastExpr> casted_return_value(void) const;\n";
   }
 
+  if (class_name == "MacroSubstitution") {
+    forward_decls.insert("TokenRange");
+    seen_methods->emplace("casted_return_type");
+    class_os
+        << "  TokenRange parsed_tokens(void) const;\n\n";
+
+    lib_cpp_os
+        << "TokenRange "
+        << class_name << "::parsed_tokens(void) const {\n"
+        << "  return TokenRange::create(\n"
+        << "      first_fully_substituted_token().parsed_token(),\n"
+        << "      last_fully_substituted_token().parsed_token());\n"
+        << "}\n\n";
+  }
+
   class_os << "};\n\n";
 
   for (auto needed : needed_decls) {
