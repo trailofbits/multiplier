@@ -57,7 +57,7 @@ gap::generator<Stmt> Stmt::overlapping(const MacroSubstitution &sub) {
   return EntityOverlapping<Stmt>(sub);
 }
 
-gap::generator<Stmt> overlapping(const std::optional<MacroSubstitution> &sub) {
+gap::generator<Stmt> Stmt::overlapping(const std::optional<MacroSubstitution> &sub) {
   if (sub.has_value()) {
     auto overlapping_stmts = overlapping(sub.value());
     for (auto stmt : overlapping_stmts) {
