@@ -51,7 +51,7 @@ static gap::generator<T> EntityOverlapping(const mx::MacroSubstitution sub) {
   for (auto i = begin->offset; i <= end->offset; ++i) {
     Token expansion_tok = frag_tokens[i];
     for (auto context = expansion_tok.context(); 
-            context; context = context->parent()) {
+         context; context = context->parent()) {
 
       auto variant = context->as_variant();
       if (!std::holds_alternative<T>(variant)) {
@@ -60,7 +60,7 @@ static gap::generator<T> EntityOverlapping(const mx::MacroSubstitution sub) {
 
       auto eid = context->entity_id();
       if (std::find(seen.begin(), seen.end(), eid) != seen.end()) {
-        continue;
+        break;
       }
 
       seen.push_back(eid);

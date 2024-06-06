@@ -676,10 +676,10 @@ RawEntityIdList SQLiteEntityProvider::ReadRedeclarations(
 
 gap::generator<std::pair<RawEntityId, RawEntityId>>
 SQLiteEntityProvider::SpecificReferences(
-    const Ptr &self, RawEntityId raw_id, RawEntityId kind_id,
+    const Ptr &self_, RawEntityId raw_id, RawEntityId kind_id,
     EntityProvider::ReferenceDirection dir, bool get_redecls) & {
 
-  Ptr self_ = self;
+  Ptr self = self_;
   ImplPtr context = impl.Lock();
   sqlite::Statement &get_references = (dir == EntityProvider::kReferenceTo ?
                                        context->get_specific_references_to :
@@ -693,7 +693,7 @@ SQLiteEntityProvider::SpecificReferences(
   RawEntityIdList redecl_ids;
   if (get_redecls) {
     do {
-      for (RawEntityId raw_redecl_id : self_->Redeclarations(self_, raw_id)) {
+      for (RawEntityId raw_redecl_id : self->Redeclarations(self, raw_id)) {
         redecl_ids.push_back(raw_redecl_id);
       }
     } while (false);
@@ -721,7 +721,7 @@ SQLiteEntityProvider::SpecificReferences(
   std::array<std::pair<RawEntityId, RawEntityId>, MX_REFERENCE_PAGE_SIZE>
       paged_results;
 
-  auto version = self_->VersionNumber();
+  auto version = self->VersionNumber();
   for (auto found = true; found; ) {
     found = false;
     auto num_paged_results = 0u;
@@ -772,7 +772,7 @@ SQLiteEntityProvider::SpecificReferences(
     }
 
     // Index changed on us; exit early.
-    if (found && version != self_->VersionNumber()) {
+    if (found && version != self->VersionNumber()) {
       co_return;
     }
   }

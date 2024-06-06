@@ -1503,9 +1503,10 @@ TokenRange TokenRange::create(const Token &first, const Token &last) {
     return TokenRange();
   }
 
-  // If tokens are macro token, don't create a token range from it. They
-  // may not be in the order.
-  if (auto reader = dynamic_cast<const ReadMacroTokensFromFragment*>(first.impl.get())) {
+  // If tokens are macro token, the order is not important as it might
+  // cross into the macro expansions or from uses to expansions. Return
+  // empty token range in such case.
+  if (dynamic_cast<const ReadMacroTokensFromFragment*>(first.impl.get())) {
     return TokenRange();
   }
 
