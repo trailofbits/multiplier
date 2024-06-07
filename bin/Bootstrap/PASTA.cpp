@@ -3900,7 +3900,6 @@ MethodListPtr CodeGenerator::RunOnClass(
   // list of fully substituted tokens.
   if (class_name == "MacroSubstitution") {
     forward_decls.insert("TokenRange");
-    seen_methods->emplace("casted_return_type");
     class_os
         << "  TokenRange parsed_tokens(void) const;\n\n";
 
