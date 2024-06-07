@@ -3896,6 +3896,14 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "  std::optional<CastExpr> casted_return_value(void) const;\n";
   }
 
+  // Add parsed_tokens API in MacroSubstitution to get the
+  // list of fully substituted tokens.
+  if (class_name == "MacroSubstitution") {
+    forward_decls.insert("TokenRange");
+    class_os
+        << "  TokenRange parsed_tokens(void) const;\n\n";
+  }
+
   class_os << "};\n\n";
 
   for (auto needed : needed_decls) {

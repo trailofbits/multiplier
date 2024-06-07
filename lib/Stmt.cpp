@@ -7,6 +7,7 @@
 #include "Stmt.h"
 
 #include <multiplier/Index.h>
+#include <multiplier/Frontend/MacroSubstitution.h>
 
 #include "Fragment.h"
 #include "Reference.h"

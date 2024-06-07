@@ -180,6 +180,16 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::MacroSubstitution::name_or_operator"),
     nullptr,
   },
+  {
+    "parsed_tokens",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->parsed_tokens());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MacroSubstitution::parsed_tokens"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

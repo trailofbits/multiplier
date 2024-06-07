@@ -640,6 +640,7 @@ class TokenContext(object):
   entity_id: int
   has_parent: bool
   index_in_fragment: int
+  as_variant: multiplier.Entity
   as_declaration: Optional[multiplier.ast.Decl]
   as_statement: Optional[multiplier.ast.Stmt]
   as_attribute: Optional[multiplier.ast.Attr]
@@ -785,9 +786,19 @@ class TokenRange(object, Sequence[Token], Iterable[Token]):
   data: str
   file_tokens: multiplier.frontend.TokenRange
   strip_whitespace: multiplier.frontend.TokenRange
+  overlapping_declarations: Iterable[multiplier.ast.Decl]
+  covering_declaration: Optional[multiplier.ast.Decl]
+  overlapping_statements: Iterable[multiplier.ast.Stmt]
+  covering_statement: Optional[multiplier.ast.Stmt]
 
+  @overload
   @staticmethod
   def create(tokens: Sequence[multiplier.frontend.UserToken | multiplier.frontend.Token]) -> multiplier.frontend.TokenRange:
+    ...
+
+  @overload
+  @staticmethod
+  def create(first: multiplier.frontend.Token, last: multiplier.frontend.Token) -> multiplier.frontend.TokenRange:
     ...
 
   def slice(self, start_index: int, end_index: int) -> multiplier.frontend.TokenRange:
@@ -1021,6 +1032,7 @@ class MacroSubstitution(multiplier.frontend.Macro):
   first_fully_substituted_token: multiplier.frontend.Token
   last_fully_substituted_token: multiplier.frontend.Token
   name_or_operator: multiplier.frontend.Token
+  parsed_tokens: multiplier.frontend.TokenRange
 
   @overload
   @staticmethod

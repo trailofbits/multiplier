@@ -676,9 +676,10 @@ RawEntityIdList SQLiteEntityProvider::ReadRedeclarations(
 
 gap::generator<std::pair<RawEntityId, RawEntityId>>
 SQLiteEntityProvider::SpecificReferences(
-    const Ptr &self, RawEntityId raw_id, RawEntityId kind_id,
+    const Ptr &self_, RawEntityId raw_id, RawEntityId kind_id,
     EntityProvider::ReferenceDirection dir, bool get_redecls) & {
 
+  Ptr self = self_;
   ImplPtr context = impl.Lock();
   sqlite::Statement &get_references = (dir == EntityProvider::kReferenceTo ?
                                        context->get_specific_references_to :

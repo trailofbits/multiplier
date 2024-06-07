@@ -143,6 +143,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "as_variant",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->as_variant());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TokenContext::as_variant"),
+    nullptr,
+  },
+  {
     "as_declaration",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

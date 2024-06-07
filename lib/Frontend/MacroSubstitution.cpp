@@ -16,6 +16,7 @@
 #include <multiplier/Frontend/MacroStringify.h>
 
 #include "../EntityProvider.h"
+#include "../Fragment.h"
 #include "../Macro.h"
 
 namespace mx {
