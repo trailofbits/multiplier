@@ -24,16 +24,17 @@ class PendingFragment;
 class CodeGeneratorImpl;
 class CodeGenerator {
  private:
+  bool enabled = true;
   std::unique_ptr<CodeGeneratorImpl> impl;
 
  public:
-  ~CodeGenerator(void);
+  CodeGenerator();
 
-  CodeGenerator(void);
+  ~CodeGenerator();
 
-  void Disable(void);
+  void Disable();
 
-  bool IsEnabled(void) const noexcept;
+  bool IsEnabled() const;
 
   // Generate Source IR from the top-level declarations. It uses vast
   // emit_module API to lower the top-level declarations and save them
