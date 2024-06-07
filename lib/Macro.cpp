@@ -203,4 +203,10 @@ gap::generator<Token> Macro::generate_expansion_tokens(void) const & {
   }
 }
 
+TokenRange MacroSubstitution::parsed_tokens(void) const  {
+  return TokenRange::create(
+      first_fully_substituted_token().parsed_token(),
+      last_fully_substituted_token().parsed_token());
+}
+
 }  // namespace mx

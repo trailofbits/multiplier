@@ -12,7 +12,6 @@
 #include "Fragment.h"
 #include "Reference.h"
 #include "Types.h"
-#include "DeclStmtUtil.h"
 
 namespace mx {
 

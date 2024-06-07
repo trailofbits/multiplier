@@ -27,7 +27,6 @@
 #include "Fragment.h"
 #include "Reference.h"
 #include "Type.h"
-#include "DeclStmtUtil.h"
 #include "Util.h"
 
 namespace mx {
@@ -1464,12 +1463,12 @@ VariantEntity Token::related_entity(void) const {
 TokenRange::TokenRange(void)
     : impl(kInvalidTokenReader),
       index(0),
-      end_offset(0) {}
+      end_index(0) {}
 
 TokenRange::TokenRange(const Token &tok)
     : impl(tok.impl),
       index(tok.offset),
-      end_offset(tok.impl ? (tok.offset + 1u) : 0u) {}
+      end_index(tok.impl ? (tok.offset + 1u) : 0u) {}
 
 TokenRange TokenRange::create(std::vector<CustomToken> tokens) {
 
@@ -1518,7 +1517,7 @@ TokenRange TokenRange::create(const Token &first, const Token &last) {
 }
 
 bool TokenRange::operator==(const TokenRange &that) const noexcept {
-  if (end_offset == that.end_offset && index == that.index) {
+  if (end_index == that.end_index && index == that.index) {
     if (impl && that.impl) {
       return impl->Equals(that.impl.get());
     } else {
@@ -1531,7 +1530,7 @@ bool TokenRange::operator==(const TokenRange &that) const noexcept {
 // Return the token at index `index`.
 Token TokenRange::operator[](size_t relative_index) const {
   size_t effective_index = (index + relative_index);
-  if (effective_index >= end_offset) {
+  if (effective_index >= end_index) {
     throw std::out_of_range(
         "Index " + std::to_string(relative_index) +
         " is out of range on mx::TokenRange");
@@ -1547,23 +1546,22 @@ Token TokenRange::front(void) const {
 
 // Return the last token.
 Token TokenRange::back(void) const {
-  return Token(impl, end_offset - 1u);
+  return Token(impl, end_index - 1u);
 }
 
 // Return a slice of this token range. If the indices given are invalid, then
 // an empty token range is returned. The indices cover the tokens in the
-// exclusive range `[start_index, end_index)`.
-TokenRange TokenRange::slice(size_t start_index,
-                             size_t end_index) const noexcept {
-  if (end_index <= start_index || start_index >= end_offset ||
-      end_index > end_offset || (index + start_index) >= end_offset ||
-      (index + end_index) > end_offset ||
-      static_cast<EntityOffset>(index + start_index) != (index + start_index) ||
-      static_cast<EntityOffset>(index + end_index) != (index + end_index)) {
+// exclusive range `[start, end)`.
+TokenRange TokenRange::slice(size_t start, size_t end) const noexcept {
+  if (end <= start || start >= end_index ||
+      end > end_index || (index + start) >= end_index ||
+      (index + end_index) > end_index ||
+      static_cast<EntityOffset>(index + start) != (index + start) ||
+      static_cast<EntityOffset>(index + end) != (index + end)) {
     return TokenRange();
   } else {
-    return TokenRange(impl, static_cast<EntityOffset>(index + start_index),
-                      static_cast<EntityOffset>(index + end_index));
+    return TokenRange(impl, static_cast<EntityOffset>(index + start),
+                      static_cast<EntityOffset>(index + end));
   }
 }
 
@@ -1580,7 +1578,7 @@ std::optional<unsigned> TokenRange::index_of(const Token &that) const noexcept {
       return std::nullopt;
     }
 
-    if (id.offset >= end_offset) {
+    if (id.offset >= end_index) {
       return std::nullopt;
     }
 
@@ -1592,7 +1590,7 @@ std::optional<unsigned> TokenRange::index_of(const Token &that) const noexcept {
       return std::nullopt;
     }
 
-    if (id.offset >= end_offset) {
+    if (id.offset >= end_index) {
       return std::nullopt;
     }
 
@@ -1606,12 +1604,12 @@ std::optional<unsigned> TokenRange::index_of(const Token &that) const noexcept {
 // Return the underlying token data associated with the tokens covered by this
 // token range.
 std::string_view TokenRange::data(void) const & {
-  if (!impl || impl.get() == kInvalidTokenReader.get() || !end_offset) {
+  if (!impl || impl.get() == kInvalidTokenReader.get() || !end_index) {
     return kEmptyStringView;
   }
 
   auto data_begin = impl->NthTokenData(index);
-  auto data_end = impl->NthTokenData(end_offset - 1u);
+  auto data_end = impl->NthTokenData(end_index - 1u);
 
   if (data_begin.data() > data_end.data()) {
     assert(false);
@@ -1675,10 +1673,81 @@ static std::optional<Macro> OriginatingMacroArgumentOrParameter(mx::Token dt) {
 
 }  // namespace
 
+namespace {
+
+template <typename T>
+static gap::generator<T> EntityOverlapping(mx::TokenRange tokens) {
+  auto begin = tokens.front().id().Extract<ParsedTokenId>();
+  auto end = tokens.back().id().Extract<ParsedTokenId>();
+  // if begin and end token have invalid fragment id. It is possible if MacroSubstitution
+  // substitute to empty data
+  if (!begin->fragment_id || !end->fragment_id) {
+    co_return;
+  }
+
+  // Verify if the fragment id is same and offset are in order
+  if ((begin->fragment_id != end->fragment_id) || (begin->offset > end->offset)) {
+    assert(false);
+    co_return;
+  }
+
+  auto frag_tokens = Fragment::containing(tokens.front())->parsed_tokens();
+  if (frag_tokens.empty()) {
+    assert(false);
+    co_return;
+  }
+
+  std::vector<RawEntityId> seen;
+  for (auto i = begin->offset; i <= end->offset; ++i) {
+    Token expansion_tok = frag_tokens[i];
+    for (auto context = expansion_tok.context(); 
+         context; context = context->parent()) {
+
+      auto variant = context->as_variant();
+      if (!std::holds_alternative<T>(variant)) {
+        continue;
+      }
+
+      auto eid = context->entity_id();
+      if (std::find(seen.begin(), seen.end(), eid) != seen.end()) {
+        break;
+      }
+
+      seen.push_back(eid);
+
+      T entity = std::move(std::get<T>(variant));
+      if (!entity.tokens().index_of(expansion_tok)) {
+        break;
+      }
+
+      co_yield std::move(entity);
+    }
+  }
+}
+
+template <typename T>
+static std::optional<T> EntityCovering(const TokenRange &tokens) {
+  // Get the overlapping entities and check if both first and last token fall
+  // in the declaration/statments token range
+  auto first = tokens.front();
+  auto last = tokens.back();
+  auto overlappings = EntityOverlapping<T>(tokens);
+  for (auto entity : overlappings) {
+    auto entity_tokens = entity.tokens();
+    if (!entity_tokens.index_of(first) || !entity_tokens.index_of(last)) {
+      continue;
+    }
+    return entity;
+  }
+  return std::nullopt;
+}
+
+}  // namespace
+
 // Convert this token range into a file token range.
 TokenRange TokenRange::file_tokens(void) const noexcept {
   TokenRange ret;
-  if (!impl || impl.get() == kInvalidTokenReader.get() || !end_offset) {
+  if (!impl || impl.get() == kInvalidTokenReader.get() || !end_index) {
     return ret;
   }
 
@@ -1758,14 +1827,14 @@ TokenRange TokenRange::file_tokens(void) const noexcept {
 
   ret.impl = last_file->impl->TokenReader(last_file->impl);
   ret.index = min_offset;
-  ret.end_offset = max_offset + 1u;
+  ret.end_index = max_offset + 1u;
   return ret;
 }
 
 // Strip leading and trailing whitespace.
 TokenRange TokenRange::strip_whitespace(void) const noexcept {
   TokenRange ret(*this);
-  for (; ret.index < ret.end_offset; ++ret.index) {
+  for (; ret.index < ret.end_index; ++ret.index) {
     const TokenKind kind = impl->NthTokenKind(ret.index);
     if (kind == TokenKind::WHITESPACE) {
       continue;
@@ -1777,39 +1846,39 @@ TokenRange TokenRange::strip_whitespace(void) const noexcept {
     }
   }
 
-  for (; ret.end_offset > ret.index; --ret.end_offset) {
-    const TokenKind kind = impl->NthTokenKind(ret.end_offset - 1u);
+  for (; ret.end_index > ret.index; --ret.end_index) {
+    const TokenKind kind = impl->NthTokenKind(ret.end_index - 1u);
     if (kind == TokenKind::WHITESPACE) {
       continue;
     } else if (kind == TokenKind::UNKNOWN &&
-               impl->NthTokenData(ret.end_offset - 1u).empty()) {
+               impl->NthTokenData(ret.end_index - 1u).empty()) {
       continue;
     } else {
       break;
     }
   }
 
-  if (ret.end_offset <= ret.index) {
-    ret.end_offset = 0;
+  if (ret.end_index <= ret.index) {
+    ret.end_index = 0;
     ret.index = 0;
   }
 
   return ret;
 }
 
-gap::generator<Decl> TokenRange::overlapping_declarations(void) const& noexcept{
+gap::generator<Decl> TokenRange::overlapping_declarations(void) const & noexcept{
   return EntityOverlapping<Decl>(*this);
 }
 
-std::optional<Decl> TokenRange::covering_declaration(void) const& noexcept{
+std::optional<Decl> TokenRange::covering_declaration(void) const & noexcept{
   return EntityCovering<Decl>(*this);
 }
 
-gap::generator<Stmt> TokenRange::overlapping_statements(void) const& noexcept{
+gap::generator<Stmt> TokenRange::overlapping_statements(void) const & noexcept{
   return EntityOverlapping<Stmt>(*this);
 }
 
-std::optional<Stmt> TokenRange::covering_statement(void) const& noexcept{
+std::optional<Stmt> TokenRange::covering_statement(void) const & noexcept{
   return EntityCovering<Stmt>(*this);
 }
 

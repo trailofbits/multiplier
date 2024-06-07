@@ -203,12 +203,6 @@ Token MacroSubstitution::name_or_operator(void) const {
   return Token();
 }
 
-TokenRange MacroSubstitution::parsed_tokens(void) const {
-  return TokenRange::create(
-      first_fully_substituted_token().parsed_token(),
-      last_fully_substituted_token().parsed_token());
-}
-
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

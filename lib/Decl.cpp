@@ -5,7 +5,6 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include "Decl.h"
-#include <iostream>
 
 #include <multiplier/AST/ClassTemplateDecl.h>
 #include <multiplier/AST/ClassTemplatePartialSpecializationDecl.h>
@@ -25,7 +24,6 @@
 #include "Reference.h"
 #include "Types.h"
 #include "Util.h"
-#include "DeclStmtUtil.h"
 
 namespace mx {
 namespace {
