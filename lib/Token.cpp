@@ -27,6 +27,7 @@
 #include "Fragment.h"
 #include "Reference.h"
 #include "Type.h"
+#include "DeclStmtUtil.h"
 #include "Util.h"
 
 namespace mx {
@@ -1463,12 +1464,12 @@ VariantEntity Token::related_entity(void) const {
 TokenRange::TokenRange(void)
     : impl(kInvalidTokenReader),
       index(0),
-      num_tokens(0) {}
+      end_offset(0) {}
 
 TokenRange::TokenRange(const Token &tok)
     : impl(tok.impl),
       index(tok.offset),
-      num_tokens(tok.impl ? (tok.offset + 1u) : 0u) {}
+      end_offset(tok.impl ? (tok.offset + 1u) : 0u) {}
 
 TokenRange TokenRange::create(std::vector<CustomToken> tokens) {
 
@@ -1506,18 +1507,18 @@ TokenRange TokenRange::create(const Token &first, const Token &last) {
   // If tokens are macro token, the order is not important as it might
   // cross into the macro expansions or from uses to expansions. Return
   // empty token range in such case.
-  if (dynamic_cast<const ReadMacroTokensFromFragment*>(first.impl.get())) {
+  VariantId vid = first.id().Unpack();
+  if (std::holds_alternative<MacroTokenId>(vid)) {
     return TokenRange();
   }
 
-
   auto start = std::min(first.offset, last.offset);
   auto end = std::max(first.offset, last.offset);
-  return TokenRange(first.impl, start, (end - start) + 1u);
+  return TokenRange(first.impl, start, end + 1u);
 }
 
 bool TokenRange::operator==(const TokenRange &that) const noexcept {
-  if (num_tokens == that.num_tokens && index == that.index) {
+  if (end_offset == that.end_offset && index == that.index) {
     if (impl && that.impl) {
       return impl->Equals(that.impl.get());
     } else {
@@ -1530,7 +1531,7 @@ bool TokenRange::operator==(const TokenRange &that) const noexcept {
 // Return the token at index `index`.
 Token TokenRange::operator[](size_t relative_index) const {
   size_t effective_index = (index + relative_index);
-  if (effective_index >= num_tokens) {
+  if (effective_index >= end_offset) {
     throw std::out_of_range(
         "Index " + std::to_string(relative_index) +
         " is out of range on mx::TokenRange");
@@ -1546,7 +1547,7 @@ Token TokenRange::front(void) const {
 
 // Return the last token.
 Token TokenRange::back(void) const {
-  return Token(impl, num_tokens - 1u);
+  return Token(impl, end_offset - 1u);
 }
 
 // Return a slice of this token range. If the indices given are invalid, then
@@ -1554,9 +1555,9 @@ Token TokenRange::back(void) const {
 // exclusive range `[start_index, end_index)`.
 TokenRange TokenRange::slice(size_t start_index,
                              size_t end_index) const noexcept {
-  if (end_index <= start_index || start_index >= num_tokens ||
-      end_index > num_tokens || (index + start_index) >= num_tokens ||
-      (index + end_index) > num_tokens ||
+  if (end_index <= start_index || start_index >= end_offset ||
+      end_index > end_offset || (index + start_index) >= end_offset ||
+      (index + end_index) > end_offset ||
       static_cast<EntityOffset>(index + start_index) != (index + start_index) ||
       static_cast<EntityOffset>(index + end_index) != (index + end_index)) {
     return TokenRange();
@@ -1579,7 +1580,7 @@ std::optional<unsigned> TokenRange::index_of(const Token &that) const noexcept {
       return std::nullopt;
     }
 
-    if (id.offset >= num_tokens) {
+    if (id.offset >= end_offset) {
       return std::nullopt;
     }
 
@@ -1591,7 +1592,7 @@ std::optional<unsigned> TokenRange::index_of(const Token &that) const noexcept {
       return std::nullopt;
     }
 
-    if (id.offset >= num_tokens) {
+    if (id.offset >= end_offset) {
       return std::nullopt;
     }
 
@@ -1605,12 +1606,12 @@ std::optional<unsigned> TokenRange::index_of(const Token &that) const noexcept {
 // Return the underlying token data associated with the tokens covered by this
 // token range.
 std::string_view TokenRange::data(void) const & {
-  if (!impl || impl.get() == kInvalidTokenReader.get() || !num_tokens) {
+  if (!impl || impl.get() == kInvalidTokenReader.get() || !end_offset) {
     return kEmptyStringView;
   }
 
   auto data_begin = impl->NthTokenData(index);
-  auto data_end = impl->NthTokenData(num_tokens - 1u);
+  auto data_end = impl->NthTokenData(end_offset - 1u);
 
   if (data_begin.data() > data_end.data()) {
     assert(false);
@@ -1677,7 +1678,7 @@ static std::optional<Macro> OriginatingMacroArgumentOrParameter(mx::Token dt) {
 // Convert this token range into a file token range.
 TokenRange TokenRange::file_tokens(void) const noexcept {
   TokenRange ret;
-  if (!impl || impl.get() == kInvalidTokenReader.get() || !num_tokens) {
+  if (!impl || impl.get() == kInvalidTokenReader.get() || !end_offset) {
     return ret;
   }
 
@@ -1757,14 +1758,14 @@ TokenRange TokenRange::file_tokens(void) const noexcept {
 
   ret.impl = last_file->impl->TokenReader(last_file->impl);
   ret.index = min_offset;
-  ret.num_tokens = max_offset + 1u;
+  ret.end_offset = max_offset + 1u;
   return ret;
 }
 
 // Strip leading and trailing whitespace.
 TokenRange TokenRange::strip_whitespace(void) const noexcept {
   TokenRange ret(*this);
-  for (; ret.index < ret.num_tokens; ++ret.index) {
+  for (; ret.index < ret.end_offset; ++ret.index) {
     const TokenKind kind = impl->NthTokenKind(ret.index);
     if (kind == TokenKind::WHITESPACE) {
       continue;
@@ -1776,25 +1777,42 @@ TokenRange TokenRange::strip_whitespace(void) const noexcept {
     }
   }
 
-  for (; ret.num_tokens > ret.index; --ret.num_tokens) {
-    const TokenKind kind = impl->NthTokenKind(ret.num_tokens - 1u);
+  for (; ret.end_offset > ret.index; --ret.end_offset) {
+    const TokenKind kind = impl->NthTokenKind(ret.end_offset - 1u);
     if (kind == TokenKind::WHITESPACE) {
       continue;
     } else if (kind == TokenKind::UNKNOWN &&
-               impl->NthTokenData(ret.num_tokens - 1u).empty()) {
+               impl->NthTokenData(ret.end_offset - 1u).empty()) {
       continue;
     } else {
       break;
     }
   }
 
-  if (ret.num_tokens <= ret.index) {
-    ret.num_tokens = 0;
+  if (ret.end_offset <= ret.index) {
+    ret.end_offset = 0;
     ret.index = 0;
   }
 
   return ret;
 }
+
+gap::generator<Decl> TokenRange::overlapping_declarations(void) const& noexcept{
+  return EntityOverlapping<Decl>(*this);
+}
+
+std::optional<Decl> TokenRange::covering_declaration(void) const& noexcept{
+  return EntityCovering<Decl>(*this);
+}
+
+gap::generator<Stmt> TokenRange::overlapping_statements(void) const& noexcept{
+  return EntityOverlapping<Stmt>(*this);
+}
+
+std::optional<Stmt> TokenRange::covering_statement(void) const& noexcept{
+  return EntityCovering<Stmt>(*this);
+}
+
 
 std::shared_ptr<TokenTreeImpl> TokenTreeImplCache::Get(void) const {
   std::unique_lock<std::mutex> locker(lock);

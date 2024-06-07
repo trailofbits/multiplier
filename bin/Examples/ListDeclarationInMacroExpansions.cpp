@@ -15,7 +15,7 @@
 
 void PrintDeclOverlappingMacroSubstitution(const mx::Fragment &fragment, const mx::Macro &macro) {
   if (auto sub = mx::MacroSubstitution::from(macro)) {
-    for (auto decl : mx::Decl::overlapping(sub.value())) {
+    for (auto decl : sub->parsed_tokens().overlapping_declarations()) {
       std::cout
         << fragment.id() << "\t\t"
         << decl.id() << "\t\t"

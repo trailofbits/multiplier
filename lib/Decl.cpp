@@ -749,28 +749,4 @@ TokenRange NamedDecl::qualified_name(
   return TokenRange(std::move(tr), 0u, num_tokens);
 }
 
-gap::generator<Decl> Decl::overlapping(const MacroSubstitution &sub) {
-  return EntityOverlapping<Decl>(sub);
-}
-
-gap::generator<Decl> Decl::overlapping(const std::optional<MacroSubstitution> &macro) {
-  if (macro.has_value()) {
-    auto overlapping_decls = overlapping(macro.value());
-    for (auto decl : overlapping_decls) {
-      co_yield decl;
-    }
-  }
-}
-
-std::optional<Decl> Decl::covering(const MacroSubstitution &sub) {
-  return EntityCovering<Decl>(sub);
-}
-
-std::optional<Decl> Decl::covering(const std::optional<MacroSubstitution> &macro) {
-  if (macro.has_value()) {
-    return covering(macro.value());
-  }
-  return std::nullopt;
-}
-
 }  // namespace mx

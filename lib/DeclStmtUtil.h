@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <iostream>
+
 #include <multiplier/Entity.h>
 #include <multiplier/Frontend/MacroSubstitution.h>
 #include <multiplier/Frontend/Token.h>
@@ -19,35 +21,29 @@ namespace mx {
 
 namespace {
 
-static inline
-std::pair<Token, Token> ParsedSusbstitutionBoundaries(
-    const mx::MacroSubstitution &sub) {
-  return std::make_pair(sub.first_fully_substituted_token().parsed_token(),
-                          sub.last_fully_substituted_token().parsed_token());
-}
-
 template <typename T>
-static gap::generator<T> EntityOverlapping(const mx::MacroSubstitution sub) {
-  auto [first, last] = ParsedSusbstitutionBoundaries(sub);
-  if (!first || !last) {
+static gap::generator<T> EntityOverlapping(const mx::TokenRange tokens) {
+  auto begin = tokens.front().id().Extract<ParsedTokenId>();
+  auto end = tokens.back().id().Extract<ParsedTokenId>();
+  // if begin and end token have invalid fragment id. It is possible if MacroSubstitution
+  // substitute to empty data
+  if (!begin->fragment_id || !end->fragment_id) {
     co_return;
   }
 
-  auto begin = first.id().Extract<ParsedTokenId>();
-  auto end = last.id().Extract<ParsedTokenId>();
-  if ((begin->fragment_id != end->fragment_id) ||
-      (begin->offset > end->offset)) {
+  // Verify if the fragment id is same and offset are in order
+  if ((begin->fragment_id != end->fragment_id) || (begin->offset > end->offset)) {
     assert(false);
     co_return;
   }
 
-  auto frag_tokens = Fragment::containing(first)->parsed_tokens();
-  if (!frag_tokens) {
+  auto frag_tokens = Fragment::containing(tokens.front())->parsed_tokens();
+  if (frag_tokens.empty()) {
     assert(false);
     co_return;
   }
+
   std::vector<RawEntityId> seen;
-
   for (auto i = begin->offset; i <= end->offset; ++i) {
     Token expansion_tok = frag_tokens[i];
     for (auto context = expansion_tok.context(); 
@@ -76,16 +72,11 @@ static gap::generator<T> EntityOverlapping(const mx::MacroSubstitution sub) {
 }
 
 template <typename T>
-static std::optional<T> EntityCovering(const mx::MacroSubstitution &sub) {
-  auto [first, last] = ParsedSusbstitutionBoundaries(sub);
-  if (!first || !last) {
-    return std::nullopt;
-  }
-
+static std::optional<T> EntityCovering(const TokenRange &tokens) {
   // Get the overlapping entities and check if both first and last token fall
   // in the declaration/statments token range
-  for (auto entity : EntityOverlapping<T>(sub)) {
-    if (!entity.tokens().index_of(first) || !entity.tokens().index_of(last)) {
+  for (auto entity : EntityOverlapping<T>(tokens)) {
+    if (!entity.tokens().index_of(tokens.front()) || !entity.tokens().index_of(tokens.back())) {
       continue;
     }
     return entity;

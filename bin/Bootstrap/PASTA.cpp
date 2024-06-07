@@ -2528,19 +2528,6 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  gap::generator<Decl> specializations(void) const &;\n"
           << "\n";
 
-      forward_decls.insert("MacroSubstitution");
-
-      class_os
-        << "  static gap::generator<" << class_name
-        << "> overlapping(const MacroSubstitution &sub);\n"
-        << "  static gap::generator<" << class_name
-        << "> overlapping(const std::optional<MacroSubstitution> &sub);\n\n"
-        << "  static std::optional<" << class_name
-        << "> covering(const MacroSubstitution &sub);\n"
-        << "  static std::optional<" << class_name
-        << "> covering(const std::optional<MacroSubstitution> &sub);\n\n";
-
-
       seen_methods->emplace("uses");  // Manual.
       seen_methods->emplace("definition");  // Manual.
       seen_methods->emplace("canonical_declaration");  // Disable this.
@@ -2565,18 +2552,6 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  std::optional<PackedDeclId> referenced_declaration_id(void) const;\n"
           << "  std::optional<Decl> referenced_declaration(void) const;\n"
           << "\n";
-
-      forward_decls.insert("MacroSubstitution");
-
-      class_os
-        << "  static gap::generator<" << class_name
-        << "> overlapping(const MacroSubstitution &sub);\n"
-        << "  static gap::generator<" << class_name
-        << "> overlapping(const std::optional<MacroSubstitution> &sub);\n\n"
-        << "  static std::optional<" << class_name
-        << "> covering(const MacroSubstitution &sub);\n"
-        << "  static std::optional<" << class_name
-        << "> covering(const std::optional<MacroSubstitution> &sub);\n\n";
 
       // `Stmt::referenced_declaration`.
       const auto ref = storage.AddMethod("UInt64");
@@ -3919,6 +3894,23 @@ MethodListPtr CodeGenerator::RunOnClass(
     class_os
         << "  std::optional<Type> casted_return_type(void) const;\n"
         << "  std::optional<CastExpr> casted_return_value(void) const;\n";
+  }
+
+  // Add parsed_tokens API in MacroSubstitution to get the
+  // list of fully substituted tokens.
+  if (class_name == "MacroSubstitution") {
+    forward_decls.insert("TokenRange");
+    seen_methods->emplace("casted_return_type");
+    class_os
+        << "  TokenRange parsed_tokens(void) const;\n\n";
+
+    lib_cpp_os
+        << "TokenRange "
+        << class_name << "::parsed_tokens(void) const {\n"
+        << "  return TokenRange::create(\n"
+        << "      first_fully_substituted_token().parsed_token(),\n"
+        << "      last_fully_substituted_token().parsed_token());\n"
+        << "}\n\n";
   }
 
   class_os << "};\n\n";

@@ -182,6 +182,46 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::TokenRange::strip_whitespace"),
     nullptr,
   },
+  {
+    "overlapping_declarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::overlapping_declarations);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TokenRange::overlapping_declarations"),
+    nullptr,
+  },
+  {
+    "covering_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->covering_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TokenRange::covering_declaration"),
+    nullptr,
+  },
+  {
+    "overlapping_statements",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::overlapping_statements);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TokenRange::overlapping_statements"),
+    nullptr,
+  },
+  {
+    "covering_statement",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->covering_statement());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TokenRange::covering_statement"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

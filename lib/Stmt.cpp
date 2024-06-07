@@ -53,28 +53,4 @@ std::optional<CastExpr> CallExpr::casted_return_value(void) const {
   return std::nullopt;
 }
 
-gap::generator<Stmt> Stmt::overlapping(const MacroSubstitution &sub) {
-  return EntityOverlapping<Stmt>(sub);
-}
-
-gap::generator<Stmt> Stmt::overlapping(const std::optional<MacroSubstitution> &sub) {
-  if (sub.has_value()) {
-    auto overlapping_stmts = overlapping(sub.value());
-    for (auto stmt : overlapping_stmts) {
-      co_yield stmt;
-    }
-  }
-}
-
-std::optional<Stmt> Stmt::covering(const MacroSubstitution &sub) {
-  return EntityCovering<Stmt>(sub);
-}
-
-std::optional<Stmt> Stmt::covering(const std::optional<MacroSubstitution> &macro) {
-  if (macro.has_value()) {
-    return covering(macro.value());
-  }
-  return std::nullopt;
-}
-
 }  // namespace mx

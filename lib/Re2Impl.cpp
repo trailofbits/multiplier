@@ -120,7 +120,7 @@ RegexQueryResultImpl::GetNextMatchInFragment(void) {
   return RegexQueryMatch(
       std::make_shared<const RegexQueryMatchImpl>(
           frag_file_tokens, match, frag, query),
-      toks.index, toks.num_tokens);
+      toks.index, toks.end_offset);
 }
 
 RegexQueryMatchImpl::~RegexQueryMatchImpl(void) {}

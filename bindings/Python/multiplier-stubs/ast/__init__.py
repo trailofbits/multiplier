@@ -34183,26 +34183,6 @@ class Stmt(multiplier.Entity):
 
   @overload
   @staticmethod
-  def overlapping(sub: multiplier.frontend.MacroSubstitution) -> Iterable[multiplier.ast.Stmt]:
-    ...
-
-  @overload
-  @staticmethod
-  def overlapping(sub: Optional[multiplier.frontend.MacroSubstitution]) -> Iterable[multiplier.ast.Stmt]:
-    ...
-
-  @overload
-  @staticmethod
-  def covering(sub: multiplier.frontend.MacroSubstitution) -> Optional[multiplier.ast.Stmt]:
-    ...
-
-  @overload
-  @staticmethod
-  def covering(sub: Optional[multiplier.frontend.MacroSubstitution]) -> Optional[multiplier.ast.Stmt]:
-    ...
-
-  @overload
-  @staticmethod
   def IN(index: multiplier.Index) -> Iterable[multiplier.ast.Stmt]:
     ...
 
@@ -57561,26 +57541,6 @@ class Decl(multiplier.Entity):
 
   @staticmethod
   def static_category() -> multiplier.EntityCategory:
-    ...
-
-  @overload
-  @staticmethod
-  def overlapping(sub: multiplier.frontend.MacroSubstitution) -> Iterable[multiplier.ast.Decl]:
-    ...
-
-  @overload
-  @staticmethod
-  def overlapping(sub: Optional[multiplier.frontend.MacroSubstitution]) -> Iterable[multiplier.ast.Decl]:
-    ...
-
-  @overload
-  @staticmethod
-  def covering(sub: multiplier.frontend.MacroSubstitution) -> Optional[multiplier.ast.Decl]:
-    ...
-
-  @overload
-  @staticmethod
-  def covering(sub: Optional[multiplier.frontend.MacroSubstitution]) -> Optional[multiplier.ast.Decl]:
     ...
 
   @overload
