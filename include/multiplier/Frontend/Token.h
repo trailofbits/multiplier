@@ -203,25 +203,25 @@ class MX_EXPORT TokenRangeIterator {
   friend class TokenTree;
 
   Token impl;
-  unsigned num_tokens;
+  unsigned end_offset;
 
   bool operator==(const TokenRangeIterator &) = delete;
   bool operator!=(const TokenRangeIterator &) = delete;
 
   inline TokenRangeIterator(std::shared_ptr<const class TokenReader> impl_,
-                           unsigned index_, unsigned num_tokens_)
+                           unsigned index_, unsigned end_offset_)
       : impl(std::move(impl_), index_),
-        num_tokens(num_tokens_) {}
+        end_offset(end_offset_) {}
 
  public:
   using EndIteratorType = IteratorEnd;
 
   inline bool operator==(EndIteratorType) const noexcept {
-    return impl.offset >= num_tokens;
+    return impl.offset >= end_offset;
   }
 
   inline bool operator!=(EndIteratorType) const noexcept {
-    return impl.offset < num_tokens;
+    return impl.offset < end_offset;
   }
 
   // Return the current token pointed to by the iterator.
@@ -241,7 +241,7 @@ class MX_EXPORT TokenRangeIterator {
   // Pre-increment.
   inline TokenRangeIterator operator++(void) && noexcept {
     auto next_offset = impl.offset + 1u;
-    return TokenRangeIterator(std::move(impl.impl), next_offset, num_tokens);
+    return TokenRangeIterator(std::move(impl.impl), next_offset, end_offset);
   }
 
   // Pre-increment.
@@ -252,7 +252,7 @@ class MX_EXPORT TokenRangeIterator {
 
   // Post-increment.
   inline TokenRangeIterator operator++(int) noexcept {
-    return TokenRangeIterator(impl.impl, impl.offset++, num_tokens);
+    return TokenRangeIterator(impl.impl, impl.offset++, end_offset);
   }
 };
 
@@ -277,13 +277,17 @@ class MX_EXPORT TokenRange {
 
   std::shared_ptr<const TokenReader> impl;
   EntityOffset index;
-  EntityOffset num_tokens;
+
+  // TokenRange contain end_index to identify the token offset
+  // where it ends. The token with end_index offset is exclusive
+  // to TokenRange
+  EntityOffset end_index;
 
   inline TokenRange(std::shared_ptr<const TokenReader> impl_,
-                    EntityOffset index_, EntityOffset num_tokens_)
+                    EntityOffset index_, EntityOffset end_index_)
       : impl(std::move(impl_)),
         index(index_),
-        num_tokens(num_tokens_) {}
+        end_index(end_index_) {}
 
  public:
   TokenRange(void);
@@ -297,6 +301,7 @@ class MX_EXPORT TokenRange {
   TokenRange &operator=(TokenRange &&) noexcept = default;
 
   static TokenRange create(std::vector<CustomToken> tokens);
+  static TokenRange create(const Token &first, const Token &last);
 
   bool operator==(const TokenRange &that) const noexcept;
   bool operator!=(const TokenRange &that) const noexcept = default;
@@ -306,12 +311,12 @@ class MX_EXPORT TokenRange {
   }
 
   inline bool empty(void) const noexcept {
-    return index >= num_tokens;
+    return index >= end_index;
   }
 
   // Return the number of tokens in this token list.
   inline size_t size(void) const noexcept {
-    return num_tokens - index;
+    return end_index - index;
   }
 
   // Return the token at index `index`.
@@ -329,12 +334,12 @@ class MX_EXPORT TokenRange {
 
   // Return an iterator pointing at the first token in this list.
   inline TokenRangeIterator begin(void) && noexcept {
-    return TokenRangeIterator(std::move(impl), index, num_tokens);
+    return TokenRangeIterator(std::move(impl), index, end_index);
   }
 
   // Return an iterator pointing at the first token in this list.
   inline TokenRangeIterator begin(void) const & noexcept {
-    return TokenRangeIterator(impl, index, num_tokens);
+    return TokenRangeIterator(impl, index, end_index);
   }
 
   inline TokenRangeIterator::EndIteratorType end(void) && noexcept {
@@ -369,6 +374,28 @@ class MX_EXPORT TokenRange {
 
   // Strip leading and trailing whitespace.
   TokenRange strip_whitespace(void) const noexcept;
+
+  // Generate declarations that share at least one overlapping parsed token
+  // in common with the token range.
+  gap::generator<Decl> overlapping_declarations(void) const & noexcept;
+
+  // Try to return the declaration such that `decl.tokens() == range`, i.e.
+  // this range covers all of the tokens of the declaration. if there are
+  // more than one declaration that matches the criteria, it gets the deepest
+  // one in the AST. Thereby allowing a caller to observe the
+  // others by traversing the parent of the covering declaration.
+  std::optional<Decl> covering_declaration(void) const & noexcept;
+
+  // Generate statements that share at least one overlapping parsed token
+  // in common with the token range.
+  gap::generator<Stmt> overlapping_statements(void) const & noexcept;
+
+  // Try to return the statement such that `stmt.tokens() == range`, i.e.
+  // this range covers all of the tokens of the statement. if there are
+  // more than one statement that matches the criteria, it gets the deepest
+  // one in the AST. Thereby allowing a caller to observe the
+  // others by traversing the parent of the covering statement.
+  std::optional<Stmt> covering_statement(void) const & noexcept;
 };
 
 }  // namespace mx

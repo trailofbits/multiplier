@@ -17,6 +17,7 @@
 #include <multiplier/AST/TemplateArgument.h>
 #include <multiplier/AST/VarTemplateDecl.h>
 #include <multiplier/AST/VarTemplatePartialSpecializationDecl.h>
+#include <multiplier/Frontend/MacroSubstitution.h>
 #include <multiplier/Index.h>
 
 #include "Fragment.h"

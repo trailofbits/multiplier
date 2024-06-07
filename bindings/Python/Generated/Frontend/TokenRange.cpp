@@ -182,6 +182,46 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::TokenRange::strip_whitespace"),
     nullptr,
   },
+  {
+    "overlapping_declarations",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::overlapping_declarations);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TokenRange::overlapping_declarations"),
+    nullptr,
+  },
+  {
+    "covering_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->covering_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TokenRange::covering_declaration"),
+    nullptr,
+  },
+  {
+    "overlapping_statements",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::overlapping_statements);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TokenRange::overlapping_statements"),
+    nullptr,
+  },
+  {
+    "covering_statement",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->covering_statement());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TokenRange::covering_statement"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace
@@ -200,6 +240,18 @@ static PyMethodDef gMethods[] = {
             }
 
             return ::mx::to_python(T::create(std::move(arg_0.value())));
+          }
+          while (num_args == 2) {
+            auto arg_0 = ::mx::from_python<mx::Token>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+            auto arg_1 = ::mx::from_python<mx::Token>(args[1]);
+            if (!arg_1.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(T::create(arg_0.value(), arg_1.value()));
           }
 
           PyErrorStreamer(PyExc_TypeError)

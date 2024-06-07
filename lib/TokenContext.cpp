@@ -141,6 +141,31 @@ std::optional<TokenContext> Token::context(void) const {
   return ret;
 }
 
+// Return the TokenContext as a `VariantEntity`. Calls specific
+// methods for variants.
+VariantEntity TokenContext::as_variant(void) const noexcept {
+  switch (CategoryFromEntityId(referenced_entity_id)) {
+#define MX_DEFINE_GETTER(ns_path, type_name, lower_name, enum_name, category_) \
+    case EntityCategory::enum_name: \
+      if (auto ent_ ## lower_name = as_ ## lower_name()) { \
+        return std::move(ent_ ## lower_name.value()); \
+      } \
+      break;
+
+    MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                                MX_IGNORE_ENTITY_CATEGORY,
+                                MX_DEFINE_GETTER,
+                                MX_IGNORE_ENTITY_CATEGORY,
+                                MX_DEFINE_GETTER,
+                                MX_DEFINE_GETTER,
+                                MX_IGNORE_ENTITY_CATEGORY,
+                                MX_IGNORE_ENTITY_CATEGORY)
+    default: break;
+  }
+#undef MX_DEFINE_GETTER
+  return NotAnEntity{};
+}
+
 #define MX_DEFINE_GETTER(ns_path, type_name, lower_name, enum_name, category) \
     std::optional<type_name> TokenContext::as_ ## lower_name(void) const { \
       if (reader && CategoryFromEntityId(referenced_entity_id) == EntityCategory::enum_name) { \
