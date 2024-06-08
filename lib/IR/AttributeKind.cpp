@@ -83,7 +83,9 @@ const char *EnumeratorName(ir::AttributeKind kind) {
     case ir::AttributeKind::HL_ANNOTATION: return "HL_ANNOTATION";
     case ir::AttributeKind::HL_FORMAT: return "HL_FORMAT";
     case ir::AttributeKind::HL_SECTION: return "HL_SECTION";
+    case ir::AttributeKind::HL_ALIGNED: return "HL_ALIGNED";
     case ir::AttributeKind::HL_ALWAYS_INLINE: return "HL_ALWAYS_INLINE";
+    case ir::AttributeKind::HL_NO_INLINE: return "HL_NO_INLINE";
     case ir::AttributeKind::HL_CONST: return "HL_CONST";
     case ir::AttributeKind::HL_LOADER_UNINITIALIZED: return "HL_LOADER_UNINITIALIZED";
     case ir::AttributeKind::HL_NO_INSTRUMENT_FUNCTION: return "HL_NO_INSTRUMENT_FUNCTION";
@@ -93,11 +95,17 @@ const char *EnumeratorName(ir::AttributeKind kind) {
     case ir::AttributeKind::HL_RESTRICT: return "HL_RESTRICT";
     case ir::AttributeKind::HL_NO_THROW: return "HL_NO_THROW";
     case ir::AttributeKind::HL_NON_NULL: return "HL_NON_NULL";
+    case ir::AttributeKind::HL_LEAF: return "HL_LEAF";
+    case ir::AttributeKind::HL_COLD: return "HL_COLD";
+    case ir::AttributeKind::HL_TRANSPARENT_UNION: return "HL_TRANSPARENT_UNION";
+    case ir::AttributeKind::HL_RETURNS_TWICE: return "HL_RETURNS_TWICE";
     case ir::AttributeKind::HL_ASM_LABEL: return "HL_ASM_LABEL";
     case ir::AttributeKind::HL_MODE: return "HL_MODE";
     case ir::AttributeKind::HL_BUILTIN: return "HL_BUILTIN";
     case ir::AttributeKind::HL_ALLOC_ALIGN: return "HL_ALLOC_ALIGN";
     case ir::AttributeKind::HL_ALLOC_SIZE: return "HL_ALLOC_SIZE";
+    case ir::AttributeKind::HL_DEPRECATED: return "HL_DEPRECATED";
+    case ir::AttributeKind::HL_MAX_FIELD_ALIGNMENT: return "HL_MAX_FIELD_ALIGNMENT";
     case ir::AttributeKind::HL_CV_QUALIFIERS: return "HL_CV_QUALIFIERS";
     case ir::AttributeKind::HL_UCV_QUALIFIERS: return "HL_UCV_QUALIFIERS";
     case ir::AttributeKind::HL_CVR_QUALIFIERS: return "HL_CVR_QUALIFIERS";
@@ -222,7 +230,9 @@ bool IsHighLevelAttributeKind(ir::AttributeKind kind) {
     case mx::ir::AttributeKind::HL_ANNOTATION:
     case mx::ir::AttributeKind::HL_FORMAT:
     case mx::ir::AttributeKind::HL_SECTION:
+    case mx::ir::AttributeKind::HL_ALIGNED:
     case mx::ir::AttributeKind::HL_ALWAYS_INLINE:
+    case mx::ir::AttributeKind::HL_NO_INLINE:
     case mx::ir::AttributeKind::HL_CONST:
     case mx::ir::AttributeKind::HL_LOADER_UNINITIALIZED:
     case mx::ir::AttributeKind::HL_NO_INSTRUMENT_FUNCTION:
@@ -232,11 +242,17 @@ bool IsHighLevelAttributeKind(ir::AttributeKind kind) {
     case mx::ir::AttributeKind::HL_RESTRICT:
     case mx::ir::AttributeKind::HL_NO_THROW:
     case mx::ir::AttributeKind::HL_NON_NULL:
+    case mx::ir::AttributeKind::HL_LEAF:
+    case mx::ir::AttributeKind::HL_COLD:
+    case mx::ir::AttributeKind::HL_TRANSPARENT_UNION:
+    case mx::ir::AttributeKind::HL_RETURNS_TWICE:
     case mx::ir::AttributeKind::HL_ASM_LABEL:
     case mx::ir::AttributeKind::HL_MODE:
     case mx::ir::AttributeKind::HL_BUILTIN:
     case mx::ir::AttributeKind::HL_ALLOC_ALIGN:
     case mx::ir::AttributeKind::HL_ALLOC_SIZE:
+    case mx::ir::AttributeKind::HL_DEPRECATED:
+    case mx::ir::AttributeKind::HL_MAX_FIELD_ALIGNMENT:
     case mx::ir::AttributeKind::HL_CV_QUALIFIERS:
     case mx::ir::AttributeKind::HL_UCV_QUALIFIERS:
     case mx::ir::AttributeKind::HL_CVR_QUALIFIERS:

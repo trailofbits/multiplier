@@ -61,8 +61,10 @@
    _hl(DoubleType, TypeKind::HL_DOUBLE, vast::hl::DoubleType) \
    _hl(LongDoubleType, TypeKind::HL_LONG_DOUBLE, vast::hl::LongDoubleType) \
    _hl(Float128Type, TypeKind::HL_FLOAT128, vast::hl::Float128Type) \
+   _hl(ComplexType, TypeKind::HL_COMPLEX, vast::hl::ComplexType) \
    _hl(PointerType, TypeKind::HL_POINTER, vast::hl::PointerType) \
    _hl(ArrayType, TypeKind::HL_ARRAY, vast::hl::ArrayType) \
+   _hl(VectorType, TypeKind::HL_VECTOR, vast::hl::VectorType) \
    _hl(DecayedType, TypeKind::HL_DECAYED, vast::hl::DecayedType) \
    _hl(AttributedType, TypeKind::HL_ATTRIBUTED, vast::hl::AttributedType) \
    _hl(AdjustedType, TypeKind::HL_ADJUSTED, vast::hl::AdjustedType) \
@@ -72,5 +74,5 @@
    _core(FunctionType, TypeKind::CORE_FUNCTION, vast::core::FunctionType) \
    _unsup(UnsupportedType, TypeKind::UNSUP_UNSUPPORTED, vast::unsup::UnsupportedType)
 
-#define MX_IR_NUM_MLIR_TYPES 64
+#define MX_IR_NUM_MLIR_TYPES 66
 

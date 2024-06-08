@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[977]) || tp >= &(gTypes[1226])) {
+  if (tp < &(gTypes[985]) || tp >= &(gTypes[1234])) {
     return std::nullopt;
   }
 
@@ -90,995 +90,995 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::ir::llvm::AShrOp::static_kind():
-      tp = &(gTypes[978]);
-      break;
-
-    case mx::ir::llvm::AddOp::static_kind():
-      tp = &(gTypes[979]);
-      break;
-
-    case mx::ir::llvm::AddrSpaceCastOp::static_kind():
-      tp = &(gTypes[980]);
-      break;
-
-    case mx::ir::llvm::AddressOfOp::static_kind():
-      tp = &(gTypes[981]);
-      break;
-
-    case mx::ir::llvm::AllocaOp::static_kind():
-      tp = &(gTypes[982]);
-      break;
-
-    case mx::ir::llvm::AndOp::static_kind():
-      tp = &(gTypes[983]);
-      break;
-
-    case mx::ir::llvm::AtomicCmpXchgOp::static_kind():
-      tp = &(gTypes[984]);
-      break;
-
-    case mx::ir::llvm::AtomicRMWOp::static_kind():
-      tp = &(gTypes[985]);
-      break;
-
-    case mx::ir::llvm::BitcastOp::static_kind():
       tp = &(gTypes[986]);
       break;
 
-    case mx::ir::llvm::BrOp::static_kind():
+    case mx::ir::llvm::AddOp::static_kind():
       tp = &(gTypes[987]);
       break;
 
-    case mx::ir::llvm::CallIntrinsicOp::static_kind():
+    case mx::ir::llvm::AddrSpaceCastOp::static_kind():
       tp = &(gTypes[988]);
       break;
 
-    case mx::ir::llvm::CallOp::static_kind():
+    case mx::ir::llvm::AddressOfOp::static_kind():
       tp = &(gTypes[989]);
       break;
 
-    case mx::ir::llvm::ComdatOp::static_kind():
+    case mx::ir::llvm::AllocaOp::static_kind():
       tp = &(gTypes[990]);
       break;
 
-    case mx::ir::llvm::ComdatSelectorOp::static_kind():
+    case mx::ir::llvm::AndOp::static_kind():
       tp = &(gTypes[991]);
       break;
 
-    case mx::ir::llvm::CondBrOp::static_kind():
+    case mx::ir::llvm::AtomicCmpXchgOp::static_kind():
       tp = &(gTypes[992]);
       break;
 
-    case mx::ir::llvm::ConstantOp::static_kind():
+    case mx::ir::llvm::AtomicRMWOp::static_kind():
       tp = &(gTypes[993]);
       break;
 
-    case mx::ir::llvm::ExtractElementOp::static_kind():
+    case mx::ir::llvm::BitcastOp::static_kind():
       tp = &(gTypes[994]);
       break;
 
-    case mx::ir::llvm::ExtractValueOp::static_kind():
+    case mx::ir::llvm::BrOp::static_kind():
       tp = &(gTypes[995]);
       break;
 
-    case mx::ir::llvm::FAddOp::static_kind():
+    case mx::ir::llvm::CallIntrinsicOp::static_kind():
       tp = &(gTypes[996]);
       break;
 
-    case mx::ir::llvm::FCmpOp::static_kind():
+    case mx::ir::llvm::CallOp::static_kind():
       tp = &(gTypes[997]);
       break;
 
-    case mx::ir::llvm::FDivOp::static_kind():
+    case mx::ir::llvm::ComdatOp::static_kind():
       tp = &(gTypes[998]);
       break;
 
-    case mx::ir::llvm::FMulOp::static_kind():
+    case mx::ir::llvm::ComdatSelectorOp::static_kind():
       tp = &(gTypes[999]);
       break;
 
-    case mx::ir::llvm::FNegOp::static_kind():
+    case mx::ir::llvm::CondBrOp::static_kind():
       tp = &(gTypes[1000]);
       break;
 
-    case mx::ir::llvm::FPExtOp::static_kind():
+    case mx::ir::llvm::ConstantOp::static_kind():
       tp = &(gTypes[1001]);
       break;
 
-    case mx::ir::llvm::FPToSIOp::static_kind():
+    case mx::ir::llvm::ExtractElementOp::static_kind():
       tp = &(gTypes[1002]);
       break;
 
-    case mx::ir::llvm::FPToUIOp::static_kind():
+    case mx::ir::llvm::ExtractValueOp::static_kind():
       tp = &(gTypes[1003]);
       break;
 
-    case mx::ir::llvm::FPTruncOp::static_kind():
+    case mx::ir::llvm::FAddOp::static_kind():
       tp = &(gTypes[1004]);
       break;
 
-    case mx::ir::llvm::FRemOp::static_kind():
+    case mx::ir::llvm::FCmpOp::static_kind():
       tp = &(gTypes[1005]);
       break;
 
-    case mx::ir::llvm::FSubOp::static_kind():
+    case mx::ir::llvm::FDivOp::static_kind():
       tp = &(gTypes[1006]);
       break;
 
-    case mx::ir::llvm::FenceOp::static_kind():
+    case mx::ir::llvm::FMulOp::static_kind():
       tp = &(gTypes[1007]);
       break;
 
-    case mx::ir::llvm::FreezeOp::static_kind():
+    case mx::ir::llvm::FNegOp::static_kind():
       tp = &(gTypes[1008]);
       break;
 
-    case mx::ir::llvm::GetElementPtrOp::static_kind():
+    case mx::ir::llvm::FPExtOp::static_kind():
       tp = &(gTypes[1009]);
       break;
 
-    case mx::ir::llvm::GlobalCtorsOp::static_kind():
+    case mx::ir::llvm::FPToSIOp::static_kind():
       tp = &(gTypes[1010]);
       break;
 
-    case mx::ir::llvm::GlobalDtorsOp::static_kind():
+    case mx::ir::llvm::FPToUIOp::static_kind():
       tp = &(gTypes[1011]);
       break;
 
-    case mx::ir::llvm::GlobalOp::static_kind():
+    case mx::ir::llvm::FPTruncOp::static_kind():
       tp = &(gTypes[1012]);
       break;
 
-    case mx::ir::llvm::ICmpOp::static_kind():
+    case mx::ir::llvm::FRemOp::static_kind():
       tp = &(gTypes[1013]);
       break;
 
-    case mx::ir::llvm::InlineAsmOp::static_kind():
+    case mx::ir::llvm::FSubOp::static_kind():
       tp = &(gTypes[1014]);
       break;
 
-    case mx::ir::llvm::InsertElementOp::static_kind():
+    case mx::ir::llvm::FenceOp::static_kind():
       tp = &(gTypes[1015]);
       break;
 
-    case mx::ir::llvm::InsertValueOp::static_kind():
+    case mx::ir::llvm::FreezeOp::static_kind():
       tp = &(gTypes[1016]);
       break;
 
-    case mx::ir::llvm::IntToPtrOp::static_kind():
+    case mx::ir::llvm::GetElementPtrOp::static_kind():
       tp = &(gTypes[1017]);
       break;
 
-    case mx::ir::llvm::InvokeOp::static_kind():
+    case mx::ir::llvm::GlobalCtorsOp::static_kind():
       tp = &(gTypes[1018]);
       break;
 
-    case mx::ir::llvm::FuncOp::static_kind():
+    case mx::ir::llvm::GlobalDtorsOp::static_kind():
       tp = &(gTypes[1019]);
       break;
 
-    case mx::ir::llvm::LShrOp::static_kind():
+    case mx::ir::llvm::GlobalOp::static_kind():
       tp = &(gTypes[1020]);
       break;
 
-    case mx::ir::llvm::LandingpadOp::static_kind():
+    case mx::ir::llvm::ICmpOp::static_kind():
       tp = &(gTypes[1021]);
       break;
 
-    case mx::ir::llvm::LinkerOptionsOp::static_kind():
+    case mx::ir::llvm::InlineAsmOp::static_kind():
       tp = &(gTypes[1022]);
       break;
 
-    case mx::ir::llvm::LoadOp::static_kind():
+    case mx::ir::llvm::InsertElementOp::static_kind():
       tp = &(gTypes[1023]);
       break;
 
-    case mx::ir::llvm::MulOp::static_kind():
+    case mx::ir::llvm::InsertValueOp::static_kind():
       tp = &(gTypes[1024]);
       break;
 
-    case mx::ir::llvm::NoneTokenOp::static_kind():
+    case mx::ir::llvm::IntToPtrOp::static_kind():
       tp = &(gTypes[1025]);
       break;
 
-    case mx::ir::llvm::OrOp::static_kind():
+    case mx::ir::llvm::InvokeOp::static_kind():
       tp = &(gTypes[1026]);
       break;
 
-    case mx::ir::llvm::PoisonOp::static_kind():
+    case mx::ir::llvm::FuncOp::static_kind():
       tp = &(gTypes[1027]);
       break;
 
-    case mx::ir::llvm::PtrToIntOp::static_kind():
+    case mx::ir::llvm::LShrOp::static_kind():
       tp = &(gTypes[1028]);
       break;
 
-    case mx::ir::llvm::ResumeOp::static_kind():
+    case mx::ir::llvm::LandingpadOp::static_kind():
       tp = &(gTypes[1029]);
       break;
 
-    case mx::ir::llvm::ReturnOp::static_kind():
+    case mx::ir::llvm::LinkerOptionsOp::static_kind():
       tp = &(gTypes[1030]);
       break;
 
-    case mx::ir::llvm::SDivOp::static_kind():
+    case mx::ir::llvm::LoadOp::static_kind():
       tp = &(gTypes[1031]);
       break;
 
-    case mx::ir::llvm::SExtOp::static_kind():
+    case mx::ir::llvm::MulOp::static_kind():
       tp = &(gTypes[1032]);
       break;
 
-    case mx::ir::llvm::SIToFPOp::static_kind():
+    case mx::ir::llvm::NoneTokenOp::static_kind():
       tp = &(gTypes[1033]);
       break;
 
-    case mx::ir::llvm::SRemOp::static_kind():
+    case mx::ir::llvm::OrOp::static_kind():
       tp = &(gTypes[1034]);
       break;
 
-    case mx::ir::llvm::SelectOp::static_kind():
+    case mx::ir::llvm::PoisonOp::static_kind():
       tp = &(gTypes[1035]);
       break;
 
-    case mx::ir::llvm::ShlOp::static_kind():
+    case mx::ir::llvm::PtrToIntOp::static_kind():
       tp = &(gTypes[1036]);
       break;
 
-    case mx::ir::llvm::ShuffleVectorOp::static_kind():
+    case mx::ir::llvm::ResumeOp::static_kind():
       tp = &(gTypes[1037]);
       break;
 
-    case mx::ir::llvm::StoreOp::static_kind():
+    case mx::ir::llvm::ReturnOp::static_kind():
       tp = &(gTypes[1038]);
       break;
 
-    case mx::ir::llvm::SubOp::static_kind():
+    case mx::ir::llvm::SDivOp::static_kind():
       tp = &(gTypes[1039]);
       break;
 
-    case mx::ir::llvm::SwitchOp::static_kind():
+    case mx::ir::llvm::SExtOp::static_kind():
       tp = &(gTypes[1040]);
       break;
 
-    case mx::ir::llvm::TruncOp::static_kind():
+    case mx::ir::llvm::SIToFPOp::static_kind():
       tp = &(gTypes[1041]);
       break;
 
-    case mx::ir::llvm::UDivOp::static_kind():
+    case mx::ir::llvm::SRemOp::static_kind():
       tp = &(gTypes[1042]);
       break;
 
-    case mx::ir::llvm::UIToFPOp::static_kind():
+    case mx::ir::llvm::SelectOp::static_kind():
       tp = &(gTypes[1043]);
       break;
 
-    case mx::ir::llvm::URemOp::static_kind():
+    case mx::ir::llvm::ShlOp::static_kind():
       tp = &(gTypes[1044]);
       break;
 
-    case mx::ir::llvm::UndefOp::static_kind():
+    case mx::ir::llvm::ShuffleVectorOp::static_kind():
       tp = &(gTypes[1045]);
       break;
 
-    case mx::ir::llvm::UnreachableOp::static_kind():
+    case mx::ir::llvm::StoreOp::static_kind():
       tp = &(gTypes[1046]);
       break;
 
-    case mx::ir::llvm::XOrOp::static_kind():
+    case mx::ir::llvm::SubOp::static_kind():
       tp = &(gTypes[1047]);
       break;
 
-    case mx::ir::llvm::ZExtOp::static_kind():
+    case mx::ir::llvm::SwitchOp::static_kind():
       tp = &(gTypes[1048]);
       break;
 
-    case mx::ir::llvm::ZeroOp::static_kind():
+    case mx::ir::llvm::TruncOp::static_kind():
       tp = &(gTypes[1049]);
       break;
 
-    case mx::ir::llvm::AbsOp::static_kind():
+    case mx::ir::llvm::UDivOp::static_kind():
       tp = &(gTypes[1050]);
       break;
 
-    case mx::ir::llvm::AnnotationOp::static_kind():
+    case mx::ir::llvm::UIToFPOp::static_kind():
       tp = &(gTypes[1051]);
       break;
 
-    case mx::ir::llvm::AssumeOp::static_kind():
+    case mx::ir::llvm::URemOp::static_kind():
       tp = &(gTypes[1052]);
       break;
 
-    case mx::ir::llvm::BitReverseOp::static_kind():
+    case mx::ir::llvm::UndefOp::static_kind():
       tp = &(gTypes[1053]);
       break;
 
-    case mx::ir::llvm::ByteSwapOp::static_kind():
+    case mx::ir::llvm::UnreachableOp::static_kind():
       tp = &(gTypes[1054]);
       break;
 
-    case mx::ir::llvm::CopySignOp::static_kind():
+    case mx::ir::llvm::XOrOp::static_kind():
       tp = &(gTypes[1055]);
       break;
 
-    case mx::ir::llvm::CoroAlignOp::static_kind():
+    case mx::ir::llvm::ZExtOp::static_kind():
       tp = &(gTypes[1056]);
       break;
 
-    case mx::ir::llvm::CoroBeginOp::static_kind():
+    case mx::ir::llvm::ZeroOp::static_kind():
       tp = &(gTypes[1057]);
       break;
 
-    case mx::ir::llvm::CoroEndOp::static_kind():
+    case mx::ir::llvm::AbsOp::static_kind():
       tp = &(gTypes[1058]);
       break;
 
-    case mx::ir::llvm::CoroFreeOp::static_kind():
+    case mx::ir::llvm::AnnotationOp::static_kind():
       tp = &(gTypes[1059]);
       break;
 
-    case mx::ir::llvm::CoroIdOp::static_kind():
+    case mx::ir::llvm::AssumeOp::static_kind():
       tp = &(gTypes[1060]);
       break;
 
-    case mx::ir::llvm::CoroPromiseOp::static_kind():
+    case mx::ir::llvm::BitReverseOp::static_kind():
       tp = &(gTypes[1061]);
       break;
 
-    case mx::ir::llvm::CoroResumeOp::static_kind():
+    case mx::ir::llvm::ByteSwapOp::static_kind():
       tp = &(gTypes[1062]);
       break;
 
-    case mx::ir::llvm::CoroSaveOp::static_kind():
+    case mx::ir::llvm::CopySignOp::static_kind():
       tp = &(gTypes[1063]);
       break;
 
-    case mx::ir::llvm::CoroSizeOp::static_kind():
+    case mx::ir::llvm::CoroAlignOp::static_kind():
       tp = &(gTypes[1064]);
       break;
 
-    case mx::ir::llvm::CoroSuspendOp::static_kind():
+    case mx::ir::llvm::CoroBeginOp::static_kind():
       tp = &(gTypes[1065]);
       break;
 
-    case mx::ir::llvm::CosOp::static_kind():
+    case mx::ir::llvm::CoroEndOp::static_kind():
       tp = &(gTypes[1066]);
       break;
 
-    case mx::ir::llvm::CountLeadingZerosOp::static_kind():
+    case mx::ir::llvm::CoroFreeOp::static_kind():
       tp = &(gTypes[1067]);
       break;
 
-    case mx::ir::llvm::CountTrailingZerosOp::static_kind():
+    case mx::ir::llvm::CoroIdOp::static_kind():
       tp = &(gTypes[1068]);
       break;
 
-    case mx::ir::llvm::CtPopOp::static_kind():
+    case mx::ir::llvm::CoroPromiseOp::static_kind():
       tp = &(gTypes[1069]);
       break;
 
-    case mx::ir::llvm::DbgDeclareOp::static_kind():
+    case mx::ir::llvm::CoroResumeOp::static_kind():
       tp = &(gTypes[1070]);
       break;
 
-    case mx::ir::llvm::DbgLabelOp::static_kind():
+    case mx::ir::llvm::CoroSaveOp::static_kind():
       tp = &(gTypes[1071]);
       break;
 
-    case mx::ir::llvm::DbgValueOp::static_kind():
+    case mx::ir::llvm::CoroSizeOp::static_kind():
       tp = &(gTypes[1072]);
       break;
 
-    case mx::ir::llvm::DebugTrapOp::static_kind():
+    case mx::ir::llvm::CoroSuspendOp::static_kind():
       tp = &(gTypes[1073]);
       break;
 
-    case mx::ir::llvm::EhTypeidForOp::static_kind():
+    case mx::ir::llvm::CosOp::static_kind():
       tp = &(gTypes[1074]);
       break;
 
-    case mx::ir::llvm::Exp2Op::static_kind():
+    case mx::ir::llvm::CountLeadingZerosOp::static_kind():
       tp = &(gTypes[1075]);
       break;
 
-    case mx::ir::llvm::ExpOp::static_kind():
+    case mx::ir::llvm::CountTrailingZerosOp::static_kind():
       tp = &(gTypes[1076]);
       break;
 
-    case mx::ir::llvm::ExpectOp::static_kind():
+    case mx::ir::llvm::CtPopOp::static_kind():
       tp = &(gTypes[1077]);
       break;
 
-    case mx::ir::llvm::ExpectWithProbabilityOp::static_kind():
+    case mx::ir::llvm::DbgDeclareOp::static_kind():
       tp = &(gTypes[1078]);
       break;
 
-    case mx::ir::llvm::FAbsOp::static_kind():
+    case mx::ir::llvm::DbgLabelOp::static_kind():
       tp = &(gTypes[1079]);
       break;
 
-    case mx::ir::llvm::FCeilOp::static_kind():
+    case mx::ir::llvm::DbgValueOp::static_kind():
       tp = &(gTypes[1080]);
       break;
 
-    case mx::ir::llvm::FFloorOp::static_kind():
+    case mx::ir::llvm::DebugTrapOp::static_kind():
       tp = &(gTypes[1081]);
       break;
 
-    case mx::ir::llvm::FMAOp::static_kind():
+    case mx::ir::llvm::EhTypeidForOp::static_kind():
       tp = &(gTypes[1082]);
       break;
 
-    case mx::ir::llvm::FMulAddOp::static_kind():
+    case mx::ir::llvm::Exp2Op::static_kind():
       tp = &(gTypes[1083]);
       break;
 
-    case mx::ir::llvm::FTruncOp::static_kind():
+    case mx::ir::llvm::ExpOp::static_kind():
       tp = &(gTypes[1084]);
       break;
 
-    case mx::ir::llvm::FShlOp::static_kind():
+    case mx::ir::llvm::ExpectOp::static_kind():
       tp = &(gTypes[1085]);
       break;
 
-    case mx::ir::llvm::FShrOp::static_kind():
+    case mx::ir::llvm::ExpectWithProbabilityOp::static_kind():
       tp = &(gTypes[1086]);
       break;
 
-    case mx::ir::llvm::GetActiveLaneMaskOp::static_kind():
+    case mx::ir::llvm::FAbsOp::static_kind():
       tp = &(gTypes[1087]);
       break;
 
-    case mx::ir::llvm::InvariantEndOp::static_kind():
+    case mx::ir::llvm::FCeilOp::static_kind():
       tp = &(gTypes[1088]);
       break;
 
-    case mx::ir::llvm::InvariantStartOp::static_kind():
+    case mx::ir::llvm::FFloorOp::static_kind():
       tp = &(gTypes[1089]);
       break;
 
-    case mx::ir::llvm::IsConstantOp::static_kind():
+    case mx::ir::llvm::FMAOp::static_kind():
       tp = &(gTypes[1090]);
       break;
 
-    case mx::ir::llvm::IsFPClassOp::static_kind():
+    case mx::ir::llvm::FMulAddOp::static_kind():
       tp = &(gTypes[1091]);
       break;
 
-    case mx::ir::llvm::LifetimeEndOp::static_kind():
+    case mx::ir::llvm::FTruncOp::static_kind():
       tp = &(gTypes[1092]);
       break;
 
-    case mx::ir::llvm::LifetimeStartOp::static_kind():
+    case mx::ir::llvm::FShlOp::static_kind():
       tp = &(gTypes[1093]);
       break;
 
-    case mx::ir::llvm::RoundAndCastToLongLongOp::static_kind():
+    case mx::ir::llvm::FShrOp::static_kind():
       tp = &(gTypes[1094]);
       break;
 
-    case mx::ir::llvm::RoundAndCastToNearestLongLongOp::static_kind():
+    case mx::ir::llvm::GetActiveLaneMaskOp::static_kind():
       tp = &(gTypes[1095]);
       break;
 
-    case mx::ir::llvm::Log10Op::static_kind():
+    case mx::ir::llvm::InvariantEndOp::static_kind():
       tp = &(gTypes[1096]);
       break;
 
-    case mx::ir::llvm::Log2Op::static_kind():
+    case mx::ir::llvm::InvariantStartOp::static_kind():
       tp = &(gTypes[1097]);
       break;
 
-    case mx::ir::llvm::LogOp::static_kind():
+    case mx::ir::llvm::IsConstantOp::static_kind():
       tp = &(gTypes[1098]);
       break;
 
-    case mx::ir::llvm::RoundAndCastToLongOp::static_kind():
+    case mx::ir::llvm::IsFPClassOp::static_kind():
       tp = &(gTypes[1099]);
       break;
 
-    case mx::ir::llvm::RoundAndCastToNearestLongOp::static_kind():
+    case mx::ir::llvm::LifetimeEndOp::static_kind():
       tp = &(gTypes[1100]);
       break;
 
-    case mx::ir::llvm::MaskedLoadOp::static_kind():
+    case mx::ir::llvm::LifetimeStartOp::static_kind():
       tp = &(gTypes[1101]);
       break;
 
-    case mx::ir::llvm::MaskedStoreOp::static_kind():
+    case mx::ir::llvm::RoundAndCastToLongLongOp::static_kind():
       tp = &(gTypes[1102]);
       break;
 
-    case mx::ir::llvm::MatrixColumnMajorLoadOp::static_kind():
+    case mx::ir::llvm::RoundAndCastToNearestLongLongOp::static_kind():
       tp = &(gTypes[1103]);
       break;
 
-    case mx::ir::llvm::MatrixColumnMajorStoreOp::static_kind():
+    case mx::ir::llvm::Log10Op::static_kind():
       tp = &(gTypes[1104]);
       break;
 
-    case mx::ir::llvm::MatrixMultiplyOp::static_kind():
+    case mx::ir::llvm::Log2Op::static_kind():
       tp = &(gTypes[1105]);
       break;
 
-    case mx::ir::llvm::MatrixTransposeOp::static_kind():
+    case mx::ir::llvm::LogOp::static_kind():
       tp = &(gTypes[1106]);
       break;
 
-    case mx::ir::llvm::MaxNumOp::static_kind():
+    case mx::ir::llvm::RoundAndCastToLongOp::static_kind():
       tp = &(gTypes[1107]);
       break;
 
-    case mx::ir::llvm::MaximumOp::static_kind():
+    case mx::ir::llvm::RoundAndCastToNearestLongOp::static_kind():
       tp = &(gTypes[1108]);
       break;
 
-    case mx::ir::llvm::MemcpyInlineOp::static_kind():
+    case mx::ir::llvm::MaskedLoadOp::static_kind():
       tp = &(gTypes[1109]);
       break;
 
-    case mx::ir::llvm::MemcpyOp::static_kind():
+    case mx::ir::llvm::MaskedStoreOp::static_kind():
       tp = &(gTypes[1110]);
       break;
 
-    case mx::ir::llvm::MemmoveOp::static_kind():
+    case mx::ir::llvm::MatrixColumnMajorLoadOp::static_kind():
       tp = &(gTypes[1111]);
       break;
 
-    case mx::ir::llvm::MemsetOp::static_kind():
+    case mx::ir::llvm::MatrixColumnMajorStoreOp::static_kind():
       tp = &(gTypes[1112]);
       break;
 
-    case mx::ir::llvm::MinNumOp::static_kind():
+    case mx::ir::llvm::MatrixMultiplyOp::static_kind():
       tp = &(gTypes[1113]);
       break;
 
-    case mx::ir::llvm::MinimumOp::static_kind():
+    case mx::ir::llvm::MatrixTransposeOp::static_kind():
       tp = &(gTypes[1114]);
       break;
 
-    case mx::ir::llvm::RoundToNearbyIntOp::static_kind():
+    case mx::ir::llvm::MaxNumOp::static_kind():
       tp = &(gTypes[1115]);
       break;
 
-    case mx::ir::llvm::NoAliasScopeDeclOp::static_kind():
+    case mx::ir::llvm::MaximumOp::static_kind():
       tp = &(gTypes[1116]);
       break;
 
-    case mx::ir::llvm::PowIOp::static_kind():
+    case mx::ir::llvm::MemcpyInlineOp::static_kind():
       tp = &(gTypes[1117]);
       break;
 
-    case mx::ir::llvm::FPowOp::static_kind():
+    case mx::ir::llvm::MemcpyOp::static_kind():
       tp = &(gTypes[1118]);
       break;
 
-    case mx::ir::llvm::PrefetchOp::static_kind():
+    case mx::ir::llvm::MemmoveOp::static_kind():
       tp = &(gTypes[1119]);
       break;
 
-    case mx::ir::llvm::PtrAnnotationOp::static_kind():
+    case mx::ir::llvm::MemsetOp::static_kind():
       tp = &(gTypes[1120]);
       break;
 
-    case mx::ir::llvm::RoundToIntOp::static_kind():
+    case mx::ir::llvm::MinNumOp::static_kind():
       tp = &(gTypes[1121]);
       break;
 
-    case mx::ir::llvm::RoundToNearestEvenOp::static_kind():
+    case mx::ir::llvm::MinimumOp::static_kind():
       tp = &(gTypes[1122]);
       break;
 
-    case mx::ir::llvm::RoundToNearestOp::static_kind():
+    case mx::ir::llvm::RoundToNearbyIntOp::static_kind():
       tp = &(gTypes[1123]);
       break;
 
-    case mx::ir::llvm::SAddSatOp::static_kind():
+    case mx::ir::llvm::NoAliasScopeDeclOp::static_kind():
       tp = &(gTypes[1124]);
       break;
 
-    case mx::ir::llvm::SAddWithOverflowOp::static_kind():
+    case mx::ir::llvm::PowIOp::static_kind():
       tp = &(gTypes[1125]);
       break;
 
-    case mx::ir::llvm::SMaxOp::static_kind():
+    case mx::ir::llvm::FPowOp::static_kind():
       tp = &(gTypes[1126]);
       break;
 
-    case mx::ir::llvm::SMinOp::static_kind():
+    case mx::ir::llvm::PrefetchOp::static_kind():
       tp = &(gTypes[1127]);
       break;
 
-    case mx::ir::llvm::SMulWithOverflowOp::static_kind():
+    case mx::ir::llvm::PtrAnnotationOp::static_kind():
       tp = &(gTypes[1128]);
       break;
 
-    case mx::ir::llvm::SSACopyOp::static_kind():
+    case mx::ir::llvm::RoundToIntOp::static_kind():
       tp = &(gTypes[1129]);
       break;
 
-    case mx::ir::llvm::SShlSatOp::static_kind():
+    case mx::ir::llvm::RoundToNearestEvenOp::static_kind():
       tp = &(gTypes[1130]);
       break;
 
-    case mx::ir::llvm::SSubSatOp::static_kind():
+    case mx::ir::llvm::RoundToNearestOp::static_kind():
       tp = &(gTypes[1131]);
       break;
 
-    case mx::ir::llvm::SSubWithOverflowOp::static_kind():
+    case mx::ir::llvm::SAddSatOp::static_kind():
       tp = &(gTypes[1132]);
       break;
 
-    case mx::ir::llvm::SinOp::static_kind():
+    case mx::ir::llvm::SAddWithOverflowOp::static_kind():
       tp = &(gTypes[1133]);
       break;
 
-    case mx::ir::llvm::SqrtOp::static_kind():
+    case mx::ir::llvm::SMaxOp::static_kind():
       tp = &(gTypes[1134]);
       break;
 
-    case mx::ir::llvm::StackRestoreOp::static_kind():
+    case mx::ir::llvm::SMinOp::static_kind():
       tp = &(gTypes[1135]);
       break;
 
-    case mx::ir::llvm::StackSaveOp::static_kind():
+    case mx::ir::llvm::SMulWithOverflowOp::static_kind():
       tp = &(gTypes[1136]);
       break;
 
-    case mx::ir::llvm::StepVectorOp::static_kind():
+    case mx::ir::llvm::SSACopyOp::static_kind():
       tp = &(gTypes[1137]);
       break;
 
-    case mx::ir::llvm::ThreadLocalAddressOp::static_kind():
+    case mx::ir::llvm::SShlSatOp::static_kind():
       tp = &(gTypes[1138]);
       break;
 
-    case mx::ir::llvm::TrapOp::static_kind():
+    case mx::ir::llvm::SSubSatOp::static_kind():
       tp = &(gTypes[1139]);
       break;
 
-    case mx::ir::llvm::UAddSatOp::static_kind():
+    case mx::ir::llvm::SSubWithOverflowOp::static_kind():
       tp = &(gTypes[1140]);
       break;
 
-    case mx::ir::llvm::UAddWithOverflowOp::static_kind():
+    case mx::ir::llvm::SinOp::static_kind():
       tp = &(gTypes[1141]);
       break;
 
-    case mx::ir::llvm::UBSanTrapOp::static_kind():
+    case mx::ir::llvm::SqrtOp::static_kind():
       tp = &(gTypes[1142]);
       break;
 
-    case mx::ir::llvm::UMaxOp::static_kind():
+    case mx::ir::llvm::StackRestoreOp::static_kind():
       tp = &(gTypes[1143]);
       break;
 
-    case mx::ir::llvm::UMinOp::static_kind():
+    case mx::ir::llvm::StackSaveOp::static_kind():
       tp = &(gTypes[1144]);
       break;
 
-    case mx::ir::llvm::UMulWithOverflowOp::static_kind():
+    case mx::ir::llvm::StepVectorOp::static_kind():
       tp = &(gTypes[1145]);
       break;
 
-    case mx::ir::llvm::UShlSatOp::static_kind():
+    case mx::ir::llvm::ThreadLocalAddressOp::static_kind():
       tp = &(gTypes[1146]);
       break;
 
-    case mx::ir::llvm::USubSatOp::static_kind():
+    case mx::ir::llvm::TrapOp::static_kind():
       tp = &(gTypes[1147]);
       break;
 
-    case mx::ir::llvm::USubWithOverflowOp::static_kind():
+    case mx::ir::llvm::UAddSatOp::static_kind():
       tp = &(gTypes[1148]);
       break;
 
-    case mx::ir::llvm::VPAShrOp::static_kind():
+    case mx::ir::llvm::UAddWithOverflowOp::static_kind():
       tp = &(gTypes[1149]);
       break;
 
-    case mx::ir::llvm::VPAddOp::static_kind():
+    case mx::ir::llvm::UBSanTrapOp::static_kind():
       tp = &(gTypes[1150]);
       break;
 
-    case mx::ir::llvm::VPAndOp::static_kind():
+    case mx::ir::llvm::UMaxOp::static_kind():
       tp = &(gTypes[1151]);
       break;
 
-    case mx::ir::llvm::VPFAddOp::static_kind():
+    case mx::ir::llvm::UMinOp::static_kind():
       tp = &(gTypes[1152]);
       break;
 
-    case mx::ir::llvm::VPFDivOp::static_kind():
+    case mx::ir::llvm::UMulWithOverflowOp::static_kind():
       tp = &(gTypes[1153]);
       break;
 
-    case mx::ir::llvm::VPFMulAddOp::static_kind():
+    case mx::ir::llvm::UShlSatOp::static_kind():
       tp = &(gTypes[1154]);
       break;
 
-    case mx::ir::llvm::VPFMulOp::static_kind():
+    case mx::ir::llvm::USubSatOp::static_kind():
       tp = &(gTypes[1155]);
       break;
 
-    case mx::ir::llvm::VPFNegOp::static_kind():
+    case mx::ir::llvm::USubWithOverflowOp::static_kind():
       tp = &(gTypes[1156]);
       break;
 
-    case mx::ir::llvm::VPFPExtOp::static_kind():
+    case mx::ir::llvm::VPAShrOp::static_kind():
       tp = &(gTypes[1157]);
       break;
 
-    case mx::ir::llvm::VPFPToSIOp::static_kind():
+    case mx::ir::llvm::VPAddOp::static_kind():
       tp = &(gTypes[1158]);
       break;
 
-    case mx::ir::llvm::VPFPToUIOp::static_kind():
+    case mx::ir::llvm::VPAndOp::static_kind():
       tp = &(gTypes[1159]);
       break;
 
-    case mx::ir::llvm::VPFPTruncOp::static_kind():
+    case mx::ir::llvm::VPFAddOp::static_kind():
       tp = &(gTypes[1160]);
       break;
 
-    case mx::ir::llvm::VPFRemOp::static_kind():
+    case mx::ir::llvm::VPFDivOp::static_kind():
       tp = &(gTypes[1161]);
       break;
 
-    case mx::ir::llvm::VPFSubOp::static_kind():
+    case mx::ir::llvm::VPFMulAddOp::static_kind():
       tp = &(gTypes[1162]);
       break;
 
-    case mx::ir::llvm::VPFmaOp::static_kind():
+    case mx::ir::llvm::VPFMulOp::static_kind():
       tp = &(gTypes[1163]);
       break;
 
-    case mx::ir::llvm::VPIntToPtrOp::static_kind():
+    case mx::ir::llvm::VPFNegOp::static_kind():
       tp = &(gTypes[1164]);
       break;
 
-    case mx::ir::llvm::VPLShrOp::static_kind():
+    case mx::ir::llvm::VPFPExtOp::static_kind():
       tp = &(gTypes[1165]);
       break;
 
-    case mx::ir::llvm::VPLoadOp::static_kind():
+    case mx::ir::llvm::VPFPToSIOp::static_kind():
       tp = &(gTypes[1166]);
       break;
 
-    case mx::ir::llvm::VPMergeMinOp::static_kind():
+    case mx::ir::llvm::VPFPToUIOp::static_kind():
       tp = &(gTypes[1167]);
       break;
 
-    case mx::ir::llvm::VPMulOp::static_kind():
+    case mx::ir::llvm::VPFPTruncOp::static_kind():
       tp = &(gTypes[1168]);
       break;
 
-    case mx::ir::llvm::VPOrOp::static_kind():
+    case mx::ir::llvm::VPFRemOp::static_kind():
       tp = &(gTypes[1169]);
       break;
 
-    case mx::ir::llvm::VPPtrToIntOp::static_kind():
+    case mx::ir::llvm::VPFSubOp::static_kind():
       tp = &(gTypes[1170]);
       break;
 
-    case mx::ir::llvm::VPReduceAddOp::static_kind():
+    case mx::ir::llvm::VPFmaOp::static_kind():
       tp = &(gTypes[1171]);
       break;
 
-    case mx::ir::llvm::VPReduceAndOp::static_kind():
+    case mx::ir::llvm::VPIntToPtrOp::static_kind():
       tp = &(gTypes[1172]);
       break;
 
-    case mx::ir::llvm::VPReduceFAddOp::static_kind():
+    case mx::ir::llvm::VPLShrOp::static_kind():
       tp = &(gTypes[1173]);
       break;
 
-    case mx::ir::llvm::VPReduceFMaxOp::static_kind():
+    case mx::ir::llvm::VPLoadOp::static_kind():
       tp = &(gTypes[1174]);
       break;
 
-    case mx::ir::llvm::VPReduceFMinOp::static_kind():
+    case mx::ir::llvm::VPMergeMinOp::static_kind():
       tp = &(gTypes[1175]);
       break;
 
-    case mx::ir::llvm::VPReduceFMulOp::static_kind():
+    case mx::ir::llvm::VPMulOp::static_kind():
       tp = &(gTypes[1176]);
       break;
 
-    case mx::ir::llvm::VPReduceMulOp::static_kind():
+    case mx::ir::llvm::VPOrOp::static_kind():
       tp = &(gTypes[1177]);
       break;
 
-    case mx::ir::llvm::VPReduceOrOp::static_kind():
+    case mx::ir::llvm::VPPtrToIntOp::static_kind():
       tp = &(gTypes[1178]);
       break;
 
-    case mx::ir::llvm::VPReduceSMaxOp::static_kind():
+    case mx::ir::llvm::VPReduceAddOp::static_kind():
       tp = &(gTypes[1179]);
       break;
 
-    case mx::ir::llvm::VPReduceSMinOp::static_kind():
+    case mx::ir::llvm::VPReduceAndOp::static_kind():
       tp = &(gTypes[1180]);
       break;
 
-    case mx::ir::llvm::VPReduceUMaxOp::static_kind():
+    case mx::ir::llvm::VPReduceFAddOp::static_kind():
       tp = &(gTypes[1181]);
       break;
 
-    case mx::ir::llvm::VPReduceUMinOp::static_kind():
+    case mx::ir::llvm::VPReduceFMaxOp::static_kind():
       tp = &(gTypes[1182]);
       break;
 
-    case mx::ir::llvm::VPReduceXorOp::static_kind():
+    case mx::ir::llvm::VPReduceFMinOp::static_kind():
       tp = &(gTypes[1183]);
       break;
 
-    case mx::ir::llvm::VPSDivOp::static_kind():
+    case mx::ir::llvm::VPReduceFMulOp::static_kind():
       tp = &(gTypes[1184]);
       break;
 
-    case mx::ir::llvm::VPSExtOp::static_kind():
+    case mx::ir::llvm::VPReduceMulOp::static_kind():
       tp = &(gTypes[1185]);
       break;
 
-    case mx::ir::llvm::VPSIToFPOp::static_kind():
+    case mx::ir::llvm::VPReduceOrOp::static_kind():
       tp = &(gTypes[1186]);
       break;
 
-    case mx::ir::llvm::VPSRemOp::static_kind():
+    case mx::ir::llvm::VPReduceSMaxOp::static_kind():
       tp = &(gTypes[1187]);
       break;
 
-    case mx::ir::llvm::VPSelectMinOp::static_kind():
+    case mx::ir::llvm::VPReduceSMinOp::static_kind():
       tp = &(gTypes[1188]);
       break;
 
-    case mx::ir::llvm::VPShlOp::static_kind():
+    case mx::ir::llvm::VPReduceUMaxOp::static_kind():
       tp = &(gTypes[1189]);
       break;
 
-    case mx::ir::llvm::VPStoreOp::static_kind():
+    case mx::ir::llvm::VPReduceUMinOp::static_kind():
       tp = &(gTypes[1190]);
       break;
 
-    case mx::ir::llvm::VPStridedLoadOp::static_kind():
+    case mx::ir::llvm::VPReduceXorOp::static_kind():
       tp = &(gTypes[1191]);
       break;
 
-    case mx::ir::llvm::VPStridedStoreOp::static_kind():
+    case mx::ir::llvm::VPSDivOp::static_kind():
       tp = &(gTypes[1192]);
       break;
 
-    case mx::ir::llvm::VPSubOp::static_kind():
+    case mx::ir::llvm::VPSExtOp::static_kind():
       tp = &(gTypes[1193]);
       break;
 
-    case mx::ir::llvm::VPTruncOp::static_kind():
+    case mx::ir::llvm::VPSIToFPOp::static_kind():
       tp = &(gTypes[1194]);
       break;
 
-    case mx::ir::llvm::VPUDivOp::static_kind():
+    case mx::ir::llvm::VPSRemOp::static_kind():
       tp = &(gTypes[1195]);
       break;
 
-    case mx::ir::llvm::VPUIToFPOp::static_kind():
+    case mx::ir::llvm::VPSelectMinOp::static_kind():
       tp = &(gTypes[1196]);
       break;
 
-    case mx::ir::llvm::VPURemOp::static_kind():
+    case mx::ir::llvm::VPShlOp::static_kind():
       tp = &(gTypes[1197]);
       break;
 
-    case mx::ir::llvm::VPXorOp::static_kind():
+    case mx::ir::llvm::VPStoreOp::static_kind():
       tp = &(gTypes[1198]);
       break;
 
-    case mx::ir::llvm::VPZExtOp::static_kind():
+    case mx::ir::llvm::VPStridedLoadOp::static_kind():
       tp = &(gTypes[1199]);
       break;
 
-    case mx::ir::llvm::VaCopyOp::static_kind():
+    case mx::ir::llvm::VPStridedStoreOp::static_kind():
       tp = &(gTypes[1200]);
       break;
 
-    case mx::ir::llvm::VaEndOp::static_kind():
+    case mx::ir::llvm::VPSubOp::static_kind():
       tp = &(gTypes[1201]);
       break;
 
-    case mx::ir::llvm::VaStartOp::static_kind():
+    case mx::ir::llvm::VPTruncOp::static_kind():
       tp = &(gTypes[1202]);
       break;
 
-    case mx::ir::llvm::VarAnnotationOp::static_kind():
+    case mx::ir::llvm::VPUDivOp::static_kind():
       tp = &(gTypes[1203]);
       break;
 
-    case mx::ir::llvm::MaskedCompressStoreOp::static_kind():
+    case mx::ir::llvm::VPUIToFPOp::static_kind():
       tp = &(gTypes[1204]);
       break;
 
-    case mx::ir::llvm::MaskedExpandLoadOp::static_kind():
+    case mx::ir::llvm::VPURemOp::static_kind():
       tp = &(gTypes[1205]);
       break;
 
-    case mx::ir::llvm::MaskedGatherOp::static_kind():
+    case mx::ir::llvm::VPXorOp::static_kind():
       tp = &(gTypes[1206]);
       break;
 
-    case mx::ir::llvm::MaskedScatterOp::static_kind():
+    case mx::ir::llvm::VPZExtOp::static_kind():
       tp = &(gTypes[1207]);
       break;
 
-    case mx::ir::llvm::VectorExtractOp::static_kind():
+    case mx::ir::llvm::VaCopyOp::static_kind():
       tp = &(gTypes[1208]);
       break;
 
-    case mx::ir::llvm::VectorInsertOp::static_kind():
+    case mx::ir::llvm::VaEndOp::static_kind():
       tp = &(gTypes[1209]);
       break;
 
-    case mx::ir::llvm::VectorReduceAddOp::static_kind():
+    case mx::ir::llvm::VaStartOp::static_kind():
       tp = &(gTypes[1210]);
       break;
 
-    case mx::ir::llvm::VectorReduceAndOp::static_kind():
+    case mx::ir::llvm::VarAnnotationOp::static_kind():
       tp = &(gTypes[1211]);
       break;
 
-    case mx::ir::llvm::VectorReduceFAddOp::static_kind():
+    case mx::ir::llvm::MaskedCompressStoreOp::static_kind():
       tp = &(gTypes[1212]);
       break;
 
-    case mx::ir::llvm::VectorReduceFMaxOp::static_kind():
+    case mx::ir::llvm::MaskedExpandLoadOp::static_kind():
       tp = &(gTypes[1213]);
       break;
 
-    case mx::ir::llvm::VectorReduceFMaximumOp::static_kind():
+    case mx::ir::llvm::MaskedGatherOp::static_kind():
       tp = &(gTypes[1214]);
       break;
 
-    case mx::ir::llvm::VectorReduceFMinOp::static_kind():
+    case mx::ir::llvm::MaskedScatterOp::static_kind():
       tp = &(gTypes[1215]);
       break;
 
-    case mx::ir::llvm::VectorReduceFMinimumOp::static_kind():
+    case mx::ir::llvm::VectorExtractOp::static_kind():
       tp = &(gTypes[1216]);
       break;
 
-    case mx::ir::llvm::VectorReduceFMulOp::static_kind():
+    case mx::ir::llvm::VectorInsertOp::static_kind():
       tp = &(gTypes[1217]);
       break;
 
-    case mx::ir::llvm::VectorReduceMulOp::static_kind():
+    case mx::ir::llvm::VectorReduceAddOp::static_kind():
       tp = &(gTypes[1218]);
       break;
 
-    case mx::ir::llvm::VectorReduceOrOp::static_kind():
+    case mx::ir::llvm::VectorReduceAndOp::static_kind():
       tp = &(gTypes[1219]);
       break;
 
-    case mx::ir::llvm::VectorReduceSMaxOp::static_kind():
+    case mx::ir::llvm::VectorReduceFAddOp::static_kind():
       tp = &(gTypes[1220]);
       break;
 
-    case mx::ir::llvm::VectorReduceSMinOp::static_kind():
+    case mx::ir::llvm::VectorReduceFMaxOp::static_kind():
       tp = &(gTypes[1221]);
       break;
 
-    case mx::ir::llvm::VectorReduceUMaxOp::static_kind():
+    case mx::ir::llvm::VectorReduceFMaximumOp::static_kind():
       tp = &(gTypes[1222]);
       break;
 
-    case mx::ir::llvm::VectorReduceUMinOp::static_kind():
+    case mx::ir::llvm::VectorReduceFMinOp::static_kind():
       tp = &(gTypes[1223]);
       break;
 
-    case mx::ir::llvm::VectorReduceXorOp::static_kind():
+    case mx::ir::llvm::VectorReduceFMinimumOp::static_kind():
       tp = &(gTypes[1224]);
       break;
 
-    case mx::ir::llvm::VScaleOp::static_kind():
+    case mx::ir::llvm::VectorReduceFMulOp::static_kind():
       tp = &(gTypes[1225]);
+      break;
+
+    case mx::ir::llvm::VectorReduceMulOp::static_kind():
+      tp = &(gTypes[1226]);
+      break;
+
+    case mx::ir::llvm::VectorReduceOrOp::static_kind():
+      tp = &(gTypes[1227]);
+      break;
+
+    case mx::ir::llvm::VectorReduceSMaxOp::static_kind():
+      tp = &(gTypes[1228]);
+      break;
+
+    case mx::ir::llvm::VectorReduceSMinOp::static_kind():
+      tp = &(gTypes[1229]);
+      break;
+
+    case mx::ir::llvm::VectorReduceUMaxOp::static_kind():
+      tp = &(gTypes[1230]);
+      break;
+
+    case mx::ir::llvm::VectorReduceUMinOp::static_kind():
+      tp = &(gTypes[1231]);
+      break;
+
+    case mx::ir::llvm::VectorReduceXorOp::static_kind():
+      tp = &(gTypes[1232]);
+      break;
+
+    case mx::ir::llvm::VScaleOp::static_kind():
+      tp = &(gTypes[1233]);
       break;
 
   }
@@ -1146,7 +1146,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[977]);
+  PyTypeObject * const tp = &(gTypes[985]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -1161,12 +1161,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[973].tp_hash;
-  tp->tp_richcompare = gTypes[973].tp_richcompare;
+  tp->tp_hash = gTypes[981].tp_hash;
+  tp->tp_richcompare = gTypes[981].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[973]);
+  tp->tp_base = &(gTypes[981]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

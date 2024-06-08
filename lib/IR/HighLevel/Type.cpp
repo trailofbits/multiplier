@@ -291,6 +291,17 @@ std::optional<Float128Type> Float128Type::from(const ::mx::ir::Type &that) {
   return ::vast::hl::Float128Type(this->::mx::ir::Type::type_);
 }
 
+std::optional<ComplexType> ComplexType::from(const ::mx::ir::Type &that) {
+  if (that.kind() == TypeKind::HL_COMPLEX) {
+    return reinterpret_cast<const ComplexType &>(that);
+  }
+  return std::nullopt;
+}
+
+::vast::hl::ComplexType ComplexType::underlying_repr(void) const noexcept {
+  return ::vast::hl::ComplexType(this->::mx::ir::Type::type_);
+}
+
 std::optional<PointerType> PointerType::from(const ::mx::ir::Type &that) {
   if (that.kind() == TypeKind::HL_POINTER) {
     return reinterpret_cast<const PointerType &>(that);
@@ -311,6 +322,17 @@ std::optional<ArrayType> ArrayType::from(const ::mx::ir::Type &that) {
 
 ::vast::hl::ArrayType ArrayType::underlying_repr(void) const noexcept {
   return ::vast::hl::ArrayType(this->::mx::ir::Type::type_);
+}
+
+std::optional<VectorType> VectorType::from(const ::mx::ir::Type &that) {
+  if (that.kind() == TypeKind::HL_VECTOR) {
+    return reinterpret_cast<const VectorType &>(that);
+  }
+  return std::nullopt;
+}
+
+::vast::hl::VectorType VectorType::underlying_repr(void) const noexcept {
+  return ::vast::hl::VectorType(this->::mx::ir::Type::type_);
 }
 
 std::optional<DecayedType> DecayedType::from(const ::mx::ir::Type &that) {

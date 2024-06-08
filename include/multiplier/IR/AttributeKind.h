@@ -84,7 +84,9 @@ enum class AttributeKind : unsigned {
   HL_ANNOTATION,
   HL_FORMAT,
   HL_SECTION,
+  HL_ALIGNED,
   HL_ALWAYS_INLINE,
+  HL_NO_INLINE,
   HL_CONST,
   HL_LOADER_UNINITIALIZED,
   HL_NO_INSTRUMENT_FUNCTION,
@@ -94,11 +96,17 @@ enum class AttributeKind : unsigned {
   HL_RESTRICT,
   HL_NO_THROW,
   HL_NON_NULL,
+  HL_LEAF,
+  HL_COLD,
+  HL_TRANSPARENT_UNION,
+  HL_RETURNS_TWICE,
   HL_ASM_LABEL,
   HL_MODE,
   HL_BUILTIN,
   HL_ALLOC_ALIGN,
   HL_ALLOC_SIZE,
+  HL_DEPRECATED,
+  HL_MAX_FIELD_ALIGNMENT,
   HL_CV_QUALIFIERS,
   HL_UCV_QUALIFIERS,
   HL_CVR_QUALIFIERS,
@@ -118,7 +126,7 @@ inline static const char *EnumerationName(ir::AttributeKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(ir::AttributeKind) {
-  return 95;
+  return 103;
 }
 
 MX_EXPORT const char *EnumeratorName(ir::AttributeKind);

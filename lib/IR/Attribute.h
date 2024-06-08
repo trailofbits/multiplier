@@ -79,7 +79,9 @@
    _hl(AnnotationAttr, AttributeKind::HL_ANNOTATION, vast::hl::AnnotationAttr) \
    _hl(FormatAttr, AttributeKind::HL_FORMAT, vast::hl::FormatAttr) \
    _hl(SectionAttr, AttributeKind::HL_SECTION, vast::hl::SectionAttr) \
+   _hl(AlignedAttr, AttributeKind::HL_ALIGNED, vast::hl::AlignedAttr) \
    _hl(AlwaysInlineAttr, AttributeKind::HL_ALWAYS_INLINE, vast::hl::AlwaysInlineAttr) \
+   _hl(NoInlineAttr, AttributeKind::HL_NO_INLINE, vast::hl::NoInlineAttr) \
    _hl(ConstAttr, AttributeKind::HL_CONST, vast::hl::ConstAttr) \
    _hl(LoaderUninitializedAttr, AttributeKind::HL_LOADER_UNINITIALIZED, vast::hl::LoaderUninitializedAttr) \
    _hl(NoInstrumentFunctionAttr, AttributeKind::HL_NO_INSTRUMENT_FUNCTION, vast::hl::NoInstrumentFunctionAttr) \
@@ -89,11 +91,17 @@
    _hl(RestrictAttr, AttributeKind::HL_RESTRICT, vast::hl::RestrictAttr) \
    _hl(NoThrowAttr, AttributeKind::HL_NO_THROW, vast::hl::NoThrowAttr) \
    _hl(NonNullAttr, AttributeKind::HL_NON_NULL, vast::hl::NonNullAttr) \
+   _hl(LeafAttr, AttributeKind::HL_LEAF, vast::hl::LeafAttr) \
+   _hl(ColdAttr, AttributeKind::HL_COLD, vast::hl::ColdAttr) \
+   _hl(TransparentUnionAttr, AttributeKind::HL_TRANSPARENT_UNION, vast::hl::TransparentUnionAttr) \
+   _hl(ReturnsTwiceAttr, AttributeKind::HL_RETURNS_TWICE, vast::hl::ReturnsTwiceAttr) \
    _hl(AsmLabelAttr, AttributeKind::HL_ASM_LABEL, vast::hl::AsmLabelAttr) \
    _hl(ModeAttr, AttributeKind::HL_MODE, vast::hl::ModeAttr) \
    _hl(BuiltinAttr, AttributeKind::HL_BUILTIN, vast::hl::BuiltinAttr) \
    _hl(AllocAlignAttr, AttributeKind::HL_ALLOC_ALIGN, vast::hl::AllocAlignAttr) \
    _hl(AllocSizeAttr, AttributeKind::HL_ALLOC_SIZE, vast::hl::AllocSizeAttr) \
+   _hl(DeprecatedAttr, AttributeKind::HL_DEPRECATED, vast::hl::DeprecatedAttr) \
+   _hl(MaxFieldAlignmentAttr, AttributeKind::HL_MAX_FIELD_ALIGNMENT, vast::hl::MaxFieldAlignmentAttr) \
    _hl(CVQualifiersAttr, AttributeKind::HL_CV_QUALIFIERS, vast::hl::CVQualifiersAttr) \
    _hl(UCVQualifiersAttr, AttributeKind::HL_UCV_QUALIFIERS, vast::hl::UCVQualifiersAttr) \
    _hl(CVRQualifiersAttr, AttributeKind::HL_CVR_QUALIFIERS, vast::hl::CVRQualifiersAttr) \
@@ -105,5 +113,5 @@
    _core(GlobalLinkageKindAttr, AttributeKind::CORE_GLOBAL_LINKAGE_KIND, vast::core::GlobalLinkageKindAttr) \
    _meta(IdentifierAttr, AttributeKind::META_IDENTIFIER, vast::meta::IdentifierAttr)
 
-#define MX_IR_NUM_MLIR_ATTRIBUTES 95
+#define MX_IR_NUM_MLIR_ATTRIBUTES 103
 

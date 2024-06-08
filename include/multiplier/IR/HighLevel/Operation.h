@@ -42,6 +42,7 @@ class CStyleCastOp;
 class CallOp;
 class ClassDeclOp;
 class CmpOp;
+class CompoundLiteralOp;
 class ConstantOp;
 class CxxBaseSpecifierOp;
 class CxxStructDeclOp;
@@ -74,6 +75,7 @@ class ForOp;
 class FuncOp;
 class GotoStmt;
 class IfOp;
+class IndirectGotoStmt;
 class LabelDeclOp;
 class LabelStmt;
 class SkipStmt;
@@ -82,9 +84,11 @@ class TypeYieldOp;
 class ValueYieldOp;
 class VarDeclOp;
 class WhileOp;
+class ImagOp;
 class ImplicitCastOp;
 class IndirectCallOp;
 class InitListExpr;
+class InitializedConstantOp;
 class LNotOp;
 class MinusOp;
 class MulFAssignOp;
@@ -98,6 +102,9 @@ class PostIncOp;
 class PreDecOp;
 class PreIncOp;
 class PredefinedExpr;
+class PreferredAlignOfExprOp;
+class PreferredAlignOfTypeOp;
+class RealOp;
 class RecordMemberOp;
 class RemFAssignOp;
 class RemFOp;
@@ -694,6 +701,23 @@ class MX_EXPORT CmpOp final : public Operation {
 };
 static_assert(sizeof(CmpOp) == sizeof(Operation));
 
+class MX_EXPORT CompoundLiteralOp final : public Operation {
+ public:
+  inline static constexpr OperationKind static_kind(void) {
+    return OperationKind::HL_COMPOUND_LITERAL;
+  }
+
+  static std::optional<CompoundLiteralOp> from(const ::mx::ir::Operation &that);
+  static std::optional<CompoundLiteralOp> producing(const ::mx::ir::Value &val);
+
+  ::vast::hl::CompoundLiteralOp underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  ::mx::ir::Value result(void) const;
+  //::mlir::Region & init(void) const;
+};
+static_assert(sizeof(CompoundLiteralOp) == sizeof(Operation));
+
 class MX_EXPORT ConstantOp final : public Operation {
  public:
   inline static constexpr OperationKind static_kind(void) {
@@ -1263,6 +1287,22 @@ class MX_EXPORT IfOp final : public Operation {
 };
 static_assert(sizeof(IfOp) == sizeof(Operation));
 
+class MX_EXPORT IndirectGotoStmtOp final : public Operation {
+ public:
+  inline static constexpr OperationKind static_kind(void) {
+    return OperationKind::HL_INDIRECT_GOTO;
+  }
+
+  static std::optional<IndirectGotoStmtOp> from(const ::mx::ir::Operation &that);
+  static std::optional<IndirectGotoStmtOp> producing(const ::mx::ir::Value &val);
+
+  ::vast::hl::IndirectGotoStmt underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //::mlir::Region & target(void) const;
+};
+static_assert(sizeof(IndirectGotoStmtOp) == sizeof(Operation));
+
 class MX_EXPORT LabelDeclOp final : public Operation {
  public:
   inline static constexpr OperationKind static_kind(void) {
@@ -1412,6 +1452,23 @@ class MX_EXPORT WhileOp final : public Operation {
 };
 static_assert(sizeof(WhileOp) == sizeof(Operation));
 
+class MX_EXPORT ImagOp final : public Operation {
+ public:
+  inline static constexpr OperationKind static_kind(void) {
+    return OperationKind::HL_IMAG;
+  }
+
+  static std::optional<ImagOp> from(const ::mx::ir::Operation &that);
+  static std::optional<ImagOp> producing(const ::mx::ir::Value &val);
+
+  ::vast::hl::ImagOp underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  ::mx::ir::Value arg(void) const;
+  ::mx::ir::Value result(void) const;
+};
+static_assert(sizeof(ImagOp) == sizeof(Operation));
+
 class MX_EXPORT ImplicitCastOp final : public Operation {
  public:
   inline static constexpr OperationKind static_kind(void) {
@@ -1464,6 +1521,23 @@ class MX_EXPORT InitListExprOp final : public Operation {
   //::mlir::Operation::operand_range elements(void) const;
 };
 static_assert(sizeof(InitListExprOp) == sizeof(Operation));
+
+class MX_EXPORT InitializedConstantOp final : public Operation {
+ public:
+  inline static constexpr OperationKind static_kind(void) {
+    return OperationKind::HL_CONST_INIT;
+  }
+
+  static std::optional<InitializedConstantOp> from(const ::mx::ir::Operation &that);
+  static std::optional<InitializedConstantOp> producing(const ::mx::ir::Value &val);
+
+  ::vast::hl::InitializedConstantOp underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  ::mx::ir::Value result(void) const;
+  //::mlir::Region & init(void) const;
+};
+static_assert(sizeof(InitializedConstantOp) == sizeof(Operation));
 
 class MX_EXPORT LNotOp final : public Operation {
  public:
@@ -1690,6 +1764,57 @@ class MX_EXPORT PredefinedExprOp final : public Operation {
   //::vast::hl::IdentKind kind(void) const;
 };
 static_assert(sizeof(PredefinedExprOp) == sizeof(Operation));
+
+class MX_EXPORT PreferredAlignOfExprOp final : public Operation {
+ public:
+  inline static constexpr OperationKind static_kind(void) {
+    return OperationKind::HL_PREFERRED_ALIGNOF_EXPR;
+  }
+
+  static std::optional<PreferredAlignOfExprOp> from(const ::mx::ir::Operation &that);
+  static std::optional<PreferredAlignOfExprOp> producing(const ::mx::ir::Value &val);
+
+  ::vast::hl::PreferredAlignOfExprOp underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  ::mx::ir::Value result(void) const;
+  //::mlir::Region & expr(void) const;
+};
+static_assert(sizeof(PreferredAlignOfExprOp) == sizeof(Operation));
+
+class MX_EXPORT PreferredAlignOfTypeOp final : public Operation {
+ public:
+  inline static constexpr OperationKind static_kind(void) {
+    return OperationKind::HL_PREFERRED_ALIGNOF_TYPE;
+  }
+
+  static std::optional<PreferredAlignOfTypeOp> from(const ::mx::ir::Operation &that);
+  static std::optional<PreferredAlignOfTypeOp> producing(const ::mx::ir::Value &val);
+
+  ::vast::hl::PreferredAlignOfTypeOp underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  ::mx::ir::Value result(void) const;
+  //::mlir::Type arg(void) const;
+};
+static_assert(sizeof(PreferredAlignOfTypeOp) == sizeof(Operation));
+
+class MX_EXPORT RealOp final : public Operation {
+ public:
+  inline static constexpr OperationKind static_kind(void) {
+    return OperationKind::HL_REAL;
+  }
+
+  static std::optional<RealOp> from(const ::mx::ir::Operation &that);
+  static std::optional<RealOp> producing(const ::mx::ir::Value &val);
+
+  ::vast::hl::RealOp underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  ::mx::ir::Value arg(void) const;
+  ::mx::ir::Value result(void) const;
+};
+static_assert(sizeof(RealOp) == sizeof(Operation));
 
 class MX_EXPORT RecordMemberOp final : public Operation {
  public:

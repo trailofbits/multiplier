@@ -14,7 +14,9 @@ namespace vast::hl {
 class AnnotationAttr;
 class FormatAttr;
 class SectionAttr;
+class AlignedAttr;
 class AlwaysInlineAttr;
+class NoInlineAttr;
 class ConstAttr;
 class LoaderUninitializedAttr;
 class NoInstrumentFunctionAttr;
@@ -24,11 +26,17 @@ class WarnUnusedResultAttr;
 class RestrictAttr;
 class NoThrowAttr;
 class NonNullAttr;
+class LeafAttr;
+class ColdAttr;
+class TransparentUnionAttr;
+class ReturnsTwiceAttr;
 class AsmLabelAttr;
 class ModeAttr;
 class BuiltinAttr;
 class AllocAlignAttr;
 class AllocSizeAttr;
+class DeprecatedAttr;
+class MaxFieldAlignmentAttr;
 class CVQualifiersAttr;
 class UCVQualifiersAttr;
 class CVRQualifiersAttr;
@@ -86,6 +94,20 @@ class MX_EXPORT SectionAttr final : public Attribute {
 };
 static_assert(sizeof(SectionAttr) == sizeof(Attribute));
 
+class MX_EXPORT AlignedAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::HL_ALIGNED;
+  }
+
+  static std::optional<AlignedAttr> from(const ::mx::ir::Attribute &that);
+
+  ::vast::hl::AlignedAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+};
+static_assert(sizeof(AlignedAttr) == sizeof(Attribute));
+
 class MX_EXPORT AlwaysInlineAttr final : public Attribute {
  public:
   inline static constexpr AttributeKind static_kind(void) {
@@ -99,6 +121,20 @@ class MX_EXPORT AlwaysInlineAttr final : public Attribute {
   // Imported methods:
 };
 static_assert(sizeof(AlwaysInlineAttr) == sizeof(Attribute));
+
+class MX_EXPORT NoInlineAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::HL_NO_INLINE;
+  }
+
+  static std::optional<NoInlineAttr> from(const ::mx::ir::Attribute &that);
+
+  ::vast::hl::NoInlineAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+};
+static_assert(sizeof(NoInlineAttr) == sizeof(Attribute));
 
 class MX_EXPORT ConstAttr final : public Attribute {
  public:
@@ -226,6 +262,62 @@ class MX_EXPORT NonNullAttr final : public Attribute {
 };
 static_assert(sizeof(NonNullAttr) == sizeof(Attribute));
 
+class MX_EXPORT LeafAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::HL_LEAF;
+  }
+
+  static std::optional<LeafAttr> from(const ::mx::ir::Attribute &that);
+
+  ::vast::hl::LeafAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+};
+static_assert(sizeof(LeafAttr) == sizeof(Attribute));
+
+class MX_EXPORT ColdAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::HL_COLD;
+  }
+
+  static std::optional<ColdAttr> from(const ::mx::ir::Attribute &that);
+
+  ::vast::hl::ColdAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+};
+static_assert(sizeof(ColdAttr) == sizeof(Attribute));
+
+class MX_EXPORT TransparentUnionAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::HL_TRANSPARENT_UNION;
+  }
+
+  static std::optional<TransparentUnionAttr> from(const ::mx::ir::Attribute &that);
+
+  ::vast::hl::TransparentUnionAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+};
+static_assert(sizeof(TransparentUnionAttr) == sizeof(Attribute));
+
+class MX_EXPORT ReturnsTwiceAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::HL_RETURNS_TWICE;
+  }
+
+  static std::optional<ReturnsTwiceAttr> from(const ::mx::ir::Attribute &that);
+
+  ::vast::hl::ReturnsTwiceAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+};
+static_assert(sizeof(ReturnsTwiceAttr) == sizeof(Attribute));
+
 class MX_EXPORT AsmLabelAttr final : public Attribute {
  public:
   inline static constexpr AttributeKind static_kind(void) {
@@ -302,6 +394,37 @@ class MX_EXPORT AllocSizeAttr final : public Attribute {
   int num_arg_pos(void) const;
 };
 static_assert(sizeof(AllocSizeAttr) == sizeof(Attribute));
+
+class MX_EXPORT DeprecatedAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::HL_DEPRECATED;
+  }
+
+  static std::optional<DeprecatedAttr> from(const ::mx::ir::Attribute &that);
+
+  ::vast::hl::DeprecatedAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //::mlir::StringAttr message(void) const;
+  //::mlir::StringAttr fixit(void) const;
+};
+static_assert(sizeof(DeprecatedAttr) == sizeof(Attribute));
+
+class MX_EXPORT MaxFieldAlignmentAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::HL_MAX_FIELD_ALIGNMENT;
+  }
+
+  static std::optional<MaxFieldAlignmentAttr> from(const ::mx::ir::Attribute &that);
+
+  ::vast::hl::MaxFieldAlignmentAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  unsigned int alignment(void) const;
+};
+static_assert(sizeof(MaxFieldAlignmentAttr) == sizeof(Attribute));
 
 class MX_EXPORT CVQualifiersAttr final : public Attribute {
  public:

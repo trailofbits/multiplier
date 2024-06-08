@@ -52,6 +52,17 @@ std::optional<SectionAttr> SectionAttr::from(const ::mx::ir::Attribute &that) {
   return ::vast::hl::SectionAttr(this->::mx::ir::Attribute::attr_);
 }
 
+std::optional<AlignedAttr> AlignedAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::HL_ALIGNED) {
+    return reinterpret_cast<const AlignedAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::vast::hl::AlignedAttr AlignedAttr::underlying_repr(void) const noexcept {
+  return ::vast::hl::AlignedAttr(this->::mx::ir::Attribute::attr_);
+}
+
 std::optional<AlwaysInlineAttr> AlwaysInlineAttr::from(const ::mx::ir::Attribute &that) {
   if (that.kind() == AttributeKind::HL_ALWAYS_INLINE) {
     return reinterpret_cast<const AlwaysInlineAttr &>(that);
@@ -61,6 +72,17 @@ std::optional<AlwaysInlineAttr> AlwaysInlineAttr::from(const ::mx::ir::Attribute
 
 ::vast::hl::AlwaysInlineAttr AlwaysInlineAttr::underlying_repr(void) const noexcept {
   return ::vast::hl::AlwaysInlineAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<NoInlineAttr> NoInlineAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::HL_NO_INLINE) {
+    return reinterpret_cast<const NoInlineAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::vast::hl::NoInlineAttr NoInlineAttr::underlying_repr(void) const noexcept {
+  return ::vast::hl::NoInlineAttr(this->::mx::ir::Attribute::attr_);
 }
 
 std::optional<ConstAttr> ConstAttr::from(const ::mx::ir::Attribute &that) {
@@ -162,6 +184,50 @@ std::optional<NonNullAttr> NonNullAttr::from(const ::mx::ir::Attribute &that) {
   return ::vast::hl::NonNullAttr(this->::mx::ir::Attribute::attr_);
 }
 
+std::optional<LeafAttr> LeafAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::HL_LEAF) {
+    return reinterpret_cast<const LeafAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::vast::hl::LeafAttr LeafAttr::underlying_repr(void) const noexcept {
+  return ::vast::hl::LeafAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<ColdAttr> ColdAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::HL_COLD) {
+    return reinterpret_cast<const ColdAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::vast::hl::ColdAttr ColdAttr::underlying_repr(void) const noexcept {
+  return ::vast::hl::ColdAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<TransparentUnionAttr> TransparentUnionAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::HL_TRANSPARENT_UNION) {
+    return reinterpret_cast<const TransparentUnionAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::vast::hl::TransparentUnionAttr TransparentUnionAttr::underlying_repr(void) const noexcept {
+  return ::vast::hl::TransparentUnionAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<ReturnsTwiceAttr> ReturnsTwiceAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::HL_RETURNS_TWICE) {
+    return reinterpret_cast<const ReturnsTwiceAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::vast::hl::ReturnsTwiceAttr ReturnsTwiceAttr::underlying_repr(void) const noexcept {
+  return ::vast::hl::ReturnsTwiceAttr(this->::mx::ir::Attribute::attr_);
+}
+
 std::optional<AsmLabelAttr> AsmLabelAttr::from(const ::mx::ir::Attribute &that) {
   if (that.kind() == AttributeKind::HL_ASM_LABEL) {
     return reinterpret_cast<const AsmLabelAttr &>(that);
@@ -239,6 +305,33 @@ int AllocSizeAttr::size_arg_pos(void) const {
 
 int AllocSizeAttr::num_arg_pos(void) const {
   auto val = underlying_repr().getNumArgPos();
+  return val;
+}
+
+std::optional<DeprecatedAttr> DeprecatedAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::HL_DEPRECATED) {
+    return reinterpret_cast<const DeprecatedAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::vast::hl::DeprecatedAttr DeprecatedAttr::underlying_repr(void) const noexcept {
+  return ::vast::hl::DeprecatedAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<MaxFieldAlignmentAttr> MaxFieldAlignmentAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::HL_MAX_FIELD_ALIGNMENT) {
+    return reinterpret_cast<const MaxFieldAlignmentAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::vast::hl::MaxFieldAlignmentAttr MaxFieldAlignmentAttr::underlying_repr(void) const noexcept {
+  return ::vast::hl::MaxFieldAlignmentAttr(this->::mx::ir::Attribute::attr_);
+}
+
+unsigned int MaxFieldAlignmentAttr::alignment(void) const {
+  auto val = underlying_repr().getAlignment();
   return val;
 }
 

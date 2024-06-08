@@ -33,8 +33,10 @@ class FloatType;
 class DoubleType;
 class LongDoubleType;
 class Float128Type;
+class ComplexType;
 class PointerType;
 class ArrayType;
+class VectorType;
 class DecayedType;
 class AttributedType;
 class AdjustedType;
@@ -361,6 +363,21 @@ class MX_EXPORT Float128Type final : public Type {
 };
 static_assert(sizeof(Float128Type) == sizeof(Type));
 
+class MX_EXPORT ComplexType final : public Type {
+ public:
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::HL_COMPLEX;
+  }
+
+  static std::optional<ComplexType> from(const ::mx::ir::Type &that);
+  ::vast::hl::ComplexType underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //Type element_type(void) const;
+  //CVRQualifiersAttr quals(void) const;
+};
+static_assert(sizeof(ComplexType) == sizeof(Type));
+
 class MX_EXPORT PointerType final : public Type {
  public:
   inline static constexpr TypeKind static_kind(void) {
@@ -393,6 +410,24 @@ class MX_EXPORT ArrayType final : public Type {
   //CVRQualifiersAttr quals(void) const;
 };
 static_assert(sizeof(ArrayType) == sizeof(Type));
+
+class MX_EXPORT VectorType final : public Type {
+ public:
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::HL_VECTOR;
+  }
+
+  static std::optional<VectorType> from(const ::mx::ir::Type &that);
+  ::vast::hl::VectorType underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //std::tuple<vector<optional<unsigned long long>, allocator<optional<unsigned long long>>>, Type> dim__and__type(void) const;
+  //dimensions_t dimensions(void) const;
+  //SizeParam size(void) const;
+  //Type element_type(void) const;
+  //CVRQualifiersAttr quals(void) const;
+};
+static_assert(sizeof(VectorType) == sizeof(Type));
 
 class MX_EXPORT DecayedType final : public Type {
  public:

@@ -965,6 +965,29 @@ std::optional<CmpOp> CmpOp::producing(const ::mx::ir::Value &that) {
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
+std::optional<CompoundLiteralOp> CompoundLiteralOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_COMPOUND_LITERAL) {
+    return reinterpret_cast<const CompoundLiteralOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<CompoundLiteralOp> CompoundLiteralOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::CompoundLiteralOp CompoundLiteralOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::CompoundLiteralOp(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Value CompoundLiteralOp::result(void) const {
+  auto val = underlying_repr().getResult();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
 std::optional<ConstantOp> ConstantOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_CONST) {
     return reinterpret_cast<const ConstantOp &>(that);
@@ -1808,6 +1831,24 @@ bool IfOp::has_else(void) const {
   return val;
 }
 
+std::optional<IndirectGotoStmtOp> IndirectGotoStmtOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_INDIRECT_GOTO) {
+    return reinterpret_cast<const IndirectGotoStmtOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<IndirectGotoStmtOp> IndirectGotoStmtOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::IndirectGotoStmt IndirectGotoStmtOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::IndirectGotoStmt(this->::mx::ir::Operation::op_);
+}
+
 std::optional<LabelDeclOp> LabelDeclOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_LABEL_DECL) {
     return reinterpret_cast<const LabelDeclOp &>(that);
@@ -2035,6 +2076,34 @@ std::optional<WhileOp> WhileOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::WhileOp(this->::mx::ir::Operation::op_);
 }
 
+std::optional<ImagOp> ImagOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_IMAG) {
+    return reinterpret_cast<const ImagOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<ImagOp> ImagOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::ImagOp ImagOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::ImagOp(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Value ImagOp::arg(void) const {
+  auto val = underlying_repr().getArg();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value ImagOp::result(void) const {
+  auto val = underlying_repr().getResult();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
 std::optional<ImplicitCastOp> ImplicitCastOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_IMPLICIT_CAST) {
     return reinterpret_cast<const ImplicitCastOp &>(that);
@@ -2102,6 +2171,29 @@ std::optional<InitListExprOp> InitListExprOp::producing(const ::mx::ir::Value &t
 
 ::vast::hl::InitListExpr InitListExprOp::underlying_repr(void) const noexcept {
   return ::vast::hl::InitListExpr(this->::mx::ir::Operation::op_);
+}
+
+std::optional<InitializedConstantOp> InitializedConstantOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_CONST_INIT) {
+    return reinterpret_cast<const InitializedConstantOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<InitializedConstantOp> InitializedConstantOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::InitializedConstantOp InitializedConstantOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::InitializedConstantOp(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Value InitializedConstantOp::result(void) const {
+  auto val = underlying_repr().getResult();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
 std::optional<LNotOp> LNotOp::from(const ::mx::ir::Operation &that) {
@@ -2484,6 +2576,80 @@ std::optional<PredefinedExprOp> PredefinedExprOp::producing(const ::mx::ir::Valu
 }
 
 ::mx::ir::Value PredefinedExprOp::result(void) const {
+  auto val = underlying_repr().getResult();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+std::optional<PreferredAlignOfExprOp> PreferredAlignOfExprOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_PREFERRED_ALIGNOF_EXPR) {
+    return reinterpret_cast<const PreferredAlignOfExprOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<PreferredAlignOfExprOp> PreferredAlignOfExprOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::PreferredAlignOfExprOp PreferredAlignOfExprOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::PreferredAlignOfExprOp(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Value PreferredAlignOfExprOp::result(void) const {
+  auto val = underlying_repr().getResult();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+std::optional<PreferredAlignOfTypeOp> PreferredAlignOfTypeOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_PREFERRED_ALIGNOF_TYPE) {
+    return reinterpret_cast<const PreferredAlignOfTypeOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<PreferredAlignOfTypeOp> PreferredAlignOfTypeOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::PreferredAlignOfTypeOp PreferredAlignOfTypeOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::PreferredAlignOfTypeOp(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Value PreferredAlignOfTypeOp::result(void) const {
+  auto val = underlying_repr().getResult();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+std::optional<RealOp> RealOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_REAL) {
+    return reinterpret_cast<const RealOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<RealOp> RealOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::RealOp RealOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::RealOp(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Value RealOp::arg(void) const {
+  auto val = underlying_repr().getArg();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Value RealOp::result(void) const {
   auto val = underlying_repr().getResult();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
