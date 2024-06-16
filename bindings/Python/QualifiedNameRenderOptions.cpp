@@ -27,6 +27,8 @@ struct O final : public ::PyObject {
 };
 
 static PyTypeObject gTypeDef = {
+  .tp_basicsize = sizeof(O),
+  .tp_itemsize = 0,
   .tp_name = "multiplier.ast.QualifiedNameRenderOptions",
   .tp_hash = PyObject_HashNotImplemented,
   .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_IMMUTABLETYPE,
@@ -40,9 +42,9 @@ static PyTypeObject gTypeDef = {
       return -1;
     }
 
-    if (!kwargs || !PyMapping_Check(kwargs) || !PyMapping_Size(kwargs)) {
+    if (!kwargs || !PyMapping_Check(kwargs)) {
       PyErrorStreamer(PyExc_TypeError)
-          << "'QualifiedNameRenderOptions.__init__' requires at least one keyword argument";
+          << "Keyword arguments to 'QualifiedNameRenderOptions.__init__' must be a dictionary";
       return -1;
     }
 
