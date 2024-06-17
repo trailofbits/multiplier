@@ -64,7 +64,8 @@ public:
   explicit CodeGeneratorError(const std::string &message)
       : std::runtime_error(message) {}
 
-  CodeGeneratorError() : std::runtime_error("Code generation error occurred") {}
+  CodeGeneratorError(void)
+      : std::runtime_error("Code generation error occurred") {}
 };
 
 // Generate `mlir::Location`s for Clang decls/stmts/etc. The location isn't
@@ -81,7 +82,8 @@ class MetaGenerator final : public vast::cg::meta_generator {
 public:
 
   MetaGenerator(mlir::MLIRContext &mctx, const EntityMapper &em)
-      : em(em), mctx(&mctx) {}
+      : em(em),
+        mctx(&mctx) {}
 
   mlir::Location location(const clang::Decl *data) const {
     return location_impl(data);
@@ -107,47 +109,68 @@ private:
   }
 };
 
-// Produce mangled symbol names. We use Multiplier's name mangler, as it will
-// embed translation unit IDs in certain places.
-//
-// TODO(pag): VAST's name mangler does some special stuff with respect to
-//            `clang::CXXConstructorDecl`s. Evaluate porting that here.
+// Produce symbol names based on entity IDs, as Multiplier's name mangler won't
+// produce named for all the same thing;s that VAST's default symbol name
+// generator will.
 class SymbolGenerator final : public vast::cg::symbol_generator {
-  const NameMangler &nm;
-public:
+ private:
+  const EntityMapper &em;
 
-  using symbol_name = vast::cg::symbol_name;
+  std::unordered_map<const vast::cg::clang_decl *, std::string> names;
+  std::string id_name;
+  llvm::raw_string_ostream os;
 
-  explicit SymbolGenerator(const NameMangler &nm) : nm(nm) {}
+  std::optional<vast::cg::symbol_name> mangle(
+      const vast::cg::clang_decl *decl_) {
 
-  std::optional<symbol_name> symbol(vast::cg::clang_global decl) {
-    const std::string &name = nm.Mangle(decl.getCanonicalDecl().getDecl());
-    if (name.empty()) {
+    auto decl = decl_->getCanonicalDecl();
+    auto it = names.find(decl);
+    if (it != names.end()) {
+      return it->second;
+    }
+
+    // TODO(pag): This won't be good enough for namespaces, as they are
+    //            internalized into fragments.
+    auto id = em.EntityId(decl);
+    if (id == mx::kInvalidEntityId) {
       return std::nullopt;
     }
 
-    return name;
+    id_name.clear();
+    os << id;
+    it = names.emplace(decl, std::move(id_name)).first;
+    return it->second;
   }
 
-  std::optional<symbol_name> symbol(const vast::cg::clang_decl_ref_expr *ref) {
-    const std::string &name = nm.Mangle(ref->getDecl());
-    if (name.empty()) {
-      return std::nullopt;
-    }
+ public:
+  virtual ~SymbolGenerator(void) = default;
 
-    return name;
+  inline SymbolGenerator(const EntityMapper &em_)
+      : em(em_),
+        os(id_name) {}
+
+  std::optional<vast::cg::symbol_name> symbol(
+      vast::cg::clang_global global) final {
+    return mangle(global.getCanonicalDecl().getDecl());
+  }
+
+  std::optional<vast::cg::symbol_name> symbol(
+      const vast::cg::clang_decl_ref_expr *ref) {
+    return mangle(ref->getDecl());
   }
 };
 
 
-class MXErrorReportVisitorProxy : public vast::cg::fallthrough_list_node {
+class MXErrorReportVisitorProxy
+    : public vast::cg::fallthrough_list_node {
   using base = vast::cg::fallthrough_visitor;
 
   template <typename EntityType, typename NameFunc>
-  auto visit_impl(EntityType entity, vast::cg::scope_context &scope, const std::string &type, NameFunc name) {
+  auto visit_impl(EntityType entity, vast::cg::scope_context &scope,
+                  const std::string &type, NameFunc name) {
     auto unsup = next->visit(entity, scope);
 
-    if constexpr (std::is_same_v<EntityType, const vast::cg::clang_type*>
+    if constexpr (std::is_same_v<EntityType, const vast::cg::clang_type *>
               ||  std::is_same_v<EntityType, vast::cg::clang_qual_type>
     ) {
       log_type(type, name(ast, entity));
@@ -162,56 +185,72 @@ class MXErrorReportVisitorProxy : public vast::cg::fallthrough_list_node {
     return unsup;
   }
 
-  void log(std::string_view type, std::string_view name, const auto *entity) const {
-    LOG(ERROR) << "Cannot codegen unsupported " << type << " " << name
-               << PrefixedLocation(ast.Adopt(entity), " at or near ")
-               << " on main job file "
-               << ast.MainFile().Path().generic_string();
+  void log(std::string_view type, std::string_view name,
+           const auto *entity) const {
+    LOG(ERROR)
+        << "Cannot codegen unsupported " << type << " " << name
+        << PrefixedLocation(ast.Adopt(entity), " at or near ")
+        << " on main job file "
+        << ast.MainFile().Path().generic_string();
   }
 
   void log_type(std::string_view type, std::string_view name) const {
-    LOG(ERROR) << "Cannot codegen unsupported " << type << " " << name
-               << " on main job file "
-               << ast.MainFile().Path().generic_string();
+    LOG(ERROR)
+        << "Cannot codegen unsupported " << type << " " << name
+        << " on main job file "
+        << ast.MainFile().Path().generic_string();
   }
 
 public:
-  MXErrorReportVisitorProxy(const pasta::AST &ast_) : ast(ast_) {}
+  MXErrorReportVisitorProxy(const pasta::AST &ast_)
+      : ast(ast_) {}
 
-  vast::operation visit(const vast::cg::clang_decl *raw_decl, vast::cg::scope_context &scope) override {
-    return visit_impl(raw_decl, scope, "declaration", [](auto &ast, auto *raw) {
-      return ast.Adopt(raw).KindName();
-    });
+  vast::operation visit(const vast::cg::clang_decl *raw_decl,
+                        vast::cg::scope_context &scope) override {
+    return visit_impl(raw_decl, scope, "declaration",
+                      [] (auto &ast, auto *raw) {
+                        return ast.Adopt(raw).KindName();
+                      });
   }
 
-  vast::operation visit(const vast::cg::clang_stmt *raw_stmt, vast::cg::scope_context &scope) override {
-    return visit_impl(raw_stmt, scope, "statement", [](auto &ast, auto *raw) {
-      return ast.Adopt(raw).KindName();
-    });
+  vast::operation visit(const vast::cg::clang_stmt *raw_stmt,
+                        vast::cg::scope_context &scope) override {
+    return visit_impl(raw_stmt, scope, "statement",
+                      [] (auto &ast, auto *raw) {
+                        return ast.Adopt(raw).KindName();
+                      });
   }
 
-  vast::mlir_type visit(const vast::cg::clang_type *type, vast::cg::scope_context &scope) override {
-    return visit_impl(type, scope, "type", [](auto &, auto *t) {
-      return vast::cg::clang_qual_type(t, 0).getAsString();
-    });
+  vast::mlir_type visit(const vast::cg::clang_type *type,
+                        vast::cg::scope_context &scope) override {
+    return visit_impl(type, scope, "type",
+                      [] (auto &, auto *t) {
+                        return vast::cg::clang_qual_type(t, 0).getAsString();
+                      });
   }
 
-  vast::mlir_type visit(vast::cg::clang_qual_type type, vast::cg::scope_context &scope) override {
-    return visit_impl(type, scope, "type", [](auto &, auto t) {
-      return t.getAsString();
-    });
+  vast::mlir_type visit(vast::cg::clang_qual_type type,
+                        vast::cg::scope_context &scope) override {
+    return visit_impl(type, scope, "type",
+                      [] (auto &, auto t) {
+                        return t.getAsString();
+                      });
   }
 
-  std::optional<vast::named_attr> visit(const vast::cg::clang_attr *raw_attr, vast::cg::scope_context &scope) override {
+  std::optional<vast::named_attr> visit(
+      const vast::cg::clang_attr *raw_attr,
+      vast::cg::scope_context &scope) override {
     return visit_impl(raw_attr, scope, "attribute", [](auto &ast, auto *raw) {
       return ast.Adopt(raw).KindName();
     });
   }
 
-  vast::operation visit_prototype(const vast::cg::clang_function *raw_decl, vast::cg::scope_context &scope) override {
-    return visit_impl(raw_decl, scope, "function prototype", [](auto &, auto *raw) {
-      return raw->getNameAsString();
-    });
+  vast::operation visit_prototype(const vast::cg::clang_function *raw_decl,
+                                  vast::cg::scope_context &scope) override {
+    return visit_impl(raw_decl, scope, "function prototype",
+                      [] (auto &, auto *raw) {
+                        return raw->getNameAsString();
+                      });
   }
 
 private:
@@ -219,10 +258,9 @@ private:
 };
 
 class MXPreprocessingVisitorProxy : public vast::cg::fallthrough_list_node {
-public:
+ public:
   MXPreprocessingVisitorProxy(clang::ASTContext &ast_context_)
-      : ast_context(ast_context_)
-  {}
+      : ast_context(ast_context_) {}
 
   // Apply the `TypeMapper`s type compression, which eagerly desugars things
   // like `AutoType`, `ElaboratedType`, etc. (but isn't as aggressive when
@@ -235,36 +273,37 @@ public:
   // `Derived::visit`, the most derived type, and represents the "top" code
   // generator visitor, which will lead us back into here to apply compression
   // on the pointer element type.
-  vast::mlir_type visit(const vast::cg::clang_type *type, vast::cg::scope_context &scope) override {
-      auto compressed = compress(type);
-      auto new_type = compressed.getTypePtrOrNull();
-      if (new_type != type) {
-          if (compressed.hasQualifiers()) {
-              return visit(compressed, scope);
-          }
-      } else {
-          assert(!compressed.hasQualifiers());
+  vast::mlir_type visit(const vast::cg::clang_type *type,
+                        vast::cg::scope_context &scope) override {
+    auto compressed = compress(type);
+    auto new_type = compressed.getTypePtrOrNull();
+    if (new_type != type) {
+      if (compressed.hasQualifiers()) {
+        return visit(compressed, scope);
       }
-      return next->visit(new_type, scope);
+    } else {
+      assert(!compressed.hasQualifiers());
+    }
+    return next->visit(new_type, scope);
   }
 
-  vast::mlir_type visit(vast::cg::clang_qual_type type, vast::cg::scope_context &scope) override {
-      return next->visit(compress(type), scope);
+  vast::mlir_type visit(vast::cg::clang_qual_type type,
+                        vast::cg::scope_context &scope) override {
+    return next->visit(compress(type), scope);
   }
 
-private:
+ private:
 
   vast::cg::clang_qual_type compress(const vast::cg::clang_type *type) {
-      return TypeMapper::Compress(ast_context, type);
+    return TypeMapper::Compress(ast_context, type);
   }
 
   vast::cg::clang_qual_type compress(vast::cg::clang_qual_type type) {
-      return TypeMapper::Compress(ast_context, type);
+    return TypeMapper::Compress(ast_context, type);
   }
 
   clang::ASTContext &ast_context;
 };
-
 
 //
 // VAST Driver Setup Functions
@@ -285,38 +324,36 @@ MakeMetaGenerator(mlir::MLIRContext &mctx, const EntityMapper &em) {
 }
 
 std::shared_ptr<vast::cg::symbol_generator>
-MakeSymbolGenerator(const NameMangler &nm) {
-  return std::make_shared<SymbolGenerator>(nm);
+MakeSymbolGenerator(const EntityMapper &em) {
+  return std::make_shared<SymbolGenerator>(em);
 }
 
 std::unique_ptr<vast::cg::driver> MakeCodeGenDriver(const pasta::AST &ast,
-                                                    const EntityMapper &em,
-                                                    const NameMangler &nm) {
+                                                    const EntityMapper &em) {
   auto &actx = ast.UnderlyingAST();
-  auto mctx  = MakeMLIRContext();
-  auto bld   = MakeCodeGenBuilder(mctx.get());
-  auto mg    = MakeMetaGenerator(*mctx, em);
-  auto sg    = MakeSymbolGenerator(nm);
+  auto mctx = MakeMLIRContext();
+  auto bld = MakeCodeGenBuilder(mctx.get());
+  auto mg = MakeMetaGenerator(*mctx, em);
+  auto sg = MakeSymbolGenerator(em);
 
   using vast::cg::as_node;
   using vast::cg::as_node_with_list_ref;
 
-  auto visitors = std::make_shared<vast::cg::visitor_list>()
-    | as_node<MXPreprocessingVisitorProxy>(ast.UnderlyingAST())
-    | as_node_with_list_ref<vast::cg::attr_visitor_proxy>()
-    | as_node<vast::cg::type_caching_proxy>()
-    | as_node_with_list_ref<vast::cg::default_visitor>(
-      *mctx, *bld, mg, sg,
-      /* strict return = */ false,
-      vast::cg::missing_return_policy::emit_trap
-    )
-    | as_node<MXErrorReportVisitorProxy>(ast)
-    | as_node_with_list_ref<vast::cg::unsup_visitor>(*mctx, *bld)
-    | as_node<vast::cg::fallthrough_visitor>();
+  auto visitors =
+      std::make_shared<vast::cg::visitor_list>() |
+      as_node<MXPreprocessingVisitorProxy>(ast.UnderlyingAST()) |
+      as_node_with_list_ref<vast::cg::attr_visitor_proxy>() |
+      as_node<vast::cg::type_caching_proxy>() |
+      as_node_with_list_ref<vast::cg::default_visitor>(
+          *mctx, *bld, mg, sg,
+          /* strict return = */ false,
+          vast::cg::missing_return_policy::emit_trap) |
+      as_node<MXErrorReportVisitorProxy>(ast) |
+      as_node_with_list_ref<vast::cg::unsup_visitor>(*mctx, *bld) |
+      as_node<vast::cg::fallthrough_visitor>();
 
   auto drv = std::make_unique<vast::cg::driver>(
-    actx, std::move(mctx), std::move(bld), visitors
-  );
+      actx, std::move(mctx), std::move(bld), visitors);
 
   drv->enable_verifier(true);
   return drv;
@@ -325,7 +362,7 @@ std::unique_ptr<vast::cg::driver> MakeCodeGenDriver(const pasta::AST &ast,
 } // namespace
 
 class CodeGeneratorImpl {
-public:
+ public:
 
   std::optional<vast::owning_module_ref> Process(const pasta::AST &ast);
   std::optional<std::string> DumpToString(vast::owning_module_ref &mod);
@@ -334,8 +371,8 @@ public:
   std::unique_ptr<vast::cg::driver> driver;
 };
 
-
-std::optional<vast::owning_module_ref> CodeGeneratorImpl::Process(const pasta::AST &ast) {
+std::optional<vast::owning_module_ref> CodeGeneratorImpl::Process(
+    const pasta::AST &ast) {
   try {
     auto decls = GenerateDeclarationsInDeclContext(ast.TranslationUnit());
 
@@ -355,21 +392,21 @@ std::optional<vast::owning_module_ref> CodeGeneratorImpl::Process(const pasta::A
   }
 }
 
-
-CodeGenerator::CodeGenerator()
+CodeGenerator::CodeGenerator(void)
     : impl(std::make_unique<CodeGeneratorImpl>()) {}
 
-void CodeGenerator::Disable() { impl->enabled = false; }
+void CodeGenerator::Disable(void) { impl->enabled = false; }
 
-bool CodeGenerator::IsEnabled() const { return impl->enabled; }
+bool CodeGenerator::IsEnabled(void) const { return impl->enabled; }
 
-CodeGenerator::~CodeGenerator() {
+CodeGenerator::~CodeGenerator(void) {
   if (impl) {
     impl.reset();
   }
 }
 
-std::optional<std::string> CodeGeneratorImpl::DumpToString(vast::owning_module_ref &mlir_module) {
+std::optional<std::string> CodeGeneratorImpl::DumpToString(
+    vast::owning_module_ref &mlir_module) {
   std::string result;
   llvm::raw_string_ostream os(result);
   mlir::BytecodeWriterConfig config("MX");
@@ -383,18 +420,20 @@ std::optional<std::string> CodeGeneratorImpl::DumpToString(vast::owning_module_r
 
 std::string CodeGenerator::GenerateSourceIR(const pasta::AST &ast,
                                             const EntityMapper &em,
-                                            const NameMangler &nm) {
+                                            const NameMangler &) {
   if (!IsEnabled()) {
     return "";
   }
 
-  impl->driver = MakeCodeGenDriver(ast, em, nm);
+  impl->driver = MakeCodeGenDriver(ast, em);
   if (auto mod = impl->Process(ast)) {
     if (auto result = impl->DumpToString(mod.value())) {
       return result.value();
     }
 
-    LOG(ERROR) << "Could not serialize module to bytecode on main job file " << ast.MainFile().Path().generic_string();
+    LOG(ERROR)
+        << "Could not serialize module to bytecode on main job file "
+        << ast.MainFile().Path().generic_string();
   }
 
   return "";
