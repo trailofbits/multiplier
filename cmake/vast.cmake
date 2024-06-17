@@ -13,4 +13,5 @@ set(VAST_LIBS
   VAST::VASTCodeGen
   VAST::VASTFrontend
   VAST::VASTSymbolInterface
+  VAST::VASTAggregateTypeDefinitionInterface
 )
