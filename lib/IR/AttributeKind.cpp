@@ -99,6 +99,9 @@ const char *EnumeratorName(ir::AttributeKind kind) {
     case ir::AttributeKind::HL_COLD: return "HL_COLD";
     case ir::AttributeKind::HL_TRANSPARENT_UNION: return "HL_TRANSPARENT_UNION";
     case ir::AttributeKind::HL_RETURNS_TWICE: return "HL_RETURNS_TWICE";
+    case ir::AttributeKind::HL_MAY_ALIAS: return "HL_MAY_ALIAS";
+    case ir::AttributeKind::HL_AVAILABLE_ONLY_IN_DEFAULT_EVAL_METHOD: return "HL_AVAILABLE_ONLY_IN_DEFAULT_EVAL_METHOD";
+    case ir::AttributeKind::HL_AVAILABILITY_ATTR: return "HL_AVAILABILITY_ATTR";
     case ir::AttributeKind::HL_ASM_LABEL: return "HL_ASM_LABEL";
     case ir::AttributeKind::HL_MODE: return "HL_MODE";
     case ir::AttributeKind::HL_BUILTIN: return "HL_BUILTIN";
@@ -109,6 +112,7 @@ const char *EnumeratorName(ir::AttributeKind kind) {
     case ir::AttributeKind::HL_CV_QUALIFIERS: return "HL_CV_QUALIFIERS";
     case ir::AttributeKind::HL_UCV_QUALIFIERS: return "HL_UCV_QUALIFIERS";
     case ir::AttributeKind::HL_CVR_QUALIFIERS: return "HL_CVR_QUALIFIERS";
+    case ir::AttributeKind::HL_OFFSET_OF_NODE: return "HL_OFFSET_OF_NODE";
     case ir::AttributeKind::CORE_BOOLEAN: return "CORE_BOOLEAN";
     case ir::AttributeKind::CORE_INTEGER: return "CORE_INTEGER";
     case ir::AttributeKind::CORE_FLOAT: return "CORE_FLOAT";
@@ -246,6 +250,9 @@ bool IsHighLevelAttributeKind(ir::AttributeKind kind) {
     case mx::ir::AttributeKind::HL_COLD:
     case mx::ir::AttributeKind::HL_TRANSPARENT_UNION:
     case mx::ir::AttributeKind::HL_RETURNS_TWICE:
+    case mx::ir::AttributeKind::HL_MAY_ALIAS:
+    case mx::ir::AttributeKind::HL_AVAILABLE_ONLY_IN_DEFAULT_EVAL_METHOD:
+    case mx::ir::AttributeKind::HL_AVAILABILITY_ATTR:
     case mx::ir::AttributeKind::HL_ASM_LABEL:
     case mx::ir::AttributeKind::HL_MODE:
     case mx::ir::AttributeKind::HL_BUILTIN:
@@ -256,6 +263,7 @@ bool IsHighLevelAttributeKind(ir::AttributeKind kind) {
     case mx::ir::AttributeKind::HL_CV_QUALIFIERS:
     case mx::ir::AttributeKind::HL_UCV_QUALIFIERS:
     case mx::ir::AttributeKind::HL_CVR_QUALIFIERS:
+    case mx::ir::AttributeKind::HL_OFFSET_OF_NODE:
       return true;
   }
 }

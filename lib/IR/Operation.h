@@ -403,6 +403,7 @@
    _hl("hl.assign.mul", OperationKind::HL_ASSIGN_MUL, vast::hl::MulIAssignOp) \
    _hl("hl.mul", OperationKind::HL_MUL, vast::hl::MulIOp) \
    _hl("hl.not", OperationKind::HL_NOT, vast::hl::NotOp) \
+   _hl("hl.offsetof.expr", OperationKind::HL_OFFSETOF_EXPR, vast::hl::OffsetOfExprOp) \
    _hl("hl.plus", OperationKind::HL_PLUS, vast::hl::PlusOp) \
    _hl("hl.post.dec", OperationKind::HL_POST_DEC, vast::hl::PostDecOp) \
    _hl("hl.post.inc", OperationKind::HL_POST_INC, vast::hl::PostIncOp) \
@@ -431,6 +432,7 @@
    _hl("hl.subscript", OperationKind::HL_SUBSCRIPT, vast::hl::SubscriptOp) \
    _hl("hl.this", OperationKind::HL_THIS, vast::hl::ThisOp) \
    _hl("hl.translation_unit", OperationKind::HL_TRANSLATION_UNIT, vast::hl::TranslationUnitOp) \
+   _hl("hl.alias", OperationKind::HL_ALIAS, vast::hl::TypeAliasOp) \
    _hl("hl.type", OperationKind::HL_TYPE, vast::hl::TypeDeclOp) \
    _hl("hl.typedef", OperationKind::HL_TYPEDEF, vast::hl::TypeDefOp) \
    _hl("hl.typeof.expr", OperationKind::HL_TYPEOF_EXPR, vast::hl::TypeOfExprOp) \
@@ -446,5 +448,5 @@
    _unsup("unsup.decl", OperationKind::UNSUP_DECL, vast::unsup::UnsupportedDecl) \
    _unsup("unsup.stmt", OperationKind::UNSUP_STMT, vast::unsup::UnsupportedStmt)
 
-#define MX_IR_NUM_MLIR_OPS 438
+#define MX_IR_NUM_MLIR_OPS 440
 

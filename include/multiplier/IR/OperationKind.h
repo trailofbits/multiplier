@@ -411,6 +411,7 @@ enum class OperationKind : unsigned {
   HL_ASSIGN_MUL,  // hl.assign.mul
   HL_MUL,  // hl.mul
   HL_NOT,  // hl.not
+  HL_OFFSETOF_EXPR,  // hl.offsetof.expr
   HL_PLUS,  // hl.plus
   HL_POST_DEC,  // hl.post.dec
   HL_POST_INC,  // hl.post.inc
@@ -439,6 +440,7 @@ enum class OperationKind : unsigned {
   HL_SUBSCRIPT,  // hl.subscript
   HL_THIS,  // hl.this
   HL_TRANSLATION_UNIT,  // hl.translation_unit
+  HL_ALIAS,  // hl.alias
   HL_TYPE,  // hl.type
   HL_TYPEDEF,  // hl.typedef
   HL_TYPEOF_EXPR,  // hl.typeof.expr
@@ -462,7 +464,7 @@ inline static const char *EnumerationName(ir::OperationKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(ir::OperationKind) {
-  return 439;
+  return 441;
 }
 
 MX_EXPORT const char *EnumeratorName(ir::OperationKind);

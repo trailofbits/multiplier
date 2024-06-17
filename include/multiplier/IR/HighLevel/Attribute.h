@@ -30,6 +30,9 @@ class LeafAttr;
 class ColdAttr;
 class TransparentUnionAttr;
 class ReturnsTwiceAttr;
+class MayAliasAttr;
+class AvailableOnlyInDefaultEvalMethodAttr;
+class AvailabilityAttrAttr;
 class AsmLabelAttr;
 class ModeAttr;
 class BuiltinAttr;
@@ -40,6 +43,7 @@ class MaxFieldAlignmentAttr;
 class CVQualifiersAttr;
 class UCVQualifiersAttr;
 class CVRQualifiersAttr;
+class OffsetOfNodeAttr;
 }  // namespace vast::hl
 namespace mx::ir::hl {
 
@@ -318,6 +322,48 @@ class MX_EXPORT ReturnsTwiceAttr final : public Attribute {
 };
 static_assert(sizeof(ReturnsTwiceAttr) == sizeof(Attribute));
 
+class MX_EXPORT MayAliasAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::HL_MAY_ALIAS;
+  }
+
+  static std::optional<MayAliasAttr> from(const ::mx::ir::Attribute &that);
+
+  ::vast::hl::MayAliasAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+};
+static_assert(sizeof(MayAliasAttr) == sizeof(Attribute));
+
+class MX_EXPORT AvailableOnlyInDefaultEvalMethodAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::HL_AVAILABLE_ONLY_IN_DEFAULT_EVAL_METHOD;
+  }
+
+  static std::optional<AvailableOnlyInDefaultEvalMethodAttr> from(const ::mx::ir::Attribute &that);
+
+  ::vast::hl::AvailableOnlyInDefaultEvalMethodAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+};
+static_assert(sizeof(AvailableOnlyInDefaultEvalMethodAttr) == sizeof(Attribute));
+
+class MX_EXPORT AvailabilityAttrAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::HL_AVAILABILITY_ATTR;
+  }
+
+  static std::optional<AvailabilityAttrAttr> from(const ::mx::ir::Attribute &that);
+
+  ::vast::hl::AvailabilityAttrAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+};
+static_assert(sizeof(AvailabilityAttrAttr) == sizeof(Attribute));
+
 class MX_EXPORT AsmLabelAttr final : public Attribute {
  public:
   inline static constexpr AttributeKind static_kind(void) {
@@ -475,5 +521,20 @@ class MX_EXPORT CVRQualifiersAttr final : public Attribute {
   bool is_restrict(void) const;
 };
 static_assert(sizeof(CVRQualifiersAttr) == sizeof(Attribute));
+
+class MX_EXPORT OffsetOfNodeAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::HL_OFFSET_OF_NODE;
+  }
+
+  static std::optional<OffsetOfNodeAttr> from(const ::mx::ir::Attribute &that);
+
+  ::vast::hl::OffsetOfNodeAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //std::variant<unsigned int, StringAttr> value(void) const;
+};
+static_assert(sizeof(OffsetOfNodeAttr) == sizeof(Attribute));
 
 }  // namespace mx::ir::hl

@@ -2412,6 +2412,29 @@ std::optional<NotOp> NotOp::producing(const ::mx::ir::Value &that) {
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
+std::optional<OffsetOfExprOp> OffsetOfExprOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_OFFSETOF_EXPR) {
+    return reinterpret_cast<const OffsetOfExprOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<OffsetOfExprOp> OffsetOfExprOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::OffsetOfExprOp OffsetOfExprOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::OffsetOfExprOp(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Value OffsetOfExprOp::result(void) const {
+  auto val = underlying_repr().getResult();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
 std::optional<PlusOp> PlusOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_PLUS) {
     return reinterpret_cast<const PlusOp &>(that);
@@ -3212,6 +3235,33 @@ std::optional<TranslationUnitOp> TranslationUnitOp::producing(const ::mx::ir::Va
 
 ::vast::hl::TranslationUnitOp TranslationUnitOp::underlying_repr(void) const noexcept {
   return ::vast::hl::TranslationUnitOp(this->::mx::ir::Operation::op_);
+}
+
+std::optional<TypeAliasOp> TypeAliasOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_ALIAS) {
+    return reinterpret_cast<const TypeAliasOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<TypeAliasOp> TypeAliasOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::TypeAliasOp TypeAliasOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::TypeAliasOp(this->::mx::ir::Operation::op_);
+}
+
+std::string_view TypeAliasOp::name(void) const {
+  auto val = underlying_repr().getName();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
 }
 
 std::optional<TypeDeclOp> TypeDeclOp::from(const ::mx::ir::Operation &that) {
