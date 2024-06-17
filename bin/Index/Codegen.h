@@ -24,7 +24,6 @@ class PendingFragment;
 class CodeGeneratorImpl;
 class CodeGenerator {
  private:
-  bool enabled = true;
   std::unique_ptr<CodeGeneratorImpl> impl;
 
  public:
