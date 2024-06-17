@@ -355,6 +355,7 @@ const char *EnumeratorName(ir::OperationKind kind) {
     case ir::OperationKind::HL_CALL: return "HL_CALL";
     case ir::OperationKind::HL_CLASS: return "HL_CLASS";
     case ir::OperationKind::HL_CMP: return "HL_CMP";
+    case ir::OperationKind::HL_COMPOUND_LITERAL: return "HL_COMPOUND_LITERAL";
     case ir::OperationKind::HL_CONST: return "HL_CONST";
     case ir::OperationKind::HL_BASE: return "HL_BASE";
     case ir::OperationKind::HL_CXXSTRUCT: return "HL_CXXSTRUCT";
@@ -387,6 +388,7 @@ const char *EnumeratorName(ir::OperationKind kind) {
     case ir::OperationKind::HL_FUNC: return "HL_FUNC";
     case ir::OperationKind::HL_GOTO: return "HL_GOTO";
     case ir::OperationKind::HL_IF: return "HL_IF";
+    case ir::OperationKind::HL_INDIRECT_GOTO: return "HL_INDIRECT_GOTO";
     case ir::OperationKind::HL_LABEL_DECL: return "HL_LABEL_DECL";
     case ir::OperationKind::HL_LABEL: return "HL_LABEL";
     case ir::OperationKind::HL_SKIP: return "HL_SKIP";
@@ -395,9 +397,11 @@ const char *EnumeratorName(ir::OperationKind kind) {
     case ir::OperationKind::HL_VALUE_YIELD: return "HL_VALUE_YIELD";
     case ir::OperationKind::HL_VAR: return "HL_VAR";
     case ir::OperationKind::HL_WHILE: return "HL_WHILE";
+    case ir::OperationKind::HL_IMAG: return "HL_IMAG";
     case ir::OperationKind::HL_IMPLICIT_CAST: return "HL_IMPLICIT_CAST";
     case ir::OperationKind::HL_INDIRECT_CALL: return "HL_INDIRECT_CALL";
     case ir::OperationKind::HL_INITLIST: return "HL_INITLIST";
+    case ir::OperationKind::HL_CONST_INIT: return "HL_CONST_INIT";
     case ir::OperationKind::HL_LNOT: return "HL_LNOT";
     case ir::OperationKind::HL_MINUS: return "HL_MINUS";
     case ir::OperationKind::HL_ASSIGN_FMUL: return "HL_ASSIGN_FMUL";
@@ -405,12 +409,16 @@ const char *EnumeratorName(ir::OperationKind kind) {
     case ir::OperationKind::HL_ASSIGN_MUL: return "HL_ASSIGN_MUL";
     case ir::OperationKind::HL_MUL: return "HL_MUL";
     case ir::OperationKind::HL_NOT: return "HL_NOT";
+    case ir::OperationKind::HL_OFFSETOF_EXPR: return "HL_OFFSETOF_EXPR";
     case ir::OperationKind::HL_PLUS: return "HL_PLUS";
     case ir::OperationKind::HL_POST_DEC: return "HL_POST_DEC";
     case ir::OperationKind::HL_POST_INC: return "HL_POST_INC";
     case ir::OperationKind::HL_PRE_DEC: return "HL_PRE_DEC";
     case ir::OperationKind::HL_PRE_INC: return "HL_PRE_INC";
     case ir::OperationKind::HL_PREDEFINED_EXPR: return "HL_PREDEFINED_EXPR";
+    case ir::OperationKind::HL_PREFERRED_ALIGNOF_EXPR: return "HL_PREFERRED_ALIGNOF_EXPR";
+    case ir::OperationKind::HL_PREFERRED_ALIGNOF_TYPE: return "HL_PREFERRED_ALIGNOF_TYPE";
+    case ir::OperationKind::HL_REAL: return "HL_REAL";
     case ir::OperationKind::HL_MEMBER: return "HL_MEMBER";
     case ir::OperationKind::HL_ASSIGN_FREM: return "HL_ASSIGN_FREM";
     case ir::OperationKind::HL_FREM: return "HL_FREM";
@@ -430,6 +438,7 @@ const char *EnumeratorName(ir::OperationKind kind) {
     case ir::OperationKind::HL_SUBSCRIPT: return "HL_SUBSCRIPT";
     case ir::OperationKind::HL_THIS: return "HL_THIS";
     case ir::OperationKind::HL_TRANSLATION_UNIT: return "HL_TRANSLATION_UNIT";
+    case ir::OperationKind::HL_ALIAS: return "HL_ALIAS";
     case ir::OperationKind::HL_TYPE: return "HL_TYPE";
     case ir::OperationKind::HL_TYPEDEF: return "HL_TYPEDEF";
     case ir::OperationKind::HL_TYPEOF_EXPR: return "HL_TYPEOF_EXPR";
@@ -833,6 +842,7 @@ bool IsHighLevelOperationKind(ir::OperationKind kind) {
     case mx::ir::OperationKind::HL_CALL:
     case mx::ir::OperationKind::HL_CLASS:
     case mx::ir::OperationKind::HL_CMP:
+    case mx::ir::OperationKind::HL_COMPOUND_LITERAL:
     case mx::ir::OperationKind::HL_CONST:
     case mx::ir::OperationKind::HL_BASE:
     case mx::ir::OperationKind::HL_CXXSTRUCT:
@@ -865,6 +875,7 @@ bool IsHighLevelOperationKind(ir::OperationKind kind) {
     case mx::ir::OperationKind::HL_FUNC:
     case mx::ir::OperationKind::HL_GOTO:
     case mx::ir::OperationKind::HL_IF:
+    case mx::ir::OperationKind::HL_INDIRECT_GOTO:
     case mx::ir::OperationKind::HL_LABEL_DECL:
     case mx::ir::OperationKind::HL_LABEL:
     case mx::ir::OperationKind::HL_SKIP:
@@ -873,9 +884,11 @@ bool IsHighLevelOperationKind(ir::OperationKind kind) {
     case mx::ir::OperationKind::HL_VALUE_YIELD:
     case mx::ir::OperationKind::HL_VAR:
     case mx::ir::OperationKind::HL_WHILE:
+    case mx::ir::OperationKind::HL_IMAG:
     case mx::ir::OperationKind::HL_IMPLICIT_CAST:
     case mx::ir::OperationKind::HL_INDIRECT_CALL:
     case mx::ir::OperationKind::HL_INITLIST:
+    case mx::ir::OperationKind::HL_CONST_INIT:
     case mx::ir::OperationKind::HL_LNOT:
     case mx::ir::OperationKind::HL_MINUS:
     case mx::ir::OperationKind::HL_ASSIGN_FMUL:
@@ -883,12 +896,16 @@ bool IsHighLevelOperationKind(ir::OperationKind kind) {
     case mx::ir::OperationKind::HL_ASSIGN_MUL:
     case mx::ir::OperationKind::HL_MUL:
     case mx::ir::OperationKind::HL_NOT:
+    case mx::ir::OperationKind::HL_OFFSETOF_EXPR:
     case mx::ir::OperationKind::HL_PLUS:
     case mx::ir::OperationKind::HL_POST_DEC:
     case mx::ir::OperationKind::HL_POST_INC:
     case mx::ir::OperationKind::HL_PRE_DEC:
     case mx::ir::OperationKind::HL_PRE_INC:
     case mx::ir::OperationKind::HL_PREDEFINED_EXPR:
+    case mx::ir::OperationKind::HL_PREFERRED_ALIGNOF_EXPR:
+    case mx::ir::OperationKind::HL_PREFERRED_ALIGNOF_TYPE:
+    case mx::ir::OperationKind::HL_REAL:
     case mx::ir::OperationKind::HL_MEMBER:
     case mx::ir::OperationKind::HL_ASSIGN_FREM:
     case mx::ir::OperationKind::HL_FREM:
@@ -908,6 +925,7 @@ bool IsHighLevelOperationKind(ir::OperationKind kind) {
     case mx::ir::OperationKind::HL_SUBSCRIPT:
     case mx::ir::OperationKind::HL_THIS:
     case mx::ir::OperationKind::HL_TRANSLATION_UNIT:
+    case mx::ir::OperationKind::HL_ALIAS:
     case mx::ir::OperationKind::HL_TYPE:
     case mx::ir::OperationKind::HL_TYPEDEF:
     case mx::ir::OperationKind::HL_TYPEOF_EXPR:

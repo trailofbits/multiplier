@@ -69,8 +69,10 @@ enum class TypeKind : unsigned {
   HL_DOUBLE,
   HL_LONG_DOUBLE,
   HL_FLOAT128,
+  HL_COMPLEX,
   HL_POINTER,
   HL_ARRAY,
+  HL_VECTOR,
   HL_DECAYED,
   HL_ATTRIBUTED,
   HL_ADJUSTED,
@@ -88,7 +90,7 @@ inline static const char *EnumerationName(ir::TypeKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(ir::TypeKind) {
-  return 64;
+  return 66;
 }
 
 MX_EXPORT const char *EnumeratorName(ir::TypeKind);

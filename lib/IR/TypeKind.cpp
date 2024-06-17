@@ -67,8 +67,10 @@ const char *EnumeratorName(ir::TypeKind kind) {
     case ir::TypeKind::HL_DOUBLE: return "HL_DOUBLE";
     case ir::TypeKind::HL_LONG_DOUBLE: return "HL_LONG_DOUBLE";
     case ir::TypeKind::HL_FLOAT128: return "HL_FLOAT128";
+    case ir::TypeKind::HL_COMPLEX: return "HL_COMPLEX";
     case ir::TypeKind::HL_POINTER: return "HL_POINTER";
     case ir::TypeKind::HL_ARRAY: return "HL_ARRAY";
+    case ir::TypeKind::HL_VECTOR: return "HL_VECTOR";
     case ir::TypeKind::HL_DECAYED: return "HL_DECAYED";
     case ir::TypeKind::HL_ATTRIBUTED: return "HL_ATTRIBUTED";
     case ir::TypeKind::HL_ADJUSTED: return "HL_ADJUSTED";
@@ -175,8 +177,10 @@ bool IsHighLevelTypeKind(ir::TypeKind kind) {
     case mx::ir::TypeKind::HL_DOUBLE:
     case mx::ir::TypeKind::HL_LONG_DOUBLE:
     case mx::ir::TypeKind::HL_FLOAT128:
+    case mx::ir::TypeKind::HL_COMPLEX:
     case mx::ir::TypeKind::HL_POINTER:
     case mx::ir::TypeKind::HL_ARRAY:
+    case mx::ir::TypeKind::HL_VECTOR:
     case mx::ir::TypeKind::HL_DECAYED:
     case mx::ir::TypeKind::HL_ATTRIBUTED:
     case mx::ir::TypeKind::HL_ADJUSTED:

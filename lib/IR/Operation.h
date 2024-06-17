@@ -349,6 +349,7 @@
    _hl("hl.call", OperationKind::HL_CALL, vast::hl::CallOp) \
    _hl("hl.class", OperationKind::HL_CLASS, vast::hl::ClassDeclOp) \
    _hl("hl.cmp", OperationKind::HL_CMP, vast::hl::CmpOp) \
+   _hl("hl.compound_literal", OperationKind::HL_COMPOUND_LITERAL, vast::hl::CompoundLiteralOp) \
    _hl("hl.const", OperationKind::HL_CONST, vast::hl::ConstantOp) \
    _hl("hl.base", OperationKind::HL_BASE, vast::hl::CxxBaseSpecifierOp) \
    _hl("hl.cxxstruct", OperationKind::HL_CXXSTRUCT, vast::hl::CxxStructDeclOp) \
@@ -381,6 +382,7 @@
    _hl("hl.func", OperationKind::HL_FUNC, vast::hl::FuncOp) \
    _hl("hl.goto", OperationKind::HL_GOTO, vast::hl::GotoStmt) \
    _hl("hl.if", OperationKind::HL_IF, vast::hl::IfOp) \
+   _hl("hl.indirect_goto", OperationKind::HL_INDIRECT_GOTO, vast::hl::IndirectGotoStmt) \
    _hl("hl.label.decl", OperationKind::HL_LABEL_DECL, vast::hl::LabelDeclOp) \
    _hl("hl.label", OperationKind::HL_LABEL, vast::hl::LabelStmt) \
    _hl("hl.skip", OperationKind::HL_SKIP, vast::hl::SkipStmt) \
@@ -389,9 +391,11 @@
    _hl("hl.value.yield", OperationKind::HL_VALUE_YIELD, vast::hl::ValueYieldOp) \
    _hl("hl.var", OperationKind::HL_VAR, vast::hl::VarDeclOp) \
    _hl("hl.while", OperationKind::HL_WHILE, vast::hl::WhileOp) \
+   _hl("hl.imag", OperationKind::HL_IMAG, vast::hl::ImagOp) \
    _hl("hl.implicit_cast", OperationKind::HL_IMPLICIT_CAST, vast::hl::ImplicitCastOp) \
    _hl("hl.indirect_call", OperationKind::HL_INDIRECT_CALL, vast::hl::IndirectCallOp) \
    _hl("hl.initlist", OperationKind::HL_INITLIST, vast::hl::InitListExpr) \
+   _hl("hl.const.init", OperationKind::HL_CONST_INIT, vast::hl::InitializedConstantOp) \
    _hl("hl.lnot", OperationKind::HL_LNOT, vast::hl::LNotOp) \
    _hl("hl.minus", OperationKind::HL_MINUS, vast::hl::MinusOp) \
    _hl("hl.assign.fmul", OperationKind::HL_ASSIGN_FMUL, vast::hl::MulFAssignOp) \
@@ -399,12 +403,16 @@
    _hl("hl.assign.mul", OperationKind::HL_ASSIGN_MUL, vast::hl::MulIAssignOp) \
    _hl("hl.mul", OperationKind::HL_MUL, vast::hl::MulIOp) \
    _hl("hl.not", OperationKind::HL_NOT, vast::hl::NotOp) \
+   _hl("hl.offsetof.expr", OperationKind::HL_OFFSETOF_EXPR, vast::hl::OffsetOfExprOp) \
    _hl("hl.plus", OperationKind::HL_PLUS, vast::hl::PlusOp) \
    _hl("hl.post.dec", OperationKind::HL_POST_DEC, vast::hl::PostDecOp) \
    _hl("hl.post.inc", OperationKind::HL_POST_INC, vast::hl::PostIncOp) \
    _hl("hl.pre.dec", OperationKind::HL_PRE_DEC, vast::hl::PreDecOp) \
    _hl("hl.pre.inc", OperationKind::HL_PRE_INC, vast::hl::PreIncOp) \
    _hl("hl.predefined.expr", OperationKind::HL_PREDEFINED_EXPR, vast::hl::PredefinedExpr) \
+   _hl("hl.preferred_alignof.expr", OperationKind::HL_PREFERRED_ALIGNOF_EXPR, vast::hl::PreferredAlignOfExprOp) \
+   _hl("hl.preferred_alignof.type", OperationKind::HL_PREFERRED_ALIGNOF_TYPE, vast::hl::PreferredAlignOfTypeOp) \
+   _hl("hl.real", OperationKind::HL_REAL, vast::hl::RealOp) \
    _hl("hl.member", OperationKind::HL_MEMBER, vast::hl::RecordMemberOp) \
    _hl("hl.assign.frem", OperationKind::HL_ASSIGN_FREM, vast::hl::RemFAssignOp) \
    _hl("hl.frem", OperationKind::HL_FREM, vast::hl::RemFOp) \
@@ -424,6 +432,7 @@
    _hl("hl.subscript", OperationKind::HL_SUBSCRIPT, vast::hl::SubscriptOp) \
    _hl("hl.this", OperationKind::HL_THIS, vast::hl::ThisOp) \
    _hl("hl.translation_unit", OperationKind::HL_TRANSLATION_UNIT, vast::hl::TranslationUnitOp) \
+   _hl("hl.alias", OperationKind::HL_ALIAS, vast::hl::TypeAliasOp) \
    _hl("hl.type", OperationKind::HL_TYPE, vast::hl::TypeDeclOp) \
    _hl("hl.typedef", OperationKind::HL_TYPEDEF, vast::hl::TypeDefOp) \
    _hl("hl.typeof.expr", OperationKind::HL_TYPEOF_EXPR, vast::hl::TypeOfExprOp) \
@@ -439,5 +448,5 @@
    _unsup("unsup.decl", OperationKind::UNSUP_DECL, vast::unsup::UnsupportedDecl) \
    _unsup("unsup.stmt", OperationKind::UNSUP_STMT, vast::unsup::UnsupportedStmt)
 
-#define MX_IR_NUM_MLIR_OPS 431
+#define MX_IR_NUM_MLIR_OPS 440
 

@@ -357,6 +357,7 @@ enum class OperationKind : unsigned {
   HL_CALL,  // hl.call
   HL_CLASS,  // hl.class
   HL_CMP,  // hl.cmp
+  HL_COMPOUND_LITERAL,  // hl.compound_literal
   HL_CONST,  // hl.const
   HL_BASE,  // hl.base
   HL_CXXSTRUCT,  // hl.cxxstruct
@@ -389,6 +390,7 @@ enum class OperationKind : unsigned {
   HL_FUNC,  // hl.func
   HL_GOTO,  // hl.goto
   HL_IF,  // hl.if
+  HL_INDIRECT_GOTO,  // hl.indirect_goto
   HL_LABEL_DECL,  // hl.label.decl
   HL_LABEL,  // hl.label
   HL_SKIP,  // hl.skip
@@ -397,9 +399,11 @@ enum class OperationKind : unsigned {
   HL_VALUE_YIELD,  // hl.value.yield
   HL_VAR,  // hl.var
   HL_WHILE,  // hl.while
+  HL_IMAG,  // hl.imag
   HL_IMPLICIT_CAST,  // hl.implicit_cast
   HL_INDIRECT_CALL,  // hl.indirect_call
   HL_INITLIST,  // hl.initlist
+  HL_CONST_INIT,  // hl.const.init
   HL_LNOT,  // hl.lnot
   HL_MINUS,  // hl.minus
   HL_ASSIGN_FMUL,  // hl.assign.fmul
@@ -407,12 +411,16 @@ enum class OperationKind : unsigned {
   HL_ASSIGN_MUL,  // hl.assign.mul
   HL_MUL,  // hl.mul
   HL_NOT,  // hl.not
+  HL_OFFSETOF_EXPR,  // hl.offsetof.expr
   HL_PLUS,  // hl.plus
   HL_POST_DEC,  // hl.post.dec
   HL_POST_INC,  // hl.post.inc
   HL_PRE_DEC,  // hl.pre.dec
   HL_PRE_INC,  // hl.pre.inc
   HL_PREDEFINED_EXPR,  // hl.predefined.expr
+  HL_PREFERRED_ALIGNOF_EXPR,  // hl.preferred_alignof.expr
+  HL_PREFERRED_ALIGNOF_TYPE,  // hl.preferred_alignof.type
+  HL_REAL,  // hl.real
   HL_MEMBER,  // hl.member
   HL_ASSIGN_FREM,  // hl.assign.frem
   HL_FREM,  // hl.frem
@@ -432,6 +440,7 @@ enum class OperationKind : unsigned {
   HL_SUBSCRIPT,  // hl.subscript
   HL_THIS,  // hl.this
   HL_TRANSLATION_UNIT,  // hl.translation_unit
+  HL_ALIAS,  // hl.alias
   HL_TYPE,  // hl.type
   HL_TYPEDEF,  // hl.typedef
   HL_TYPEOF_EXPR,  // hl.typeof.expr
@@ -455,7 +464,7 @@ inline static const char *EnumerationName(ir::OperationKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(ir::OperationKind) {
-  return 432;
+  return 441;
 }
 
 MX_EXPORT const char *EnumeratorName(ir::OperationKind);
