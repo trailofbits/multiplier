@@ -676,10 +676,10 @@ RawEntityIdList SQLiteEntityProvider::ReadRedeclarations(
 
 gap::generator<std::pair<RawEntityId, RawEntityId>>
 SQLiteEntityProvider::SpecificReferences(
-    const Ptr &self_, RawEntityId raw_id, RawEntityId kind_id,
+    const Ptr &self, RawEntityId raw_id, RawEntityId kind_id,
     EntityProvider::ReferenceDirection dir, bool get_redecls) & {
 
-  Ptr self = self_;
+  auto ep = self;
   ImplPtr context = impl.Lock();
   sqlite::Statement &get_references = (dir == EntityProvider::kReferenceTo ?
                                        context->get_specific_references_to :
@@ -693,7 +693,7 @@ SQLiteEntityProvider::SpecificReferences(
   RawEntityIdList redecl_ids;
   if (get_redecls) {
     do {
-      for (RawEntityId raw_redecl_id : self->Redeclarations(self, raw_id)) {
+      for (RawEntityId raw_redecl_id : ep->Redeclarations(ep, raw_id)) {
         redecl_ids.push_back(raw_redecl_id);
       }
     } while (false);
@@ -721,7 +721,7 @@ SQLiteEntityProvider::SpecificReferences(
   std::array<std::pair<RawEntityId, RawEntityId>, MX_REFERENCE_PAGE_SIZE>
       paged_results;
 
-  auto version = self->VersionNumber();
+  auto version = ep->VersionNumber();
   for (auto found = true; found; ) {
     found = false;
     auto num_paged_results = 0u;
@@ -772,7 +772,7 @@ SQLiteEntityProvider::SpecificReferences(
     }
 
     // Index changed on us; exit early.
-    if (found && version != self->VersionNumber()) {
+    if (found && version != ep->VersionNumber()) {
       co_return;
     }
   }
@@ -784,7 +784,7 @@ gap::generator<std::tuple<RawEntityId, RawEntityId, RawEntityId>>
 SQLiteEntityProvider::References(const Ptr &self, RawEntityId raw_id,
                                  EntityProvider::ReferenceDirection dir,
                                  bool get_redecls) & {
-
+  auto ep = self;
   ImplPtr context = impl.Lock();
   sqlite::Statement &get_references = (dir == EntityProvider::kReferenceTo ?
                                        context->get_references_to :
@@ -798,7 +798,7 @@ SQLiteEntityProvider::References(const Ptr &self, RawEntityId raw_id,
   RawEntityIdList redecl_ids;
   if (get_redecls) {
     do {
-      for (RawEntityId raw_redecl_id : self->Redeclarations(self, raw_id)) {
+      for (RawEntityId raw_redecl_id : ep->Redeclarations(ep, raw_id)) {
         redecl_ids.push_back(raw_redecl_id);
       }
     } while (false);
@@ -826,7 +826,7 @@ SQLiteEntityProvider::References(const Ptr &self, RawEntityId raw_id,
   std::array<std::tuple<RawEntityId, RawEntityId, RawEntityId>, MX_REFERENCE_PAGE_SIZE>
       paged_results;
 
-  auto version = self->VersionNumber();
+  auto version = ep->VersionNumber();
   for (auto found = true; found; ) {
     found = false;
     auto num_paged_results = 0u;
@@ -879,7 +879,7 @@ SQLiteEntityProvider::References(const Ptr &self, RawEntityId raw_id,
     }
 
     // Index changed on us; exit early.
-    if (found && version != self->VersionNumber()) {
+    if (found && version != ep->VersionNumber()) {
       co_return;
     }
   }
@@ -934,6 +934,8 @@ static unsigned ReadSymbolPage(
 gap::generator<RawEntityId> SQLiteEntityProvider::FindSymbol(
     const Ptr &self, std::string symbol) & {
 
+  auto ep = self;
+
   // NOTE(pag): SQLite doesn't understand unsigned integers. When it sees our
   //            entity IDs, if the high bit is `1`, then it treats those as
   //            negative numbers. To get pagination-like effects, we iterate
@@ -946,7 +948,7 @@ gap::generator<RawEntityId> SQLiteEntityProvider::FindSymbol(
 
   std::array<RawEntityId, MX_ID_LIST_PAGE_SIZE> paged_results;
 
-  auto version = self->VersionNumber();
+  auto version = ep->VersionNumber();
   for (auto found = true; found; ) {
     found = false;
     auto num_paged_results = ReadSymbolPage(
@@ -957,7 +959,7 @@ gap::generator<RawEntityId> SQLiteEntityProvider::FindSymbol(
     }
 
     // Index changed on us; exit early.
-    if (found && version != self->VersionNumber()) {
+    if (found && version != ep->VersionNumber()) {
       co_return;
     }
   }

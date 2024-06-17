@@ -46,7 +46,7 @@ for the `ext/filter/logical_filters.c` file (e.g. remove lines 2-1878,
 Start Multiplier indexer:
 
 ```shell
-$ ./bin/mx-index --target <path_to>/php-src/compile_commands.json --database /tmp/php.db --workspace_dir /tmp/php.ws --show_progress
+$ ./bin/mx-index --target <path_to>/php-src/compile_commands.json --db /tmp/php.db --workspace_dir /tmp/php.ws --show_progress
 ```
 
 This could take some time. When indexing is done, the indexer will exit.

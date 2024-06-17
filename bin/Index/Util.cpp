@@ -541,6 +541,8 @@ pasta::DerivedToken DerivedLocation(const pasta::DerivedToken &tok) {
 
 namespace {
 
+static bool RawDeclIsDefinition(const clang::Decl *decl_);
+
 // NOTE(pag): An `alias` attribute is considered a "defining attribute".
 static bool FuncIsDefinition(clang::FunctionDecl *decl) {
   if (decl->isThisDeclarationADefinition()) {
@@ -563,35 +565,26 @@ static bool ParamIsDefinition(clang::ParmVarDecl *decl) {
   }
 }
 
-}  // namespace
-
-// Does this look like a replaceable fragment? This happens when there's a
-// method with an uninstantiated/unsubstitued body, or return type that isn't
-// yet deduced.
-bool IsReplaceableFragment(const std::vector<pasta::Decl> &decls) {
-  if (decls.size() != 1u) {
-    return false;
+// Treat specializations of definitions as definitions. This makes sure our IDs
+// are consistent in cross-references.
+static bool SpecializationIsDefinition(
+    clang::ClassTemplateSpecializationDecl *decl) {
+  if (decl->isThisDeclarationADefinition()) {
+    return true;
   }
 
-  const pasta::Decl &decl = decls.front();
-  switch (decl.Kind()) {
-    case pasta::DeclKind::kFunction:
-    case pasta::DeclKind::kCXXConversion:
-    case pasta::DeclKind::kCXXConstructor:
-    case pasta::DeclKind::kCXXDeductionGuide:
-    case pasta::DeclKind::kCXXDestructor:
-    case pasta::DeclKind::kCXXMethod:
-      break;
-    default:
-      return false;
+  auto spec_or_partial = decl->getSpecializedTemplateOrPartial();
+  if (auto tpl = spec_or_partial.get<clang::ClassTemplateDecl *>()) {
+    return RawDeclIsDefinition(tpl);
+
+  } else if (auto partial = spec_or_partial.get<clang::ClassTemplatePartialSpecializationDecl *>()) {
+    return RawDeclIsDefinition(partial);
   }
 
-  if (decl.IsImplicit()) {
-    return false;
-  }
+  return false;
+}
 
-  const auto &func = reinterpret_cast<const pasta::FunctionDecl &>(decl);
-  
+static bool IsReplaceableFunction(const pasta::FunctionDecl &func) {
   // We don't expect to be looking at the pattern definition itself. We should
   // really never hit this condition, because the top-level decl in `decls`
   // should instead be the `FunctionTemplateDecl`.
@@ -624,9 +617,21 @@ bool IsReplaceableFragment(const std::vector<pasta::Decl> &decls) {
   return pattern_decl->DoesThisDeclarationHaveABody();
 }
 
-// Returns `true` if `decl` is a definition.
-bool IsDefinition(const pasta::Decl &decl_) {
-  auto decl = const_cast<clang::Decl *>(decl_.RawDecl()->RemappedDecl);
+static bool IsReplaceableClass(
+    const pasta::ClassTemplateSpecializationDecl &spec) {
+  return IsDefinition(spec) != spec.IsThisDeclarationADefinition();
+}
+
+static bool TemplateIsDefinition(clang::RedeclarableTemplateDecl *decl) {
+  if (auto from_tpl = decl->getInstantiatedFromMemberTemplate()) {
+    return RawDeclIsDefinition(from_tpl);
+  }
+
+  return false;
+}
+
+static bool RawDeclIsDefinition(const clang::Decl *decl_) {
+  auto decl = decl_->RemappedDecl;
 
   if (auto parm_decl = clang::dyn_cast<clang::ParmVarDecl>(decl)) {
     return ParamIsDefinition(parm_decl);
@@ -653,17 +658,32 @@ bool IsDefinition(const pasta::Decl &decl_) {
   } else if (auto face_decl = clang::dyn_cast<clang::ObjCInterfaceDecl>(decl)) {
     return face_decl->isThisDeclarationADefinition();
 
+  } else if (auto spec = clang::dyn_cast<clang::ClassTemplateSpecializationDecl>(decl)) {
+    return SpecializationIsDefinition(spec);
+
   } else if (auto tag_decl = clang::dyn_cast<clang::TagDecl>(decl)) {
     return tag_decl->isThisDeclarationADefinition();
 
   } else if (auto ctpl_decl = clang::dyn_cast<clang::ClassTemplateDecl>(decl)) {
-    return ctpl_decl->isThisDeclarationADefinition();
+    if (ctpl_decl->isThisDeclarationADefinition()) {
+      return true;
+    }
+
+    return TemplateIsDefinition(ctpl_decl);
 
   } else if (auto ftpl_decl = clang::dyn_cast<clang::FunctionTemplateDecl>(decl)) {
-    return ftpl_decl->isThisDeclarationADefinition();
+    if (ftpl_decl->isThisDeclarationADefinition()) {
+      return true;
+    }
+
+    return TemplateIsDefinition(ctpl_decl);
 
   } else if (auto vtpl_decl = clang::dyn_cast<clang::VarTemplateDecl>(decl)) {
-    return vtpl_decl->isThisDeclarationADefinition();
+    if (vtpl_decl->isThisDeclarationADefinition()) {
+      return true;
+    }
+
+    return TemplateIsDefinition(ctpl_decl);
 
   } else if (clang::isa<clang::EnumConstantDecl>(decl)) {
     return true;
@@ -671,6 +691,44 @@ bool IsDefinition(const pasta::Decl &decl_) {
   } else {
     return false;
   }
+}
+
+}  // namespace
+
+// Does this look like a replaceable fragment? This happens when there's a
+// method with an uninstantiated/unsubstitued body, or return type that isn't
+// yet deduced, or class template specialization where the pattern is a
+// defintion but the specialization isn't.
+bool IsReplaceableFragment(const std::vector<pasta::Decl> &decls) {
+  if (decls.size() != 1u) {
+    return false;
+  }
+
+  const pasta::Decl &decl = decls.front();
+  if (decl.IsImplicit()) {
+    return false;
+  }
+
+  switch (decl.Kind()) {
+    case pasta::DeclKind::kFunction:
+    case pasta::DeclKind::kCXXConversion:
+    case pasta::DeclKind::kCXXConstructor:
+    case pasta::DeclKind::kCXXDeductionGuide:
+    case pasta::DeclKind::kCXXDestructor:
+    case pasta::DeclKind::kCXXMethod:
+      return IsReplaceableFunction(
+          reinterpret_cast<const pasta::FunctionDecl &>(decl));
+    case pasta::DeclKind::kClassTemplateSpecialization:
+      return IsReplaceableClass(
+          reinterpret_cast<const pasta::ClassTemplateSpecializationDecl &>(decl));
+    default:
+      return false;
+  }
+}
+
+// Returns `true` if `decl` is a definition.
+bool IsDefinition(const pasta::Decl &decl) {
+  return RawDeclIsDefinition(decl.RawDecl());
 }
 
 // Checks if the declaration is valid and serializable

@@ -213,5 +213,15 @@
     "file": "LambdaInConstructorInClassInFunction.cpp",
     "command": "/usr/bin/c++ -std=c++20 LambdaInConstructorInClassInFunction.cpp",
     "directory": ""
+},
+{
+    "file": "UpgradeSpecialization.cpp",
+    "command": "/usr/bin/c++ -std=c++20 UpgradeSpecialization.cpp",
+    "directory": ""
+},
+{
+    "file": "UpgradeSpecialization.cpp",
+    "command": "/usr/bin/c++ -std=c++20 UpgradeSpecialization.cpp -DUPGRADE_SPEC=1",
+    "directory": ""
 }
 ]
