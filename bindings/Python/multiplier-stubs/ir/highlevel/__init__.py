@@ -222,6 +222,36 @@ class ReturnsTwiceAttr(multiplier.ir.highlevel.Attribute):
   def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.ReturnsTwiceAttr]:
     ...
 
+class MayAliasAttr(multiplier.ir.highlevel.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.MayAliasAttr]:
+    ...
+
+class AvailableOnlyInDefaultEvalMethodAttr(multiplier.ir.highlevel.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.AvailableOnlyInDefaultEvalMethodAttr]:
+    ...
+
+class AvailabilityAttrAttr(multiplier.ir.highlevel.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.AvailabilityAttrAttr]:
+    ...
+
 class AsmLabelAttr(multiplier.ir.highlevel.Attribute):
   is_literal: bool
 
@@ -334,6 +364,16 @@ class CVRQualifiersAttr(multiplier.ir.highlevel.Attribute):
 
   @staticmethod
   def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.CVRQualifiersAttr]:
+    ...
+
+class OffsetOfNodeAttr(multiplier.ir.highlevel.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.OffsetOfNodeAttr]:
     ...
 
 class Operation(multiplier.ir.Operation):
@@ -1692,6 +1732,21 @@ class NotOp(multiplier.ir.highlevel.Operation):
   def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.highlevel.NotOp]:
     ...
 
+class OffsetOfExprOp(multiplier.ir.highlevel.Operation):
+  result: multiplier.ir.Value
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.OperationKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Operation) -> Optional[multiplier.ir.highlevel.OffsetOfExprOp]:
+    ...
+
+  @staticmethod
+  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.highlevel.OffsetOfExprOp]:
+    ...
+
 class PlusOp(multiplier.ir.highlevel.Operation):
   arg: multiplier.ir.Value
   result: multiplier.ir.Value
@@ -2140,6 +2195,21 @@ class TranslationUnitOp(multiplier.ir.highlevel.Operation):
 
   @staticmethod
   def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.highlevel.TranslationUnitOp]:
+    ...
+
+class TypeAliasOp(multiplier.ir.highlevel.Operation):
+  name: str
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.OperationKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Operation) -> Optional[multiplier.ir.highlevel.TypeAliasOp]:
+    ...
+
+  @staticmethod
+  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.highlevel.TypeAliasOp]:
     ...
 
 class TypeDeclOp(multiplier.ir.highlevel.Operation):
