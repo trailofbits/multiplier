@@ -683,7 +683,7 @@ static bool RawDeclIsDefinition(const clang::Decl *decl_) {
       return true;
     }
 
-    return TemplateIsDefinition(ctpl_decl);
+    return TemplateIsDefinition(vtpl_decl);
 
   } else if (clang::isa<clang::EnumConstantDecl>(decl)) {
     return true;
