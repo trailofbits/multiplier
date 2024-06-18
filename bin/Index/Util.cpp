@@ -676,7 +676,7 @@ static bool RawDeclIsDefinition(const clang::Decl *decl_) {
       return true;
     }
 
-    return TemplateIsDefinition(ctpl_decl);
+    return TemplateIsDefinition(ftpl_decl);
 
   } else if (auto vtpl_decl = clang::dyn_cast<clang::VarTemplateDecl>(decl)) {
     if (vtpl_decl->isThisDeclarationADefinition()) {
