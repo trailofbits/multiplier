@@ -565,6 +565,21 @@ static bool ParamIsDefinition(clang::ParmVarDecl *decl) {
   }
 }
 
+// Treat class declarations inside of specializations, where the class itself
+// isn't needed, but where it is a definition inside of the template pattern,
+// as definitions.
+static bool ClassIsDefinition(clang::CXXRecordDecl *decl) {
+  if (decl->isThisDeclarationADefinition()) {
+    return true;
+  }
+
+  if (auto orig = decl->getInstantiatedFromMemberClass()) {
+    return RawDeclIsDefinition(orig);
+  }
+
+  return false;
+}
+
 // Treat specializations of definitions as definitions. This makes sure our IDs
 // are consistent in cross-references.
 static bool SpecializationIsDefinition(
@@ -581,7 +596,7 @@ static bool SpecializationIsDefinition(
     return RawDeclIsDefinition(partial);
   }
 
-  return false;
+  return ClassIsDefinition(decl);
 }
 
 static bool IsReplaceableFunction(const pasta::FunctionDecl &func) {
@@ -617,7 +632,11 @@ static bool IsReplaceableFunction(const pasta::FunctionDecl &func) {
   return pattern_decl->DoesThisDeclarationHaveABody();
 }
 
-static bool IsReplaceableClass(
+static bool IsReplaceableClass(const pasta::CXXRecordDecl &decl) {
+  return IsDefinition(decl) != decl.IsThisDeclarationADefinition();
+}
+
+static bool IsReplaceableClassSpecialization(
     const pasta::ClassTemplateSpecializationDecl &spec) {
   return IsDefinition(spec) != spec.IsThisDeclarationADefinition();
 }
@@ -661,6 +680,9 @@ static bool RawDeclIsDefinition(const clang::Decl *decl_) {
   } else if (auto spec = clang::dyn_cast<clang::ClassTemplateSpecializationDecl>(decl)) {
     return SpecializationIsDefinition(spec);
 
+  } else if (auto cls = clang::dyn_cast<clang::CXXRecordDecl>(decl)) {
+    return ClassIsDefinition(cls);
+
   } else if (auto tag_decl = clang::dyn_cast<clang::TagDecl>(decl)) {
     return tag_decl->isThisDeclarationADefinition();
 
@@ -676,14 +698,14 @@ static bool RawDeclIsDefinition(const clang::Decl *decl_) {
       return true;
     }
 
-    return TemplateIsDefinition(ctpl_decl);
+    return TemplateIsDefinition(ftpl_decl);
 
   } else if (auto vtpl_decl = clang::dyn_cast<clang::VarTemplateDecl>(decl)) {
     if (vtpl_decl->isThisDeclarationADefinition()) {
       return true;
     }
 
-    return TemplateIsDefinition(ctpl_decl);
+    return TemplateIsDefinition(vtpl_decl);
 
   } else if (clang::isa<clang::EnumConstantDecl>(decl)) {
     return true;
@@ -719,8 +741,12 @@ bool IsReplaceableFragment(const std::vector<pasta::Decl> &decls) {
       return IsReplaceableFunction(
           reinterpret_cast<const pasta::FunctionDecl &>(decl));
     case pasta::DeclKind::kClassTemplateSpecialization:
-      return IsReplaceableClass(
+    case pasta::DeclKind::kClassTemplatePartialSpecialization:
+      return IsReplaceableClassSpecialization(
           reinterpret_cast<const pasta::ClassTemplateSpecializationDecl &>(decl));
+    case pasta::DeclKind::kCXXRecord:
+      return IsReplaceableClass(
+          reinterpret_cast<const pasta::CXXRecordDecl &>(decl));
     default:
       return false;
   }

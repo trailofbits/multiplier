@@ -96,6 +96,7 @@ class MulFOp;
 class MulIAssignOp;
 class MulIOp;
 class NotOp;
+class OffsetOfExprOp;
 class PlusOp;
 class PostDecOp;
 class PostIncOp;
@@ -124,6 +125,7 @@ class SubIOp;
 class SubscriptOp;
 class ThisOp;
 class TranslationUnitOp;
+class TypeAliasOp;
 class TypeDeclOp;
 class TypeDefOp;
 class TypeOfExprOp;
@@ -1662,6 +1664,24 @@ class MX_EXPORT NotOp final : public Operation {
 };
 static_assert(sizeof(NotOp) == sizeof(Operation));
 
+class MX_EXPORT OffsetOfExprOp final : public Operation {
+ public:
+  inline static constexpr OperationKind static_kind(void) {
+    return OperationKind::HL_OFFSETOF_EXPR;
+  }
+
+  static std::optional<OffsetOfExprOp> from(const ::mx::ir::Operation &that);
+  static std::optional<OffsetOfExprOp> producing(const ::mx::ir::Value &val);
+
+  ::vast::hl::OffsetOfExprOp underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  ::mx::ir::Value result(void) const;
+  //::mlir::MutableArrayRef<Region> array_index_exprs(void) const;
+  //::mlir::ArrayAttr components(void) const;
+};
+static_assert(sizeof(OffsetOfExprOp) == sizeof(Operation));
+
 class MX_EXPORT PlusOp final : public Operation {
  public:
   inline static constexpr OperationKind static_kind(void) {
@@ -2156,6 +2176,24 @@ class MX_EXPORT TranslationUnitOp final : public Operation {
   //::mlir::Region & body(void) const;
 };
 static_assert(sizeof(TranslationUnitOp) == sizeof(Operation));
+
+class MX_EXPORT TypeAliasOp final : public Operation {
+ public:
+  inline static constexpr OperationKind static_kind(void) {
+    return OperationKind::HL_ALIAS;
+  }
+
+  static std::optional<TypeAliasOp> from(const ::mx::ir::Operation &that);
+  static std::optional<TypeAliasOp> producing(const ::mx::ir::Value &val);
+
+  ::vast::hl::TypeAliasOp underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  std::string_view name(void) const;
+  //::mlir::Type type(void) const;
+  //mlir_type defined_type(void) const;
+};
+static_assert(sizeof(TypeAliasOp) == sizeof(Operation));
 
 class MX_EXPORT TypeDeclOp final : public Operation {
  public:

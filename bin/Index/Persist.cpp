@@ -910,11 +910,13 @@ void GlobalIndexingState::PersistFragment(
 
     // Associate the range of file tokens with the fragment. This helps with
     // implementing things like regular expression (via RE2) searches over code.
-    database.AddAsync(
-        mx::FragmentFileRangeRecord{
-            pf.fragment_id,
-            pf.file_location->first_file_token_id,
-            pf.file_location->last_file_token_id});
+    if (!pf.raw_parent_entity) {
+      database.AddAsync(
+          mx::FragmentFileRangeRecord{
+              pf.fragment_id,
+              pf.file_location->first_file_token_id,
+              pf.file_location->last_file_token_id});
+    }
   }
 
   auto tlds = fb.initTopLevelDeclarations(pf.num_top_level_declarations);

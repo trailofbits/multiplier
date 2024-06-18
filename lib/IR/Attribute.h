@@ -95,6 +95,9 @@
    _hl(ColdAttr, AttributeKind::HL_COLD, vast::hl::ColdAttr) \
    _hl(TransparentUnionAttr, AttributeKind::HL_TRANSPARENT_UNION, vast::hl::TransparentUnionAttr) \
    _hl(ReturnsTwiceAttr, AttributeKind::HL_RETURNS_TWICE, vast::hl::ReturnsTwiceAttr) \
+   _hl(MayAliasAttr, AttributeKind::HL_MAY_ALIAS, vast::hl::MayAliasAttr) \
+   _hl(AvailableOnlyInDefaultEvalMethodAttr, AttributeKind::HL_AVAILABLE_ONLY_IN_DEFAULT_EVAL_METHOD, vast::hl::AvailableOnlyInDefaultEvalMethodAttr) \
+   _hl(AvailabilityAttrAttr, AttributeKind::HL_AVAILABILITY_ATTR, vast::hl::AvailabilityAttrAttr) \
    _hl(AsmLabelAttr, AttributeKind::HL_ASM_LABEL, vast::hl::AsmLabelAttr) \
    _hl(ModeAttr, AttributeKind::HL_MODE, vast::hl::ModeAttr) \
    _hl(BuiltinAttr, AttributeKind::HL_BUILTIN, vast::hl::BuiltinAttr) \
@@ -105,6 +108,7 @@
    _hl(CVQualifiersAttr, AttributeKind::HL_CV_QUALIFIERS, vast::hl::CVQualifiersAttr) \
    _hl(UCVQualifiersAttr, AttributeKind::HL_UCV_QUALIFIERS, vast::hl::UCVQualifiersAttr) \
    _hl(CVRQualifiersAttr, AttributeKind::HL_CVR_QUALIFIERS, vast::hl::CVRQualifiersAttr) \
+   _hl(OffsetOfNodeAttr, AttributeKind::HL_OFFSET_OF_NODE, vast::hl::OffsetOfNodeAttr) \
    _core(BooleanAttr, AttributeKind::CORE_BOOLEAN, vast::core::BooleanAttr) \
    _core(IntegerAttr, AttributeKind::CORE_INTEGER, vast::core::IntegerAttr) \
    _core(FloatAttr, AttributeKind::CORE_FLOAT, vast::core::FloatAttr) \
@@ -113,5 +117,5 @@
    _core(GlobalLinkageKindAttr, AttributeKind::CORE_GLOBAL_LINKAGE_KIND, vast::core::GlobalLinkageKindAttr) \
    _meta(IdentifierAttr, AttributeKind::META_IDENTIFIER, vast::meta::IdentifierAttr)
 
-#define MX_IR_NUM_MLIR_ATTRIBUTES 103
+#define MX_IR_NUM_MLIR_ATTRIBUTES 107
 

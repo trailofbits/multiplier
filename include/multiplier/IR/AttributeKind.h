@@ -100,6 +100,9 @@ enum class AttributeKind : unsigned {
   HL_COLD,
   HL_TRANSPARENT_UNION,
   HL_RETURNS_TWICE,
+  HL_MAY_ALIAS,
+  HL_AVAILABLE_ONLY_IN_DEFAULT_EVAL_METHOD,
+  HL_AVAILABILITY_ATTR,
   HL_ASM_LABEL,
   HL_MODE,
   HL_BUILTIN,
@@ -110,6 +113,7 @@ enum class AttributeKind : unsigned {
   HL_CV_QUALIFIERS,
   HL_UCV_QUALIFIERS,
   HL_CVR_QUALIFIERS,
+  HL_OFFSET_OF_NODE,
   CORE_BOOLEAN,
   CORE_INTEGER,
   CORE_FLOAT,
@@ -126,7 +130,7 @@ inline static const char *EnumerationName(ir::AttributeKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(ir::AttributeKind) {
-  return 103;
+  return 107;
 }
 
 MX_EXPORT const char *EnumeratorName(ir::AttributeKind);

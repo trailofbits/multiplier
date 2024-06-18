@@ -409,6 +409,7 @@ const char *EnumeratorName(ir::OperationKind kind) {
     case ir::OperationKind::HL_ASSIGN_MUL: return "HL_ASSIGN_MUL";
     case ir::OperationKind::HL_MUL: return "HL_MUL";
     case ir::OperationKind::HL_NOT: return "HL_NOT";
+    case ir::OperationKind::HL_OFFSETOF_EXPR: return "HL_OFFSETOF_EXPR";
     case ir::OperationKind::HL_PLUS: return "HL_PLUS";
     case ir::OperationKind::HL_POST_DEC: return "HL_POST_DEC";
     case ir::OperationKind::HL_POST_INC: return "HL_POST_INC";
@@ -437,6 +438,7 @@ const char *EnumeratorName(ir::OperationKind kind) {
     case ir::OperationKind::HL_SUBSCRIPT: return "HL_SUBSCRIPT";
     case ir::OperationKind::HL_THIS: return "HL_THIS";
     case ir::OperationKind::HL_TRANSLATION_UNIT: return "HL_TRANSLATION_UNIT";
+    case ir::OperationKind::HL_ALIAS: return "HL_ALIAS";
     case ir::OperationKind::HL_TYPE: return "HL_TYPE";
     case ir::OperationKind::HL_TYPEDEF: return "HL_TYPEDEF";
     case ir::OperationKind::HL_TYPEOF_EXPR: return "HL_TYPEOF_EXPR";
@@ -894,6 +896,7 @@ bool IsHighLevelOperationKind(ir::OperationKind kind) {
     case mx::ir::OperationKind::HL_ASSIGN_MUL:
     case mx::ir::OperationKind::HL_MUL:
     case mx::ir::OperationKind::HL_NOT:
+    case mx::ir::OperationKind::HL_OFFSETOF_EXPR:
     case mx::ir::OperationKind::HL_PLUS:
     case mx::ir::OperationKind::HL_POST_DEC:
     case mx::ir::OperationKind::HL_POST_INC:
@@ -922,6 +925,7 @@ bool IsHighLevelOperationKind(ir::OperationKind kind) {
     case mx::ir::OperationKind::HL_SUBSCRIPT:
     case mx::ir::OperationKind::HL_THIS:
     case mx::ir::OperationKind::HL_TRANSLATION_UNIT:
+    case mx::ir::OperationKind::HL_ALIAS:
     case mx::ir::OperationKind::HL_TYPE:
     case mx::ir::OperationKind::HL_TYPEDEF:
     case mx::ir::OperationKind::HL_TYPEOF_EXPR:

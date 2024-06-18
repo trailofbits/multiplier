@@ -9,6 +9,7 @@
 #include <multiplier/IR/HighLevel/Attribute.h>
 
 #include <mlir/Dialect/LLVMIR/LLVMDialect.h>
+#include <vast/Dialect/Dialects.hpp>
 #include <vast/Dialect/ABI/ABIOps.hpp>
 
 namespace mx::ir::hl {
@@ -228,6 +229,39 @@ std::optional<ReturnsTwiceAttr> ReturnsTwiceAttr::from(const ::mx::ir::Attribute
   return ::vast::hl::ReturnsTwiceAttr(this->::mx::ir::Attribute::attr_);
 }
 
+std::optional<MayAliasAttr> MayAliasAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::HL_MAY_ALIAS) {
+    return reinterpret_cast<const MayAliasAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::vast::hl::MayAliasAttr MayAliasAttr::underlying_repr(void) const noexcept {
+  return ::vast::hl::MayAliasAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<AvailableOnlyInDefaultEvalMethodAttr> AvailableOnlyInDefaultEvalMethodAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::HL_AVAILABLE_ONLY_IN_DEFAULT_EVAL_METHOD) {
+    return reinterpret_cast<const AvailableOnlyInDefaultEvalMethodAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::vast::hl::AvailableOnlyInDefaultEvalMethodAttr AvailableOnlyInDefaultEvalMethodAttr::underlying_repr(void) const noexcept {
+  return ::vast::hl::AvailableOnlyInDefaultEvalMethodAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<AvailabilityAttrAttr> AvailabilityAttrAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::HL_AVAILABILITY_ATTR) {
+    return reinterpret_cast<const AvailabilityAttrAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::vast::hl::AvailabilityAttrAttr AvailabilityAttrAttr::underlying_repr(void) const noexcept {
+  return ::vast::hl::AvailabilityAttrAttr(this->::mx::ir::Attribute::attr_);
+}
+
 std::optional<AsmLabelAttr> AsmLabelAttr::from(const ::mx::ir::Attribute &that) {
   if (that.kind() == AttributeKind::HL_ASM_LABEL) {
     return reinterpret_cast<const AsmLabelAttr &>(that);
@@ -406,6 +440,17 @@ bool CVRQualifiersAttr::is_volatile(void) const {
 bool CVRQualifiersAttr::is_restrict(void) const {
   auto val = underlying_repr().getIsRestrict();
   return val;
+}
+
+std::optional<OffsetOfNodeAttr> OffsetOfNodeAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::HL_OFFSET_OF_NODE) {
+    return reinterpret_cast<const OffsetOfNodeAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::vast::hl::OffsetOfNodeAttr OffsetOfNodeAttr::underlying_repr(void) const noexcept {
+  return ::vast::hl::OffsetOfNodeAttr(this->::mx::ir::Attribute::attr_);
 }
 
 }  // namespace mx::ir::hl

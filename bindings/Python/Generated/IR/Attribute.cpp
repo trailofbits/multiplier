@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[867]) || tp >= &(gTypes[976])) {
+  if (tp < &(gTypes[867]) || tp >= &(gTypes[980])) {
     return std::nullopt;
   }
 
@@ -433,72 +433,88 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       tp = &(gTypes[956]);
       break;
 
-    case mx::ir::hl::AsmLabelAttr::static_kind():
+    case mx::ir::hl::MayAliasAttr::static_kind():
       tp = &(gTypes[957]);
       break;
 
-    case mx::ir::hl::ModeAttr::static_kind():
+    case mx::ir::hl::AvailableOnlyInDefaultEvalMethodAttr::static_kind():
       tp = &(gTypes[958]);
       break;
 
-    case mx::ir::hl::BuiltinAttr::static_kind():
+    case mx::ir::hl::AvailabilityAttrAttr::static_kind():
       tp = &(gTypes[959]);
       break;
 
-    case mx::ir::hl::AllocAlignAttr::static_kind():
+    case mx::ir::hl::AsmLabelAttr::static_kind():
       tp = &(gTypes[960]);
       break;
 
-    case mx::ir::hl::AllocSizeAttr::static_kind():
+    case mx::ir::hl::ModeAttr::static_kind():
       tp = &(gTypes[961]);
       break;
 
-    case mx::ir::hl::DeprecatedAttr::static_kind():
+    case mx::ir::hl::BuiltinAttr::static_kind():
       tp = &(gTypes[962]);
       break;
 
-    case mx::ir::hl::MaxFieldAlignmentAttr::static_kind():
+    case mx::ir::hl::AllocAlignAttr::static_kind():
       tp = &(gTypes[963]);
       break;
 
-    case mx::ir::hl::CVQualifiersAttr::static_kind():
+    case mx::ir::hl::AllocSizeAttr::static_kind():
       tp = &(gTypes[964]);
       break;
 
-    case mx::ir::hl::UCVQualifiersAttr::static_kind():
+    case mx::ir::hl::DeprecatedAttr::static_kind():
       tp = &(gTypes[965]);
       break;
 
-    case mx::ir::hl::CVRQualifiersAttr::static_kind():
+    case mx::ir::hl::MaxFieldAlignmentAttr::static_kind():
       tp = &(gTypes[966]);
       break;
 
-    case mx::ir::core::BooleanAttr::static_kind():
+    case mx::ir::hl::CVQualifiersAttr::static_kind():
+      tp = &(gTypes[967]);
+      break;
+
+    case mx::ir::hl::UCVQualifiersAttr::static_kind():
       tp = &(gTypes[968]);
       break;
 
-    case mx::ir::core::IntegerAttr::static_kind():
+    case mx::ir::hl::CVRQualifiersAttr::static_kind():
       tp = &(gTypes[969]);
       break;
 
-    case mx::ir::core::FloatAttr::static_kind():
+    case mx::ir::hl::OffsetOfNodeAttr::static_kind():
       tp = &(gTypes[970]);
       break;
 
-    case mx::ir::core::VoidAttr::static_kind():
-      tp = &(gTypes[971]);
-      break;
-
-    case mx::ir::core::SourceLanguageAttr::static_kind():
+    case mx::ir::core::BooleanAttr::static_kind():
       tp = &(gTypes[972]);
       break;
 
-    case mx::ir::core::GlobalLinkageKindAttr::static_kind():
+    case mx::ir::core::IntegerAttr::static_kind():
       tp = &(gTypes[973]);
       break;
 
-    case mx::ir::meta::IdentifierAttr::static_kind():
+    case mx::ir::core::FloatAttr::static_kind():
+      tp = &(gTypes[974]);
+      break;
+
+    case mx::ir::core::VoidAttr::static_kind():
       tp = &(gTypes[975]);
+      break;
+
+    case mx::ir::core::SourceLanguageAttr::static_kind():
+      tp = &(gTypes[976]);
+      break;
+
+    case mx::ir::core::GlobalLinkageKindAttr::static_kind():
+      tp = &(gTypes[977]);
+      break;
+
+    case mx::ir::meta::IdentifierAttr::static_kind():
+      tp = &(gTypes[979]);
       break;
 
   }
