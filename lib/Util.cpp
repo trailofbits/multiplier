@@ -39,8 +39,7 @@ bool IsNonValueStatement(StmtKind kind) {
 // Converts a declaration category into token category.
 TokenCategory ConvertDeclCategoryToTokenCategory(DeclCategory category) {
   if (category == DeclCategory::UNKNOWN) {
-    assert(false);
-    return TokenCategory::UNKNOWN;
+    return TokenCategory::ERROR;
 
   } else {
     return static_cast<TokenCategory>(

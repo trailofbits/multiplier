@@ -972,7 +972,7 @@ class TLDFinder final : public pasta::DeclVisitor {
     VisitDeclaratorDecl(decl);
   }
 
-  void VisitRecordDecl(const pasta::RecordDecl &decl) final {
+  void VisitCXXRecordDecl(const pasta::CXXRecordDecl &decl) final {
     auto raw_decl = RawEntity(decl);
     if (seen.count(raw_decl)) {
       return;
@@ -1002,9 +1002,19 @@ class TLDFinder final : public pasta::DeclVisitor {
         VisitDeeperDeclContext(decl, decl, true);
         return;
       }
+    
+    // This is a class inside of a template specialization. This ends up being
+    // a potential replaceable class/fragment case, because sometimes we might
+    // only needs it declaration, while other times we might needs its
+    // definition, which Clang will lazily materialize.
+    } else if (decl.InstantiatedFromMemberClass()) {
+      CHECK(seen.emplace(raw_decl).second);
+      AddDeclAlways(decl);
+      VisitDeeperDeclContext(decl, decl, true);
+      return;
     }
 
-    VisitTagDecl(decl);
+    VisitRecordDecl(decl);
   }
 
   void VisitTagDecl(const pasta::TagDecl &decl) final {
