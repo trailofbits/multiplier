@@ -91,5 +91,8 @@ bool BlocksMatch(
     const std::shared_ptr<const SourceIRImpl> &a_mod, mlir::Block *a,
     const std::shared_ptr<const SourceIRImpl> &b_mod, mlir::Block *b);
 
+// Return a reference to the global MLIR context.
+mlir::MLIRContext &GlobalMLIRContext(void);
+
 }  // namespace ir
 }  // namespace mx
