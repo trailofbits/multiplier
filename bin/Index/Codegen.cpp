@@ -56,6 +56,8 @@ VAST_UNRELAX_WARNINGS
 #include "TypeMapper.h"
 #include "Util.h"
 
+#include "../../lib/IR/SourceIR.h"
+
 namespace indexer {
 namespace {
 
@@ -292,6 +294,21 @@ class MXPreprocessingVisitorProxy : public vast::cg::fallthrough_list_node {
     return next->visit(compress(type), scope);
   }
 
+  vast::operation visit(const vast::cg::clang_decl *decl,
+                        vast::cg::scope_context &scope) override {
+    
+    // NOTE(pag): Workaround until VAST fixes Issue #625.
+    //
+    // XREF: https://github.com/trailofbits/vast/issues/625
+    if (auto func = clang::dyn_cast<clang::FunctionDecl>(decl)) {
+      if (auto def = func->getDefinition()) {
+        return next->visit(def, scope);
+      }
+    }
+
+    return next->visit(decl, scope);
+  }
+
  private:
 
   vast::cg::clang_qual_type compress(const vast::cg::clang_type *type) {
@@ -309,12 +326,8 @@ class MXPreprocessingVisitorProxy : public vast::cg::fallthrough_list_node {
 // VAST Driver Setup Functions
 //
 
-std::unique_ptr<mlir::MLIRContext> MakeMLIRContext() {
-  return vast::cg::mk_mcontext();
-}
-
 std::unique_ptr<vast::cg::codegen_builder>
-MakeCodeGenBuilder(mlir::MLIRContext *mctx) {
+MakeCodeGenBuilder(mlir::MLIRContext &mctx) {
   return vast::cg::mk_codegen_builder(mctx);
 }
 
@@ -331,9 +344,9 @@ MakeSymbolGenerator(const EntityMapper &em) {
 std::unique_ptr<vast::cg::driver> MakeCodeGenDriver(const pasta::AST &ast,
                                                     const EntityMapper &em) {
   auto &actx = ast.UnderlyingAST();
-  auto mctx = MakeMLIRContext();
-  auto bld = MakeCodeGenBuilder(mctx.get());
-  auto mg = MakeMetaGenerator(*mctx, em);
+  auto &mctx = mx::ir::GlobalMLIRContext();
+  auto bld = MakeCodeGenBuilder(mctx);
+  auto mg = MakeMetaGenerator(mctx, em);
   auto sg = MakeSymbolGenerator(em);
 
   using vast::cg::as_node;
@@ -345,35 +358,24 @@ std::unique_ptr<vast::cg::driver> MakeCodeGenDriver(const pasta::AST &ast,
       as_node_with_list_ref<vast::cg::attr_visitor_proxy>() |
       as_node<vast::cg::type_caching_proxy>() |
       as_node_with_list_ref<vast::cg::default_visitor>(
-          *mctx, *bld, mg, sg,
+          mctx, *bld, mg, sg,
           /* strict return = */ false,
           vast::cg::missing_return_policy::emit_trap) |
       as_node<MXErrorReportVisitorProxy>(ast) |
-      as_node_with_list_ref<vast::cg::unsup_visitor>(*mctx, *bld) |
+      as_node_with_list_ref<vast::cg::unsup_visitor>(mctx, *bld) |
       as_node<vast::cg::fallthrough_visitor>();
 
   auto drv = std::make_unique<vast::cg::driver>(
-      actx, std::move(mctx), std::move(bld), visitors);
+      actx, mctx, std::move(bld), visitors);
 
   drv->enable_verifier(true);
   return drv;
 }
 
-} // namespace
-
-class CodeGeneratorImpl {
- public:
-
-  std::optional<vast::owning_module_ref> Process(const pasta::AST &ast);
-  std::optional<std::string> DumpToString(vast::owning_module_ref &mod);
-
-  bool enabled = true;
-  std::unique_ptr<vast::cg::driver> driver;
-};
-
-std::optional<vast::owning_module_ref> CodeGeneratorImpl::Process(
-    const pasta::AST &ast) {
+static std::optional<vast::owning_module_ref> CreateModule(
+    const pasta::AST &ast, const EntityMapper &em) {
   try {
+    auto driver = MakeCodeGenDriver(ast, em);
     auto decls = GenerateDeclarationsInDeclContext(ast.TranslationUnit());
 
     for (const auto &decl : decls) {
@@ -392,6 +394,26 @@ std::optional<vast::owning_module_ref> CodeGeneratorImpl::Process(
   }
 }
 
+static std::optional<std::string> DumpToString(
+    vast::owning_module_ref &mlir_module) {
+  std::string result;
+  llvm::raw_string_ostream os(result);
+  mlir::BytecodeWriterConfig config("MX");
+
+  if (mlir::failed(mlir::writeBytecodeToFile(mlir_module.get(), os, config))) {
+    return std::nullopt;
+  }
+
+  return std::make_optional(result);
+}
+
+} // namespace
+
+class CodeGeneratorImpl {
+ public:
+  bool enabled = true;
+};
+
 CodeGenerator::CodeGenerator(void)
     : impl(std::make_unique<CodeGeneratorImpl>()) {}
 
@@ -405,19 +427,6 @@ CodeGenerator::~CodeGenerator(void) {
   }
 }
 
-std::optional<std::string> CodeGeneratorImpl::DumpToString(
-    vast::owning_module_ref &mlir_module) {
-  std::string result;
-  llvm::raw_string_ostream os(result);
-  mlir::BytecodeWriterConfig config("MX");
-
-  if (mlir::failed(mlir::writeBytecodeToFile(mlir_module.get(), os, config))) {
-    return std::nullopt;
-  }
-
-  return std::make_optional(result);
-}
-
 std::string CodeGenerator::GenerateSourceIR(const pasta::AST &ast,
                                             const EntityMapper &em,
                                             const NameMangler &) {
@@ -425,9 +434,8 @@ std::string CodeGenerator::GenerateSourceIR(const pasta::AST &ast,
     return "";
   }
 
-  impl->driver = MakeCodeGenDriver(ast, em);
-  if (auto mod = impl->Process(ast)) {
-    if (auto result = impl->DumpToString(mod.value())) {
+  if (auto mod = CreateModule(ast, em)) {
+    if (auto result = DumpToString(mod.value())) {
       return result.value();
     }
 

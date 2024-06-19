@@ -576,5 +576,10 @@ gap::generator<Operation> Operation::all_from(const ::mx::Stmt &that) {
       that.id().Pack());
 }
 
+// Return a reference to the global MLIR context.
+mlir::MLIRContext &GlobalMLIRContext(void) {
+  return kMLIR.Context();
+}
+
 }  // namespace ir
 }  // namespace mx
