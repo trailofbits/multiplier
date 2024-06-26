@@ -79,6 +79,7 @@ enum class TypeKind : unsigned {
   HL_REFERENCE,
   HL_TYPE_OF_EXPR,
   HL_TYPE_OF_TYPE,
+  HL_ATOMIC,
   CORE_FUNCTION,
   UNSUP_UNSUPPORTED,
 };
@@ -90,7 +91,7 @@ inline static const char *EnumerationName(ir::TypeKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(ir::TypeKind) {
-  return 66;
+  return 67;
 }
 
 MX_EXPORT const char *EnumeratorName(ir::TypeKind);

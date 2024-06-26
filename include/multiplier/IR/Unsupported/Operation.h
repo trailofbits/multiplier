@@ -34,7 +34,7 @@ class MX_EXPORT UnsupportedDeclOp final : public Operation {
   ::vast::unsup::UnsupportedDecl underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Region & body(void) const;
+  ::mx::ir::Region body(void) const;
   std::string_view name(void) const;
 };
 static_assert(sizeof(UnsupportedDeclOp) == sizeof(Operation));

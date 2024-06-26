@@ -77,6 +77,7 @@ const char *EnumeratorName(ir::TypeKind kind) {
     case ir::TypeKind::HL_REFERENCE: return "HL_REFERENCE";
     case ir::TypeKind::HL_TYPE_OF_EXPR: return "HL_TYPE_OF_EXPR";
     case ir::TypeKind::HL_TYPE_OF_TYPE: return "HL_TYPE_OF_TYPE";
+    case ir::TypeKind::HL_ATOMIC: return "HL_ATOMIC";
     case ir::TypeKind::CORE_FUNCTION: return "CORE_FUNCTION";
     case ir::TypeKind::UNSUP_UNSUPPORTED: return "UNSUP_UNSUPPORTED";
   }
@@ -187,6 +188,7 @@ bool IsHighLevelTypeKind(ir::TypeKind kind) {
     case mx::ir::TypeKind::HL_REFERENCE:
     case mx::ir::TypeKind::HL_TYPE_OF_EXPR:
     case mx::ir::TypeKind::HL_TYPE_OF_TYPE:
+    case mx::ir::TypeKind::HL_ATOMIC:
       return true;
   }
 }

@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1361]) || tp >= &(gTypes[1362])) {
+  if (tp < &(gTypes[1362]) || tp >= &(gTypes[1363])) {
     return std::nullopt;
   }
 
@@ -90,7 +90,7 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::ir::hl::DoOp::static_kind():
-      tp = &(gTypes[1361]);
+      tp = &(gTypes[1362]);
       break;
 
   }
@@ -124,6 +124,26 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
 namespace {
 static PyGetSetDef gProperties[] = {
+  {
+    "body_region",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->body_region());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::hl::DoOp::body_region"),
+    nullptr,
+  },
+  {
+    "cond_region",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->cond_region());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::hl::DoOp::cond_region"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace
@@ -196,7 +216,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1361]);
+  PyTypeObject * const tp = &(gTypes[1362]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

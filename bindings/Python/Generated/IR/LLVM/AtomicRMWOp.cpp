@@ -145,6 +145,26 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "syncscope",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->syncscope());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::AtomicRMWOp::syncscope"),
+    nullptr,
+  },
+  {
+    "alignment",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->alignment());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::AtomicRMWOp::alignment"),
+    nullptr,
+  },
+  {
     "volatile__",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

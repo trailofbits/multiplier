@@ -125,6 +125,26 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyGetSetDef gProperties[] = {
   {
+    "alignment",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->alignment());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::AllocaOp::alignment"),
+    nullptr,
+  },
+  {
+    "elem_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->elem_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::AllocaOp::elem_type"),
+    nullptr,
+  },
+  {
     "inalloca",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

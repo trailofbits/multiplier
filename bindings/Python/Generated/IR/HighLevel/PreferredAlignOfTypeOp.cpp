@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1396]) || tp >= &(gTypes[1397])) {
+  if (tp < &(gTypes[1397]) || tp >= &(gTypes[1398])) {
     return std::nullopt;
   }
 
@@ -90,7 +90,7 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::ir::hl::PreferredAlignOfTypeOp::static_kind():
-      tp = &(gTypes[1396]);
+      tp = &(gTypes[1397]);
       break;
 
   }
@@ -132,6 +132,16 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::hl::PreferredAlignOfTypeOp::result"),
+    nullptr,
+  },
+  {
+    "arg",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->arg());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::hl::PreferredAlignOfTypeOp::arg"),
     nullptr,
   },
   {}  // Sentinel.
@@ -206,7 +216,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1396]);
+  PyTypeObject * const tp = &(gTypes[1397]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

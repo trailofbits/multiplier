@@ -27,7 +27,7 @@
 #pragma GCC diagnostic ignored "-Wc99-extensions"
 #pragma GCC diagnostic ignored "-Wunused-function"
 namespace {
-using T = mx::ir::hl::ReturnOp;
+using T = mx::ir::hl::RefOp;
 
 struct O final : public ::PyObject {
 
@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1406]) || tp >= &(gTypes[1407])) {
+  if (tp < &(gTypes[1303]) || tp >= &(gTypes[1308])) {
     return std::nullopt;
   }
 
@@ -89,8 +89,20 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       tp = gType;
       break;
 
-    case mx::ir::hl::ReturnOp::static_kind():
-      tp = &(gTypes[1406]);
+    case mx::ir::hl::DeclRefOp::static_kind():
+      tp = &(gTypes[1304]);
+      break;
+
+    case mx::ir::hl::EnumRefOp::static_kind():
+      tp = &(gTypes[1305]);
+      break;
+
+    case mx::ir::hl::FuncRefOp::static_kind():
+      tp = &(gTypes[1306]);
+      break;
+
+    case mx::ir::hl::GlobalRefOp::static_kind():
+      tp = &(gTypes[1307]);
       break;
 
   }
@@ -115,7 +127,7 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
   }
 
   auto tp_obj = reinterpret_cast<BorrowedPyObject *>(gType);
-  if (0 != PyModule_AddObjectRef(module, "ReturnOp", tp_obj)) {
+  if (0 != PyModule_AddObjectRef(module, "RefOp", tp_obj)) {
     return false;
   }
 
@@ -124,29 +136,22 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
 namespace {
 static PyGetSetDef gProperties[] = {
+  {
+    "referenced_symbol",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->referenced_symbol());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::hl::RefOp::referenced_symbol"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace
 
 namespace {
 static PyMethodDef gMethods[] = {
-  {
-    "static_kind",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          (void) args;
-          while (num_args == 0) {
-
-            return ::mx::to_python(T::static_kind());
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'static_kind'";
-          return nullptr;
-        }),
-    METH_FASTCALL | METH_STATIC,
-    PyDoc_STR("Wrapper for mx::ir::hl::ReturnOp::static_kind"),
-  },
   {
     "FROM",
     reinterpret_cast<PyCFunction>(
@@ -166,28 +171,7 @@ static PyMethodDef gMethods[] = {
           return nullptr;
         }),
     METH_FASTCALL | METH_STATIC,
-    PyDoc_STR("Wrapper for mx::ir::hl::ReturnOp::from"),
-  },
-  {
-    "producing",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          (void) args;
-          while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::ir::Value>(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(T::producing(arg_0.value()));
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'producing'";
-          return nullptr;
-        }),
-    METH_FASTCALL | METH_STATIC,
-    PyDoc_STR("Wrapper for mx::ir::hl::ReturnOp::producing"),
+    PyDoc_STR("Wrapper for mx::ir::hl::RefOp::from"),
   },
   {}  // Sentinel.
 };
@@ -196,7 +180,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1406]);
+  PyTypeObject * const tp = &(gTypes[1303]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -205,9 +189,9 @@ PyTypeObject *InitType(void) noexcept {
     }
     PyObject_Free(obj);
   };
-  tp->tp_name = "multiplier.ir.highlevel.ReturnOp";
+  tp->tp_name = "multiplier.ir.highlevel.RefOp";
   tp->tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_DISALLOW_INSTANTIATION;
-  tp->tp_doc = PyDoc_STR("Wrapper for mx::ir::hl::::ReturnOp");
+  tp->tp_doc = PyDoc_STR("Wrapper for mx::ir::hl::::RefOp");
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
@@ -220,13 +204,13 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)
-          << "'ReturnOp.__init__' does not take any keyword arguments";
+          << "'RefOp.__init__' does not take any keyword arguments";
       return -1;
     }
 
     if (!args || !PySequence_Check(args)) {
       PyErrorStreamer(PyExc_TypeError)
-          << "Invalid positional arguments passed to 'ReturnOp.__init__'";
+          << "Invalid positional arguments passed to 'RefOp.__init__'";
       return -1;
     }
 
@@ -236,7 +220,7 @@ PyTypeObject *InitType(void) noexcept {
     (void) obj;
     (void) num_args;
     PyErrorStreamer(PyExc_TypeError)
-        << "Class 'ReturnOp' cannot be directly instantiated";
+        << "Class 'RefOp' cannot be directly instantiated";
     return -1;
 
   };

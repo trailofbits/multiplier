@@ -125,6 +125,26 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyGetSetDef gProperties[] = {
   {
+    "initializer",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->initializer());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::GlobalOp::initializer"),
+    nullptr,
+  },
+  {
+    "global_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->global_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::GlobalOp::global_type"),
+    nullptr,
+  },
+  {
     "constant",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -165,6 +185,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "alignment",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->alignment());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::GlobalOp::alignment"),
+    nullptr,
+  },
+  {
     "addr_space",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -172,6 +202,16 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::llvm::GlobalOp::addr_space"),
+    nullptr,
+  },
+  {
+    "section",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->section());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::GlobalOp::section"),
     nullptr,
   },
   {}  // Sentinel.

@@ -33,6 +33,7 @@ class Attribute(multiplier.ir.Attribute):
     ...
 
 class TypedAttr(multiplier.ir.builtin.Attribute):
+  type: multiplier.ir.Type
 
   @staticmethod
   def static_kind() -> multiplier.ir.AttributeKind:
@@ -47,6 +48,7 @@ class ElementsAttr(multiplier.ir.builtin.Attribute):
   num_elements: int
   size: int
   empty: bool
+  type: multiplier.ir.Type
 
   @staticmethod
   def static_kind() -> multiplier.ir.AttributeKind:
@@ -132,6 +134,7 @@ class DictionaryAttr(multiplier.ir.builtin.Attribute):
 
 class FloatAttr(multiplier.ir.builtin.Attribute):
   value_as_double: float
+  type: multiplier.ir.Type
 
   @staticmethod
   def static_kind() -> multiplier.ir.AttributeKind:
@@ -145,6 +148,7 @@ class IntegerAttr(multiplier.ir.builtin.Attribute):
   int_: int
   s_int: int
   u_int: int
+  type: multiplier.ir.Type
 
   @staticmethod
   def static_kind() -> multiplier.ir.AttributeKind:
@@ -166,6 +170,7 @@ class IntegerSetAttr(multiplier.ir.builtin.Attribute):
 
 class OpaqueAttr(multiplier.ir.builtin.Attribute):
   attr_data: str
+  type: multiplier.ir.Type
 
   @staticmethod
   def static_kind() -> multiplier.ir.AttributeKind:
@@ -200,6 +205,7 @@ class StringAttr(multiplier.ir.builtin.Attribute):
   str: str
   empty: bool
   value: str
+  type: multiplier.ir.Type
 
   @staticmethod
   def static_kind() -> multiplier.ir.AttributeKind:
@@ -277,6 +283,9 @@ class Operation(multiplier.ir.Operation):
     ...
 
 class ModuleOp(multiplier.ir.builtin.Operation):
+  body_region: multiplier.ir.Region
+  sym_name: Optional[str]
+  sym_visibility: Optional[str]
   name: Optional[str]
   is_optional_symbol: bool
   default_dialect: str
@@ -314,6 +323,7 @@ class Type(multiplier.ir.Type):
     ...
 
 class ShapedType(multiplier.ir.builtin.Type):
+  element_type: multiplier.ir.Type
   has_rank: bool
   element_type_bit_width: int
   rank: int

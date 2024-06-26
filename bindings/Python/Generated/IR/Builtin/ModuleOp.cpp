@@ -125,6 +125,36 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyGetSetDef gProperties[] = {
   {
+    "body_region",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->body_region());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::builtin::ModuleOp::body_region"),
+    nullptr,
+  },
+  {
+    "sym_name",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->sym_name());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::builtin::ModuleOp::sym_name"),
+    nullptr,
+  },
+  {
+    "sym_visibility",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->sym_visibility());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::builtin::ModuleOp::sym_visibility"),
+    nullptr,
+  },
+  {
     "name",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

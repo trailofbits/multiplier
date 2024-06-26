@@ -124,6 +124,16 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
 namespace {
 static PyGetSetDef gProperties[] = {
+  {
+    "body_region",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->body_region());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::memref::AllocaScopeOp::body_region"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

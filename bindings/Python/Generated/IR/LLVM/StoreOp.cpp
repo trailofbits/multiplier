@@ -135,6 +135,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "alignment",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->alignment());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::StoreOp::alignment"),
+    nullptr,
+  },
+  {
     "volatile__",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -152,6 +162,16 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::llvm::StoreOp::nontemporal"),
+    nullptr,
+  },
+  {
+    "syncscope",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->syncscope());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::StoreOp::syncscope"),
     nullptr,
   },
   {}  // Sentinel.

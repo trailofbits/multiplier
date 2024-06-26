@@ -653,8 +653,9 @@ class TypeKind(IntEnum):
   HL_REFERENCE = 62
   HL_TYPE_OF_EXPR = 63
   HL_TYPE_OF_TYPE = 64
-  CORE_FUNCTION = 65
-  UNSUP_UNSUPPORTED = 66
+  HL_ATOMIC = 65
+  CORE_FUNCTION = 66
+  UNSUP_UNSUPPORTED = 67
 
 class Attribute(object):
   kind: multiplier.ir.AttributeKind
@@ -729,6 +730,10 @@ class Operation(multiplier.Entity):
   only_region: Optional[multiplier.ir.Region]
   only_region_blocks: Iterable[multiplier.ir.Block]
   uses: Iterable[multiplier.ir.Operand]
+  previous: Optional[multiplier.ir.Operation]
+  next: Optional[multiplier.ir.Operation]
+  is_terminator: bool
+  defined_symbol: Optional[multiplier.ir.Symbol]
 
   @staticmethod
   def classify(arg_0: str) -> multiplier.ir.OperationKind:
@@ -784,6 +789,10 @@ class Operation(multiplier.Entity):
   def all_from(that: multiplier.ast.Stmt) -> Iterable[multiplier.ir.Operation]:
     ...
 
+  @staticmethod
+  def defining(symbol: multiplier.ir.Symbol) -> multiplier.ir.Operation:
+    ...
+
   def nth_operand(self, arg_0: int) -> Optional[multiplier.ir.Operand]:
     ...
 
@@ -797,6 +806,15 @@ class Operand(object):
   operation: multiplier.ir.Operation
   index: int
   value: multiplier.ir.Value
+
+class Symbol(object):
+  operation: multiplier.ir.Operation
+  name: str
+  references: Iterable[multiplier.ir.Operation]
+
+  @staticmethod
+  def FROM(arg_0: multiplier.ir.Operation) -> Optional[multiplier.ir.Symbol]:
+    ...
 
 class Region(object):
   num_blocks: int

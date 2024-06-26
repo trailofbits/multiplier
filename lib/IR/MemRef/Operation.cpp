@@ -142,6 +142,11 @@ std::optional<GenericAtomicRMWOp> GenericAtomicRMWOp::producing(const ::mx::ir::
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
+::mx::ir::Region GenericAtomicRMWOp::atomic_body(void) const {
+  auto &val = underlying_repr().getAtomicBody();
+  return ::mx::ir::Region(module_, val);
+}
+
 std::optional<LoadOp> LoadOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::MEMREF_LOAD) {
     return reinterpret_cast<const LoadOp &>(that);
@@ -188,6 +193,15 @@ std::optional<AllocOp> AllocOp::producing(const ::mx::ir::Value &that) {
   return ::mlir::memref::AllocOp(this->::mx::ir::Operation::op_);
 }
 
+std::optional<unsigned long long> AllocOp::alignment(void) const {
+  auto opt_val = underlying_repr().getAlignment();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  return val;
+}
+
 std::optional<AllocaOp> AllocaOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::MEMREF_ALLOCA) {
     return reinterpret_cast<const AllocaOp &>(that);
@@ -206,6 +220,15 @@ std::optional<AllocaOp> AllocaOp::producing(const ::mx::ir::Value &that) {
   return ::mlir::memref::AllocaOp(this->::mx::ir::Operation::op_);
 }
 
+std::optional<unsigned long long> AllocaOp::alignment(void) const {
+  auto opt_val = underlying_repr().getAlignment();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  return val;
+}
+
 std::optional<AllocaScopeOp> AllocaScopeOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::MEMREF_ALLOCA_SCOPE) {
     return reinterpret_cast<const AllocaScopeOp &>(that);
@@ -222,6 +245,11 @@ std::optional<AllocaScopeOp> AllocaScopeOp::producing(const ::mx::ir::Value &tha
 
 ::mlir::memref::AllocaScopeOp AllocaScopeOp::underlying_repr(void) const noexcept {
   return ::mlir::memref::AllocaScopeOp(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Region AllocaScopeOp::body_region(void) const {
+  auto &val = underlying_repr().getBodyRegion();
+  return ::mx::ir::Region(module_, val);
 }
 
 std::optional<AllocaScopeReturnOp> AllocaScopeReturnOp::from(const ::mx::ir::Operation &that) {
@@ -317,6 +345,15 @@ std::optional<DimOp> DimOp::producing(const ::mx::ir::Value &that) {
 ::mx::ir::Value DimOp::source(void) const {
   auto val = underlying_repr().getSource();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+std::optional<long long> DimOp::constant_index(void) const {
+  auto opt_val = underlying_repr().getConstantIndex();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  return val;
 }
 
 std::optional<DMAStartOp> DMAStartOp::from(const ::mx::ir::Operation &that) {
@@ -523,8 +560,30 @@ std::string_view GlobalOp::sym_name(void) const {
   }
 }
 
+std::optional<std::string_view> GlobalOp::sym_visibility(void) const {
+  auto opt_val = underlying_repr().getSymVisibility();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
 bool GlobalOp::constant(void) const {
   auto val = underlying_repr().getConstant();
+  return val;
+}
+
+std::optional<unsigned long long> GlobalOp::alignment(void) const {
+  auto opt_val = underlying_repr().getAlignment();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
   return val;
 }
 
@@ -623,6 +682,15 @@ std::optional<ReallocOp> ReallocOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::memref::ReallocOp ReallocOp::underlying_repr(void) const noexcept {
   return ::mlir::memref::ReallocOp(this->::mx::ir::Operation::op_);
+}
+
+std::optional<unsigned long long> ReallocOp::alignment(void) const {
+  auto opt_val = underlying_repr().getAlignment();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  return val;
 }
 
 std::optional<ReinterpretCastOp> ReinterpretCastOp::from(const ::mx::ir::Operation &that) {

@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1421]) || tp >= &(gTypes[1422])) {
+  if (tp < &(gTypes[1422]) || tp >= &(gTypes[1423])) {
     return std::nullopt;
   }
 
@@ -90,7 +90,7 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::ir::hl::UnionDeclOp::static_kind():
-      tp = &(gTypes[1421]);
+      tp = &(gTypes[1422]);
       break;
 
   }
@@ -124,6 +124,16 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
 namespace {
 static PyGetSetDef gProperties[] = {
+  {
+    "fields",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->fields());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::hl::UnionDeclOp::fields"),
+    nullptr,
+  },
   {
     "name",
     reinterpret_cast<getter>(
@@ -216,7 +226,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1421]);
+  PyTypeObject * const tp = &(gTypes[1422]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

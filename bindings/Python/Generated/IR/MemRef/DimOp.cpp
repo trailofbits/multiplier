@@ -134,6 +134,16 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::ir::memref::DimOp::source"),
     nullptr,
   },
+  {
+    "constant_index",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->constant_index());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::memref::DimOp::constant_index"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

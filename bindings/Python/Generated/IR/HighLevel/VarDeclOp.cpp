@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1374]) || tp >= &(gTypes[1375])) {
+  if (tp < &(gTypes[1375]) || tp >= &(gTypes[1376])) {
     return std::nullopt;
   }
 
@@ -90,7 +90,7 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::ir::hl::VarDeclOp::static_kind():
-      tp = &(gTypes[1374]);
+      tp = &(gTypes[1375]);
       break;
 
   }
@@ -132,6 +132,26 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::hl::VarDeclOp::result"),
+    nullptr,
+  },
+  {
+    "initializer",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->initializer());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::hl::VarDeclOp::initializer"),
+    nullptr,
+  },
+  {
+    "allocation_size",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->allocation_size());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::hl::VarDeclOp::allocation_size"),
     nullptr,
   },
   {
@@ -316,7 +336,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1374]);
+  PyTypeObject * const tp = &(gTypes[1375]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

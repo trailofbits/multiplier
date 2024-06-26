@@ -8,6 +8,8 @@
 
 #include <multiplier/IR/HighLevel/Attribute.h>
 
+#include <multiplier/IR/Type.h>
+
 #include <mlir/Dialect/LLVMIR/LLVMDialect.h>
 #include <vast/Dialect/Dialects.hpp>
 #include <vast/Dialect/ABI/ABIOps.hpp>

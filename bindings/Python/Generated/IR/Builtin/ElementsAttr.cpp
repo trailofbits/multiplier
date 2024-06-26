@@ -164,6 +164,16 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::ir::builtin::ElementsAttr::empty"),
     nullptr,
   },
+  {
+    "type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::builtin::ElementsAttr::type"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

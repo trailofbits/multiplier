@@ -33,6 +33,7 @@ class Operation(multiplier.ir.Operation):
     ...
 
 class UnsupportedDeclOp(multiplier.ir.unsupported.Operation):
+  body: multiplier.ir.Region
   name: str
 
   @staticmethod

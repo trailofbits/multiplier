@@ -91,7 +91,7 @@ class MX_EXPORT LazyOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value result(void) const;
-  //::mlir::Region & lazy(void) const;
+  ::mx::ir::Region lazy(void) const;
 };
 static_assert(sizeof(LazyOp) == sizeof(Operation));
 
@@ -107,7 +107,7 @@ class MX_EXPORT ScopeOp final : public Operation {
   ::vast::core::ScopeOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Region & body(void) const;
+  ::mx::ir::Region body(void) const;
 };
 static_assert(sizeof(ScopeOp) == sizeof(Operation));
 

@@ -33,6 +33,7 @@ class Attribute(multiplier.ir.Attribute):
     ...
 
 class BooleanAttr(multiplier.ir.core.Attribute):
+  type: multiplier.ir.Type
   value: bool
 
   @staticmethod
@@ -44,6 +45,7 @@ class BooleanAttr(multiplier.ir.core.Attribute):
     ...
 
 class IntegerAttr(multiplier.ir.core.Attribute):
+  type: multiplier.ir.Type
 
   @staticmethod
   def static_kind() -> multiplier.ir.AttributeKind:
@@ -54,6 +56,7 @@ class IntegerAttr(multiplier.ir.core.Attribute):
     ...
 
 class FloatAttr(multiplier.ir.core.Attribute):
+  type: multiplier.ir.Type
 
   @staticmethod
   def static_kind() -> multiplier.ir.AttributeKind:
@@ -64,6 +67,7 @@ class FloatAttr(multiplier.ir.core.Attribute):
     ...
 
 class VoidAttr(multiplier.ir.core.Attribute):
+  type: multiplier.ir.Type
 
   @staticmethod
   def static_kind() -> multiplier.ir.AttributeKind:
@@ -149,6 +153,7 @@ class ImplicitReturnOp(multiplier.ir.core.Operation):
 
 class LazyOp(multiplier.ir.core.Operation):
   result: multiplier.ir.Value
+  lazy: multiplier.ir.Region
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -163,6 +168,7 @@ class LazyOp(multiplier.ir.core.Operation):
     ...
 
 class ScopeOp(multiplier.ir.core.Operation):
+  body: multiplier.ir.Region
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:

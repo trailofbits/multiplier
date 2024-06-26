@@ -56,7 +56,7 @@ class MX_EXPORT ShapedType final : public Type {
   ::mlir::ShapedType underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Type element_type(void) const;
+  ::mx::ir::Type element_type(void) const;
   bool has_rank(void) const;
   //::llvm::ArrayRef<long long> shape(void) const;
   unsigned int element_type_bit_width(void) const;
