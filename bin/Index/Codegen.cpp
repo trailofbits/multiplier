@@ -294,21 +294,6 @@ class MXPreprocessingVisitorProxy : public vast::cg::fallthrough_list_node {
     return next->visit(compress(type), scope);
   }
 
-  vast::operation visit(const vast::cg::clang_decl *decl,
-                        vast::cg::scope_context &scope) override {
-    
-    // NOTE(pag): Workaround until VAST fixes Issue #625.
-    //
-    // XREF: https://github.com/trailofbits/vast/issues/625
-    if (auto func = clang::dyn_cast<clang::FunctionDecl>(decl)) {
-      if (auto def = func->getDefinition()) {
-        return next->visit(def, scope);
-      }
-    }
-
-    return next->visit(decl, scope);
-  }
-
  private:
 
   vast::cg::clang_qual_type compress(const vast::cg::clang_type *type) {

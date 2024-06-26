@@ -11,14 +11,22 @@
 #include <mlir/IR/OperationSupport.h>
 #include <mlir/IR/Region.h>
 #include <multiplier/IR/Block.h>
+#include <multiplier/IR/HighLevel/Operation.h>
 #include <multiplier/IR/Region.h>
 #include <multiplier/IR/Value.h>
+#include <vast/Util/Symbols.hpp>
+#include <vast/Util/Terminator.hpp>
 
 #include <unordered_map>
 
 #include "Operation.h"
 
 namespace mx::ir {
+namespace {
+
+static const std::string_view kEmptySymbolName("");
+
+}  // namespace
 
 bool OperationIdsMatch(mlir::Operation *a, mlir::Operation *b) {
   auto a_eid = a->getLoc().cast<mlir::OpaqueLoc>().getUnderlyingLocation();
@@ -167,6 +175,157 @@ gap::generator<Operand> Operation::uses(void) const & noexcept {
       co_yield Operand(module_, &use);
     }
   }
+}
+
+// Returns `true` whether or not this operation is a terminator.
+bool Operation::is_terminator(void) const noexcept {
+  return vast::is_terminator(op_) ||
+         vast::core::is_soft_terminator(op_);
+}
+
+// Return the previous and next operations in the current `Block`.
+std::optional<Operation> Operation::previous(void) const noexcept {
+  if (auto prev_op = op_->getNextNode()) {
+    return Operation(module_, prev_op);
+  }
+  return std::nullopt;
+}
+
+std::optional<Operation> Operation::next(void) const noexcept {
+  if (auto next_op = op_->getNextNode()) {
+    return Operation(module_, next_op);
+  }
+  return std::nullopt;
+}
+
+// Return the name of this operation's symbol, if any.
+std::optional<Symbol> Operation::defined_symbol(void) const noexcept {
+  if (mlir::dyn_cast<vast::util::vast_symbol_interface>(op_)) {
+    return Symbol(module_, op_, kind_);
+  }
+
+  if (mlir::dyn_cast<vast::util::mlir_symbol_interface>(op_)) {
+    return Symbol(module_, op_, kind_);
+  }
+
+  return std::nullopt;
+}
+
+// Return the operation defining a symbol.
+Operation Operation::defining(const Symbol &symbol) {
+  return symbol.operation();
+}
+
+// If an operation defines a symbol then return it.
+std::optional<Symbol> Symbol::from(const Operation &op) {
+  return op.defined_symbol();
+}
+
+// The operation defining this symbol.
+Operation Symbol::operation(void) const noexcept {
+  return Operation(module_, op_, kind_);
+}
+
+namespace hl {
+
+std::optional<RefOp> RefOp::from(const ::mx::ir::Operation &op) {
+  switch (op.kind()) {
+    case OperationKind::HL_REF:
+    case OperationKind::HL_FUNCREF:
+    case OperationKind::HL_GLOBREF:
+    case OperationKind::HL_ENUMREF:
+      return reinterpret_cast<const RefOp &>(op);
+    default:
+      return std::nullopt;
+  }
+}
+
+std::optional<Symbol> RefOp::referenced_symbol(void) const noexcept {
+
+  // if (mlir::isa<vast::hl::DeclRefOp>(uop) ||
+  //     mlir::isa<vast::hl::FuncRefOp>(uop) ||
+  //     mlir::isa<vast::hl::GlobalRefOp>(uop) ||
+  //     mlir::isa<vast::hl::EnumRefOp>(uop)) {
+  //   return RefOp();
+  // }
+
+  switch (kind()) {
+    case OperationKind::HL_REF: {
+      auto decl_ref = reinterpret_cast<const DeclRefOp &>(*this);
+      if (auto op = Operation::producing(decl_ref.decl())) {
+        return op->defined_symbol();
+      }
+      break;
+    }
+    case OperationKind::HL_FUNCREF:
+      if (auto func_ref = mlir::dyn_cast<vast::hl::FuncRefOp>(op_)) {
+        (void) func_ref;
+      }
+      break;
+    case OperationKind::HL_GLOBREF:
+      if (auto global_ref = mlir::dyn_cast<vast::hl::GlobalRefOp>(op_)) {
+        (void) global_ref;
+      }
+      break;
+    case OperationKind::HL_ENUMREF:
+      if (auto enum_ref = mlir::dyn_cast<vast::hl::EnumRefOp>(op_)) {
+        (void) enum_ref;
+      }
+      break;
+    default:
+      break;
+  }
+  return std::nullopt;
+}
+
+}  // namespace hl
+
+// References to this symbol.
+gap::generator<Operation> Symbol::references(void) const & noexcept {
+  if (auto vast_symbol = mlir::dyn_cast<vast::util::vast_symbol_interface>(op_)) {
+    for (auto user : vast_symbol->getUsers()) {
+      co_yield Operation(module_, user);
+    }
+
+  } else if (auto mlir_symbol = mlir::dyn_cast<vast::util::mlir_symbol_interface >(op_)) {
+    auto stab = mlir::SymbolTable::getNearestSymbolTable(op_);
+    if (auto users = mlir_symbol.getSymbolUses(stab)) {
+      for (auto use : *users) {
+        co_yield Operation(module_, use.getUser());
+      }
+    }
+
+  } else {
+    co_return;
+  }
+}
+
+// Name of this symbol.
+std::string_view Symbol::name(void) const noexcept {
+  if (auto vast_symbol = mlir::dyn_cast<vast::util::vast_symbol_interface>(op_)) {
+    auto name = vast::util::symbol_name(vast_symbol);
+    return std::string_view(name.data(), name.size());
+  }
+
+  if (auto mlir_symbol = mlir::dyn_cast<vast::util::mlir_symbol_interface>(op_)) {
+    auto name = vast::util::symbol_name(mlir_symbol);
+    return std::string_view(name.data(), name.size());
+  }
+
+  assert(false);
+  return kEmptySymbolName;
+}
+
+bool Symbol::operator==(const Symbol &that) const noexcept {
+  if (underlying_operation() == that.underlying_operation()) {
+    return true;
+  }
+
+  if (module_ == that.module_) {
+    return false;
+  }
+
+  return OperationIdsMatch(op_, that.op_);
 }
 
 // If an operation produces a single result, then this gives us the result.

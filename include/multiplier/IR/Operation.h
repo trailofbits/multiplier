@@ -42,6 +42,7 @@ class Region;
 class Result;
 class Operand;
 class SourceIRImpl;
+class Symbol;
 class Value;
 
 // An operation is like an 'instruction', but can contain arbitrary
@@ -56,6 +57,7 @@ class MX_EXPORT Operation {
   friend class Region;
   friend class Result;
   friend class SourceIRImpl;
+  friend class Symbol;
   friend class Value;
 
   friend class ::mx::Decl;
@@ -152,6 +154,19 @@ class MX_EXPORT Operation {
   // one of the result values of the operations.
   gap::generator<Operand> uses(void) const & noexcept;
 
+  // Return the previous and next operations in the current `Block`.
+  std::optional<Operation> previous(void) const noexcept;
+  std::optional<Operation> next(void) const noexcept;
+
+  // Returns `true` whether or not this operation is a terminator.
+  bool is_terminator(void) const noexcept;
+
+  // Return the symbol defined by this operation, if any.
+  std::optional<Symbol> defined_symbol(void) const noexcept;
+
+  // Return the operation defining a symbol.
+  static Operation defining(const Symbol &symbol);
+
   bool operator==(const Operation &that) const noexcept;
   bool operator!=(const Operation &that) const noexcept = default;
 };
@@ -228,6 +243,47 @@ class MX_EXPORT Operand {
 
   bool operator==(const Operand &that) const noexcept;
   bool operator!=(const Operand &that) const noexcept = default;
+};
+
+// API for symbols defined by operations.
+class MX_EXPORT Symbol {
+ private:
+  friend class Block;
+  friend class Label;
+  friend class Operation;
+  friend class Value;
+
+  std::shared_ptr<const SourceIRImpl> module_;
+  mlir::Operation *op_;
+  OperationKind kind_;
+
+ public:
+
+  inline Symbol(std::shared_ptr<const SourceIRImpl> module,
+                mlir::Operation *opaque,
+                OperationKind kind)
+      : module_(std::move(module)),
+        op_(opaque),
+        kind_(kind) {}
+
+  inline mlir::Operation *underlying_operation(void) const noexcept {
+    return op_;
+  }
+
+  // If an operation defines a symbol then return it.
+  static std::optional<Symbol> from(const Operation &);
+
+  // The operation defining this symbol.
+  Operation operation(void) const noexcept;
+
+  // Name of this symbol.
+  std::string_view name(void) const noexcept;
+
+  // References to this symbol.
+  gap::generator<Operation> references(void) const & noexcept;
+
+  bool operator==(const Symbol &that) const noexcept;
+  bool operator!=(const Symbol &that) const noexcept = default;
 };
 
 }  // namespace ir
