@@ -44585,7 +44585,7 @@ class LabelStmt(multiplier.ast.ValueStmt):
     ...
 
 class Expr(multiplier.ast.ValueStmt):
-  has_side_effects: bool
+  has_side_effects: Optional[bool]
   ignore_casts: multiplier.ast.Expr
   ignore_conversion_operator_single_step: multiplier.ast.Expr
   ignore_implicit_casts: multiplier.ast.Expr

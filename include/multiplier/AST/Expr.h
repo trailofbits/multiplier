@@ -65,7 +65,7 @@ class MX_EXPORT Expr : public ValueStmt {
   static std::optional<Expr> from(const VariantEntity &e);
   static std::optional<Expr> from(const TokenContext &t);
 
-  bool has_side_effects(void) const;
+  std::optional<bool> has_side_effects(void) const;
   Expr ignore_casts(void) const;
   Expr ignore_conversion_operator_single_step(void) const;
   Expr ignore_implicit_casts(void) const;

@@ -277,15 +277,15 @@ std::optional<Expr> GenericSelectionExpr::result_expression(void) const {
 }
 
 bool GenericSelectionExpr::is_expression_predicate(void) const {
-  return impl->reader.getVal84();
-}
-
-bool GenericSelectionExpr::is_result_dependent(void) const {
   return impl->reader.getVal85();
 }
 
-bool GenericSelectionExpr::is_type_predicate(void) const {
+bool GenericSelectionExpr::is_result_dependent(void) const {
   return impl->reader.getVal86();
+}
+
+bool GenericSelectionExpr::is_type_predicate(void) const {
+  return impl->reader.getVal87();
 }
 
 #pragma GCC diagnostic pop

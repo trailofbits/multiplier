@@ -237,11 +237,39 @@ BuildCommandAction::GetCompilerInfo(void) {
   bool skip = false;
   bool skip_internal_option = false;
   bool has_output = false;
-  auto inferred_lang = "c";
+  bool next_is_language = false;
+  std::string_view inferred_lang = "c";
+  std::string_view specified_lang = "c";
   bool specifies_language = false;
   for (const char *arg_ : command.vec) {
 
     std::string_view arg(arg_);
+
+    if (next_is_language) {
+      assert(specifies_language);
+      next_is_language = false;
+
+      if (arg == "87") {
+        new_args.emplace_back("-x87");
+        specifies_language = false;
+        continue;
+      }
+
+      specified_lang = arg;
+      continue;
+    }
+
+    if (skip) {
+      skip = false;
+
+      // NOTE(pag): Have observed things like the following in the Linux kernel:
+      //
+      //      ... -main-file-name -mrelocation-model ...
+      //
+      if (arg.front() != '-' && 1u < arg.size()) {
+        continue;
+      }
+    }
 
     // Try to detect C++ code.
     if (!specifies_language) {
@@ -257,11 +285,26 @@ BuildCommandAction::GetCompilerInfo(void) {
             arg_str.ends_with(".hpp")) {
           inferred_lang = "c++";
 
+        } else if (arg_str.ends_with(".ii")) {
+          inferred_lang = "c++-cpp-output";
+
+        } else if (arg_str.ends_with(".iih")) {
+          inferred_lang = "c++-header-unit-cpp-output";
+
         } else if (arg_str.ends_with(".c")) {
           inferred_lang = "c";
 
+        } else if (arg_str.ends_with(".i")) {
+          inferred_lang = "cpp-output";
+
         } else if (arg_str.ends_with(".s")) {
           inferred_lang = "asm";
+        
+        } else if (arg_str.ends_with(".ll") || arg_str.ends_with(".ir")) {
+          inferred_lang = "ir";
+
+        } else if (arg_str.ends_with(".bc")) {
+          inferred_lang = "bc";
         }
       }
     }
@@ -269,18 +312,6 @@ BuildCommandAction::GetCompilerInfo(void) {
     if (skip_internal_option) {
       skip_internal_option = false;
       continue;
-    }
-
-    if (skip) {
-      skip = false;
-
-      // NOTE(pag): Have observed things like the following in the Linux kernel:
-      //
-      //      ... -main-file-name -mrelocation-model ...
-      //
-      if (arg.front() != '-' && 1u < arg.size()) {
-        continue;
-      }
     }
 
     // Drop things like `-Wall`, `-Werror, `-fsanitize=..`, etc.
@@ -361,10 +392,22 @@ BuildCommandAction::GetCompilerInfo(void) {
     } else if (arg == "-x87") {
 
     // `-x c`, `-xc`, `--language c`, `--language=c`, etc.
-    } else if (arg == kLanguageX || arg == kLanguage ||
-               arg.starts_with(kLanguageX) ||
-               arg.starts_with(kLanguageEQ)) {
+    } else if (arg == kLanguageX || arg == kLanguage) {
       specifies_language = true;
+      next_is_language = true;
+      continue;
+
+    } else if (arg.starts_with(kLanguageX)) {
+      specifies_language = true;
+      specified_lang = arg;
+      specified_lang.remove_prefix(kLanguageX.size());
+      continue;
+
+    } else if (arg.starts_with(kLanguageEQ)) {
+      specifies_language = true;
+      specified_lang = arg;
+      specified_lang.remove_prefix(kLanguageX.size());
+      continue;
 
     // Something like `"-DFOO=bar"` or `'-DFOO=bar'`.
     } else if ((arg.front() == '\'' || arg.front() == '"') && arg[1] == '-' &&
@@ -380,9 +423,24 @@ BuildCommandAction::GetCompilerInfo(void) {
   new_args.emplace_back("-P");  // Disable preprocessor line markers.
   new_args.emplace_back("-v");
 
-  if (!specifies_language) {
+  std::string lang;
+
+  if (!specified_lang.empty()) {
     new_args.push_back("-x");
-    new_args.push_back(inferred_lang);   
+    new_args.emplace_back(specified_lang.data(), specified_lang.size());
+    lang = new_args.back();
+  
+  } else if (!inferred_lang.empty()) {
+    new_args.push_back("-x");
+    new_args.emplace_back(inferred_lang.data(), inferred_lang.size());
+    lang = new_args.back();
+  }
+
+  if (lang == "ir") {
+    return "Unsupported source language: LLVM IR";
+
+  } else if (lang == "bc") {
+    return "Unsupported source language: LLVM Bitcode";
   }
 
   // Include a non-existent file. This guarantees a fatal error in all cases,
@@ -484,8 +542,12 @@ bool BuildCommandAction::CanRunCompileJob(const pasta::CompileJob &job) const {
       continue;
     }
 
-    if (arg == "c" || arg == "c-header" ||
-        arg == "c++" || arg == "c++-header") {
+    if (arg == "c" || arg == "c-header" || arg == "cpp-output" ||
+        arg == "c-header-cpp-output" || arg == "c++" || arg == "c++-header" ||
+        arg == "c++-cpp-output" || arg == "c++-header-cpp-output" ||
+        arg == "c++-header-unit-cpp-output" ||
+        arg == "c++-header-unit-header" || arg == "c++-system-header" ||
+        arg == "c++-user-header") {
 
     } else {
       LOG(ERROR) << "Skipping compile job due to unsupported language "
@@ -781,6 +843,26 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o,
     return false;
   }
 
+  // Observed this in XNU builds.
+  if (file) {
+    auto file_str = file->str();
+    if (file_str == "/dev/null") {
+      LOG(INFO) << "Skipping command specifying file as '/dev/null'";
+      return true;  // Not an error.
+    }
+
+    if (file_str.ends_with(".S") || file_str.ends_with(".s")) {
+      LOG(INFO) << "Skipping command operating on assembly file";
+      return true;  // Not an error.
+    }
+
+    if (file_str.ends_with(".bc") || file_str.ends_with(".ll") ||
+        file_str.ends_with(".ir")) {
+      LOG(INFO) << "Skipping command operating on LLVM IR/bitcode";
+      return true;  // Not an error.
+    }
+  }
+
   auto cwd_str = cwd->str();
   if (cwd_str.empty()) {
     cwd_str = d->cwd.generic_string();
@@ -861,7 +943,9 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o,
         arg_view.contains_insensitive(".cxx") ||
         arg_view.contains_insensitive(".cpp") ||
         arg_view.contains_insensitive(".hxx") ||
-        arg_view.contains_insensitive(".hpp")) {
+        arg_view.contains_insensitive(".hpp") ||
+        arg_view.contains_insensitive(".ii") ||
+        arg_view.contains_insensitive(".iih")) {
       command->lang = pasta::TargetLanguage::kCXX;
       break;
     }

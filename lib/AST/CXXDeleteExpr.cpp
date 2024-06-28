@@ -195,7 +195,7 @@ std::optional<CXXDeleteExpr> CXXDeleteExpr::from(const TokenContext &t) {
 }
 
 bool CXXDeleteExpr::does_usual_array_delete_want_size(void) const {
-  return impl->reader.getVal84();
+  return impl->reader.getVal85();
 }
 
 Expr CXXDeleteExpr::argument(void) const {
@@ -230,15 +230,15 @@ std::optional<FunctionDecl> CXXDeleteExpr::operator_delete(void) const {
 }
 
 bool CXXDeleteExpr::is_array_form(void) const {
-  return impl->reader.getVal85();
-}
-
-bool CXXDeleteExpr::is_array_form_as_written(void) const {
   return impl->reader.getVal86();
 }
 
-bool CXXDeleteExpr::is_global_delete(void) const {
+bool CXXDeleteExpr::is_array_form_as_written(void) const {
   return impl->reader.getVal87();
+}
+
+bool CXXDeleteExpr::is_global_delete(void) const {
+  return impl->reader.getVal88();
 }
 
 #pragma GCC diagnostic pop

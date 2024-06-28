@@ -193,7 +193,7 @@ std::optional<ObjCAvailabilityCheckExpr> ObjCAvailabilityCheckExpr::from(const T
 }
 
 bool ObjCAvailabilityCheckExpr::has_version(void) const {
-  return impl->reader.getVal84();
+  return impl->reader.getVal85();
 }
 
 #pragma GCC diagnostic pop

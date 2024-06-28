@@ -564,8 +564,13 @@ std::optional<Expr> Expr::from(const TokenContext &t) {
   return std::nullopt;
 }
 
-bool Expr::has_side_effects(void) const {
-  return impl->reader.getVal12();
+std::optional<bool> Expr::has_side_effects(void) const {
+  if (!impl->reader.getVal16()) {
+    return std::nullopt;
+  } else {
+    return static_cast<bool>(impl->reader.getVal12());
+  }
+  return std::nullopt;
 }
 
 Expr Expr::ignore_casts(void) const {
@@ -637,11 +642,11 @@ Expr Expr::ignore_unless_spelled_in_source(void) const {
 }
 
 bool Expr::contains_errors(void) const {
-  return impl->reader.getVal16();
+  return impl->reader.getVal23();
 }
 
 bool Expr::contains_unexpanded_parameter_pack(void) const {
-  return impl->reader.getVal23();
+  return impl->reader.getVal24();
 }
 
 Token Expr::expression_token(void) const {
@@ -709,80 +714,80 @@ ExprValueKind Expr::value_kind(void) const {
 }
 
 bool Expr::has_non_trivial_call(void) const {
-  return impl->reader.getVal24();
-}
-
-bool Expr::is_default_argument(void) const {
   return impl->reader.getVal25();
 }
 
-bool Expr::is_gl_value(void) const {
+bool Expr::is_default_argument(void) const {
   return impl->reader.getVal57();
 }
 
-bool Expr::is_implicit_cxx_this(void) const {
+bool Expr::is_gl_value(void) const {
   return impl->reader.getVal58();
 }
 
-bool Expr::is_instantiation_dependent(void) const {
+bool Expr::is_implicit_cxx_this(void) const {
   return impl->reader.getVal59();
 }
 
-bool Expr::is_l_value(void) const {
+bool Expr::is_instantiation_dependent(void) const {
   return impl->reader.getVal70();
 }
 
-bool Expr::is_objcgc_candidate(void) const {
+bool Expr::is_l_value(void) const {
   return impl->reader.getVal71();
 }
 
-bool Expr::is_obj_c_self_expression(void) const {
+bool Expr::is_objcgc_candidate(void) const {
   return impl->reader.getVal72();
 }
 
-bool Expr::is_ordinary_or_bit_field_object(void) const {
+bool Expr::is_obj_c_self_expression(void) const {
   return impl->reader.getVal73();
 }
 
-bool Expr::is_pr_value(void) const {
+bool Expr::is_ordinary_or_bit_field_object(void) const {
   return impl->reader.getVal74();
 }
 
+bool Expr::is_pr_value(void) const {
+  return impl->reader.getVal75();
+}
+
 std::optional<bool> Expr::is_read_if_discarded_in_c_plus_plus11(void) const {
-  if (!impl->reader.getVal76()) {
+  if (!impl->reader.getVal77()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(impl->reader.getVal75());
+    return static_cast<bool>(impl->reader.getVal76());
   }
   return std::nullopt;
 }
 
 bool Expr::is_type_dependent(void) const {
-  return impl->reader.getVal77();
-}
-
-bool Expr::is_value_dependent(void) const {
   return impl->reader.getVal78();
 }
 
-bool Expr::is_x_value(void) const {
+bool Expr::is_value_dependent(void) const {
   return impl->reader.getVal79();
 }
 
-bool Expr::refers_to_bit_field(void) const {
+bool Expr::is_x_value(void) const {
   return impl->reader.getVal80();
 }
 
-bool Expr::refers_to_global_register_variable(void) const {
+bool Expr::refers_to_bit_field(void) const {
   return impl->reader.getVal81();
 }
 
-bool Expr::refers_to_matrix_element(void) const {
+bool Expr::refers_to_global_register_variable(void) const {
   return impl->reader.getVal82();
 }
 
-bool Expr::refers_to_vector_element(void) const {
+bool Expr::refers_to_matrix_element(void) const {
   return impl->reader.getVal83();
+}
+
+bool Expr::refers_to_vector_element(void) const {
+  return impl->reader.getVal84();
 }
 
 #pragma GCC diagnostic pop
