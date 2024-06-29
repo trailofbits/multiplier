@@ -221,11 +221,11 @@ Token ChooseExpr::r_paren_token(void) const {
 }
 
 bool ChooseExpr::is_condition_dependent(void) const {
-  return impl->reader.getVal85();
+  return impl->reader.getVal83();
 }
 
 bool ChooseExpr::is_condition_true(void) const {
-  return impl->reader.getVal86();
+  return impl->reader.getVal84();
 }
 
 #pragma GCC diagnostic pop

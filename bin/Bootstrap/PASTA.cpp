@@ -323,6 +323,7 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"Expr", "ClassifyLValue"},  // Calls `clang::Expr::ClassifyImpl`.
   {"Expr", "IsBoundMemberFunction"},  // Calls `clang::Expr::ClassifyImpl`.
   {"Expr", "IsModifiableLvalue"},  // Calls `clang::Expr::ClassifyImpl`.
+  {"Expr", "HasSideEffects"},  // Recursively goes into children, triggering asserts.
 
   // Internally can call all sorts of stuff, e.g. `InitListExpr::isTransparent`.
   {"Expr", "IsCXX11ConstantExpression"},

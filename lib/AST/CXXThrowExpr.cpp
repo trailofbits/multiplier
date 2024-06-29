@@ -210,7 +210,7 @@ Token CXXThrowExpr::throw_token(void) const {
 }
 
 bool CXXThrowExpr::is_thrown_variable_in_scope(void) const {
-  return impl->reader.getVal85();
+  return impl->reader.getVal83();
 }
 
 #pragma GCC diagnostic pop

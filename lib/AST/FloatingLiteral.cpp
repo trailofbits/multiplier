@@ -197,7 +197,7 @@ Token FloatingLiteral::token(void) const {
 }
 
 bool FloatingLiteral::is_exact(void) const {
-  return impl->reader.getVal85();
+  return impl->reader.getVal83();
 }
 
 #pragma GCC diagnostic pop

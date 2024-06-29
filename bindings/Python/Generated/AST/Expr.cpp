@@ -617,16 +617,6 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyGetSetDef gProperties[] = {
   {
-    "has_side_effects",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->has_side_effects());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Expr::has_side_effects"),
-    nullptr,
-  },
-  {
     "ignore_casts",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

@@ -224,31 +224,31 @@ Token MemberExpr::template_keyword_token(void) const {
 }
 
 bool MemberExpr::had_multiple_candidates(void) const {
-  return impl->reader.getVal85();
+  return impl->reader.getVal83();
 }
 
 bool MemberExpr::has_explicit_template_arguments(void) const {
-  return impl->reader.getVal86();
+  return impl->reader.getVal84();
 }
 
 bool MemberExpr::has_qualifier(void) const {
-  return impl->reader.getVal87();
+  return impl->reader.getVal85();
 }
 
 bool MemberExpr::has_template_keyword(void) const {
-  return impl->reader.getVal88();
+  return impl->reader.getVal86();
 }
 
 bool MemberExpr::is_arrow(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal87();
 }
 
 bool MemberExpr::is_implicit_access(void) const {
-  return impl->reader.getVal91();
+  return impl->reader.getVal89();
 }
 
 NonOdrUseReason MemberExpr::is_non_odr_use(void) const {
-  return static_cast<NonOdrUseReason>(impl->reader.getVal90());
+  return static_cast<NonOdrUseReason>(impl->reader.getVal88());
 }
 
 #pragma GCC diagnostic pop

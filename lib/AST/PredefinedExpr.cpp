@@ -207,7 +207,7 @@ std::optional<StringLiteral> PredefinedExpr::function_name(void) const {
 }
 
 PredefinedIdentKind PredefinedExpr::identifier_kind(void) const {
-  return static_cast<PredefinedIdentKind>(impl->reader.getVal90());
+  return static_cast<PredefinedIdentKind>(impl->reader.getVal88());
 }
 
 std::string_view PredefinedExpr::identifier_kind_name(void) const {
@@ -220,7 +220,7 @@ Token PredefinedExpr::token(void) const {
 }
 
 bool PredefinedExpr::is_transparent(void) const {
-  return impl->reader.getVal85();
+  return impl->reader.getVal83();
 }
 
 #pragma GCC diagnostic pop

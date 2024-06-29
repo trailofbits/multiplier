@@ -208,7 +208,7 @@ Expr ObjCBoxedExpr::sub_expression(void) const {
 }
 
 bool ObjCBoxedExpr::is_expressible_as_constant_initializer(void) const {
-  return impl->reader.getVal85();
+  return impl->reader.getVal83();
 }
 
 #pragma GCC diagnostic pop

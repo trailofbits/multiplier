@@ -221,7 +221,7 @@ Token CXXDefaultArgExpr::used_token(void) const {
 }
 
 bool CXXDefaultArgExpr::has_rewritten_initializer(void) const {
-  return impl->reader.getVal85();
+  return impl->reader.getVal83();
 }
 
 #pragma GCC diagnostic pop

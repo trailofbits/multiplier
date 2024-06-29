@@ -198,7 +198,7 @@ Expr CXXNoexceptExpr::operand(void) const {
 }
 
 bool CXXNoexceptExpr::value(void) const {
-  return impl->reader.getVal85();
+  return impl->reader.getVal83();
 }
 
 #pragma GCC diagnostic pop

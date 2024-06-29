@@ -203,7 +203,7 @@ Token CXXFunctionalCastExpr::r_paren_token(void) const {
 }
 
 bool CXXFunctionalCastExpr::is_list_initialization(void) const {
-  return impl->reader.getVal87();
+  return impl->reader.getVal85();
 }
 
 #pragma GCC diagnostic pop
