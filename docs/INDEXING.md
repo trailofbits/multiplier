@@ -159,6 +159,45 @@ phase.
 ## Getting `compile_commands.json`
 There are several ways to get a `compile_commands.json` file from your build.
 
+### Clang
+If you project can be cnfigured to build with Clang then you're in luck, because
+you can get Clang to collect the compile commands on your behalf with a few tricks.
+
+Suppose your normal build command is `make all` or `ninja all`. Then you will
+run it as follows:
+
+```shell
+mkdir -p /tmp/clang_compile_commands
+
+rm /tmp/clang_compile_commands/*.json
+
+CCC_OVERRIDE_OPTIONS="# +-gen-cdb-fragment-path +$/tmp/clang_compile_commands " \
+ninja all
+```
+
+What the above command does is:
+
+ - Create the directory `/tmp/compile_commands` if it doesn't yet exist
+ - Remove all JSON files from within that directory if any remain. This is an
+   optional step, and you'd want to do that if you did a `make clean` or
+   `ninja clean` step prior to running your build command.
+ - Run your build command, in this case `ninja all`, with the `CCC_OVERRIDE_OPTIONS`
+   environment variable set. This environment variable allows one to rewrite Clang
+   compile commands. In this case, the rewriting introduces the command-line
+   option `-gen-cdb-fragment-path /tmp/clang_compile_commands`. This option
+   instructs Clang to save JSON compile commands into the `/tmp/clang_compile_commands`
+   directory.
+
+Next, run the following command:
+
+```shell
+python3 /path/to/multiplier-checkout/scripts/combine_compile_commands.py /tmp/compile_commands/*.json > compile_commands.json
+```
+
+This invokes the [combine_compile_commands.py](../scripts/combine_compile_commands.py) script
+to combine the JSON files into a single file, and saves it into the current working
+directory under the name `compile_commands.json`.
+
 ### CMake
 Add the following option to your [CMake](https://cmake.org/) configuration command:
 [`-DCMAKE_EXPORT_COMPILE_COMMANDS=ON`](https://cmake.org/cmake/help/latest/variable/CMAKE_EXPORT_COMPILE_COMMANDS.html). This will save a `compile_commands.json`
