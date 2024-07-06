@@ -2109,6 +2109,7 @@ static LoaderFunc * const gHighLevelLoaders[] = {
   PythonBinding<mx::ir::hl::AnnotationAttr>::load,
   PythonBinding<mx::ir::hl::FormatAttr>::load,
   PythonBinding<mx::ir::hl::SectionAttr>::load,
+  PythonBinding<mx::ir::hl::AliasAttr>::load,
   PythonBinding<mx::ir::hl::AlignedAttr>::load,
   PythonBinding<mx::ir::hl::AlwaysInlineAttr>::load,
   PythonBinding<mx::ir::hl::NoInlineAttr>::load,

@@ -62,6 +62,16 @@ class SectionAttr(multiplier.ir.highlevel.Attribute):
   def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.SectionAttr]:
     ...
 
+class AliasAttr(multiplier.ir.highlevel.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.highlevel.AliasAttr]:
+    ...
+
 class AlignedAttr(multiplier.ir.highlevel.Attribute):
 
   @staticmethod

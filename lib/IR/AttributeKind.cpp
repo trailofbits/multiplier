@@ -83,6 +83,7 @@ const char *EnumeratorName(ir::AttributeKind kind) {
     case ir::AttributeKind::HL_ANNOTATION: return "HL_ANNOTATION";
     case ir::AttributeKind::HL_FORMAT: return "HL_FORMAT";
     case ir::AttributeKind::HL_SECTION: return "HL_SECTION";
+    case ir::AttributeKind::HL_ALIAS: return "HL_ALIAS";
     case ir::AttributeKind::HL_ALIGNED: return "HL_ALIGNED";
     case ir::AttributeKind::HL_ALWAYS_INLINE: return "HL_ALWAYS_INLINE";
     case ir::AttributeKind::HL_NO_INLINE: return "HL_NO_INLINE";
@@ -234,6 +235,7 @@ bool IsHighLevelAttributeKind(ir::AttributeKind kind) {
     case mx::ir::AttributeKind::HL_ANNOTATION:
     case mx::ir::AttributeKind::HL_FORMAT:
     case mx::ir::AttributeKind::HL_SECTION:
+    case mx::ir::AttributeKind::HL_ALIAS:
     case mx::ir::AttributeKind::HL_ALIGNED:
     case mx::ir::AttributeKind::HL_ALWAYS_INLINE:
     case mx::ir::AttributeKind::HL_NO_INLINE:

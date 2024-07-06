@@ -1911,6 +1911,7 @@ class Attribute;
 class AnnotationAttr;
 class FormatAttr;
 class SectionAttr;
+class AliasAttr;
 class AlignedAttr;
 class AlwaysInlineAttr;
 class NoInlineAttr;

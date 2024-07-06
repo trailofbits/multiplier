@@ -14,6 +14,7 @@ namespace vast::hl {
 class AnnotationAttr;
 class FormatAttr;
 class SectionAttr;
+class AliasAttr;
 class AlignedAttr;
 class AlwaysInlineAttr;
 class NoInlineAttr;
@@ -97,6 +98,21 @@ class MX_EXPORT SectionAttr final : public Attribute {
   //::mlir::StringAttr name(void) const;
 };
 static_assert(sizeof(SectionAttr) == sizeof(Attribute));
+
+class MX_EXPORT AliasAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::HL_ALIAS;
+  }
+
+  static std::optional<AliasAttr> from(const ::mx::ir::Attribute &that);
+
+  ::vast::hl::AliasAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //::mlir::StringAttr name(void) const;
+};
+static_assert(sizeof(AliasAttr) == sizeof(Attribute));
 
 class MX_EXPORT AlignedAttr final : public Attribute {
  public:
