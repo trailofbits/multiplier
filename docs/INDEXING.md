@@ -160,7 +160,7 @@ phase.
 There are several ways to get a `compile_commands.json` file from your build.
 
 ### Clang
-If you project can be cnfigured to build with Clang then you're in luck, because
+If you project can be configured to build with Clang then you're in luck, because
 you can get Clang to collect the compile commands on your behalf with a few tricks.
 
 Suppose your normal build command is `make all` or `ninja all`. Then you will
@@ -175,7 +175,7 @@ CCC_OVERRIDE_OPTIONS="# +-gen-cdb-fragment-path +$/tmp/clang_compile_commands " 
 ninja all
 ```
 
-What the above command does is:
+The above commands:
 
  - Create the directory `/tmp/compile_commands` if it doesn't yet exist
  - Remove all JSON files from within that directory if any remain. This is an
@@ -191,7 +191,7 @@ What the above command does is:
 Next, run the following command:
 
 ```shell
-python3 /path/to/multiplier-checkout/scripts/combine_compile_commands.py /tmp/compile_commands/*.json > compile_commands.json
+python3 /path/to/multiplier-checkout/scripts/combine_compile_commands.py /tmp/clang_compile_commands/*.json > compile_commands.json
 ```
 
 This invokes the [combine_compile_commands.py](../scripts/combine_compile_commands.py) script
