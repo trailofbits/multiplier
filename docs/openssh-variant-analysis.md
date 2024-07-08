@@ -1,6 +1,20 @@
-# Variant analysis of CVE-2024-6387
+# Variant analysis of regreSSHion (CVE-2024-6387)
 
-This variant analysis looks for calls to signal-unsafe functions by signal handlers.
+This variant analysis looks for calls to signal-unsafe functions by signal handlers. Note that the scope of this analysis is limited to identifying the potential of apparently reachable unsafe paths, not verifying whether reachibility conditions, nor verifying whether or not those paths are exploitable.
+
+This analysis starts with showing how to checkout and index the relevant version of the code, then how to discover the unsafe paths through the call graph manually using example tools, and finally how to use the Python API to script up a simple but generic checker for this kind of issue.
+
+* [Getting and indexing the code](#getting-and-indexing-the-code)
+  * [Configuring the build](#configuring-the-build)
+  * [Building the code](#building-the-code)
+  * [Indexing the code](#indexing-the-code)
+* [Manually finding the issue](#manually-finding-the-issue)
+  * [Finding `SIGALRM` handlers](#finding-sigalrm-handlers)
+  * [Finding paths from signal handlers to `free`](#finding-paths-from-signal-handlers-to-free)
+  * [Confirming reachability](#confirming-reachability)
+* [Automating the analysis](#automating-the-analysis)
+  * [Setting up a virtual environment](#setting-up-a-virtual-environment)
+  * [Interacting with a database](#interacting-with-a-database)
 
 ## Getting and indexing the code
 
@@ -79,7 +93,9 @@ The [description](https://www.qualys.com/2024/07/01/cve-2024-6387/regresshion.tx
 
 > The `SIGALRM` handler of this OpenSSH version calls `packet_close()`, which calls `buffer_free()`, which calls `xfree()` and hence `free()`, which is not async-signal-safe.
 
-We'll start by checking this with the test tools provided in the SDK. This is not the actual way I would recommend doing anything, as these tools are designed as examples of how to use the API, as well as functionality tests of the API -- they are not designed specifically for productivity or composition.
+We'll start by checking this with the test tools provided in the SDK. This is not the actual way I would recommend doing anything in practice, as these tools are designed as examples of how to use the API, as well as functionality tests of the API -- they are not designed specifically for productivity or composition. Later we'll use scripting to turn this into automated checker.
+
+### Finding `SIGALRM` handlers
 
 We'll start by trying to understand the specific `SIGALRM` signal. First, lets locate the entity:
 
@@ -103,9 +119,11 @@ So this says there's a function, `ssh_signal`, taking in a signal number `signum
 ![Registering sig_alarm for SIGALRM](images/openssh-variant-analysis-sigalrm-ref-1.png)
 ![Registering grace_alarm_handler for SIGALRM](images/openssh-variant-analysis-sigalrm-ref-2.png)
 
+### Finding paths from signal handlers to `free`
+
 So next we can look for paths between `sig_alarm` or `grace_alarm_handler` and a async signal unsafe function, such as `free`.
 
-First, we'll find `free`:
+Next, we'll find `free`:
 
 ```bash
 % mx-find-symbol --db /tmp/openssh.db --name free --exact
@@ -141,6 +159,8 @@ Next, lets see if we can find a path from `sig_alarm` or `grace_alarm_handler` t
 
 This creates the call graphs of `free` rooted at `sig_alarm` and `grace_alarm_handler`, respectively. The output of the `mx-print-call-graph` is a [DOT digraph](https://graphviz.org/doc/info/lang.html). There are no edges in the `sig_alarm` to `free` graph, so we'll focus on the `grace_alarm_handler` to `free` graph:
 
+### Confirming reachability
+
 ```bash
 % xdot /tmp/grace_alarm_handler_to_free.dot
 ```
@@ -152,3 +172,52 @@ With output looking like this:
 We can see that from `grace_alarm_handler`, we can reach `sshfata` via `xmalloc` or `get_sock_port`, and from there `cleanup_exit` provides paths to `free`.
 
 We have now manually confirmed the rough reachability details of the CVE, i.e. that an async-signal unsafe function can potentially be invoked by a signal handler in OpenSSH.
+
+## Automating the analysis
+
+We can automate the analysis using Multiplier's Python API.
+
+### Setting up a virtual environment
+
+If you have unpacked a [release](https://github.com/trailofbits/multiplier/releases) of Multiplier to `/path/to/multiplier`, then inspect the `lib` subdirectory to see the Python version against which the API is built:
+
+```bash
+% ls /path/to/multiplier/lib
+cmake     libLTO.so.18.1    libRemarks.so.18.1  libgap-coro.a   libmultiplier.so  python3.11
+```
+
+Above we see a `python3.11` subdirectory inside of `lib`. Next, create and enter a virtual environment using a Python interpreter with a matching version number:
+
+```bash
+% python3.11 -m venv /path/to/multiplier
+% source /path/to/multiplier/bin/activate
+(multiplier) %
+```
+
+### Interacting with a database
+
+Inside your virtual environment, open your Python interpreter and try the following:
+
+```bash
+% python
+Python 3.11 ...
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import multiplier as mx
+>>>
+```
+
+Next, we'll open a connection to the OpenSSH database. We do two things here: we open the database by its path, then we wrap that connection in an in-memory cache. In practice, you always want to wrap the connection in the cache. Having this as a separate API may seem strange or unintuitive; however, it's important to remember that the Python API is derived from the C++ API, and so this allows users of the C++ API to decide how many caches they want to have, giving them a measure of concurrency control (e.g. if there are multiple analysis threads).
+
+```python
+>>> index = mx.Index.in_memory_cache(mx.Index.from_database("/tmp/openssh.db"))
+```
+
+Lets verify that we can indeed find `SIGALRM` as before:
+
+```python
+>>> sigalrm = next(index.query_entities("SIGALRM"))
+>>> sigalrm
+<multiplier.frontend.DefineMacroDirective object at 0x104328c90>
+>>> "".join(t.data for t in sigalrm.use_tokens.file_tokens)
+'#define SIGALRM 14'
+```
