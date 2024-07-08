@@ -171,7 +171,7 @@ mkdir -p /tmp/clang_compile_commands
 
 rm /tmp/clang_compile_commands/*.json
 
-CCC_OVERRIDE_OPTIONS="# +-gen-cdb-fragment-path +$/tmp/clang_compile_commands " \
+CCC_OVERRIDE_OPTIONS="# +-gen-cdb-fragment-path +/tmp/clang_compile_commands " \
 ninja all
 ```
 
