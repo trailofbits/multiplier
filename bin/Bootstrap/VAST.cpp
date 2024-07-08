@@ -665,7 +665,38 @@ class ValueGeneratorWrapper final : public TypeWrapper {
   }
 };
 
-#define IDENTITY_WRAPPER(t) {#t, new IdentityWrapper(#t)}
+class TypeTypeWrapper final : public TypeWrapper {
+ public:
+  virtual ~TypeTypeWrapper(void) = default;
+  explicit TypeTypeWrapper(void) {}
+
+  void ReturnType(std::ostream &os, const pasta::CXXMethodDecl &) final {
+    os << "::mx::ir::Type";
+  }
+
+  virtual std::string_view MethodRefKind(void) final {
+    return "";
+  }
+
+  std::string_view CallMethod(std::ostream &os, const pasta::CXXMethodDecl &m,
+                              const std::string &indent) {
+    os << indent << "auto mlir_type = underlying_repr()." << m.Name() << "();\n";
+    return "mlir_type";
+  }
+
+  void Implementation(std::ostream &os, const pasta::CXXMethodDecl &m,
+                      const std::string &indent, std::string_view val) final {
+    os << indent << "return ::mx::ir::Type(\n"
+       << indent << "    " << val << ".getContext(),\n"
+       << indent << "    reinterpret_cast<const mlir::TypeStorage *>(\n"
+       << indent << "        " << val << ".getAsOpaquePointer()));\n";
+  }
+};
+
+#define IDENTITY_WRAPPER(t) \
+    {#t, new IdentityWrapper(#t)}, \
+    {"std::optional<" #t ">", new OptionalTypeWrapper(new IdentityWrapper(#t))}, \
+    {"::std::optional<" #t ">", new OptionalTypeWrapper(new IdentityWrapper(#t))}
 
 static std::unordered_map<std::string, TypeWrapper *> gReturnType{
   IDENTITY_WRAPPER(bool),
@@ -693,51 +724,21 @@ static std::unordered_map<std::string, TypeWrapper *> gReturnType{
   IDENTITY_WRAPPER(std::string),
   IDENTITY_WRAPPER(std::string_view),
   {"::llvm::StringRef", new StringRefWrapper},
+  {"std::optional<StringRef>", new OptionalTypeWrapper(new StringRefWrapper)},
+  {"::std::optional<StringRef>", new OptionalTypeWrapper(new StringRefWrapper)},
+  {"::std::optional<::llvm::StringRef>", new OptionalTypeWrapper(new StringRefWrapper)},
   {"::mlir::Value", new ValueWrapper},
   {"::mlir::Region&", new RegionWrapper},
+  {"::mlir::Region &", new RegionWrapper},
   {"::mlir::Block&", new BlockWrapper},
+  {"::mlir::Block &", new BlockWrapper},
+  {"::mlir::Type", new TypeTypeWrapper},
   {"::mlir::mlir::Operation::result_range", new ValueGeneratorWrapper("::mx::ir::Result")},
   {"::mlir::mlir::Operation::operand_range", new ValueGeneratorWrapper("::mx::ir::Operand")},
-  {"::std::optional<::llvm::StringRef>", new OptionalTypeWrapper(new StringRefWrapper)},
-  {"std::optional<StringRef>", new OptionalTypeWrapper(new StringRefWrapper)},
-//  {"::mlir::Attribute", "::mx::ir::Attribute"},
-//  {"::mlir::Value", "::mx::ir::Value"},
-//  {"::mlir::Type", "::mx::ir::Type"},
-//  {"::llvm::StringRef", "std::string_view"},
-//  {"std::string_view", "std::string_view"},
-//  {"std::string", "std::string_view"},
-//  {"::mlir::Region&", "::mx::ir::Region"},
-//  {"::std::optional<::mlir::Attribute>", "std::optional<::mx::ir::Attribute>"},
-//  {"::std::optional<::mlir::Value>", "std::optional<::mx::ir::Value>"},
-//  {"::std::optional<::mlir::Type>", "std::optional<::mx::ir::Type>"},
-//  {"::std::optional<::llvm::StringRef>", "std::optional<std::string_view>"},
-//  {"::std::optional<::mlir::Region>", "std::optional<::mx::ir::Region>"},
-//  {"bool", "bool"},
-//  {"short", "short"},
-//  {"int", "int"},
-//  {"unsigned", "unsigned"},
-//  {"uint8_t", "uint8_t"},
-//  {"uint16_t", "uint16_t"},
-//  {"uint32_t", "uint32_t"},
-//  {"int64_t", "uint64_t"},
-//  {"int8_t", "int8_t"},
-//  {"int16_t", "int16_t"},
-//  {"int32_t", "int32_t"},
-//  {"int64_t", "int64_t"},
-//  {"::std::optional<unsigned>", "std::optional<unsigned>"},
-//  {"::std::optional<uint8_t>", "std::optional<uint8_t>"},
-//  {"::std::optional<uint16_t>", "std::optional<uint16_t>"},
-//  {"::std::optional<uint32_t>", "std::optional<uint32_t>"},
-//  {"::std::optional<int64_t>", "std::optional<uint64_t>"},
-//  {"::std::optional<int8_t>", "std::optional<int8_t>"},
-//  {"::std::optional<int16_t>", "std::optional<int16_t>"},
-//  {"::std::optional<int32_t>", "std::optional<int32_t>"},
-//  {"::std::optional<int64_t>", "std::optional<int64_t>"},
 };
 
 void CodeGenerator::Summarize(void) {
   for (Dialect &dialect : gDialects) {
-
     for (Op &op : ops) {
       if (op.root_ns == dialect.root_ns && op.ns == dialect.ns) {
         dialect.ops.push_back(&op);
@@ -1030,6 +1031,16 @@ void CodeGenerator::RunOnOps(void) {
         << "};\n"
         << "static_assert(sizeof(Operation) == sizeof(::mx::ir::Operation));\n\n";
 
+    if (dialect.our_ns_name == "hl") {
+      hpp
+          << "class MX_EXPORT RefOp : public Operation {\n"
+          << " public:\n"
+          << "  static std::optional<RefOp> from(const ::mx::ir::Operation &);\n"
+          << "  std::optional<Symbol> referenced_symbol(void) const noexcept;\n"
+          << "};\n"
+          << "static_assert(sizeof(RefOp) == sizeof(Operation));\n\n";
+    }
+
     cpp
         << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
         << "// All rights reserved.\n"
@@ -1070,8 +1081,18 @@ void CodeGenerator::RunOnOps(void) {
       std::string snake_name = OpNameToSnakeCase(op->op_name);
       std::string enum_name = OpNameToEnumCase(op->op_name);
 
+      auto base = "Operation";
+      if (dialect.our_ns_name == "hl") {
+        if (op_name == "GlobalRefOp" ||
+            op_name == "EnumRefOp" ||
+            op_name == "FuncRefOp" ||
+            op_name == "DeclRefOp") {
+          base = "RefOp";
+        }
+      }
+
       hpp
-          << "class MX_EXPORT " << op_name << " final : public Operation {\n"
+          << "class MX_EXPORT " << op_name << " final : public " << base << " {\n"
           << " public:\n"
           << "  inline static constexpr OperationKind static_kind(void) {\n"
           << "    return OperationKind::" << enum_name
@@ -1082,7 +1103,6 @@ void CodeGenerator::RunOnOps(void) {
           << "  ::" << dialect.ns_key
           << "::" << op->name << " underlying_repr(void) const noexcept;\n\n"
           << "  // Imported methods:\n";
-
       cpp
           << "std::optional<" << op_name << "> " << op_name
           << "::from(const ::mx::ir::Operation &that) {\n"
@@ -1628,7 +1648,8 @@ void CodeGenerator::RunOnAttrs(void) {
         << "// the LICENSE file found in the root directory of this source tree.\n\n"
         << "// Auto-generated file; do not modify!\n\n"
         << "#include <multiplier/IR/" << dialect.our_dir_name.generic_string()
-        << "/Attribute.h>\n\n";
+        << "/Attribute.h>\n\n"
+        << "#include <multiplier/IR/Type.h>\n\n";
 
     std::set<std::string> seen;
     for (Attr *attr : dialect.attrs) {

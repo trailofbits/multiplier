@@ -193,7 +193,7 @@ std::optional<ExtVectorElementExpr> ExtVectorElementExpr::from(const TokenContex
 }
 
 bool ExtVectorElementExpr::contains_duplicate_elements(void) const {
-  return impl->reader.getVal84();
+  return impl->reader.getVal83();
 }
 
 Token ExtVectorElementExpr::accessor_token(void) const {
@@ -206,7 +206,7 @@ Expr ExtVectorElementExpr::base(void) const {
 }
 
 bool ExtVectorElementExpr::is_arrow(void) const {
-  return impl->reader.getVal85();
+  return impl->reader.getVal84();
 }
 
 #pragma GCC diagnostic pop

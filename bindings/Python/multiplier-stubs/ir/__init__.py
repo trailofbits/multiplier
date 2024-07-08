@@ -98,43 +98,44 @@ class AttributeKind(IntEnum):
   HL_ANNOTATION = 68
   HL_FORMAT = 69
   HL_SECTION = 70
-  HL_ALIGNED = 71
-  HL_ALWAYS_INLINE = 72
-  HL_NO_INLINE = 73
-  HL_CONST = 74
-  HL_LOADER_UNINITIALIZED = 75
-  HL_NO_INSTRUMENT_FUNCTION = 76
-  HL_PACKED = 77
-  HL_PURE = 78
-  HL_WARN_UNUSED_RESULT = 79
-  HL_RESTRICT = 80
-  HL_NO_THROW = 81
-  HL_NON_NULL = 82
-  HL_LEAF = 83
-  HL_COLD = 84
-  HL_TRANSPARENT_UNION = 85
-  HL_RETURNS_TWICE = 86
-  HL_MAY_ALIAS = 87
-  HL_AVAILABLE_ONLY_IN_DEFAULT_EVAL_METHOD = 88
-  HL_AVAILABILITY_ATTR = 89
-  HL_ASM_LABEL = 90
-  HL_MODE = 91
-  HL_BUILTIN = 92
-  HL_ALLOC_ALIGN = 93
-  HL_ALLOC_SIZE = 94
-  HL_DEPRECATED = 95
-  HL_MAX_FIELD_ALIGNMENT = 96
-  HL_CV_QUALIFIERS = 97
-  HL_UCV_QUALIFIERS = 98
-  HL_CVR_QUALIFIERS = 99
-  HL_OFFSET_OF_NODE = 100
-  CORE_BOOLEAN = 101
-  CORE_INTEGER = 102
-  CORE_FLOAT = 103
-  CORE_VOID = 104
-  CORE_SOURCE_LANGUAGE = 105
-  CORE_GLOBAL_LINKAGE_KIND = 106
-  META_IDENTIFIER = 107
+  HL_ALIAS = 71
+  HL_ALIGNED = 72
+  HL_ALWAYS_INLINE = 73
+  HL_NO_INLINE = 74
+  HL_CONST = 75
+  HL_LOADER_UNINITIALIZED = 76
+  HL_NO_INSTRUMENT_FUNCTION = 77
+  HL_PACKED = 78
+  HL_PURE = 79
+  HL_WARN_UNUSED_RESULT = 80
+  HL_RESTRICT = 81
+  HL_NO_THROW = 82
+  HL_NON_NULL = 83
+  HL_LEAF = 84
+  HL_COLD = 85
+  HL_TRANSPARENT_UNION = 86
+  HL_RETURNS_TWICE = 87
+  HL_MAY_ALIAS = 88
+  HL_AVAILABLE_ONLY_IN_DEFAULT_EVAL_METHOD = 89
+  HL_AVAILABILITY_ATTR = 90
+  HL_ASM_LABEL = 91
+  HL_MODE = 92
+  HL_BUILTIN = 93
+  HL_ALLOC_ALIGN = 94
+  HL_ALLOC_SIZE = 95
+  HL_DEPRECATED = 96
+  HL_MAX_FIELD_ALIGNMENT = 97
+  HL_CV_QUALIFIERS = 98
+  HL_UCV_QUALIFIERS = 99
+  HL_CVR_QUALIFIERS = 100
+  HL_OFFSET_OF_NODE = 101
+  CORE_BOOLEAN = 102
+  CORE_INTEGER = 103
+  CORE_FLOAT = 104
+  CORE_VOID = 105
+  CORE_SOURCE_LANGUAGE = 106
+  CORE_GLOBAL_LINKAGE_KIND = 107
+  META_IDENTIFIER = 108
 
 class ValueKind(IntEnum):
   OPERATION_RESULT = 0
@@ -653,8 +654,9 @@ class TypeKind(IntEnum):
   HL_REFERENCE = 62
   HL_TYPE_OF_EXPR = 63
   HL_TYPE_OF_TYPE = 64
-  CORE_FUNCTION = 65
-  UNSUP_UNSUPPORTED = 66
+  HL_ATOMIC = 65
+  CORE_FUNCTION = 66
+  UNSUP_UNSUPPORTED = 67
 
 class Attribute(object):
   kind: multiplier.ir.AttributeKind
@@ -729,6 +731,10 @@ class Operation(multiplier.Entity):
   only_region: Optional[multiplier.ir.Region]
   only_region_blocks: Iterable[multiplier.ir.Block]
   uses: Iterable[multiplier.ir.Operand]
+  previous: Optional[multiplier.ir.Operation]
+  next: Optional[multiplier.ir.Operation]
+  is_terminator: bool
+  defined_symbol: Optional[multiplier.ir.Symbol]
 
   @staticmethod
   def classify(arg_0: str) -> multiplier.ir.OperationKind:
@@ -784,6 +790,10 @@ class Operation(multiplier.Entity):
   def all_from(that: multiplier.ast.Stmt) -> Iterable[multiplier.ir.Operation]:
     ...
 
+  @staticmethod
+  def defining(symbol: multiplier.ir.Symbol) -> multiplier.ir.Operation:
+    ...
+
   def nth_operand(self, arg_0: int) -> Optional[multiplier.ir.Operand]:
     ...
 
@@ -797,6 +807,15 @@ class Operand(object):
   operation: multiplier.ir.Operation
   index: int
   value: multiplier.ir.Value
+
+class Symbol(object):
+  operation: multiplier.ir.Operation
+  name: str
+  references: Iterable[multiplier.ir.Operation]
+
+  @staticmethod
+  def FROM(arg_0: multiplier.ir.Operation) -> Optional[multiplier.ir.Symbol]:
+    ...
 
 class Region(object):
   num_blocks: int

@@ -8,6 +8,8 @@
 
 #include <multiplier/IR/LLVM/Attribute.h>
 
+#include <multiplier/IR/Type.h>
+
 #include <mlir/Dialect/LLVMIR/LLVMDialect.h>
 
 namespace mx::ir::llvm {

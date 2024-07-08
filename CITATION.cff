@@ -1,0 +1,51 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: Multiplier
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Peter
+    family-names: Goodman
+    email: peter.goodman@gmail.com
+    affiliation: Trail of Bits
+  - given-names: Akshay
+    family-names: Kumar
+    email: iit.akshay@gmail.com
+    affiliation: Trail of Bits
+repository-code: 'https://github.com/trailofbits/multiplier'
+abstract: >-
+  Multiplier provides precise and comprehensive code
+  understanding capabilities. It does so by saving build
+  artifacts into a database, and then making them
+  persistently accessible using a C++ or Python API.
+
+
+  Multiplier emphasizes the ability to unique identify all
+  entities in a build process, including individual tokens,
+  AST nodes, and intermediate representations. With
+  Multiplier, an analyst can identify code patterns of
+  interest over one of the representations, and then
+  accurately relay results back to humans in a readable
+  form, or to follow-on scripts via entity IDs.
+
+
+  Multiplier's APIs are extensive, and often provide as-good
+  or better-than compiler-level quality information, but
+  linked at a whole-program granularity. We like to say that
+  with its APIs, you can get everywhere from anywhere.
+keywords:
+  - c
+  - c++
+  - clang
+  - compiler
+  - index
+  - analysis
+  - intermediate representation
+  - ast
+  - abstract syntax tree
+  - parsing
+license: Apache-2.0

@@ -8,6 +8,8 @@
 
 #include <multiplier/IR/Builtin/Attribute.h>
 
+#include <multiplier/IR/Type.h>
+
 #include <mlir/Dialect/LLVMIR/LLVMDialect.h>
 #include <mlir/Dialect/MemRef/IR/MemRef.h>
 
@@ -28,6 +30,14 @@ std::optional<TypedAttr> TypedAttr::from(const ::mx::ir::Attribute &that) {
 
 ::mlir::TypedAttr TypedAttr::underlying_repr(void) const noexcept {
   return ::mlir::TypedAttr(this->::mx::ir::Attribute::attr_);
+}
+
+::mx::ir::Type TypedAttr::type(void) const {
+  auto mlir_type = underlying_repr().getType();
+  return ::mx::ir::Type(
+      mlir_type.getContext(),
+      reinterpret_cast<const mlir::TypeStorage *>(
+          mlir_type.getAsOpaquePointer()));
 }
 
 std::optional<ElementsAttr> ElementsAttr::from(const ::mx::ir::Attribute &that) {
@@ -59,6 +69,14 @@ int64_t ElementsAttr::size(void) const {
 bool ElementsAttr::empty(void) const {
   auto val = underlying_repr().empty();
   return val;
+}
+
+::mx::ir::Type ElementsAttr::type(void) const {
+  auto mlir_type = underlying_repr().getType();
+  return ::mx::ir::Type(
+      mlir_type.getContext(),
+      reinterpret_cast<const mlir::TypeStorage *>(
+          mlir_type.getAsOpaquePointer()));
 }
 
 std::optional<AffineMapAttr> AffineMapAttr::from(const ::mx::ir::Attribute &that) {
@@ -174,6 +192,14 @@ double FloatAttr::value_as_double(void) const {
   return val;
 }
 
+::mx::ir::Type FloatAttr::type(void) const {
+  auto mlir_type = underlying_repr().getType();
+  return ::mx::ir::Type(
+      mlir_type.getContext(),
+      reinterpret_cast<const mlir::TypeStorage *>(
+          mlir_type.getAsOpaquePointer()));
+}
+
 std::optional<IntegerAttr> IntegerAttr::from(const ::mx::ir::Attribute &that) {
   if (that.kind() == AttributeKind::BUILTIN_INTEGER) {
     return reinterpret_cast<const IntegerAttr &>(that);
@@ -198,6 +224,14 @@ int64_t IntegerAttr::s_int(void) const {
 uint64_t IntegerAttr::u_int(void) const {
   auto val = underlying_repr().getUInt();
   return val;
+}
+
+::mx::ir::Type IntegerAttr::type(void) const {
+  auto mlir_type = underlying_repr().getType();
+  return ::mx::ir::Type(
+      mlir_type.getContext(),
+      reinterpret_cast<const mlir::TypeStorage *>(
+          mlir_type.getAsOpaquePointer()));
 }
 
 std::optional<IntegerSetAttr> IntegerSetAttr::from(const ::mx::ir::Attribute &that) {
@@ -229,6 +263,14 @@ std::string_view OpaqueAttr::attr_data(void) const {
   } else {
     return {};
   }
+}
+
+::mx::ir::Type OpaqueAttr::type(void) const {
+  auto mlir_type = underlying_repr().getType();
+  return ::mx::ir::Type(
+      mlir_type.getContext(),
+      reinterpret_cast<const mlir::TypeStorage *>(
+          mlir_type.getAsOpaquePointer()));
 }
 
 std::optional<SparseElementsAttr> SparseElementsAttr::from(const ::mx::ir::Attribute &that) {
@@ -286,6 +328,14 @@ std::string_view StringAttr::value(void) const {
   } else {
     return {};
   }
+}
+
+::mx::ir::Type StringAttr::type(void) const {
+  auto mlir_type = underlying_repr().getType();
+  return ::mx::ir::Type(
+      mlir_type.getContext(),
+      reinterpret_cast<const mlir::TypeStorage *>(
+          mlir_type.getAsOpaquePointer()));
 }
 
 std::optional<SymbolRefAttr> SymbolRefAttr::from(const ::mx::ir::Attribute &that) {

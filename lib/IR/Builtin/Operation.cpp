@@ -44,6 +44,37 @@ std::optional<ModuleOp> ModuleOp::producing(const ::mx::ir::Value &that) {
   return ::mlir::ModuleOp(this->::mx::ir::Operation::op_);
 }
 
+::mx::ir::Region ModuleOp::body_region(void) const {
+  auto &val = underlying_repr().getBodyRegion();
+  return ::mx::ir::Region(module_, val);
+}
+
+std::optional<std::string_view> ModuleOp::sym_name(void) const {
+  auto opt_val = underlying_repr().getSymName();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
+std::optional<std::string_view> ModuleOp::sym_visibility(void) const {
+  auto opt_val = underlying_repr().getSymVisibility();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
 std::optional<std::string_view> ModuleOp::name(void) const {
   auto opt_val = underlying_repr().getName();
   if (!opt_val) {

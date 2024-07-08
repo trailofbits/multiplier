@@ -37,7 +37,7 @@ class MX_EXPORT BooleanAttr final : public Attribute {
   ::vast::core::BooleanAttr underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Type type(void) const;
+  ::mx::ir::Type type(void) const;
   bool value(void) const;
 };
 static_assert(sizeof(BooleanAttr) == sizeof(Attribute));
@@ -53,7 +53,7 @@ class MX_EXPORT IntegerAttr final : public Attribute {
   ::vast::core::IntegerAttr underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Type type(void) const;
+  ::mx::ir::Type type(void) const;
   //::llvm::APSInt value(void) const;
 };
 static_assert(sizeof(IntegerAttr) == sizeof(Attribute));
@@ -69,7 +69,7 @@ class MX_EXPORT FloatAttr final : public Attribute {
   ::vast::core::FloatAttr underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Type type(void) const;
+  ::mx::ir::Type type(void) const;
   //::llvm::APFloat value(void) const;
 };
 static_assert(sizeof(FloatAttr) == sizeof(Attribute));
@@ -85,7 +85,7 @@ class MX_EXPORT VoidAttr final : public Attribute {
   ::vast::core::VoidAttr underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Type type(void) const;
+  ::mx::ir::Type type(void) const;
 };
 static_assert(sizeof(VoidAttr) == sizeof(Attribute));
 

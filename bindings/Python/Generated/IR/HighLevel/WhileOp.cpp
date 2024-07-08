@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1375]) || tp >= &(gTypes[1376])) {
+  if (tp < &(gTypes[1377]) || tp >= &(gTypes[1378])) {
     return std::nullopt;
   }
 
@@ -90,7 +90,7 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::ir::hl::WhileOp::static_kind():
-      tp = &(gTypes[1375]);
+      tp = &(gTypes[1377]);
       break;
 
   }
@@ -124,6 +124,26 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
 namespace {
 static PyGetSetDef gProperties[] = {
+  {
+    "cond_region",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->cond_region());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::hl::WhileOp::cond_region"),
+    nullptr,
+  },
+  {
+    "body_region",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->body_region());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::hl::WhileOp::body_region"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace
@@ -196,7 +216,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1375]);
+  PyTypeObject * const tp = &(gTypes[1377]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -211,12 +231,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[1302].tp_hash;
-  tp->tp_richcompare = gTypes[1302].tp_richcompare;
+  tp->tp_hash = gTypes[1303].tp_hash;
+  tp->tp_richcompare = gTypes[1303].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[1302]);
+  tp->tp_base = &(gTypes[1303]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

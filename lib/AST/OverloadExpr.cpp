@@ -260,11 +260,11 @@ Token OverloadExpr::template_keyword_token(void) const {
 }
 
 bool OverloadExpr::has_explicit_template_arguments(void) const {
-  return impl->reader.getVal84();
+  return impl->reader.getVal83();
 }
 
 bool OverloadExpr::has_template_keyword(void) const {
-  return impl->reader.getVal85();
+  return impl->reader.getVal84();
 }
 
 #pragma GCC diagnostic pop

@@ -43,6 +43,7 @@ We like to say that with its APIs, *you can get everywhere from anywhere*.
   * [List all indexed variables](docs/mx-list-variables.md)
   * [Search the code with regular expressions](docs/mx-regex-query.md)
 * Writeups
+  * [regreSSHion OpenSSH variant analysis](docs/openssh-variant-analysis.md)
   * [PHP variant analysis](docs/php-variant-analysis.md)
 
 # License

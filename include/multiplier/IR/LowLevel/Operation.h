@@ -194,7 +194,7 @@ class MX_EXPORT InlineScopeOp final : public Operation {
   ::vast::ll::InlineScope underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Region & body(void) const;
+  ::mx::ir::Region body(void) const;
 };
 static_assert(sizeof(InlineScopeOp) == sizeof(Operation));
 
@@ -227,11 +227,11 @@ class MX_EXPORT FuncOp final : public Operation {
   ::vast::ll::FuncOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Region & body(void) const;
+  ::mx::ir::Region body(void) const;
   std::string_view sym_name(void) const;
   //::vast::core::FunctionType function_type(void) const;
   //::vast::core::GlobalLinkageKind linkage(void) const;
-  //::std::optional<StringRef> sym_visibility(void) const;
+  std::optional<std::string_view> sym_visibility(void) const;
   //::std::optional<ArrayAttr> arg_attrs(void) const;
   //::std::optional<ArrayAttr> res_attrs(void) const;
   bool is_var_arg(void) const;
@@ -292,7 +292,7 @@ class MX_EXPORT ScopeOp final : public Operation {
   ::vast::ll::Scope underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Region & body(void) const;
+  ::mx::ir::Region body(void) const;
   //mlir::Block * start__block(void) const;
 };
 static_assert(sizeof(ScopeOp) == sizeof(Operation));

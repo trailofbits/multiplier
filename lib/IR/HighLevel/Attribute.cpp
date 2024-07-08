@@ -8,6 +8,8 @@
 
 #include <multiplier/IR/HighLevel/Attribute.h>
 
+#include <multiplier/IR/Type.h>
+
 #include <mlir/Dialect/LLVMIR/LLVMDialect.h>
 #include <vast/Dialect/Dialects.hpp>
 #include <vast/Dialect/ABI/ABIOps.hpp>
@@ -51,6 +53,17 @@ std::optional<SectionAttr> SectionAttr::from(const ::mx::ir::Attribute &that) {
 
 ::vast::hl::SectionAttr SectionAttr::underlying_repr(void) const noexcept {
   return ::vast::hl::SectionAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<AliasAttr> AliasAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::HL_ALIAS) {
+    return reinterpret_cast<const AliasAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::vast::hl::AliasAttr AliasAttr::underlying_repr(void) const noexcept {
+  return ::vast::hl::AliasAttr(this->::mx::ir::Attribute::attr_);
 }
 
 std::optional<AlignedAttr> AlignedAttr::from(const ::mx::ir::Attribute &that) {

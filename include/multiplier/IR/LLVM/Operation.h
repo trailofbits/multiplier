@@ -353,8 +353,8 @@ class MX_EXPORT AllocaOp final : public Operation {
   // Imported methods:
   //::mlir::TypedValue<IntegerType> array_size(void) const;
   //::mlir::TypedValue<LLVMPointerType> res(void) const;
-  //::std::optional<unsigned long long> alignment(void) const;
-  //::mlir::Type elem_type(void) const;
+  std::optional<unsigned long long> alignment(void) const;
+  ::mx::ir::Type elem_type(void) const;
   bool inalloca(void) const;
   //::llvm::SmallVector<MemorySlot, 3> promotable_slots(void) const;
   //::llvm::SmallVector<DestructurableMemorySlot, 1> destructurable_slots(void) const;
@@ -398,8 +398,8 @@ class MX_EXPORT AtomicCmpXchgOp final : public Operation {
   ::mx::ir::Value res(void) const;
   //::mlir::LLVM::AtomicOrdering success_ordering(void) const;
   //::mlir::LLVM::AtomicOrdering failure_ordering(void) const;
-  //::std::optional<StringRef> syncscope(void) const;
-  //::std::optional<unsigned long long> alignment(void) const;
+  std::optional<std::string_view> syncscope(void) const;
+  std::optional<unsigned long long> alignment(void) const;
   bool weak(void) const;
   bool volatile__(void) const;
   //::std::optional<ArrayAttr> access_groups(void) const;
@@ -427,8 +427,8 @@ class MX_EXPORT AtomicRMWOp final : public Operation {
   ::mx::ir::Value res(void) const;
   //::mlir::LLVM::AtomicBinOp bin_op(void) const;
   //::mlir::LLVM::AtomicOrdering ordering(void) const;
-  //::std::optional<StringRef> syncscope(void) const;
-  //::std::optional<unsigned long long> alignment(void) const;
+  std::optional<std::string_view> syncscope(void) const;
+  std::optional<unsigned long long> alignment(void) const;
   bool volatile__(void) const;
   //::std::optional<ArrayAttr> access_groups(void) const;
   //::std::optional<ArrayAttr> alias_scopes(void) const;
@@ -507,7 +507,7 @@ class MX_EXPORT CallOp final : public Operation {
   //::mlir::Operation::operand_range callee_operands(void) const;
   ::mx::ir::Value result(void) const;
   //::std::optional<LLVMFunctionType> callee_type(void) const;
-  //::std::optional<StringRef> callee(void) const;
+  std::optional<std::string_view> callee(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
   //::std::optional<ArrayRef<int>> branch_weights(void) const;
   //::mlir::LLVM::cconv::CConv c_conv(void) const;
@@ -534,7 +534,7 @@ class MX_EXPORT ComdatOp final : public Operation {
   ::mlir::LLVM::ComdatOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Region & body(void) const;
+  ::mx::ir::Region body(void) const;
   std::string_view sym_name(void) const;
 };
 static_assert(sizeof(ComdatOp) == sizeof(Operation));
@@ -845,7 +845,7 @@ class MX_EXPORT FenceOp final : public Operation {
 
   // Imported methods:
   //::mlir::LLVM::AtomicOrdering ordering(void) const;
-  //::std::optional<StringRef> syncscope(void) const;
+  std::optional<std::string_view> syncscope(void) const;
 };
 static_assert(sizeof(FenceOp) == sizeof(Operation));
 
@@ -882,7 +882,7 @@ class MX_EXPORT GetElementPtrOp final : public Operation {
   //::mlir::Operation::operand_range dynamic_indices(void) const;
   ::mx::ir::Value res(void) const;
   //::llvm::ArrayRef<int> raw_constant_indices(void) const;
-  //::mlir::Type elem_type(void) const;
+  ::mx::ir::Type elem_type(void) const;
   bool inbounds(void) const;
   //Type result_ptr_element_type(void) const;
   //GEPIndicesAdaptor<ValueRange> indices(void) const;
@@ -935,18 +935,18 @@ class MX_EXPORT GlobalOp final : public Operation {
   ::mlir::LLVM::GlobalOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Region & initializer(void) const;
-  //::mlir::Type global_type(void) const;
+  ::mx::ir::Region initializer(void) const;
+  ::mx::ir::Type global_type(void) const;
   bool constant(void) const;
   std::string_view sym_name(void) const;
   //::mlir::LLVM::Linkage linkage(void) const;
   bool dso_local(void) const;
   bool thread_local__(void) const;
   //::std::optional<Attribute> value(void) const;
-  //::std::optional<unsigned long long> alignment(void) const;
+  std::optional<unsigned long long> alignment(void) const;
   uint32_t addr_space(void) const;
   //::std::optional<UnnamedAddr> unnamed_addr(void) const;
-  //::std::optional<StringRef> section(void) const;
+  std::optional<std::string_view> section(void) const;
   //::std::optional<SymbolRefAttr> comdat(void) const;
   //::mlir::LLVM::DIGlobalVariableExpressionAttr dbg_expr(void) const;
   //::mlir::LLVM::Visibility visibility__(void) const;
@@ -1072,7 +1072,7 @@ class MX_EXPORT InvokeOp final : public Operation {
   //::mlir::Block * normal_dest(void) const;
   //::mlir::Block * unwind_dest(void) const;
   //::std::optional<LLVMFunctionType> callee_type(void) const;
-  //::std::optional<StringRef> callee(void) const;
+  std::optional<std::string_view> callee(void) const;
   //::std::optional<ArrayRef<int>> branch_weights(void) const;
   //::mlir::LLVM::cconv::CConv c_conv(void) const;
   //::mlir::CallInterfaceCallable callable_for_callee(void) const;
@@ -1093,34 +1093,34 @@ class MX_EXPORT FuncOp final : public Operation {
   ::mlir::LLVM::LLVMFuncOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Region & body(void) const;
+  ::mx::ir::Region body(void) const;
   std::string_view sym_name(void) const;
-  //::std::optional<StringRef> sym_visibility(void) const;
+  std::optional<std::string_view> sym_visibility(void) const;
   //::mlir::LLVM::LLVMFunctionType function_type(void) const;
   //::mlir::LLVM::Linkage linkage(void) const;
   bool dso_local(void) const;
   //::mlir::LLVM::cconv::CConv c_conv(void) const;
   //::std::optional<SymbolRefAttr> comdat(void) const;
-  //::std::optional<StringRef> personality(void) const;
-  //::std::optional<StringRef> garbage_collector(void) const;
+  std::optional<std::string_view> personality(void) const;
+  std::optional<std::string_view> garbage_collector(void) const;
   //::std::optional<ArrayAttr> passthrough(void) const;
   //::std::optional<ArrayAttr> arg_attrs(void) const;
   //::std::optional<ArrayAttr> res_attrs(void) const;
-  //::std::optional<unsigned long long> function_entry_count(void) const;
+  std::optional<unsigned long long> function_entry_count(void) const;
   //::std::optional<MemoryEffectsAttr> memory(void) const;
   //::mlir::LLVM::Visibility visibility__(void) const;
-  //::std::optional<bool> arm_streaming(void) const;
-  //::std::optional<bool> arm_locally_streaming(void) const;
-  //::std::optional<bool> arm_streaming_compatible(void) const;
-  //::std::optional<bool> arm_new_za(void) const;
-  //::std::optional<bool> arm_preserves_za(void) const;
-  //::std::optional<bool> arm_shared_za(void) const;
-  //::std::optional<StringRef> section(void) const;
+  std::optional<bool> arm_streaming(void) const;
+  std::optional<bool> arm_locally_streaming(void) const;
+  std::optional<bool> arm_streaming_compatible(void) const;
+  std::optional<bool> arm_new_za(void) const;
+  std::optional<bool> arm_preserves_za(void) const;
+  std::optional<bool> arm_shared_za(void) const;
+  std::optional<std::string_view> section(void) const;
   //::std::optional<UnnamedAddr> unnamed_addr(void) const;
-  //::std::optional<unsigned long long> alignment(void) const;
+  std::optional<unsigned long long> alignment(void) const;
   //::std::optional<VScaleRangeAttr> vscale_range(void) const;
   //::std::optional<FramePointerKindAttr> frame_pointer(void) const;
-  //::std::optional<StringRef> target_cpu(void) const;
+  std::optional<std::string_view> target_cpu(void) const;
   //::std::optional<TargetFeaturesAttr> target_features(void) const;
   //Block * add_entry_block(void) const;
   bool is_var_arg(void) const;
@@ -1195,12 +1195,12 @@ class MX_EXPORT LoadOp final : public Operation {
   // Imported methods:
   //::mlir::TypedValue<LLVMPointerType> addr(void) const;
   ::mx::ir::Value res(void) const;
-  //::std::optional<unsigned long long> alignment(void) const;
+  std::optional<unsigned long long> alignment(void) const;
   bool volatile__(void) const;
   bool nontemporal(void) const;
   bool invariant(void) const;
   //::mlir::LLVM::AtomicOrdering ordering(void) const;
-  //::std::optional<StringRef> syncscope(void) const;
+  std::optional<std::string_view> syncscope(void) const;
   //::std::optional<ArrayAttr> access_groups(void) const;
   //::std::optional<ArrayAttr> alias_scopes(void) const;
   //::std::optional<ArrayAttr> noalias_scopes(void) const;
@@ -1469,11 +1469,11 @@ class MX_EXPORT StoreOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value value(void) const;
   //::mlir::TypedValue<LLVMPointerType> addr(void) const;
-  //::std::optional<unsigned long long> alignment(void) const;
+  std::optional<unsigned long long> alignment(void) const;
   bool volatile__(void) const;
   bool nontemporal(void) const;
   //::mlir::LLVM::AtomicOrdering ordering(void) const;
-  //::std::optional<StringRef> syncscope(void) const;
+  std::optional<std::string_view> syncscope(void) const;
   //::std::optional<ArrayAttr> access_groups(void) const;
   //::std::optional<ArrayAttr> alias_scopes(void) const;
   //::std::optional<ArrayAttr> noalias_scopes(void) const;

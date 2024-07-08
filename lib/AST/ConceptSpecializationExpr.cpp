@@ -250,7 +250,7 @@ Token ConceptSpecializationExpr::template_keyword_token(void) const {
 }
 
 bool ConceptSpecializationExpr::has_explicit_template_arguments(void) const {
-  return impl->reader.getVal84();
+  return impl->reader.getVal83();
 }
 
 #pragma GCC diagnostic pop

@@ -212,7 +212,7 @@ Expr MatrixSubscriptExpr::row_index(void) const {
 }
 
 bool MatrixSubscriptExpr::is_incomplete(void) const {
-  return impl->reader.getVal84();
+  return impl->reader.getVal83();
 }
 
 #pragma GCC diagnostic pop

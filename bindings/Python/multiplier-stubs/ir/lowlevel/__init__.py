@@ -155,6 +155,7 @@ class InitializeVarOp(multiplier.ir.lowlevel.Operation):
     ...
 
 class InlineScopeOp(multiplier.ir.lowlevel.Operation):
+  body: multiplier.ir.Region
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -184,7 +185,9 @@ class LoadOp(multiplier.ir.lowlevel.Operation):
     ...
 
 class FuncOp(multiplier.ir.lowlevel.Operation):
+  body: multiplier.ir.Region
   sym_name: str
+  sym_visibility: Optional[str]
   is_var_arg: bool
   is_declaration: bool
 
@@ -233,6 +236,7 @@ class ReturnOp(multiplier.ir.lowlevel.Operation):
     ...
 
 class ScopeOp(multiplier.ir.lowlevel.Operation):
+  body: multiplier.ir.Region
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:

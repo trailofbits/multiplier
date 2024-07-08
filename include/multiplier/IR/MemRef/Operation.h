@@ -137,7 +137,7 @@ class MX_EXPORT GenericAtomicRMWOp final : public Operation {
   //::mlir::TypedValue<MemRefType> memref(void) const;
   //::mlir::Operation::operand_range indices(void) const;
   ::mx::ir::Value result(void) const;
-  //::mlir::Region & atomic_body(void) const;
+  ::mx::ir::Region atomic_body(void) const;
   //Region & body(void) const;
   //Value current_value(void) const;
   //MemRefType mem_ref_type(void) const;
@@ -180,7 +180,7 @@ class MX_EXPORT AllocOp final : public Operation {
   //::mlir::Operation::operand_range dynamic_sizes(void) const;
   //::mlir::Operation::operand_range symbol_operands(void) const;
   //::mlir::TypedValue<MemRefType> memref(void) const;
-  //::std::optional<unsigned long long> alignment(void) const;
+  std::optional<unsigned long long> alignment(void) const;
   //StringRef alignment_attr_str_name(void) const;
   //MemRefType type(void) const;
   //SmallVector<OpFoldResult, 6> mixed_sizes(void) const;
@@ -202,7 +202,7 @@ class MX_EXPORT AllocaOp final : public Operation {
   //::mlir::Operation::operand_range dynamic_sizes(void) const;
   //::mlir::Operation::operand_range symbol_operands(void) const;
   //::mlir::TypedValue<MemRefType> memref(void) const;
-  //::std::optional<unsigned long long> alignment(void) const;
+  std::optional<unsigned long long> alignment(void) const;
   //::llvm::SmallVector<MemorySlot, 3> promotable_slots(void) const;
   //::llvm::SmallVector<DestructurableMemorySlot, 1> destructurable_slots(void) const;
   //StringRef alignment_attr_str_name(void) const;
@@ -224,7 +224,7 @@ class MX_EXPORT AllocaScopeOp final : public Operation {
 
   // Imported methods:
   //::mlir::Operation::result_range results(void) const;
-  //::mlir::Region & body_region(void) const;
+  ::mx::ir::Region body_region(void) const;
 };
 static_assert(sizeof(AllocaScopeOp) == sizeof(Operation));
 
@@ -317,7 +317,7 @@ class MX_EXPORT DimOp final : public Operation {
   ::mx::ir::Value source(void) const;
   //::mlir::TypedValue<IndexType> index(void) const;
   //::mlir::TypedValue<IndexType> result(void) const;
-  //std::optional<long long> constant_index(void) const;
+  std::optional<long long> constant_index(void) const;
   //Value shaped_value(void) const;
   //OpFoldResult dimension(void) const;
   //Speculation::Speculatability speculatability(void) const;
@@ -472,11 +472,11 @@ class MX_EXPORT GlobalOp final : public Operation {
 
   // Imported methods:
   std::string_view sym_name(void) const;
-  //::std::optional<StringRef> sym_visibility(void) const;
+  std::optional<std::string_view> sym_visibility(void) const;
   //::mlir::MemRefType type(void) const;
   //::std::optional<Attribute> initial_value(void) const;
   bool constant(void) const;
-  //::std::optional<unsigned long long> alignment(void) const;
+  std::optional<unsigned long long> alignment(void) const;
   bool is_external(void) const;
   bool is_uninitialized(void) const;
   //ElementsAttr constant_init_value(void) const;
@@ -555,7 +555,7 @@ class MX_EXPORT ReallocOp final : public Operation {
   // Imported methods:
   //::mlir::TypedValue<MemRefType> source(void) const;
   //::mlir::TypedValue<IndexType> dynamic_result_size(void) const;
-  //::std::optional<unsigned long long> alignment(void) const;
+  std::optional<unsigned long long> alignment(void) const;
   //MemRefType type(void) const;
 };
 static_assert(sizeof(ReallocOp) == sizeof(Operation));

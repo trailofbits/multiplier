@@ -592,6 +592,8 @@ class AddressOfOp(multiplier.ir.llvm.Operation):
     ...
 
 class AllocaOp(multiplier.ir.llvm.Operation):
+  alignment: Optional[int]
+  elem_type: multiplier.ir.Type
   inalloca: bool
 
   @staticmethod
@@ -627,6 +629,8 @@ class AtomicCmpXchgOp(multiplier.ir.llvm.Operation):
   cmp: multiplier.ir.Value
   val: multiplier.ir.Value
   res: multiplier.ir.Value
+  syncscope: Optional[str]
+  alignment: Optional[int]
   weak: bool
   volatile__: bool
 
@@ -645,6 +649,8 @@ class AtomicCmpXchgOp(multiplier.ir.llvm.Operation):
 class AtomicRMWOp(multiplier.ir.llvm.Operation):
   val: multiplier.ir.Value
   res: multiplier.ir.Value
+  syncscope: Optional[str]
+  alignment: Optional[int]
   volatile__: bool
 
   @staticmethod
@@ -707,6 +713,7 @@ class CallIntrinsicOp(multiplier.ir.llvm.Operation):
 
 class CallOp(multiplier.ir.llvm.Operation):
   result: multiplier.ir.Value
+  callee: Optional[str]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -721,6 +728,7 @@ class CallOp(multiplier.ir.llvm.Operation):
     ...
 
 class ComdatOp(multiplier.ir.llvm.Operation):
+  body: multiplier.ir.Region
   sym_name: str
 
   @staticmethod
@@ -994,6 +1002,7 @@ class FSubOp(multiplier.ir.llvm.Operation):
     ...
 
 class FenceOp(multiplier.ir.llvm.Operation):
+  syncscope: Optional[str]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1026,6 +1035,7 @@ class FreezeOp(multiplier.ir.llvm.Operation):
 class GetElementPtrOp(multiplier.ir.llvm.Operation):
   base: multiplier.ir.Value
   res: multiplier.ir.Value
+  elem_type: multiplier.ir.Type
   inbounds: bool
 
   @staticmethod
@@ -1069,11 +1079,15 @@ class GlobalDtorsOp(multiplier.ir.llvm.Operation):
     ...
 
 class GlobalOp(multiplier.ir.llvm.Operation):
+  initializer: multiplier.ir.Region
+  global_type: multiplier.ir.Type
   constant: bool
   sym_name: str
   dso_local: bool
   thread_local__: bool
+  alignment: Optional[int]
   addr_space: int
+  section: Optional[str]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1174,6 +1188,7 @@ class IntToPtrOp(multiplier.ir.llvm.Operation):
     ...
 
 class InvokeOp(multiplier.ir.llvm.Operation):
+  callee: Optional[str]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1188,8 +1203,22 @@ class InvokeOp(multiplier.ir.llvm.Operation):
     ...
 
 class FuncOp(multiplier.ir.llvm.Operation):
+  body: multiplier.ir.Region
   sym_name: str
+  sym_visibility: Optional[str]
   dso_local: bool
+  personality: Optional[str]
+  garbage_collector: Optional[str]
+  function_entry_count: Optional[int]
+  arm_streaming: Optional[bool]
+  arm_locally_streaming: Optional[bool]
+  arm_streaming_compatible: Optional[bool]
+  arm_new_za: Optional[bool]
+  arm_preserves_za: Optional[bool]
+  arm_shared_za: Optional[bool]
+  section: Optional[str]
+  alignment: Optional[int]
+  target_cpu: Optional[str]
   is_var_arg: bool
 
   @staticmethod
@@ -1253,9 +1282,11 @@ class LinkerOptionsOp(multiplier.ir.llvm.Operation):
 
 class LoadOp(multiplier.ir.llvm.Operation):
   res: multiplier.ir.Value
+  alignment: Optional[int]
   volatile__: bool
   nontemporal: bool
   invariant: bool
+  syncscope: Optional[str]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1499,8 +1530,10 @@ class ShuffleVectorOp(multiplier.ir.llvm.Operation):
 
 class StoreOp(multiplier.ir.llvm.Operation):
   value: multiplier.ir.Value
+  alignment: Optional[int]
   volatile__: bool
   nontemporal: bool
+  syncscope: Optional[str]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:

@@ -79,6 +79,7 @@
    _hl(AnnotationAttr, AttributeKind::HL_ANNOTATION, vast::hl::AnnotationAttr) \
    _hl(FormatAttr, AttributeKind::HL_FORMAT, vast::hl::FormatAttr) \
    _hl(SectionAttr, AttributeKind::HL_SECTION, vast::hl::SectionAttr) \
+   _hl(AliasAttr, AttributeKind::HL_ALIAS, vast::hl::AliasAttr) \
    _hl(AlignedAttr, AttributeKind::HL_ALIGNED, vast::hl::AlignedAttr) \
    _hl(AlwaysInlineAttr, AttributeKind::HL_ALWAYS_INLINE, vast::hl::AlwaysInlineAttr) \
    _hl(NoInlineAttr, AttributeKind::HL_NO_INLINE, vast::hl::NoInlineAttr) \
@@ -117,5 +118,5 @@
    _core(GlobalLinkageKindAttr, AttributeKind::CORE_GLOBAL_LINKAGE_KIND, vast::core::GlobalLinkageKindAttr) \
    _meta(IdentifierAttr, AttributeKind::META_IDENTIFIER, vast::meta::IdentifierAttr)
 
-#define MX_IR_NUM_MLIR_ATTRIBUTES 107
+#define MX_IR_NUM_MLIR_ATTRIBUTES 108
 

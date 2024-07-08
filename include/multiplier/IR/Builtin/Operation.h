@@ -34,9 +34,9 @@ class MX_EXPORT ModuleOp final : public Operation {
   ::mlir::ModuleOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Region & body_region(void) const;
-  //::std::optional<StringRef> sym_name(void) const;
-  //::std::optional<StringRef> sym_visibility(void) const;
+  ::mx::ir::Region body_region(void) const;
+  std::optional<std::string_view> sym_name(void) const;
+  std::optional<std::string_view> sym_visibility(void) const;
   std::optional<std::string_view> name(void) const;
   bool is_optional_symbol(void) const;
   //DataLayoutSpecInterface data_layout_spec(void) const;

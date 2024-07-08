@@ -94,6 +94,7 @@ class CopyOp(multiplier.ir.memref.Operation):
 
 class GenericAtomicRMWOp(multiplier.ir.memref.Operation):
   result: multiplier.ir.Value
+  atomic_body: multiplier.ir.Region
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -124,6 +125,7 @@ class LoadOp(multiplier.ir.memref.Operation):
     ...
 
 class AllocOp(multiplier.ir.memref.Operation):
+  alignment: Optional[int]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -138,6 +140,7 @@ class AllocOp(multiplier.ir.memref.Operation):
     ...
 
 class AllocaOp(multiplier.ir.memref.Operation):
+  alignment: Optional[int]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -152,6 +155,7 @@ class AllocaOp(multiplier.ir.memref.Operation):
     ...
 
 class AllocaScopeOp(multiplier.ir.memref.Operation):
+  body_region: multiplier.ir.Region
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -223,6 +227,7 @@ class DeallocOp(multiplier.ir.memref.Operation):
 
 class DimOp(multiplier.ir.memref.Operation):
   source: multiplier.ir.Value
+  constant_index: Optional[int]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -335,7 +340,9 @@ class GetGlobalOp(multiplier.ir.memref.Operation):
 
 class GlobalOp(multiplier.ir.memref.Operation):
   sym_name: str
+  sym_visibility: Optional[str]
   constant: bool
+  alignment: Optional[int]
   is_external: bool
   is_uninitialized: bool
 
@@ -397,6 +404,7 @@ class RankOp(multiplier.ir.memref.Operation):
     ...
 
 class ReallocOp(multiplier.ir.memref.Operation):
+  alignment: Optional[int]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:

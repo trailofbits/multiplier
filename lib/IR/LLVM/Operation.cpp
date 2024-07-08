@@ -165,6 +165,23 @@ std::optional<AllocaOp> AllocaOp::producing(const ::mx::ir::Value &that) {
   return ::mlir::LLVM::AllocaOp(this->::mx::ir::Operation::op_);
 }
 
+std::optional<unsigned long long> AllocaOp::alignment(void) const {
+  auto opt_val = underlying_repr().getAlignment();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  return val;
+}
+
+::mx::ir::Type AllocaOp::elem_type(void) const {
+  auto mlir_type = underlying_repr().getElemType();
+  return ::mx::ir::Type(
+      mlir_type.getContext(),
+      reinterpret_cast<const mlir::TypeStorage *>(
+          mlir_type.getAsOpaquePointer()));
+}
+
 bool AllocaOp::inalloca(void) const {
   auto val = underlying_repr().getInalloca();
   return val;
@@ -236,6 +253,28 @@ std::optional<AtomicCmpXchgOp> AtomicCmpXchgOp::producing(const ::mx::ir::Value 
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
+std::optional<std::string_view> AtomicCmpXchgOp::syncscope(void) const {
+  auto opt_val = underlying_repr().getSyncscope();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
+std::optional<unsigned long long> AtomicCmpXchgOp::alignment(void) const {
+  auto opt_val = underlying_repr().getAlignment();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  return val;
+}
+
 bool AtomicCmpXchgOp::weak(void) const {
   auto val = underlying_repr().getWeak();
   return val;
@@ -272,6 +311,28 @@ std::optional<AtomicRMWOp> AtomicRMWOp::producing(const ::mx::ir::Value &that) {
 ::mx::ir::Value AtomicRMWOp::res(void) const {
   auto val = underlying_repr().getRes();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+std::optional<std::string_view> AtomicRMWOp::syncscope(void) const {
+  auto opt_val = underlying_repr().getSyncscope();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
+std::optional<unsigned long long> AtomicRMWOp::alignment(void) const {
+  auto opt_val = underlying_repr().getAlignment();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  return val;
 }
 
 bool AtomicRMWOp::volatile__(void) const {
@@ -380,6 +441,19 @@ std::optional<CallOp> CallOp::producing(const ::mx::ir::Value &that) {
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
+std::optional<std::string_view> CallOp::callee(void) const {
+  auto opt_val = underlying_repr().getCallee();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
 std::optional<ComdatOp> ComdatOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::LLVM_COMDAT) {
     return reinterpret_cast<const ComdatOp &>(that);
@@ -396,6 +470,11 @@ std::optional<ComdatOp> ComdatOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::LLVM::ComdatOp ComdatOp::underlying_repr(void) const noexcept {
   return ::mlir::LLVM::ComdatOp(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Region ComdatOp::body(void) const {
+  auto &val = underlying_repr().getBody();
+  return ::mx::ir::Region(module_, val);
 }
 
 std::string_view ComdatOp::sym_name(void) const {
@@ -887,6 +966,19 @@ std::optional<FenceOp> FenceOp::producing(const ::mx::ir::Value &that) {
   return ::mlir::LLVM::FenceOp(this->::mx::ir::Operation::op_);
 }
 
+std::optional<std::string_view> FenceOp::syncscope(void) const {
+  auto opt_val = underlying_repr().getSyncscope();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
 std::optional<FreezeOp> FreezeOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::LLVM_FREEZE) {
     return reinterpret_cast<const FreezeOp &>(that);
@@ -941,6 +1033,14 @@ std::optional<GetElementPtrOp> GetElementPtrOp::producing(const ::mx::ir::Value 
 ::mx::ir::Value GetElementPtrOp::res(void) const {
   auto val = underlying_repr().getRes();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Type GetElementPtrOp::elem_type(void) const {
+  auto mlir_type = underlying_repr().getElemType();
+  return ::mx::ir::Type(
+      mlir_type.getContext(),
+      reinterpret_cast<const mlir::TypeStorage *>(
+          mlir_type.getAsOpaquePointer()));
 }
 
 bool GetElementPtrOp::inbounds(void) const {
@@ -1002,6 +1102,19 @@ std::optional<GlobalOp> GlobalOp::producing(const ::mx::ir::Value &that) {
   return ::mlir::LLVM::GlobalOp(this->::mx::ir::Operation::op_);
 }
 
+::mx::ir::Region GlobalOp::initializer(void) const {
+  auto &val = underlying_repr().getInitializer();
+  return ::mx::ir::Region(module_, val);
+}
+
+::mx::ir::Type GlobalOp::global_type(void) const {
+  auto mlir_type = underlying_repr().getGlobalType();
+  return ::mx::ir::Type(
+      mlir_type.getContext(),
+      reinterpret_cast<const mlir::TypeStorage *>(
+          mlir_type.getAsOpaquePointer()));
+}
+
 bool GlobalOp::constant(void) const {
   auto val = underlying_repr().getConstant();
   return val;
@@ -1026,9 +1139,31 @@ bool GlobalOp::thread_local__(void) const {
   return val;
 }
 
+std::optional<unsigned long long> GlobalOp::alignment(void) const {
+  auto opt_val = underlying_repr().getAlignment();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  return val;
+}
+
 uint32_t GlobalOp::addr_space(void) const {
   auto val = underlying_repr().getAddrSpace();
   return val;
+}
+
+std::optional<std::string_view> GlobalOp::section(void) const {
+  auto opt_val = underlying_repr().getSection();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
 }
 
 std::optional<ICmpOp> ICmpOp::from(const ::mx::ir::Operation &that) {
@@ -1227,6 +1362,19 @@ std::optional<InvokeOp> InvokeOp::producing(const ::mx::ir::Value &that) {
   return ::mlir::LLVM::InvokeOp(this->::mx::ir::Operation::op_);
 }
 
+std::optional<std::string_view> InvokeOp::callee(void) const {
+  auto opt_val = underlying_repr().getCallee();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
 std::optional<FuncOp> FuncOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::LLVM_FUNC) {
     return reinterpret_cast<const FuncOp &>(that);
@@ -1245,8 +1393,26 @@ std::optional<FuncOp> FuncOp::producing(const ::mx::ir::Value &that) {
   return ::mlir::LLVM::LLVMFuncOp(this->::mx::ir::Operation::op_);
 }
 
+::mx::ir::Region FuncOp::body(void) const {
+  auto &val = underlying_repr().getBody();
+  return ::mx::ir::Region(module_, val);
+}
+
 std::string_view FuncOp::sym_name(void) const {
   auto val = underlying_repr().getSymName();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
+std::optional<std::string_view> FuncOp::sym_visibility(void) const {
+  auto opt_val = underlying_repr().getSymVisibility();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);
   } else {
@@ -1257,6 +1423,130 @@ std::string_view FuncOp::sym_name(void) const {
 bool FuncOp::dso_local(void) const {
   auto val = underlying_repr().getDsoLocal();
   return val;
+}
+
+std::optional<std::string_view> FuncOp::personality(void) const {
+  auto opt_val = underlying_repr().getPersonality();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
+std::optional<std::string_view> FuncOp::garbage_collector(void) const {
+  auto opt_val = underlying_repr().getGarbageCollector();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
+std::optional<unsigned long long> FuncOp::function_entry_count(void) const {
+  auto opt_val = underlying_repr().getFunctionEntryCount();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  return val;
+}
+
+std::optional<bool> FuncOp::arm_streaming(void) const {
+  auto opt_val = underlying_repr().getArmStreaming();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  return val;
+}
+
+std::optional<bool> FuncOp::arm_locally_streaming(void) const {
+  auto opt_val = underlying_repr().getArmLocallyStreaming();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  return val;
+}
+
+std::optional<bool> FuncOp::arm_streaming_compatible(void) const {
+  auto opt_val = underlying_repr().getArmStreamingCompatible();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  return val;
+}
+
+std::optional<bool> FuncOp::arm_new_za(void) const {
+  auto opt_val = underlying_repr().getArmNewZa();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  return val;
+}
+
+std::optional<bool> FuncOp::arm_preserves_za(void) const {
+  auto opt_val = underlying_repr().getArmPreservesZa();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  return val;
+}
+
+std::optional<bool> FuncOp::arm_shared_za(void) const {
+  auto opt_val = underlying_repr().getArmSharedZa();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  return val;
+}
+
+std::optional<std::string_view> FuncOp::section(void) const {
+  auto opt_val = underlying_repr().getSection();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
+std::optional<unsigned long long> FuncOp::alignment(void) const {
+  auto opt_val = underlying_repr().getAlignment();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  return val;
+}
+
+std::optional<std::string_view> FuncOp::target_cpu(void) const {
+  auto opt_val = underlying_repr().getTargetCpu();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
 }
 
 bool FuncOp::is_var_arg(void) const {
@@ -1366,6 +1656,15 @@ std::optional<LoadOp> LoadOp::producing(const ::mx::ir::Value &that) {
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
+std::optional<unsigned long long> LoadOp::alignment(void) const {
+  auto opt_val = underlying_repr().getAlignment();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  return val;
+}
+
 bool LoadOp::volatile__(void) const {
   auto val = underlying_repr().getVolatile_();
   return val;
@@ -1379,6 +1678,19 @@ bool LoadOp::nontemporal(void) const {
 bool LoadOp::invariant(void) const {
   auto val = underlying_repr().getInvariant();
   return val;
+}
+
+std::optional<std::string_view> LoadOp::syncscope(void) const {
+  auto opt_val = underlying_repr().getSyncscope();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
 }
 
 std::optional<MulOp> MulOp::from(const ::mx::ir::Operation &that) {
@@ -1816,6 +2128,15 @@ std::optional<StoreOp> StoreOp::producing(const ::mx::ir::Value &that) {
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
+std::optional<unsigned long long> StoreOp::alignment(void) const {
+  auto opt_val = underlying_repr().getAlignment();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  return val;
+}
+
 bool StoreOp::volatile__(void) const {
   auto val = underlying_repr().getVolatile_();
   return val;
@@ -1824,6 +2145,19 @@ bool StoreOp::volatile__(void) const {
 bool StoreOp::nontemporal(void) const {
   auto val = underlying_repr().getNontemporal();
   return val;
+}
+
+std::optional<std::string_view> StoreOp::syncscope(void) const {
+  auto opt_val = underlying_repr().getSyncscope();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
 }
 
 std::optional<SubOp> SubOp::from(const ::mx::ir::Operation &that) {

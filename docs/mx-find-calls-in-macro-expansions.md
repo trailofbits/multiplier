@@ -1,16 +1,12 @@
 # `mx-find-calls-in-macro-expansions`
 
-This tool locates calls to functions that are visible in the top-level arguments
-to macros.
+This tool finds calls to functions where the calls themselves are expressed as
+explicit arguments to the top-level macro use.
 
-For example:
 ```shell
-mx-find-calls-in-macro-expansions --db /tmp/curl.db
+% mx-find-calls-in-macro-expansions --db /tmp/xnu.db
 ```
 
-Here is one of the outputs:
+Here is an examples of its output:
 
-![Call in macro argument](images/mx-find-calls-in-macro-expansions.png)
-
-In the above, the `infof` function is called inside the top-level argument list
-to the `DEBUGF` macro.
+![Example call in a macro expansion](images/mx-find-calls-in-macro-expansions.png)

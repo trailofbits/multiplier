@@ -84,6 +84,7 @@ enum class AttributeKind : unsigned {
   HL_ANNOTATION,
   HL_FORMAT,
   HL_SECTION,
+  HL_ALIAS,
   HL_ALIGNED,
   HL_ALWAYS_INLINE,
   HL_NO_INLINE,
@@ -130,7 +131,7 @@ inline static const char *EnumerationName(ir::AttributeKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(ir::AttributeKind) {
-  return 107;
+  return 108;
 }
 
 MX_EXPORT const char *EnumeratorName(ir::AttributeKind);

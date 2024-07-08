@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1031]) || tp >= &(gTypes[1032])) {
+  if (tp < &(gTypes[1032]) || tp >= &(gTypes[1033])) {
     return std::nullopt;
   }
 
@@ -90,7 +90,7 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::ir::llvm::FuncOp::static_kind():
-      tp = &(gTypes[1031]);
+      tp = &(gTypes[1032]);
       break;
 
   }
@@ -125,6 +125,16 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyGetSetDef gProperties[] = {
   {
+    "body",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->body());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::FuncOp::body"),
+    nullptr,
+  },
+  {
     "sym_name",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -135,6 +145,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "sym_visibility",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->sym_visibility());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::FuncOp::sym_visibility"),
+    nullptr,
+  },
+  {
     "dso_local",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -142,6 +162,126 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::llvm::FuncOp::dso_local"),
+    nullptr,
+  },
+  {
+    "personality",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->personality());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::FuncOp::personality"),
+    nullptr,
+  },
+  {
+    "garbage_collector",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->garbage_collector());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::FuncOp::garbage_collector"),
+    nullptr,
+  },
+  {
+    "function_entry_count",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->function_entry_count());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::FuncOp::function_entry_count"),
+    nullptr,
+  },
+  {
+    "arm_streaming",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->arm_streaming());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::FuncOp::arm_streaming"),
+    nullptr,
+  },
+  {
+    "arm_locally_streaming",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->arm_locally_streaming());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::FuncOp::arm_locally_streaming"),
+    nullptr,
+  },
+  {
+    "arm_streaming_compatible",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->arm_streaming_compatible());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::FuncOp::arm_streaming_compatible"),
+    nullptr,
+  },
+  {
+    "arm_new_za",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->arm_new_za());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::FuncOp::arm_new_za"),
+    nullptr,
+  },
+  {
+    "arm_preserves_za",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->arm_preserves_za());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::FuncOp::arm_preserves_za"),
+    nullptr,
+  },
+  {
+    "arm_shared_za",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->arm_shared_za());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::FuncOp::arm_shared_za"),
+    nullptr,
+  },
+  {
+    "section",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->section());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::FuncOp::section"),
+    nullptr,
+  },
+  {
+    "alignment",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->alignment());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::FuncOp::alignment"),
+    nullptr,
+  },
+  {
+    "target_cpu",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->target_cpu());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::FuncOp::target_cpu"),
     nullptr,
   },
   {
@@ -226,7 +366,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1031]);
+  PyTypeObject * const tp = &(gTypes[1032]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -241,12 +381,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[989].tp_hash;
-  tp->tp_richcompare = gTypes[989].tp_richcompare;
+  tp->tp_hash = gTypes[990].tp_hash;
+  tp->tp_richcompare = gTypes[990].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[989]);
+  tp->tp_base = &(gTypes[990]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

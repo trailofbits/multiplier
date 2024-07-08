@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1024]) || tp >= &(gTypes[1025])) {
+  if (tp < &(gTypes[1025]) || tp >= &(gTypes[1026])) {
     return std::nullopt;
   }
 
@@ -90,7 +90,7 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::ir::llvm::GlobalOp::static_kind():
-      tp = &(gTypes[1024]);
+      tp = &(gTypes[1025]);
       break;
 
   }
@@ -124,6 +124,26 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
 namespace {
 static PyGetSetDef gProperties[] = {
+  {
+    "initializer",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->initializer());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::GlobalOp::initializer"),
+    nullptr,
+  },
+  {
+    "global_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->global_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::GlobalOp::global_type"),
+    nullptr,
+  },
   {
     "constant",
     reinterpret_cast<getter>(
@@ -165,6 +185,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "alignment",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->alignment());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::GlobalOp::alignment"),
+    nullptr,
+  },
+  {
     "addr_space",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -172,6 +202,16 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::llvm::GlobalOp::addr_space"),
+    nullptr,
+  },
+  {
+    "section",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->section());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::GlobalOp::section"),
     nullptr,
   },
   {}  // Sentinel.
@@ -246,7 +286,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1024]);
+  PyTypeObject * const tp = &(gTypes[1025]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -261,12 +301,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[989].tp_hash;
-  tp->tp_richcompare = gTypes[989].tp_richcompare;
+  tp->tp_hash = gTypes[990].tp_hash;
+  tp->tp_richcompare = gTypes[990].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[989]);
+  tp->tp_base = &(gTypes[990]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

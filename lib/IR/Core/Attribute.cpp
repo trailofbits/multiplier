@@ -8,6 +8,8 @@
 
 #include <multiplier/IR/Core/Attribute.h>
 
+#include <multiplier/IR/Type.h>
+
 #include <mlir/Dialect/LLVMIR/LLVMDialect.h>
 #include <mlir/Dialect/MemRef/IR/MemRef.h>
 #include <vast/Dialect/Dialects.hpp>
@@ -31,6 +33,14 @@ std::optional<BooleanAttr> BooleanAttr::from(const ::mx::ir::Attribute &that) {
   return ::vast::core::BooleanAttr(this->::mx::ir::Attribute::attr_);
 }
 
+::mx::ir::Type BooleanAttr::type(void) const {
+  auto mlir_type = underlying_repr().getType();
+  return ::mx::ir::Type(
+      mlir_type.getContext(),
+      reinterpret_cast<const mlir::TypeStorage *>(
+          mlir_type.getAsOpaquePointer()));
+}
+
 bool BooleanAttr::value(void) const {
   auto val = underlying_repr().getValue();
   return val;
@@ -47,6 +57,14 @@ std::optional<IntegerAttr> IntegerAttr::from(const ::mx::ir::Attribute &that) {
   return ::vast::core::IntegerAttr(this->::mx::ir::Attribute::attr_);
 }
 
+::mx::ir::Type IntegerAttr::type(void) const {
+  auto mlir_type = underlying_repr().getType();
+  return ::mx::ir::Type(
+      mlir_type.getContext(),
+      reinterpret_cast<const mlir::TypeStorage *>(
+          mlir_type.getAsOpaquePointer()));
+}
+
 std::optional<FloatAttr> FloatAttr::from(const ::mx::ir::Attribute &that) {
   if (that.kind() == AttributeKind::CORE_FLOAT) {
     return reinterpret_cast<const FloatAttr &>(that);
@@ -58,6 +76,14 @@ std::optional<FloatAttr> FloatAttr::from(const ::mx::ir::Attribute &that) {
   return ::vast::core::FloatAttr(this->::mx::ir::Attribute::attr_);
 }
 
+::mx::ir::Type FloatAttr::type(void) const {
+  auto mlir_type = underlying_repr().getType();
+  return ::mx::ir::Type(
+      mlir_type.getContext(),
+      reinterpret_cast<const mlir::TypeStorage *>(
+          mlir_type.getAsOpaquePointer()));
+}
+
 std::optional<VoidAttr> VoidAttr::from(const ::mx::ir::Attribute &that) {
   if (that.kind() == AttributeKind::CORE_VOID) {
     return reinterpret_cast<const VoidAttr &>(that);
@@ -67,6 +93,14 @@ std::optional<VoidAttr> VoidAttr::from(const ::mx::ir::Attribute &that) {
 
 ::vast::core::VoidAttr VoidAttr::underlying_repr(void) const noexcept {
   return ::vast::core::VoidAttr(this->::mx::ir::Attribute::attr_);
+}
+
+::mx::ir::Type VoidAttr::type(void) const {
+  auto mlir_type = underlying_repr().getType();
+  return ::mx::ir::Type(
+      mlir_type.getContext(),
+      reinterpret_cast<const mlir::TypeStorage *>(
+          mlir_type.getAsOpaquePointer()));
 }
 
 std::optional<SourceLanguageAttr> SourceLanguageAttr::from(const ::mx::ir::Attribute &that) {

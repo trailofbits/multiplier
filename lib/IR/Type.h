@@ -71,8 +71,9 @@
    _hl(ReferenceType, TypeKind::HL_REFERENCE, vast::hl::ReferenceType) \
    _hl(TypeOfExprType, TypeKind::HL_TYPE_OF_EXPR, vast::hl::TypeOfExprType) \
    _hl(TypeOfTypeType, TypeKind::HL_TYPE_OF_TYPE, vast::hl::TypeOfTypeType) \
+   _hl(AtomicType, TypeKind::HL_ATOMIC, vast::hl::AtomicType) \
    _core(FunctionType, TypeKind::CORE_FUNCTION, vast::core::FunctionType) \
    _unsup(UnsupportedType, TypeKind::UNSUP_UNSUPPORTED, vast::unsup::UnsupportedType)
 
-#define MX_IR_NUM_MLIR_TYPES 66
+#define MX_IR_NUM_MLIR_TYPES 67
 

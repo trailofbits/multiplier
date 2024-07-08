@@ -197,7 +197,7 @@ Token CXXBoolLiteralExpr::token(void) const {
 }
 
 bool CXXBoolLiteralExpr::value(void) const {
-  return impl->reader.getVal84();
+  return impl->reader.getVal83();
 }
 
 #pragma GCC diagnostic pop

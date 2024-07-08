@@ -31,6 +31,14 @@ std::optional<ShapedType> ShapedType::from(const ::mx::ir::Type &that) {
   return ::mlir::ShapedType(this->::mx::ir::Type::type_);
 }
 
+::mx::ir::Type ShapedType::element_type(void) const {
+  auto mlir_type = underlying_repr().getElementType();
+  return ::mx::ir::Type(
+      mlir_type.getContext(),
+      reinterpret_cast<const mlir::TypeStorage *>(
+          mlir_type.getAsOpaquePointer()));
+}
+
 bool ShapedType::has_rank(void) const {
   auto val = underlying_repr().hasRank();
   return val;

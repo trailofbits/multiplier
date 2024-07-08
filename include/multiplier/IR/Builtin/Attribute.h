@@ -53,7 +53,7 @@ class MX_EXPORT TypedAttr final : public Attribute {
   ::mlir::TypedAttr underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Type type(void) const;
+  ::mx::ir::Type type(void) const;
 };
 static_assert(sizeof(TypedAttr) == sizeof(Attribute));
 
@@ -74,7 +74,7 @@ class MX_EXPORT ElementsAttr final : public Attribute {
   int64_t num_elements(void) const;
   int64_t size(void) const;
   bool empty(void) const;
-  //::mlir::Type type(void) const;
+  ::mx::ir::Type type(void) const;
 };
 static_assert(sizeof(ElementsAttr) == sizeof(Attribute));
 
@@ -206,7 +206,7 @@ class MX_EXPORT FloatAttr final : public Attribute {
 
   // Imported methods:
   double value_as_double(void) const;
-  //::mlir::Type type(void) const;
+  ::mx::ir::Type type(void) const;
   //::llvm::APFloat value(void) const;
 };
 static_assert(sizeof(FloatAttr) == sizeof(Attribute));
@@ -226,7 +226,7 @@ class MX_EXPORT IntegerAttr final : public Attribute {
   int64_t s_int(void) const;
   uint64_t u_int(void) const;
   //APSInt aps_int(void) const;
-  //::mlir::Type type(void) const;
+  ::mx::ir::Type type(void) const;
   //APInt value(void) const;
 };
 static_assert(sizeof(IntegerAttr) == sizeof(Attribute));
@@ -259,7 +259,7 @@ class MX_EXPORT OpaqueAttr final : public Attribute {
   // Imported methods:
   //StringAttr dialect_namespace(void) const;
   std::string_view attr_data(void) const;
-  //::mlir::Type type(void) const;
+  ::mx::ir::Type type(void) const;
 };
 static_assert(sizeof(OpaqueAttr) == sizeof(Attribute));
 
@@ -321,7 +321,7 @@ class MX_EXPORT StringAttr final : public Attribute {
   //StringRef::iterator begin(void) const;
   //StringRef::iterator end(void) const;
   std::string_view value(void) const;
-  //::mlir::Type type(void) const;
+  ::mx::ir::Type type(void) const;
 };
 static_assert(sizeof(StringAttr) == sizeof(Attribute));
 
