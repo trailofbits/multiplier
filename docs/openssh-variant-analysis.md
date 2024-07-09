@@ -232,11 +232,11 @@ Alright, we're now in a position to start actually attacking the overarching pro
 
 ### Problem analysis
 
-The first problem we need to solve is discovering signal handlers. There are two ways of registering signal handlers: i) the `signal` function, and the `sigaction` function.
+ 1. The first problem we need to solve is discovering signal handlers. There are two ways of registering signal handlers: the `signal` function, and the `sigaction` function.
 
-The second problem we need to solve is identifying async-unsafe functions. We're going to simplify our lives and hard code a list of such functions.
+ 2. The second problem we need to solve is identifying async-unsafe functions. We're going to simplify our lives and hard code a list of such functions.
 
-The last problem is finding paths in the call graph between signal handlers and async-unsafe functions.
+ 3. The last problem is finding paths in the call graph between signal handlers and async-unsafe functions.
 
 ### Discovering signal handlers
 
