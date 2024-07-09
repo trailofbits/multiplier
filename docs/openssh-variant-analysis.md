@@ -15,6 +15,10 @@ This analysis starts with showing how to checkout and index the relevant version
 * [Automating the analysis](#automating-the-analysis)
   * [Setting up a virtual environment](#setting-up-a-virtual-environment)
   * [Interacting with a database](#interacting-with-a-database)
+  * [Problem analysis](#problem-analysis)
+  * [Discovering signal handlers](#discovering-signal-handlers)
+    * [Finding `signal`](#finding-signal)
+    * [Finding `sigaction`](#finding-sigaction)
 
 ## Getting and indexing the code
 
@@ -68,7 +72,7 @@ Using the [combine_compile_commands.py](../scripts/combine_compile_commands.py) 
 Next, we'll run `mx-index` to index OpenSSH.
 
 ```bash
-% time ./bin/mx-index --db /tmp/openssh.db --workspace /tmp/openssh.ws --target compile_commands.json --show_progress
+% time ./bin/mx-index --db /tmp/openssh.db --workspace /tmp/openssh.ws --target compile_commands.json --generate_sourceir --show_progress
 Commands                       (237 / 237)           100% [||||||||||||||||||||||||||||||||||||||||]
 Evaluated commands             (237 / 237)           100% [||||||||||||||||||||||||||||||||||||||||]
 Parsing                        (237 / 237)           100% [||||||||||||||||||||||||||||||||||||||||]
@@ -82,6 +86,8 @@ mx-index --db /tmp/openssh.db --workspace /tmp/openssh.ws --target    246.65s us
 ```
 
 Here we told `mx-index` to save its database to `/tmp/openssh.db` (we'll need this soon), and its temporary workspace to the directory `/tmp/openssh.ws`. We can now delete `/tmp/openssh.ws`, as its only needed if we wanted to index additional projects into the same database.
+
+The `--generate_sourceir` flag is optional if you plan to do the Python scripting. It will produce a lot more errors as output, but the indexer should finish.
 
 ```bash
 rm -rf /tmp/openssh.ws
@@ -218,6 +224,160 @@ Lets verify that we can indeed find `SIGALRM` as before:
 >>> sigalrm = next(index.query_entities("SIGALRM"))
 >>> sigalrm
 <multiplier.frontend.DefineMacroDirective object at 0x104328c90>
->>> "".join(t.data for t in sigalrm.use_tokens.file_tokens)
+>>> sigalrm.use_tokens.file_tokens.data
 '#define SIGALRM 14'
 ```
+
+Alright, we're now in a position to start actually attacking the overarching problem of discovering instances, or variants, of the same underlying bug across a whole codebase. Lets break things down into sub problems and then we can attack each sub problem in turn.
+
+### Problem analysis
+
+The first problem we need to solve is discovering signal handlers. There are two ways of registering signal handlers: i) the `signal` function, and the `sigaction` function.
+
+The second problem we need to solve is identifying async-unsafe functions. We're going to simplify our lives and hard code a list of such functions.
+
+The last problem is finding paths in the call graph between signal handlers and async-unsafe functions.
+
+### Discovering signal handlers
+
+Lets go inspect the prototypes of the signal handler registration functions:
+
+#### Finding `signal`
+
+```python
+>>> signal = next(f for f in index.query_entities("signal") if isinstance(f, mx.ast.FunctionDecl) and f.name == "signal")
+>>> print(signal.tokens.file_tokens.data)
+void(*signal(int, void (*)(int)))(int);
+```
+
+The first thing to notice is the querying approach is a bit more complex than what we saw with `SIGALRM`. With OpenSSH, there are a lot of entities with `signal` in the name, so we narrowed it down to function declarations with `isinstance` and we did an exact match on the function's name.
+
+That's easy enough: the `signal` function takes in a function pointer representing the new signal handler function, and returns a function pointer representing the old signal handler. So if we want to find signal handlers, then we need to find function pointers flowing into the only argument to `signal`.
+
+#### Finding `sigaction`
+
+```python
+>>> sigaction = next(f for f in index.query_entities("sigaction") if isinstance(f, mx.ast.FunctionDecl) and f.name == "sigaction")
+>>> print(sigaction.tokens.file_tokens.data)
+int sigaction(int, const struct sigaction * __restrict,
+      struct sigaction * __restrict);
+```
+
+Alright, this is a bit more complicated: `sigaction` takes in a signal number, such as `SIGALRM`, and a pointer to a `struct sigaction`. We could search for `struct sigaction` by name, but lets try to get at it via the `sigaction` function instead. This will ensure we find the *right* `struct sigaction`, because in theory there could be many same-named but differently purposed structures in a codebase.
+
+We can get at the second parameter as follows:
+
+```python
+>>> sigaction.nth_parameter(1).type
+<multiplier.ast.QualifiedType object at 0x1048991d0>
+```
+
+And we can access its type as follows:
+
+```python
+>>> sigaction.nth_parameter(1).type
+<multiplier.ast.QualifiedType object at 0x1048991d0>
+```
+
+This is still opaque though -- what is this `QualifiedType` actually?
+
+```python
+>>> sigaction.nth_parameter(1).type.tokens.data
+'const struct sigaction * restrict'
+```
+
+So we're on the right track. Now we want to strip off the qualifiers (`restrict`):
+
+```python
+>>> sigaction.nth_parameter(1).type.unqualified_type
+<multiplier.ast.PointerType object at 0x1048980c0>
+>>> sigaction.nth_parameter(1).type.unqualified_type.tokens.data
+'const struct sigaction *'
+```
+
+We can also use `.unqualified_desugared_type` in place of `.unqualified_type` to strip out `typedef` types and such. That is a more robust solution.
+
+And next we want to find the element type of the pointer:
+
+```python
+>>> sigaction.nth_parameter(1).type.unqualified_desugared_type.pointee_type
+<multiplier.ast.QualifiedType object at 0x1059bbc30>
+>>> sigaction.nth_parameter(1).type.unqualified_desugared_type.pointee_type.tokens.data
+'const struct sigaction'
+```
+
+And finally, lets get at the `struct sigaction` type:
+
+```python
+>>> sigaction_type = sigaction.nth_parameter(1).type.unqualified_desugared_type.pointee_type.unqualified_desugared_type
+>>> sigaction_type
+<multiplier.ast.RecordType object at 0x104899fb0>
+>>> sigaction_type.tokens.data
+'struct sigaction'
+```
+
+We can get at the record declaration as follows:
+
+```python
+>>> sigaction_struct = sigaction_type.declaration
+>>> sigaction_struct
+<multiplier.ast.RecordDecl object at 0x104899fb0>
+>>> print(sigaction_struct.tokens.file_tokens.data)
+struct  sigaction {
+  union __sigaction_u __sigaction_u;  /* signal handler */
+  sigset_t sa_mask;               /* signal mask to apply */
+  int     sa_flags;               /* see signal options below */
+};
+```
+
+It looks like the signal handler is itself nested inside of a `union __sigaction_u` inside of `struct sigaction`. I'm on macOS, and there are no clear guarantees as to how deep this rabbit hole of structs and unions will go. Consulting the [Linux manual pages](https://man7.org/linux/man-pages/man2/sigaction.2.html) for this structure shows that the nature of this structure is finnicky at best:
+
+```
+The sigaction structure is defined as something like:
+
+    struct sigaction {
+        void     (*sa_handler)(int);
+        void     (*sa_sigaction)(int, siginfo_t *, void *);
+        sigset_t   sa_mask;
+        int        sa_flags;
+        void     (*sa_restorer)(void);
+    };
+
+On some architectures a union is involved: do not assign to both
+sa_handler and sa_sigaction.
+```
+
+Alright, we're going to have to do some digging. We'll apply a simple work list algorithm to go and find the nested fields that have function pointer types.
+
+```python
+>>> wl = [sigaction_struct]
+>>> found = []
+>>> while len(wl):
+...   frag = mx.Fragment.containing(wl.pop())
+...   for field in mx.ast.FieldDecl.IN(frag):
+...     if "restore" in field.name:
+...       continue
+...     ft = field.type.unqualified_desugared_type
+...     if isinstance(ft, mx.ast.PointerType):
+...       found.append(field)
+...     elif isinstance(ft, mx.ast.RecordType):
+...       wl.append(ft.declaration)
+...
+>>> found
+[<multiplier.ast.FieldDecl object at 0x105a1eeb0>, <multiplier.ast.FieldDecl object at 0x105a1f000>]
+```
+
+Lets see what we found:
+
+```python
+>>> render_opts = mx.ast.QualifiedNameRenderOptions(fully_qualified=True)
+>>> [f.qualified_name(render_opts).data for f in found]
+['__sigaction_u::__sa_handler', '__sigaction_u::__sa_sigaction']
+```
+
+Alright, it looks like our worklist algorithm has discovered the relevant fields within `union __sigaction_u` given a starting point of `struct sigaction`. Lets describe how it worked:
+
+ 1. The worklist operates on record declarations.
+ 2. We get the "fragment" containing the record declaration popped off the back of the work list. Every declaration is nested inside of a fragment, which is the unit of deduplication and serialization granularity in Multiplier. Roughly, every lexically freestanding top-level declaration is placed into its own fragment, and any lexically nested declaration belongs to that fragment. There are caveats to this rule when it comes to C++ classes, methods, and templates. 
+ 3. Then, we find all field declarations within the fragment we're looking at, then check if their type is a pointer type. Note that we skip fields containing the word `restore` in their names. This field isn't meant to be used by user code.
+
