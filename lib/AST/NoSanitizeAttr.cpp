@@ -126,7 +126,7 @@ std::optional<NoSanitizeAttr> NoSanitizeAttr::from(const TokenContext &t) {
 }
 
 bool NoSanitizeAttr::has_coverage(void) const {
-  return impl->reader.getVal14();
+  return impl->reader.getVal15();
 }
 
 #pragma GCC diagnostic pop

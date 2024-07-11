@@ -126,7 +126,7 @@ std::optional<FunctionReturnThunksAttr> FunctionReturnThunksAttr::from(const Tok
 }
 
 FunctionReturnThunksAttrKind FunctionReturnThunksAttr::thunk_type(void) const {
-  return static_cast<FunctionReturnThunksAttrKind>(impl->reader.getVal12());
+  return static_cast<FunctionReturnThunksAttrKind>(impl->reader.getVal13());
 }
 
 #pragma GCC diagnostic pop

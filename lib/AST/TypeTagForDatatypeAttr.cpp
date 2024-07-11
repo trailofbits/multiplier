@@ -127,7 +127,7 @@ std::optional<TypeTagForDatatypeAttr> TypeTagForDatatypeAttr::from(const TokenCo
 }
 
 bool TypeTagForDatatypeAttr::layout_compatible(void) const {
-  return impl->reader.getVal14();
+  return impl->reader.getVal15();
 }
 
 Type TypeTagForDatatypeAttr::matching_c_type(void) const {
@@ -136,12 +136,12 @@ Type TypeTagForDatatypeAttr::matching_c_type(void) const {
 }
 
 Type TypeTagForDatatypeAttr::matching_c_type_token(void) const {
-  RawEntityId eid = impl->reader.getVal22();
+  RawEntityId eid = impl->reader.getVal23();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool TypeTagForDatatypeAttr::must_be_null(void) const {
-  return impl->reader.getVal15();
+  return impl->reader.getVal16();
 }
 
 #pragma GCC diagnostic pop

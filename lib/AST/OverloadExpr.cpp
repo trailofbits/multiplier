@@ -231,16 +231,16 @@ gap::generator<NamedDecl> OverloadExpr::declarations(void) const & {
 }
 
 Token OverloadExpr::l_angle_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Token OverloadExpr::name_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 std::optional<CXXRecordDecl> OverloadExpr::naming_class(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal39();
+    RawEntityId eid = impl->reader.getVal40();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -252,19 +252,19 @@ std::optional<CXXRecordDecl> OverloadExpr::naming_class(void) const {
 }
 
 Token OverloadExpr::r_angle_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
-}
-
-Token OverloadExpr::template_keyword_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
+Token OverloadExpr::template_keyword_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
+}
+
 bool OverloadExpr::has_explicit_template_arguments(void) const {
-  return impl->reader.getVal83();
+  return impl->reader.getVal84();
 }
 
 bool OverloadExpr::has_template_keyword(void) const {
-  return impl->reader.getVal84();
+  return impl->reader.getVal85();
 }
 
 #pragma GCC diagnostic pop

@@ -171,6 +171,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "builtin_callee",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->builtin_callee());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CallExpr::builtin_callee"),
+    nullptr,
+  },
+  {
     "call_return_type",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

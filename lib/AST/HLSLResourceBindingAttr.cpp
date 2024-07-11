@@ -130,9 +130,17 @@ std::string_view HLSLResourceBindingAttr::slot(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
+uint32_t HLSLResourceBindingAttr::slot_length(void) const {
+  return impl->reader.getVal12();
+}
+
 std::string_view HLSLResourceBindingAttr::space(void) const {
-  capnp::Text::Reader data = impl->reader.getVal23();
+  capnp::Text::Reader data = impl->reader.getVal24();
   return std::string_view(data.cStr(), data.size());
+}
+
+uint32_t HLSLResourceBindingAttr::space_length(void) const {
+  return impl->reader.getVal25();
 }
 
 #pragma GCC diagnostic pop

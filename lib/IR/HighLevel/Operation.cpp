@@ -2661,6 +2661,14 @@ std::optional<OffsetOfExprOp> OffsetOfExprOp::producing(const ::mx::ir::Value &t
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
+::mx::ir::Type OffsetOfExprOp::source(void) const {
+  auto mlir_type = underlying_repr().getSource();
+  return ::mx::ir::Type(
+      mlir_type.getContext(),
+      reinterpret_cast<const mlir::TypeStorage *>(
+          mlir_type.getAsOpaquePointer()));
+}
+
 std::optional<PlusOp> PlusOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_PLUS) {
     return reinterpret_cast<const PlusOp &>(that);

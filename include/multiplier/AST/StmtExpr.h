@@ -70,6 +70,7 @@ class MX_EXPORT StmtExpr : public Expr {
   Token l_paren_token(void) const;
   Token r_paren_token(void) const;
   CompoundStmt sub_statement(void) const;
+  uint32_t template_depth(void) const;
 };
 
 static_assert(sizeof(StmtExpr) == sizeof(Expr));

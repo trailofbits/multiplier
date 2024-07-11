@@ -189,7 +189,7 @@ class MXErrorReportVisitorProxy
 
   void log(std::string_view type, std::string_view name,
            const auto *entity) const {
-    LOG(ERROR)
+    LOG(WARNING)
         << "Cannot codegen unsupported " << type << " " << name
         << PrefixedLocation(ast.Adopt(entity), " at or near ")
         << " on main job file "
@@ -197,7 +197,7 @@ class MXErrorReportVisitorProxy
   }
 
   void log_type(std::string_view type, std::string_view name) const {
-    LOG(ERROR)
+    LOG(WARNING)
         << "Cannot codegen unsupported " << type << " " << name
         << " on main job file "
         << ast.MainFile().Path().generic_string();

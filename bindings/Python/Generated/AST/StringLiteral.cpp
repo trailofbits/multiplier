@@ -145,6 +145,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "byte_length",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->byte_length());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::StringLiteral::byte_length"),
+    nullptr,
+  },
+  {
     "bytes",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -155,6 +165,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "character_byte_width",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->character_byte_width());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::StringLiteral::character_byte_width"),
+    nullptr,
+  },
+  {
     "literal_kind",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -162,6 +182,26 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::StringLiteral::literal_kind"),
+    nullptr,
+  },
+  {
+    "length",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->length());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::StringLiteral::length"),
+    nullptr,
+  },
+  {
+    "num_concatenated",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_concatenated());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::StringLiteral::num_concatenated"),
     nullptr,
   },
   {

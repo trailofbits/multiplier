@@ -134,6 +134,16 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::BTFDeclTagAttr::btf_decl_tag"),
     nullptr,
   },
+  {
+    "btf_decl_tag_length",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->btf_decl_tag_length());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BTFDeclTagAttr::btf_decl_tag_length"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

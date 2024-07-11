@@ -144,6 +144,16 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::SwiftVersionedRemovalAttr::is_replaced_by_active"),
     nullptr,
   },
+  {
+    "raw_kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->raw_kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SwiftVersionedRemovalAttr::raw_kind"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

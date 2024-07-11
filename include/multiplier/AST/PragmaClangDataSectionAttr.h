@@ -53,6 +53,7 @@ class MX_EXPORT PragmaClangDataSectionAttr : public InheritableAttr {
   static std::optional<PragmaClangDataSectionAttr> from(const TokenContext &t);
 
   std::string_view name(void) const;
+  uint32_t name_length(void) const;
 };
 
 static_assert(sizeof(PragmaClangDataSectionAttr) == sizeof(InheritableAttr));

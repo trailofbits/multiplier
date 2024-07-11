@@ -52,6 +52,7 @@ class MX_EXPORT MSP430InterruptAttr : public InheritableAttr {
   static std::optional<MSP430InterruptAttr> from(const VariantEntity &e);
   static std::optional<MSP430InterruptAttr> from(const TokenContext &t);
 
+  uint32_t number(void) const;
 };
 
 static_assert(sizeof(MSP430InterruptAttr) == sizeof(InheritableAttr));

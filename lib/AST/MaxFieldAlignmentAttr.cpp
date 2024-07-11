@@ -125,6 +125,10 @@ std::optional<MaxFieldAlignmentAttr> MaxFieldAlignmentAttr::from(const TokenCont
   return std::nullopt;
 }
 
+uint32_t MaxFieldAlignmentAttr::alignment(void) const {
+  return impl->reader.getVal12();
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

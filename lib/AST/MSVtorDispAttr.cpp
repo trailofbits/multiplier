@@ -125,8 +125,12 @@ std::optional<MSVtorDispAttr> MSVtorDispAttr::from(const TokenContext &t) {
   return std::nullopt;
 }
 
+uint32_t MSVtorDispAttr::vdm(void) const {
+  return impl->reader.getVal12();
+}
+
 MSVtorDispMode MSVtorDispAttr::vtor_disp_mode(void) const {
-  return static_cast<MSVtorDispMode>(impl->reader.getVal12());
+  return static_cast<MSVtorDispMode>(impl->reader.getVal13());
 }
 
 #pragma GCC diagnostic pop

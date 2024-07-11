@@ -6,6 +6,8 @@
 
 #include <multiplier/IR/Value.h>
 
+#include <cassert>
+
 #include <mlir/IR/Block.h>
 #include <mlir/IR/Operation.h>
 #include <mlir/IR/OperationSupport.h>
@@ -22,6 +24,12 @@ MX_EXPORT const char *EnumeratorName(ValueKind kind) {
     case ValueKind::BLOCK_ARGUMENT: return "BLOCK_ARGUMENT";
     default: return "<invalid>";
   }
+}
+
+Value::Value(std::shared_ptr<const SourceIRImpl> module, void *value)
+    : module_(std::move(module)),
+      impl_(value) {
+  assert(value != nullptr);
 }
 
 ValueKind Value::kind(void) const noexcept {

@@ -130,12 +130,16 @@ std::string_view CapabilityAttr::name(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
+uint32_t CapabilityAttr::name_length(void) const {
+  return impl->reader.getVal12();
+}
+
 CapabilityAttrSpelling CapabilityAttr::semantic_spelling(void) const {
-  return static_cast<CapabilityAttrSpelling>(impl->reader.getVal12());
+  return static_cast<CapabilityAttrSpelling>(impl->reader.getVal13());
 }
 
 bool CapabilityAttr::is_shared(void) const {
-  return impl->reader.getVal14();
+  return impl->reader.getVal15();
 }
 
 #pragma GCC diagnostic pop

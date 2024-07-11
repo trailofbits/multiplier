@@ -194,12 +194,12 @@ std::optional<FunctionParmPackExpr> FunctionParmPackExpr::from(const TokenContex
 }
 
 VarDecl FunctionParmPackExpr::parameter_pack(void) const {
-  RawEntityId eid = impl->reader.getVal37();
+  RawEntityId eid = impl->reader.getVal38();
   return VarDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Token FunctionParmPackExpr::parameter_pack_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 unsigned FunctionParmPackExpr::num_expansions(void) const {

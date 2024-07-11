@@ -124,6 +124,16 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
 namespace {
 static PyGetSetDef gProperties[] = {
+  {
+    "num_elements_flattened",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_elements_flattened());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ConstantMatrixType::num_elements_flattened"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

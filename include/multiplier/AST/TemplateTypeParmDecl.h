@@ -74,6 +74,8 @@ class MX_EXPORT TemplateTypeParmDecl : public TypeDecl {
   std::optional<Type> default_argument(void) const;
   std::optional<Type> default_argument_info(void) const;
   Token default_argument_token(void) const;
+  uint32_t depth(void) const;
+  uint32_t index(void) const;
   bool has_default_argument(void) const;
   bool has_type_constraint(void) const;
   bool is_expanded_parameter_pack(void) const;

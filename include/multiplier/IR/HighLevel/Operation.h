@@ -1685,6 +1685,7 @@ class MX_EXPORT OffsetOfExprOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value result(void) const;
   //::mlir::MutableArrayRef<Region> array_index_exprs(void) const;
+  ::mx::ir::Type source(void) const;
   //::mlir::ArrayAttr components(void) const;
 };
 static_assert(sizeof(OffsetOfExprOp) == sizeof(Operation));

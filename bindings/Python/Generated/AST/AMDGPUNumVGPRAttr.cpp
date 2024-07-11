@@ -124,6 +124,16 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
 namespace {
 static PyGetSetDef gProperties[] = {
+  {
+    "num_vgpr",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_vgpr());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AMDGPUNumVGPRAttr::num_vgpr"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

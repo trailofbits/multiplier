@@ -126,7 +126,7 @@ std::optional<SwiftErrorAttr> SwiftErrorAttr::from(const TokenContext &t) {
 }
 
 SwiftErrorAttrConventionKind SwiftErrorAttr::convention(void) const {
-  return static_cast<SwiftErrorAttrConventionKind>(impl->reader.getVal12());
+  return static_cast<SwiftErrorAttrConventionKind>(impl->reader.getVal13());
 }
 
 #pragma GCC diagnostic pop

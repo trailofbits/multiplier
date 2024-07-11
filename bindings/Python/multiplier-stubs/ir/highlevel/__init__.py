@@ -1792,6 +1792,7 @@ class NotOp(multiplier.ir.highlevel.Operation):
 
 class OffsetOfExprOp(multiplier.ir.highlevel.Operation):
   result: multiplier.ir.Value
+  source: multiplier.ir.Type
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:

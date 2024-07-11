@@ -193,7 +193,11 @@ std::optional<FixedPointLiteral> FixedPointLiteral::from(const TokenContext &t) 
 }
 
 Token FixedPointLiteral::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+}
+
+uint32_t FixedPointLiteral::scale(void) const {
+  return impl->reader.getVal26();
 }
 
 #pragma GCC diagnostic pop

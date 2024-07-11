@@ -134,6 +134,16 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::InitSegAttr::section"),
     nullptr,
   },
+  {
+    "section_length",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->section_length());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::InitSegAttr::section_length"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

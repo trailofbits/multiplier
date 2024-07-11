@@ -128,7 +128,7 @@ std::optional<DiagnoseIfAttr> DiagnoseIfAttr::from(const TokenContext &t) {
 }
 
 bool DiagnoseIfAttr::argument_dependent(void) const {
-  return impl->reader.getVal14();
+  return impl->reader.getVal15();
 }
 
 Expr DiagnoseIfAttr::condition(void) const {
@@ -137,7 +137,7 @@ Expr DiagnoseIfAttr::condition(void) const {
 }
 
 DiagnoseIfAttrDiagnosticType DiagnoseIfAttr::diagnostic_type(void) const {
-  return static_cast<DiagnoseIfAttrDiagnosticType>(impl->reader.getVal12());
+  return static_cast<DiagnoseIfAttrDiagnosticType>(impl->reader.getVal13());
 }
 
 std::string_view DiagnoseIfAttr::message(void) const {
@@ -145,17 +145,21 @@ std::string_view DiagnoseIfAttr::message(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
+uint32_t DiagnoseIfAttr::message_length(void) const {
+  return impl->reader.getVal12();
+}
+
 NamedDecl DiagnoseIfAttr::parent(void) const {
-  RawEntityId eid = impl->reader.getVal22();
+  RawEntityId eid = impl->reader.getVal23();
   return NamedDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 bool DiagnoseIfAttr::is_error(void) const {
-  return impl->reader.getVal15();
+  return impl->reader.getVal16();
 }
 
 bool DiagnoseIfAttr::is_warning(void) const {
-  return impl->reader.getVal16();
+  return impl->reader.getVal17();
 }
 
 #pragma GCC diagnostic pop

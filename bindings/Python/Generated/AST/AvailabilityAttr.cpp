@@ -135,6 +135,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "message_length",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->message_length());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AvailabilityAttr::message_length"),
+    nullptr,
+  },
+  {
     "replacement",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -142,6 +152,16 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::AvailabilityAttr::replacement"),
+    nullptr,
+  },
+  {
+    "replacement_length",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->replacement_length());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AvailabilityAttr::replacement_length"),
     nullptr,
   },
   {

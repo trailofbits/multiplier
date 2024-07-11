@@ -126,7 +126,7 @@ std::optional<ZeroCallUsedRegsAttr> ZeroCallUsedRegsAttr::from(const TokenContex
 }
 
 ZeroCallUsedRegsAttrZeroCallUsedRegsKind ZeroCallUsedRegsAttr::zero_call_used_regs(void) const {
-  return static_cast<ZeroCallUsedRegsAttrZeroCallUsedRegsKind>(impl->reader.getVal12());
+  return static_cast<ZeroCallUsedRegsAttrZeroCallUsedRegsKind>(impl->reader.getVal13());
 }
 
 #pragma GCC diagnostic pop

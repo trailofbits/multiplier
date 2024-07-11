@@ -134,6 +134,16 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::SwiftAsyncErrorAttr::convention"),
     nullptr,
   },
+  {
+    "handler_parameter_index",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->handler_parameter_index());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SwiftAsyncErrorAttr::handler_parameter_index"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

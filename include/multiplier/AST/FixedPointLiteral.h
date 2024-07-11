@@ -67,6 +67,7 @@ class MX_EXPORT FixedPointLiteral : public Expr {
   static std::optional<FixedPointLiteral> from(const TokenContext &t);
 
   Token token(void) const;
+  uint32_t scale(void) const;
 };
 
 static_assert(sizeof(FixedPointLiteral) == sizeof(Expr));

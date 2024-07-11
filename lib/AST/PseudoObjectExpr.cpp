@@ -193,12 +193,16 @@ std::optional<PseudoObjectExpr> PseudoObjectExpr::from(const TokenContext &t) {
 }
 
 Expr PseudoObjectExpr::result_expression(void) const {
-  RawEntityId eid = impl->reader.getVal37();
+  RawEntityId eid = impl->reader.getVal38();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
+uint32_t PseudoObjectExpr::result_expression_index(void) const {
+  return impl->reader.getVal26();
+}
+
 Expr PseudoObjectExpr::syntactic_form(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal39();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
@@ -235,11 +239,11 @@ gap::generator<Expr> PseudoObjectExpr::semantics(void) const & {
 }
 
 unsigned PseudoObjectExpr::num_semantic_expressions(void) const {
-  return impl->reader.getVal26().size();
+  return impl->reader.getVal27().size();
 }
 
 std::optional<Expr> PseudoObjectExpr::nth_semantic_expression(unsigned n) const {
-  auto list = impl->reader.getVal26();
+  auto list = impl->reader.getVal27();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -253,12 +257,12 @@ std::optional<Expr> PseudoObjectExpr::nth_semantic_expression(unsigned n) const 
 }
 
 gap::generator<Expr> PseudoObjectExpr::semantic_expressions(void) const & {
-  auto list = impl->reader.getVal26();
+  auto list = impl->reader.getVal27();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d26 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from_base(std::move(d26))) {
+    if (auto d27 = ep->StmtFor(ep, v)) {
+      if (auto e = Expr::from_base(std::move(d27))) {
         co_yield std::move(*e);
       }
     }

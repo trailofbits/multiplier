@@ -126,7 +126,7 @@ std::optional<VisibilityAttr> VisibilityAttr::from(const TokenContext &t) {
 }
 
 VisibilityAttrVisibilityType VisibilityAttr::visibility(void) const {
-  return static_cast<VisibilityAttrVisibilityType>(impl->reader.getVal12());
+  return static_cast<VisibilityAttrVisibilityType>(impl->reader.getVal13());
 }
 
 #pragma GCC diagnostic pop

@@ -73,13 +73,9 @@ class MX_EXPORT Operation {
   OperationKind kind_;
 
  public:
-
-  inline Operation(std::shared_ptr<const SourceIRImpl> module,
-                   mlir::Operation *opaque,
-                   OperationKind kind)
-      : module_(std::move(module)),
-        op_(opaque),
-        kind_(kind) {}
+  Operation(std::shared_ptr<const SourceIRImpl> module,
+            mlir::Operation *opaque,
+            OperationKind kind);
 
   inline Operation(std::shared_ptr<const SourceIRImpl> module,
                    mlir::Operation *opaque)

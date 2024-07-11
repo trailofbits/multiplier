@@ -126,7 +126,7 @@ std::optional<ReturnTypestateAttr> ReturnTypestateAttr::from(const TokenContext 
 }
 
 ReturnTypestateAttrConsumedState ReturnTypestateAttr::state(void) const {
-  return static_cast<ReturnTypestateAttrConsumedState>(impl->reader.getVal12());
+  return static_cast<ReturnTypestateAttrConsumedState>(impl->reader.getVal13());
 }
 
 #pragma GCC diagnostic pop

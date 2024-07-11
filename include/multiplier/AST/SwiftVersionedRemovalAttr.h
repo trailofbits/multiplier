@@ -53,6 +53,7 @@ class MX_EXPORT SwiftVersionedRemovalAttr : public Attr {
 
   AttrKind attribute_kind_to_remove(void) const;
   bool is_replaced_by_active(void) const;
+  uint32_t raw_kind(void) const;
 };
 
 static_assert(sizeof(SwiftVersionedRemovalAttr) == sizeof(Attr));

@@ -59,6 +59,7 @@ class MX_EXPORT DiagnoseIfAttr : public InheritableAttr {
   Expr condition(void) const;
   DiagnoseIfAttrDiagnosticType diagnostic_type(void) const;
   std::string_view message(void) const;
+  uint32_t message_length(void) const;
   NamedDecl parent(void) const;
   bool is_error(void) const;
   bool is_warning(void) const;

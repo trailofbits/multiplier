@@ -70,6 +70,7 @@ class MX_EXPORT LifetimeExtendedTemporaryDecl : public Decl {
 
   gap::generator<Stmt> children(void) const &;
   ValueDecl extending_declaration(void) const;
+  uint32_t mangling_number(void) const;
   StorageDuration storage_duration(void) const;
   Expr temporary_expression(void) const;
 };

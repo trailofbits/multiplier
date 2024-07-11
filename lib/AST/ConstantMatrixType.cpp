@@ -98,6 +98,10 @@ std::optional<ConstantMatrixType> ConstantMatrixType::from(const TokenContext &t
   return std::nullopt;
 }
 
+uint32_t ConstantMatrixType::num_elements_flattened(void) const {
+  return impl->reader.getVal21();
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

@@ -67,6 +67,7 @@ class MX_EXPORT PseudoObjectExpr : public Expr {
   static std::optional<PseudoObjectExpr> from(const TokenContext &t);
 
   Expr result_expression(void) const;
+  uint32_t result_expression_index(void) const;
   Expr syntactic_form(void) const;
   std::optional<Expr> nth_semantic(unsigned n) const;
   unsigned num_semantics(void) const;

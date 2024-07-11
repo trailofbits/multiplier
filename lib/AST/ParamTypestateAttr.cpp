@@ -126,7 +126,7 @@ std::optional<ParamTypestateAttr> ParamTypestateAttr::from(const TokenContext &t
 }
 
 ParamTypestateAttrConsumedState ParamTypestateAttr::parameter_state(void) const {
-  return static_cast<ParamTypestateAttrConsumedState>(impl->reader.getVal12());
+  return static_cast<ParamTypestateAttrConsumedState>(impl->reader.getVal13());
 }
 
 #pragma GCC diagnostic pop

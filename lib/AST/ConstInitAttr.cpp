@@ -126,11 +126,11 @@ std::optional<ConstInitAttr> ConstInitAttr::from(const TokenContext &t) {
 }
 
 ConstInitAttrSpelling ConstInitAttr::semantic_spelling(void) const {
-  return static_cast<ConstInitAttrSpelling>(impl->reader.getVal12());
+  return static_cast<ConstInitAttrSpelling>(impl->reader.getVal13());
 }
 
 bool ConstInitAttr::is_constinit(void) const {
-  return impl->reader.getVal14();
+  return impl->reader.getVal15();
 }
 
 #pragma GCC diagnostic pop

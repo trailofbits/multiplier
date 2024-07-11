@@ -126,7 +126,7 @@ std::optional<HLSLShaderAttr> HLSLShaderAttr::from(const TokenContext &t) {
 }
 
 HLSLShaderAttrShaderType HLSLShaderAttr::type(void) const {
-  return static_cast<HLSLShaderAttrShaderType>(impl->reader.getVal12());
+  return static_cast<HLSLShaderAttrShaderType>(impl->reader.getVal13());
 }
 
 #pragma GCC diagnostic pop

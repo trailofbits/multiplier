@@ -185,6 +185,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "friend_type_num_template_parameter_lists",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->friend_type_num_template_parameter_lists());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FriendDecl::friend_type_num_template_parameter_lists"),
+    nullptr,
+  },
+  {
     "is_unsupported_friend",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

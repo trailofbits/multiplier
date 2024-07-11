@@ -39,7 +39,7 @@ class MX_EXPORT Type {
   TypeKind kind_;
 
  public:
-  inline Type(mlir::MLIRContext *context, const mlir::TypeStorage *type)
+  Type(mlir::MLIRContext *context, const mlir::TypeStorage *type)
       : context_(std::move(context)),
         type_(const_cast<mlir::TypeStorage *>(type)),
         kind_(classify(type_)) {}

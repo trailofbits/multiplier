@@ -126,7 +126,7 @@ std::optional<ARMInterruptAttr> ARMInterruptAttr::from(const TokenContext &t) {
 }
 
 ARMInterruptAttrInterruptType ARMInterruptAttr::interrupt(void) const {
-  return static_cast<ARMInterruptAttrInterruptType>(impl->reader.getVal12());
+  return static_cast<ARMInterruptAttrInterruptType>(impl->reader.getVal13());
 }
 
 #pragma GCC diagnostic pop

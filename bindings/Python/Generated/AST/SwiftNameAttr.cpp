@@ -134,6 +134,16 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::SwiftNameAttr::name"),
     nullptr,
   },
+  {
+    "name_length",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->name_length());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SwiftNameAttr::name_length"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

@@ -126,7 +126,11 @@ std::optional<SwiftAsyncErrorAttr> SwiftAsyncErrorAttr::from(const TokenContext 
 }
 
 SwiftAsyncErrorAttrConventionKind SwiftAsyncErrorAttr::convention(void) const {
-  return static_cast<SwiftAsyncErrorAttrConventionKind>(impl->reader.getVal12());
+  return static_cast<SwiftAsyncErrorAttrConventionKind>(impl->reader.getVal13());
+}
+
+uint32_t SwiftAsyncErrorAttr::handler_parameter_index(void) const {
+  return impl->reader.getVal12();
 }
 
 #pragma GCC diagnostic pop

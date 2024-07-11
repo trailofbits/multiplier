@@ -55,6 +55,7 @@ class MX_EXPORT EnableIfAttr : public InheritableAttr {
 
   Expr condition(void) const;
   std::string_view message(void) const;
+  uint32_t message_length(void) const;
 };
 
 static_assert(sizeof(EnableIfAttr) == sizeof(InheritableAttr));

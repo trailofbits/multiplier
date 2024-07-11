@@ -220,7 +220,7 @@ std::optional<ExplicitCastExpr> ExplicitCastExpr::from(const TokenContext &t) {
 }
 
 Type ExplicitCastExpr::type_as_written(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal42();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 

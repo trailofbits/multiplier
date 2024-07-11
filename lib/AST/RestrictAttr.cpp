@@ -126,7 +126,7 @@ std::optional<RestrictAttr> RestrictAttr::from(const TokenContext &t) {
 }
 
 RestrictAttrSpelling RestrictAttr::semantic_spelling(void) const {
-  return static_cast<RestrictAttrSpelling>(impl->reader.getVal12());
+  return static_cast<RestrictAttrSpelling>(impl->reader.getVal13());
 }
 
 #pragma GCC diagnostic pop

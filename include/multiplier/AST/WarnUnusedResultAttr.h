@@ -55,6 +55,7 @@ class MX_EXPORT WarnUnusedResultAttr : public InheritableAttr {
 
   bool is_cxx11_no_discard(void) const;
   std::string_view message(void) const;
+  uint32_t message_length(void) const;
   WarnUnusedResultAttrSpelling semantic_spelling(void) const;
 };
 

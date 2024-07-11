@@ -53,9 +53,12 @@ class MX_EXPORT ExternalSourceSymbolAttr : public InheritableAttr {
   static std::optional<ExternalSourceSymbolAttr> from(const TokenContext &t);
 
   std::string_view defined_in(void) const;
+  uint32_t defined_in_length(void) const;
   bool generated_declaration(void) const;
   std::string_view language(void) const;
+  uint32_t language_length(void) const;
   std::string_view usr(void) const;
+  uint32_t usr_length(void) const;
 };
 
 static_assert(sizeof(ExternalSourceSymbolAttr) == sizeof(InheritableAttr));

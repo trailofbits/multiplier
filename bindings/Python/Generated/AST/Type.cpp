@@ -361,6 +361,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "raw_qualifiers",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->raw_qualifiers());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Type::raw_qualifiers"),
+    nullptr,
+  },
+  {
     "desugared_type",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

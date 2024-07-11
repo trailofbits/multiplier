@@ -99,7 +99,7 @@ std::optional<RValueReferenceType> RValueReferenceType::from(const TokenContext 
 }
 
 bool RValueReferenceType::is_sugared(void) const {
-  return impl->reader.getVal22();
+  return impl->reader.getVal25();
 }
 
 #pragma GCC diagnostic pop

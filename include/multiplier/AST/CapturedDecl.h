@@ -68,6 +68,7 @@ class MX_EXPORT CapturedDecl : public Decl {
   static std::optional<CapturedDecl> from(const TokenContext &t);
 
   ImplicitParamDecl context_parameter(void) const;
+  uint32_t context_parameter_position(void) const;
   bool is_nothrow(void) const;
   std::optional<ImplicitParamDecl> nth_parameter(unsigned n) const;
   unsigned num_parameters(void) const;

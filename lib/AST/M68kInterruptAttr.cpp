@@ -125,6 +125,10 @@ std::optional<M68kInterruptAttr> M68kInterruptAttr::from(const TokenContext &t) 
   return std::nullopt;
 }
 
+uint32_t M68kInterruptAttr::number(void) const {
+  return impl->reader.getVal12();
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

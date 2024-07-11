@@ -55,6 +55,7 @@ class MX_EXPORT FunctionProtoType : public FunctionType {
   static std::optional<FunctionProtoType> from(const TokenContext &t);
 
   std::optional<CanThrowResult> can_throw(void) const;
+  uint32_t a_arch64_sme_attributes(void) const;
   Token ellipsis_token(void) const;
   std::optional<FunctionDecl> exception_spec_declaration(void) const;
   std::optional<FunctionDecl> exception_spec_template(void) const;

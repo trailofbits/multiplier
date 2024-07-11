@@ -54,6 +54,7 @@ class MX_EXPORT SwiftAsyncErrorAttr : public InheritableAttr {
   static std::optional<SwiftAsyncErrorAttr> from(const TokenContext &t);
 
   SwiftAsyncErrorAttrConventionKind convention(void) const;
+  uint32_t handler_parameter_index(void) const;
 };
 
 static_assert(sizeof(SwiftAsyncErrorAttr) == sizeof(InheritableAttr));

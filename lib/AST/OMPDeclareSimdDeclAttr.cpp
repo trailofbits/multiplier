@@ -126,7 +126,7 @@ std::optional<OMPDeclareSimdDeclAttr> OMPDeclareSimdDeclAttr::from(const TokenCo
 }
 
 OMPDeclareSimdDeclAttrBranchStateTy OMPDeclareSimdDeclAttr::branch_state(void) const {
-  return static_cast<OMPDeclareSimdDeclAttrBranchStateTy>(impl->reader.getVal12());
+  return static_cast<OMPDeclareSimdDeclAttrBranchStateTy>(impl->reader.getVal13());
 }
 
 Expr OMPDeclareSimdDeclAttr::simdlen(void) const {

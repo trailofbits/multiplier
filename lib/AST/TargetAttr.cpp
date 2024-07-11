@@ -131,12 +131,16 @@ std::string_view TargetAttr::architecture(void) const {
 }
 
 std::string_view TargetAttr::features_string(void) const {
-  capnp::Text::Reader data = impl->reader.getVal23();
+  capnp::Text::Reader data = impl->reader.getVal24();
   return std::string_view(data.cStr(), data.size());
 }
 
+uint32_t TargetAttr::features_string_length(void) const {
+  return impl->reader.getVal12();
+}
+
 bool TargetAttr::is_default_version(void) const {
-  return impl->reader.getVal14();
+  return impl->reader.getVal15();
 }
 
 #pragma GCC diagnostic pop

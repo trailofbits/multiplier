@@ -154,6 +154,16 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::StmtExpr::sub_statement"),
     nullptr,
   },
+  {
+    "template_depth",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->template_depth());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::StmtExpr::template_depth"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

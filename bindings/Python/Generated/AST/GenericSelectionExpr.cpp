@@ -205,6 +205,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "result_index",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->result_index());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::GenericSelectionExpr::result_index"),
+    nullptr,
+  },
+  {
     "is_expression_predicate",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

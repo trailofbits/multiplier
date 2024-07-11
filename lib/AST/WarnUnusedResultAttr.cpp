@@ -126,7 +126,7 @@ std::optional<WarnUnusedResultAttr> WarnUnusedResultAttr::from(const TokenContex
 }
 
 bool WarnUnusedResultAttr::is_cxx11_no_discard(void) const {
-  return impl->reader.getVal14();
+  return impl->reader.getVal15();
 }
 
 std::string_view WarnUnusedResultAttr::message(void) const {
@@ -134,8 +134,12 @@ std::string_view WarnUnusedResultAttr::message(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
+uint32_t WarnUnusedResultAttr::message_length(void) const {
+  return impl->reader.getVal12();
+}
+
 WarnUnusedResultAttrSpelling WarnUnusedResultAttr::semantic_spelling(void) const {
-  return static_cast<WarnUnusedResultAttrSpelling>(impl->reader.getVal12());
+  return static_cast<WarnUnusedResultAttrSpelling>(impl->reader.getVal13());
 }
 
 #pragma GCC diagnostic pop

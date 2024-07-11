@@ -185,6 +185,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "size",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->size());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DesignatedInitExpr::size"),
+    nullptr,
+  },
+  {
     "uses_gnu_syntax",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

@@ -134,6 +134,16 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::FixedPointLiteral::token"),
     nullptr,
   },
+  {
+    "scale",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->scale());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FixedPointLiteral::scale"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

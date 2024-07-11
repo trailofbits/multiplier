@@ -126,7 +126,7 @@ std::optional<CFGuardAttr> CFGuardAttr::from(const TokenContext &t) {
 }
 
 CFGuardAttrGuardArg CFGuardAttr::guard(void) const {
-  return static_cast<CFGuardAttrGuardArg>(impl->reader.getVal12());
+  return static_cast<CFGuardAttrGuardArg>(impl->reader.getVal13());
 }
 
 #pragma GCC diagnostic pop

@@ -6,6 +6,8 @@
 
 #include <multiplier/IR/Region.h>
 
+#include <cassert>
+
 #include <mlir/IR/Block.h>
 #include <mlir/IR/Operation.h>
 #include <mlir/IR/Region.h>
@@ -22,6 +24,13 @@ const char *EnumeratorName(BasicBlockOrder val) {
     case BasicBlockOrder::POST_ORDER: return "POST_ORDER";
     default: return "<invalid>";
   }
+}
+
+Region::Region(std::shared_ptr<const SourceIRImpl> module,
+               mlir::Region *region)
+    : module_(std::move(module)),
+      region_(region) {
+  assert(region_ != nullptr);
 }
 
 Region Region::containing(const Block &block) {

@@ -132,7 +132,7 @@ Type PreferredNameAttr::typedef_type(void) const {
 }
 
 Type PreferredNameAttr::typedef_type_token(void) const {
-  RawEntityId eid = impl->reader.getVal22();
+  RawEntityId eid = impl->reader.getVal23();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 

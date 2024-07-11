@@ -99,12 +99,12 @@ std::optional<ObjCTypeParamType> ObjCTypeParamType::from(const TokenContext &t) 
 }
 
 ObjCTypeParamDecl ObjCTypeParamType::declaration(void) const {
-  RawEntityId eid = impl->reader.getVal19();
+  RawEntityId eid = impl->reader.getVal20();
   return ObjCTypeParamDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 bool ObjCTypeParamType::is_sugared(void) const {
-  return impl->reader.getVal20();
+  return impl->reader.getVal23();
 }
 
 #pragma GCC diagnostic pop

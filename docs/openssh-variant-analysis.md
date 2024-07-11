@@ -351,7 +351,7 @@ Alright, we're going to have to do some digging. We'll apply a simple work list 
 
 ```python
 >>> wl = [sigaction_struct]
->>> found = []
+>>> sigaction_fields = []
 >>> while len(wl):
 ...   frag = mx.Fragment.containing(wl.pop())
 ...   for field in mx.ast.FieldDecl.IN(frag):
@@ -359,11 +359,11 @@ Alright, we're going to have to do some digging. We'll apply a simple work list 
 ...       continue
 ...     ft = field.type.unqualified_desugared_type
 ...     if isinstance(ft, mx.ast.PointerType):
-...       found.append(field)
+...       sigaction_fields.append(field)
 ...     elif isinstance(ft, mx.ast.RecordType):
 ...       wl.append(ft.declaration)
 ...
->>> found
+>>> sigaction_fields
 [<multiplier.ast.FieldDecl object at 0x105a1eeb0>, <multiplier.ast.FieldDecl object at 0x105a1f000>]
 ```
 
@@ -371,7 +371,7 @@ Lets see what we found:
 
 ```python
 >>> render_opts = mx.ast.QualifiedNameRenderOptions(fully_qualified=True)
->>> [f.qualified_name(render_opts).data for f in found]
+>>> [f.qualified_name(render_opts).data for f in sigaction_fields]
 ['__sigaction_u::__sa_handler', '__sigaction_u::__sa_sigaction']
 ```
 
@@ -381,3 +381,88 @@ Alright, it looks like our worklist algorithm has discovered the relevant fields
  2. We get the "fragment" containing the record declaration popped off the back of the work list. Every declaration is nested inside of a fragment, which is the unit of deduplication and serialization granularity in Multiplier. Roughly, every lexically freestanding top-level declaration is placed into its own fragment, and any lexically nested declaration belongs to that fragment. There are caveats to this rule when it comes to C++ classes, methods, and templates. 
  3. Then, we find all field declarations within the fragment we're looking at, then check if their type is a pointer type. Note that we skip fields containing the word `restore` in their names. This field isn't meant to be used by user code.
 
+#### Slicing to find reaching values
+
+Alright, next up, we want to slice backwards through a program to discover function pointers that flow into the second argument of `signal`, or into any of our `sigaction_fields`.
+
+```python
+>>> wl = [signal.nth_parameter(1)] + sigaction_fields
+>>> seen = set()
+>>> render_opts = mx.ast.QualifiedNameRenderOptions(fully_qualified=True)
+>>> handlers = []
+>>> while len(wl):
+...   ent = wl.pop()
+...   if isinstance(ent, mx.Entity):
+...     eid = ent.id
+...     if eid in seen:
+...       continue
+...     seen.add(eid)
+...   if isinstance(ent, mx.ast.ParmVarDecl):
+...     print("Visiting {} '{}' with ID {}".format( \
+...         ent.kind.name, ent.qualified_name(render_opts).data, ent.id))
+...     func = ent.parent_declaration
+...     n = [p.id for p in func.parameters].index(ent.id)
+...     for caller in func.callers:
+...       if isinstance(caller, mx.ast.CallExpr):
+...         if nth_arg := caller.nth_argument(n):
+...           wl.append(nth_arg)
+...   elif isinstance(ent, (mx.ast.VarDecl, mx.ast.FieldDecl)):
+...     print("Visiting {} '{}' with ID {}".format( \
+...         ent.kind.name, ent.qualified_name(render_opts).data, ent.id))
+...     for ref in mx.Reference.to(ent):
+...       if brk := ref.builtin_reference_kind:
+...         if brk in (mx.BuiltinReferenceKind.WRITES_VALUE, \
+...                    mx.BuiltinReferenceKind.UPDATES_VALUE):
+...           if decl_ref := ref.as_statement:
+...             wl.append(decl_ref)
+...   elif isinstance(ent, (mx.ast.DeclRefExpr, mx.ast.MemberExpr)):
+...     if isinstance(ent, mx.ast.DeclRefExpr):
+...       maybe_handler = ent.declaration
+...       if isinstance(maybe_handler, mx.ast.FunctionDecl):
+...         handlers.append(maybe_handler)
+...         continue
+...     print(f"Visiting {ent.kind.name} '{ent.tokens.file_tokens.data}' with ID {ent.id}")
+...     for op in mx.ir.Operation.all_from(ent):
+...       for use in op.uses:
+...         user = use.operation
+...         for other_use in user.operands:
+...           if other_use != use:
+...             wl.append(other_use.value)
+...   elif isinstance(ent, mx.ast.CallExpr):
+...     print(f"Skipping {ent.kind.name} '{ent.tokens.file_tokens.data}' with ID {ent.id}")
+...   elif isinstance(ent, mx.ast.Expr):
+...     print(f"Visiting {ent.kind.name} '{ent.tokens.file_tokens.data}' with ID {ent.id}")
+...     for op in mx.ir.Operation.all_from(ent):
+...       for use in op.operands:
+...         wl.append(use.value)
+...   elif isinstance(ent, mx.ir.Result):
+...     wl.append(ent.operation)
+...   elif isinstance(ent, mx.ir.Argument):
+...     block = mx.ir.Block.containing(ent)
+...     for label in block.uses:
+...       print(label)
+...     region = mx.ir.Region.containing(block)
+...     if region.entry_block == block:
+...       region_op = mx.ir.Operation.containing(block)
+...       if isinstance(region_op, mx.ir.highlevel.FuncOp):
+...         func_decl = mx.ast.FunctionDecl.FROM(region_op)
+...         if not func_decl:
+...           if decl := index.entity(int(region_op.sym_name)):
+...             if isinstance(decl, mx.ast.FunctionDecl):
+...               func_decl = decl
+...         if func_decl:
+...           wl.append(func_decl.nth_parameter(ent.index)) 
+...       else:
+...         wl.append(region_op.nth_operand(ent.index).value)
+...   elif isinstance(ent, mx.ir.highlevel.CallOp):
+...     print(f"Skipping {ent.kind.name} with ID {ent.id}")
+...   elif isinstance(ent, mx.ir.highlevel.DeclRefOp):
+...     print(f"Working back through {ent.kind.name} with ID {ent.id}")
+...     wl.append(ent.decl)
+...   elif isinstance(ent, mx.ir.Operation):
+...     print(f"Working back through {ent.kind.name} with ID {ent.id}")
+...     for op in ent.operands:
+...       wl.append(op.value)
+...   else:
+...     print(f"Unknown: {ent.kind.name} {ent.tokens.file_tokens.data}")
+```

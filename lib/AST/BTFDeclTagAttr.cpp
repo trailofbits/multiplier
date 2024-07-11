@@ -130,6 +130,10 @@ std::string_view BTFDeclTagAttr::btf_decl_tag(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
+uint32_t BTFDeclTagAttr::btf_decl_tag_length(void) const {
+  return impl->reader.getVal12();
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

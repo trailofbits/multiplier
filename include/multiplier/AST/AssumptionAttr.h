@@ -53,6 +53,7 @@ class MX_EXPORT AssumptionAttr : public InheritableAttr {
   static std::optional<AssumptionAttr> from(const TokenContext &t);
 
   std::string_view assumption(void) const;
+  uint32_t assumption_length(void) const;
 };
 
 static_assert(sizeof(AssumptionAttr) == sizeof(InheritableAttr));

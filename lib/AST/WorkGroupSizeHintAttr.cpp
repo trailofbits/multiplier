@@ -125,6 +125,18 @@ std::optional<WorkGroupSizeHintAttr> WorkGroupSizeHintAttr::from(const TokenCont
   return std::nullopt;
 }
 
+uint32_t WorkGroupSizeHintAttr::x_dim(void) const {
+  return impl->reader.getVal12();
+}
+
+uint32_t WorkGroupSizeHintAttr::y_dim(void) const {
+  return impl->reader.getVal25();
+}
+
+uint32_t WorkGroupSizeHintAttr::z_dim(void) const {
+  return impl->reader.getVal27();
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

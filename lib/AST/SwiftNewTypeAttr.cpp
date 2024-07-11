@@ -126,11 +126,11 @@ std::optional<SwiftNewTypeAttr> SwiftNewTypeAttr::from(const TokenContext &t) {
 }
 
 SwiftNewTypeAttrNewtypeKind SwiftNewTypeAttr::newtype_kind(void) const {
-  return static_cast<SwiftNewTypeAttrNewtypeKind>(impl->reader.getVal12());
+  return static_cast<SwiftNewTypeAttrNewtypeKind>(impl->reader.getVal13());
 }
 
 SwiftNewTypeAttrSpelling SwiftNewTypeAttr::semantic_spelling(void) const {
-  return static_cast<SwiftNewTypeAttrSpelling>(impl->reader.getVal20());
+  return static_cast<SwiftNewTypeAttrSpelling>(impl->reader.getVal21());
 }
 
 #pragma GCC diagnostic pop

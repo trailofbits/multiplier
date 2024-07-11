@@ -75,6 +75,7 @@ class MX_EXPORT DesignatedInitExpr : public Expr {
   Token equal_or_colon_token(void) const;
   Expr initializer(void) const;
   bool is_direct_initializer(void) const;
+  uint32_t size(void) const;
   bool uses_gnu_syntax(void) const;
   std::optional<Expr> nth_sub_expression(unsigned n) const;
   unsigned num_sub_expressions(void) const;

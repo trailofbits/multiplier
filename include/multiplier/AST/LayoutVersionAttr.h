@@ -52,6 +52,7 @@ class MX_EXPORT LayoutVersionAttr : public InheritableAttr {
   static std::optional<LayoutVersionAttr> from(const VariantEntity &e);
   static std::optional<LayoutVersionAttr> from(const TokenContext &t);
 
+  uint32_t version(void) const;
 };
 
 static_assert(sizeof(LayoutVersionAttr) == sizeof(InheritableAttr));

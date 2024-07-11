@@ -76,6 +76,7 @@ class MX_EXPORT FieldDecl : public DeclaratorDecl {
 
   std::optional<Expr> bit_width(void) const;
   std::optional<VariableArrayType> captured_vla_type(void) const;
+  uint32_t field_index(void) const;
   InClassInitStyle in_class_initializer_style(void) const;
   std::optional<Expr> in_class_initializer(void) const;
   bool has_captured_vla_type(void) const;

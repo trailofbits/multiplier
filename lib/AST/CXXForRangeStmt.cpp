@@ -286,16 +286,16 @@ VarDecl CXXForRangeStmt::loop_variable(void) const {
 }
 
 Token CXXForRangeStmt::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal30());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal31());
 }
 
 Expr CXXForRangeStmt::range_initializer(void) const {
-  RawEntityId eid = impl->reader.getVal31();
+  RawEntityId eid = impl->reader.getVal32();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 DeclStmt CXXForRangeStmt::range_statement(void) const {
-  RawEntityId eid = impl->reader.getVal32();
+  RawEntityId eid = impl->reader.getVal33();
   return DeclStmt::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 

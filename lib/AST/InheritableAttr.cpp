@@ -1101,7 +1101,7 @@ std::optional<InheritableAttr> InheritableAttr::from(const TokenContext &t) {
 }
 
 bool InheritableAttr::should_inherit_even_if_already_present(void) const {
-  return impl->reader.getVal13();
+  return impl->reader.getVal14();
 }
 
 #pragma GCC diagnostic pop

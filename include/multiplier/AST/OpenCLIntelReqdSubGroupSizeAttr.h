@@ -52,6 +52,7 @@ class MX_EXPORT OpenCLIntelReqdSubGroupSizeAttr : public InheritableAttr {
   static std::optional<OpenCLIntelReqdSubGroupSizeAttr> from(const VariantEntity &e);
   static std::optional<OpenCLIntelReqdSubGroupSizeAttr> from(const TokenContext &t);
 
+  uint32_t sub_group_size(void) const;
 };
 
 static_assert(sizeof(OpenCLIntelReqdSubGroupSizeAttr) == sizeof(InheritableAttr));

@@ -197,7 +197,7 @@ std::optional<FullExpr> FullExpr::from(const TokenContext &t) {
 }
 
 Expr FullExpr::sub_expression(void) const {
-  RawEntityId eid = impl->reader.getVal37();
+  RawEntityId eid = impl->reader.getVal38();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 

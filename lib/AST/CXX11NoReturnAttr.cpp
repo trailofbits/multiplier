@@ -126,7 +126,7 @@ std::optional<CXX11NoReturnAttr> CXX11NoReturnAttr::from(const TokenContext &t) 
 }
 
 CXX11NoReturnAttrSpelling CXX11NoReturnAttr::semantic_spelling(void) const {
-  return static_cast<CXX11NoReturnAttrSpelling>(impl->reader.getVal12());
+  return static_cast<CXX11NoReturnAttrSpelling>(impl->reader.getVal13());
 }
 
 #pragma GCC diagnostic pop

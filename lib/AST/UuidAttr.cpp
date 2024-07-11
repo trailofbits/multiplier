@@ -136,6 +136,10 @@ MSGuidDecl UuidAttr::guid_declaration(void) const {
   return MSGuidDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
+uint32_t UuidAttr::guid_length(void) const {
+  return impl->reader.getVal12();
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

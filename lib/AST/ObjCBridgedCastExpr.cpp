@@ -195,20 +195,20 @@ std::optional<ObjCBridgedCastExpr> ObjCBridgedCastExpr::from(const TokenContext 
 }
 
 Token ObjCBridgedCastExpr::bridge_keyword_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }
 
 ObjCBridgeCastKind ObjCBridgedCastExpr::bridge_kind(void) const {
-  return static_cast<ObjCBridgeCastKind>(impl->reader.getVal90());
+  return static_cast<ObjCBridgeCastKind>(impl->reader.getVal91());
 }
 
 std::string_view ObjCBridgedCastExpr::bridge_kind_name(void) const {
-  capnp::Text::Reader data = impl->reader.getVal65();
+  capnp::Text::Reader data = impl->reader.getVal66();
   return std::string_view(data.cStr(), data.size());
 }
 
 Token ObjCBridgedCastExpr::l_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
 }
 
 #pragma GCC diagnostic pop

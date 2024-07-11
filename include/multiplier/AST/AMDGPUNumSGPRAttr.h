@@ -52,6 +52,7 @@ class MX_EXPORT AMDGPUNumSGPRAttr : public InheritableAttr {
   static std::optional<AMDGPUNumSGPRAttr> from(const VariantEntity &e);
   static std::optional<AMDGPUNumSGPRAttr> from(const TokenContext &t);
 
+  uint32_t num_sgpr(void) const;
 };
 
 static_assert(sizeof(AMDGPUNumSGPRAttr) == sizeof(InheritableAttr));

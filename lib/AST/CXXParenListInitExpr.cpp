@@ -194,16 +194,16 @@ std::optional<CXXParenListInitExpr> CXXParenListInitExpr::from(const TokenContex
 }
 
 Expr CXXParenListInitExpr::array_filler(void) const {
-  RawEntityId eid = impl->reader.getVal37();
+  RawEntityId eid = impl->reader.getVal38();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Token CXXParenListInitExpr::initializer_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 FieldDecl CXXParenListInitExpr::initialized_field_in_union(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal40();
   return FieldDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 

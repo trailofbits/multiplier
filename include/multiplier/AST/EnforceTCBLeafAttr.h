@@ -53,6 +53,7 @@ class MX_EXPORT EnforceTCBLeafAttr : public InheritableAttr {
   static std::optional<EnforceTCBLeafAttr> from(const TokenContext &t);
 
   std::string_view tcb_name(void) const;
+  uint32_t tcb_name_length(void) const;
 };
 
 static_assert(sizeof(EnforceTCBLeafAttr) == sizeof(InheritableAttr));

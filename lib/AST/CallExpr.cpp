@@ -240,22 +240,26 @@ gap::generator<Expr> CallExpr::arguments(void) const & {
 }
 
 CallExprADLCallKind CallExpr::adl_call_kind(void) const {
-  return static_cast<CallExprADLCallKind>(impl->reader.getVal88());
+  return static_cast<CallExprADLCallKind>(impl->reader.getVal89());
+}
+
+uint32_t CallExpr::builtin_callee(void) const {
+  return impl->reader.getVal26();
 }
 
 Type CallExpr::call_return_type(void) const {
-  RawEntityId eid = impl->reader.getVal37();
+  RawEntityId eid = impl->reader.getVal38();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Expr CallExpr::callee(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal39();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 std::optional<Decl> CallExpr::callee_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal39();
+    RawEntityId eid = impl->reader.getVal40();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -268,7 +272,7 @@ std::optional<Decl> CallExpr::callee_declaration(void) const {
 
 std::optional<FunctionDecl> CallExpr::direct_callee(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal40();
+    RawEntityId eid = impl->reader.getVal41();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -280,31 +284,31 @@ std::optional<FunctionDecl> CallExpr::direct_callee(void) const {
 }
 
 Token CallExpr::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 bool CallExpr::has_stored_fp_features(void) const {
-  return impl->reader.getVal83();
-}
-
-bool CallExpr::has_unused_result_attribute(void) const {
   return impl->reader.getVal84();
 }
 
-bool CallExpr::is_builtin_assume_false(void) const {
+bool CallExpr::has_unused_result_attribute(void) const {
   return impl->reader.getVal85();
 }
 
-bool CallExpr::is_call_to_std_move(void) const {
+bool CallExpr::is_builtin_assume_false(void) const {
   return impl->reader.getVal86();
 }
 
-bool CallExpr::is_unevaluated_builtin_call(void) const {
+bool CallExpr::is_call_to_std_move(void) const {
   return impl->reader.getVal87();
 }
 
+bool CallExpr::is_unevaluated_builtin_call(void) const {
+  return impl->reader.getVal88();
+}
+
 bool CallExpr::uses_adl(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal90();
 }
 
 #pragma GCC diagnostic pop

@@ -129,6 +129,10 @@ std::string_view IFuncAttr::resolver(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
+uint32_t IFuncAttr::resolver_length(void) const {
+  return impl->reader.getVal12();
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

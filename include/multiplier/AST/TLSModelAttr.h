@@ -53,6 +53,7 @@ class MX_EXPORT TLSModelAttr : public InheritableAttr {
   static std::optional<TLSModelAttr> from(const TokenContext &t);
 
   std::string_view model(void) const;
+  uint32_t model_length(void) const;
 };
 
 static_assert(sizeof(TLSModelAttr) == sizeof(InheritableAttr));

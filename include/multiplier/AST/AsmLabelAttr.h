@@ -54,6 +54,7 @@ class MX_EXPORT AsmLabelAttr : public InheritableAttr {
 
   bool is_literal_label(void) const;
   std::string_view label(void) const;
+  uint32_t label_length(void) const;
 };
 
 static_assert(sizeof(AsmLabelAttr) == sizeof(InheritableAttr));

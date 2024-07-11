@@ -135,6 +135,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "result_expression_index",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->result_expression_index());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::PseudoObjectExpr::result_expression_index"),
+    nullptr,
+  },
+  {
     "syntactic_form",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

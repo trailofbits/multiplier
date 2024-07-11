@@ -126,7 +126,7 @@ std::optional<ObjCMethodFamilyAttr> ObjCMethodFamilyAttr::from(const TokenContex
 }
 
 ObjCMethodFamilyAttrFamilyKind ObjCMethodFamilyAttr::family(void) const {
-  return static_cast<ObjCMethodFamilyAttrFamilyKind>(impl->reader.getVal12());
+  return static_cast<ObjCMethodFamilyAttrFamilyKind>(impl->reader.getVal13());
 }
 
 #pragma GCC diagnostic pop

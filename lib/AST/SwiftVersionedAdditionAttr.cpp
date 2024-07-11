@@ -130,7 +130,7 @@ Attr SwiftVersionedAdditionAttr::additional_attribute(void) const {
 }
 
 bool SwiftVersionedAdditionAttr::is_replaced_by_active(void) const {
-  return impl->reader.getVal13();
+  return impl->reader.getVal14();
 }
 
 #pragma GCC diagnostic pop

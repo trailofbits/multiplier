@@ -193,16 +193,16 @@ std::optional<ExpressionTraitExpr> ExpressionTraitExpr::from(const TokenContext 
 }
 
 Expr ExpressionTraitExpr::queried_expression(void) const {
-  RawEntityId eid = impl->reader.getVal37();
+  RawEntityId eid = impl->reader.getVal38();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 ExpressionTrait ExpressionTraitExpr::trait(void) const {
-  return static_cast<ExpressionTrait>(impl->reader.getVal88());
+  return static_cast<ExpressionTrait>(impl->reader.getVal89());
 }
 
 bool ExpressionTraitExpr::value(void) const {
-  return impl->reader.getVal83();
+  return impl->reader.getVal84();
 }
 
 #pragma GCC diagnostic pop

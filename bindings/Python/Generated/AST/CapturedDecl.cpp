@@ -165,6 +165,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "context_parameter_position",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->context_parameter_position());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CapturedDecl::context_parameter_position"),
+    nullptr,
+  },
+  {
     "is_nothrow",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

@@ -223,11 +223,11 @@ std::optional<FunctionTemplateDecl> FunctionTemplateDecl::from(const TokenContex
 }
 
 bool FunctionTemplateDecl::is_abbreviated(void) const {
-  return impl->reader.getVal66();
+  return impl->reader.getVal69();
 }
 
 bool FunctionTemplateDecl::is_this_declaration_a_definition(void) const {
-  return impl->reader.getVal78();
+  return impl->reader.getVal81();
 }
 
 #pragma GCC diagnostic pop

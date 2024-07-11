@@ -235,22 +235,22 @@ std::optional<CXXMethodDecl> CXXMethodDecl::from(const TokenContext &t) {
 }
 
 Type CXXMethodDecl::function_object_parameter_reference_type(void) const {
-  RawEntityId eid = impl->reader.getVal148();
+  RawEntityId eid = impl->reader.getVal154();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type CXXMethodDecl::function_object_parameter_type(void) const {
-  RawEntityId eid = impl->reader.getVal149();
+  RawEntityId eid = impl->reader.getVal155();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 RefQualifierKind CXXMethodDecl::reference_qualifier(void) const {
-  return static_cast<RefQualifierKind>(impl->reader.getVal150());
+  return static_cast<RefQualifierKind>(impl->reader.getVal156());
 }
 
 std::optional<Type> CXXMethodDecl::this_type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal151();
+    RawEntityId eid = impl->reader.getVal157();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -262,51 +262,51 @@ std::optional<Type> CXXMethodDecl::this_type(void) const {
 }
 
 bool CXXMethodDecl::has_inline_body(void) const {
-  return impl->reader.getVal152();
-}
-
-bool CXXMethodDecl::is_const(void) const {
-  return impl->reader.getVal153();
-}
-
-bool CXXMethodDecl::is_copy_assignment_operator(void) const {
-  return impl->reader.getVal154();
-}
-
-bool CXXMethodDecl::is_explicit_object_member_function(void) const {
-  return impl->reader.getVal155();
-}
-
-bool CXXMethodDecl::is_implicit_object_member_function(void) const {
-  return impl->reader.getVal156();
-}
-
-bool CXXMethodDecl::is_instance(void) const {
-  return impl->reader.getVal157();
-}
-
-bool CXXMethodDecl::is_lambda_static_invoker(void) const {
   return impl->reader.getVal158();
 }
 
-bool CXXMethodDecl::is_move_assignment_operator(void) const {
+bool CXXMethodDecl::is_const(void) const {
   return impl->reader.getVal159();
 }
 
-bool CXXMethodDecl::is_virtual(void) const {
+bool CXXMethodDecl::is_copy_assignment_operator(void) const {
   return impl->reader.getVal160();
 }
 
-bool CXXMethodDecl::is_volatile(void) const {
+bool CXXMethodDecl::is_explicit_object_member_function(void) const {
   return impl->reader.getVal161();
 }
 
+bool CXXMethodDecl::is_implicit_object_member_function(void) const {
+  return impl->reader.getVal162();
+}
+
+bool CXXMethodDecl::is_instance(void) const {
+  return impl->reader.getVal163();
+}
+
+bool CXXMethodDecl::is_lambda_static_invoker(void) const {
+  return impl->reader.getVal164();
+}
+
+bool CXXMethodDecl::is_move_assignment_operator(void) const {
+  return impl->reader.getVal165();
+}
+
+bool CXXMethodDecl::is_virtual(void) const {
+  return impl->reader.getVal166();
+}
+
+bool CXXMethodDecl::is_volatile(void) const {
+  return impl->reader.getVal167();
+}
+
 unsigned CXXMethodDecl::num_overridden_methods(void) const {
-  return impl->reader.getVal162().size();
+  return impl->reader.getVal168().size();
 }
 
 std::optional<CXXMethodDecl> CXXMethodDecl::nth_overridden_method(unsigned n) const {
-  auto list = impl->reader.getVal162();
+  auto list = impl->reader.getVal168();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -320,17 +320,21 @@ std::optional<CXXMethodDecl> CXXMethodDecl::nth_overridden_method(unsigned n) co
 }
 
 gap::generator<CXXMethodDecl> CXXMethodDecl::overridden_methods(void) const & {
-  auto list = impl->reader.getVal162();
+  auto list = impl->reader.getVal168();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d162 = ep->DeclFor(ep, v)) {
-      if (auto e = CXXMethodDecl::from_base(std::move(d162))) {
+    if (auto d168 = ep->DeclFor(ep, v)) {
+      if (auto e = CXXMethodDecl::from_base(std::move(d168))) {
         co_yield std::move(*e);
       }
     }
   }
   co_return;
+}
+
+uint32_t CXXMethodDecl::size_overridden_methods(void) const {
+  return impl->reader.getVal169();
 }
 
 #pragma GCC diagnostic pop

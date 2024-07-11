@@ -126,12 +126,16 @@ std::optional<UnavailableAttr> UnavailableAttr::from(const TokenContext &t) {
 }
 
 UnavailableAttrImplicitReason UnavailableAttr::implicit_reason(void) const {
-  return static_cast<UnavailableAttrImplicitReason>(impl->reader.getVal12());
+  return static_cast<UnavailableAttrImplicitReason>(impl->reader.getVal13());
 }
 
 std::string_view UnavailableAttr::message(void) const {
   capnp::Text::Reader data = impl->reader.getVal11();
   return std::string_view(data.cStr(), data.size());
+}
+
+uint32_t UnavailableAttr::message_length(void) const {
+  return impl->reader.getVal12();
 }
 
 #pragma GCC diagnostic pop

@@ -52,6 +52,7 @@ class MX_EXPORT PatchableFunctionEntryAttr : public InheritableAttr {
   static std::optional<PatchableFunctionEntryAttr> from(const VariantEntity &e);
   static std::optional<PatchableFunctionEntryAttr> from(const TokenContext &t);
 
+  uint32_t count(void) const;
 };
 
 static_assert(sizeof(PatchableFunctionEntryAttr) == sizeof(InheritableAttr));

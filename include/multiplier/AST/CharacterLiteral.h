@@ -69,6 +69,7 @@ class MX_EXPORT CharacterLiteral : public Expr {
 
   CharacterLiteralKind literal_kind(void) const;
   Token token(void) const;
+  uint32_t value(void) const;
 };
 
 static_assert(sizeof(CharacterLiteral) == sizeof(Expr));

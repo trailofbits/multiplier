@@ -45,6 +45,7 @@ class MX_EXPORT ArrayType : public Type {
   static std::optional<ArrayType> from(const TokenContext &t);
 
   Type element_type(void) const;
+  uint32_t index_type_cvr_qualifiers(void) const;
   ArraySizeModifier size_modifier(void) const;
 };
 

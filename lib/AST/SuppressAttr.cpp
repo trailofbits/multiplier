@@ -127,7 +127,7 @@ std::optional<SuppressAttr> SuppressAttr::from(const TokenContext &t) {
 }
 
 bool SuppressAttr::is_gsl(void) const {
-  return impl->reader.getVal14();
+  return impl->reader.getVal15();
 }
 
 #pragma GCC diagnostic pop

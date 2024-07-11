@@ -98,15 +98,15 @@ std::optional<BitIntType> BitIntType::from(const TokenContext &t) {
 }
 
 bool BitIntType::is_signed(void) const {
-  return impl->reader.getVal20();
+  return impl->reader.getVal23();
 }
 
 bool BitIntType::is_sugared(void) const {
-  return impl->reader.getVal21();
+  return impl->reader.getVal24();
 }
 
 bool BitIntType::is_unsigned(void) const {
-  return impl->reader.getVal22();
+  return impl->reader.getVal25();
 }
 
 #pragma GCC diagnostic pop

@@ -55,6 +55,7 @@ class MX_EXPORT UseHandleAttr : public InheritableParamAttr {
   static std::optional<UseHandleAttr> from(const TokenContext &t);
 
   std::string_view handle_type(void) const;
+  uint32_t handle_type_length(void) const;
 };
 
 static_assert(sizeof(UseHandleAttr) == sizeof(InheritableParamAttr));

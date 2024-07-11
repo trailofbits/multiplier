@@ -193,11 +193,11 @@ std::optional<ObjCSelectorExpr> ObjCSelectorExpr::from(const TokenContext &t) {
 }
 
 Token ObjCSelectorExpr::at_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Token ObjCSelectorExpr::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 #pragma GCC diagnostic pop

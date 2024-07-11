@@ -164,6 +164,11 @@ static const MLIRInitializer kMLIR(0);
 }  // namespace
 
 OperationKind Operation::classify(::mlir::Operation *opaque) {
+  if (!opaque) {
+    assert(false);
+    return OperationKind::UNKNOWN;
+  }
+
   mlir::TypeID tid = opaque->getName().getTypeID();
   if (auto it = kMLIR.op_type_to_kind.find(tid);
       it != kMLIR.op_type_to_kind.end()) {
@@ -184,6 +189,11 @@ OperationKind Operation::classify(std::string_view name_) {
 }
 
 AttributeKind Attribute::classify(::mlir::AttributeStorage *opaque) {
+  if (!opaque) {
+    assert(false);
+    return AttributeKind::UNKNOWN;
+  }
+
   mlir::TypeID tid = opaque->getAbstractAttribute().getTypeID();
   if (auto it = kMLIR.attr_type_to_kind.find(tid);
       it != kMLIR.attr_type_to_kind.end()) {
@@ -194,6 +204,11 @@ AttributeKind Attribute::classify(::mlir::AttributeStorage *opaque) {
 }
 
 TypeKind Type::classify(::mlir::TypeStorage *opaque) {
+  if (!opaque) {
+    assert(false);
+    return TypeKind::UNKNOWN;
+  }
+
   mlir::TypeID tid = opaque->getAbstractType().getTypeID();
   if (auto it = kMLIR.type_type_to_kind.find(tid);
       it != kMLIR.type_type_to_kind.end()) {

@@ -134,6 +134,16 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::WebAssemblyImportModuleAttr::import_module"),
     nullptr,
   },
+  {
+    "import_module_length",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->import_module_length());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::WebAssemblyImportModuleAttr::import_module_length"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

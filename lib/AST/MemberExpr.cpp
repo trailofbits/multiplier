@@ -194,61 +194,61 @@ std::optional<MemberExpr> MemberExpr::from(const TokenContext &t) {
 }
 
 Expr MemberExpr::base(void) const {
-  RawEntityId eid = impl->reader.getVal37();
+  RawEntityId eid = impl->reader.getVal38();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Token MemberExpr::l_angle_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 ValueDecl MemberExpr::member_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal40();
   return ValueDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Token MemberExpr::member_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
-}
-
-Token MemberExpr::operator_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
-Token MemberExpr::r_angle_token(void) const {
+Token MemberExpr::operator_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
-Token MemberExpr::template_keyword_token(void) const {
+Token MemberExpr::r_angle_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }
 
-bool MemberExpr::had_multiple_candidates(void) const {
-  return impl->reader.getVal83();
+Token MemberExpr::template_keyword_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
 }
 
-bool MemberExpr::has_explicit_template_arguments(void) const {
+bool MemberExpr::had_multiple_candidates(void) const {
   return impl->reader.getVal84();
 }
 
-bool MemberExpr::has_qualifier(void) const {
+bool MemberExpr::has_explicit_template_arguments(void) const {
   return impl->reader.getVal85();
 }
 
-bool MemberExpr::has_template_keyword(void) const {
+bool MemberExpr::has_qualifier(void) const {
   return impl->reader.getVal86();
 }
 
-bool MemberExpr::is_arrow(void) const {
+bool MemberExpr::has_template_keyword(void) const {
   return impl->reader.getVal87();
 }
 
+bool MemberExpr::is_arrow(void) const {
+  return impl->reader.getVal88();
+}
+
 bool MemberExpr::is_implicit_access(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal90();
 }
 
 NonOdrUseReason MemberExpr::is_non_odr_use(void) const {
-  return static_cast<NonOdrUseReason>(impl->reader.getVal88());
+  return static_cast<NonOdrUseReason>(impl->reader.getVal89());
 }
 
 #pragma GCC diagnostic pop

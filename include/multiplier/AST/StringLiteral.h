@@ -69,8 +69,12 @@ class MX_EXPORT StringLiteral : public Expr {
 
   std::optional<bool> contains_non_ascii(void) const;
   std::optional<bool> contains_non_ascii_or_null(void) const;
+  uint32_t byte_length(void) const;
   std::string_view bytes(void) const;
+  uint32_t character_byte_width(void) const;
   StringLiteralKind literal_kind(void) const;
+  uint32_t length(void) const;
+  uint32_t num_concatenated(void) const;
   std::optional<std::string_view> string(void) const;
   bool is_ordinary(void) const;
   bool is_pascal(void) const;

@@ -126,7 +126,7 @@ std::optional<ConsumableAttr> ConsumableAttr::from(const TokenContext &t) {
 }
 
 ConsumableAttrConsumedState ConsumableAttr::default_state(void) const {
-  return static_cast<ConsumableAttrConsumedState>(impl->reader.getVal12());
+  return static_cast<ConsumableAttrConsumedState>(impl->reader.getVal13());
 }
 
 #pragma GCC diagnostic pop

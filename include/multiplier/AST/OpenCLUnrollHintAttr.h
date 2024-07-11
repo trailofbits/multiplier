@@ -52,6 +52,7 @@ class MX_EXPORT OpenCLUnrollHintAttr : public StmtAttr {
   static std::optional<OpenCLUnrollHintAttr> from(const VariantEntity &e);
   static std::optional<OpenCLUnrollHintAttr> from(const TokenContext &t);
 
+  uint32_t unroll_hint(void) const;
 };
 
 static_assert(sizeof(OpenCLUnrollHintAttr) == sizeof(StmtAttr));

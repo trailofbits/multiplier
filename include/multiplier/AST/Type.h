@@ -104,6 +104,7 @@ class MX_EXPORT Type {
   static std::optional<Type> from(const VariantEntity &e);
   static std::optional<Type> from(const TokenContext &t);
 
+  uint32_t raw_qualifiers(void) const;
   Type desugared_type(void) const;
   Type canonical_type(void) const;
   bool is_qualified(void) const;

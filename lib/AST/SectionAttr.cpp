@@ -130,8 +130,12 @@ std::string_view SectionAttr::name(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
+uint32_t SectionAttr::name_length(void) const {
+  return impl->reader.getVal12();
+}
+
 SectionAttrSpelling SectionAttr::semantic_spelling(void) const {
-  return static_cast<SectionAttrSpelling>(impl->reader.getVal12());
+  return static_cast<SectionAttrSpelling>(impl->reader.getVal13());
 }
 
 #pragma GCC diagnostic pop

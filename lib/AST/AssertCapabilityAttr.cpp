@@ -126,11 +126,11 @@ std::optional<AssertCapabilityAttr> AssertCapabilityAttr::from(const TokenContex
 }
 
 AssertCapabilityAttrSpelling AssertCapabilityAttr::semantic_spelling(void) const {
-  return static_cast<AssertCapabilityAttrSpelling>(impl->reader.getVal12());
+  return static_cast<AssertCapabilityAttrSpelling>(impl->reader.getVal13());
 }
 
 bool AssertCapabilityAttr::is_shared(void) const {
-  return impl->reader.getVal14();
+  return impl->reader.getVal15();
 }
 
 #pragma GCC diagnostic pop

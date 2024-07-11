@@ -194,12 +194,12 @@ std::optional<DesignatedInitUpdateExpr> DesignatedInitUpdateExpr::from(const Tok
 }
 
 Expr DesignatedInitUpdateExpr::base(void) const {
-  RawEntityId eid = impl->reader.getVal37();
+  RawEntityId eid = impl->reader.getVal38();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 InitListExpr DesignatedInitUpdateExpr::updater(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal39();
   return InitListExpr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 

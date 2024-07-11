@@ -68,6 +68,7 @@ class MX_EXPORT SubstNonTypeTemplateParmPackExpr : public Expr {
   static std::optional<SubstNonTypeTemplateParmPackExpr> from(const TokenContext &t);
 
   Decl associated_declaration(void) const;
+  uint32_t index(void) const;
   NonTypeTemplateParmDecl parameter_pack(void) const;
   Token parameter_pack_token(void) const;
 };

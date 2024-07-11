@@ -53,6 +53,7 @@ class MX_EXPORT WeakRefAttr : public InheritableAttr {
   static std::optional<WeakRefAttr> from(const TokenContext &t);
 
   std::string_view aliasee(void) const;
+  uint32_t aliasee_length(void) const;
 };
 
 static_assert(sizeof(WeakRefAttr) == sizeof(InheritableAttr));

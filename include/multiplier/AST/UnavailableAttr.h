@@ -55,6 +55,7 @@ class MX_EXPORT UnavailableAttr : public InheritableAttr {
 
   UnavailableAttrImplicitReason implicit_reason(void) const;
   std::string_view message(void) const;
+  uint32_t message_length(void) const;
 };
 
 static_assert(sizeof(UnavailableAttr) == sizeof(InheritableAttr));

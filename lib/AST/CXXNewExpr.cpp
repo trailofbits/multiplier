@@ -197,17 +197,17 @@ std::optional<CXXNewExpr> CXXNewExpr::from(const TokenContext &t) {
 }
 
 bool CXXNewExpr::does_usual_array_delete_want_size(void) const {
-  return impl->reader.getVal83();
+  return impl->reader.getVal84();
 }
 
 Type CXXNewExpr::allocated_type(void) const {
-  RawEntityId eid = impl->reader.getVal37();
+  RawEntityId eid = impl->reader.getVal38();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<Expr> CXXNewExpr::array_size(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal38();
+    RawEntityId eid = impl->reader.getVal39();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -220,7 +220,7 @@ std::optional<Expr> CXXNewExpr::array_size(void) const {
 
 std::optional<CXXConstructExpr> CXXNewExpr::construct_expression(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal39();
+    RawEntityId eid = impl->reader.getVal40();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -232,16 +232,16 @@ std::optional<CXXConstructExpr> CXXNewExpr::construct_expression(void) const {
 }
 
 TokenRange CXXNewExpr::direct_initializer_range(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal40(), impl->reader.getVal41());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal41(), impl->reader.getVal42());
 }
 
 CXXNewInitializationStyle CXXNewExpr::initialization_style(void) const {
-  return static_cast<CXXNewInitializationStyle>(impl->reader.getVal88());
+  return static_cast<CXXNewInitializationStyle>(impl->reader.getVal89());
 }
 
 std::optional<Expr> CXXNewExpr::initializer(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal42();
+    RawEntityId eid = impl->reader.getVal43();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -254,7 +254,7 @@ std::optional<Expr> CXXNewExpr::initializer(void) const {
 
 std::optional<FunctionDecl> CXXNewExpr::operator_delete(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal43();
+    RawEntityId eid = impl->reader.getVal44();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -267,7 +267,7 @@ std::optional<FunctionDecl> CXXNewExpr::operator_delete(void) const {
 
 std::optional<FunctionDecl> CXXNewExpr::operator_new(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal44();
+    RawEntityId eid = impl->reader.getVal45();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -279,27 +279,27 @@ std::optional<FunctionDecl> CXXNewExpr::operator_new(void) const {
 }
 
 TokenRange CXXNewExpr::type_id_parentheses(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal45(), impl->reader.getVal46());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal46(), impl->reader.getVal47());
 }
 
 bool CXXNewExpr::has_initializer(void) const {
-  return impl->reader.getVal84();
-}
-
-bool CXXNewExpr::is_array(void) const {
   return impl->reader.getVal85();
 }
 
-bool CXXNewExpr::is_global_new(void) const {
+bool CXXNewExpr::is_array(void) const {
   return impl->reader.getVal86();
 }
 
-bool CXXNewExpr::is_parenthesis_type_id(void) const {
+bool CXXNewExpr::is_global_new(void) const {
   return impl->reader.getVal87();
 }
 
+bool CXXNewExpr::is_parenthesis_type_id(void) const {
+  return impl->reader.getVal88();
+}
+
 bool CXXNewExpr::pass_alignment(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal90();
 }
 
 unsigned CXXNewExpr::num_placement_arguments(void) const {

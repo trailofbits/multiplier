@@ -71,6 +71,7 @@ class MX_EXPORT MaterializeTemporaryExpr : public Expr {
 
   std::optional<ValueDecl> extending_declaration(void) const;
   std::optional<LifetimeExtendedTemporaryDecl> lifetime_extended_temporary_declaration(void) const;
+  uint32_t mangling_number(void) const;
   StorageDuration storage_duration(void) const;
   Expr sub_expression(void) const;
   bool is_bound_to_lvalue_reference(void) const;

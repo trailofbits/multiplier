@@ -100,7 +100,7 @@ std::optional<AttributedType> AttributedType::from(const TokenContext &t) {
 
 std::optional<Attr> AttributedType::attribute(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal19();
+    RawEntityId eid = impl->reader.getVal20();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -112,50 +112,50 @@ std::optional<Attr> AttributedType::attribute(void) const {
 }
 
 AttrKind AttributedType::attribute_kind(void) const {
-  return static_cast<AttrKind>(impl->reader.getVal68());
+  return static_cast<AttrKind>(impl->reader.getVal70());
 }
 
 Type AttributedType::equivalent_type(void) const {
-  RawEntityId eid = impl->reader.getVal25();
+  RawEntityId eid = impl->reader.getVal27();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<NullabilityKind> AttributedType::immediate_nullability(void) const {
-  if (!impl->reader.getVal20()) {
+  if (!impl->reader.getVal23()) {
     return std::nullopt;
   } else {
-    return static_cast<NullabilityKind>(impl->reader.getVal27());
+    return static_cast<NullabilityKind>(impl->reader.getVal29());
   }
   return std::nullopt;
 }
 
 Type AttributedType::modified_type(void) const {
-  RawEntityId eid = impl->reader.getVal26();
+  RawEntityId eid = impl->reader.getVal28();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool AttributedType::has_attribute(void) const {
-  return impl->reader.getVal21();
+  return impl->reader.getVal24();
 }
 
 bool AttributedType::is_calling_conv(void) const {
-  return impl->reader.getVal22();
+  return impl->reader.getVal25();
 }
 
 bool AttributedType::is_ms_type_spec(void) const {
-  return impl->reader.getVal28();
-}
-
-bool AttributedType::is_qualifier(void) const {
-  return impl->reader.getVal29();
-}
-
-bool AttributedType::is_sugared(void) const {
   return impl->reader.getVal30();
 }
 
-bool AttributedType::is_web_assembly_funcref_spec(void) const {
+bool AttributedType::is_qualifier(void) const {
   return impl->reader.getVal31();
+}
+
+bool AttributedType::is_sugared(void) const {
+  return impl->reader.getVal32();
+}
+
+bool AttributedType::is_web_assembly_funcref_spec(void) const {
+  return impl->reader.getVal33();
 }
 
 #pragma GCC diagnostic pop

@@ -222,11 +222,11 @@ std::optional<OMPAllocateDecl> OMPAllocateDecl::from(const TokenContext &t) {
 }
 
 unsigned OMPAllocateDecl::num_varlists(void) const {
-  return impl->reader.getVal40().size();
+  return impl->reader.getVal43().size();
 }
 
 std::optional<Expr> OMPAllocateDecl::nth_varlist(unsigned n) const {
-  auto list = impl->reader.getVal40();
+  auto list = impl->reader.getVal43();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -240,12 +240,12 @@ std::optional<Expr> OMPAllocateDecl::nth_varlist(unsigned n) const {
 }
 
 gap::generator<Expr> OMPAllocateDecl::varlists(void) const & {
-  auto list = impl->reader.getVal40();
+  auto list = impl->reader.getVal43();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d40 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from_base(std::move(d40))) {
+    if (auto d43 = ep->StmtFor(ep, v)) {
+      if (auto e = Expr::from_base(std::move(d43))) {
         co_yield std::move(*e);
       }
     }

@@ -53,6 +53,7 @@ class MX_EXPORT AnnotateTypeAttr : public TypeAttr {
   static std::optional<AnnotateTypeAttr> from(const TokenContext &t);
 
   std::string_view annotation(void) const;
+  uint32_t annotation_length(void) const;
 };
 
 static_assert(sizeof(AnnotateTypeAttr) == sizeof(TypeAttr));

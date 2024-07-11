@@ -53,6 +53,7 @@ class MX_EXPORT SwiftAttrAttr : public InheritableAttr {
   static std::optional<SwiftAttrAttr> from(const TokenContext &t);
 
   std::string_view attribute(void) const;
+  uint32_t attribute_length(void) const;
 };
 
 static_assert(sizeof(SwiftAttrAttr) == sizeof(InheritableAttr));

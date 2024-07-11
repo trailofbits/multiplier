@@ -52,6 +52,7 @@ class MX_EXPORT XRayLogArgsAttr : public InheritableAttr {
   static std::optional<XRayLogArgsAttr> from(const VariantEntity &e);
   static std::optional<XRayLogArgsAttr> from(const TokenContext &t);
 
+  uint32_t argument_count(void) const;
 };
 
 static_assert(sizeof(XRayLogArgsAttr) == sizeof(InheritableAttr));

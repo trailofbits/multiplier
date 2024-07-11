@@ -49,6 +49,8 @@ class MX_EXPORT TemplateTypeParmType : public Type {
   static std::optional<TemplateTypeParmType> from(const TokenContext &t);
 
   std::optional<TemplateTypeParmDecl> declaration(void) const;
+  uint32_t depth(void) const;
+  uint32_t index(void) const;
   bool is_parameter_pack(void) const;
   bool is_sugared(void) const;
 };

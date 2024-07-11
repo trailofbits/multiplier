@@ -132,12 +132,12 @@ Expr CUDALaunchBoundsAttr::max_blocks(void) const {
 }
 
 Expr CUDALaunchBoundsAttr::max_threads(void) const {
-  RawEntityId eid = impl->reader.getVal22();
+  RawEntityId eid = impl->reader.getVal23();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr CUDALaunchBoundsAttr::min_blocks(void) const {
-  RawEntityId eid = impl->reader.getVal25();
+  RawEntityId eid = impl->reader.getVal28();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 

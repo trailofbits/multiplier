@@ -74,6 +74,7 @@ class MX_EXPORT CallExpr : public Expr {
   unsigned num_arguments(void) const;
   gap::generator<Expr> arguments(void) const &;
   CallExprADLCallKind adl_call_kind(void) const;
+  uint32_t builtin_callee(void) const;
   Type call_return_type(void) const;
   Expr callee(void) const;
   std::optional<Decl> callee_declaration(void) const;

@@ -205,6 +205,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "block_mangling_number",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->block_mangling_number());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::BlockDecl::block_mangling_number"),
+    nullptr,
+  },
+  {
     "caret_token",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

@@ -129,6 +129,10 @@ std::string_view AliasAttr::aliasee(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
+uint32_t AliasAttr::aliasee_length(void) const {
+  return impl->reader.getVal12();
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

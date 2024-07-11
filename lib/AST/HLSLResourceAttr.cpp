@@ -126,7 +126,7 @@ std::optional<HLSLResourceAttr> HLSLResourceAttr::from(const TokenContext &t) {
 }
 
 bool HLSLResourceAttr::is_rov(void) const {
-  return impl->reader.getVal14();
+  return impl->reader.getVal15();
 }
 
 #pragma GCC diagnostic pop

@@ -126,7 +126,7 @@ std::optional<BlocksAttr> BlocksAttr::from(const TokenContext &t) {
 }
 
 BlocksAttrBlockType BlocksAttr::type(void) const {
-  return static_cast<BlocksAttrBlockType>(impl->reader.getVal12());
+  return static_cast<BlocksAttrBlockType>(impl->reader.getVal13());
 }
 
 #pragma GCC diagnostic pop

@@ -99,7 +99,7 @@ std::optional<FunctionNoProtoType> FunctionNoProtoType::from(const TokenContext 
 }
 
 bool FunctionNoProtoType::is_sugared(void) const {
-  return impl->reader.getVal31();
+  return impl->reader.getVal33();
 }
 
 #pragma GCC diagnostic pop

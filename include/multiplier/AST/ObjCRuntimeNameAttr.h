@@ -51,6 +51,7 @@ class MX_EXPORT ObjCRuntimeNameAttr : public Attr {
   static std::optional<ObjCRuntimeNameAttr> from(const TokenContext &t);
 
   std::string_view metadata_name(void) const;
+  uint32_t metadata_name_length(void) const;
 };
 
 static_assert(sizeof(ObjCRuntimeNameAttr) == sizeof(Attr));

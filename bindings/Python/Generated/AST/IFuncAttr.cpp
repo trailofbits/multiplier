@@ -134,6 +134,16 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::IFuncAttr::resolver"),
     nullptr,
   },
+  {
+    "resolver_length",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->resolver_length());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IFuncAttr::resolver_length"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

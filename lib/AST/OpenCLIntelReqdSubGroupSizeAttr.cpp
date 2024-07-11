@@ -125,6 +125,10 @@ std::optional<OpenCLIntelReqdSubGroupSizeAttr> OpenCLIntelReqdSubGroupSizeAttr::
   return std::nullopt;
 }
 
+uint32_t OpenCLIntelReqdSubGroupSizeAttr::sub_group_size(void) const {
+  return impl->reader.getVal12();
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

@@ -126,7 +126,7 @@ std::optional<PcsAttr> PcsAttr::from(const TokenContext &t) {
 }
 
 PcsAttrPCSType PcsAttr::pcs(void) const {
-  return static_cast<PcsAttrPCSType>(impl->reader.getVal12());
+  return static_cast<PcsAttrPCSType>(impl->reader.getVal13());
 }
 
 #pragma GCC diagnostic pop

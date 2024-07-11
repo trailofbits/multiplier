@@ -53,7 +53,9 @@ class MX_EXPORT DeprecatedAttr : public InheritableAttr {
   static std::optional<DeprecatedAttr> from(const TokenContext &t);
 
   std::string_view message(void) const;
+  uint32_t message_length(void) const;
   std::string_view replacement(void) const;
+  uint32_t replacement_length(void) const;
 };
 
 static_assert(sizeof(DeprecatedAttr) == sizeof(InheritableAttr));

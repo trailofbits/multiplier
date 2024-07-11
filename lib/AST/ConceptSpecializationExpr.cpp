@@ -197,21 +197,21 @@ std::optional<ConceptSpecializationExpr> ConceptSpecializationExpr::from(const T
 }
 
 Token ConceptSpecializationExpr::concept_name_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 NamedDecl ConceptSpecializationExpr::found_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal39();
   return NamedDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 ConceptDecl ConceptSpecializationExpr::named_concept(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal40();
   return ConceptDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 ImplicitConceptSpecializationDecl ConceptSpecializationExpr::specialization_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal41();
   return ImplicitConceptSpecializationDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
@@ -246,11 +246,11 @@ gap::generator<TemplateArgument> ConceptSpecializationExpr::template_arguments(v
 }
 
 Token ConceptSpecializationExpr::template_keyword_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 bool ConceptSpecializationExpr::has_explicit_template_arguments(void) const {
-  return impl->reader.getVal83();
+  return impl->reader.getVal84();
 }
 
 #pragma GCC diagnostic pop

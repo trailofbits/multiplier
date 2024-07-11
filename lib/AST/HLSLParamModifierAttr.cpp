@@ -126,31 +126,31 @@ std::optional<HLSLParamModifierAttr> HLSLParamModifierAttr::from(const TokenCont
 }
 
 bool HLSLParamModifierAttr::merged_spelling(void) const {
-  return impl->reader.getVal13();
-}
-
-HLSLParamModifierAttrSpelling HLSLParamModifierAttr::semantic_spelling(void) const {
-  return static_cast<HLSLParamModifierAttrSpelling>(impl->reader.getVal12());
-}
-
-bool HLSLParamModifierAttr::is_any_in(void) const {
   return impl->reader.getVal14();
 }
 
-bool HLSLParamModifierAttr::is_any_out(void) const {
+HLSLParamModifierAttrSpelling HLSLParamModifierAttr::semantic_spelling(void) const {
+  return static_cast<HLSLParamModifierAttrSpelling>(impl->reader.getVal13());
+}
+
+bool HLSLParamModifierAttr::is_any_in(void) const {
   return impl->reader.getVal15();
 }
 
-bool HLSLParamModifierAttr::is_in(void) const {
+bool HLSLParamModifierAttr::is_any_out(void) const {
   return impl->reader.getVal16();
 }
 
-bool HLSLParamModifierAttr::is_in_out(void) const {
+bool HLSLParamModifierAttr::is_in(void) const {
   return impl->reader.getVal17();
 }
 
-bool HLSLParamModifierAttr::is_out(void) const {
+bool HLSLParamModifierAttr::is_in_out(void) const {
   return impl->reader.getVal18();
+}
+
+bool HLSLParamModifierAttr::is_out(void) const {
+  return impl->reader.getVal19();
 }
 
 #pragma GCC diagnostic pop

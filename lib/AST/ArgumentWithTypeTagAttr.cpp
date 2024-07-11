@@ -126,11 +126,11 @@ std::optional<ArgumentWithTypeTagAttr> ArgumentWithTypeTagAttr::from(const Token
 }
 
 bool ArgumentWithTypeTagAttr::is_pointer(void) const {
-  return impl->reader.getVal14();
+  return impl->reader.getVal15();
 }
 
 ArgumentWithTypeTagAttrSpelling ArgumentWithTypeTagAttr::semantic_spelling(void) const {
-  return static_cast<ArgumentWithTypeTagAttrSpelling>(impl->reader.getVal12());
+  return static_cast<ArgumentWithTypeTagAttrSpelling>(impl->reader.getVal13());
 }
 
 #pragma GCC diagnostic pop

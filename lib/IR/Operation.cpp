@@ -6,6 +6,7 @@
 
 #include <multiplier/IR/Operation.h>
 
+#include <cassert>
 #include <mlir/IR/Block.h>
 #include <mlir/IR/Operation.h>
 #include <mlir/IR/OperationSupport.h>
@@ -14,10 +15,9 @@
 #include <multiplier/IR/HighLevel/Operation.h>
 #include <multiplier/IR/Region.h>
 #include <multiplier/IR/Value.h>
+#include <unordered_map>
 #include <vast/Util/Symbols.hpp>
 #include <vast/Util/Terminator.hpp>
-
-#include <unordered_map>
 
 #include "Operation.h"
 
@@ -36,6 +36,15 @@ bool OperationIdsMatch(mlir::Operation *a, mlir::Operation *b) {
   }
 
   return a_eid != kInvalidEntityId;
+}
+
+Operation::Operation(std::shared_ptr<const SourceIRImpl> module,
+                     mlir::Operation *opaque,
+                     OperationKind kind)
+    : module_(std::move(module)),
+      op_(opaque),
+      kind_(kind) {
+  assert(op_ != nullptr);        
 }
 
 // Return the ID of this operation.

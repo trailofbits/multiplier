@@ -126,12 +126,16 @@ std::optional<AsmLabelAttr> AsmLabelAttr::from(const TokenContext &t) {
 }
 
 bool AsmLabelAttr::is_literal_label(void) const {
-  return impl->reader.getVal14();
+  return impl->reader.getVal15();
 }
 
 std::string_view AsmLabelAttr::label(void) const {
   capnp::Text::Reader data = impl->reader.getVal11();
   return std::string_view(data.cStr(), data.size());
+}
+
+uint32_t AsmLabelAttr::label_length(void) const {
+  return impl->reader.getVal12();
 }
 
 #pragma GCC diagnostic pop

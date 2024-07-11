@@ -126,7 +126,7 @@ std::optional<SwiftAsyncAttr> SwiftAsyncAttr::from(const TokenContext &t) {
 }
 
 SwiftAsyncAttrKind SwiftAsyncAttr::attribute_kind(void) const {
-  return static_cast<SwiftAsyncAttrKind>(impl->reader.getVal12());
+  return static_cast<SwiftAsyncAttrKind>(impl->reader.getVal13());
 }
 
 #pragma GCC diagnostic pop

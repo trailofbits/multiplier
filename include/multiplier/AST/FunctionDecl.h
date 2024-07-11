@@ -89,6 +89,7 @@ class MX_EXPORT FunctionDecl : public DeclaratorDecl {
   bool uses_fp_intrin(void) const;
   std::optional<bool> does_declaration_force_externally_visible_definition(void) const;
   bool does_this_declaration_have_a_body(void) const;
+  uint32_t builtin_id(void) const;
   Type call_result_type(void) const;
   ConstexprSpecKind constexpr_kind(void) const;
   Type declared_return_type(void) const;
@@ -98,6 +99,9 @@ class MX_EXPORT FunctionDecl : public DeclaratorDecl {
   TokenRange exception_spec_tokens(void) const;
   ExceptionSpecificationType exception_spec_type(void) const;
   LanguageLinkage language_linkage(void) const;
+  uint32_t memory_function_kind(void) const;
+  uint32_t min_required_arguments(void) const;
+  uint32_t min_required_explicit_arguments(void) const;
   MultiVersionKind multi_version_kind(void) const;
   OverloadedOperatorKind overloaded_operator(void) const;
   TokenRange parameters_tokens(void) const;

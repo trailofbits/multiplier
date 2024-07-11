@@ -54,6 +54,7 @@ class MX_EXPORT TargetVersionAttr : public InheritableAttr {
 
   std::string_view name(void) const;
   std::string_view names_string(void) const;
+  uint32_t names_string_length(void) const;
   bool is_default_version(void) const;
 };
 

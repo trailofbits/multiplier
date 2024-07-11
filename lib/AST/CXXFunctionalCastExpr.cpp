@@ -195,15 +195,15 @@ std::optional<CXXFunctionalCastExpr> CXXFunctionalCastExpr::from(const TokenCont
 }
 
 Token CXXFunctionalCastExpr::l_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
-}
-
-Token CXXFunctionalCastExpr::r_paren_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }
 
+Token CXXFunctionalCastExpr::r_paren_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
+}
+
 bool CXXFunctionalCastExpr::is_list_initialization(void) const {
-  return impl->reader.getVal85();
+  return impl->reader.getVal86();
 }
 
 #pragma GCC diagnostic pop

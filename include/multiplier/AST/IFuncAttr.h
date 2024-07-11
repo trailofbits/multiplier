@@ -51,6 +51,7 @@ class MX_EXPORT IFuncAttr : public Attr {
   static std::optional<IFuncAttr> from(const TokenContext &t);
 
   std::string_view resolver(void) const;
+  uint32_t resolver_length(void) const;
 };
 
 static_assert(sizeof(IFuncAttr) == sizeof(Attr));

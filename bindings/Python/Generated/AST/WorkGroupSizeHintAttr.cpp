@@ -124,6 +124,36 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
 namespace {
 static PyGetSetDef gProperties[] = {
+  {
+    "x_dim",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->x_dim());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::WorkGroupSizeHintAttr::x_dim"),
+    nullptr,
+  },
+  {
+    "y_dim",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->y_dim());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::WorkGroupSizeHintAttr::y_dim"),
+    nullptr,
+  },
+  {
+    "z_dim",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->z_dim());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::WorkGroupSizeHintAttr::z_dim"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

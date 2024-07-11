@@ -126,15 +126,15 @@ std::optional<LoopHintAttr> LoopHintAttr::from(const TokenContext &t) {
 }
 
 LoopHintAttrOptionType LoopHintAttr::option(void) const {
-  return static_cast<LoopHintAttrOptionType>(impl->reader.getVal12());
+  return static_cast<LoopHintAttrOptionType>(impl->reader.getVal13());
 }
 
 LoopHintAttrSpelling LoopHintAttr::semantic_spelling(void) const {
-  return static_cast<LoopHintAttrSpelling>(impl->reader.getVal20());
+  return static_cast<LoopHintAttrSpelling>(impl->reader.getVal21());
 }
 
 LoopHintAttrLoopHintState LoopHintAttr::state(void) const {
-  return static_cast<LoopHintAttrLoopHintState>(impl->reader.getVal21());
+  return static_cast<LoopHintAttrLoopHintState>(impl->reader.getVal22());
 }
 
 std::optional<Expr> LoopHintAttr::value(void) const {

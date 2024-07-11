@@ -635,6 +635,26 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "owning_module_id",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->owning_module_id());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Decl::owning_module_id"),
+    nullptr,
+  },
+  {
+    "template_depth",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->template_depth());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Decl::template_depth"),
+    nullptr,
+  },
+  {
     "is_deprecated",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

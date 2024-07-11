@@ -227,7 +227,7 @@ gap::generator<Expr> GenericSelectionExpr::association_expressions(void) const &
 
 std::optional<Expr> GenericSelectionExpr::controlling_expression(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal37();
+    RawEntityId eid = impl->reader.getVal38();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -240,7 +240,7 @@ std::optional<Expr> GenericSelectionExpr::controlling_expression(void) const {
 
 std::optional<Type> GenericSelectionExpr::controlling_type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal38();
+    RawEntityId eid = impl->reader.getVal39();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -252,20 +252,20 @@ std::optional<Type> GenericSelectionExpr::controlling_type(void) const {
 }
 
 Token GenericSelectionExpr::default_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
-}
-
-Token GenericSelectionExpr::generic_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
-Token GenericSelectionExpr::r_paren_token(void) const {
+Token GenericSelectionExpr::generic_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+}
+
+Token GenericSelectionExpr::r_paren_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 std::optional<Expr> GenericSelectionExpr::result_expression(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal42();
+    RawEntityId eid = impl->reader.getVal43();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -276,16 +276,20 @@ std::optional<Expr> GenericSelectionExpr::result_expression(void) const {
   return std::nullopt;
 }
 
-bool GenericSelectionExpr::is_expression_predicate(void) const {
-  return impl->reader.getVal83();
+uint32_t GenericSelectionExpr::result_index(void) const {
+  return impl->reader.getVal26();
 }
 
-bool GenericSelectionExpr::is_result_dependent(void) const {
+bool GenericSelectionExpr::is_expression_predicate(void) const {
   return impl->reader.getVal84();
 }
 
-bool GenericSelectionExpr::is_type_predicate(void) const {
+bool GenericSelectionExpr::is_result_dependent(void) const {
   return impl->reader.getVal85();
+}
+
+bool GenericSelectionExpr::is_type_predicate(void) const {
+  return impl->reader.getVal86();
 }
 
 #pragma GCC diagnostic pop

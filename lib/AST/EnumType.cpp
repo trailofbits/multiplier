@@ -99,7 +99,7 @@ std::optional<EnumType> EnumType::from(const TokenContext &t) {
 }
 
 bool EnumType::is_sugared(void) const {
-  return impl->reader.getVal21();
+  return impl->reader.getVal24();
 }
 
 #pragma GCC diagnostic pop

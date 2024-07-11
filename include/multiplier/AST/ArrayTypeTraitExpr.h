@@ -71,6 +71,7 @@ class MX_EXPORT ArrayTypeTraitExpr : public Expr {
   Expr dimension_expression(void) const;
   Type queried_type(void) const;
   ArrayTypeTrait trait(void) const;
+  uint64_t value(void) const;
 };
 
 static_assert(sizeof(ArrayTypeTraitExpr) == sizeof(Expr));
