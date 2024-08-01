@@ -17,6 +17,7 @@ concurrency:
 env:
   LLVM_PASTA_VER: b9e223f
   LLVM_VER: 18
+  FULL_LLVM_VER: 18.1.0
   PYTHON_VER: 3.11
   UBUNTU_CODENAME: jammy
   CMAKE_VERSION: 3.26
@@ -41,10 +42,12 @@ jobs:
 
       - name: Install prereqs
         run: |
-          curl -sS https://apt.llvm.org/llvm-snapshot.gpg.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/llvm.gpg > /dev/null
-          echo "deb [signed-by=/etc/apt/trusted.gpg.d/llvm.gpg] http://apt.llvm.org/${UBUNTU_CODENAME}/ llvm-toolchain-${UBUNTU_CODENAME}-${LLVM_VER} main" >> /etc/apt/sources.list.d/llvm.list > /dev/null
-          echo "deb-src [signed-by=/etc/apt/trusted.gpg.d/llvm.gpg] http://apt.llvm.org/${UBUNTU_CODENAME}/ llvm-toolchain-${UBUNTU_CODENAME}-${LLVM_VER} main" >> /etc/apt/sources.list.d/llvm.list > /dev/null
-          apt-get update; apt-get install clang-${LLVM_VER} lld-${LLVM_VER} python${PYTHON_VER} python${PYTHON_VER}-dev -y
+          apt-get update; apt-get install python${PYTHON_VER} python${PYTHON_VER}-dev -y
+
+      - name: Setup LLVM
+        uses: trail-of-forks/install-llvm-action@master
+        with:
+          version: "${FULL_LLVM_VER}"
 
       - name: Setup cmake
         uses: trail-of-forks/actions-setup-cmake@master
