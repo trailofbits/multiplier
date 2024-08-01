@@ -50,7 +50,7 @@ jobs:
       - name: Setup cmake
         uses: trail-of-forks/actions-setup-cmake@master
         with:
-          cmake-version: '3.24.x'
+          cmake-version: '3.26.x'
 
       - name: Use cmake
         run: cmake --version
