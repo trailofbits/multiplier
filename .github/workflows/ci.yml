@@ -19,14 +19,13 @@ env:
   LLVM_VER: 18
   PYTHON_VER: 3.11
   UBUNTU_CODENAME: jammy
-  UBUNTU_VERSION: 22.04
   CMAKE_VERSION: 3.26
 
 jobs:
   build:
-    runs-on: ubuntu-${UBUNTU_VERSION}
+    runs-on: ubuntu-latest
     container:
-      image: ghcr.io/lifting-bits/cxx-common/vcpkg-builder-ubuntu-v2:${UBUNTU_VERSION}
+      image: ghcr.io/lifting-bits/cxx-common/vcpkg-builder-ubuntu-v2:22.04
       options: --user 1001
 
     permissions:
