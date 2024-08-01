@@ -18,12 +18,15 @@ env:
   LLVM_PASTA_VER: b9e223f
   LLVM_VER: 18
   PYTHON_VER: 3.11
+  UBUNTU_CODENAME: jammy
+  UBUNTU_VERSION: 22.04
+  CMAKE_VERSION: 3.26
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-${UBUNTU_VERSION}
     container:
-      image: ghcr.io/lifting-bits/cxx-common/vcpkg-builder-ubuntu-v2:22.04
+      image: ghcr.io/lifting-bits/cxx-common/vcpkg-builder-ubuntu-v2:${UBUNTU_VERSION}
       options: --user 1001
 
     permissions:
@@ -39,15 +42,15 @@ jobs:
 
       - name: Install prereqs
         run: |
-          curl -sSL https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
-          echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-${LLVM_VER} main" | tee -a /etc/apt/sources.list > /dev/null
-          echo "deb-src http://apt.llvm.org/jammy/ llvm-toolchain-jammy-${LLVM_VER} main" | tee -a /etc/apt/sources.list > /dev/null
+          curl -sS https://apt.llvm.org/llvm-snapshot.gpg.key | gpg --dearmor > /etc/apt/trusted.gpg.d/llvm.gpg > /dev/null
+          echo "deb [signed-by=/etc/apt/trusted.gpg.d/llvm.gpg] http://apt.llvm.org/${UBUNTU_CODENAME}/ llvm-toolchain-${UBUNTU_CODENAME}-${LLVM_VER} main" >> /etc/apt/sources.list.d/llvm.list > /dev/null
+          echo "deb-src [signed-by=/etc/apt/trusted.gpg.d/llvm.gpg] http://apt.llvm.org/${UBUNTU_CODENAME}/ llvm-toolchain-${UBUNTU_CODENAME}-${LLVM_VER} main" >> /etc/apt/sources.list.d/llvm.list > /dev/null
           apt-get update; apt-get install clang-${LLVM_VER} lld-${LLVM_VER} python${PYTHON_VER} python${PYTHON_VER}-dev -y
 
       - name: Setup cmake
         uses: trail-of-forks/actions-setup-cmake@master
         with:
-          cmake-version: '3.26.x'
+          cmake-version: '${CMAKE_VERSION}.x'
 
       - name: Use cmake
         run: cmake --version
