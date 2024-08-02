@@ -57,7 +57,7 @@ jobs:
       - name: Use CMake
         run: |
           sudo apt-get install -y libidn12
-          sudo ln -s  /usr/lib/x86_64-linux-gnu/libidn.so.12.x /usr/lib/x86_64-linux-gnu/libidn.so.11
+          sudo ln -s $(readlink /usr/lib/x86_64-linux-gnu/libidn.so.12) /usr/lib/x86_64-linux-gnu/libidn.so.11
           cmake --version
 
       - name: Checkout repository
