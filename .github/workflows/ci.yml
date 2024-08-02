@@ -17,7 +17,6 @@ concurrency:
 env:
   LLVM_PASTA_VER: b9e223f
   LLVM_VER: 18
-  FULL_LLVM_VER: 18.1.0
   PYTHON_VER: 3.11
   UBUNTU_CODENAME: jammy
   CMAKE_VERSION: 3.26
@@ -47,7 +46,7 @@ jobs:
       - name: Setup LLVM
         uses: trail-of-forks/install-llvm-action@master
         with:
-          version: "${FULL_LLVM_VER}"
+          version: "${LLVM_VER}"
 
       - name: Setup cmake
         uses: trail-of-forks/actions-setup-cmake@master
