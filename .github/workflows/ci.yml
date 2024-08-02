@@ -55,6 +55,7 @@ jobs:
           cmake-version: ${{ env.CMAKE_VER }}.x
 
       - name: Use CMake
+        run: sudo ln -s  /usr/lib/x86_64-linux-gnu/libidn.so.12.x /usr/lib/x86_64-linux-gnu/libidn.so.11
         run: cmake --version
 
       - name: Checkout repository
