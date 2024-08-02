@@ -49,7 +49,7 @@ jobs:
         run: cmake --version
 
       - name: Use Clang
-        run: clang --version
+        run: clang-${LLVM_VER} --version
 
       - name: Install Python
         uses: actions/setup-python@v5
@@ -90,8 +90,8 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX=${RELEASE_DIR} \
             -DCMAKE_LINKER_TYPE=LLD \
-            -DCMAKE_C_COMPILER="$(which clang)" \
-            -DCMAKE_CXX_COMPILER="$(which clang++)" \
+            -DCMAKE_C_COMPILER="$(which clang-${LLVM_VER})" \
+            -DCMAKE_CXX_COMPILER="$(which clang++-${LLVM_VER})" \
             -DClang_DIR=${LLVM_PREFIX_DIR}/lib/cmake/clang \
             -DLLVM_DIR=${LLVM_PREFIX_DIR}/lib/cmake/llvm \
             -DMLIR_DIR=${LLVM_PREFIX_DIR}/lib/cmake/mlir \
