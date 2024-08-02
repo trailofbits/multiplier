@@ -40,20 +40,19 @@ jobs:
       - run: git config --global --add safe.directory '*'
 
       - name: Install prereqs
-        run: |
-          apt-get update; apt-get install python${PYTHON_VER} python${PYTHON_VER}-dev -y
+        run: apt-get update && apt-get install python${PYTHON_VER} python${PYTHON_VER}-dev -y
 
-      - name: Setup LLVM
+      - name: Install LLVM
         uses: trail-of-forks/install-llvm-action@master
         with:
           version: "${LLVM_VER}"
 
-      - name: Setup cmake
+      - name: Install CMake
         uses: trail-of-forks/actions-setup-cmake@master
         with:
           cmake-version: '${CMAKE_VERSION}.x'
 
-      - name: Use cmake
+      - name: Use CMake
         run: cmake --version
 
       - name: Set up variables
