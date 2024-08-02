@@ -45,9 +45,9 @@ jobs:
 
       - name: Use LLVM
         run: clang --version
-
-      - name: Install dependencies
-        run: apt install build-essential ninja-build
+      
+      - name: Install ninja-build tool
+        uses: trail-of-forks/gha-setup-ninja@master
 
       - name: Install CMake
         uses: trail-of-forks/actions-setup-cmake@master
