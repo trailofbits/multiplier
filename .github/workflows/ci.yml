@@ -54,6 +54,10 @@ jobs:
       - name: Use CMake
         run: cmake --version
 
+      - name: Install ninja-build tool
+        uses: trail-of-forks/gha-setup-ninja@master
+        run: echo "NINJA_BUILD=$(which ninja)" >> $GITHUB_ENV
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -77,7 +81,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build
-        uses: trail-of-forks/gha-setup-ninja@master
         run: |
 
           CXXFLAGS="-g0" \
@@ -90,7 +93,7 @@ jobs:
             -DCMAKE_SHARED_LINKER_FLAGS="--ld-path=$(which ld.lld-${LLVM_VER})" \
             -DCMAKE_C_COMPILER="$(which clang-${LLVM_VER})" \
             -DCMAKE_CXX_COMPILER="$(which clang++-${LLVM_VER})" \
-            -DCMAKE_MAKE_PROGRAM="$(which ninja)" \
+            -DCMAKE_MAKE_PROGRAM="${NINJA_BUILD}" \
             -DClang_DIR=${LLVM_PREFIX_DIR}/lib/cmake/clang \
             -DLLVM_DIR=${LLVM_PREFIX_DIR}/lib/cmake/llvm \
             -DMLIR_DIR=${LLVM_PREFIX_DIR}/lib/cmake/mlir \
