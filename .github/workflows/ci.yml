@@ -42,7 +42,7 @@ jobs:
       - name: Install Python
         uses: actions/setup-python@v5
         with:
-          python-version: '${PYTHON_VER}-dev'
+          python-version: '3.12.4-dev'
 
       - name: Install LLVM
         uses: trail-of-forks/install-llvm-action@master
