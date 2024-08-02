@@ -36,7 +36,7 @@ jobs:
           sudo apt install -y software-properties-common lsb-release
           sudo apt clean all
           curl -sSL https://apt.llvm.org/llvm-snapshot.gpg.key | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/llvm.gpg >/dev/null
-          sudo apt-add-repository "deb https://apt.llvm.org/$(lsb_release -cs)/ $(lsb_release -cs) main"
+          sudo apt-add-repository "deb https://apt.llvm.org/$(lsb_release -cs)/ llvm-toolchain-$(lsb_release -cs)-${LLVM_VER} main"
           curl -sSL https://apt.kitware.com/keys/kitware-archive-latest.asc | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
           sudo apt-add-repository "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main"
           sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6AF7F09730B3F0A4
