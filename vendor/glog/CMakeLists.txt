@@ -39,9 +39,7 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         "-DCMAKE_INSTALL_RPATH=${CMAKE_INSTALL_RPATH}"
                         "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
                         "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
-                        "-DCMAKE_EXE_LINKER_FLAGS=${CMAKE_EXE_LINKER_FLAGS}"
-                        "-DCMAKE_MODULE_LINKER_FLAGS=${CMAKE_MODULE_LINKER_FLAGS}"
-                        "-DCMAKE_SHARED_LINKER_FLAGS=${CMAKE_SHARED_LINKER_FLAGS}"
+                        "-DCMAKE_LINKER_TYPE=${CMAKE_LINKER_TYPE}"
                         "-DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}"
                         "-DCMAKE_INTERPROCEDURAL_OPTIMIZATION=${CMAKE_INTERPROCEDURAL_OPTIMIZATION}"
                         -DBUILD_SHARED_LIBS=OFF

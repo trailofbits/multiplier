@@ -42,9 +42,7 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
                         "-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}"
                         "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}"
-                        "-DCMAKE_EXE_LINKER_FLAGS=${CMAKE_EXE_LINKER_FLAGS}"
-                        "-DCMAKE_MODULE_LINKER_FLAGS=${CMAKE_MODULE_LINKER_FLAGS}"
-                        "-DCMAKE_SHARED_LINKER_FLAGS=${CMAKE_SHARED_LINKER_FLAGS}"
+                        "-DCMAKE_LINKER_TYPE=${CMAKE_LINKER_TYPE}"
                         "-DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}"
                         "-DCMAKE_INTERPROCEDURAL_OPTIMIZATION=${CMAKE_INTERPROCEDURAL_OPTIMIZATION}"
                         -DWITH_JEMALLOC:BOOL=OFF

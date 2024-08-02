@@ -19,7 +19,7 @@ env:
   LLVM_VER: 17
   PYTHON_VER: 3.12
   UBUNTU_CODENAME: jammy
-  CMAKE_VER: 3.26
+  CMAKE_VER: 3.30
 
 jobs:
   build:
@@ -33,7 +33,7 @@ jobs:
       - name: Install Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ env.PYTHON_VER }}
+          python-version: ${{ env.PYTHON_VER }}-dev
 
       - name: Use Python
         run: python --version
@@ -87,11 +87,9 @@ jobs:
           cmake \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX=${RELEASE_DIR} \
-            -DCMAKE_EXE_LINKER_FLAGS="--ld-path=$(which ld.lld-${LLVM_VER})" \
-            -DCMAKE_MODULE_LINKER_FLAGS="--ld-path=$(which ld.lld-${LLVM_VER})" \
-            -DCMAKE_SHARED_LINKER_FLAGS="--ld-path=$(which ld.lld-${LLVM_VER})" \
-            -DCMAKE_C_COMPILER="$(which clang-${LLVM_VER})" \
-            -DCMAKE_CXX_COMPILER="$(which clang++-${LLVM_VER})" \
+            -DCMAKE_LINKER_TYPE=LLD \
+            -DCMAKE_C_COMPILER="$(which clang)" \
+            -DCMAKE_CXX_COMPILER="$(which clang++)" \
             -DClang_DIR=${LLVM_PREFIX_DIR}/lib/cmake/clang \
             -DLLVM_DIR=${LLVM_PREFIX_DIR}/lib/cmake/llvm \
             -DMLIR_DIR=${LLVM_PREFIX_DIR}/lib/cmake/mlir \

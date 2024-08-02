@@ -56,9 +56,7 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
                         "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
                         "-DCMAKE_ASM_COMPILER=${CMAKE_C_COMPILER}"
-                        "-DCMAKE_EXE_LINKER_FLAGS=${CMAKE_EXE_LINKER_FLAGS}"
-                        "-DCMAKE_MODULE_LINKER_FLAGS=${CMAKE_MODULE_LINKER_FLAGS}"
-                        "-DCMAKE_SHARED_LINKER_FLAGS=${CMAKE_SHARED_LINKER_FLAGS}"
+                        "-DCMAKE_LINKER_TYPE=${CMAKE_LINKER_TYPE}"
                         -DCMAKE_CXX_STANDARD=17
                         "-DCMAKE_INTERPROCEDURAL_OPTIMIZATION=${CMAKE_INTERPROCEDURAL_OPTIMIZATION}"
                         -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON
