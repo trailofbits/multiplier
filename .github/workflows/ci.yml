@@ -24,30 +24,27 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/lifting-bits/cxx-common/vcpkg-builder-ubuntu-v2:22.04
-      options: --user 1001
 
     permissions:
       contents: write
       packages: write
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          submodules: "recursive"
-      - run: git config --global --add safe.directory '*'
-
       - name: Install Python
         uses: actions/setup-python@v5
         with:
-          python-version: "${PYTHON_VER}-dev"
+          python-version: "3.12.4"
+
+      - name: Use Python
+        run: python --version
 
       - name: Install LLVM
         uses: trail-of-forks/install-llvm-action@master
         with:
           version: "${LLVM_VER}"
+
+      - name: Use LLVM
+        run: clang --version
 
       - name: Install CMake
         uses: trail-of-forks/actions-setup-cmake@master
@@ -56,6 +53,12 @@ jobs:
 
       - name: Use CMake
         run: cmake --version
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: "recursive"
+      - run: git config --global --add safe.directory '*'
 
       - name: Set up variables
         run: |
