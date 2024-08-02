@@ -16,7 +16,7 @@ concurrency:
 
 env:
   LLVM_PASTA_VER: b9e223f
-  LLVM_VER: 17
+  LLVM_VER: 18
   PYTHON_VER: 3.12
   UBUNTU_CODENAME: jammy
 
@@ -29,22 +29,27 @@ jobs:
       packages: write
 
     steps:
-      - name: Install CMake and Ninja
+      - name: Install CMake, Clang, and Ninja
         run: |
-          sudo apt remove --purge --auto-remove cmake
+          sudo apt remove --purge --auto-remove cmake clang
           sudo apt update
           sudo apt install -y software-properties-common lsb-release
           sudo apt clean all
-          wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
+          curl -sSL https://apt.llvm.org/llvm-snapshot.gpg.key | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/llvm.gpg >/dev/null
+          sudo apt-add-repository "deb https://apt.llvm.org/$(lsb_release -cs)/ $(lsb_release -cs) main"
+          curl -sSL https://apt.kitware.com/keys/kitware-archive-latest.asc | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
           sudo apt-add-repository "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main"
           sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6AF7F09730B3F0A4
           sudo apt update
           sudo apt install kitware-archive-keyring
           sudo rm /etc/apt/trusted.gpg.d/kitware.gpg
-          sudo apt install cmake ninja-build
+          sudo apt install clang-18 lld-18 cmake ninja-build
 
       - name: Use CMake
         run: cmake --version
+
+      - name: Use Clang
+        run: clang --version
 
       - name: Install Python
         uses: actions/setup-python@v5
@@ -53,14 +58,6 @@ jobs:
 
       - name: Use Python
         run: python --version
-
-      - name: Install LLVM
-        uses: trail-of-forks/install-llvm-action@master
-        with:
-          version: ${{ env.LLVM_VER }}
-
-      - name: Use LLVM
-        run: clang --version
 
       - name: Checkout repository
         uses: actions/checkout@v4
