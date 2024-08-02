@@ -41,7 +41,7 @@ jobs:
       - name: Install LLVM
         uses: trail-of-forks/install-llvm-action@master
         with:
-          version: "18.1.3"
+          version: "18.1.2"
 
       - name: Use LLVM
         run: clang --version
