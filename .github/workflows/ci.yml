@@ -33,7 +33,7 @@ jobs:
       - name: Install Python
         uses: actions/setup-python@v5
         with:
-          python-version: $PYTHON_VER
+          python-version: ${{ env.PYTHON_VER }}
 
       - name: Use Python
         run: python --version
@@ -41,7 +41,7 @@ jobs:
       - name: Install LLVM
         uses: trail-of-forks/install-llvm-action@master
         with:
-          version: $LLVM_VER
+          version: ${{ env.LLVM_VER }}
 
       - name: Use LLVM
         run: clang --version
@@ -49,7 +49,7 @@ jobs:
       - name: Install CMake
         uses: trail-of-forks/actions-setup-cmake@master
         with:
-          cmake-version: $CMAKE_VER.x
+          cmake-version: ${{ env.CMAKE_VER }}.x
 
       - name: Use CMake
         run: cmake --version
