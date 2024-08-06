@@ -195,12 +195,12 @@ std::optional<RequiresExpr> RequiresExpr::from(const TokenContext &t) {
 }
 
 RequiresExprBodyDecl RequiresExpr::body(void) const {
-  RawEntityId eid = impl->reader.getVal37();
+  RawEntityId eid = impl->reader.getVal38();
   return RequiresExprBodyDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Token RequiresExpr::l_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 unsigned RequiresExpr::num_local_parameters(void) const {
@@ -236,15 +236,15 @@ gap::generator<ParmVarDecl> RequiresExpr::local_parameters(void) const & {
 }
 
 Token RequiresExpr::r_brace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
-}
-
-Token RequiresExpr::r_paren_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
-Token RequiresExpr::requires_keyword_token(void) const {
+Token RequiresExpr::r_paren_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+}
+
+Token RequiresExpr::requires_keyword_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 #pragma GCC diagnostic pop

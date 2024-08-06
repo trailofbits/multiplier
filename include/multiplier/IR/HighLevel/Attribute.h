@@ -32,6 +32,10 @@ class ColdAttr;
 class TransparentUnionAttr;
 class ReturnsTwiceAttr;
 class MayAliasAttr;
+class UnusedAttr;
+class UsedAttr;
+class GNUInlineAttr;
+class NoCfCheckAttr;
 class AvailableOnlyInDefaultEvalMethodAttr;
 class AvailabilityAttrAttr;
 class AsmLabelAttr;
@@ -351,6 +355,62 @@ class MX_EXPORT MayAliasAttr final : public Attribute {
   // Imported methods:
 };
 static_assert(sizeof(MayAliasAttr) == sizeof(Attribute));
+
+class MX_EXPORT UnusedAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::HL_UNUSED;
+  }
+
+  static std::optional<UnusedAttr> from(const ::mx::ir::Attribute &that);
+
+  ::vast::hl::UnusedAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+};
+static_assert(sizeof(UnusedAttr) == sizeof(Attribute));
+
+class MX_EXPORT UsedAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::HL_USED;
+  }
+
+  static std::optional<UsedAttr> from(const ::mx::ir::Attribute &that);
+
+  ::vast::hl::UsedAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+};
+static_assert(sizeof(UsedAttr) == sizeof(Attribute));
+
+class MX_EXPORT GNUInlineAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::HL_GNU_INLINE;
+  }
+
+  static std::optional<GNUInlineAttr> from(const ::mx::ir::Attribute &that);
+
+  ::vast::hl::GNUInlineAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+};
+static_assert(sizeof(GNUInlineAttr) == sizeof(Attribute));
+
+class MX_EXPORT NoCfCheckAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::HL_NO_CF_CHECK;
+  }
+
+  static std::optional<NoCfCheckAttr> from(const ::mx::ir::Attribute &that);
+
+  ::vast::hl::NoCfCheckAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+};
+static_assert(sizeof(NoCfCheckAttr) == sizeof(Attribute));
 
 class MX_EXPORT AvailableOnlyInDefaultEvalMethodAttr final : public Attribute {
  public:

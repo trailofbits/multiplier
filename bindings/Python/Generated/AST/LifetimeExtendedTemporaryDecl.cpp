@@ -175,6 +175,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "mangling_number",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->mangling_number());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::LifetimeExtendedTemporaryDecl::mangling_number"),
+    nullptr,
+  },
+  {
     "storage_duration",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

@@ -215,6 +215,10 @@ bool CompoundStmt::has_stored_fp_features(void) const {
   return impl->reader.getVal12();
 }
 
+uint32_t CompoundStmt::size(void) const {
+  return impl->reader.getVal26();
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

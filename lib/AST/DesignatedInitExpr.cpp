@@ -225,32 +225,36 @@ gap::generator<Designator> DesignatedInitExpr::designators(void) const & {
 }
 
 TokenRange DesignatedInitExpr::designators_tokens(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal37(), impl->reader.getVal38());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal38(), impl->reader.getVal39());
 }
 
 Token DesignatedInitExpr::equal_or_colon_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 Expr DesignatedInitExpr::initializer(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal41();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 bool DesignatedInitExpr::is_direct_initializer(void) const {
-  return impl->reader.getVal83();
-}
-
-bool DesignatedInitExpr::uses_gnu_syntax(void) const {
   return impl->reader.getVal84();
 }
 
+uint32_t DesignatedInitExpr::size(void) const {
+  return impl->reader.getVal26();
+}
+
+bool DesignatedInitExpr::uses_gnu_syntax(void) const {
+  return impl->reader.getVal85();
+}
+
 unsigned DesignatedInitExpr::num_sub_expressions(void) const {
-  return impl->reader.getVal26().size();
+  return impl->reader.getVal27().size();
 }
 
 std::optional<Expr> DesignatedInitExpr::nth_sub_expression(unsigned n) const {
-  auto list = impl->reader.getVal26();
+  auto list = impl->reader.getVal27();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -264,12 +268,12 @@ std::optional<Expr> DesignatedInitExpr::nth_sub_expression(unsigned n) const {
 }
 
 gap::generator<Expr> DesignatedInitExpr::sub_expressions(void) const & {
-  auto list = impl->reader.getVal26();
+  auto list = impl->reader.getVal27();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d26 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from_base(std::move(d26))) {
+    if (auto d27 = ep->StmtFor(ep, v)) {
+      if (auto e = Expr::from_base(std::move(d27))) {
         co_yield std::move(*e);
       }
     }

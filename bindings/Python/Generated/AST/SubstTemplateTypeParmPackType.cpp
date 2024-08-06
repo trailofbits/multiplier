@@ -145,6 +145,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "index",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->index());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::SubstTemplateTypeParmPackType::index"),
+    nullptr,
+  },
+  {
     "replaced_parameter",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

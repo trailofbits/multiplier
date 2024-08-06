@@ -80,6 +80,8 @@ class MX_EXPORT ParmVarDecl : public VarDecl {
   std::optional<Expr> default_argument(void) const;
   TokenRange default_argument_range(void) const;
   Token explicit_object_parameter_this_token(void) const;
+  uint32_t depth(void) const;
+  uint32_t index(void) const;
   DeclObjCDeclQualifier obj_c_decl_qualifier(void) const;
   Type original_type(void) const;
   std::optional<Expr> uninstantiated_default_argument(void) const;

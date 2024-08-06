@@ -71,6 +71,7 @@ class MX_EXPORT FriendDecl : public Decl {
   std::optional<NamedDecl> friend_declaration(void) const;
   Token friend_token(void) const;
   std::optional<Type> friend_type(void) const;
+  uint32_t friend_type_num_template_parameter_lists(void) const;
   bool is_unsupported_friend(void) const;
   std::optional<TemplateParameterList> nth_friend_type_template_parameter_list(unsigned n) const;
   unsigned num_friend_type_template_parameter_lists(void) const;

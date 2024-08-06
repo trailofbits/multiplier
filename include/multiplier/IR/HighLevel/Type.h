@@ -43,6 +43,7 @@ class AdjustedType;
 class ReferenceType;
 class TypeOfExprType;
 class TypeOfTypeType;
+class AutoType;
 class AtomicType;
 }  // namespace vast::hl
 namespace mx::ir::hl {
@@ -516,6 +517,21 @@ class MX_EXPORT TypeOfTypeType final : public Type {
   //CVRQualifiersAttr quals(void) const;
 };
 static_assert(sizeof(TypeOfTypeType) == sizeof(Type));
+
+class MX_EXPORT AutoType final : public Type {
+ public:
+  inline static constexpr TypeKind static_kind(void) {
+    return TypeKind::HL_AUTO;
+  }
+
+  static std::optional<AutoType> from(const ::mx::ir::Type &that);
+  ::vast::hl::AutoType underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //Type deduced_type(void) const;
+  //CVRQualifiersAttr quals(void) const;
+};
+static_assert(sizeof(AutoType) == sizeof(Type));
 
 class MX_EXPORT AtomicType final : public Type {
  public:

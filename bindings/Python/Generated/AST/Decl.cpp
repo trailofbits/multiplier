@@ -635,6 +635,26 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "owning_module_id",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->owning_module_id());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Decl::owning_module_id"),
+    nullptr,
+  },
+  {
+    "template_depth",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->template_depth());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Decl::template_depth"),
+    nullptr,
+  },
+  {
     "is_deprecated",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -941,7 +961,7 @@ static PyMethodDef gMethods[] = {
             if (!arg_0.has_value()) {
               break;
             }
-            auto arg_1 = ::mx::from_python<std::span<mx::DeclKind>>(args[1]);
+            auto arg_1 = ::mx::from_python<std::span<const mx::DeclKind>>(args[1]);
             if (!arg_1.has_value()) {
               break;
             }
@@ -953,7 +973,7 @@ static PyMethodDef gMethods[] = {
             if (!arg_0.has_value()) {
               break;
             }
-            auto arg_1 = ::mx::from_python<std::span<mx::DeclKind>>(args[1]);
+            auto arg_1 = ::mx::from_python<std::span<const mx::DeclKind>>(args[1]);
             if (!arg_1.has_value()) {
               break;
             }
@@ -965,7 +985,7 @@ static PyMethodDef gMethods[] = {
             if (!arg_0.has_value()) {
               break;
             }
-            auto arg_1 = ::mx::from_python<std::span<mx::DeclKind>>(args[1]);
+            auto arg_1 = ::mx::from_python<std::span<const mx::DeclKind>>(args[1]);
             if (!arg_1.has_value()) {
               break;
             }
@@ -985,7 +1005,7 @@ static PyMethodDef gMethods[] = {
             if (!arg_0.has_value()) {
               break;
             }
-            auto arg_1 = ::mx::from_python<std::span<mx::DeclKind>>(args[1]);
+            auto arg_1 = ::mx::from_python<std::span<const mx::DeclKind>>(args[1]);
             if (!arg_1.has_value()) {
               break;
             }

@@ -74,6 +74,7 @@ class MX_EXPORT BlockDecl : public Decl {
   bool captures_cxx_this(void) const;
   bool does_not_escape(void) const;
   std::optional<Decl> block_mangling_context_declaration(void) const;
+  uint32_t block_mangling_number(void) const;
   Token caret_token(void) const;
   CompoundStmt compound_body(void) const;
   Type signature_as_written(void) const;

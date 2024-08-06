@@ -49,6 +49,7 @@ class MX_EXPORT ConstantMatrixType : public MatrixType {
   static std::optional<ConstantMatrixType> from(const VariantEntity &e);
   static std::optional<ConstantMatrixType> from(const TokenContext &t);
 
+  uint32_t num_elements_flattened(void) const;
 };
 
 static_assert(sizeof(ConstantMatrixType) == sizeof(MatrixType));

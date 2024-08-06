@@ -125,6 +125,10 @@ std::optional<InitPriorityAttr> InitPriorityAttr::from(const TokenContext &t) {
   return std::nullopt;
 }
 
+uint32_t InitPriorityAttr::priority(void) const {
+  return impl->reader.getVal12();
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

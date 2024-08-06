@@ -124,6 +124,16 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
 namespace {
 static PyGetSetDef gProperties[] = {
+  {
+    "vector_width",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->vector_width());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::MinVectorWidthAttr::vector_width"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

@@ -126,15 +126,15 @@ std::optional<MSInheritanceAttr> MSInheritanceAttr::from(const TokenContext &t) 
 }
 
 bool MSInheritanceAttr::best_case(void) const {
-  return impl->reader.getVal14();
+  return impl->reader.getVal15();
 }
 
 MSInheritanceModel MSInheritanceAttr::inheritance_model(void) const {
-  return static_cast<MSInheritanceModel>(impl->reader.getVal12());
+  return static_cast<MSInheritanceModel>(impl->reader.getVal13());
 }
 
 MSInheritanceAttrSpelling MSInheritanceAttr::semantic_spelling(void) const {
-  return static_cast<MSInheritanceAttrSpelling>(impl->reader.getVal20());
+  return static_cast<MSInheritanceAttrSpelling>(impl->reader.getVal21());
 }
 
 #pragma GCC diagnostic pop

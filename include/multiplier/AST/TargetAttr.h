@@ -54,6 +54,7 @@ class MX_EXPORT TargetAttr : public InheritableAttr {
 
   std::string_view architecture(void) const;
   std::string_view features_string(void) const;
+  uint32_t features_string_length(void) const;
   bool is_default_version(void) const;
 };
 

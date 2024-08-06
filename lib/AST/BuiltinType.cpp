@@ -98,35 +98,35 @@ std::optional<BuiltinType> BuiltinType::from(const TokenContext &t) {
 }
 
 BuiltinTypeKind BuiltinType::builtin_kind(void) const {
-  return static_cast<BuiltinTypeKind>(impl->reader.getVal68());
+  return static_cast<BuiltinTypeKind>(impl->reader.getVal70());
 }
 
 bool BuiltinType::is_floating_point(void) const {
-  return impl->reader.getVal20();
+  return impl->reader.getVal23();
 }
 
 bool BuiltinType::is_integer(void) const {
-  return impl->reader.getVal21();
+  return impl->reader.getVal24();
 }
 
 bool BuiltinType::is_sve_bool(void) const {
-  return impl->reader.getVal22();
+  return impl->reader.getVal25();
 }
 
 bool BuiltinType::is_sve_count(void) const {
-  return impl->reader.getVal28();
-}
-
-bool BuiltinType::is_signed_integer(void) const {
-  return impl->reader.getVal29();
-}
-
-bool BuiltinType::is_sugared(void) const {
   return impl->reader.getVal30();
 }
 
-bool BuiltinType::is_unsigned_integer(void) const {
+bool BuiltinType::is_signed_integer(void) const {
   return impl->reader.getVal31();
+}
+
+bool BuiltinType::is_sugared(void) const {
+  return impl->reader.getVal32();
+}
+
+bool BuiltinType::is_unsigned_integer(void) const {
+  return impl->reader.getVal33();
 }
 
 #pragma GCC diagnostic pop

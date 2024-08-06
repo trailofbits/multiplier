@@ -300,6 +300,10 @@ std::optional<OMPLoopBasedDirective> OMPLoopBasedDirective::from(const TokenCont
   return std::nullopt;
 }
 
+uint32_t OMPLoopBasedDirective::loops_number(void) const {
+  return impl->reader.getVal26();
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

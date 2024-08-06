@@ -55,6 +55,7 @@ class MX_EXPORT ErrorAttr : public InheritableAttr {
 
   ErrorAttrSpelling semantic_spelling(void) const;
   std::string_view user_diagnostic(void) const;
+  uint32_t user_diagnostic_length(void) const;
   bool is_error(void) const;
   bool is_warning(void) const;
 };

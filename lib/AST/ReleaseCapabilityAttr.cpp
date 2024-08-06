@@ -126,15 +126,15 @@ std::optional<ReleaseCapabilityAttr> ReleaseCapabilityAttr::from(const TokenCont
 }
 
 ReleaseCapabilityAttrSpelling ReleaseCapabilityAttr::semantic_spelling(void) const {
-  return static_cast<ReleaseCapabilityAttrSpelling>(impl->reader.getVal12());
+  return static_cast<ReleaseCapabilityAttrSpelling>(impl->reader.getVal13());
 }
 
 bool ReleaseCapabilityAttr::is_generic(void) const {
-  return impl->reader.getVal14();
+  return impl->reader.getVal15();
 }
 
 bool ReleaseCapabilityAttr::is_shared(void) const {
-  return impl->reader.getVal15();
+  return impl->reader.getVal16();
 }
 
 #pragma GCC diagnostic pop

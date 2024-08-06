@@ -49,11 +49,8 @@ class MX_EXPORT Region final {
   mlir::Region *region_;
 
  public:
-
-  inline Region(std::shared_ptr<const SourceIRImpl> module,
-                mlir::Region *region)
-      : module_(std::move(module)),
-        region_(region) {}
+  Region(std::shared_ptr<const SourceIRImpl> module,
+         mlir::Region *region);
 
   inline Region(std::shared_ptr<const SourceIRImpl> module,
                 mlir::Region &region)

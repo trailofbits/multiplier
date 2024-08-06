@@ -253,6 +253,50 @@ std::optional<MayAliasAttr> MayAliasAttr::from(const ::mx::ir::Attribute &that) 
   return ::vast::hl::MayAliasAttr(this->::mx::ir::Attribute::attr_);
 }
 
+std::optional<UnusedAttr> UnusedAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::HL_UNUSED) {
+    return reinterpret_cast<const UnusedAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::vast::hl::UnusedAttr UnusedAttr::underlying_repr(void) const noexcept {
+  return ::vast::hl::UnusedAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<UsedAttr> UsedAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::HL_USED) {
+    return reinterpret_cast<const UsedAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::vast::hl::UsedAttr UsedAttr::underlying_repr(void) const noexcept {
+  return ::vast::hl::UsedAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<GNUInlineAttr> GNUInlineAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::HL_GNU_INLINE) {
+    return reinterpret_cast<const GNUInlineAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::vast::hl::GNUInlineAttr GNUInlineAttr::underlying_repr(void) const noexcept {
+  return ::vast::hl::GNUInlineAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<NoCfCheckAttr> NoCfCheckAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::HL_NO_CF_CHECK) {
+    return reinterpret_cast<const NoCfCheckAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::vast::hl::NoCfCheckAttr NoCfCheckAttr::underlying_repr(void) const noexcept {
+  return ::vast::hl::NoCfCheckAttr(this->::mx::ir::Attribute::attr_);
+}
+
 std::optional<AvailableOnlyInDefaultEvalMethodAttr> AvailableOnlyInDefaultEvalMethodAttr::from(const ::mx::ir::Attribute &that) {
   if (that.kind() == AttributeKind::HL_AVAILABLE_ONLY_IN_DEFAULT_EVAL_METHOD) {
     return reinterpret_cast<const AvailableOnlyInDefaultEvalMethodAttr &>(that);

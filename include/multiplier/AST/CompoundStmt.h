@@ -66,6 +66,7 @@ class MX_EXPORT CompoundStmt : public Stmt {
   Token right_brace_token(void) const;
   std::optional<Stmt> statement_expression_result(void) const;
   bool has_stored_fp_features(void) const;
+  uint32_t size(void) const;
 };
 
 static_assert(sizeof(CompoundStmt) == sizeof(Stmt));

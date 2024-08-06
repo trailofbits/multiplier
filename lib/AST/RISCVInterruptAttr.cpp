@@ -126,7 +126,7 @@ std::optional<RISCVInterruptAttr> RISCVInterruptAttr::from(const TokenContext &t
 }
 
 RISCVInterruptAttrInterruptType RISCVInterruptAttr::interrupt(void) const {
-  return static_cast<RISCVInterruptAttrInterruptType>(impl->reader.getVal12());
+  return static_cast<RISCVInterruptAttrInterruptType>(impl->reader.getVal13());
 }
 
 #pragma GCC diagnostic pop

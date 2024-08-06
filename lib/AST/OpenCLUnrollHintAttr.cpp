@@ -125,6 +125,10 @@ std::optional<OpenCLUnrollHintAttr> OpenCLUnrollHintAttr::from(const TokenContex
   return std::nullopt;
 }
 
+uint32_t OpenCLUnrollHintAttr::unroll_hint(void) const {
+  return impl->reader.getVal12();
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

@@ -52,6 +52,7 @@ class MX_EXPORT M68kInterruptAttr : public InheritableAttr {
   static std::optional<M68kInterruptAttr> from(const VariantEntity &e);
   static std::optional<M68kInterruptAttr> from(const TokenContext &t);
 
+  uint32_t number(void) const;
 };
 
 static_assert(sizeof(M68kInterruptAttr) == sizeof(InheritableAttr));

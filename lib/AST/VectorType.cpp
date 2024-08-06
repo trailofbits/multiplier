@@ -101,16 +101,16 @@ std::optional<VectorType> VectorType::from(const TokenContext &t) {
 }
 
 Type VectorType::element_type(void) const {
-  RawEntityId eid = impl->reader.getVal19();
+  RawEntityId eid = impl->reader.getVal20();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 VectorKind VectorType::vector_kind(void) const {
-  return static_cast<VectorKind>(impl->reader.getVal27());
+  return static_cast<VectorKind>(impl->reader.getVal29());
 }
 
 bool VectorType::is_sugared(void) const {
-  return impl->reader.getVal20();
+  return impl->reader.getVal23();
 }
 
 #pragma GCC diagnostic pop

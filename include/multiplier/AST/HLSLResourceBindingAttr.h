@@ -53,7 +53,9 @@ class MX_EXPORT HLSLResourceBindingAttr : public InheritableAttr {
   static std::optional<HLSLResourceBindingAttr> from(const TokenContext &t);
 
   std::string_view slot(void) const;
+  uint32_t slot_length(void) const;
   std::string_view space(void) const;
+  uint32_t space_length(void) const;
 };
 
 static_assert(sizeof(HLSLResourceBindingAttr) == sizeof(InheritableAttr));

@@ -225,13 +225,13 @@ std::optional<UsingShadowDecl> UsingShadowDecl::from(const TokenContext &t) {
 }
 
 BaseUsingDecl UsingShadowDecl::introducer(void) const {
-  RawEntityId eid = impl->reader.getVal45();
+  RawEntityId eid = impl->reader.getVal48();
   return BaseUsingDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 std::optional<UsingShadowDecl> UsingShadowDecl::next_using_shadow_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal46();
+    RawEntityId eid = impl->reader.getVal49();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -243,7 +243,7 @@ std::optional<UsingShadowDecl> UsingShadowDecl::next_using_shadow_declaration(vo
 }
 
 NamedDecl UsingShadowDecl::target_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal47();
+  RawEntityId eid = impl->reader.getVal50();
   return NamedDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 

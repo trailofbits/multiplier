@@ -361,6 +361,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "raw_qualifiers",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->raw_qualifiers());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Type::raw_qualifiers"),
+    nullptr,
+  },
+  {
     "desugared_type",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -571,7 +581,7 @@ static PyMethodDef gMethods[] = {
             if (!arg_0.has_value()) {
               break;
             }
-            auto arg_1 = ::mx::from_python<std::span<mx::TypeKind>>(args[1]);
+            auto arg_1 = ::mx::from_python<std::span<const mx::TypeKind>>(args[1]);
             if (!arg_1.has_value()) {
               break;
             }

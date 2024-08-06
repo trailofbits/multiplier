@@ -37,10 +37,8 @@ class MX_EXPORT Block final {
   mlir::Block *block_;
 
  public:
-  inline Block(std::shared_ptr<const SourceIRImpl> module,
-               mlir::Block *block)
-      : module_(std::move(module)),
-        block_(block) {}
+  Block(std::shared_ptr<const SourceIRImpl> module,
+        mlir::Block *block);
 
   inline Block(std::shared_ptr<const SourceIRImpl> module,
                mlir::Block &block)

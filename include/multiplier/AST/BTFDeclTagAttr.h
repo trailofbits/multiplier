@@ -53,6 +53,7 @@ class MX_EXPORT BTFDeclTagAttr : public InheritableAttr {
   static std::optional<BTFDeclTagAttr> from(const TokenContext &t);
 
   std::string_view btf_decl_tag(void) const;
+  uint32_t btf_decl_tag_length(void) const;
 };
 
 static_assert(sizeof(BTFDeclTagAttr) == sizeof(InheritableAttr));

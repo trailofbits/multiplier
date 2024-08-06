@@ -55,6 +55,7 @@ class MX_EXPORT AnnotateAttr : public InheritableParamAttr {
   static std::optional<AnnotateAttr> from(const TokenContext &t);
 
   std::string_view annotation(void) const;
+  uint32_t annotation_length(void) const;
 };
 
 static_assert(sizeof(AnnotateAttr) == sizeof(InheritableParamAttr));

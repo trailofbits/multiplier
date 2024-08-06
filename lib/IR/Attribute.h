@@ -97,6 +97,10 @@
    _hl(TransparentUnionAttr, AttributeKind::HL_TRANSPARENT_UNION, vast::hl::TransparentUnionAttr) \
    _hl(ReturnsTwiceAttr, AttributeKind::HL_RETURNS_TWICE, vast::hl::ReturnsTwiceAttr) \
    _hl(MayAliasAttr, AttributeKind::HL_MAY_ALIAS, vast::hl::MayAliasAttr) \
+   _hl(UnusedAttr, AttributeKind::HL_UNUSED, vast::hl::UnusedAttr) \
+   _hl(UsedAttr, AttributeKind::HL_USED, vast::hl::UsedAttr) \
+   _hl(GNUInlineAttr, AttributeKind::HL_GNU_INLINE, vast::hl::GNUInlineAttr) \
+   _hl(NoCfCheckAttr, AttributeKind::HL_NO_CF_CHECK, vast::hl::NoCfCheckAttr) \
    _hl(AvailableOnlyInDefaultEvalMethodAttr, AttributeKind::HL_AVAILABLE_ONLY_IN_DEFAULT_EVAL_METHOD, vast::hl::AvailableOnlyInDefaultEvalMethodAttr) \
    _hl(AvailabilityAttrAttr, AttributeKind::HL_AVAILABILITY_ATTR, vast::hl::AvailabilityAttrAttr) \
    _hl(AsmLabelAttr, AttributeKind::HL_ASM_LABEL, vast::hl::AsmLabelAttr) \
@@ -118,5 +122,5 @@
    _core(GlobalLinkageKindAttr, AttributeKind::CORE_GLOBAL_LINKAGE_KIND, vast::core::GlobalLinkageKindAttr) \
    _meta(IdentifierAttr, AttributeKind::META_IDENTIFIER, vast::meta::IdentifierAttr)
 
-#define MX_IR_NUM_MLIR_ATTRIBUTES 108
+#define MX_IR_NUM_MLIR_ATTRIBUTES 112
 

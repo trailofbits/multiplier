@@ -126,11 +126,11 @@ std::optional<ArmNewAttr> ArmNewAttr::from(const TokenContext &t) {
 }
 
 bool ArmNewAttr::is_new_za(void) const {
-  return impl->reader.getVal14();
+  return impl->reader.getVal15();
 }
 
 bool ArmNewAttr::is_new_zt0(void) const {
-  return impl->reader.getVal15();
+  return impl->reader.getVal16();
 }
 
 #pragma GCC diagnostic pop

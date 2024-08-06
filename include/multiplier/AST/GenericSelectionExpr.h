@@ -76,6 +76,7 @@ class MX_EXPORT GenericSelectionExpr : public Expr {
   Token generic_token(void) const;
   Token r_paren_token(void) const;
   std::optional<Expr> result_expression(void) const;
+  uint32_t result_index(void) const;
   bool is_expression_predicate(void) const;
   bool is_result_dependent(void) const;
   bool is_type_predicate(void) const;

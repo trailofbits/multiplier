@@ -228,7 +228,7 @@ std::optional<CXXDestructorDecl> CXXDestructorDecl::from(const TokenContext &t) 
 
 std::optional<FunctionDecl> CXXDestructorDecl::operator_delete(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal163();
+    RawEntityId eid = impl->reader.getVal170();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -241,7 +241,7 @@ std::optional<FunctionDecl> CXXDestructorDecl::operator_delete(void) const {
 
 std::optional<Expr> CXXDestructorDecl::operator_delete_this_argument(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal164();
+    RawEntityId eid = impl->reader.getVal171();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }

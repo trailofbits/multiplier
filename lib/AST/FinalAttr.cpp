@@ -126,11 +126,11 @@ std::optional<FinalAttr> FinalAttr::from(const TokenContext &t) {
 }
 
 FinalAttrSpelling FinalAttr::semantic_spelling(void) const {
-  return static_cast<FinalAttrSpelling>(impl->reader.getVal12());
+  return static_cast<FinalAttrSpelling>(impl->reader.getVal13());
 }
 
 bool FinalAttr::is_spelled_as_sealed(void) const {
-  return impl->reader.getVal14();
+  return impl->reader.getVal15();
 }
 
 #pragma GCC diagnostic pop

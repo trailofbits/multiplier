@@ -155,6 +155,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "level",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->level());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPDeclareTargetDeclAttr::level"),
+    nullptr,
+  },
+  {
     "map_type",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

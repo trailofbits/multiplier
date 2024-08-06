@@ -185,6 +185,26 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "depth",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->depth());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ParmVarDecl::depth"),
+    nullptr,
+  },
+  {
+    "index",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->index());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ParmVarDecl::index"),
+    nullptr,
+  },
+  {
     "obj_c_decl_qualifier",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

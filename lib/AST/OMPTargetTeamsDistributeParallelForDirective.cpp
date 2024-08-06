@@ -195,7 +195,7 @@ std::optional<OMPTargetTeamsDistributeParallelForDirective> OMPTargetTeamsDistri
 }
 
 Expr OMPTargetTeamsDistributeParallelForDirective::task_reduction_reference_expression(void) const {
-  RawEntityId eid = impl->reader.getVal55();
+  RawEntityId eid = impl->reader.getVal56();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 

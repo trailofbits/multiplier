@@ -126,7 +126,7 @@ std::optional<MipsLongCallAttr> MipsLongCallAttr::from(const TokenContext &t) {
 }
 
 MipsLongCallAttrSpelling MipsLongCallAttr::semantic_spelling(void) const {
-  return static_cast<MipsLongCallAttrSpelling>(impl->reader.getVal12());
+  return static_cast<MipsLongCallAttrSpelling>(impl->reader.getVal13());
 }
 
 #pragma GCC diagnostic pop

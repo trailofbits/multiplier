@@ -195,7 +195,7 @@ std::optional<UnaryExprOrTypeTraitExpr> UnaryExprOrTypeTraitExpr::from(const Tok
 
 std::optional<Expr> UnaryExprOrTypeTraitExpr::argument_expression(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal37();
+    RawEntityId eid = impl->reader.getVal38();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -208,7 +208,7 @@ std::optional<Expr> UnaryExprOrTypeTraitExpr::argument_expression(void) const {
 
 std::optional<Type> UnaryExprOrTypeTraitExpr::argument_type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal38();
+    RawEntityId eid = impl->reader.getVal39();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -220,24 +220,24 @@ std::optional<Type> UnaryExprOrTypeTraitExpr::argument_type(void) const {
 }
 
 UnaryExprOrTypeTrait UnaryExprOrTypeTraitExpr::keyword_kind(void) const {
-  return static_cast<UnaryExprOrTypeTrait>(impl->reader.getVal88());
+  return static_cast<UnaryExprOrTypeTrait>(impl->reader.getVal89());
 }
 
 Token UnaryExprOrTypeTraitExpr::operator_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
-}
-
-Token UnaryExprOrTypeTraitExpr::r_paren_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
+Token UnaryExprOrTypeTraitExpr::r_paren_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+}
+
 Type UnaryExprOrTypeTraitExpr::type_of_argument(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal42();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool UnaryExprOrTypeTraitExpr::is_argument_type(void) const {
-  return impl->reader.getVal83();
+  return impl->reader.getVal84();
 }
 
 #pragma GCC diagnostic pop

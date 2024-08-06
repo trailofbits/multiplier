@@ -164,6 +164,16 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::CompoundStmt::has_stored_fp_features"),
     nullptr,
   },
+  {
+    "size",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->size());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CompoundStmt::size"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

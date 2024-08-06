@@ -130,6 +130,10 @@ std::string_view AnnotateTypeAttr::annotation(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
+uint32_t AnnotateTypeAttr::annotation_length(void) const {
+  return impl->reader.getVal12();
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

@@ -193,20 +193,20 @@ std::optional<VAArgExpr> VAArgExpr::from(const TokenContext &t) {
 }
 
 Token VAArgExpr::builtin_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
-}
-
-Token VAArgExpr::r_paren_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
+Token VAArgExpr::r_paren_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+}
+
 Expr VAArgExpr::sub_expression(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal40();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 bool VAArgExpr::is_microsoft_abi(void) const {
-  return impl->reader.getVal83();
+  return impl->reader.getVal84();
 }
 
 #pragma GCC diagnostic pop

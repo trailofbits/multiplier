@@ -127,11 +127,11 @@ std::optional<OMPDeclareTargetDeclAttr> OMPDeclareTargetDeclAttr::from(const Tok
 }
 
 OMPDeclareTargetDeclAttrDevTypeTy OMPDeclareTargetDeclAttr::dev_type(void) const {
-  return static_cast<OMPDeclareTargetDeclAttrDevTypeTy>(impl->reader.getVal12());
+  return static_cast<OMPDeclareTargetDeclAttrDevTypeTy>(impl->reader.getVal13());
 }
 
 bool OMPDeclareTargetDeclAttr::indirect(void) const {
-  return impl->reader.getVal14();
+  return impl->reader.getVal15();
 }
 
 Expr OMPDeclareTargetDeclAttr::indirect_expression(void) const {
@@ -139,8 +139,12 @@ Expr OMPDeclareTargetDeclAttr::indirect_expression(void) const {
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
+uint32_t OMPDeclareTargetDeclAttr::level(void) const {
+  return impl->reader.getVal12();
+}
+
 OMPDeclareTargetDeclAttrMapTypeTy OMPDeclareTargetDeclAttr::map_type(void) const {
-  return static_cast<OMPDeclareTargetDeclAttrMapTypeTy>(impl->reader.getVal20());
+  return static_cast<OMPDeclareTargetDeclAttrMapTypeTy>(impl->reader.getVal21());
 }
 
 #pragma GCC diagnostic pop

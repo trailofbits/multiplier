@@ -51,6 +51,7 @@ class MX_EXPORT InitSegAttr : public Attr {
   static std::optional<InitSegAttr> from(const TokenContext &t);
 
   std::string_view section(void) const;
+  uint32_t section_length(void) const;
 };
 
 static_assert(sizeof(InitSegAttr) == sizeof(Attr));

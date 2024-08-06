@@ -124,6 +124,16 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
 namespace {
 static PyGetSetDef gProperties[] = {
+  {
+    "argument_count",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->argument_count());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::XRayLogArgsAttr::argument_count"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

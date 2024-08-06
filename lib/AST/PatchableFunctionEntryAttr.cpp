@@ -125,6 +125,10 @@ std::optional<PatchableFunctionEntryAttr> PatchableFunctionEntryAttr::from(const
   return std::nullopt;
 }
 
+uint32_t PatchableFunctionEntryAttr::count(void) const {
+  return impl->reader.getVal12();
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

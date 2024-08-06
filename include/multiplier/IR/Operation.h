@@ -73,13 +73,9 @@ class MX_EXPORT Operation {
   OperationKind kind_;
 
  public:
-
-  inline Operation(std::shared_ptr<const SourceIRImpl> module,
-                   mlir::Operation *opaque,
-                   OperationKind kind)
-      : module_(std::move(module)),
-        op_(opaque),
-        kind_(kind) {}
+  Operation(std::shared_ptr<const SourceIRImpl> module,
+            mlir::Operation *opaque,
+            OperationKind kind);
 
   inline Operation(std::shared_ptr<const SourceIRImpl> module,
                    mlir::Operation *opaque)
@@ -169,6 +165,9 @@ class MX_EXPORT Operation {
 
   bool operator==(const Operation &that) const noexcept;
   bool operator!=(const Operation &that) const noexcept = default;
+
+  // Dump this operation.
+  void dump(void) const;
 };
 
 // A value produced as a result of an operation.

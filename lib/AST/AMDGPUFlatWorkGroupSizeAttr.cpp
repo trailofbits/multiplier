@@ -132,7 +132,7 @@ Expr AMDGPUFlatWorkGroupSizeAttr::max(void) const {
 }
 
 Expr AMDGPUFlatWorkGroupSizeAttr::min(void) const {
-  RawEntityId eid = impl->reader.getVal22();
+  RawEntityId eid = impl->reader.getVal23();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 

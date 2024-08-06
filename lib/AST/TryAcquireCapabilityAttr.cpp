@@ -127,7 +127,7 @@ std::optional<TryAcquireCapabilityAttr> TryAcquireCapabilityAttr::from(const Tok
 }
 
 TryAcquireCapabilityAttrSpelling TryAcquireCapabilityAttr::semantic_spelling(void) const {
-  return static_cast<TryAcquireCapabilityAttrSpelling>(impl->reader.getVal12());
+  return static_cast<TryAcquireCapabilityAttrSpelling>(impl->reader.getVal13());
 }
 
 Expr TryAcquireCapabilityAttr::success_value(void) const {
@@ -136,7 +136,7 @@ Expr TryAcquireCapabilityAttr::success_value(void) const {
 }
 
 bool TryAcquireCapabilityAttr::is_shared(void) const {
-  return impl->reader.getVal14();
+  return impl->reader.getVal15();
 }
 
 #pragma GCC diagnostic pop

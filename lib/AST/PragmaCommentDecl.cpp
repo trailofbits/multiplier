@@ -220,12 +220,12 @@ std::optional<PragmaCommentDecl> PragmaCommentDecl::from(const TokenContext &t) 
 }
 
 std::string_view PragmaCommentDecl::argument(void) const {
-  capnp::Text::Reader data = impl->reader.getVal52();
+  capnp::Text::Reader data = impl->reader.getVal55();
   return std::string_view(data.cStr(), data.size());
 }
 
 PragmaMSCommentKind PragmaCommentDecl::comment_kind(void) const {
-  return static_cast<PragmaMSCommentKind>(impl->reader.getVal54());
+  return static_cast<PragmaMSCommentKind>(impl->reader.getVal57());
 }
 
 #pragma GCC diagnostic pop

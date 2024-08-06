@@ -54,6 +54,7 @@ class MX_EXPORT CapabilityAttr : public InheritableAttr {
   static std::optional<CapabilityAttr> from(const TokenContext &t);
 
   std::string_view name(void) const;
+  uint32_t name_length(void) const;
   CapabilityAttrSpelling semantic_spelling(void) const;
   bool is_shared(void) const;
 };

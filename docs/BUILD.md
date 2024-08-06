@@ -1,9 +1,39 @@
 # Building Multiplier
 
+Building Multiplier from scratch can take a long time, so prepare yourself. You
+will need a modern Clang (18+) and CMake (3.30+) to build Multiplier, as it
+relies on modern C++ and CMake features.
+
+* [Step 0](#step-0)
+  + [Dependencies](#dependencies)
+* [Step 1](#step-1)
+  + [macOS](#macos)
+    - [XCode](#xcode)
+    - [Build tools](#build-tools)
+  + [Linux](#linux)
+    - [Clang](#clang)
+    - [CMake](#cmake)
+    - [Python](#python)
+* [Step 2: Environment](#step-2--environment)
+* [Step 3: Download and build Multiplier](#step-3--download-and-build-multiplier)
+  + [Configuring](#configuring)
+    - [macOS](#macos-1)
+    - [Linux](#linux-1)
+  + [Build & Install](#build---install)
+
 ## Step 0
 
 Going forward, we assume the environment variable `WORKSPACE_DIR` dir represents
 the directory where everything goes.
+
+### Dependencies
+
+| Name | Version |
+| ---- | ------- |
+| [Git](https://git-scm.com/) | Latest |
+| [CMake](https://cmake.org/) | 3.30+ |
+| [Clang](http://clang.llvm.org/) | 18+ |
+| [Python](https://www.python.org/) | 3.12+ |
 
 ## Step 1
 
@@ -16,8 +46,8 @@ to run `clang --version` and see something like this:
 
 ```shell
 % clang --version
-Apple clang version 13.1.6 (clang-1316.0.21.2.3)
-Target: x86_64-apple-darwin21.4.0
+Apple clang version 15.0.0 (clang-1500.3.9.4)
+Target: arm64-apple-darwin23.5.0
 Thread model: posix
 InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
 ```
@@ -59,11 +89,52 @@ from the official website.
 ### Linux
 
 ```shell
-sudo apt-get update
-sudo apt-get install build-essential ninja-build cmake graphviz xdot clang-17
+sudo apt update
+sudo apt install build-essential ninja-build cmake graphviz xdot
 ```
 
-Make sure to check `cmake --version`. You need at least CMake version 3.28.
+#### Clang
+
+If you can't `sudo apt-get install clang-18`, then try the following:
+
+```shell
+sudo apt install lsb_release
+
+curl -sSL https://apt.llvm.org/llvm-snapshot.gpg.key | \
+  gpg --dearmor - | \
+  sudo tee /etc/apt/trusted.gpg.d/llvm.gpg
+
+sudo apt-add-repository "deb https://apt.llvm.org/$(lsb_release -cs)/ llvm-toolchain-$(lsb_release -cs)-${LLVM_VER} main"
+
+sudo apt install clang-18
+```
+
+#### CMake
+
+If you don't already have CMake 3.30+, and if your installed `cmake --version`
+reports a smaller version number, then try the following:
+
+```shell
+curl -sSL https://apt.kitware.com/keys/kitware-archive-latest.asc | \
+    gpg --dearmor - | \
+    sudo tee /etc/apt/trusted.gpg.d/kitware.gpg
+
+sudo apt-add-repository "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main"
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6AF7F09730B3F0A4
+sudo apt update
+sudo apt install kitware-archive-keyring
+sudo apt install cmake
+```
+
+#### Python
+
+You will need to have the Python headers and libraries installed, ideally for
+Python 3.12+. Python 3.11 should also work, but other uses of Multiplier's
+Python API may prefer 3.12+ due to its support for subinterpreters.
+
+```shell
+sudo apt install python3.12-dev
+```
 
 ## Step 2: Environment
 
@@ -106,6 +177,7 @@ Multiplier, and not whatever version of Clang was built/installed by Homebrew.
 cmake \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_INSTALL_PREFIX="${WORKSPACE_DIR}/install" \
+  -DCMAKE_LINKER_TYPE=LLD \
   -DCMAKE_C_COMPILER=/usr/bin/clang \
   -DCMAKE_CXX_COMPILER=/usr/bin/clang++ \
   -DMX_ENABLE_INSTALL=ON \
@@ -120,9 +192,7 @@ cmake \
 cmake \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX="${WORKSPACE_DIR}/install" \
-    -DCMAKE_EXE_LINKER_FLAGS="--ld-path=$(which ld.lld-17)" \
-    -DCMAKE_MODULE_LINKER_FLAGS="--ld-path=$(which ld.lld-17)" \
-    -DCMAKE_SHARED_LINKER_FLAGS="--ld-path=$(which ld.lld-17)" \
+    -DCMAKE_LINKER_TYPE=LLD \
     -DCMAKE_C_COMPILER="$(which clang-17)" \
     -DCMAKE_CXX_COMPILER="$(which clang++-17)" \
     -DMX_ENABLE_INSTALL=ON \

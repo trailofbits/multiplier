@@ -79,13 +79,16 @@ class MetaGenerator final : public vast::cg::meta_generator {
   const EntityMapper &em;
 
   // MLIR context for generating the MLIR location from source location
-  mlir::MLIRContext *const mctx;
+  mlir::MLIRContext * const mctx;
+
+  mlir::Location unknown_location;
 
 public:
 
-  MetaGenerator(mlir::MLIRContext &mctx, const EntityMapper &em)
-      : em(em),
-        mctx(&mctx) {}
+  MetaGenerator(mlir::MLIRContext &mctx_, const EntityMapper &em_)
+      : em(em_),
+        mctx(&mctx_),
+        unknown_location(mlir::UnknownLoc::get(mctx)) {}
 
   mlir::Location location(const clang::Decl *data) const {
     return location_impl(data);
@@ -103,7 +106,14 @@ private:
   template <typename T> mlir::Location location_impl(const T *data) const {
     auto raw_entity_id = em.EntityId(data);
     if (raw_entity_id == mx::kInvalidEntityId) {
-      return mlir::UnknownLoc::get(mctx);
+      if constexpr (std::is_same_v<T, clang::Stmt> ||
+                    std::is_same_v<T, clang::Expr>) {
+        if (auto dre = clang::dyn_cast<clang::DeclRefExpr>(data)) {
+          dre->dumpColor();
+          assert(false);
+        }
+      }
+      return unknown_location;
     }
 
     auto attr = vast::meta::IdentifierAttr::get(mctx, raw_entity_id);
@@ -189,7 +199,7 @@ class MXErrorReportVisitorProxy
 
   void log(std::string_view type, std::string_view name,
            const auto *entity) const {
-    LOG(ERROR)
+    LOG(WARNING)
         << "Cannot codegen unsupported " << type << " " << name
         << PrefixedLocation(ast.Adopt(entity), " at or near ")
         << " on main job file "
@@ -197,7 +207,7 @@ class MXErrorReportVisitorProxy
   }
 
   void log_type(std::string_view type, std::string_view name) const {
-    LOG(ERROR)
+    LOG(WARNING)
         << "Cannot codegen unsupported " << type << " " << name
         << " on main job file "
         << ast.MainFile().Path().generic_string();
@@ -260,9 +270,15 @@ private:
 };
 
 class MXPreprocessingVisitorProxy : public vast::cg::fallthrough_list_node {
+ private:
+  clang::ASTContext &ast_context;
+  const EntityMapper &em;
+
  public:
-  MXPreprocessingVisitorProxy(clang::ASTContext &ast_context_)
-      : ast_context(ast_context_) {}
+  MXPreprocessingVisitorProxy(clang::ASTContext &ast_context_,
+                              const EntityMapper &em_)
+      : ast_context(ast_context_),
+        em(em_) {}
 
   // Apply the `TypeMapper`s type compression, which eagerly desugars things
   // like `AutoType`, `ElaboratedType`, etc. (but isn't as aggressive when
@@ -294,6 +310,18 @@ class MXPreprocessingVisitorProxy : public vast::cg::fallthrough_list_node {
     return next->visit(compress(type), scope);
   }
 
+  // Don't codegen statements for fragments that aren't indexed as part of this
+  // translation unit.
+  vast::operation visit(const vast::cg::clang_stmt *raw_stmt,
+                        vast::cg::scope_context &scope) override {
+    auto eid = em.EntityId(raw_stmt);
+    if (eid == mx::kInvalidEntityId) {
+      return {};
+    }
+
+    return next->visit(raw_stmt, scope);
+  }
+
  private:
 
   vast::cg::clang_qual_type compress(const vast::cg::clang_type *type) {
@@ -303,80 +331,50 @@ class MXPreprocessingVisitorProxy : public vast::cg::fallthrough_list_node {
   vast::cg::clang_qual_type compress(vast::cg::clang_qual_type type) {
     return TypeMapper::Compress(ast_context, type);
   }
-
-  clang::ASTContext &ast_context;
 };
 
-//
-// VAST Driver Setup Functions
-//
+static std::optional<vast::owning_module_ref> CreateModule(
+    const pasta::AST &ast, const EntityMapper &em) try {
 
-std::unique_ptr<vast::cg::codegen_builder>
-MakeCodeGenBuilder(mlir::MLIRContext &mctx) {
-  return vast::cg::mk_codegen_builder(mctx);
-}
-
-std::shared_ptr<vast::cg::meta_generator>
-MakeMetaGenerator(mlir::MLIRContext &mctx, const EntityMapper &em) {
-  return std::make_shared<MetaGenerator>(mctx, em);
-}
-
-std::shared_ptr<vast::cg::symbol_generator>
-MakeSymbolGenerator(const EntityMapper &em) {
-  return std::make_shared<SymbolGenerator>(em);
-}
-
-std::unique_ptr<vast::cg::driver> MakeCodeGenDriver(const pasta::AST &ast,
-                                                    const EntityMapper &em) {
   auto &actx = ast.UnderlyingAST();
   auto &mctx = mx::ir::GlobalMLIRContext();
-  auto bld = MakeCodeGenBuilder(mctx);
-  auto mg = MakeMetaGenerator(mctx, em);
-  auto sg = MakeSymbolGenerator(em);
+  auto bld = vast::cg::mk_codegen_builder(mctx);
+  auto mg = std::make_shared<MetaGenerator>(mctx, em);
+  auto sg = std::make_shared<SymbolGenerator>(em);
 
   using vast::cg::as_node;
   using vast::cg::as_node_with_list_ref;
 
   auto visitors =
       std::make_shared<vast::cg::visitor_list>() |
-      as_node<MXPreprocessingVisitorProxy>(ast.UnderlyingAST()) |
+      as_node<MXPreprocessingVisitorProxy>(ast.UnderlyingAST(), em) |
       as_node_with_list_ref<vast::cg::attr_visitor_proxy>() |
       as_node<vast::cg::type_caching_proxy>() |
       as_node_with_list_ref<vast::cg::default_visitor>(
-          mctx, *bld, mg, sg,
+          mctx, actx, *bld, mg, sg,
           /* strict return = */ false,
           vast::cg::missing_return_policy::emit_trap) |
       as_node<MXErrorReportVisitorProxy>(ast) |
       as_node_with_list_ref<vast::cg::unsup_visitor>(mctx, *bld) |
       as_node<vast::cg::fallthrough_visitor>();
 
-  auto drv = std::make_unique<vast::cg::driver>(
-      actx, mctx, std::move(bld), visitors);
+  vast::cg::driver driver(actx, mctx, std::move(bld), visitors);
+  driver.enable_verifier(true);
 
-  drv->enable_verifier(true);
-  return drv;
-}
-
-static std::optional<vast::owning_module_ref> CreateModule(
-    const pasta::AST &ast, const EntityMapper &em) {
-  try {
-    auto driver = MakeCodeGenDriver(ast, em);
-    auto decls = GenerateDeclarationsInDeclContext(ast.TranslationUnit());
-
-    for (const auto &decl : decls) {
-      driver->emit(const_cast<clang::Decl *>(decl.RawDecl()));
-    }
-
-    driver->finalize();
-    return std::make_optional(driver->freeze());
-
-  } catch (const CodeGeneratorError &e) {
-    LOG(ERROR) << "Error generating Source IR: " << e.what();
-    return std::nullopt;
-  } catch (const std::exception &e) {
-    LOG(ERROR) << "Error verifying Source IR: " << e.what();
-    return std::nullopt;
+  auto decls = GenerateDeclarationsInDeclContext(ast.TranslationUnit());
+  for (const auto &decl : decls) {
+    driver.emit(const_cast<clang::Decl *>(decl.RawDecl()));
   }
+
+  driver.finalize();
+  return std::make_optional(driver.freeze());
+
+} catch (const CodeGeneratorError &e) {
+  LOG(ERROR) << "Error generating Source IR: " << e.what();
+  return std::nullopt;
+} catch (const std::exception &e) {
+  LOG(ERROR) << "Error verifying Source IR: " << e.what();
+  return std::nullopt;
 }
 
 static std::optional<std::string> DumpToString(
@@ -389,7 +387,7 @@ static std::optional<std::string> DumpToString(
     return std::nullopt;
   }
 
-  return std::make_optional(result);
+  return std::make_optional(std::move(result));
 }
 
 } // namespace
@@ -419,15 +417,39 @@ std::string CodeGenerator::GenerateSourceIR(const pasta::AST &ast,
     return "";
   }
 
-  if (auto mod = CreateModule(ast, em)) {
-    if (auto result = DumpToString(mod.value())) {
-      return result.value();
-    }
-
-    LOG(ERROR)
-        << "Could not serialize module to bytecode on main job file "
-        << ast.MainFile().Path().generic_string();
+  auto mod = CreateModule(ast, em);
+  if (!mod) {
+    return "";
   }
+
+  // Set the flag to enable printing of debug information. The prettyForm
+  // flag passed to the function is set to false to avoid printing them in
+  // `pretty` form. This is because the IR generated in pretty form is not
+  // parsable.
+  auto flags = mlir::OpPrintingFlags();
+  flags.enableDebugInfo(true, false);
+
+  // Nifty for debugging, to see what the MLIR looked like.
+  if (false) {
+    std::error_code ec;
+    std::string out_file =
+        (std::filesystem::path("/tmp/src/") / ast.MainFile().Path().filename()).generic_string();
+    llvm::raw_fd_ostream os(out_file, ec);
+    if (!ec) {
+      (*mod)->print(os, flags);
+    } else {
+      LOG(ERROR) << ec.message();
+    }
+    os.close();
+  }
+
+  if (auto result = DumpToString(mod.value())) {
+    return result.value();
+  }
+
+  LOG(ERROR)
+      << "Could not serialize module to bytecode on main job file "
+      << ast.MainFile().Path().generic_string();
 
   return "";
 }

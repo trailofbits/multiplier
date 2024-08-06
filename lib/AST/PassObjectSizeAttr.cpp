@@ -127,11 +127,11 @@ std::optional<PassObjectSizeAttr> PassObjectSizeAttr::from(const TokenContext &t
 }
 
 PassObjectSizeAttrSpelling PassObjectSizeAttr::semantic_spelling(void) const {
-  return static_cast<PassObjectSizeAttrSpelling>(impl->reader.getVal12());
+  return static_cast<PassObjectSizeAttrSpelling>(impl->reader.getVal13());
 }
 
 bool PassObjectSizeAttr::is_dynamic(void) const {
-  return impl->reader.getVal14();
+  return impl->reader.getVal15();
 }
 
 #pragma GCC diagnostic pop

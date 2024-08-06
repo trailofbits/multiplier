@@ -194,17 +194,21 @@ std::optional<ArrayTypeTraitExpr> ArrayTypeTraitExpr::from(const TokenContext &t
 }
 
 Expr ArrayTypeTraitExpr::dimension_expression(void) const {
-  RawEntityId eid = impl->reader.getVal37();
+  RawEntityId eid = impl->reader.getVal38();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Type ArrayTypeTraitExpr::queried_type(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal39();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 ArrayTypeTrait ArrayTypeTraitExpr::trait(void) const {
-  return static_cast<ArrayTypeTrait>(impl->reader.getVal88());
+  return static_cast<ArrayTypeTrait>(impl->reader.getVal89());
+}
+
+uint64_t ArrayTypeTraitExpr::value(void) const {
+  return impl->reader.getVal40();
 }
 
 #pragma GCC diagnostic pop

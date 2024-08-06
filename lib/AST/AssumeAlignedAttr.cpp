@@ -133,7 +133,7 @@ Expr AssumeAlignedAttr::alignment(void) const {
 
 std::optional<Expr> AssumeAlignedAttr::offset(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal22();
+    RawEntityId eid = impl->reader.getVal23();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }

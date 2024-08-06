@@ -193,12 +193,12 @@ std::optional<OpaqueValueExpr> OpaqueValueExpr::from(const TokenContext &t) {
 }
 
 Token OpaqueValueExpr::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 std::optional<Expr> OpaqueValueExpr::source_expression(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal38();
+    RawEntityId eid = impl->reader.getVal39();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -210,7 +210,7 @@ std::optional<Expr> OpaqueValueExpr::source_expression(void) const {
 }
 
 bool OpaqueValueExpr::is_unique(void) const {
-  return impl->reader.getVal83();
+  return impl->reader.getVal84();
 }
 
 #pragma GCC diagnostic pop

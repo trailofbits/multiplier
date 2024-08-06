@@ -60,6 +60,7 @@ class MX_EXPORT OMPLoopBasedDirective : public OMPExecutableDirective {
   static std::optional<OMPLoopBasedDirective> from(const VariantEntity &e);
   static std::optional<OMPLoopBasedDirective> from(const TokenContext &t);
 
+  uint32_t loops_number(void) const;
 };
 
 static_assert(sizeof(OMPLoopBasedDirective) == sizeof(OMPExecutableDirective));

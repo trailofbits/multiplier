@@ -193,15 +193,15 @@ std::optional<ConvertVectorExpr> ConvertVectorExpr::from(const TokenContext &t) 
 }
 
 Token ConvertVectorExpr::builtin_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
-}
-
-Token ConvertVectorExpr::r_paren_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
+Token ConvertVectorExpr::r_paren_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+}
+
 Expr ConvertVectorExpr::src_expression(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal40();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 

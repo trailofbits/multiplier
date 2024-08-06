@@ -203,7 +203,7 @@ RecordDecl CapturedStmt::captured_record_declaration(void) const {
 }
 
 CapturedRegionKind CapturedStmt::captured_region_kind(void) const {
-  return static_cast<CapturedRegionKind>(impl->reader.getVal56());
+  return static_cast<CapturedRegionKind>(impl->reader.getVal57());
 }
 
 Stmt CapturedStmt::captured_statement(void) const {

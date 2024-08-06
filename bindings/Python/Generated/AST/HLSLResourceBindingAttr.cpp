@@ -135,6 +135,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "slot_length",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->slot_length());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::HLSLResourceBindingAttr::slot_length"),
+    nullptr,
+  },
+  {
     "space",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -142,6 +152,16 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::HLSLResourceBindingAttr::space"),
+    nullptr,
+  },
+  {
+    "space_length",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->space_length());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::HLSLResourceBindingAttr::space_length"),
     nullptr,
   },
   {}  // Sentinel.

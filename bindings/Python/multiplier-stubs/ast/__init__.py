@@ -6002,6 +6002,7 @@ class AlignValueAttr(multiplier.ast.Attr):
 
 class AliasAttr(multiplier.ast.Attr):
   aliasee: str
+  aliasee_length: int
 
   @overload
   @staticmethod
@@ -7231,6 +7232,7 @@ class CmseNSCallAttr(multiplier.ast.TypeAttr):
 
 class BTFTypeTagAttr(multiplier.ast.TypeAttr):
   btf_type_tag: str
+  btf_type_tag_length: int
 
   @overload
   @staticmethod
@@ -7720,6 +7722,7 @@ class ArmInAttr(multiplier.ast.TypeAttr):
 
 class AnnotateTypeAttr(multiplier.ast.TypeAttr):
   annotation: str
+  annotation_length: int
 
   @overload
   @staticmethod
@@ -8271,6 +8274,7 @@ class ThreadAttr(multiplier.ast.Attr):
 class SwiftVersionedRemovalAttr(multiplier.ast.Attr):
   attribute_kind_to_remove: multiplier.ast.AttrKind
   is_replaced_by_active: bool
+  raw_kind: int
 
   @overload
   @staticmethod
@@ -8513,6 +8517,7 @@ class StmtAttr(multiplier.ast.Attr):
     ...
 
 class OpenCLUnrollHintAttr(multiplier.ast.StmtAttr):
+  unroll_hint: int
 
   @overload
   @staticmethod
@@ -9129,6 +9134,7 @@ class ObjCRuntimeVisibleAttr(multiplier.ast.Attr):
 
 class ObjCRuntimeNameAttr(multiplier.ast.Attr):
   metadata_name: str
+  metadata_name_length: int
 
   @overload
   @staticmethod
@@ -9742,6 +9748,7 @@ class OMPDeclareSimdDeclAttr(multiplier.ast.Attr):
     ...
 
 class OMPCaptureKindAttr(multiplier.ast.Attr):
+  capture_kind_value: int
 
   @overload
   @staticmethod
@@ -10113,6 +10120,7 @@ class LoaderUninitializedAttr(multiplier.ast.Attr):
 
 class InitSegAttr(multiplier.ast.Attr):
   section: str
+  section_length: int
 
   @overload
   @staticmethod
@@ -10541,7 +10549,9 @@ class HLSLShaderAttr(multiplier.ast.InheritableAttr):
 
 class HLSLResourceBindingAttr(multiplier.ast.InheritableAttr):
   slot: str
+  slot_length: int
   space: str
+  space_length: int
 
   @overload
   @staticmethod
@@ -11581,9 +11591,12 @@ class FastCallAttr(multiplier.ast.InheritableAttr):
 
 class ExternalSourceSymbolAttr(multiplier.ast.InheritableAttr):
   defined_in: str
+  defined_in_length: int
   generated_declaration: bool
   language: str
+  language_length: int
   usr: str
+  usr_length: int
 
   @overload
   @staticmethod
@@ -11770,6 +11783,7 @@ class ExcludeFromExplicitInstantiationAttr(multiplier.ast.InheritableAttr):
 class ErrorAttr(multiplier.ast.InheritableAttr):
   semantic_spelling: multiplier.ast.ErrorAttrSpelling
   user_diagnostic: str
+  user_diagnostic_length: int
   is_error: bool
   is_warning: bool
 
@@ -11896,6 +11910,7 @@ class EnumExtensibilityAttr(multiplier.ast.InheritableAttr):
 
 class EnforceTCBLeafAttr(multiplier.ast.InheritableAttr):
   tcb_name: str
+  tcb_name_length: int
 
   @overload
   @staticmethod
@@ -11958,6 +11973,7 @@ class EnforceTCBLeafAttr(multiplier.ast.InheritableAttr):
 
 class EnforceTCBAttr(multiplier.ast.InheritableAttr):
   tcb_name: str
+  tcb_name_length: int
 
   @overload
   @staticmethod
@@ -12021,6 +12037,7 @@ class EnforceTCBAttr(multiplier.ast.InheritableAttr):
 class EnableIfAttr(multiplier.ast.InheritableAttr):
   condition: multiplier.ast.Expr
   message: str
+  message_length: int
 
   @overload
   @staticmethod
@@ -12269,6 +12286,7 @@ class DiagnoseIfAttr(multiplier.ast.InheritableAttr):
   condition: multiplier.ast.Expr
   diagnostic_type: multiplier.ast.DiagnoseIfAttrDiagnosticType
   message: str
+  message_length: int
   parent: multiplier.ast.NamedDecl
   is_error: bool
   is_warning: bool
@@ -12457,7 +12475,9 @@ class DestructorAttr(multiplier.ast.InheritableAttr):
 
 class DeprecatedAttr(multiplier.ast.InheritableAttr):
   message: str
+  message_length: int
   replacement: str
+  replacement_length: int
 
   @overload
   @staticmethod
@@ -13988,6 +14008,7 @@ class ColdAttr(multiplier.ast.InheritableAttr):
 
 class CodeSegAttr(multiplier.ast.InheritableAttr):
   name: str
+  name_length: int
 
   @overload
   @staticmethod
@@ -14295,6 +14316,7 @@ class CapturedRecordAttr(multiplier.ast.InheritableAttr):
 
 class CapabilityAttr(multiplier.ast.InheritableAttr):
   name: str
+  name_length: int
   semantic_spelling: multiplier.ast.CapabilityAttrSpelling
   is_shared: bool
 
@@ -15829,6 +15851,7 @@ class BlocksAttr(multiplier.ast.InheritableAttr):
 
 class BTFDeclTagAttr(multiplier.ast.InheritableAttr):
   btf_decl_tag: str
+  btf_decl_tag_length: int
 
   @overload
   @staticmethod
@@ -16074,7 +16097,9 @@ class AvailableOnlyInDefaultEvalMethodAttr(multiplier.ast.InheritableAttr):
 
 class AvailabilityAttr(multiplier.ast.InheritableAttr):
   message: str
+  message_length: int
   replacement: str
+  replacement_length: int
   strict: bool
   unavailable: bool
 
@@ -16139,6 +16164,7 @@ class AvailabilityAttr(multiplier.ast.InheritableAttr):
 
 class AssumptionAttr(multiplier.ast.InheritableAttr):
   assumption: str
+  assumption_length: int
 
   @overload
   @staticmethod
@@ -16450,6 +16476,7 @@ class AssertCapabilityAttr(multiplier.ast.InheritableAttr):
 class AsmLabelAttr(multiplier.ast.InheritableAttr):
   is_literal_label: bool
   label: str
+  label_length: int
 
   @overload
   @staticmethod
@@ -17308,6 +17335,7 @@ class AllocAlignAttr(multiplier.ast.InheritableAttr):
     ...
 
 class AlignedAttr(multiplier.ast.InheritableAttr):
+  alignment: int
   alignment_expression: Optional[multiplier.ast.Expr]
   alignment_type: Optional[multiplier.ast.Type]
   cached_alignment_value: Optional[int]
@@ -17625,6 +17653,7 @@ class AcquiredAfterAttr(multiplier.ast.InheritableAttr):
 
 class AcquireHandleAttr(multiplier.ast.InheritableAttr):
   handle_type: str
+  handle_type_length: int
 
   @overload
   @staticmethod
@@ -17996,6 +18025,7 @@ class AMDGPUWavesPerEUAttr(multiplier.ast.InheritableAttr):
     ...
 
 class AMDGPUNumVGPRAttr(multiplier.ast.InheritableAttr):
+  num_vgpr: int
 
   @overload
   @staticmethod
@@ -18057,6 +18087,7 @@ class AMDGPUNumVGPRAttr(multiplier.ast.InheritableAttr):
     ...
 
 class AMDGPUNumSGPRAttr(multiplier.ast.InheritableAttr):
+  num_sgpr: int
 
   @overload
   @staticmethod
@@ -18426,6 +18457,7 @@ class ZeroCallUsedRegsAttr(multiplier.ast.InheritableAttr):
     ...
 
 class XRayLogArgsAttr(multiplier.ast.InheritableAttr):
+  argument_count: int
 
   @overload
   @staticmethod
@@ -18612,6 +18644,9 @@ class X86ForceAlignArgPointerAttr(multiplier.ast.InheritableAttr):
     ...
 
 class WorkGroupSizeHintAttr(multiplier.ast.InheritableAttr):
+  x_dim: int
+  y_dim: int
+  z_dim: int
 
   @overload
   @staticmethod
@@ -18674,6 +18709,7 @@ class WorkGroupSizeHintAttr(multiplier.ast.InheritableAttr):
 
 class WebAssemblyImportNameAttr(multiplier.ast.InheritableAttr):
   import_name: str
+  import_name_length: int
 
   @overload
   @staticmethod
@@ -18736,6 +18772,7 @@ class WebAssemblyImportNameAttr(multiplier.ast.InheritableAttr):
 
 class WebAssemblyImportModuleAttr(multiplier.ast.InheritableAttr):
   import_module: str
+  import_module_length: int
 
   @overload
   @staticmethod
@@ -18798,6 +18835,7 @@ class WebAssemblyImportModuleAttr(multiplier.ast.InheritableAttr):
 
 class WebAssemblyExportNameAttr(multiplier.ast.InheritableAttr):
   export_name: str
+  export_name_length: int
 
   @overload
   @staticmethod
@@ -18860,6 +18898,7 @@ class WebAssemblyExportNameAttr(multiplier.ast.InheritableAttr):
 
 class WeakRefAttr(multiplier.ast.InheritableAttr):
   aliasee: str
+  aliasee_length: int
 
   @overload
   @staticmethod
@@ -19045,6 +19084,7 @@ class WeakAttr(multiplier.ast.InheritableAttr):
 class WarnUnusedResultAttr(multiplier.ast.InheritableAttr):
   is_cxx11_no_discard: bool
   message: str
+  message_length: int
   semantic_spelling: multiplier.ast.WarnUnusedResultAttrSpelling
 
   @overload
@@ -19417,6 +19457,7 @@ class VecReturnAttr(multiplier.ast.InheritableAttr):
 class UuidAttr(multiplier.ast.InheritableAttr):
   guid: str
   guid_declaration: multiplier.ast.MSGuidDecl
+  guid_length: int
 
   @overload
   @staticmethod
@@ -19786,6 +19827,7 @@ class UninitializedAttr(multiplier.ast.InheritableAttr):
 class UnavailableAttr(multiplier.ast.InheritableAttr):
   implicit_reason: multiplier.ast.UnavailableAttrImplicitReason
   message: str
+  message_length: int
 
   @overload
   @staticmethod
@@ -20285,6 +20327,7 @@ class TestTypestateAttr(multiplier.ast.InheritableAttr):
 class TargetVersionAttr(multiplier.ast.InheritableAttr):
   name: str
   names_string: str
+  names_string_length: int
   is_default_version: bool
 
   @overload
@@ -20410,6 +20453,7 @@ class TargetClonesAttr(multiplier.ast.InheritableAttr):
 class TargetAttr(multiplier.ast.InheritableAttr):
   architecture: str
   features_string: str
+  features_string_length: int
   is_default_version: bool
 
   @overload
@@ -20473,6 +20517,7 @@ class TargetAttr(multiplier.ast.InheritableAttr):
 
 class TLSModelAttr(multiplier.ast.InheritableAttr):
   model: str
+  model_length: int
 
   @overload
   @staticmethod
@@ -20720,6 +20765,7 @@ class SwiftNewTypeAttr(multiplier.ast.InheritableAttr):
 
 class SwiftNameAttr(multiplier.ast.InheritableAttr):
   name: str
+  name_length: int
 
   @overload
   @staticmethod
@@ -21088,6 +21134,7 @@ class SwiftBridgedTypedefAttr(multiplier.ast.InheritableAttr):
 
 class SwiftBridgeAttr(multiplier.ast.InheritableAttr):
   swift_type: str
+  swift_type_length: int
 
   @overload
   @staticmethod
@@ -21150,6 +21197,7 @@ class SwiftBridgeAttr(multiplier.ast.InheritableAttr):
 
 class SwiftAttrAttr(multiplier.ast.InheritableAttr):
   attribute: str
+  attribute_length: int
 
   @overload
   @staticmethod
@@ -21212,6 +21260,7 @@ class SwiftAttrAttr(multiplier.ast.InheritableAttr):
 
 class SwiftAsyncNameAttr(multiplier.ast.InheritableAttr):
   name: str
+  name_length: int
 
   @overload
   @staticmethod
@@ -21274,6 +21323,7 @@ class SwiftAsyncNameAttr(multiplier.ast.InheritableAttr):
 
 class SwiftAsyncErrorAttr(multiplier.ast.InheritableAttr):
   convention: multiplier.ast.SwiftAsyncErrorAttrConventionKind
+  handler_parameter_index: int
 
   @overload
   @staticmethod
@@ -22010,6 +22060,7 @@ class SelectAnyAttr(multiplier.ast.InheritableAttr):
 
 class SectionAttr(multiplier.ast.InheritableAttr):
   name: str
+  name_length: int
   semantic_spelling: multiplier.ast.SectionAttrSpelling
 
   @overload
@@ -22625,6 +22676,9 @@ class RequiresCapabilityAttr(multiplier.ast.InheritableAttr):
     ...
 
 class ReqdWorkGroupSizeAttr(multiplier.ast.InheritableAttr):
+  x_dim: int
+  y_dim: int
+  z_dim: int
 
   @overload
   @staticmethod
@@ -23489,6 +23543,7 @@ class PreferredNameAttr(multiplier.ast.InheritableAttr):
 
 class PragmaClangTextSectionAttr(multiplier.ast.InheritableAttr):
   name: str
+  name_length: int
 
   @overload
   @staticmethod
@@ -23551,6 +23606,7 @@ class PragmaClangTextSectionAttr(multiplier.ast.InheritableAttr):
 
 class PragmaClangRodataSectionAttr(multiplier.ast.InheritableAttr):
   name: str
+  name_length: int
 
   @overload
   @staticmethod
@@ -23613,6 +23669,7 @@ class PragmaClangRodataSectionAttr(multiplier.ast.InheritableAttr):
 
 class PragmaClangRelroSectionAttr(multiplier.ast.InheritableAttr):
   name: str
+  name_length: int
 
   @overload
   @staticmethod
@@ -23675,6 +23732,7 @@ class PragmaClangRelroSectionAttr(multiplier.ast.InheritableAttr):
 
 class PragmaClangDataSectionAttr(multiplier.ast.InheritableAttr):
   name: str
+  name_length: int
 
   @overload
   @staticmethod
@@ -23737,6 +23795,7 @@ class PragmaClangDataSectionAttr(multiplier.ast.InheritableAttr):
 
 class PragmaClangBSSSectionAttr(multiplier.ast.InheritableAttr):
   name: str
+  name_length: int
 
   @overload
   @staticmethod
@@ -23923,6 +23982,7 @@ class PcsAttr(multiplier.ast.InheritableAttr):
     ...
 
 class PatchableFunctionEntryAttr(multiplier.ast.InheritableAttr):
+  count: int
 
   @overload
   @staticmethod
@@ -24480,6 +24540,7 @@ class OpenCLKernelAttr(multiplier.ast.InheritableAttr):
     ...
 
 class OpenCLIntelReqdSubGroupSizeAttr(multiplier.ast.InheritableAttr):
+  sub_group_size: int
 
   @overload
   @staticmethod
@@ -25949,6 +26010,7 @@ class OMPDeclareTargetDeclAttr(multiplier.ast.InheritableAttr):
   dev_type: multiplier.ast.OMPDeclareTargetDeclAttrDevTypeTy
   indirect: bool
   indirect_expression: multiplier.ast.Expr
+  level: int
   map_type: multiplier.ast.OMPDeclareTargetDeclAttrMapTypeTy
 
   @overload
@@ -28032,6 +28094,7 @@ class Mips16Attr(multiplier.ast.InheritableAttr):
     ...
 
 class MinVectorWidthAttr(multiplier.ast.InheritableAttr):
+  vector_width: int
 
   @overload
   @staticmethod
@@ -28337,6 +28400,7 @@ class MayAliasAttr(multiplier.ast.InheritableAttr):
     ...
 
 class MaxFieldAlignmentAttr(multiplier.ast.InheritableAttr):
+  alignment: int
 
   @overload
   @staticmethod
@@ -28398,6 +28462,7 @@ class MaxFieldAlignmentAttr(multiplier.ast.InheritableAttr):
     ...
 
 class MSVtorDispAttr(multiplier.ast.InheritableAttr):
+  vdm: int
   vtor_disp_mode: multiplier.ast.MSVtorDispMode
 
   @overload
@@ -28521,6 +28586,7 @@ class MSStructAttr(multiplier.ast.InheritableAttr):
     ...
 
 class MSP430InterruptAttr(multiplier.ast.InheritableAttr):
+  number: int
 
   @overload
   @staticmethod
@@ -29012,6 +29078,7 @@ class M68kRTDAttr(multiplier.ast.InheritableAttr):
     ...
 
 class M68kInterruptAttr(multiplier.ast.InheritableAttr):
+  number: int
 
   @overload
   @staticmethod
@@ -29318,6 +29385,7 @@ class LeafAttr(multiplier.ast.InheritableAttr):
     ...
 
 class LayoutVersionAttr(multiplier.ast.InheritableAttr):
+  version: int
 
   @overload
   @staticmethod
@@ -29562,6 +29630,7 @@ class IntelOclBiccAttr(multiplier.ast.InheritableAttr):
     ...
 
 class InitPriorityAttr(multiplier.ast.InheritableAttr):
+  priority: int
 
   @overload
   @staticmethod
@@ -29803,6 +29872,7 @@ class CFConsumedAttr(multiplier.ast.InheritableParamAttr):
 
 class AnnotateAttr(multiplier.ast.InheritableParamAttr):
   annotation: str
+  annotation_length: int
 
   @overload
   @staticmethod
@@ -29865,6 +29935,7 @@ class AnnotateAttr(multiplier.ast.InheritableParamAttr):
 
 class UseHandleAttr(multiplier.ast.InheritableParamAttr):
   handle_type: str
+  handle_type_length: int
 
   @overload
   @staticmethod
@@ -29927,6 +29998,7 @@ class UseHandleAttr(multiplier.ast.InheritableParamAttr):
 
 class ReleaseHandleAttr(multiplier.ast.InheritableParamAttr):
   handle_type: str
+  handle_type_length: int
 
   @overload
   @staticmethod
@@ -30537,6 +30609,7 @@ class NSConsumedAttr(multiplier.ast.InheritableParamAttr):
 
 class IFuncAttr(multiplier.ast.Attr):
   resolver: str
+  resolver_length: int
 
   @overload
   @staticmethod
@@ -30722,6 +30795,7 @@ class BuiltinAliasAttr(multiplier.ast.Attr):
 
 class Type(multiplier.Entity):
   tokens: multiplier.frontend.TokenRange
+  raw_qualifiers: int
   desugared_type: multiplier.ast.Type
   canonical_type: multiplier.ast.Type
   is_qualified: bool
@@ -30792,6 +30866,8 @@ class Type(multiplier.Entity):
 
 class TemplateTypeParmType(multiplier.ast.Type):
   declaration: Optional[multiplier.ast.TemplateTypeParmDecl]
+  depth: int
+  index: int
   is_parameter_pack: bool
   is_sugared: bool
 
@@ -31055,6 +31131,7 @@ class EnumType(multiplier.ast.TagType):
 
 class SubstTemplateTypeParmType(multiplier.ast.Type):
   associated_declaration: multiplier.ast.Decl
+  index: int
   pack_index: Optional[int]
   replaced_parameter: multiplier.ast.TemplateTypeParmDecl
   replacement_type: multiplier.ast.Type
@@ -31111,6 +31188,7 @@ class SubstTemplateTypeParmType(multiplier.ast.Type):
 class SubstTemplateTypeParmPackType(multiplier.ast.Type):
   associated_declaration: multiplier.ast.Decl
   final: bool
+  index: int
   replaced_parameter: multiplier.ast.TemplateTypeParmDecl
   is_sugared: bool
 
@@ -32022,6 +32100,7 @@ class DependentSizedMatrixType(multiplier.ast.MatrixType):
     ...
 
 class ConstantMatrixType(multiplier.ast.MatrixType):
+  num_elements_flattened: int
 
   @staticmethod
   def IN(index: multiplier.Index) -> Iterable[multiplier.ast.ConstantMatrixType]:
@@ -32184,6 +32263,7 @@ class FunctionType(multiplier.ast.Type):
   cmse_ns_call_attribute: bool
   has_reg_parm: bool
   no_return_attribute: bool
+  reg_parm_type: int
   return_type: multiplier.ast.Type
   is_const: bool
   is_restrict: bool
@@ -32235,6 +32315,7 @@ class FunctionType(multiplier.ast.Type):
 
 class FunctionProtoType(multiplier.ast.FunctionType):
   can_throw: Optional[multiplier.ast.CanThrowResult]
+  a_arch64_sme_attributes: int
   ellipsis_token: multiplier.frontend.Token
   exception_spec_declaration: Optional[multiplier.ast.FunctionDecl]
   exception_spec_template: Optional[multiplier.ast.FunctionDecl]
@@ -33174,6 +33255,7 @@ class AtomicType(multiplier.ast.Type):
 
 class ArrayType(multiplier.ast.Type):
   element_type: multiplier.ast.Type
+  index_type_cvr_qualifiers: int
   size_modifier: multiplier.ast.ArraySizeModifier
 
   @staticmethod
@@ -38444,6 +38526,7 @@ class OMPMaskedDirective(multiplier.ast.OMPExecutableDirective):
     ...
 
 class OMPLoopBasedDirective(multiplier.ast.OMPExecutableDirective):
+  loops_number: int
 
   @overload
   @staticmethod
@@ -43414,6 +43497,7 @@ class CompoundStmt(multiplier.ast.Stmt):
   right_brace_token: multiplier.frontend.Token
   statement_expression_result: Optional[multiplier.ast.Stmt]
   has_stored_fp_features: bool
+  size: int
 
   @overload
   @staticmethod
@@ -44806,6 +44890,7 @@ class DesignatedInitExpr(multiplier.ast.Expr):
   equal_or_colon_token: multiplier.frontend.Token
   initializer: multiplier.ast.Expr
   is_direct_initializer: bool
+  size: int
   uses_gnu_syntax: bool
   num_sub_expressions: int
   sub_expressions: Iterable[multiplier.ast.Expr]
@@ -45844,6 +45929,7 @@ class ChooseExpr(multiplier.ast.Expr):
 class CharacterLiteral(multiplier.ast.Expr):
   literal_kind: multiplier.ast.CharacterLiteralKind
   token: multiplier.frontend.Token
+  value: int
 
   @overload
   @staticmethod
@@ -47105,6 +47191,7 @@ class CallExpr(multiplier.ast.Expr):
   num_arguments: int
   arguments: Iterable[multiplier.ast.Expr]
   adl_call_kind: multiplier.ast.CallExprADLCallKind
+  builtin_callee: int
   call_return_type: multiplier.ast.Type
   callee: multiplier.ast.Expr
   callee_declaration: Optional[multiplier.ast.Decl]
@@ -50256,6 +50343,7 @@ class ArrayTypeTraitExpr(multiplier.ast.Expr):
   dimension_expression: multiplier.ast.Expr
   queried_type: multiplier.ast.Type
   trait: multiplier.ast.ArrayTypeTrait
+  value: int
 
   @overload
   @staticmethod
@@ -51458,6 +51546,7 @@ class TypeTraitExpr(multiplier.ast.Expr):
 
 class SubstNonTypeTemplateParmPackExpr(multiplier.ast.Expr):
   associated_declaration: multiplier.ast.Decl
+  index: int
   parameter_pack: multiplier.ast.NonTypeTemplateParmDecl
   parameter_pack_token: multiplier.frontend.Token
 
@@ -51550,6 +51639,7 @@ class SubstNonTypeTemplateParmPackExpr(multiplier.ast.Expr):
 
 class SubstNonTypeTemplateParmExpr(multiplier.ast.Expr):
   associated_declaration: multiplier.ast.Decl
+  index: int
   name_token: multiplier.frontend.Token
   pack_index: Optional[int]
   parameter: multiplier.ast.NonTypeTemplateParmDecl
@@ -51647,8 +51737,12 @@ class SubstNonTypeTemplateParmExpr(multiplier.ast.Expr):
 class StringLiteral(multiplier.ast.Expr):
   contains_non_ascii: Optional[bool]
   contains_non_ascii_or_null: Optional[bool]
+  byte_length: int
   bytes: str
+  character_byte_width: int
   literal_kind: multiplier.ast.StringLiteralKind
+  length: int
+  num_concatenated: int
   string: Optional[str]
   is_ordinary: bool
   is_pascal: bool
@@ -51749,6 +51843,7 @@ class StmtExpr(multiplier.ast.Expr):
   l_paren_token: multiplier.frontend.Token
   r_paren_token: multiplier.frontend.Token
   sub_statement: multiplier.ast.CompoundStmt
+  template_depth: int
 
   @overload
   @staticmethod
@@ -52405,6 +52500,7 @@ class RecoveryExpr(multiplier.ast.Expr):
 
 class PseudoObjectExpr(multiplier.ast.Expr):
   result_expression: multiplier.ast.Expr
+  result_expression_index: int
   syntactic_form: multiplier.ast.Expr
   num_semantics: int
   semantics: Iterable[multiplier.ast.Expr]
@@ -55339,6 +55435,7 @@ class MatrixSubscriptExpr(multiplier.ast.Expr):
 class MaterializeTemporaryExpr(multiplier.ast.Expr):
   extending_declaration: Optional[multiplier.ast.ValueDecl]
   lifetime_extended_temporary_declaration: Optional[multiplier.ast.LifetimeExtendedTemporaryDecl]
+  mangling_number: int
   storage_duration: multiplier.ast.StorageDuration
   sub_expression: multiplier.ast.Expr
   is_bound_to_lvalue_reference: bool
@@ -56111,6 +56208,7 @@ class GenericSelectionExpr(multiplier.ast.Expr):
   generic_token: multiplier.frontend.Token
   r_paren_token: multiplier.frontend.Token
   result_expression: Optional[multiplier.ast.Expr]
+  result_index: int
   is_expression_predicate: bool
   is_result_dependent: bool
   is_type_predicate: bool
@@ -56752,6 +56850,7 @@ class FloatingLiteral(multiplier.ast.Expr):
 
 class FixedPointLiteral(multiplier.ast.Expr):
   token: multiplier.frontend.Token
+  scale: int
 
   @overload
   @staticmethod
@@ -57512,6 +57611,8 @@ class Decl(multiplier.Entity):
   max_alignment: Optional[int]
   module_ownership_kind: multiplier.ast.DeclModuleOwnershipKind
   non_closure_context: Optional[multiplier.ast.Decl]
+  owning_module_id: int
+  template_depth: int
   is_deprecated: bool
   is_file_context_declaration: bool
   is_function_or_function_template: bool
@@ -57649,6 +57750,7 @@ class CapturedDecl(multiplier.ast.Decl):
   definition: Optional[multiplier.ast.CapturedDecl]
   redeclarations: Iterable[multiplier.ast.CapturedDecl]
   context_parameter: multiplier.ast.ImplicitParamDecl
+  context_parameter_position: int
   is_nothrow: bool
   num_parameters: int
   parameters: Iterable[multiplier.ast.ImplicitParamDecl]
@@ -57753,6 +57855,7 @@ class BlockDecl(multiplier.ast.Decl):
   captures_cxx_this: bool
   does_not_escape: bool
   block_mangling_context_declaration: Optional[multiplier.ast.Decl]
+  block_mangling_number: int
   caret_token: multiplier.frontend.Token
   compound_body: multiplier.ast.CompoundStmt
   signature_as_written: multiplier.ast.Type
@@ -60142,6 +60245,7 @@ class IndirectFieldDecl(multiplier.ast.ValueDecl):
   redeclarations: Iterable[multiplier.ast.IndirectFieldDecl]
   chain: Iterable[multiplier.ast.NamedDecl]
   anonymous_field: Optional[multiplier.ast.FieldDecl]
+  chaining_size: int
   variable_declaration: Optional[multiplier.ast.VarDecl]
 
   @overload
@@ -60564,6 +60668,8 @@ class ParmVarDecl(multiplier.ast.VarDecl):
   default_argument: Optional[multiplier.ast.Expr]
   default_argument_range: multiplier.frontend.TokenRange
   explicit_object_parameter_this_token: multiplier.frontend.Token
+  depth: int
+  index: int
   obj_c_decl_qualifier: multiplier.ast.DeclObjCDeclQualifier
   original_type: multiplier.ast.Type
   uninstantiated_default_argument: Optional[multiplier.ast.Expr]
@@ -61351,6 +61457,7 @@ class FunctionDecl(multiplier.ast.DeclaratorDecl):
   uses_fp_intrin: bool
   does_declaration_force_externally_visible_definition: Optional[bool]
   does_this_declaration_have_a_body: bool
+  builtin_id: int
   call_result_type: multiplier.ast.Type
   constexpr_kind: multiplier.ast.ConstexprSpecKind
   declared_return_type: multiplier.ast.Type
@@ -61360,6 +61467,9 @@ class FunctionDecl(multiplier.ast.DeclaratorDecl):
   exception_spec_tokens: multiplier.frontend.TokenRange
   exception_spec_type: multiplier.ast.ExceptionSpecificationType
   language_linkage: multiplier.ast.LanguageLinkage
+  memory_function_kind: int
+  min_required_arguments: int
+  min_required_explicit_arguments: int
   multi_version_kind: multiplier.ast.MultiVersionKind
   overloaded_operator: multiplier.ast.OverloadedOperatorKind
   parameters_tokens: multiplier.frontend.TokenRange
@@ -61541,6 +61651,7 @@ class CXXMethodDecl(multiplier.ast.FunctionDecl):
   is_volatile: bool
   num_overridden_methods: int
   overridden_methods: Iterable[multiplier.ast.CXXMethodDecl]
+  size_overridden_methods: int
   overridden_by_methods: Iterable[multiplier.ast.CXXMethodDecl]
   transitive_overridden_by_methods: Iterable[multiplier.ast.CXXMethodDecl]
 
@@ -62028,6 +62139,7 @@ class FieldDecl(multiplier.ast.DeclaratorDecl):
   redeclarations: Iterable[multiplier.ast.FieldDecl]
   bit_width: Optional[multiplier.ast.Expr]
   captured_vla_type: Optional[multiplier.ast.VariableArrayType]
+  field_index: int
   in_class_initializer_style: multiplier.ast.InClassInitStyle
   in_class_initializer: Optional[multiplier.ast.Expr]
   has_captured_vla_type: bool
@@ -63170,6 +63282,8 @@ class TemplateTypeParmDecl(multiplier.ast.TypeDecl):
   default_argument: Optional[multiplier.ast.Type]
   default_argument_info: Optional[multiplier.ast.Type]
   default_argument_token: multiplier.frontend.Token
+  depth: int
+  index: int
   has_default_argument: bool
   has_type_constraint: bool
   is_expanded_parameter_pack: bool
@@ -63510,12 +63624,15 @@ class CXXRecordDecl(multiplier.ast.RecordDecl):
   dependent_lambda_call_operator: Optional[multiplier.ast.FunctionTemplateDecl]
   described_class_template: Optional[multiplier.ast.ClassTemplateDecl]
   destructor: Optional[multiplier.ast.CXXDestructorDecl]
+  device_lambda_mangling_number: int
   generic_lambda_template_parameter_list: Optional[multiplier.ast.TemplateParameterList]
   instantiated_from_member_class: Optional[multiplier.ast.CXXRecordDecl]
   lambda_call_operator: Optional[multiplier.ast.CXXMethodDecl]
   lambda_capture_default: Optional[multiplier.ast.LambdaCaptureDefault]
   lambda_context_declaration: Optional[multiplier.ast.Decl]
+  lambda_dependency_kind: int
   lambda_explicit_template_parameters: Optional[Sequence[multiplier.ast.NamedDecl]]
+  lambda_index_in_context: int
   lambda_mangling_number: Optional[int]
   lambda_static_invoker: Optional[multiplier.ast.CXXMethodDecl]
   ms_inheritance_model: Optional[multiplier.ast.MSInheritanceModel]
@@ -64400,6 +64517,7 @@ class ObjCTypeParamDecl(multiplier.ast.TypedefNameDecl):
   definition: Optional[multiplier.ast.ObjCTypeParamDecl]
   redeclarations: Iterable[multiplier.ast.ObjCTypeParamDecl]
   colon_token: multiplier.frontend.Token
+  index: int
   variance: multiplier.ast.ObjCTypeParamVariance
   variance_token: multiplier.frontend.Token
   has_explicit_bound: bool
@@ -66743,6 +66861,7 @@ class LifetimeExtendedTemporaryDecl(multiplier.ast.Decl):
   redeclarations: Iterable[multiplier.ast.LifetimeExtendedTemporaryDecl]
   children: Iterable[multiplier.ast.Stmt]
   extending_declaration: multiplier.ast.ValueDecl
+  mangling_number: int
   storage_duration: multiplier.ast.StorageDuration
   temporary_expression: multiplier.ast.Expr
 
@@ -67134,6 +67253,7 @@ class FriendDecl(multiplier.ast.Decl):
   friend_declaration: Optional[multiplier.ast.NamedDecl]
   friend_token: multiplier.frontend.Token
   friend_type: Optional[multiplier.ast.Type]
+  friend_type_num_template_parameter_lists: int
   is_unsupported_friend: bool
   num_friend_type_template_parameter_lists: int
   friend_type_template_parameter_lists: Iterable[multiplier.ast.TemplateParameterList]

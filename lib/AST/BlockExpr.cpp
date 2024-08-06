@@ -195,21 +195,21 @@ std::optional<BlockExpr> BlockExpr::from(const TokenContext &t) {
 }
 
 BlockDecl BlockExpr::block_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal37();
+  RawEntityId eid = impl->reader.getVal38();
   return BlockDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Stmt BlockExpr::body(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal39();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Token BlockExpr::caret_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 FunctionProtoType BlockExpr::function_type(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal41();
   return FunctionProtoType::from_base(impl->ep->TypeFor(impl->ep, eid)).value();
 }
 

@@ -73,6 +73,7 @@ class MX_EXPORT ObjCTypeParamDecl : public TypedefNameDecl {
   static std::optional<ObjCTypeParamDecl> from(const TokenContext &t);
 
   Token colon_token(void) const;
+  uint32_t index(void) const;
   ObjCTypeParamVariance variance(void) const;
   Token variance_token(void) const;
   bool has_explicit_bound(void) const;

@@ -1679,6 +1679,49 @@ std::string_view GlobalRefOp::global(void) const {
   }
 }
 
+std::optional<BinaryCondOp> BinaryCondOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_BINARY_COND) {
+    return reinterpret_cast<const BinaryCondOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<BinaryCondOp> BinaryCondOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::BinaryCondOp BinaryCondOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::BinaryCondOp(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Value BinaryCondOp::result(void) const {
+  auto val = underlying_repr().getResult();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Region BinaryCondOp::common_region(void) const {
+  auto &val = underlying_repr().getCommonRegion();
+  return ::mx::ir::Region(module_, val);
+}
+
+::mx::ir::Region BinaryCondOp::cond_region(void) const {
+  auto &val = underlying_repr().getCondRegion();
+  return ::mx::ir::Region(module_, val);
+}
+
+::mx::ir::Region BinaryCondOp::then_region(void) const {
+  auto &val = underlying_repr().getThenRegion();
+  return ::mx::ir::Region(module_, val);
+}
+
+::mx::ir::Region BinaryCondOp::else_region(void) const {
+  auto &val = underlying_repr().getElseRegion();
+  return ::mx::ir::Region(module_, val);
+}
+
 std::optional<BreakOp> BreakOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_BREAK) {
     return reinterpret_cast<const BreakOp &>(that);
@@ -2657,6 +2700,37 @@ std::optional<OffsetOfExprOp> OffsetOfExprOp::producing(const ::mx::ir::Value &t
 }
 
 ::mx::ir::Value OffsetOfExprOp::result(void) const {
+  auto val = underlying_repr().getResult();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Type OffsetOfExprOp::source(void) const {
+  auto mlir_type = underlying_repr().getSource();
+  return ::mx::ir::Type(
+      mlir_type.getContext(),
+      reinterpret_cast<const mlir::TypeStorage *>(
+          mlir_type.getAsOpaquePointer()));
+}
+
+std::optional<OpaqueValueExprOp> OpaqueValueExprOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_OPAQUE_EXPR) {
+    return reinterpret_cast<const OpaqueValueExprOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<OpaqueValueExprOp> OpaqueValueExprOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::OpaqueValueExpr OpaqueValueExprOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::OpaqueValueExpr(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Value OpaqueValueExprOp::result(void) const {
   auto val = underlying_repr().getResult();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }

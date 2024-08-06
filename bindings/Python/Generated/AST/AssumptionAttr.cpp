@@ -134,6 +134,16 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::AssumptionAttr::assumption"),
     nullptr,
   },
+  {
+    "assumption_length",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->assumption_length());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::AssumptionAttr::assumption_length"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

@@ -130,17 +130,25 @@ std::string_view AvailabilityAttr::message(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
+uint32_t AvailabilityAttr::message_length(void) const {
+  return impl->reader.getVal12();
+}
+
 std::string_view AvailabilityAttr::replacement(void) const {
-  capnp::Text::Reader data = impl->reader.getVal23();
+  capnp::Text::Reader data = impl->reader.getVal24();
   return std::string_view(data.cStr(), data.size());
 }
 
+uint32_t AvailabilityAttr::replacement_length(void) const {
+  return impl->reader.getVal25();
+}
+
 bool AvailabilityAttr::strict(void) const {
-  return impl->reader.getVal14();
+  return impl->reader.getVal15();
 }
 
 bool AvailabilityAttr::unavailable(void) const {
-  return impl->reader.getVal15();
+  return impl->reader.getVal16();
 }
 
 #pragma GCC diagnostic pop

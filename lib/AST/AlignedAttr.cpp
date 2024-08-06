@@ -127,6 +127,10 @@ std::optional<AlignedAttr> AlignedAttr::from(const TokenContext &t) {
   return std::nullopt;
 }
 
+uint32_t AlignedAttr::alignment(void) const {
+  return impl->reader.getVal12();
+}
+
 std::optional<Expr> AlignedAttr::alignment_expression(void) const {
   if (true) {
     RawEntityId eid = impl->reader.getVal10();
@@ -142,7 +146,7 @@ std::optional<Expr> AlignedAttr::alignment_expression(void) const {
 
 std::optional<Type> AlignedAttr::alignment_type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal22();
+    RawEntityId eid = impl->reader.getVal23();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -154,44 +158,44 @@ std::optional<Type> AlignedAttr::alignment_type(void) const {
 }
 
 std::optional<uint32_t> AlignedAttr::cached_alignment_value(void) const {
-  if (!impl->reader.getVal14()) {
+  if (!impl->reader.getVal15()) {
     return std::nullopt;
   } else {
-    return static_cast<uint32_t>(impl->reader.getVal26());
+    return static_cast<uint32_t>(impl->reader.getVal25());
   }
   return std::nullopt;
 }
 
 AlignedAttrSpelling AlignedAttr::semantic_spelling(void) const {
-  return static_cast<AlignedAttrSpelling>(impl->reader.getVal12());
+  return static_cast<AlignedAttrSpelling>(impl->reader.getVal13());
 }
 
 bool AlignedAttr::is_alignas(void) const {
-  return impl->reader.getVal15();
-}
-
-bool AlignedAttr::is_alignment_dependent(void) const {
   return impl->reader.getVal16();
 }
 
-bool AlignedAttr::is_alignment_error_dependent(void) const {
+bool AlignedAttr::is_alignment_dependent(void) const {
   return impl->reader.getVal17();
 }
 
-bool AlignedAttr::is_alignment_expression(void) const {
+bool AlignedAttr::is_alignment_error_dependent(void) const {
   return impl->reader.getVal18();
 }
 
+bool AlignedAttr::is_alignment_expression(void) const {
+  return impl->reader.getVal19();
+}
+
 bool AlignedAttr::is_c11(void) const {
-  return impl->reader.getVal27();
+  return impl->reader.getVal29();
 }
 
 bool AlignedAttr::is_declspec(void) const {
-  return impl->reader.getVal28();
+  return impl->reader.getVal30();
 }
 
 bool AlignedAttr::is_gnu(void) const {
-  return impl->reader.getVal29();
+  return impl->reader.getVal31();
 }
 
 #pragma GCC diagnostic pop

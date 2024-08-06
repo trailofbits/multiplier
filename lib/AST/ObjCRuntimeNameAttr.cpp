@@ -129,6 +129,10 @@ std::string_view ObjCRuntimeNameAttr::metadata_name(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
+uint32_t ObjCRuntimeNameAttr::metadata_name_length(void) const {
+  return impl->reader.getVal12();
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

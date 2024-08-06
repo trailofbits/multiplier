@@ -126,7 +126,7 @@ std::optional<OpenCLLocalAddressSpaceAttr> OpenCLLocalAddressSpaceAttr::from(con
 }
 
 OpenCLLocalAddressSpaceAttrSpelling OpenCLLocalAddressSpaceAttr::semantic_spelling(void) const {
-  return static_cast<OpenCLLocalAddressSpaceAttrSpelling>(impl->reader.getVal12());
+  return static_cast<OpenCLLocalAddressSpaceAttrSpelling>(impl->reader.getVal13());
 }
 
 #pragma GCC diagnostic pop

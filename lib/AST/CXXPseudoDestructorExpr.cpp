@@ -194,17 +194,17 @@ std::optional<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::from(const Token
 }
 
 Expr CXXPseudoDestructorExpr::base(void) const {
-  RawEntityId eid = impl->reader.getVal37();
+  RawEntityId eid = impl->reader.getVal38();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Token CXXPseudoDestructorExpr::colon_colon_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 std::optional<Type> CXXPseudoDestructorExpr::destroyed_type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal39();
+    RawEntityId eid = impl->reader.getVal40();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -216,23 +216,23 @@ std::optional<Type> CXXPseudoDestructorExpr::destroyed_type(void) const {
 }
 
 Token CXXPseudoDestructorExpr::destroyed_type_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
-}
-
-Token CXXPseudoDestructorExpr::operator_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
-Token CXXPseudoDestructorExpr::tilde_token(void) const {
+Token CXXPseudoDestructorExpr::operator_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
+Token CXXPseudoDestructorExpr::tilde_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
+}
+
 bool CXXPseudoDestructorExpr::has_qualifier(void) const {
-  return impl->reader.getVal83();
+  return impl->reader.getVal84();
 }
 
 bool CXXPseudoDestructorExpr::is_arrow(void) const {
-  return impl->reader.getVal84();
+  return impl->reader.getVal85();
 }
 
 #pragma GCC diagnostic pop

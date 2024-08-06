@@ -50,6 +50,7 @@ class MX_EXPORT OMPCaptureKindAttr : public Attr {
   static std::optional<OMPCaptureKindAttr> from(const VariantEntity &e);
   static std::optional<OMPCaptureKindAttr> from(const TokenContext &t);
 
+  uint32_t capture_kind_value(void) const;
 };
 
 static_assert(sizeof(OMPCaptureKindAttr) == sizeof(Attr));

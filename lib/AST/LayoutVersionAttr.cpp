@@ -125,6 +125,10 @@ std::optional<LayoutVersionAttr> LayoutVersionAttr::from(const TokenContext &t) 
   return std::nullopt;
 }
 
+uint32_t LayoutVersionAttr::version(void) const {
+  return impl->reader.getVal12();
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

@@ -126,7 +126,7 @@ std::optional<EnumExtensibilityAttr> EnumExtensibilityAttr::from(const TokenCont
 }
 
 EnumExtensibilityAttrKind EnumExtensibilityAttr::extensibility(void) const {
-  return static_cast<EnumExtensibilityAttrKind>(impl->reader.getVal12());
+  return static_cast<EnumExtensibilityAttrKind>(impl->reader.getVal13());
 }
 
 #pragma GCC diagnostic pop

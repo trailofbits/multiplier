@@ -102,12 +102,12 @@ std::optional<MatrixType> MatrixType::from(const TokenContext &t) {
 }
 
 Type MatrixType::element_type(void) const {
-  RawEntityId eid = impl->reader.getVal19();
+  RawEntityId eid = impl->reader.getVal20();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool MatrixType::is_sugared(void) const {
-  return impl->reader.getVal20();
+  return impl->reader.getVal23();
 }
 
 #pragma GCC diagnostic pop

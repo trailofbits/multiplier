@@ -124,6 +124,16 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
 namespace {
 static PyGetSetDef gProperties[] = {
+  {
+    "capture_kind_value",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->capture_kind_value());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OMPCaptureKindAttr::capture_kind_value"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

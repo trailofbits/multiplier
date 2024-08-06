@@ -125,19 +125,19 @@ std::optional<OpenCLAccessAttr> OpenCLAccessAttr::from(const TokenContext &t) {
 }
 
 OpenCLAccessAttrSpelling OpenCLAccessAttr::semantic_spelling(void) const {
-  return static_cast<OpenCLAccessAttrSpelling>(impl->reader.getVal12());
+  return static_cast<OpenCLAccessAttrSpelling>(impl->reader.getVal13());
 }
 
 bool OpenCLAccessAttr::is_read_only(void) const {
-  return impl->reader.getVal13();
-}
-
-bool OpenCLAccessAttr::is_read_write(void) const {
   return impl->reader.getVal14();
 }
 
-bool OpenCLAccessAttr::is_write_only(void) const {
+bool OpenCLAccessAttr::is_read_write(void) const {
   return impl->reader.getVal15();
+}
+
+bool OpenCLAccessAttr::is_write_only(void) const {
+  return impl->reader.getVal16();
 }
 
 #pragma GCC diagnostic pop

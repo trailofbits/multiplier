@@ -125,6 +125,10 @@ std::optional<MinVectorWidthAttr> MinVectorWidthAttr::from(const TokenContext &t
   return std::nullopt;
 }
 
+uint32_t MinVectorWidthAttr::vector_width(void) const {
+  return impl->reader.getVal12();
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

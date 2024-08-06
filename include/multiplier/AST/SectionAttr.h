@@ -54,6 +54,7 @@ class MX_EXPORT SectionAttr : public InheritableAttr {
   static std::optional<SectionAttr> from(const TokenContext &t);
 
   std::string_view name(void) const;
+  uint32_t name_length(void) const;
   SectionAttrSpelling semantic_spelling(void) const;
 };
 

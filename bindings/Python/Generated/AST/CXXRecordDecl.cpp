@@ -253,6 +253,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "device_lambda_mangling_number",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->device_lambda_mangling_number());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXRecordDecl::device_lambda_mangling_number"),
+    nullptr,
+  },
+  {
     "generic_lambda_template_parameter_list",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -303,6 +313,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "lambda_dependency_kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->lambda_dependency_kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXRecordDecl::lambda_dependency_kind"),
+    nullptr,
+  },
+  {
     "lambda_explicit_template_parameters",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -310,6 +330,16 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::CXXRecordDecl::lambda_explicit_template_parameters"),
+    nullptr,
+  },
+  {
+    "lambda_index_in_context",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->lambda_index_in_context());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::CXXRecordDecl::lambda_index_in_context"),
     nullptr,
   },
   {

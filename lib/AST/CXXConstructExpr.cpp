@@ -230,44 +230,44 @@ gap::generator<Expr> CXXConstructExpr::arguments(void) const & {
 }
 
 CXXConstructionKind CXXConstructExpr::construction_kind(void) const {
-  return static_cast<CXXConstructionKind>(impl->reader.getVal88());
+  return static_cast<CXXConstructionKind>(impl->reader.getVal89());
 }
 
 CXXConstructorDecl CXXConstructExpr::constructor(void) const {
-  RawEntityId eid = impl->reader.getVal37();
+  RawEntityId eid = impl->reader.getVal38();
   return CXXConstructorDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Token CXXConstructExpr::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 TokenRange CXXConstructExpr::parenthesis_or_brace_range(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal39(), impl->reader.getVal40());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal40(), impl->reader.getVal41());
 }
 
 bool CXXConstructExpr::had_multiple_candidates(void) const {
-  return impl->reader.getVal83();
-}
-
-bool CXXConstructExpr::is_elidable(void) const {
   return impl->reader.getVal84();
 }
 
-bool CXXConstructExpr::is_immediate_escalating(void) const {
+bool CXXConstructExpr::is_elidable(void) const {
   return impl->reader.getVal85();
 }
 
-bool CXXConstructExpr::is_list_initialization(void) const {
+bool CXXConstructExpr::is_immediate_escalating(void) const {
   return impl->reader.getVal86();
 }
 
-bool CXXConstructExpr::is_std_initializer_list_initialization(void) const {
+bool CXXConstructExpr::is_list_initialization(void) const {
   return impl->reader.getVal87();
 }
 
+bool CXXConstructExpr::is_std_initializer_list_initialization(void) const {
+  return impl->reader.getVal88();
+}
+
 bool CXXConstructExpr::requires_zero_initialization(void) const {
-  return impl->reader.getVal89();
+  return impl->reader.getVal90();
 }
 
 #pragma GCC diagnostic pop

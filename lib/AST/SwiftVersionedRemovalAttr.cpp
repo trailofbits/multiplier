@@ -125,11 +125,15 @@ std::optional<SwiftVersionedRemovalAttr> SwiftVersionedRemovalAttr::from(const T
 }
 
 AttrKind SwiftVersionedRemovalAttr::attribute_kind_to_remove(void) const {
-  return static_cast<AttrKind>(impl->reader.getVal19());
+  return static_cast<AttrKind>(impl->reader.getVal20());
 }
 
 bool SwiftVersionedRemovalAttr::is_replaced_by_active(void) const {
-  return impl->reader.getVal13();
+  return impl->reader.getVal14();
+}
+
+uint32_t SwiftVersionedRemovalAttr::raw_kind(void) const {
+  return impl->reader.getVal12();
 }
 
 #pragma GCC diagnostic pop

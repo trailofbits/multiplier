@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1239]) || tp >= &(gTypes[1271])) {
+  if (tp < &(gTypes[1243]) || tp >= &(gTypes[1275])) {
     return std::nullopt;
   }
 
@@ -90,127 +90,127 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::ir::memref::AssumeAlignmentOp::static_kind():
-      tp = &(gTypes[1240]);
-      break;
-
-    case mx::ir::memref::AtomicRMWOp::static_kind():
-      tp = &(gTypes[1241]);
-      break;
-
-    case mx::ir::memref::AtomicYieldOp::static_kind():
-      tp = &(gTypes[1242]);
-      break;
-
-    case mx::ir::memref::CopyOp::static_kind():
-      tp = &(gTypes[1243]);
-      break;
-
-    case mx::ir::memref::GenericAtomicRMWOp::static_kind():
       tp = &(gTypes[1244]);
       break;
 
-    case mx::ir::memref::LoadOp::static_kind():
+    case mx::ir::memref::AtomicRMWOp::static_kind():
       tp = &(gTypes[1245]);
       break;
 
-    case mx::ir::memref::AllocOp::static_kind():
+    case mx::ir::memref::AtomicYieldOp::static_kind():
       tp = &(gTypes[1246]);
       break;
 
-    case mx::ir::memref::AllocaOp::static_kind():
+    case mx::ir::memref::CopyOp::static_kind():
       tp = &(gTypes[1247]);
       break;
 
-    case mx::ir::memref::AllocaScopeOp::static_kind():
+    case mx::ir::memref::GenericAtomicRMWOp::static_kind():
       tp = &(gTypes[1248]);
       break;
 
-    case mx::ir::memref::AllocaScopeReturnOp::static_kind():
+    case mx::ir::memref::LoadOp::static_kind():
       tp = &(gTypes[1249]);
       break;
 
-    case mx::ir::memref::CastOp::static_kind():
+    case mx::ir::memref::AllocOp::static_kind():
       tp = &(gTypes[1250]);
       break;
 
-    case mx::ir::memref::CollapseShapeOp::static_kind():
+    case mx::ir::memref::AllocaOp::static_kind():
       tp = &(gTypes[1251]);
       break;
 
-    case mx::ir::memref::DeallocOp::static_kind():
+    case mx::ir::memref::AllocaScopeOp::static_kind():
       tp = &(gTypes[1252]);
       break;
 
-    case mx::ir::memref::DimOp::static_kind():
+    case mx::ir::memref::AllocaScopeReturnOp::static_kind():
       tp = &(gTypes[1253]);
       break;
 
-    case mx::ir::memref::DMAStartOp::static_kind():
+    case mx::ir::memref::CastOp::static_kind():
       tp = &(gTypes[1254]);
       break;
 
-    case mx::ir::memref::DMAWaitOp::static_kind():
+    case mx::ir::memref::CollapseShapeOp::static_kind():
       tp = &(gTypes[1255]);
       break;
 
-    case mx::ir::memref::ExpandShapeOp::static_kind():
+    case mx::ir::memref::DeallocOp::static_kind():
       tp = &(gTypes[1256]);
       break;
 
-    case mx::ir::memref::ExtractAlignedPointerAsIndexOp::static_kind():
+    case mx::ir::memref::DimOp::static_kind():
       tp = &(gTypes[1257]);
       break;
 
-    case mx::ir::memref::ExtractStridedMetadataOp::static_kind():
+    case mx::ir::memref::DMAStartOp::static_kind():
       tp = &(gTypes[1258]);
       break;
 
-    case mx::ir::memref::GetGlobalOp::static_kind():
+    case mx::ir::memref::DMAWaitOp::static_kind():
       tp = &(gTypes[1259]);
       break;
 
-    case mx::ir::memref::GlobalOp::static_kind():
+    case mx::ir::memref::ExpandShapeOp::static_kind():
       tp = &(gTypes[1260]);
       break;
 
-    case mx::ir::memref::MemorySpaceCastOp::static_kind():
+    case mx::ir::memref::ExtractAlignedPointerAsIndexOp::static_kind():
       tp = &(gTypes[1261]);
       break;
 
-    case mx::ir::memref::PrefetchOp::static_kind():
+    case mx::ir::memref::ExtractStridedMetadataOp::static_kind():
       tp = &(gTypes[1262]);
       break;
 
-    case mx::ir::memref::RankOp::static_kind():
+    case mx::ir::memref::GetGlobalOp::static_kind():
       tp = &(gTypes[1263]);
       break;
 
-    case mx::ir::memref::ReallocOp::static_kind():
+    case mx::ir::memref::GlobalOp::static_kind():
       tp = &(gTypes[1264]);
       break;
 
-    case mx::ir::memref::ReinterpretCastOp::static_kind():
+    case mx::ir::memref::MemorySpaceCastOp::static_kind():
       tp = &(gTypes[1265]);
       break;
 
-    case mx::ir::memref::ReshapeOp::static_kind():
+    case mx::ir::memref::PrefetchOp::static_kind():
       tp = &(gTypes[1266]);
       break;
 
-    case mx::ir::memref::StoreOp::static_kind():
+    case mx::ir::memref::RankOp::static_kind():
       tp = &(gTypes[1267]);
       break;
 
-    case mx::ir::memref::TransposeOp::static_kind():
+    case mx::ir::memref::ReallocOp::static_kind():
       tp = &(gTypes[1268]);
       break;
 
-    case mx::ir::memref::ViewOp::static_kind():
+    case mx::ir::memref::ReinterpretCastOp::static_kind():
       tp = &(gTypes[1269]);
       break;
 
-    case mx::ir::memref::SubViewOp::static_kind():
+    case mx::ir::memref::ReshapeOp::static_kind():
       tp = &(gTypes[1270]);
+      break;
+
+    case mx::ir::memref::StoreOp::static_kind():
+      tp = &(gTypes[1271]);
+      break;
+
+    case mx::ir::memref::TransposeOp::static_kind():
+      tp = &(gTypes[1272]);
+      break;
+
+    case mx::ir::memref::ViewOp::static_kind():
+      tp = &(gTypes[1273]);
+      break;
+
+    case mx::ir::memref::SubViewOp::static_kind():
+      tp = &(gTypes[1274]);
       break;
 
   }
@@ -278,7 +278,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1239]);
+  PyTypeObject * const tp = &(gTypes[1243]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -293,12 +293,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[986].tp_hash;
-  tp->tp_richcompare = gTypes[986].tp_richcompare;
+  tp->tp_hash = gTypes[990].tp_hash;
+  tp->tp_richcompare = gTypes[990].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[986]);
+  tp->tp_base = &(gTypes[990]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

@@ -165,6 +165,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "message_length",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->message_length());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DiagnoseIfAttr::message_length"),
+    nullptr,
+  },
+  {
     "parent",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

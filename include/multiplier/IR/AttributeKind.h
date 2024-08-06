@@ -102,6 +102,10 @@ enum class AttributeKind : unsigned {
   HL_TRANSPARENT_UNION,
   HL_RETURNS_TWICE,
   HL_MAY_ALIAS,
+  HL_UNUSED,
+  HL_USED,
+  HL_GNU_INLINE,
+  HL_NO_CF_CHECK,
   HL_AVAILABLE_ONLY_IN_DEFAULT_EVAL_METHOD,
   HL_AVAILABILITY_ATTR,
   HL_ASM_LABEL,
@@ -131,7 +135,7 @@ inline static const char *EnumerationName(ir::AttributeKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(ir::AttributeKind) {
-  return 108;
+  return 112;
 }
 
 MX_EXPORT const char *EnumeratorName(ir::AttributeKind);

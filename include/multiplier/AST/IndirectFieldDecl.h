@@ -73,6 +73,7 @@ class MX_EXPORT IndirectFieldDecl : public ValueDecl {
 
   gap::generator<NamedDecl> chain(void) const &;
   std::optional<FieldDecl> anonymous_field(void) const;
+  uint32_t chaining_size(void) const;
   std::optional<VarDecl> variable_declaration(void) const;
 };
 

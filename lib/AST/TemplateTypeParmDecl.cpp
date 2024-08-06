@@ -223,12 +223,12 @@ std::optional<TemplateTypeParmDecl> TemplateTypeParmDecl::from(const TokenContex
 }
 
 bool TemplateTypeParmDecl::default_argument_was_inherited(void) const {
-  return impl->reader.getVal63();
+  return impl->reader.getVal66();
 }
 
 std::optional<Type> TemplateTypeParmDecl::default_argument(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal46();
+    RawEntityId eid = impl->reader.getVal49();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -241,7 +241,7 @@ std::optional<Type> TemplateTypeParmDecl::default_argument(void) const {
 
 std::optional<Type> TemplateTypeParmDecl::default_argument_info(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal47();
+    RawEntityId eid = impl->reader.getVal50();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -253,27 +253,35 @@ std::optional<Type> TemplateTypeParmDecl::default_argument_info(void) const {
 }
 
 Token TemplateTypeParmDecl::default_argument_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal55());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal58());
+}
+
+uint32_t TemplateTypeParmDecl::depth(void) const {
+  return impl->reader.getVal41();
+}
+
+uint32_t TemplateTypeParmDecl::index(void) const {
+  return impl->reader.getVal117();
 }
 
 bool TemplateTypeParmDecl::has_default_argument(void) const {
-  return impl->reader.getVal64();
+  return impl->reader.getVal67();
 }
 
 bool TemplateTypeParmDecl::has_type_constraint(void) const {
-  return impl->reader.getVal65();
+  return impl->reader.getVal68();
 }
 
 bool TemplateTypeParmDecl::is_expanded_parameter_pack(void) const {
-  return impl->reader.getVal66();
+  return impl->reader.getVal69();
 }
 
 bool TemplateTypeParmDecl::is_pack_expansion(void) const {
-  return impl->reader.getVal78();
+  return impl->reader.getVal81();
 }
 
 bool TemplateTypeParmDecl::was_declared_with_typename(void) const {
-  return impl->reader.getVal79();
+  return impl->reader.getVal82();
 }
 
 #pragma GCC diagnostic pop

@@ -51,6 +51,7 @@ class MX_EXPORT SubstTemplateTypeParmPackType : public Type {
 
   Decl associated_declaration(void) const;
   bool final(void) const;
+  uint32_t index(void) const;
   TemplateTypeParmDecl replaced_parameter(void) const;
   bool is_sugared(void) const;
 };

@@ -90,86 +90,90 @@ std::optional<Type> Type::from(const TokenContext &t) {
   return t.as_type();
 }
 
-Type Type::desugared_type(void) const {
-  RawEntityId eid = impl->reader.getVal0();
-  return Type(impl->ep->TypeFor(impl->ep, eid));
+uint32_t Type::raw_qualifiers(void) const {
+  return impl->reader.getVal0();
 }
 
-Type Type::canonical_type(void) const {
+Type Type::desugared_type(void) const {
   RawEntityId eid = impl->reader.getVal1();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
+Type Type::canonical_type(void) const {
+  RawEntityId eid = impl->reader.getVal2();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
+}
+
 bool Type::is_qualified(void) const {
-  return impl->reader.getVal2();
+  return impl->reader.getVal3();
 }
 
 Type Type::unqualified_type(void) const {
-  RawEntityId eid = impl->reader.getVal3();
+  RawEntityId eid = impl->reader.getVal4();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<uint64_t> Type::size_in_bits(void) const {
-  if (!impl->reader.getVal5()) {
+  if (!impl->reader.getVal6()) {
     return std::nullopt;
   } else {
-    return static_cast<uint64_t>(impl->reader.getVal4());
+    return static_cast<uint64_t>(impl->reader.getVal5());
   }
   return std::nullopt;
 }
 
 std::optional<uint64_t> Type::alignment(void) const {
-  if (!impl->reader.getVal7()) {
+  if (!impl->reader.getVal8()) {
     return std::nullopt;
   } else {
-    return static_cast<uint64_t>(impl->reader.getVal6());
+    return static_cast<uint64_t>(impl->reader.getVal7());
   }
   return std::nullopt;
 }
 
 bool Type::accepts_obj_c_type_parameters(void) const {
-  return impl->reader.getVal8();
-}
-
-bool Type::can_decay_to_pointer_type(void) const {
   return impl->reader.getVal9();
 }
 
-bool Type::can_have_nullability(void) const {
+bool Type::can_decay_to_pointer_type(void) const {
   return impl->reader.getVal10();
 }
 
-bool Type::contains_errors(void) const {
+bool Type::can_have_nullability(void) const {
   return impl->reader.getVal11();
 }
 
-bool Type::contains_unexpanded_parameter_pack(void) const {
+bool Type::contains_errors(void) const {
   return impl->reader.getVal12();
 }
 
+bool Type::contains_unexpanded_parameter_pack(void) const {
+  return impl->reader.getVal13();
+}
+
 Linkage Type::linkage(void) const {
-  return static_cast<Linkage>(impl->reader.getVal13());
+  return static_cast<Linkage>(impl->reader.getVal14());
 }
 
 TypeKind Type::kind(void) const {
-  return static_cast<TypeKind>(impl->reader.getVal14());
+  return static_cast<TypeKind>(impl->reader.getVal15());
 }
 
 Type Type::unqualified_desugared_type(void) const {
-  RawEntityId eid = impl->reader.getVal15();
+  RawEntityId eid = impl->reader.getVal16();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Visibility Type::visibility(void) const {
-  return static_cast<Visibility>(impl->reader.getVal16());
+  return static_cast<Visibility>(impl->reader.getVal17());
 }
 
 bool Type::is_sizeless_vector_type(void) const {
-  return impl->reader.getVal17();
+  return impl->reader.getVal18();
 }
 
 bool Type::is_unresolved_type(void) const {
-  return impl->reader.getVal18();
+  return impl->reader.getVal19();
 }
 
 #pragma GCC diagnostic pop

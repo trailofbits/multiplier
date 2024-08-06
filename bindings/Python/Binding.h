@@ -727,6 +727,24 @@ struct GeneratorPythonBinding {
   }
 };
 
+// Packages up a function pointer and zero or more arguments into an object
+// with a method returning a generator, suitable for using with
+// `generator_to_python`.
+template <typename ValueType, typename... Args>
+struct StaticGenerator {
+  using FuncType = gap::generator<ValueType>(Args...);
+  FuncType * const func_ptr;
+  const std::tuple<std::decay_t<Args>...> args;
+
+  inline StaticGenerator(FuncType *func_ptr_, std::decay_t<Args>... args_)
+      : func_ptr(func_ptr_),
+        args(std::move(args_)...) {}
+
+  inline gap::generator<ValueType> generate(void) const & noexcept {
+    return std::apply(func_ptr, args);
+  }
+};
+
 template <typename EntityType, typename ValueType>
 bool GeneratorPythonBinding<EntityType, ValueType>::gInitialized = false;
 

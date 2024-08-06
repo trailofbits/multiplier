@@ -130,6 +130,10 @@ std::string_view AcquireHandleAttr::handle_type(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
+uint32_t AcquireHandleAttr::handle_type_length(void) const {
+  return impl->reader.getVal12();
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

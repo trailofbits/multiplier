@@ -125,6 +125,10 @@ std::optional<XRayLogArgsAttr> XRayLogArgsAttr::from(const TokenContext &t) {
   return std::nullopt;
 }
 
+uint32_t XRayLogArgsAttr::argument_count(void) const {
+  return impl->reader.getVal12();
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

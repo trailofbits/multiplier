@@ -194,7 +194,7 @@ std::optional<CoawaitExpr> CoawaitExpr::from(const TokenContext &t) {
 }
 
 bool CoawaitExpr::is_implicit(void) const {
-  return impl->reader.getVal83();
+  return impl->reader.getVal84();
 }
 
 #pragma GCC diagnostic pop

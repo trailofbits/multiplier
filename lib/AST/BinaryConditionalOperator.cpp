@@ -195,12 +195,12 @@ std::optional<BinaryConditionalOperator> BinaryConditionalOperator::from(const T
 }
 
 Expr BinaryConditionalOperator::common(void) const {
-  RawEntityId eid = impl->reader.getVal42();
+  RawEntityId eid = impl->reader.getVal43();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 OpaqueValueExpr BinaryConditionalOperator::opaque_value(void) const {
-  RawEntityId eid = impl->reader.getVal43();
+  RawEntityId eid = impl->reader.getVal44();
   return OpaqueValueExpr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 

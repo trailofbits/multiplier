@@ -52,6 +52,7 @@ class MX_EXPORT InitPriorityAttr : public InheritableAttr {
   static std::optional<InitPriorityAttr> from(const VariantEntity &e);
   static std::optional<InitPriorityAttr> from(const TokenContext &t);
 
+  uint32_t priority(void) const;
 };
 
 static_assert(sizeof(InitPriorityAttr) == sizeof(InheritableAttr));

@@ -53,6 +53,7 @@ class MX_EXPORT BTFTypeTagAttr : public TypeAttr {
   static std::optional<BTFTypeTagAttr> from(const TokenContext &t);
 
   std::string_view btf_type_tag(void) const;
+  uint32_t btf_type_tag_length(void) const;
 };
 
 static_assert(sizeof(BTFTypeTagAttr) == sizeof(TypeAttr));

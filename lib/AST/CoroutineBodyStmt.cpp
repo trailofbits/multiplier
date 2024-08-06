@@ -241,11 +241,11 @@ Stmt CoroutineBodyStmt::initializer_suspend_statement(void) const {
 }
 
 unsigned CoroutineBodyStmt::num_parameter_moves(void) const {
-  return impl->reader.getVal26().size();
+  return impl->reader.getVal27().size();
 }
 
 std::optional<Stmt> CoroutineBodyStmt::nth_parameter_move(unsigned n) const {
-  auto list = impl->reader.getVal26();
+  auto list = impl->reader.getVal27();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -259,12 +259,12 @@ std::optional<Stmt> CoroutineBodyStmt::nth_parameter_move(unsigned n) const {
 }
 
 gap::generator<Stmt> CoroutineBodyStmt::parameter_moves(void) const & {
-  auto list = impl->reader.getVal26();
+  auto list = impl->reader.getVal27();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d26 = ep->StmtFor(ep, v)) {
-      co_yield Stmt(std::move(d26));
+    if (auto d27 = ep->StmtFor(ep, v)) {
+      co_yield Stmt(std::move(d27));
     }
   }
   co_return;
@@ -300,7 +300,7 @@ Stmt CoroutineBodyStmt::return_statement(void) const {
 
 std::optional<Stmt> CoroutineBodyStmt::return_statement_on_alloc_failure(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal30();
+    RawEntityId eid = impl->reader.getVal31();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -312,12 +312,12 @@ std::optional<Stmt> CoroutineBodyStmt::return_statement_on_alloc_failure(void) c
 }
 
 Expr CoroutineBodyStmt::return_value(void) const {
-  RawEntityId eid = impl->reader.getVal31();
+  RawEntityId eid = impl->reader.getVal32();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr CoroutineBodyStmt::return_value_initializer(void) const {
-  RawEntityId eid = impl->reader.getVal32();
+  RawEntityId eid = impl->reader.getVal33();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 

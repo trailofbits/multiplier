@@ -135,6 +135,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "a_arch64_sme_attributes",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->a_arch64_sme_attributes());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionProtoType::a_arch64_sme_attributes"),
+    nullptr,
+  },
+  {
     "ellipsis_token",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

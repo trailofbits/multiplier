@@ -194,7 +194,7 @@ std::optional<CUDAKernelCallExpr> CUDAKernelCallExpr::from(const TokenContext &t
 }
 
 CallExpr CUDAKernelCallExpr::config(void) const {
-  RawEntityId eid = impl->reader.getVal42();
+  RawEntityId eid = impl->reader.getVal43();
   return CallExpr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 

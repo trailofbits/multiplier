@@ -72,9 +72,7 @@ class MX_EXPORT Value {
 
  public:
 
-  inline Value(std::shared_ptr<const SourceIRImpl> module, void *value)
-      : module_(std::move(module)),
-        impl_(value) {}
+  Value(std::shared_ptr<const SourceIRImpl> module, void *value);
 
   ValueKind kind(void) const noexcept;
 

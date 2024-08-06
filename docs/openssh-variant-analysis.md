@@ -1,6 +1,17 @@
-# Variant analysis of CVE-2024-6387
+# Variant analysis of regreSSHion (CVE-2024-6387)
 
-This variant analysis looks for calls to signal-unsafe functions by signal handlers.
+This variant analysis looks for calls to signal-unsafe functions by signal handlers. Note that the scope of this analysis is limited to identifying the potential of apparently reachable unsafe paths, not verifying whether reachibility conditions, nor verifying whether or not those paths are exploitable.
+
+This analysis starts with showing how to checkout and index the relevant version of the code, then how to discover the unsafe paths through the call graph manually using example tools, and finally how to use the Python API to script up a simple but generic checker for this kind of issue.
+
+* [Getting and indexing the code](#getting-and-indexing-the-code)
+  * [Configuring the build](#configuring-the-build)
+  * [Building the code](#building-the-code)
+  * [Indexing the code](#indexing-the-code)
+* [Manually finding the issue](#manually-finding-the-issue)
+  * [Finding `SIGALRM` handlers](#finding-sigalrm-handlers)
+  * [Finding paths from signal handlers to `free`](#finding-paths-from-signal-handlers-to-free)
+  * [Confirming reachability](#confirming-reachability)
 
 ## Getting and indexing the code
 
@@ -54,7 +65,7 @@ Using the [combine_compile_commands.py](../scripts/combine_compile_commands.py) 
 Next, we'll run `mx-index` to index OpenSSH.
 
 ```bash
-% time ./bin/mx-index --db /tmp/openssh.db --workspace /tmp/openssh.ws --target compile_commands.json --show_progress
+% time ./bin/mx-index --db /tmp/openssh.db --workspace /tmp/openssh.ws --target compile_commands.json --generate_sourceir --show_progress
 Commands                       (237 / 237)           100% [||||||||||||||||||||||||||||||||||||||||]
 Evaluated commands             (237 / 237)           100% [||||||||||||||||||||||||||||||||||||||||]
 Parsing                        (237 / 237)           100% [||||||||||||||||||||||||||||||||||||||||]
@@ -69,6 +80,8 @@ mx-index --db /tmp/openssh.db --workspace /tmp/openssh.ws --target    246.65s us
 
 Here we told `mx-index` to save its database to `/tmp/openssh.db` (we'll need this soon), and its temporary workspace to the directory `/tmp/openssh.ws`. We can now delete `/tmp/openssh.ws`, as its only needed if we wanted to index additional projects into the same database.
 
+The `--generate_sourceir` flag is optional if you plan to do the Python scripting. It will produce a lot more errors as output, but the indexer should finish.
+
 ```bash
 rm -rf /tmp/openssh.ws
 ```
@@ -79,7 +92,9 @@ The [description](https://www.qualys.com/2024/07/01/cve-2024-6387/regresshion.tx
 
 > The `SIGALRM` handler of this OpenSSH version calls `packet_close()`, which calls `buffer_free()`, which calls `xfree()` and hence `free()`, which is not async-signal-safe.
 
-We'll start by checking this with the test tools provided in the SDK. This is not the actual way I would recommend doing anything, as these tools are designed as examples of how to use the API, as well as functionality tests of the API -- they are not designed specifically for productivity or composition.
+We'll start by checking this with the test tools provided in the SDK. This is not the actual way I would recommend doing anything in practice, as these tools are designed as examples of how to use the API, as well as functionality tests of the API -- they are not designed specifically for productivity or composition. Later we'll use scripting to turn this into automated checker.
+
+### Finding `SIGALRM` handlers
 
 We'll start by trying to understand the specific `SIGALRM` signal. First, lets locate the entity:
 
@@ -103,9 +118,11 @@ So this says there's a function, `ssh_signal`, taking in a signal number `signum
 ![Registering sig_alarm for SIGALRM](images/openssh-variant-analysis-sigalrm-ref-1.png)
 ![Registering grace_alarm_handler for SIGALRM](images/openssh-variant-analysis-sigalrm-ref-2.png)
 
+### Finding paths from signal handlers to `free`
+
 So next we can look for paths between `sig_alarm` or `grace_alarm_handler` and a async signal unsafe function, such as `free`.
 
-First, we'll find `free`:
+Next, we'll find `free`:
 
 ```bash
 % mx-find-symbol --db /tmp/openssh.db --name free --exact
@@ -140,6 +157,8 @@ Next, lets see if we can find a path from `sig_alarm` or `grace_alarm_handler` t
 ```
 
 This creates the call graphs of `free` rooted at `sig_alarm` and `grace_alarm_handler`, respectively. The output of the `mx-print-call-graph` is a [DOT digraph](https://graphviz.org/doc/info/lang.html). There are no edges in the `sig_alarm` to `free` graph, so we'll focus on the `grace_alarm_handler` to `free` graph:
+
+### Confirming reachability
 
 ```bash
 % xdot /tmp/grace_alarm_handler_to_free.dot

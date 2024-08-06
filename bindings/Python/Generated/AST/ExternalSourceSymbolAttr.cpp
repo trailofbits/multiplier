@@ -135,6 +135,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "defined_in_length",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->defined_in_length());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ExternalSourceSymbolAttr::defined_in_length"),
+    nullptr,
+  },
+  {
     "generated_declaration",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -155,6 +165,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "language_length",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->language_length());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ExternalSourceSymbolAttr::language_length"),
+    nullptr,
+  },
+  {
     "usr",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -162,6 +182,16 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ExternalSourceSymbolAttr::usr"),
+    nullptr,
+  },
+  {
+    "usr_length",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->usr_length());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ExternalSourceSymbolAttr::usr_length"),
     nullptr,
   },
   {}  // Sentinel.

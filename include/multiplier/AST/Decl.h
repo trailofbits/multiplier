@@ -141,6 +141,8 @@ class MX_EXPORT Decl {
   std::optional<uint32_t> max_alignment(void) const;
   DeclModuleOwnershipKind module_ownership_kind(void) const;
   std::optional<Decl> non_closure_context(void) const;
+  uint32_t owning_module_id(void) const;
+  uint32_t template_depth(void) const;
   bool is_deprecated(void) const;
   bool is_file_context_declaration(void) const;
   bool is_function_or_function_template(void) const;

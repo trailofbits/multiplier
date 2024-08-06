@@ -194,16 +194,16 @@ std::optional<AddrLabelExpr> AddrLabelExpr::from(const TokenContext &t) {
 }
 
 Token AddrLabelExpr::amp_amp_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 LabelDecl AddrLabelExpr::label(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal39();
   return LabelDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Token AddrLabelExpr::label_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 #pragma GCC diagnostic pop

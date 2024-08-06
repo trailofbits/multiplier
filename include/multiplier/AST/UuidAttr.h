@@ -55,6 +55,7 @@ class MX_EXPORT UuidAttr : public InheritableAttr {
 
   std::string_view guid(void) const;
   MSGuidDecl guid_declaration(void) const;
+  uint32_t guid_length(void) const;
 };
 
 static_assert(sizeof(UuidAttr) == sizeof(InheritableAttr));

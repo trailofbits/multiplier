@@ -370,6 +370,7 @@
    _hl("hl.field", OperationKind::HL_FIELD, vast::hl::FieldDeclOp) \
    _hl("hl.funcref", OperationKind::HL_FUNCREF, vast::hl::FuncRefOp) \
    _hl("hl.globref", OperationKind::HL_GLOBREF, vast::hl::GlobalRefOp) \
+   _hl("hl.binary_cond", OperationKind::HL_BINARY_COND, vast::hl::BinaryCondOp) \
    _hl("hl.break", OperationKind::HL_BREAK, vast::hl::BreakOp) \
    _hl("hl.case", OperationKind::HL_CASE, vast::hl::CaseOp) \
    _hl("hl.cond", OperationKind::HL_COND, vast::hl::CondOp) \
@@ -404,6 +405,7 @@
    _hl("hl.mul", OperationKind::HL_MUL, vast::hl::MulIOp) \
    _hl("hl.not", OperationKind::HL_NOT, vast::hl::NotOp) \
    _hl("hl.offsetof.expr", OperationKind::HL_OFFSETOF_EXPR, vast::hl::OffsetOfExprOp) \
+   _hl("hl.opaque_expr", OperationKind::HL_OPAQUE_EXPR, vast::hl::OpaqueValueExpr) \
    _hl("hl.plus", OperationKind::HL_PLUS, vast::hl::PlusOp) \
    _hl("hl.post.dec", OperationKind::HL_POST_DEC, vast::hl::PostDecOp) \
    _hl("hl.post.inc", OperationKind::HL_POST_INC, vast::hl::PostIncOp) \
@@ -448,5 +450,5 @@
    _unsup("unsup.decl", OperationKind::UNSUP_DECL, vast::unsup::UnsupportedDecl) \
    _unsup("unsup.stmt", OperationKind::UNSUP_STMT, vast::unsup::UnsupportedStmt)
 
-#define MX_IR_NUM_MLIR_OPS 440
+#define MX_IR_NUM_MLIR_OPS 442
 

@@ -73,7 +73,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1426]) || tp >= &(gTypes[1433])) {
+  if (tp < &(gTypes[1432]) || tp >= &(gTypes[1439])) {
     return std::nullopt;
   }
 
@@ -90,27 +90,27 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::ir::core::BinLAndOp::static_kind():
-      tp = &(gTypes[1427]);
+      tp = &(gTypes[1433]);
       break;
 
     case mx::ir::core::BinLOrOp::static_kind():
-      tp = &(gTypes[1428]);
+      tp = &(gTypes[1434]);
       break;
 
     case mx::ir::core::ImplicitReturnOp::static_kind():
-      tp = &(gTypes[1429]);
+      tp = &(gTypes[1435]);
       break;
 
     case mx::ir::core::LazyOp::static_kind():
-      tp = &(gTypes[1430]);
+      tp = &(gTypes[1436]);
       break;
 
     case mx::ir::core::ScopeOp::static_kind():
-      tp = &(gTypes[1431]);
+      tp = &(gTypes[1437]);
       break;
 
     case mx::ir::core::SelectOp::static_kind():
-      tp = &(gTypes[1432]);
+      tp = &(gTypes[1438]);
       break;
 
   }
@@ -178,7 +178,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1426]);
+  PyTypeObject * const tp = &(gTypes[1432]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -193,12 +193,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[986].tp_hash;
-  tp->tp_richcompare = gTypes[986].tp_richcompare;
+  tp->tp_hash = gTypes[990].tp_hash;
+  tp->tp_richcompare = gTypes[990].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[986]);
+  tp->tp_base = &(gTypes[990]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

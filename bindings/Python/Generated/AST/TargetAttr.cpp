@@ -145,6 +145,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "features_string_length",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->features_string_length());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::TargetAttr::features_string_length"),
+    nullptr,
+  },
+  {
     "is_default_version",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

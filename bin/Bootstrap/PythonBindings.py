@@ -400,6 +400,14 @@ METHOD_SPEC_CALL = """
 """
 
 
+STATIC_GENERATOR_SPEC_CALL = """
+            using Gen = ::mx::StaticGenerator<{cxx_generator_params}>;
+            Gen::FuncType *func = &T::{method_name};
+            Gen generator(func{args_comma}{args});
+            return ::mx::generator_to_python(std::move(generator), &Gen::generate);
+"""
+
+
 METHOD_SPEC_CHECK_ARGCOUNT_END = "          }\n"
 
 
@@ -1102,6 +1110,7 @@ class Renamer:
 
 ARGUMENT_RENAMES = {
   "from": "from_",
+  "global": "global_",
 }
 
 class BasicRenamer(Renamer):
@@ -1109,6 +1118,7 @@ class BasicRenamer(Renamer):
     "from": "FROM",
     "in": "IN",
     "as": "AS",
+    "global": "global_",
   }
 
   def rename_method(self, class_schema: ClassSchema,
@@ -1151,10 +1161,25 @@ def _wrap_method_impl(class_schema: ClassSchema, schema: MethodSchema,
     else:
       cxx_args.append(METHOD_SPEC_CALL_ARG.format(i))
 
-  out.append(METHOD_SPEC_CALL.format(
+  # NOTE(pag): We don't really need the special generator form to turn static
+  #            methods returning generators into instance methods returning
+  #            generators. This turned out to be a side-quest during bug-hunting
+  #            related to a generator lifetime issue, but it was really a simple
+  #            error of a `std::move` in a loop.
+  call_form = METHOD_SPEC_CALL
+  param_types = []
+  if False and is_static and isinstance(schema.return_type, GapGeneratorSchema):
+    call_form = STATIC_GENERATOR_SPEC_CALL
+    param_types = [schema.return_type.element_type.cxx_value_name]
+    for i, arg in enumerate(schema.parameters):
+      param_types.append(arg.element_type.cxx_name)
+
+  out.append(call_form.format(
       this=is_static and "T::" or "obj->",
       method_name=schema.name,
-      args=", ".join(cxx_args)))
+      args_comma=len(cxx_args) and ", " or "",
+      args=", ".join(cxx_args),
+      cxx_generator_params=", ".join(param_types)))
 
   out.append(METHOD_SPEC_CHECK_ARGCOUNT_END)
 

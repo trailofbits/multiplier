@@ -125,6 +125,10 @@ std::optional<MSP430InterruptAttr> MSP430InterruptAttr::from(const TokenContext 
   return std::nullopt;
 }
 
+uint32_t MSP430InterruptAttr::number(void) const {
+  return impl->reader.getVal12();
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

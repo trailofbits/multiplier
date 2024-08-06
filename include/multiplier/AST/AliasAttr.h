@@ -51,6 +51,7 @@ class MX_EXPORT AliasAttr : public Attr {
   static std::optional<AliasAttr> from(const TokenContext &t);
 
   std::string_view aliasee(void) const;
+  uint32_t aliasee_length(void) const;
 };
 
 static_assert(sizeof(AliasAttr) == sizeof(Attr));

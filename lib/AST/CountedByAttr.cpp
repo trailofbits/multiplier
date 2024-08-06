@@ -127,7 +127,7 @@ std::optional<CountedByAttr> CountedByAttr::from(const TokenContext &t) {
 }
 
 TokenRange CountedByAttr::counted_by_field_token(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal10(), impl->reader.getVal22());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal10(), impl->reader.getVal23());
 }
 
 #pragma GCC diagnostic pop

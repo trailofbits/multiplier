@@ -132,12 +132,12 @@ Expr OMPAllocateDeclAttr::alignment(void) const {
 }
 
 Expr OMPAllocateDeclAttr::allocator(void) const {
-  RawEntityId eid = impl->reader.getVal22();
+  RawEntityId eid = impl->reader.getVal23();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 OMPAllocateDeclAttrAllocatorTypeTy OMPAllocateDeclAttr::allocator_type(void) const {
-  return static_cast<OMPAllocateDeclAttrAllocatorTypeTy>(impl->reader.getVal12());
+  return static_cast<OMPAllocateDeclAttrAllocatorTypeTy>(impl->reader.getVal13());
 }
 
 #pragma GCC diagnostic pop

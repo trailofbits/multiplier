@@ -53,6 +53,7 @@ class MX_EXPORT AcquireHandleAttr : public InheritableAttr {
   static std::optional<AcquireHandleAttr> from(const TokenContext &t);
 
   std::string_view handle_type(void) const;
+  uint32_t handle_type_length(void) const;
 };
 
 static_assert(sizeof(AcquireHandleAttr) == sizeof(InheritableAttr));

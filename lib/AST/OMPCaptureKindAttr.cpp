@@ -124,6 +124,10 @@ std::optional<OMPCaptureKindAttr> OMPCaptureKindAttr::from(const TokenContext &t
   return std::nullopt;
 }
 
+uint32_t OMPCaptureKindAttr::capture_kind_value(void) const {
+  return impl->reader.getVal12();
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

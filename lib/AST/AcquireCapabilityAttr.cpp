@@ -126,11 +126,11 @@ std::optional<AcquireCapabilityAttr> AcquireCapabilityAttr::from(const TokenCont
 }
 
 AcquireCapabilityAttrSpelling AcquireCapabilityAttr::semantic_spelling(void) const {
-  return static_cast<AcquireCapabilityAttrSpelling>(impl->reader.getVal12());
+  return static_cast<AcquireCapabilityAttrSpelling>(impl->reader.getVal13());
 }
 
 bool AcquireCapabilityAttr::is_shared(void) const {
-  return impl->reader.getVal14();
+  return impl->reader.getVal15();
 }
 
 #pragma GCC diagnostic pop

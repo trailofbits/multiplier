@@ -134,6 +134,16 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::WeakRefAttr::aliasee"),
     nullptr,
   },
+  {
+    "aliasee_length",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->aliasee_length());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::WeakRefAttr::aliasee_length"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

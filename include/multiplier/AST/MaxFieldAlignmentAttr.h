@@ -52,6 +52,7 @@ class MX_EXPORT MaxFieldAlignmentAttr : public InheritableAttr {
   static std::optional<MaxFieldAlignmentAttr> from(const VariantEntity &e);
   static std::optional<MaxFieldAlignmentAttr> from(const TokenContext &t);
 
+  uint32_t alignment(void) const;
 };
 
 static_assert(sizeof(MaxFieldAlignmentAttr) == sizeof(InheritableAttr));

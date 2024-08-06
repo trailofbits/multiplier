@@ -130,18 +130,30 @@ std::string_view ExternalSourceSymbolAttr::defined_in(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
+uint32_t ExternalSourceSymbolAttr::defined_in_length(void) const {
+  return impl->reader.getVal12();
+}
+
 bool ExternalSourceSymbolAttr::generated_declaration(void) const {
-  return impl->reader.getVal14();
+  return impl->reader.getVal15();
 }
 
 std::string_view ExternalSourceSymbolAttr::language(void) const {
-  capnp::Text::Reader data = impl->reader.getVal23();
+  capnp::Text::Reader data = impl->reader.getVal24();
   return std::string_view(data.cStr(), data.size());
 }
 
+uint32_t ExternalSourceSymbolAttr::language_length(void) const {
+  return impl->reader.getVal25();
+}
+
 std::string_view ExternalSourceSymbolAttr::usr(void) const {
-  capnp::Text::Reader data = impl->reader.getVal24();
+  capnp::Text::Reader data = impl->reader.getVal26();
   return std::string_view(data.cStr(), data.size());
+}
+
+uint32_t ExternalSourceSymbolAttr::usr_length(void) const {
+  return impl->reader.getVal27();
 }
 
 #pragma GCC diagnostic pop

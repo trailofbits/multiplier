@@ -6,6 +6,8 @@
 
 #include <multiplier/IR/Block.h>
 
+#include <cassert>
+
 #include <mlir/IR/Block.h>
 #include <mlir/IR/Operation.h>
 #include <mlir/IR/OperationSupport.h>
@@ -78,6 +80,13 @@ bool BlocksMatch(
 #endif
 
   return true;
+}
+
+Block::Block(std::shared_ptr<const SourceIRImpl> module,
+             mlir::Block *block)
+    : module_(std::move(module)),
+      block_(block) {
+  assert(block_ != nullptr);
 }
 
 // Return the block containing a given argument.

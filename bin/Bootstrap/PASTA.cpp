@@ -793,7 +793,7 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
 
 static const char *SchemaIntType(pasta::Type type) {
   auto t = type;
-  if (auto bt = pasta::BuiltinType::From(type.UnqualifiedType())) {
+  if (auto bt = pasta::BuiltinType::From(type.UnqualifiedDesugaredType())) {
     switch (bt->BuiltinKind()) {
       case pasta::BuiltinTypeKind::kBoolean: return "Bool";
       case pasta::BuiltinTypeKind::kCharacterS: return "Int8";  // `char`.
@@ -3328,6 +3328,13 @@ MethodListPtr CodeGenerator::RunOnClass(
       }
     } else if (snake_name == "calculate_inheritance_model") {
       snake_name = "inheritance_model";
+    
+    } else if (snake_name == "function_scope_index") {
+      snake_name = "index";
+
+    // For parameter packs / substituted parameters.
+    } else if (snake_name == "function_scope_depth") {
+      snake_name = "depth";
     }
 
     if (snake_name.ends_with("_type_info")) {
@@ -3372,9 +3379,9 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     std::string camel_name = SnakeCaseToCamelCase(snake_name);
 
-    auto return_type = method.ReturnType().UnqualifiedType();
+    auto return_type = method.ReturnType().UnqualifiedDesugaredType();
     if (auto return_type_ref = pasta::ReferenceType::From(return_type)) {
-      return_type = return_type_ref->PointeeType().UnqualifiedType();
+      return_type = return_type_ref->PointeeType().UnqualifiedDesugaredType();
     }
 
     if (auto record = return_type.AsRecordDeclaration()) {
@@ -3795,6 +3802,9 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       serialize_cpp_os
           << "  b." << setter_name << "(e." << method_name << "());\n";
+    
+    } else {
+      std::cerr << "\tMissing " << method_name << '\n';
     }
   }
 

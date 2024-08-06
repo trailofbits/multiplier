@@ -52,6 +52,7 @@ class MX_EXPORT MinVectorWidthAttr : public InheritableAttr {
   static std::optional<MinVectorWidthAttr> from(const VariantEntity &e);
   static std::optional<MinVectorWidthAttr> from(const TokenContext &t);
 
+  uint32_t vector_width(void) const;
 };
 
 static_assert(sizeof(MinVectorWidthAttr) == sizeof(InheritableAttr));

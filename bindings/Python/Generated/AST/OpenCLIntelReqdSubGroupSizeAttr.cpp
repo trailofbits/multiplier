@@ -124,6 +124,16 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
 namespace {
 static PyGetSetDef gProperties[] = {
+  {
+    "sub_group_size",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->sub_group_size());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::OpenCLIntelReqdSubGroupSizeAttr::sub_group_size"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

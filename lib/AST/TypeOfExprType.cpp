@@ -99,16 +99,16 @@ std::optional<TypeOfExprType> TypeOfExprType::from(const TokenContext &t) {
 }
 
 TypeOfKind TypeOfExprType::type_kind(void) const {
-  return static_cast<TypeOfKind>(impl->reader.getVal27());
+  return static_cast<TypeOfKind>(impl->reader.getVal29());
 }
 
 Expr TypeOfExprType::underlying_expression(void) const {
-  RawEntityId eid = impl->reader.getVal19();
+  RawEntityId eid = impl->reader.getVal20();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 bool TypeOfExprType::is_sugared(void) const {
-  return impl->reader.getVal20();
+  return impl->reader.getVal23();
 }
 
 #pragma GCC diagnostic pop

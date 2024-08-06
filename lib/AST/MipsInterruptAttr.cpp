@@ -126,7 +126,7 @@ std::optional<MipsInterruptAttr> MipsInterruptAttr::from(const TokenContext &t) 
 }
 
 MipsInterruptAttrInterruptType MipsInterruptAttr::interrupt(void) const {
-  return static_cast<MipsInterruptAttrInterruptType>(impl->reader.getVal12());
+  return static_cast<MipsInterruptAttrInterruptType>(impl->reader.getVal13());
 }
 
 #pragma GCC diagnostic pop

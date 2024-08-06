@@ -101,7 +101,7 @@ std::optional<ConstantArrayType> ConstantArrayType::from(const TokenContext &t) 
 
 std::optional<Expr> ConstantArrayType::size_expression(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal25();
+    RawEntityId eid = impl->reader.getVal27();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -113,7 +113,7 @@ std::optional<Expr> ConstantArrayType::size_expression(void) const {
 }
 
 bool ConstantArrayType::is_sugared(void) const {
-  return impl->reader.getVal20();
+  return impl->reader.getVal23();
 }
 
 #pragma GCC diagnostic pop

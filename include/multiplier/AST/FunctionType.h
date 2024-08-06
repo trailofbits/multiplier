@@ -49,6 +49,7 @@ class MX_EXPORT FunctionType : public Type {
   bool cmse_ns_call_attribute(void) const;
   bool has_reg_parm(void) const;
   bool no_return_attribute(void) const;
+  uint32_t reg_parm_type(void) const;
   Type return_type(void) const;
   bool is_const(void) const;
   bool is_restrict(void) const;

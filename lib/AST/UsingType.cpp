@@ -99,21 +99,21 @@ std::optional<UsingType> UsingType::from(const TokenContext &t) {
 }
 
 UsingShadowDecl UsingType::found_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal19();
+  RawEntityId eid = impl->reader.getVal20();
   return UsingShadowDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Type UsingType::underlying_type(void) const {
-  RawEntityId eid = impl->reader.getVal25();
+  RawEntityId eid = impl->reader.getVal27();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool UsingType::is_sugared(void) const {
-  return impl->reader.getVal20();
+  return impl->reader.getVal23();
 }
 
 bool UsingType::type_matches_declaration(void) const {
-  return impl->reader.getVal21();
+  return impl->reader.getVal24();
 }
 
 #pragma GCC diagnostic pop

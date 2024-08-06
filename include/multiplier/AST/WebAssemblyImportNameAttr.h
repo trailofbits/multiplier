@@ -53,6 +53,7 @@ class MX_EXPORT WebAssemblyImportNameAttr : public InheritableAttr {
   static std::optional<WebAssemblyImportNameAttr> from(const TokenContext &t);
 
   std::string_view import_name(void) const;
+  uint32_t import_name_length(void) const;
 };
 
 static_assert(sizeof(WebAssemblyImportNameAttr) == sizeof(InheritableAttr));

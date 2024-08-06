@@ -193,20 +193,20 @@ std::optional<SYCLUniqueStableNameExpr> SYCLUniqueStableNameExpr::from(const Tok
 }
 
 std::string_view SYCLUniqueStableNameExpr::compute_name(void) const {
-  capnp::Text::Reader data = impl->reader.getVal60();
+  capnp::Text::Reader data = impl->reader.getVal61();
   return std::string_view(data.cStr(), data.size());
 }
 
 Token SYCLUniqueStableNameExpr::l_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
-}
-
-Token SYCLUniqueStableNameExpr::token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
-Token SYCLUniqueStableNameExpr::r_paren_token(void) const {
+Token SYCLUniqueStableNameExpr::token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+}
+
+Token SYCLUniqueStableNameExpr::r_paren_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 #pragma GCC diagnostic pop

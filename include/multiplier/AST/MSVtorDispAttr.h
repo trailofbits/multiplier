@@ -53,6 +53,7 @@ class MX_EXPORT MSVtorDispAttr : public InheritableAttr {
   static std::optional<MSVtorDispAttr> from(const VariantEntity &e);
   static std::optional<MSVtorDispAttr> from(const TokenContext &t);
 
+  uint32_t vdm(void) const;
   MSVtorDispMode vtor_disp_mode(void) const;
 };
 

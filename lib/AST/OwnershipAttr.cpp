@@ -126,23 +126,23 @@ std::optional<OwnershipAttr> OwnershipAttr::from(const TokenContext &t) {
 }
 
 OwnershipAttrOwnershipKind OwnershipAttr::own_kind(void) const {
-  return static_cast<OwnershipAttrOwnershipKind>(impl->reader.getVal12());
+  return static_cast<OwnershipAttrOwnershipKind>(impl->reader.getVal13());
 }
 
 OwnershipAttrSpelling OwnershipAttr::semantic_spelling(void) const {
-  return static_cast<OwnershipAttrSpelling>(impl->reader.getVal20());
+  return static_cast<OwnershipAttrSpelling>(impl->reader.getVal21());
 }
 
 bool OwnershipAttr::is_holds(void) const {
-  return impl->reader.getVal14();
-}
-
-bool OwnershipAttr::is_returns(void) const {
   return impl->reader.getVal15();
 }
 
-bool OwnershipAttr::is_takes(void) const {
+bool OwnershipAttr::is_returns(void) const {
   return impl->reader.getVal16();
+}
+
+bool OwnershipAttr::is_takes(void) const {
+  return impl->reader.getVal17();
 }
 
 #pragma GCC diagnostic pop

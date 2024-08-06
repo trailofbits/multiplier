@@ -53,6 +53,7 @@ class MX_EXPORT PragmaClangRodataSectionAttr : public InheritableAttr {
   static std::optional<PragmaClangRodataSectionAttr> from(const TokenContext &t);
 
   std::string_view name(void) const;
+  uint32_t name_length(void) const;
 };
 
 static_assert(sizeof(PragmaClangRodataSectionAttr) == sizeof(InheritableAttr));

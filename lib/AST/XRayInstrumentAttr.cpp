@@ -126,15 +126,15 @@ std::optional<XRayInstrumentAttr> XRayInstrumentAttr::from(const TokenContext &t
 }
 
 bool XRayInstrumentAttr::always_x_ray_instrument(void) const {
-  return impl->reader.getVal14();
+  return impl->reader.getVal15();
 }
 
 XRayInstrumentAttrSpelling XRayInstrumentAttr::semantic_spelling(void) const {
-  return static_cast<XRayInstrumentAttrSpelling>(impl->reader.getVal12());
+  return static_cast<XRayInstrumentAttrSpelling>(impl->reader.getVal13());
 }
 
 bool XRayInstrumentAttr::never_x_ray_instrument(void) const {
-  return impl->reader.getVal15();
+  return impl->reader.getVal16();
 }
 
 #pragma GCC diagnostic pop

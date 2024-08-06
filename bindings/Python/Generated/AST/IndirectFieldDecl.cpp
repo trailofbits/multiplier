@@ -175,6 +175,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "chaining_size",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->chaining_size());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IndirectFieldDecl::chaining_size"),
+    nullptr,
+  },
+  {
     "variable_declaration",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

@@ -58,6 +58,7 @@ class MX_EXPORT OMPDeclareTargetDeclAttr : public InheritableAttr {
   OMPDeclareTargetDeclAttrDevTypeTy dev_type(void) const;
   bool indirect(void) const;
   Expr indirect_expression(void) const;
+  uint32_t level(void) const;
   OMPDeclareTargetDeclAttrMapTypeTy map_type(void) const;
 };
 

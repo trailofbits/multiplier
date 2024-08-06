@@ -127,11 +127,11 @@ std::optional<AlwaysInlineAttr> AlwaysInlineAttr::from(const TokenContext &t) {
 }
 
 AlwaysInlineAttrSpelling AlwaysInlineAttr::semantic_spelling(void) const {
-  return static_cast<AlwaysInlineAttrSpelling>(impl->reader.getVal12());
+  return static_cast<AlwaysInlineAttrSpelling>(impl->reader.getVal13());
 }
 
 bool AlwaysInlineAttr::is_clang_always_inline(void) const {
-  return impl->reader.getVal14();
+  return impl->reader.getVal15();
 }
 
 #pragma GCC diagnostic pop

@@ -225,6 +225,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "builtin_id",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->builtin_id());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionDecl::builtin_id"),
+    nullptr,
+  },
+  {
     "call_result_type",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -312,6 +322,36 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::FunctionDecl::language_linkage"),
+    nullptr,
+  },
+  {
+    "memory_function_kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->memory_function_kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionDecl::memory_function_kind"),
+    nullptr,
+  },
+  {
+    "min_required_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->min_required_arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionDecl::min_required_arguments"),
+    nullptr,
+  },
+  {
+    "min_required_explicit_arguments",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->min_required_explicit_arguments());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::FunctionDecl::min_required_explicit_arguments"),
     nullptr,
   },
   {

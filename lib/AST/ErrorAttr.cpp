@@ -126,7 +126,7 @@ std::optional<ErrorAttr> ErrorAttr::from(const TokenContext &t) {
 }
 
 ErrorAttrSpelling ErrorAttr::semantic_spelling(void) const {
-  return static_cast<ErrorAttrSpelling>(impl->reader.getVal12());
+  return static_cast<ErrorAttrSpelling>(impl->reader.getVal13());
 }
 
 std::string_view ErrorAttr::user_diagnostic(void) const {
@@ -134,12 +134,16 @@ std::string_view ErrorAttr::user_diagnostic(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
+uint32_t ErrorAttr::user_diagnostic_length(void) const {
+  return impl->reader.getVal12();
+}
+
 bool ErrorAttr::is_error(void) const {
-  return impl->reader.getVal14();
+  return impl->reader.getVal15();
 }
 
 bool ErrorAttr::is_warning(void) const {
-  return impl->reader.getVal15();
+  return impl->reader.getVal16();
 }
 
 #pragma GCC diagnostic pop

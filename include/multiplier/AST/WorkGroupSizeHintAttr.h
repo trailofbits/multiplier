@@ -52,6 +52,9 @@ class MX_EXPORT WorkGroupSizeHintAttr : public InheritableAttr {
   static std::optional<WorkGroupSizeHintAttr> from(const VariantEntity &e);
   static std::optional<WorkGroupSizeHintAttr> from(const TokenContext &t);
 
+  uint32_t x_dim(void) const;
+  uint32_t y_dim(void) const;
+  uint32_t z_dim(void) const;
 };
 
 static_assert(sizeof(WorkGroupSizeHintAttr) == sizeof(InheritableAttr));

@@ -125,6 +125,10 @@ std::optional<AMDGPUNumVGPRAttr> AMDGPUNumVGPRAttr::from(const TokenContext &t) 
   return std::nullopt;
 }
 
+uint32_t AMDGPUNumVGPRAttr::num_vgpr(void) const {
+  return impl->reader.getVal12();
+}
+
 #pragma GCC diagnostic pop
 #endif
 }  // namespace mx

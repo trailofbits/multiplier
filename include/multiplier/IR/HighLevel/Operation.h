@@ -63,6 +63,7 @@ class FCmpOp;
 class FieldDeclOp;
 class FuncRefOp;
 class GlobalRefOp;
+class BinaryCondOp;
 class BreakOp;
 class CaseOp;
 class CondOp;
@@ -97,6 +98,7 @@ class MulIAssignOp;
 class MulIOp;
 class NotOp;
 class OffsetOfExprOp;
+class OpaqueValueExpr;
 class PlusOp;
 class PostDecOp;
 class PostIncOp;
@@ -1083,6 +1085,26 @@ class MX_EXPORT GlobalRefOp final : public RefOp {
 };
 static_assert(sizeof(GlobalRefOp) == sizeof(Operation));
 
+class MX_EXPORT BinaryCondOp final : public Operation {
+ public:
+  inline static constexpr OperationKind static_kind(void) {
+    return OperationKind::HL_BINARY_COND;
+  }
+
+  static std::optional<BinaryCondOp> from(const ::mx::ir::Operation &that);
+  static std::optional<BinaryCondOp> producing(const ::mx::ir::Value &val);
+
+  ::vast::hl::BinaryCondOp underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  ::mx::ir::Value result(void) const;
+  ::mx::ir::Region common_region(void) const;
+  ::mx::ir::Region cond_region(void) const;
+  ::mx::ir::Region then_region(void) const;
+  ::mx::ir::Region else_region(void) const;
+};
+static_assert(sizeof(BinaryCondOp) == sizeof(Operation));
+
 class MX_EXPORT BreakOp final : public Operation {
  public:
   inline static constexpr OperationKind static_kind(void) {
@@ -1246,7 +1268,7 @@ class MX_EXPORT FuncOp final : public Operation {
   ::mx::ir::Region body(void) const;
   std::string_view sym_name(void) const;
   //::vast::core::FunctionType function_type(void) const;
-  //::vast::core::GlobalLinkageKind linkage(void) const;
+  //::std::optional<GlobalLinkageKind> linkage(void) const;
   std::optional<std::string_view> sym_visibility(void) const;
   //::std::optional<ArrayAttr> arg_attrs(void) const;
   //::std::optional<ArrayAttr> res_attrs(void) const;
@@ -1685,9 +1707,27 @@ class MX_EXPORT OffsetOfExprOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value result(void) const;
   //::mlir::MutableArrayRef<Region> array_index_exprs(void) const;
+  ::mx::ir::Type source(void) const;
   //::mlir::ArrayAttr components(void) const;
 };
 static_assert(sizeof(OffsetOfExprOp) == sizeof(Operation));
+
+class MX_EXPORT OpaqueValueExprOp final : public Operation {
+ public:
+  inline static constexpr OperationKind static_kind(void) {
+    return OperationKind::HL_OPAQUE_EXPR;
+  }
+
+  static std::optional<OpaqueValueExprOp> from(const ::mx::ir::Operation &that);
+  static std::optional<OpaqueValueExprOp> producing(const ::mx::ir::Value &val);
+
+  ::vast::hl::OpaqueValueExpr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //::mlir::Operation::operand_range arg(void) const;
+  ::mx::ir::Value result(void) const;
+};
+static_assert(sizeof(OpaqueValueExprOp) == sizeof(Operation));
 
 class MX_EXPORT PlusOp final : public Operation {
  public:

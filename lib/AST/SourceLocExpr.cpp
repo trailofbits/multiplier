@@ -193,20 +193,20 @@ std::optional<SourceLocExpr> SourceLocExpr::from(const TokenContext &t) {
 }
 
 std::string_view SourceLocExpr::builtin_string(void) const {
-  capnp::Text::Reader data = impl->reader.getVal60();
+  capnp::Text::Reader data = impl->reader.getVal61();
   return std::string_view(data.cStr(), data.size());
 }
 
 SourceLocIdentKind SourceLocExpr::identifier_kind(void) const {
-  return static_cast<SourceLocIdentKind>(impl->reader.getVal88());
+  return static_cast<SourceLocIdentKind>(impl->reader.getVal89());
 }
 
 Token SourceLocExpr::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 bool SourceLocExpr::is_int_type(void) const {
-  return impl->reader.getVal83();
+  return impl->reader.getVal84();
 }
 
 #pragma GCC diagnostic pop

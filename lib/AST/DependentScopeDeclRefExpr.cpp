@@ -193,23 +193,23 @@ std::optional<DependentScopeDeclRefExpr> DependentScopeDeclRefExpr::from(const T
 }
 
 Token DependentScopeDeclRefExpr::l_angle_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
-}
-
-Token DependentScopeDeclRefExpr::r_angle_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
-Token DependentScopeDeclRefExpr::template_keyword_token(void) const {
+Token DependentScopeDeclRefExpr::r_angle_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
+Token DependentScopeDeclRefExpr::template_keyword_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+}
+
 bool DependentScopeDeclRefExpr::has_explicit_template_arguments(void) const {
-  return impl->reader.getVal83();
+  return impl->reader.getVal84();
 }
 
 bool DependentScopeDeclRefExpr::has_template_keyword(void) const {
-  return impl->reader.getVal84();
+  return impl->reader.getVal85();
 }
 
 #pragma GCC diagnostic pop
