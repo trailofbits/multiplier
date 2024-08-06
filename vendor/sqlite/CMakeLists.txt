@@ -15,8 +15,8 @@ endif()
 
 FetchContent_Declare(
   sqlite
-  URL      https://sqlite.org/2023/sqlite-amalgamation-3430000.zip
-  URL_HASH SHA3_256=1286856f5dff3b145f02dfe5aa626657c172a415889e5a265dc4dee83a799c03
+  URL      https://www.sqlite.org/2024/sqlite-amalgamation-3460000.zip
+  URL_HASH SHA3_256=1221eed70de626871912bfca144c00411f0c30d3c2b7935cff3963b63370ef7c
 )
 
 FetchContent_MakeAvailable(sqlite)

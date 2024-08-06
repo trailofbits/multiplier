@@ -390,6 +390,12 @@ gap::generator<mx::ReferenceRecord> EnumerateStmtToDeclReferences(
 
   if (pasta::FunctionDecl::From(to_decl).has_value()) {
     record.kind = mx::BuiltinReferenceKind::TAKES_ADDRESS;
+
+  // A statement flowing into a parameter is treated as a write.
+  } else if (pasta::ParmVarDecl::From(to_decl).has_value()) {
+    record.kind = mx::BuiltinReferenceKind::WRITES_VALUE;
+    co_yield record;
+    co_return;
   }
 
   std::optional<pasta::Stmt> maybe_parent;
@@ -548,6 +554,15 @@ gap::generator<pasta::Decl> DeclReferencesFrom(pasta::Stmt stmt) {
 
     if (auto conversion_func = cast->ConversionFunction()) {
       co_yield conversion_func.value();
+
+      // // Mark the parameter itself as being references, as the value `b` flows
+      // // into the conversion function.
+      // if (auto cf = pasta::FunctionDecl::From(conversion_func.value())) {
+      //   auto params = cf->ParameterDeclarations();
+      //   if (params.size() == 1u) {
+      //     co_yield std::move(params[0]);
+      //   }
+      // }
     }
 
     // TODO(pag): If we want to allow implicit casts, then update

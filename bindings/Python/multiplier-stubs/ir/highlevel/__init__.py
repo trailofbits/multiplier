@@ -449,7 +449,7 @@ class FuncRefOp(multiplier.ir.highlevel.RefOp):
 
 class GlobalRefOp(multiplier.ir.highlevel.RefOp):
   result: multiplier.ir.Value
-  global: str
+  global_: str
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:

@@ -312,9 +312,15 @@ bool PendingFragment::TryAdd(const pasta::Decl &entity) {
 }
 
 bool PendingFragment::TryAdd(const pasta::Stmt &entity) {
+
+  // If we're generating MLIR, then we need the entity IDs of statements to
+  // stay around until code generation time, as we only generate MLIR after
+  // persisting all fragments.
+  auto &entity_ids = em.generate_source_ir ? em.entity_ids : em.token_tree_ids;
+
   return DoTryAdd(
       entity,
-      em.generate_source_ir ? em.entity_ids : em.token_tree_ids,
+      entity_ids,
       [&, this] (mx::EntityOffset offset) {
         mx::StmtId id;
         id.fragment_id = fragment_index;

@@ -20,6 +20,7 @@
 #include <multiplier/IR/Attribute.h>
 #include <multiplier/IR/HighLevel/Operation.h>
 #include <multiplier/IR/Operation.h>
+#include <multiplier/IR/OperationKind.h>
 #include <multiplier/IR/Type.h>
 
 #include <llvm/ADT/DenseMap.h>
@@ -538,8 +539,7 @@ static gap::generator<Operation> AllFrom(
   }
 
   for (auto [op_kind, op_ptr] : it->second) {
-    ::mx::ir::Operation op(std::move(source_ir), op_ptr, op_kind);
-    co_yield reinterpret_cast<Operation &&>(op);
+    co_yield ::mx::ir::Operation(source_ir, op_ptr, op_kind);
   }
 }
 

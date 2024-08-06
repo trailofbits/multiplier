@@ -961,7 +961,7 @@ static PyMethodDef gMethods[] = {
             if (!arg_0.has_value()) {
               break;
             }
-            auto arg_1 = ::mx::from_python<std::span<mx::DeclKind>>(args[1]);
+            auto arg_1 = ::mx::from_python<std::span<const mx::DeclKind>>(args[1]);
             if (!arg_1.has_value()) {
               break;
             }
@@ -973,7 +973,7 @@ static PyMethodDef gMethods[] = {
             if (!arg_0.has_value()) {
               break;
             }
-            auto arg_1 = ::mx::from_python<std::span<mx::DeclKind>>(args[1]);
+            auto arg_1 = ::mx::from_python<std::span<const mx::DeclKind>>(args[1]);
             if (!arg_1.has_value()) {
               break;
             }
@@ -985,7 +985,7 @@ static PyMethodDef gMethods[] = {
             if (!arg_0.has_value()) {
               break;
             }
-            auto arg_1 = ::mx::from_python<std::span<mx::DeclKind>>(args[1]);
+            auto arg_1 = ::mx::from_python<std::span<const mx::DeclKind>>(args[1]);
             if (!arg_1.has_value()) {
               break;
             }
@@ -1005,7 +1005,7 @@ static PyMethodDef gMethods[] = {
             if (!arg_0.has_value()) {
               break;
             }
-            auto arg_1 = ::mx::from_python<std::span<mx::DeclKind>>(args[1]);
+            auto arg_1 = ::mx::from_python<std::span<const mx::DeclKind>>(args[1]);
             if (!arg_1.has_value()) {
               break;
             }

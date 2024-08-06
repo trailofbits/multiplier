@@ -165,6 +165,9 @@ class MX_EXPORT Operation {
 
   bool operator==(const Operation &that) const noexcept;
   bool operator!=(const Operation &that) const noexcept = default;
+
+  // Dump this operation.
+  void dump(void) const;
 };
 
 // A value produced as a result of an operation.

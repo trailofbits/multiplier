@@ -135,7 +135,7 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "global",
+    "global_",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
           return ::mx::to_python(T_cast(self)->global());

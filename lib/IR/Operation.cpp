@@ -225,6 +225,11 @@ Operation Operation::defining(const Symbol &symbol) {
   return symbol.operation();
 }
 
+// Dump this operation.
+void Operation::dump(void) const {
+  return op_->dump();
+}
+
 // If an operation defines a symbol then return it.
 std::optional<Symbol> Symbol::from(const Operation &op) {
   return op.defined_symbol();
