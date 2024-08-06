@@ -865,7 +865,7 @@ void Rebuilder::BuildBottomUp(std::deque<Substitution> &orig_subs_alloc) {
       continue;
     }
 
-    // The parsed token appears mutliple times in the printed range.
+    // The parsed token appears multiple times in the printed range.
     // Conservatively ignore it for now.
     //
     // TODO(pag): Eventually do something smarter.
