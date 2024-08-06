@@ -230,7 +230,7 @@ class MX_EXPORT FuncOp final : public Operation {
   ::mx::ir::Region body(void) const;
   std::string_view sym_name(void) const;
   //::vast::core::FunctionType function_type(void) const;
-  //::vast::core::GlobalLinkageKind linkage(void) const;
+  //::std::optional<GlobalLinkageKind> linkage(void) const;
   std::optional<std::string_view> sym_visibility(void) const;
   //::std::optional<ArrayAttr> arg_attrs(void) const;
   //::std::optional<ArrayAttr> res_attrs(void) const;

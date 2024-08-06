@@ -1,5 +1,16 @@
 # Indexing code
 
+* [Basic usage](#basic-usage)
+* [Compatible Builds](#compatible-builds)
+* [Best Effort Builds](#best-effort-builds)
+* [Getting `compile_commands.json`](#getting--compile-commandsjson-)
+  + [Clang](#clang)
+  + [CMake](#cmake)
+  + [Bear](#bear)
+  + [`scan-build`](#-scan-build-)
+* [Importing builds from target binaries](#importing-builds-from-target-binaries)
+
+
 ## Basic usage
 
 Once installed, a build of a codebase can be indexed by the `mx-index` binary.

@@ -101,6 +101,10 @@ const char *EnumeratorName(ir::AttributeKind kind) {
     case ir::AttributeKind::HL_TRANSPARENT_UNION: return "HL_TRANSPARENT_UNION";
     case ir::AttributeKind::HL_RETURNS_TWICE: return "HL_RETURNS_TWICE";
     case ir::AttributeKind::HL_MAY_ALIAS: return "HL_MAY_ALIAS";
+    case ir::AttributeKind::HL_UNUSED: return "HL_UNUSED";
+    case ir::AttributeKind::HL_USED: return "HL_USED";
+    case ir::AttributeKind::HL_GNU_INLINE: return "HL_GNU_INLINE";
+    case ir::AttributeKind::HL_NO_CF_CHECK: return "HL_NO_CF_CHECK";
     case ir::AttributeKind::HL_AVAILABLE_ONLY_IN_DEFAULT_EVAL_METHOD: return "HL_AVAILABLE_ONLY_IN_DEFAULT_EVAL_METHOD";
     case ir::AttributeKind::HL_AVAILABILITY_ATTR: return "HL_AVAILABILITY_ATTR";
     case ir::AttributeKind::HL_ASM_LABEL: return "HL_ASM_LABEL";
@@ -253,6 +257,10 @@ bool IsHighLevelAttributeKind(ir::AttributeKind kind) {
     case mx::ir::AttributeKind::HL_TRANSPARENT_UNION:
     case mx::ir::AttributeKind::HL_RETURNS_TWICE:
     case mx::ir::AttributeKind::HL_MAY_ALIAS:
+    case mx::ir::AttributeKind::HL_UNUSED:
+    case mx::ir::AttributeKind::HL_USED:
+    case mx::ir::AttributeKind::HL_GNU_INLINE:
+    case mx::ir::AttributeKind::HL_NO_CF_CHECK:
     case mx::ir::AttributeKind::HL_AVAILABLE_ONLY_IN_DEFAULT_EVAL_METHOD:
     case mx::ir::AttributeKind::HL_AVAILABILITY_ATTR:
     case mx::ir::AttributeKind::HL_ASM_LABEL:

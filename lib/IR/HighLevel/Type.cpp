@@ -410,6 +410,17 @@ std::optional<TypeOfTypeType> TypeOfTypeType::from(const ::mx::ir::Type &that) {
   return ::vast::hl::TypeOfTypeType(this->::mx::ir::Type::type_);
 }
 
+std::optional<AutoType> AutoType::from(const ::mx::ir::Type &that) {
+  if (that.kind() == TypeKind::HL_AUTO) {
+    return reinterpret_cast<const AutoType &>(that);
+  }
+  return std::nullopt;
+}
+
+::vast::hl::AutoType AutoType::underlying_repr(void) const noexcept {
+  return ::vast::hl::AutoType(this->::mx::ir::Type::type_);
+}
+
 std::optional<AtomicType> AtomicType::from(const ::mx::ir::Type &that) {
   if (that.kind() == TypeKind::HL_ATOMIC) {
     return reinterpret_cast<const AtomicType &>(that);

@@ -351,7 +351,7 @@ static std::optional<vast::owning_module_ref> CreateModule(
       as_node_with_list_ref<vast::cg::attr_visitor_proxy>() |
       as_node<vast::cg::type_caching_proxy>() |
       as_node_with_list_ref<vast::cg::default_visitor>(
-          mctx, *bld, mg, sg,
+          mctx, actx, *bld, mg, sg,
           /* strict return = */ false,
           vast::cg::missing_return_policy::emit_trap) |
       as_node<MXErrorReportVisitorProxy>(ast) |
@@ -417,15 +417,20 @@ std::string CodeGenerator::GenerateSourceIR(const pasta::AST &ast,
     return "";
   }
 
-  if (auto mod = CreateModule(ast, em)) {
+  auto mod = CreateModule(ast, em);
+  if (!mod) {
+    return "";
+  }
 
-    // Set the flag to enable printing of debug information. The prettyForm
-    // flag passed to the function is set to false to avoid printing them in
-    // `pretty` form. This is because the IR generated in pretty form is not
-    // parsable.
-    auto flags = mlir::OpPrintingFlags();
-    flags.enableDebugInfo(true, false);
+  // Set the flag to enable printing of debug information. The prettyForm
+  // flag passed to the function is set to false to avoid printing them in
+  // `pretty` form. This is because the IR generated in pretty form is not
+  // parsable.
+  auto flags = mlir::OpPrintingFlags();
+  flags.enableDebugInfo(true, false);
 
+  // Nifty for debugging, to see what the MLIR looked like.
+  if (false) {
     std::error_code ec;
     std::string out_file =
         (std::filesystem::path("/tmp/src/") / ast.MainFile().Path().filename()).generic_string();
@@ -435,17 +440,16 @@ std::string CodeGenerator::GenerateSourceIR(const pasta::AST &ast,
     } else {
       LOG(ERROR) << ec.message();
     }
-
     os.close();
-
-    if (auto result = DumpToString(mod.value())) {
-      return result.value();
-    }
-
-    LOG(ERROR)
-        << "Could not serialize module to bytecode on main job file "
-        << ast.MainFile().Path().generic_string();
   }
+
+  if (auto result = DumpToString(mod.value())) {
+    return result.value();
+  }
+
+  LOG(ERROR)
+      << "Could not serialize module to bytecode on main job file "
+      << ast.MainFile().Path().generic_string();
 
   return "";
 }

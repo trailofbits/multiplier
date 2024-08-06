@@ -17,43 +17,53 @@ concurrency:
 env:
   LLVM_PASTA_VER: b9e223f
   LLVM_VER: 18
-  PYTHON_VER: 3.11
+  PYTHON_VER: 3.12
+  UBUNTU_CODENAME: jammy
 
 jobs:
   build:
-    runs-on: ubuntu-latest-32x64
-    container:
-      image: ghcr.io/lifting-bits/cxx-common/vcpkg-builder-ubuntu-v2:22.04
-      options: --user 1001
+    runs-on: ubuntu-latest
 
     permissions:
       contents: write
       packages: write
 
     steps:
+      - name: Install CMake, Clang, and Ninja
+        run: |
+          sudo apt remove --purge --auto-remove cmake clang
+          sudo apt update
+          sudo apt install -y software-properties-common lsb-release pixz
+          sudo apt clean all
+          curl -sSL https://apt.llvm.org/llvm-snapshot.gpg.key | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/llvm.gpg >/dev/null
+          sudo apt-add-repository "deb https://apt.llvm.org/$(lsb_release -cs)/ llvm-toolchain-$(lsb_release -cs)-${LLVM_VER} main"
+          curl -sSL https://apt.kitware.com/keys/kitware-archive-latest.asc | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
+          sudo apt-add-repository "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main"
+          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6AF7F09730B3F0A4
+          sudo apt update
+          sudo apt install kitware-archive-keyring
+          sudo rm /etc/apt/trusted.gpg.d/kitware.gpg
+          sudo apt install clang-18 lld-18 cmake ninja-build
+
+      - name: Use CMake
+        run: cmake --version
+
+      - name: Use Clang
+        run: clang-${LLVM_VER} --version
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VER }}-dev
+
+      - name: Use Python
+        run: python --version
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           submodules: "recursive"
       - run: git config --global --add safe.directory '*'
-
-      - name: Install prereqs
-        run: |
-          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
-          chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
-          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-          curl -sSL https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
-          echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-${LLVM_VER} main" | tee -a /etc/apt/sources.list > /dev/null
-          echo "deb-src http://apt.llvm.org/jammy/ llvm-toolchain-jammy-${LLVM_VER} main" | tee -a /etc/apt/sources.list > /dev/null
-          apt-get update; apt-get install gh clang-${LLVM_VER} lld-${LLVM_VER} python${PYTHON_VER} python${PYTHON_VER}-dev -y
-
-      - name: Setup cmake
-        uses: trail-of-forks/actions-setup-cmake@master
-        with:
-          cmake-version: '3.24.x'
-
-      - name: Use cmake
-        run: cmake --version
 
       - name: Set up variables
         run: |
@@ -79,9 +89,7 @@ jobs:
           cmake \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX=${RELEASE_DIR} \
-            -DCMAKE_EXE_LINKER_FLAGS="--ld-path=$(which ld.lld-${LLVM_VER})" \
-            -DCMAKE_MODULE_LINKER_FLAGS="--ld-path=$(which ld.lld-${LLVM_VER})" \
-            -DCMAKE_SHARED_LINKER_FLAGS="--ld-path=$(which ld.lld-${LLVM_VER})" \
+            -DCMAKE_LINKER_TYPE=LLD \
             -DCMAKE_C_COMPILER="$(which clang-${LLVM_VER})" \
             -DCMAKE_CXX_COMPILER="$(which clang++-${LLVM_VER})" \
             -DClang_DIR=${LLVM_PREFIX_DIR}/lib/cmake/clang \

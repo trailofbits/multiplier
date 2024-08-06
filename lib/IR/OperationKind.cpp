@@ -376,6 +376,7 @@ const char *EnumeratorName(ir::OperationKind kind) {
     case ir::OperationKind::HL_FIELD: return "HL_FIELD";
     case ir::OperationKind::HL_FUNCREF: return "HL_FUNCREF";
     case ir::OperationKind::HL_GLOBREF: return "HL_GLOBREF";
+    case ir::OperationKind::HL_BINARY_COND: return "HL_BINARY_COND";
     case ir::OperationKind::HL_BREAK: return "HL_BREAK";
     case ir::OperationKind::HL_CASE: return "HL_CASE";
     case ir::OperationKind::HL_COND: return "HL_COND";
@@ -410,6 +411,7 @@ const char *EnumeratorName(ir::OperationKind kind) {
     case ir::OperationKind::HL_MUL: return "HL_MUL";
     case ir::OperationKind::HL_NOT: return "HL_NOT";
     case ir::OperationKind::HL_OFFSETOF_EXPR: return "HL_OFFSETOF_EXPR";
+    case ir::OperationKind::HL_OPAQUE_EXPR: return "HL_OPAQUE_EXPR";
     case ir::OperationKind::HL_PLUS: return "HL_PLUS";
     case ir::OperationKind::HL_POST_DEC: return "HL_POST_DEC";
     case ir::OperationKind::HL_POST_INC: return "HL_POST_INC";
@@ -863,6 +865,7 @@ bool IsHighLevelOperationKind(ir::OperationKind kind) {
     case mx::ir::OperationKind::HL_FIELD:
     case mx::ir::OperationKind::HL_FUNCREF:
     case mx::ir::OperationKind::HL_GLOBREF:
+    case mx::ir::OperationKind::HL_BINARY_COND:
     case mx::ir::OperationKind::HL_BREAK:
     case mx::ir::OperationKind::HL_CASE:
     case mx::ir::OperationKind::HL_COND:
@@ -897,6 +900,7 @@ bool IsHighLevelOperationKind(ir::OperationKind kind) {
     case mx::ir::OperationKind::HL_MUL:
     case mx::ir::OperationKind::HL_NOT:
     case mx::ir::OperationKind::HL_OFFSETOF_EXPR:
+    case mx::ir::OperationKind::HL_OPAQUE_EXPR:
     case mx::ir::OperationKind::HL_PLUS:
     case mx::ir::OperationKind::HL_POST_DEC:
     case mx::ir::OperationKind::HL_POST_INC:
