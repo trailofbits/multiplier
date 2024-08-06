@@ -4,7 +4,7 @@ Multiplier provides precise and comprehensive code understanding capabilities.
 It does so by saving build artifacts into a database, and then making them
 persistently accessible using a C++ or Python API.
 
-Multiplier emphasizes the ability to unique identify *all* entities in a build
+Multiplier emphasizes the ability to uniquely identify *all* entities in a build
 process, including individual tokens, AST nodes, and intermediate
 representations. With Multiplier, an analyst can identify code patterns of
 interest over one of the representations, and then accurately relay results back
