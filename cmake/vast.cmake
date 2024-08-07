@@ -8,6 +8,7 @@
 
 set(VAST_LIBS
   VAST::VASTTargetLLVMIR
+  VAST::VASTToLLVMConversionPasses
   VAST::VASTAliasTypeInterface
   VAST::VASTElementTypeInterface
   VAST::VASTCodeGen

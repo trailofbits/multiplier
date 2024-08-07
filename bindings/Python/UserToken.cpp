@@ -27,6 +27,8 @@ struct O final : public ::PyObject {
 };
 
 static PyTypeObject gTypeDef = {
+  .tp_basicsize = sizeof(O),
+  .tp_itemsize = 0,
   .tp_name = "multiplier.frontend.UserToken",
   .tp_hash = PyObject_HashNotImplemented,
   .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_IMMUTABLETYPE,
@@ -71,7 +73,7 @@ static PyTypeObject gTypeDef = {
     auto obj = reinterpret_cast<O *>(self);
     obj->data = new (obj->backing_storage) T;
 
-    if (kind) {
+    if (kind && kind != Py_None) {
       auto tk = ::mx::from_python<mx::TokenKind>(kind);
       if (!tk) {
         PyErrorStreamer(PyExc_TypeError)
@@ -83,8 +85,8 @@ static PyTypeObject gTypeDef = {
       obj->data->kind = tk.value();
     }
 
-    if (category) {
-      auto tc = ::mx::from_python<mx::TokenCategory>(kind);
+    if (category && category != Py_None) {
+      auto tc = ::mx::from_python<mx::TokenCategory>(category);
       if (!tc) {
         PyErrorStreamer(PyExc_TypeError)
             << "Value to 'category' argument of 'UserToken.__init__' must have "
@@ -95,7 +97,7 @@ static PyTypeObject gTypeDef = {
       obj->data->category = tc.value();
     }
 
-    if (data) {
+    if (data && data != Py_None) {
       auto d = ::mx::from_python<std::string>(data);
       if (!d) {
         PyErrorStreamer(PyExc_TypeError)

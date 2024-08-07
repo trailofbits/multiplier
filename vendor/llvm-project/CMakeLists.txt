@@ -46,6 +46,12 @@ else()
   set(LLVM_ENABLE_ASSERTIONS OFF)
 endif()
 
+if(UNIX AND NOT APPLE)
+  set(LLVM_ENABLE_LLD ON)
+else()
+  set(LLVM_ENABLE_LLD OFF)
+endif()
+
 # (b) Nested CMake run. May need more -D... options than shown here.
 execute_process(COMMAND ${CMAKE_COMMAND}
                         -G "${CMAKE_GENERATOR}"
@@ -88,6 +94,7 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         -DLLVM_INCLUDE_TOOLS:BOOL=ON
                         -DLLVM_INSTALL_UTILS:BOOL=ON
                         -DLLVM_ENABLE_ZSTD:BOOL=ON
+                        -DLLVM_ENABLE_LLD:BOOL=${LLVM_ENABLE_LLD}
                         "-Dzstd_DIR=${zstd_DIR}"
                         "${src_dir}/llvm"
                WORKING_DIRECTORY "${build_dir}")

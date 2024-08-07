@@ -177,7 +177,6 @@ Multiplier, and not whatever version of Clang was built/installed by Homebrew.
 cmake \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_INSTALL_PREFIX="${WORKSPACE_DIR}/install" \
-  -DCMAKE_LINKER_TYPE=LLD \
   -DCMAKE_C_COMPILER=/usr/bin/clang \
   -DCMAKE_CXX_COMPILER=/usr/bin/clang++ \
   -DMX_ENABLE_INSTALL=ON \

@@ -96,7 +96,6 @@ jobs:
             -DLLVM_DIR=${LLVM_PREFIX_DIR}/lib/cmake/llvm \
             -DMLIR_DIR=${LLVM_PREFIX_DIR}/lib/cmake/mlir \
             -DMX_USE_VENDORED_CLANG=OFF \
-            -DLLVM_ENABLE_LLD:BOOL=TRUE \
             -GNinja \
             ./
 
