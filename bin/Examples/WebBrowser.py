@@ -57,6 +57,11 @@ TEXT_NEAR = fe.UserToken(
     category=fe.TokenCategory.UNKNOWN,
     data="near"
 )
+TEXT_IN = fe.UserToken(
+    kind=fe.TokenKind.UNKNOWN,
+    category=fe.TokenCategory.UNKNOWN,
+    data="in"
+)
 
 FileOrFragment = fe.File | mx.Fragment
 
@@ -230,6 +235,24 @@ def entity_name(entity: mx.Entity, full_name=True) -> fe.TokenRange:
 
     elif isinstance(entity, ast.Type):
         return entity.tokens
+
+    elif isinstance(entity, ast.Stmt):
+        if decl := entity.parent_declaration:
+            if isinstance(decl, ast.NamedDecl):
+                name = entity_name(decl, full_name)
+                return make_token_range(
+                    [
+                        fe.UserToken(
+                            kind=fe.TokenKind.UNKNOWN,
+                            category=fe.TokenCategory.UNKNOWN,
+                            data=entity.__class__.__name__,
+                            related_entity=entity
+                        ),
+                    ],
+                    [SPACE, TEXT_IN, SPACE],
+                    [tok for tok in name]
+                )
+
 
     return make_token_range(
         [
@@ -518,7 +541,7 @@ class ExpandableTree:
         self.update.refresh(*args)
 
     def entry_id(self, entity: mx.Entity | int) -> str:
-        entity_id = isinstance(entity, mx.Entity) and entity.id or entity
+        entity_id = int(isinstance(entity, mx.Entity) and entity.id or entity)
         return f'{self.id_prefix}{next_id()}_{entity_id}'
 
     @abc.abstractmethod
@@ -572,23 +595,22 @@ class ReferenceTree(ExpandableTree):
             entity_id = ref.referenced_entity_id
             label = f'Entity {entity_id}'
             token_data: str = ""
-            name: str = ""
-            if context := ref.context or ref.as_variant:
-                name = entity_name(context).data
-                if not isinstance(context, ast.NamedDecl):
-                    if hasattr(context, 'tokens'):
-                        token_data = context.tokens.data
-                    elif hasattr(context, 'use_tokens'):
-                        token_data = context.use_tokens.data
+            ref_entity = ref.as_variant
+            name: str = entity_name(ref_entity).data
+            if not isinstance(ref_entity, ast.NamedDecl):
+                if hasattr(ref_entity, 'tokens'):
+                    token_data = (self.kind == 'to' and ref.context or ref_entity).tokens.data
+                elif hasattr(ref_entity, 'use_tokens'):
+                    token_data = ref_entity.use_tokens.data
 
             node = {
                 'label': len(token_data) and token_data or (
                              len(name) and name or label
                          ),
-                'id': self.entry_id(entity_id),
+                'id': self.entry_id(ref_entity.id),
             }
 
-            if loc := file_line_col_token_list(context, False):
+            if loc := file_line_col_token_list(ref_entity, False):
                 node['description'] = fe.TokenRange.create(loc).data
 
             root['children'].append(node)
@@ -785,32 +807,34 @@ class CodeTabs:
         container_id: int = container.id
         tab_id = f'tab-{container_id}'
 
-        if container_id in self.containers:
+        if container_id not in self.containers:
             self.panels.set_value(tab_id)
-            return
 
-        with self.tabs:
-            label = entity_name(container, not isinstance(container, fe.File)).data
-            tab = ui.tab(tab_id, label=label)
+            with self.tabs:
+                label = entity_name(container, not isinstance(container, fe.File)).data
+                tab = ui.tab(tab_id, label=label)
 
-        with self.panels:
-            panel = ui.tab_panel(tab_id)
+            with self.panels:
+                panel = ui.tab_panel(tab_id)
 
-            # NOTE(pag): Tags inside of the panel seem to inherit/compute
-            #            `display: block;`, which makes the `span` tags of
-            #            the `Text` class render one per line. Use the
-            #            Tailwind `contents` class to make all the tags
-            #            inside of `panel` behave more like inline elements.
-            with panel.classes('w-full contents'):
-                self.render_panel(container, entity)
-                if isinstance(entity, fe.File):
-                    ui.navigate.to('#line-1')
+                # NOTE(pag): Tags inside of the panel seem to inherit/compute
+                #            `display: block;`, which makes the `span` tags of
+                #            the `Text` class render one per line. Use the
+                #            Tailwind `contents` class to make all the tags
+                #            inside of `panel` behave more like inline elements.
+                with panel.classes('w-full contents'):
+                    self.render_panel(container, entity)
+
+            self.containers[container_id] = (tab, panel)
+        else:
+            tab, panel = self.containers[container_id]
 
         if not isinstance(entity, fe.File):
             if flc := file_line_col(entity):
                 ui.navigate.to(f'#line-{flc[1]}')
+        elif isinstance(entity, fe.File):
+            ui.navigate.to('#line-1')
 
-        self.containers[container_id] = (tab, panel)
         self.panels.set_value(tab_id)
 
 

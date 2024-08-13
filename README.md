@@ -24,7 +24,10 @@ We like to say that with its APIs, *you can get everywhere from anywhere*.
 * Writeups
   * [regreSSHion OpenSSH variant analysis](docs/openssh-variant-analysis.md)
   * [PHP variant analysis](docs/php-variant-analysis.md)
-* Included tools
+* Included Python tools
+  * [Web-based code browser for browsing code from a database](docs/web-browser.md)
+  * [Group functions by type](docs/group-functions.md)
+* Included C++ tools
   * [Find function calls inside macro argument lists](docs/mx-find-calls-in-macro-expansions.md)
   * [Find possible divergent representations](docs/mx-find-divergent-candidates.md)
   * [Find uses of `copy_to_user` in the Linux kernel that overwrite flexible array members](docs/mx-find-flexible-user-copies.md)

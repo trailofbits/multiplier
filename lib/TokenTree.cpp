@@ -894,6 +894,9 @@ static bool AddTrailingWhitespace(TokenKind tk) {
       return true;
     case TokenKind::KEYWORD_BREAK:
     case TokenKind::KEYWORD_CONTINUE:
+    case TokenKind::KEYWORD_DEFAULT:
+    case TokenKind::KEYWORD_SIZEOF:
+    case TokenKind::KEYWORD___ATTRIBUTE:
       return false;
     default:
       return IsKeyword(tk);
