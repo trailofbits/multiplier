@@ -6,10 +6,29 @@ from an indexed database. The web browser also implements a feature [requested](
 by Phil Eaton: being able to quickly find functions that share the same function signature.
 The underlying analysis for finding same-typed functions is its own [tool](group-functions.md).
 
-To run the web browser, first install NiceGUI using `pip install nicegui`. Then:
+
+
+To run the web browser, first download a [pre-built release for Linux](https://github.com/trailofbits/multiplier/releases) of Multiplier. Then,
+follow the [instructions to index a codebase](INDEXING.MD). In this example, I indexed OpenSSH.
+
+If you're using a pre-built release extracted to `/path/to/multiplier/release`, then you'll want to set up a Python virtual environment as follows:
 
 ```shell
-python /path/to/multiplier/checkout/bin/Examples/WebBrowser.py --db /tmp/openssh.db 
+$ python3.12 -m venv /path/multiplier/release
+$ source /path/multiplier/release/bin/activate
+(multiplier) $
+```
+
+Next, install NiceGUI into the Python virtual environment:
+
+```shell
+(multiplier) $ python -m pip install nicegui
+```
+
+Finally, invoke [WebBrowser.py](../bin/Examples/WebBrowser.py) from a *source checkout* of Multiplier.
+
+```shell
+(multiplier) $ python /path/to/multiplier/source/bin/Examples/WebBrowser.py --db /tmp/openssh.db 
 ```
 
 Using and indexed OpenSSH as an example, here is what the web browser looks like
