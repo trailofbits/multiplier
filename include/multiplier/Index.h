@@ -291,11 +291,14 @@ class MX_EXPORT UserToken final {
   }
 
   inline UserToken &operator=(UserToken &&that_) noexcept {
-    UserToken that(std::move(that_));
-    kind = that.kind;
-    category = that.category;
-    data.swap(that.data);
-    related_entity.swap(that.related_entity);
+    std::string temp_data = std::move(that_.data);
+    VariantEntity temp_re = std::move(that_.related_entity);
+    that_.related_entity = NotAnEntity{};
+
+    kind = that_.kind;
+    category = that_.category;
+    data.swap(temp_data);
+    related_entity.swap(temp_re);
     return *this;
   }
 };

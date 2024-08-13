@@ -41,8 +41,7 @@ RUN cmake \
     -DCMAKE_C_COMPILER="$(which clang-18)" \
     -DCMAKE_CXX_COMPILER="$(which clang++-18)" \
     -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
-    -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=TRUE \
-    -DLLVM_ENABLE_LLD:BOOL=TRUE
+    -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=TRUE
 
 RUN cmake --build '/work/build/multiplier' --target install
 RUN chmod +x /work/install/bin/*

@@ -892,6 +892,12 @@ static bool AddTrailingWhitespace(TokenKind tk) {
     case TokenKind::GREATER_GREATER_GREATER:
     case TokenKind::R_BRACE:
       return true;
+    case TokenKind::KEYWORD_BREAK:
+    case TokenKind::KEYWORD_CONTINUE:
+    case TokenKind::KEYWORD_DEFAULT:
+    case TokenKind::KEYWORD_SIZEOF:
+    case TokenKind::KEYWORD___ATTRIBUTE:
+      return false;
     default:
       return IsKeyword(tk);
   }
@@ -2733,14 +2739,12 @@ void TokenTreeReader::Append(TokenTreeImpl::TokenIndex ti) {
     add_leading_ws = false;  // E.g. `};`.
   }
 
-  EntityOffset data_size = static_cast<EntityOffset>(data.size());
-
   // Force inject whitespace between two tokens.
   if (add_leading_ws || (!is_first && AddLeadingWhitespace(tk))) {
     if (!is_include_tok && !SuppressLeadingWhitespace(tk)) {
       tokens.emplace_back(kWhitespaceReader.get(), 0u);
       data.push_back(' ');
-      token_offset.emplace_back(data_size++);
+      token_offset.emplace_back(static_cast<EntityOffset>(data.size()));
     }
   }
 

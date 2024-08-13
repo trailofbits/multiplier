@@ -108,7 +108,7 @@ PyTypeObject *InitType(void) noexcept {
     if (auto *data = T_cast(obj)) {
       data->~T();
     }
-    PyObject_Free(obj);
+    Py_TYPE(obj)->tp_free((PyObject *) obj);
   };
   tp->tp_name = "multiplier.frontend.TokenTreeVisitor";
   tp->tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE;

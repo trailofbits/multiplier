@@ -1507,7 +1507,7 @@ TokenRange TokenRange::create(const Token &first, const Token &last) {
   // cross into the macro expansions or from uses to expansions. Return
   // empty token range in such case.
   VariantId vid = first.id().Unpack();
-  if (std::holds_alternative<MacroTokenId>(vid)) {
+  if (std::holds_alternative<MacroTokenId>(vid) && first != last) {
     return TokenRange();
   }
 
