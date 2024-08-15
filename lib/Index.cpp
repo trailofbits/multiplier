@@ -78,6 +78,16 @@ Index Index::from_database(std::filesystem::path path) {
   return EntityProvider::CreateFromDatabase(std::move(path));
 }
 
+Index Index::containing(const Compilation &entity) {
+  return Index(entity.impl->ep);
+}
+Index Index::containing(const CXXBaseSpecifier &entity) {
+  return Index(entity.impl->ep);
+}
+Index Index::containing(const CXXCtorInitializer &entity) {
+  return Index(entity.impl->ep);
+}
+
 Index Index::containing(const Fragment &fragment) {
   return Index(fragment.impl->ep);
 }
