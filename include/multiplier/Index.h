@@ -136,6 +136,9 @@ class MX_EXPORT Index final {
   // by specifying the path to that database.
   static Index from_database(std::filesystem::path path);
 
+  static Index containing(const Compilation &entity);
+  static Index containing(const CXXBaseSpecifier &entity);
+  static Index containing(const CXXCtorInitializer &entity);
   static Index containing(const Fragment &entity);
   static Index containing(const File &entity);
   static Index containing(const Decl &entity);

@@ -263,6 +263,21 @@ class Index(object):
 
   @overload
   @staticmethod
+  def containing(entity: multiplier.frontend.Compilation) -> multiplier.Index:
+    ...
+
+  @overload
+  @staticmethod
+  def containing(entity: multiplier.ast.CXXBaseSpecifier) -> multiplier.Index:
+    ...
+
+  @overload
+  @staticmethod
+  def containing(entity: multiplier.ast.CXXCtorInitializer) -> multiplier.Index:
+    ...
+
+  @overload
+  @staticmethod
   def containing(entity: multiplier.Fragment) -> multiplier.Index:
     ...
 
