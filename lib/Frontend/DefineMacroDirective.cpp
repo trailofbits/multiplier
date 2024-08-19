@@ -177,6 +177,14 @@ bool DefineMacroDirective::is_function_like(void) const {
   return impl->reader.getVal13();
 }
 
+bool DefineMacroDirective::is_builtin(void) const {
+  return impl->reader.getVal14();
+}
+
+bool DefineMacroDirective::is_command_line(void) const {
+  return impl->reader.getVal15();
+}
+
 gap::generator<PreprocessedEntity> DefineMacroDirective::parameters(void) const & {
   Index index(impl->ep);
   auto list = impl->reader.getVal9();

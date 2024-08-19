@@ -544,6 +544,8 @@ void SerializeDefineMacroDirective(const PendingFragment &pf, const EntityMapper
   }
   b.setVal3(e.IsVariadic());
   b.setVal13(e.IsFunctionLike());
+  b.setVal14(e.IsBuiltin());
+  b.setVal15(e.IsCommandLine());
   if (true) {
     auto v9 = e.Parameters();
     auto sv9 = b.initVal9(static_cast<unsigned>(v9.size()));
@@ -10418,7 +10420,6 @@ void SerializeCXXRecordDecl(const PendingFragment &pf, const EntityMapper &es, m
   } else {
     b.setVal113(mx::kInvalidEntityId);
   }
-  b.setVal41(e.DeviceLambdaManglingNumber());
   auto v114 = e.GenericLambdaTemplateParameterList();
   if (v114) {
     auto id114 = es.EntityId(v114.value());
@@ -10454,7 +10455,7 @@ void SerializeCXXRecordDecl(const PendingFragment &pf, const EntityMapper &es, m
   } else {
     b.setVal119(mx::kInvalidEntityId);
   }
-  b.setVal117(e.LambdaDependencyKind());
+  b.setVal41(e.LambdaDependencyKind());
   do {
     auto ov178 = e.LambdaExplicitTemplateParameters();
     if (!ov178) {
@@ -10470,10 +10471,9 @@ void SerializeCXXRecordDecl(const PendingFragment &pf, const EntityMapper &es, m
       ++i178;
     }
   } while (false);
-  b.setVal129(e.LambdaIndexInContext());
-  auto v130 = e.LambdaManglingNumber();
-  if (v130) {
-    b.setVal130(static_cast<uint32_t>(v130.value()));
+  auto v117 = e.LambdaManglingNumber();
+  if (v117) {
+    b.setVal117(static_cast<uint32_t>(v117.value()));
     b.setVal131(true);
   } else {
     b.setVal131(false);

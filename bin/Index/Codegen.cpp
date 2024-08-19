@@ -32,10 +32,12 @@ VAST_UNRELAX_WARNINGS
 #include <vast/CodeGen/CodeGenBuilder.hpp>
 #include <vast/CodeGen/CodeGenDriver.hpp>
 #include <vast/CodeGen/CodeGenMetaGenerator.hpp>
+#include <vast/CodeGen/CodeGenPolicy.hpp>
 #include <vast/CodeGen/CodeGenVisitorList.hpp>
 #include <vast/CodeGen/DefaultVisitor.hpp>
 #include <vast/CodeGen/UnsupportedVisitor.hpp>
 #include <vast/CodeGen/DataLayout.hpp>
+#include <vast/CodeGen/DefaultCodeGenPolicy.hpp>
 #include <vast/CodeGen/DefaultVisitor.hpp>
 #include <vast/CodeGen/FallthroughVisitor.hpp>
 #include <vast/CodeGen/ScopeContext.hpp>
@@ -173,7 +175,7 @@ class SymbolGenerator final : public vast::cg::symbol_generator {
 };
 
 
-class MXErrorReportVisitorProxy
+class ErrorReportVisitorProxy
     : public vast::cg::fallthrough_list_node {
   using base = vast::cg::fallthrough_visitor;
 
@@ -214,7 +216,7 @@ class MXErrorReportVisitorProxy
   }
 
 public:
-  MXErrorReportVisitorProxy(const pasta::AST &ast_)
+  ErrorReportVisitorProxy(const pasta::AST &ast_)
       : ast(ast_) {}
 
   vast::operation visit(const vast::cg::clang_decl *raw_decl,
@@ -269,14 +271,14 @@ private:
   const pasta::AST &ast;
 };
 
-class MXPreprocessingVisitorProxy : public vast::cg::fallthrough_list_node {
+class PreprocessingVisitorProxy : public vast::cg::fallthrough_list_node {
  private:
   clang::ASTContext &ast_context;
   const EntityMapper &em;
 
  public:
-  MXPreprocessingVisitorProxy(clang::ASTContext &ast_context_,
-                              const EntityMapper &em_)
+  PreprocessingVisitorProxy(clang::ASTContext &ast_context_,
+                            const EntityMapper &em_)
       : ast_context(ast_context_),
         em(em_) {}
 
@@ -333,29 +335,81 @@ class MXPreprocessingVisitorProxy : public vast::cg::fallthrough_list_node {
   }
 };
 
+class CodeGenPolicy final : public vast::cg::policy_base {
+ private:
+  const EntityMapper &em;
+  std::unordered_set<mx::RawEntityId> fragment_indexes;
+
+ public:
+  CodeGenPolicy(const EntityMapper &em_,
+                std::vector<mx::PackedFragmentId> fragment_ids)
+      : em(em_) {
+
+    for (auto fid : fragment_ids) {
+      fragment_indexes.insert(fid.Unpack().fragment_id);
+    }
+  }
+
+  virtual ~CodeGenPolicy(void) = default;
+
+  bool emit_strict_function_return(
+      const vast::cg::clang_function *) const final {
+    return false;
+  };
+
+  enum vast::cg::missing_return_policy missing_return_policy(
+      const vast::cg::clang_function *) const final {
+    return vast::cg::missing_return_policy::emit_trap;
+  }
+
+  bool SkipDeclBody(const void *decl) const {
+    auto eid = em.EntityId(decl);
+    if (eid == mx::kInvalidEntityId) {
+      assert(false);
+      return true;
+    }
+
+    auto decl_id = mx::EntityId(eid).Extract<mx::DeclId>();
+    if (!decl_id) {
+      assert(false);
+      return false;
+    }
+
+    return !fragment_indexes.contains(decl_id->fragment_id);
+  }
+
+  bool skip_function_body(const vast::cg::clang_function *decl) const final {
+    return SkipDeclBody(decl);
+  }
+
+  bool skip_global_initializer(
+      const vast::cg::clang_var_decl *decl) const final {
+    return SkipDeclBody(decl);
+  }
+};
+
 static std::optional<vast::owning_module_ref> CreateModule(
-    const pasta::AST &ast, const EntityMapper &em) try {
+    const pasta::AST &ast, const EntityMapper &em,
+    std::vector<mx::PackedFragmentId> fragment_ids) try {
 
   auto &actx = ast.UnderlyingAST();
   auto &mctx = mx::ir::GlobalMLIRContext();
   auto bld = vast::cg::mk_codegen_builder(mctx);
   auto mg = std::make_shared<MetaGenerator>(mctx, em);
   auto sg = std::make_shared<SymbolGenerator>(em);
-
+  auto cp = std::make_shared<CodeGenPolicy>(em, std::move(fragment_ids));
   using vast::cg::as_node;
   using vast::cg::as_node_with_list_ref;
 
   auto visitors =
       std::make_shared<vast::cg::visitor_list>() |
-      as_node<MXPreprocessingVisitorProxy>(ast.UnderlyingAST(), em) |
+      as_node<PreprocessingVisitorProxy>(ast.UnderlyingAST(), em) |
       as_node_with_list_ref<vast::cg::attr_visitor_proxy>() |
       as_node<vast::cg::type_caching_proxy>() |
       as_node_with_list_ref<vast::cg::default_visitor>(
-          mctx, actx, *bld, mg, sg,
-          /* strict return = */ false,
-          vast::cg::missing_return_policy::emit_trap) |
-      as_node<MXErrorReportVisitorProxy>(ast) |
-      as_node_with_list_ref<vast::cg::unsup_visitor>(mctx, *bld) |
+          mctx, actx, *bld, mg, sg, cp) |
+      as_node<ErrorReportVisitorProxy>(ast) |
+      as_node_with_list_ref<vast::cg::unsup_visitor>(mctx, *bld, mg) |
       as_node<vast::cg::fallthrough_visitor>();
 
   vast::cg::driver driver(actx, mctx, std::move(bld), visitors);
@@ -410,14 +464,15 @@ CodeGenerator::~CodeGenerator(void) {
   }
 }
 
-std::string CodeGenerator::GenerateSourceIR(const pasta::AST &ast,
-                                            const EntityMapper &em,
-                                            const NameMangler &) {
+std::string CodeGenerator::GenerateSourceIR(
+    const pasta::AST &ast, const EntityMapper &em, const NameMangler &,
+    std::vector<mx::PackedFragmentId> fragment_ids) {
+
   if (!IsEnabled()) {
     return "";
   }
 
-  auto mod = CreateModule(ast, em);
+  auto mod = CreateModule(ast, em, std::move(fragment_ids));
   if (!mod) {
     return "";
   }
@@ -430,7 +485,7 @@ std::string CodeGenerator::GenerateSourceIR(const pasta::AST &ast,
   flags.enableDebugInfo(true, false);
 
   // Nifty for debugging, to see what the MLIR looked like.
-  if (false) {
+  if (true) {
     std::error_code ec;
     std::string out_file =
         (std::filesystem::path("/tmp/src/") / ast.MainFile().Path().filename()).generic_string();

@@ -364,10 +364,6 @@ std::optional<CXXDestructorDecl> CXXRecordDecl::destructor(void) const {
   return std::nullopt;
 }
 
-uint32_t CXXRecordDecl::device_lambda_mangling_number(void) const {
-  return impl->reader.getVal41();
-}
-
 std::optional<TemplateParameterList> CXXRecordDecl::generic_lambda_template_parameter_list(void) const {
   if (true) {
     RawEntityId eid = impl->reader.getVal114();
@@ -430,7 +426,7 @@ std::optional<Decl> CXXRecordDecl::lambda_context_declaration(void) const {
 }
 
 uint32_t CXXRecordDecl::lambda_dependency_kind(void) const {
-  return impl->reader.getVal117();
+  return impl->reader.getVal41();
 }
 
 std::optional<std::vector<NamedDecl>> CXXRecordDecl::lambda_explicit_template_parameters(void) const {
@@ -452,15 +448,11 @@ std::optional<std::vector<NamedDecl>> CXXRecordDecl::lambda_explicit_template_pa
   return vec;
 }
 
-uint32_t CXXRecordDecl::lambda_index_in_context(void) const {
-  return impl->reader.getVal129();
-}
-
 std::optional<uint32_t> CXXRecordDecl::lambda_mangling_number(void) const {
   if (!impl->reader.getVal131()) {
     return std::nullopt;
   } else {
-    return static_cast<uint32_t>(impl->reader.getVal130());
+    return static_cast<uint32_t>(impl->reader.getVal117());
   }
   return std::nullopt;
 }

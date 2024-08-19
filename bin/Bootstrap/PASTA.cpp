@@ -756,6 +756,8 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"CXXRecordDecl", "ODRHash"},
   {"FunctionDecl", "ODRHash"},
   {"CXXRecordDecl", "VisibleConversionFunctions"},
+  {"CXXRecordDecl", "DeviceLambdaManglingNumber"},
+  {"CXXRecordDecl", "LambdaIndexInContext"},
   {"FunctionDecl", "WillHaveBody"},
 
   // These will be discovered dynamically. This is because methods on class

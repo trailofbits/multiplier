@@ -1073,7 +1073,8 @@ void GlobalIndexingState::PersistCompilation(
     sourceir_progress->AddWork(1u);
   }
 
-  if (std::string mlir = codegen.GenerateSourceIR(ast, em, nm);
+  if (std::string mlir = codegen.GenerateSourceIR(
+          ast, em, nm, std::move(fragment_ids));
       !mlir.empty()) {
     cb.setMlir(mlir);
     if (sourceir_progress) {

@@ -59,6 +59,8 @@ class MX_EXPORT DefineMacroDirective : public MacroDirective {
   gap::generator<PreprocessedEntity> body(void) const &;
   bool is_variadic(void) const;
   bool is_function_like(void) const;
+  bool is_builtin(void) const;
+  bool is_command_line(void) const;
   gap::generator<PreprocessedEntity> parameters(void) const &;
 };
 

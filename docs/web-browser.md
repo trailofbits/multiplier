@@ -9,7 +9,7 @@ The underlying analysis for finding same-typed functions is its own [tool](group
 
 
 To run the web browser, first download a [pre-built release for Linux](https://github.com/trailofbits/multiplier/releases) of Multiplier. Then,
-follow the [instructions to index a codebase](INDEXING.MD). In this example, I indexed OpenSSH.
+follow the [instructions to index a codebase](INDEXING.MD). In this example, I [indexed OpenSSH](openssh-variant-analysis.md#getting-and-indexing-the-code).
 
 If you're using a pre-built release extracted to `/path/to/multiplier/release`, then you'll want to set up a Python virtual environment as follows:
 

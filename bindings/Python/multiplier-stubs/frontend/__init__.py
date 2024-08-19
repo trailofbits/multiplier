@@ -1692,6 +1692,8 @@ class DefineMacroDirective(multiplier.frontend.MacroDirective):
   body: Iterable[multiplier.frontend.Macro | multiplier.frontend.Token | multiplier.Fragment]
   is_variadic: bool
   is_function_like: bool
+  is_builtin: bool
+  is_command_line: bool
   parameters: Iterable[multiplier.frontend.Macro | multiplier.frontend.Token | multiplier.Fragment]
 
   @overload

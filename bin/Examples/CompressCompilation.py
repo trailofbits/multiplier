@@ -9,16 +9,21 @@ import json
 import multiplier as mx
 
 
-def make_compile_commands(comp: mx.frontend.Compilation, root_path: pathlib.PurePath):
-    with open(str(root_path / "compile_commands.json"), "w") as cc:
-        cc.write(json.dumps([ {
-            "directory": str(comp.working_directory),
-            "file": str(comp.main_source_file_path),
-            "arguments": [arg for arg in comp.arguments]
-        }], indent="  "))
-
-
 def harness(comp: mx.frontend.Compilation, root_path: pathlib.PurePath):
+    stdarg_h_path = str(comp.resource_directory / "include" / "stdarg.h")
+    new_stdarg_h_path = str(root_path / pathlib.PurePath("." + stdarg_h_path))
+    os.makedirs(os.path.dirname(new_stdarg_h_path), exist_ok=True)
+
+    # Multiplier / PASTA's heuristic for finding the resource directory is to
+    # locate `stdarg.h`. Copy this file if it's present, regardless of if the
+    # file is needed by this compilation unit.
+    if os.path.exists(stdarg_h_path):
+        with open(stdarg_h_path, "r") as real_stdarg_h:
+            with open(new_stdarg_h_path, "w") as copy_stdarg_h:
+                copy_stdarg_h.write(real_stdarg_h.read())
+
+    # Pull in all files actually parsed / pre-processed as part of this
+    # compilation.
     for file in comp.files:
         for path in file.paths:
             nested = root_path / pathlib.PurePath("." + str(path))
@@ -27,8 +32,18 @@ def harness(comp: mx.frontend.Compilation, root_path: pathlib.PurePath):
             with open(str(nested), "w") as file_copy:
                 file_copy.write(file.data)
 
-    make_compile_commands(comp, root_path)
+    # Make a fake `compile_commands.json`.
+    with open(str(root_path / "compile_commands.json"), "w") as cc:
+        cc.write(json.dumps([ {
+            "directory": str(comp.working_directory),
+            "file": str(comp.main_source_file_path),
+            "arguments": [str(comp.compiler_executable_path)] + [arg for arg in comp.arguments],
+            "resource_directory": str(comp.resource_directory),
+        }], indent="  "))
 
+    # Go get all macro definitions not associated with a file. This will capture
+    # compiler-builtin macros. Unfortunately this will also capture the macros
+    # defined at the command-line.
     with open(str(root_path / "builtin-macros.h"), "w") as macros:
         index = mx.Index.containing(comp)
         for macro in mx.frontend.DefineMacroDirective.IN(index):

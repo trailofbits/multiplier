@@ -165,6 +165,26 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "is_builtin",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_builtin());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DefineMacroDirective::is_builtin"),
+    nullptr,
+  },
+  {
+    "is_command_line",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_command_line());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::DefineMacroDirective::is_command_line"),
+    nullptr,
+  },
+  {
     "parameters",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

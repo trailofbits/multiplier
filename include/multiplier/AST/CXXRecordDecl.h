@@ -96,7 +96,6 @@ class MX_EXPORT CXXRecordDecl : public RecordDecl {
   std::optional<FunctionTemplateDecl> dependent_lambda_call_operator(void) const;
   std::optional<ClassTemplateDecl> described_class_template(void) const;
   std::optional<CXXDestructorDecl> destructor(void) const;
-  uint32_t device_lambda_mangling_number(void) const;
   std::optional<TemplateParameterList> generic_lambda_template_parameter_list(void) const;
   std::optional<CXXRecordDecl> instantiated_from_member_class(void) const;
   std::optional<CXXMethodDecl> lambda_call_operator(void) const;
@@ -104,7 +103,6 @@ class MX_EXPORT CXXRecordDecl : public RecordDecl {
   std::optional<Decl> lambda_context_declaration(void) const;
   uint32_t lambda_dependency_kind(void) const;
   std::optional<std::vector<NamedDecl>> lambda_explicit_template_parameters(void) const;
-  uint32_t lambda_index_in_context(void) const;
   std::optional<uint32_t> lambda_mangling_number(void) const;
   std::optional<CXXMethodDecl> lambda_static_invoker(void) const;
   std::optional<MSInheritanceModel> ms_inheritance_model(void) const;

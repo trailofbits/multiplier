@@ -183,9 +183,9 @@ struct FragmentCollector {
   void PartitionEntitiesAndFillPendingFragments(void);
   void PersistParsedFragments(void);
 
-  void CreateFloatingDirectiveFragment(const pasta::Macro &macro);
+  PendingFragmentPtr CreateFloatingDirectiveFragment(const pasta::Macro &macro);
 
-  void CreateFloatingDeclFragment(
+  PendingFragmentPtr CreateFloatingDeclFragment(
       std::optional<FileLocationOfFragment> floc,
       mx::EntityOffset begin_index,
       mx::EntityOffset end_index,
@@ -1018,6 +1018,21 @@ class TLDFinder final : public pasta::DeclVisitor {
   }
 
   void VisitTagDecl(const pasta::TagDecl &decl) final {
+
+    // XREF Issue #565: There can be declarations embedded in declarators, e.g.
+    //                  the usual case like: `struct Foo *bar;` but also more
+    //                  obscure cases like `struct Forward` below:
+    //
+    //    struct Thing {
+    //      __typeof__(struct Forward) *ptr;
+    //    };
+    if ((depth || parent_decl) && IsInjectedForwardDeclaration(decl)) {
+      CHECK(seen.emplace(RawEntity(decl)).second);
+      AddDeclAlways(decl);
+      em.MarkAsTopLevel(decl);
+      return;
+    }
+
     VisitTypeDecl(decl);
     VisitDeeperDeclContext(decl, decl, em.IsTopLevel(decl));
   }
@@ -2646,7 +2661,7 @@ static pasta::PrintedTokenRange CreateParsedTokenRange(
 // forward declarations to prevent Issue #396.
 //
 // XREF(pag): https://github.com/trailofbits/multiplier/issues/396
-void FragmentCollector::CreateFloatingDeclFragment(
+PendingFragmentPtr FragmentCollector::CreateFloatingDeclFragment(
     std::optional<FileLocationOfFragment> floc,
     mx::EntityOffset begin_index,
     mx::EntityOffset end_index,
@@ -2738,7 +2753,7 @@ void FragmentCollector::CreateFloatingDeclFragment(
 
   pf->is_floating = true;
 
-  pending_fragments.emplace_back(std::move(pf));
+  return pf;
 }
 
 // Check if the full range has any other tokens in them.
@@ -2772,7 +2787,7 @@ static bool CanUseFullDirectiveRange(const pasta::TokenRange &full_range) {
 }
 
 // Create a floating fragment for the top-level directives.
-void FragmentCollector::CreateFloatingDirectiveFragment(
+PendingFragmentPtr FragmentCollector::CreateFloatingDirectiveFragment(
     const pasta::Macro &macro) {
 
   auto dir = pasta::MacroDirective::From(macro);
@@ -2817,8 +2832,7 @@ void FragmentCollector::CreateFloatingDirectiveFragment(
       false  /* using parsed tokens */);
 
   pf->is_floating = true;
-
-  pending_fragments.emplace_back(std::move(pf));
+  return pf;
 }
 
 // Perform a topological sort of the top-level entities.
@@ -2915,7 +2929,9 @@ void FragmentCollector::FillPendingFragments(EntityGroupRange group_range) {
                  (IsInjectedForwardDeclaration(decl) ||
                   !floc || decl.IsImplicit())) {
         CHECK(!er.parent);
-        CreateFloatingDeclFragment(floc, begin_index, end_index, decl);
+
+        pending_fragments.emplace_back(CreateFloatingDeclFragment(
+            floc, begin_index, end_index, decl));
 
       // These are generally template instantiations.
       } else if (er.parent) {
@@ -2938,7 +2954,7 @@ void FragmentCollector::FillPendingFragments(EntityGroupRange group_range) {
       // entity mapper. We process these first, as they can end up being used
       // lexically inside of other top-level entities.
       if (ShouldGoInFloatingFragment(macro)) {
-        CreateFloatingDirectiveFragment(macro);
+        pending_fragments.emplace_back(CreateFloatingDirectiveFragment(macro));
 
       } else {
         top_level_macros.emplace_back(macro);
