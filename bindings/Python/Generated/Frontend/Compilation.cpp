@@ -153,6 +153,46 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "defines",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::defines);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Compilation::defines"),
+    nullptr,
+  },
+  {
+    "builtin_defines",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::builtin_defines);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Compilation::builtin_defines"),
+    nullptr,
+  },
+  {
+    "command_line_defines",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::command_line_defines);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Compilation::command_line_defines"),
+    nullptr,
+  },
+  {
+    "written_defines",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::written_defines);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Compilation::written_defines"),
+    nullptr,
+  },
+  {
     "main_source_file",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

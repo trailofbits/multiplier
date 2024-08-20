@@ -7,6 +7,7 @@
 #include "Compilation.h"
 
 #include <multiplier/Fragment.h>
+#include <multiplier/Frontend/DefineMacroDirective.h>
 #include <multiplier/Frontend/IncludePathLocation.h>
 #include <multiplier/IR/Builtin/Operation.h>
 
@@ -144,6 +145,70 @@ gap::generator<File> Compilation::files(void) const & {
   for (RawEntityId eid : impl->reader.getFileIds()) {
     if (FileImplPtr fptr = ep->FileFor(ep, eid)) {
       co_yield File(std::move(fptr));
+    } else {
+      assert(false);
+    }
+  }
+}
+
+// All defines that were used in this compilation.
+gap::generator<DefineMacroDirective> Compilation::defines(void) const & {
+  for (auto def : builtin_defines()) {
+    co_yield std::move(def);
+  }
+  for (auto def : command_line_defines()) {
+    co_yield std::move(def);
+  }
+  for (auto def : written_defines()) {
+    co_yield std::move(def);
+  }
+}
+
+// All builtin defines that were used in this compilation.
+gap::generator<DefineMacroDirective> Compilation::builtin_defines(void) const & {
+  auto ep = impl->ep;
+  for (RawEntityId eid : impl->reader.getBuiltinMacroIds()) {
+    if (MacroImplPtr mptr = ep->MacroFor(ep, eid)) {
+      Macro macro(std::move(mptr));
+      if (macro.kind() == MacroKind::DEFINE_DIRECTIVE) {
+        co_yield std::move(reinterpret_cast<DefineMacroDirective &>(macro));
+      } else {
+        assert(false);
+      }
+    } else {
+      assert(false);
+    }
+  }
+}
+
+// All command-line defines that were used in this compilation.
+gap::generator<DefineMacroDirective> Compilation::command_line_defines(void) const & {
+  auto ep = impl->ep;
+  for (RawEntityId eid : impl->reader.getCommandLineMacroIds()) {
+    if (MacroImplPtr mptr = ep->MacroFor(ep, eid)) {
+      Macro macro(std::move(mptr));
+      if (macro.kind() == MacroKind::DEFINE_DIRECTIVE) {
+        co_yield std::move(reinterpret_cast<DefineMacroDirective &>(macro));
+      } else {
+        assert(false);
+      }
+    } else {
+      assert(false);
+    }
+  }
+}
+
+// All written (in code) defines that were used in this compilation.
+gap::generator<DefineMacroDirective> Compilation::written_defines(void) const & {
+  auto ep = impl->ep;
+  for (RawEntityId eid : impl->reader.getMacroIds()) {
+    if (MacroImplPtr mptr = ep->MacroFor(ep, eid)) {
+      Macro macro(std::move(mptr));
+      if (macro.kind() == MacroKind::DEFINE_DIRECTIVE) {
+        co_yield std::move(reinterpret_cast<DefineMacroDirective &>(macro));
+      } else {
+        assert(false);
+      }
     } else {
       assert(false);
     }

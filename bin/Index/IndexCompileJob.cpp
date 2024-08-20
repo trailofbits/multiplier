@@ -151,6 +151,8 @@ struct FragmentCollector {
   EntityOffsetMap bof_to_eof;
   EntityOffsetMap eof_to_include;
 
+  std::vector<pasta::DefineMacroDirective> used_defines;
+
   // Filled up.
   std::vector<PendingFragmentPtr> pending_fragments;
 
@@ -1943,6 +1945,14 @@ static void AddDeclToEntityRangeList(
       static_cast<unsigned>(entity_ranges.size()));
 }
 
+inline static bool IsUsed(const pasta::DefineMacroDirective &dmd) {
+  for (pasta::Macro use : dmd.Uses()) {
+    (void) use;
+    return true;
+  }
+  return false;
+}
+
 // Go find the top-level macros to be indexed. These are basically directives.
 // We find the top-level macro expansions later during the `TokenTree` building
 // process, because we only really care about how the top-level expansions
@@ -1996,20 +2006,32 @@ std::vector<EntityRange> FragmentCollector::FindTLMs(void) {
     // If this is a macro definition, then only keep track of it if we see it
     // used/expanded.
     if (auto dmd = pasta::DefineMacroDirective::From(md)) {
-      for (pasta::Macro use : dmd->Uses()) {
+      if (IsUsed(dmd.value())) {
         add_macro(std::move(md));
+        used_defines.emplace_back(std::move(dmd.value()));
         break;
       }
       continue;
     }
 
-    add_macro(std::move(md));
+    add_macro(md);
 
     // If it's an include-like directive, then we want to be able to associate
     // begin- and end-of-file markers with this directive. Here we'll find
     // the relevant begin-of-file markers.
     auto ild = pasta::IncludeLikeMacroDirective::From(md);
     if (!ild) {
+
+      // Define directives can be embedded within macro expansions. Go locate
+      // those, just in case we didn't cover them above.
+      for (auto dir : FindDirectivesInMacro(md)) {
+        if (auto dmd = pasta::DefineMacroDirective::From(dir)) {
+          if (IsUsed(dmd.value())) {
+            used_defines.emplace_back(std::move(dmd.value()));
+          }
+        }
+      }
+
       continue;
     }
 
@@ -3220,7 +3242,8 @@ void FragmentCollector::PersistParsedFragments(void) {
   }
 
   context.PersistCompilation(compiler, job, ast, em, nm, tu_id,
-                             std::move(fragment_ids));
+                             std::move(fragment_ids),
+                             std::move(used_defines));
 }
 
 // Look through all files referenced by the AST get their unique IDs. If this

@@ -657,6 +657,10 @@ class Compilation(multiplier.Entity):
   ir: Optional[multiplier.ir.builtin.ModuleOp]
   fragments: Iterable[multiplier.Fragment]
   files: Iterable[multiplier.frontend.File]
+  defines: Iterable[multiplier.frontend.DefineMacroDirective]
+  builtin_defines: Iterable[multiplier.frontend.DefineMacroDirective]
+  command_line_defines: Iterable[multiplier.frontend.DefineMacroDirective]
+  written_defines: Iterable[multiplier.frontend.DefineMacroDirective]
   main_source_file: multiplier.frontend.File
   main_source_file_path: pathlib.PurePath
   compiler_executable_path: pathlib.PurePath

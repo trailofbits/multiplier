@@ -26,6 +26,7 @@ class ModuleOp;
 
 class CompilationImpl;
 class Decl;
+class DefineMacroDirective;
 class EntityProvider;
 class File;
 class Fragment;
@@ -91,6 +92,18 @@ class MX_EXPORT Compilation {
 
   // The files parsed by this compilation.
   gap::generator<File> files(void) const &;
+
+  // All defines that were used in this compilation.
+  gap::generator<DefineMacroDirective> defines(void) const &;
+
+  // All builtin defines that were used in this compilation.
+  gap::generator<DefineMacroDirective> builtin_defines(void) const &;
+
+  // All command-line defines that were used in this compilation.
+  gap::generator<DefineMacroDirective> command_line_defines(void) const &;
+
+  // All written (in code) defines that were used in this compilation.
+  gap::generator<DefineMacroDirective> written_defines(void) const &;
 
   // The main source file of this compilation.
   File main_source_file(void) const noexcept;
