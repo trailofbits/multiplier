@@ -63624,7 +63624,6 @@ class CXXRecordDecl(multiplier.ast.RecordDecl):
   dependent_lambda_call_operator: Optional[multiplier.ast.FunctionTemplateDecl]
   described_class_template: Optional[multiplier.ast.ClassTemplateDecl]
   destructor: Optional[multiplier.ast.CXXDestructorDecl]
-  device_lambda_mangling_number: int
   generic_lambda_template_parameter_list: Optional[multiplier.ast.TemplateParameterList]
   instantiated_from_member_class: Optional[multiplier.ast.CXXRecordDecl]
   lambda_call_operator: Optional[multiplier.ast.CXXMethodDecl]
@@ -63632,7 +63631,6 @@ class CXXRecordDecl(multiplier.ast.RecordDecl):
   lambda_context_declaration: Optional[multiplier.ast.Decl]
   lambda_dependency_kind: int
   lambda_explicit_template_parameters: Optional[Sequence[multiplier.ast.NamedDecl]]
-  lambda_index_in_context: int
   lambda_mangling_number: Optional[int]
   lambda_static_invoker: Optional[multiplier.ast.CXXMethodDecl]
   ms_inheritance_model: Optional[multiplier.ast.MSInheritanceModel]

@@ -325,6 +325,7 @@ BuildCommandAction::GetCompilerInfo(void) {
         arg.starts_with("-fsanitize=") ||
         arg.starts_with("-fcoverage-compilation-dir=") ||
         arg.starts_with("-fcrash-diagnostics-dir=") ||
+        arg == "-fskip-odr-check-in-gmf" ||
         arg == "-pic-is-pie" ||
         arg == "-mindirect-branch-cs-prefix" ||
         arg == "-Wno-cast-function-type-strict" ||

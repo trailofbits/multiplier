@@ -992,7 +992,8 @@ void GlobalIndexingState::PersistCompilation(
     const pasta::Compiler &compiler, const pasta::CompileJob &job,
     const pasta::AST &ast, const EntityMapper &em, const NameMangler &nm,
     mx::PackedCompilationId tu_id,
-    std::vector<mx::PackedFragmentId> fragment_ids) {
+    std::vector<mx::PackedFragmentId> fragment_ids,
+    std::vector<pasta::DefineMacroDirective> used_defines) {
 
   capnp::MallocMessageBuilder message;
   mx::rpc::Compilation::Builder cb = message.initRoot<mx::rpc::Compilation>();
@@ -1054,6 +1055,8 @@ void GlobalIndexingState::PersistCompilation(
     ipb.setLocation(static_cast<mx::rpc::IncludePathLocation>(path.Location()));
   }
 
+  // Save all the file IDs that ended up being parsed as part of this
+  // compilation unit.
   i = 0u;
   const auto &files = ast.ParsedFiles();
   auto fl = cb.initFileIds(static_cast<unsigned>(files.size()));
@@ -1061,19 +1064,73 @@ void GlobalIndexingState::PersistCompilation(
     fl.set(i++, em.EntityId(file));
   }
 
+  // Save all the fragments IDs that ended up being deduplicated to be part of
+  // this compilation unit.
+  //
+  // TODO(pag): Consider *all* fragment IDs? We include all macros below.
   i = 0u;
   fl = cb.initFragmentIds(static_cast<unsigned>(fragment_ids.size()));
   for (mx::PackedFragmentId frag_id : fragment_ids) {
     fl.set(i++, frag_id.Pack());
   }
 
+  // Count how many macro IDs we need to serialize.
+  auto num_builtin_ids = 0u;
+  auto num_command_line_ids = 0u;
+  auto num_other_ids = 0u;
+  for (const auto &dmd : used_defines) {
+    auto macro_id = em.EntityId(dmd);
+    if (macro_id == mx::kInvalidEntityId) {
+      continue;
+    }
+
+    if (dmd.IsBuiltin()) {
+      ++num_builtin_ids;
+    } else if (dmd.IsCommandLine()) {
+      ++num_command_line_ids;
+    } else {
+      ++num_other_ids;
+    }
+  }
+
+  // Allocate storage for the macro ids.
+  auto builtin_ids = cb.initBuiltinMacroIds(num_builtin_ids);
+  auto command_line_ids = cb.initCommandLineMacroIds(num_command_line_ids);
+  auto macro_ids = cb.initMacroIds(num_other_ids);
+
+  num_builtin_ids = 0u;
+  num_command_line_ids = 0u;
+  num_other_ids = 0u;
+
+  // Save all the macro IDs.
+  for (const auto &dmd : used_defines) {
+    auto macro_id = em.EntityId(dmd);
+    if (macro_id == mx::kInvalidEntityId) {
+      continue;
+    }
+
+    if (dmd.IsBuiltin()) {
+      builtin_ids.set(num_builtin_ids++, macro_id);
+
+    } else if (dmd.IsCommandLine()) {
+      command_line_ids.set(num_command_line_ids++, macro_id);
+
+    } else {
+      macro_ids.set(num_other_ids++, macro_id);
+    }
+  }
+
+  // Set the main file ID. This is the ID of the primary source file that kicked
+  // off all subsequent includes.
   cb.setMainFileId(em.EntityId(ast.MainFile()));
 
+  // Generate MLIR with VAST.
   if (sourceir_progress) {
     sourceir_progress->AddWork(1u);
   }
 
-  if (std::string mlir = codegen.GenerateSourceIR(ast, em, nm);
+  if (std::string mlir = codegen.GenerateSourceIR(
+          ast, em, nm, std::move(fragment_ids));
       !mlir.empty()) {
     cb.setMlir(mlir);
     if (sourceir_progress) {

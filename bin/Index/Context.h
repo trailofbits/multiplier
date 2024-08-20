@@ -140,11 +140,12 @@ class GlobalIndexingState {
                     EntityMapper &em, const PendingFragment &fragment);
 
   // Persist the compilation.
-  void PersistCompilation(const pasta::Compiler &compiler,
-                          const pasta::CompileJob &job, const pasta::AST &ast,
-                          const EntityMapper &em, const NameMangler &nm,
-                          mx::PackedCompilationId tu_id,
-                          std::vector<mx::PackedFragmentId> fragment_ids);
+  void PersistCompilation(
+      const pasta::Compiler &compiler, const pasta::CompileJob &job,
+      const pasta::AST &ast, const EntityMapper &em, const NameMangler &nm,
+      mx::PackedCompilationId tu_id,
+      std::vector<mx::PackedFragmentId> fragment_ids,
+      std::vector<pasta::DefineMacroDirective> used_defines);
 };
 
 }  // namespace indexer

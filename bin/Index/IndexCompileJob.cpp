@@ -151,6 +151,8 @@ struct FragmentCollector {
   EntityOffsetMap bof_to_eof;
   EntityOffsetMap eof_to_include;
 
+  std::vector<pasta::DefineMacroDirective> used_defines;
+
   // Filled up.
   std::vector<PendingFragmentPtr> pending_fragments;
 
@@ -183,9 +185,9 @@ struct FragmentCollector {
   void PartitionEntitiesAndFillPendingFragments(void);
   void PersistParsedFragments(void);
 
-  void CreateFloatingDirectiveFragment(const pasta::Macro &macro);
+  PendingFragmentPtr CreateFloatingDirectiveFragment(const pasta::Macro &macro);
 
-  void CreateFloatingDeclFragment(
+  PendingFragmentPtr CreateFloatingDeclFragment(
       std::optional<FileLocationOfFragment> floc,
       mx::EntityOffset begin_index,
       mx::EntityOffset end_index,
@@ -1018,6 +1020,21 @@ class TLDFinder final : public pasta::DeclVisitor {
   }
 
   void VisitTagDecl(const pasta::TagDecl &decl) final {
+
+    // XREF Issue #565: There can be declarations embedded in declarators, e.g.
+    //                  the usual case like: `struct Foo *bar;` but also more
+    //                  obscure cases like `struct Forward` below:
+    //
+    //    struct Thing {
+    //      __typeof__(struct Forward) *ptr;
+    //    };
+    if ((depth || parent_decl) && IsInjectedForwardDeclaration(decl)) {
+      CHECK(seen.emplace(RawEntity(decl)).second);
+      AddDeclAlways(decl);
+      em.MarkAsTopLevel(decl);
+      return;
+    }
+
     VisitTypeDecl(decl);
     VisitDeeperDeclContext(decl, decl, em.IsTopLevel(decl));
   }
@@ -1928,6 +1945,14 @@ static void AddDeclToEntityRangeList(
       static_cast<unsigned>(entity_ranges.size()));
 }
 
+inline static bool IsUsed(const pasta::DefineMacroDirective &dmd) {
+  for (pasta::Macro use : dmd.Uses()) {
+    (void) use;
+    return true;
+  }
+  return false;
+}
+
 // Go find the top-level macros to be indexed. These are basically directives.
 // We find the top-level macro expansions later during the `TokenTree` building
 // process, because we only really care about how the top-level expansions
@@ -1981,20 +2006,32 @@ std::vector<EntityRange> FragmentCollector::FindTLMs(void) {
     // If this is a macro definition, then only keep track of it if we see it
     // used/expanded.
     if (auto dmd = pasta::DefineMacroDirective::From(md)) {
-      for (pasta::Macro use : dmd->Uses()) {
+      if (IsUsed(dmd.value())) {
         add_macro(std::move(md));
+        used_defines.emplace_back(std::move(dmd.value()));
         break;
       }
       continue;
     }
 
-    add_macro(std::move(md));
+    add_macro(md);
 
     // If it's an include-like directive, then we want to be able to associate
     // begin- and end-of-file markers with this directive. Here we'll find
     // the relevant begin-of-file markers.
     auto ild = pasta::IncludeLikeMacroDirective::From(md);
     if (!ild) {
+
+      // Define directives can be embedded within macro expansions. Go locate
+      // those, just in case we didn't cover them above.
+      for (auto dir : FindDirectivesInMacro(md)) {
+        if (auto dmd = pasta::DefineMacroDirective::From(dir)) {
+          if (IsUsed(dmd.value())) {
+            used_defines.emplace_back(std::move(dmd.value()));
+          }
+        }
+      }
+
       continue;
     }
 
@@ -2646,7 +2683,7 @@ static pasta::PrintedTokenRange CreateParsedTokenRange(
 // forward declarations to prevent Issue #396.
 //
 // XREF(pag): https://github.com/trailofbits/multiplier/issues/396
-void FragmentCollector::CreateFloatingDeclFragment(
+PendingFragmentPtr FragmentCollector::CreateFloatingDeclFragment(
     std::optional<FileLocationOfFragment> floc,
     mx::EntityOffset begin_index,
     mx::EntityOffset end_index,
@@ -2738,7 +2775,7 @@ void FragmentCollector::CreateFloatingDeclFragment(
 
   pf->is_floating = true;
 
-  pending_fragments.emplace_back(std::move(pf));
+  return pf;
 }
 
 // Check if the full range has any other tokens in them.
@@ -2772,7 +2809,7 @@ static bool CanUseFullDirectiveRange(const pasta::TokenRange &full_range) {
 }
 
 // Create a floating fragment for the top-level directives.
-void FragmentCollector::CreateFloatingDirectiveFragment(
+PendingFragmentPtr FragmentCollector::CreateFloatingDirectiveFragment(
     const pasta::Macro &macro) {
 
   auto dir = pasta::MacroDirective::From(macro);
@@ -2817,8 +2854,7 @@ void FragmentCollector::CreateFloatingDirectiveFragment(
       false  /* using parsed tokens */);
 
   pf->is_floating = true;
-
-  pending_fragments.emplace_back(std::move(pf));
+  return pf;
 }
 
 // Perform a topological sort of the top-level entities.
@@ -2915,7 +2951,9 @@ void FragmentCollector::FillPendingFragments(EntityGroupRange group_range) {
                  (IsInjectedForwardDeclaration(decl) ||
                   !floc || decl.IsImplicit())) {
         CHECK(!er.parent);
-        CreateFloatingDeclFragment(floc, begin_index, end_index, decl);
+
+        pending_fragments.emplace_back(CreateFloatingDeclFragment(
+            floc, begin_index, end_index, decl));
 
       // These are generally template instantiations.
       } else if (er.parent) {
@@ -2938,7 +2976,7 @@ void FragmentCollector::FillPendingFragments(EntityGroupRange group_range) {
       // entity mapper. We process these first, as they can end up being used
       // lexically inside of other top-level entities.
       if (ShouldGoInFloatingFragment(macro)) {
-        CreateFloatingDirectiveFragment(macro);
+        pending_fragments.emplace_back(CreateFloatingDirectiveFragment(macro));
 
       } else {
         top_level_macros.emplace_back(macro);
@@ -3204,7 +3242,8 @@ void FragmentCollector::PersistParsedFragments(void) {
   }
 
   context.PersistCompilation(compiler, job, ast, em, nm, tu_id,
-                             std::move(fragment_ids));
+                             std::move(fragment_ids),
+                             std::move(used_defines));
 }
 
 // Look through all files referenced by the AST get their unique IDs. If this
