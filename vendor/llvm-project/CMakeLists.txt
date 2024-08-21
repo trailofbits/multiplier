@@ -86,6 +86,7 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         -DLLVM_ENABLE_RTTI:BOOL=ON
                         "-DLLVM_ENABLE_ASSERTIONS:BOOL=${LLVM_ENABLE_ASSERTIONS}"
                         -DLLVM_ENABLE_EXPENSIVE_CHECKS:BOOL=OFF
+                        "-DLLVM_ABI_BREAKING_CHECKS:STRING=FORCE_OFF"
                         -DLLVM_ENABLE_FFI:BOOL=OFF
                         -DLLVM_ENABLE_WARNINGS:BOOL=ON
                         -DLLVM_INCLUDE_BENCHMARKS:BOOL=OFF

@@ -41,16 +41,14 @@ def harness(comp: mx.frontend.Compilation, root_path: pathlib.PurePath):
             "resource_directory": str(comp.resource_directory),
         }], indent="  "))
 
-    # Go get all macro definitions not associated with a file. This will capture
-    # compiler-builtin macros. Unfortunately this will also capture the macros
-    # defined at the command-line.
+    # Go get all (used) compiler builtin macro definitions.
     with open(str(root_path / "builtin-macros.h"), "w") as macros:
-        index = mx.Index.containing(comp)
-        for macro in mx.frontend.DefineMacroDirective.IN(index):
-            file = mx.frontend.File.containing(macro)
-            if not file:
-                macros.write(" ".join(t.data for t in macro.generate_use_tokens))
-                macros.write('\n')
+        for macro in comp.builtin_defines:
+            macros.write(f"#ifdef {macro.name.data}\n")
+            macros.write(f"#  undef {macro.name.data}\n")
+            macros.write("#endif\n")
+            macros.write(" ".join(t.data for t in macro.generate_use_tokens))
+            macros.write('\n')
 
     with tarfile.open(str(root_path) + ".tar.gz", "w:gz") as tar:
         tar.add(str(root_path), arcname=root_path.name)
