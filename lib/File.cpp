@@ -299,8 +299,11 @@ SpecificEntityId<FileId> File::id(void) const noexcept {
 }
 
 // Generate all files in the index.
-gap::generator<File> File::in(const Index &index) {
-  return index.files();
+gap::generator<File> File::in(const Index &index_) {
+  Index index = index_;
+  for (auto file : index.files()) {
+    co_yield std::move(file);
+  }
 }
 
 gap::generator<Fragment> File::fragments(void) const & {
