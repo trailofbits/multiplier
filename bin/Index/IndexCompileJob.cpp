@@ -2009,9 +2009,24 @@ std::vector<EntityRange> FragmentCollector::FindTLMs(void) {
       if (IsUsed(dmd.value())) {
         add_macro(std::move(md));
         used_defines.emplace_back(std::move(dmd.value()));
-        break;
       }
       continue;
+    
+    // Define directives can be embedded within macro expansions. Go locate
+    // those, just in case we didn't cover them above.
+    } else {
+      for (auto maybe_def : FindDirectivesInMacro(md)) {
+        if (auto def = pasta::DefineMacroDirective::From(maybe_def)) {
+          
+          // Unconditionally add a `#define` that is inside of another macro
+          // (e.g. an expansion) even if it isn't used.
+          add_macro(def.value());
+          
+          if (IsUsed(def.value())) {
+            used_defines.emplace_back(std::move(def.value()));
+          }
+        }
+      }
     }
 
     add_macro(md);
@@ -2021,17 +2036,6 @@ std::vector<EntityRange> FragmentCollector::FindTLMs(void) {
     // the relevant begin-of-file markers.
     auto ild = pasta::IncludeLikeMacroDirective::From(md);
     if (!ild) {
-
-      // Define directives can be embedded within macro expansions. Go locate
-      // those, just in case we didn't cover them above.
-      for (auto dir : FindDirectivesInMacro(md)) {
-        if (auto dmd = pasta::DefineMacroDirective::From(dir)) {
-          if (IsUsed(dmd.value())) {
-            used_defines.emplace_back(std::move(dmd.value()));
-          }
-        }
-      }
-
       continue;
     }
 
@@ -2940,7 +2944,6 @@ void FragmentCollector::FillPendingFragments(EntityGroupRange group_range) {
 
       // Things like namespaces.
       if (ShouldHideFromIndexer(decl)) {
-        // LOG(ERROR) << "hidden " << RawEntity(decl);
         continue;
 
       // E.g. if there's something like: `typedef struct page *pgtable_t;`,

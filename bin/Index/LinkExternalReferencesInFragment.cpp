@@ -489,9 +489,12 @@ void LinkExternalReferencesInFragment(
             //            issue/condition in `FindTLMs` in file
             //            `bin/Index/IndexCompileJob.cpp`.
             if (!macro_name->FileLocation()) {
+              assert(def->IsCommandLine() || def->IsBuiltin());
               continue;
             }
 
+            // If we're here it basically means we found a use of a definition
+            // but we didn't persist the definition.
             assert(false);
             continue;
           }
