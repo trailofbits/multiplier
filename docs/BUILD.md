@@ -104,7 +104,7 @@ curl -sSL https://apt.llvm.org/llvm-snapshot.gpg.key | \
   gpg --dearmor - | \
   sudo tee /etc/apt/trusted.gpg.d/llvm.gpg
 
-sudo apt-add-repository "deb https://apt.llvm.org/$(lsb_release -cs)/ llvm-toolchain-$(lsb_release -cs)-${LLVM_VER} main"
+sudo apt-add-repository "deb https://apt.llvm.org/$(lsb_release -cs)/ llvm-toolchain-$(lsb_release -cs)-18 main"
 
 sudo apt install clang-18
 ```
