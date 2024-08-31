@@ -586,6 +586,7 @@ class AddIOp(multiplier.ir.highlevel.Operation):
     ...
 
 class AddrLabelExprOp(multiplier.ir.highlevel.Operation):
+  label: multiplier.ir.Value
   result: multiplier.ir.Value
 
   @staticmethod
@@ -649,6 +650,9 @@ class AlignOfTypeOp(multiplier.ir.highlevel.Operation):
     ...
 
 class AsmOp(multiplier.ir.highlevel.Operation):
+  asm_outputs: Iterable[multiplier.ir.Operand]
+  asm_inputs: Iterable[multiplier.ir.Operand]
+  labels: Iterable[multiplier.ir.Operand]
   asm_template: str
   is_volatile: bool
   has_goto: bool
@@ -970,6 +974,8 @@ class CStyleCastOp(multiplier.ir.highlevel.Operation):
     ...
 
 class CallOp(multiplier.ir.highlevel.Operation):
+  arg_operands: Iterable[multiplier.ir.Operand]
+  results: Iterable[multiplier.ir.Result]
   callee: str
 
   @staticmethod
@@ -1220,6 +1226,7 @@ class EnumDeclOp(multiplier.ir.highlevel.Operation):
   constants: multiplier.ir.Region
   name: str
   is_complete: bool
+  constants_block: multiplier.ir.Block
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1441,9 +1448,9 @@ class EmptyDeclOp(multiplier.ir.highlevel.Operation):
     ...
 
 class ForOp(multiplier.ir.highlevel.Operation):
-  cond_region: multiplier.ir.Region
-  incr_region: multiplier.ir.Region
-  body_region: multiplier.ir.Region
+  cond_region: Optional[multiplier.ir.Region]
+  incr_region: Optional[multiplier.ir.Region]
+  body_region: Optional[multiplier.ir.Region]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1458,10 +1465,13 @@ class ForOp(multiplier.ir.highlevel.Operation):
     ...
 
 class FuncOp(multiplier.ir.highlevel.Operation):
-  body: multiplier.ir.Region
+  body: Optional[multiplier.ir.Region]
   sym_name: str
   sym_visibility: Optional[str]
   is_var_arg: bool
+  callable_results: Iterable[multiplier.ir.Type]
+  argument_types: Iterable[multiplier.ir.Type]
+  result_types: Iterable[multiplier.ir.Type]
   is_declaration: bool
 
   @staticmethod
@@ -1477,6 +1487,7 @@ class FuncOp(multiplier.ir.highlevel.Operation):
     ...
 
 class GotoStmtOp(multiplier.ir.highlevel.Operation):
+  label: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1493,7 +1504,7 @@ class GotoStmtOp(multiplier.ir.highlevel.Operation):
 class IfOp(multiplier.ir.highlevel.Operation):
   cond_region: multiplier.ir.Region
   then_region: multiplier.ir.Region
-  else_region: multiplier.ir.Region
+  else_region: Optional[multiplier.ir.Region]
   has_else: bool
 
   @staticmethod
@@ -1524,6 +1535,7 @@ class IndirectGotoStmtOp(multiplier.ir.highlevel.Operation):
     ...
 
 class LabelDeclOp(multiplier.ir.highlevel.Operation):
+  result: multiplier.ir.Value
   name: str
 
   @staticmethod
@@ -1539,6 +1551,7 @@ class LabelDeclOp(multiplier.ir.highlevel.Operation):
     ...
 
 class LabelStmtOp(multiplier.ir.highlevel.Operation):
+  label: multiplier.ir.Value
   body: multiplier.ir.Region
 
   @staticmethod
@@ -1584,6 +1597,7 @@ class SwitchOp(multiplier.ir.highlevel.Operation):
 
 class TypeYieldOp(multiplier.ir.highlevel.Operation):
   result: multiplier.ir.Value
+  yielded: multiplier.ir.Type
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1614,8 +1628,8 @@ class ValueYieldOp(multiplier.ir.highlevel.Operation):
 
 class VarDeclOp(multiplier.ir.highlevel.Operation):
   result: multiplier.ir.Value
-  initializer: multiplier.ir.Region
-  allocation_size: multiplier.ir.Region
+  initializer: Optional[multiplier.ir.Region]
+  allocation_size: Optional[multiplier.ir.Region]
   name: str
   has_local_storage: bool
   is_local_var_decl: bool
@@ -1690,6 +1704,8 @@ class ImplicitCastOp(multiplier.ir.highlevel.Operation):
 
 class IndirectCallOp(multiplier.ir.highlevel.Operation):
   callee: multiplier.ir.Value
+  arg_operands: Iterable[multiplier.ir.Operand]
+  results: Iterable[multiplier.ir.Result]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1704,6 +1720,7 @@ class IndirectCallOp(multiplier.ir.highlevel.Operation):
     ...
 
 class InitListExprOp(multiplier.ir.highlevel.Operation):
+  elements: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1866,6 +1883,7 @@ class OffsetOfExprOp(multiplier.ir.highlevel.Operation):
     ...
 
 class OpaqueValueExprOp(multiplier.ir.highlevel.Operation):
+  arg: Iterable[multiplier.ir.Operand]
   result: multiplier.ir.Value
 
   @staticmethod
@@ -2144,6 +2162,7 @@ class RemUOp(multiplier.ir.highlevel.Operation):
     ...
 
 class ReturnOp(multiplier.ir.highlevel.Operation):
+  result: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2160,6 +2179,7 @@ class ReturnOp(multiplier.ir.highlevel.Operation):
 class SizeOfExprOp(multiplier.ir.highlevel.Operation):
   result: multiplier.ir.Value
   expr: multiplier.ir.Region
+  value: int
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2176,6 +2196,7 @@ class SizeOfExprOp(multiplier.ir.highlevel.Operation):
 class SizeOfTypeOp(multiplier.ir.highlevel.Operation):
   result: multiplier.ir.Value
   arg: multiplier.ir.Type
+  value: int
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2208,7 +2229,11 @@ class StmtExprOp(multiplier.ir.highlevel.Operation):
 class StructDeclOp(multiplier.ir.highlevel.Operation):
   fields: multiplier.ir.Region
   name: str
+  field_types: Iterable[multiplier.ir.Type]
+  defined_name: str
+  defined_type: multiplier.ir.Type
   is_complete_definition: bool
+  fields_block: multiplier.ir.Block
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2340,6 +2365,7 @@ class TranslationUnitOp(multiplier.ir.highlevel.Operation):
 class TypeAliasOp(multiplier.ir.highlevel.Operation):
   name: str
   type: multiplier.ir.Type
+  defined_type: multiplier.ir.Type
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2355,6 +2381,7 @@ class TypeAliasOp(multiplier.ir.highlevel.Operation):
 
 class TypeDeclOp(multiplier.ir.highlevel.Operation):
   name: str
+  defined_type: multiplier.ir.Type
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2371,6 +2398,7 @@ class TypeDeclOp(multiplier.ir.highlevel.Operation):
 class TypeDefOp(multiplier.ir.highlevel.Operation):
   name: str
   type: multiplier.ir.Type
+  defined_type: multiplier.ir.Type
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2404,7 +2432,11 @@ class TypeOfExprOp(multiplier.ir.highlevel.Operation):
 class UnionDeclOp(multiplier.ir.highlevel.Operation):
   fields: multiplier.ir.Region
   name: str
+  field_types: Iterable[multiplier.ir.Type]
+  defined_name: str
+  defined_type: multiplier.ir.Type
   is_complete_definition: bool
+  fields_block: multiplier.ir.Block
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:

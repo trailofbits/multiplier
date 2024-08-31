@@ -138,6 +138,7 @@ class BinLOrOp(multiplier.ir.core.Operation):
     ...
 
 class ImplicitReturnOp(multiplier.ir.core.Operation):
+  result: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -186,6 +187,7 @@ class SelectOp(multiplier.ir.core.Operation):
   cond: multiplier.ir.Value
   then_region: multiplier.ir.Value
   else_region: multiplier.ir.Value
+  results: Iterable[multiplier.ir.Result]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -209,6 +211,8 @@ class FunctionType(multiplier.ir.core.Type):
   is_var_arg: bool
   num_inputs: int
   num_results: int
+  inputs: Iterable[multiplier.ir.Type]
+  results: Iterable[multiplier.ir.Type]
   var_arg: bool
 
   @staticmethod

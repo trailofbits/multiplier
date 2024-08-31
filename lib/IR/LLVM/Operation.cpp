@@ -386,6 +386,13 @@ std::optional<BrOp> BrOp::producing(const ::mx::ir::Value &that) {
   return ::mlir::LLVM::BrOp(this->::mx::ir::Operation::op_);
 }
 
+gap::generator<::mx::ir::Operand> BrOp::dest_operands(void) const & {
+  auto range = underlying_repr().getDestOperands();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
 std::optional<CallIntrinsicOp> CallIntrinsicOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::LLVM_CALL_INTRINSIC) {
     return reinterpret_cast<const CallIntrinsicOp &>(that);
@@ -402,6 +409,13 @@ std::optional<CallIntrinsicOp> CallIntrinsicOp::producing(const ::mx::ir::Value 
 
 ::mlir::LLVM::CallIntrinsicOp CallIntrinsicOp::underlying_repr(void) const noexcept {
   return ::mlir::LLVM::CallIntrinsicOp(this->::mx::ir::Operation::op_);
+}
+
+gap::generator<::mx::ir::Operand> CallIntrinsicOp::args(void) const & {
+  auto range = underlying_repr().getArgs();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
 }
 
 ::mx::ir::Value CallIntrinsicOp::results(void) const {
@@ -436,6 +450,13 @@ std::optional<CallOp> CallOp::producing(const ::mx::ir::Value &that) {
   return ::mlir::LLVM::CallOp(this->::mx::ir::Operation::op_);
 }
 
+gap::generator<::mx::ir::Operand> CallOp::callee_operands(void) const & {
+  auto range = underlying_repr().getCalleeOperands();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
 ::mx::ir::Value CallOp::result(void) const {
   auto val = underlying_repr().getResult();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
@@ -451,6 +472,13 @@ std::optional<std::string_view> CallOp::callee(void) const {
     return std::string_view(val.data(), size);
   } else {
     return {};
+  }
+}
+
+gap::generator<::mx::ir::Operand> CallOp::arg_operands(void) const & {
+  auto range = underlying_repr().getArgOperands();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
   }
 }
 
@@ -529,6 +557,20 @@ std::optional<CondBrOp> CondBrOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::LLVM::CondBrOp CondBrOp::underlying_repr(void) const noexcept {
   return ::mlir::LLVM::CondBrOp(this->::mx::ir::Operation::op_);
+}
+
+gap::generator<::mx::ir::Operand> CondBrOp::true_dest_operands(void) const & {
+  auto range = underlying_repr().getTrueDestOperands();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
+gap::generator<::mx::ir::Operand> CondBrOp::false_dest_operands(void) const & {
+  auto range = underlying_repr().getFalseDestOperands();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
 }
 
 std::optional<ConstantOp> ConstantOp::from(const ::mx::ir::Operation &that) {
@@ -1030,6 +1072,13 @@ std::optional<GetElementPtrOp> GetElementPtrOp::producing(const ::mx::ir::Value 
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
+gap::generator<::mx::ir::Operand> GetElementPtrOp::dynamic_indices(void) const & {
+  auto range = underlying_repr().getDynamicIndices();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
 ::mx::ir::Value GetElementPtrOp::res(void) const {
   auto val = underlying_repr().getRes();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
@@ -1217,6 +1266,13 @@ std::optional<InlineAsmOp> InlineAsmOp::producing(const ::mx::ir::Value &that) {
   return ::mlir::LLVM::InlineAsmOp(this->::mx::ir::Operation::op_);
 }
 
+gap::generator<::mx::ir::Operand> InlineAsmOp::operands(void) const & {
+  auto range = underlying_repr().getOperands();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
 ::mx::ir::Value InlineAsmOp::res(void) const {
   auto val = underlying_repr().getRes();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
@@ -1362,6 +1418,27 @@ std::optional<InvokeOp> InvokeOp::producing(const ::mx::ir::Value &that) {
   return ::mlir::LLVM::InvokeOp(this->::mx::ir::Operation::op_);
 }
 
+gap::generator<::mx::ir::Operand> InvokeOp::callee_operands(void) const & {
+  auto range = underlying_repr().getCalleeOperands();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
+gap::generator<::mx::ir::Operand> InvokeOp::normal_dest_operands(void) const & {
+  auto range = underlying_repr().getNormalDestOperands();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
+gap::generator<::mx::ir::Operand> InvokeOp::unwind_dest_operands(void) const & {
+  auto range = underlying_repr().getUnwindDestOperands();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
 std::optional<std::string_view> InvokeOp::callee(void) const {
   auto opt_val = underlying_repr().getCallee();
   if (!opt_val) {
@@ -1372,6 +1449,13 @@ std::optional<std::string_view> InvokeOp::callee(void) const {
     return std::string_view(val.data(), size);
   } else {
     return {};
+  }
+}
+
+gap::generator<::mx::ir::Operand> InvokeOp::arg_operands(void) const & {
+  auto range = underlying_repr().getArgOperands();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
   }
 }
 
@@ -1393,8 +1477,12 @@ std::optional<FuncOp> FuncOp::producing(const ::mx::ir::Value &that) {
   return ::mlir::LLVM::LLVMFuncOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Region FuncOp::body(void) const {
-  auto &val = underlying_repr().getBody();
+std::optional<::mx::ir::Region> FuncOp::body(void) const {
+  auto opt_val = underlying_repr().getBody();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
   return ::mx::ir::Region(module_, val);
 }
 
@@ -2209,6 +2297,13 @@ std::optional<SwitchOp> SwitchOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::LLVM::SwitchOp SwitchOp::underlying_repr(void) const noexcept {
   return ::mlir::LLVM::SwitchOp(this->::mx::ir::Operation::op_);
+}
+
+gap::generator<::mx::ir::Operand> SwitchOp::default_operands(void) const & {
+  auto range = underlying_repr().getDefaultOperands();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
 }
 
 std::optional<TruncOp> TruncOp::from(const ::mx::ir::Operation &that) {
@@ -3832,6 +3927,13 @@ std::optional<MaskedLoadOp> MaskedLoadOp::producing(const ::mx::ir::Value &that)
 ::mx::ir::Value MaskedLoadOp::mask(void) const {
   auto val = underlying_repr().getMask();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+gap::generator<::mx::ir::Operand> MaskedLoadOp::pass_thru(void) const & {
+  auto range = underlying_repr().getPassThru();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
 }
 
 ::mx::ir::Value MaskedLoadOp::res(void) const {
@@ -7107,6 +7209,13 @@ std::optional<MaskedGatherOp> MaskedGatherOp::producing(const ::mx::ir::Value &t
 ::mx::ir::Value MaskedGatherOp::mask(void) const {
   auto val = underlying_repr().getMask();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+gap::generator<::mx::ir::Operand> MaskedGatherOp::pass_thru(void) const & {
+  auto range = underlying_repr().getPassThru();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
 }
 
 ::mx::ir::Value MaskedGatherOp::res(void) const {

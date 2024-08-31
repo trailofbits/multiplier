@@ -47,6 +47,26 @@ unsigned int FunctionType::num_results(void) const {
   return val;
 }
 
+gap::generator<::mx::ir::Type> FunctionType::inputs(void) const & {
+  auto range = underlying_repr().getInputs();
+  for (auto el_ty : range) {
+    co_yield ::mx::ir::Type(
+        el_ty.getContext(),
+        reinterpret_cast<const mlir::TypeStorage *>(
+            el_ty.getAsOpaquePointer()));
+  }
+}
+
+gap::generator<::mx::ir::Type> FunctionType::results(void) const & {
+  auto range = underlying_repr().getResults();
+  for (auto el_ty : range) {
+    co_yield ::mx::ir::Type(
+        el_ty.getContext(),
+        reinterpret_cast<const mlir::TypeStorage *>(
+            el_ty.getAsOpaquePointer()));
+  }
+}
+
 bool FunctionType::var_arg(void) const {
   auto val = underlying_repr().getVarArg();
   return val;

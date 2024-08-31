@@ -124,6 +124,26 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
 namespace {
 static PyGetSetDef gProperties[] = {
+  {
+    "true_dest_operands",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::true_dest_operands);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::CondBrOp::true_dest_operands"),
+    nullptr,
+  },
+  {
+    "false_dest_operands",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::false_dest_operands);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::CondBrOp::false_dest_operands"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

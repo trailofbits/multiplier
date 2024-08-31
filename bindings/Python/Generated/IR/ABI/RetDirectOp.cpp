@@ -134,6 +134,16 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::ir::abi::RetDirectOp::value"),
     nullptr,
   },
+  {
+    "result",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::result);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::abi::RetDirectOp::result"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

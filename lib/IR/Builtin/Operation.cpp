@@ -120,4 +120,18 @@ std::optional<UnrealizedConversionCastOp> UnrealizedConversionCastOp::producing(
   return ::mlir::UnrealizedConversionCastOp(this->::mx::ir::Operation::op_);
 }
 
+gap::generator<::mx::ir::Operand> UnrealizedConversionCastOp::inputs(void) const & {
+  auto range = underlying_repr().getInputs();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
+gap::generator<::mx::ir::Result> UnrealizedConversionCastOp::outputs(void) const & {
+  auto range = underlying_repr().getOutputs();
+  for (auto val : range) {
+    co_yield ::mx::ir::Result(module_, val.getAsOpaquePointer());
+  }
+}
+
 }  // namespace mx::ir::builtin

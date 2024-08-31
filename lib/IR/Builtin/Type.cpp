@@ -365,6 +365,11 @@ std::optional<TupleType> TupleType::from(const ::mx::ir::Type &that) {
   return ::mlir::TupleType(this->::mx::ir::Type::type_);
 }
 
+size_t TupleType::size(void) const {
+  auto val = underlying_repr().size();
+  return val;
+}
+
 std::optional<UnrankedMemRefType> UnrankedMemRefType::from(const ::mx::ir::Type &that) {
   if (that.kind() == TypeKind::BUILTIN_UNRANKED_MEM_REF) {
     return reinterpret_cast<const UnrankedMemRefType &>(that);

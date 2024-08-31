@@ -34,8 +34,8 @@ class MX_EXPORT FunctionType final : public Type {
   bool is_var_arg(void) const;
   unsigned int num_inputs(void) const;
   unsigned int num_results(void) const;
-  //::llvm::ArrayRef<Type> inputs(void) const;
-  //::llvm::ArrayRef<Type> results(void) const;
+  gap::generator<::mx::ir::Type> inputs(void) const &;
+  gap::generator<::mx::ir::Type> results(void) const &;
   bool var_arg(void) const;
 };
 static_assert(sizeof(FunctionType) == sizeof(Type));

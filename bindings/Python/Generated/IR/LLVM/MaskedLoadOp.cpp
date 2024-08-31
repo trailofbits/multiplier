@@ -135,6 +135,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "pass_thru",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::pass_thru);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::MaskedLoadOp::pass_thru"),
+    nullptr,
+  },
+  {
     "res",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

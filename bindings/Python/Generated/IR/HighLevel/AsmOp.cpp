@@ -125,6 +125,36 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyGetSetDef gProperties[] = {
   {
+    "asm_outputs",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::asm_outputs);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::hl::AsmOp::asm_outputs"),
+    nullptr,
+  },
+  {
+    "asm_inputs",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::asm_inputs);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::hl::AsmOp::asm_inputs"),
+    nullptr,
+  },
+  {
+    "labels",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::labels);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::hl::AsmOp::labels"),
+    nullptr,
+  },
+  {
     "asm_template",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

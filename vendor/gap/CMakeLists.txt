@@ -17,6 +17,10 @@ if(NOT MX_USE_VENDORED_GAP)
   endif()
 endif()
 
+find_package(LLVM CONFIG REQUIRED QUIET HINTS "${MX_VENDOR_INSTALL_DIR}")
+find_package(MLIR CONFIG REQUIRED QUIET HINTS "${MX_VENDOR_INSTALL_DIR}")
+find_package(Clang CONFIG REQUIRED QUIET HINTS "${MX_VENDOR_INSTALL_DIR}")
+
 set(src_dir "${CMAKE_CURRENT_LIST_DIR}/src")
 set(build_dir "${CMAKE_CURRENT_BINARY_DIR}/build")
 
@@ -52,7 +56,12 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         -DGAP_ENABLE_COROUTINES:BOOL=ON
                         -DGAP_ENABLE_VCPKG:BOOL=OFF
                         -DGAP_ENABLE_WARNINGS:BOOL=OFF
+                        -DGAP_ENABLE_SARIF:BOOL=OFF
+                        -DGAP_ENABLE_MLIR:BOOL=ON
                         -DGAP_INSTALL:BOOL=ON
+                        "-DLLVM_DIR=${LLVM_DIR}"
+                        "-DMLIR_DIR=${MLIR_DIR}"
+                        "-DClang_DIR=${Clang_DIR}"
                         "${src_dir}"
                WORKING_DIRECTORY "${build_dir}")
 

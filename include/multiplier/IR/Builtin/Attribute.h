@@ -107,7 +107,7 @@ class MX_EXPORT ArrayAttr final : public Attribute {
   // Imported methods:
   //iterator begin(void) const;
   //iterator end(void) const;
-  //size_t size(void) const;
+  size_t size(void) const;
   bool empty(void) const;
   //::llvm::ArrayRef<Attribute> value(void) const;
 };
@@ -189,7 +189,7 @@ class MX_EXPORT DictionaryAttr final : public Attribute {
   //iterator begin(void) const;
   //iterator end(void) const;
   bool empty(void) const;
-  //size_t size(void) const;
+  size_t size(void) const;
   //::llvm::ArrayRef<NamedAttribute> value(void) const;
 };
 static_assert(sizeof(DictionaryAttr) == sizeof(Attribute));
@@ -316,7 +316,7 @@ class MX_EXPORT StringAttr final : public Attribute {
   //StringRef strref(void) const;
   std::string str(void) const;
   //const char * data(void) const;
-  //size_t size(void) const;
+  size_t size(void) const;
   bool empty(void) const;
   //StringRef::iterator begin(void) const;
   //StringRef::iterator end(void) const;

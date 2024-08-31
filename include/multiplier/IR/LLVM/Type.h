@@ -56,7 +56,7 @@ class MX_EXPORT FunctionType final : public Type {
   //ArrayRef<Type> return_types(void) const;
   unsigned int num_params(void) const;
   //Type return_type(void) const;
-  //::llvm::ArrayRef<Type> params(void) const;
+  gap::generator<::mx::ir::Type> params(void) const &;
   bool var_arg(void) const;
 };
 static_assert(sizeof(FunctionType) == sizeof(Type));
@@ -117,7 +117,7 @@ class MX_EXPORT TargetExtType final : public Type {
   // Imported methods:
   bool supports_mem_ops(void) const;
   std::string_view ext_type_name(void) const;
-  //::llvm::ArrayRef<Type> type_params(void) const;
+  gap::generator<::mx::ir::Type> type_params(void) const &;
   //::llvm::ArrayRef<unsigned int> int_params(void) const;
 };
 static_assert(sizeof(TargetExtType) == sizeof(Type));

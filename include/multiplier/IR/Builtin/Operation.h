@@ -56,8 +56,8 @@ class MX_EXPORT UnrealizedConversionCastOp final : public Operation {
   ::mlir::UnrealizedConversionCastOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range inputs(void) const;
-  //::mlir::Operation::result_range outputs(void) const;
+  gap::generator<::mx::ir::Operand> inputs(void) const &;
+  gap::generator<::mx::ir::Result> outputs(void) const &;
 };
 static_assert(sizeof(UnrealizedConversionCastOp) == sizeof(Operation));
 

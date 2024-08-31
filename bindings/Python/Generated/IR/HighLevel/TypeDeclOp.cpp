@@ -134,6 +134,16 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::ir::hl::TypeDeclOp::name"),
     nullptr,
   },
+  {
+    "defined_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->defined_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::hl::TypeDeclOp::defined_type"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

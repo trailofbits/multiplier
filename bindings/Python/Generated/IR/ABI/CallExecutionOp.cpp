@@ -125,6 +125,16 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyGetSetDef gProperties[] = {
   {
+    "args",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::args);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::abi::CallExecutionOp::args"),
+    nullptr,
+  },
+  {
     "result",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -152,6 +162,16 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::abi::CallExecutionOp::callee"),
+    nullptr,
+  },
+  {
+    "arg_operands",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::arg_operands);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::abi::CallExecutionOp::arg_operands"),
     nullptr,
   },
   {}  // Sentinel.

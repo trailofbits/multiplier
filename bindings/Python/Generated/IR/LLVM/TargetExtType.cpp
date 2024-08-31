@@ -144,6 +144,16 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::ir::llvm::TargetExtType::ext_type_name"),
     nullptr,
   },
+  {
+    "type_params",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::type_params);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::TargetExtType::type_params"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

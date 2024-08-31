@@ -373,7 +373,7 @@ class MX_EXPORT TupleType final : public Type {
   ::mlir::TupleType underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //size_t size(void) const;
+  size_t size(void) const;
   //iterator begin(void) const;
   //iterator end(void) const;
   //ArrayRef<Type> types(void) const;

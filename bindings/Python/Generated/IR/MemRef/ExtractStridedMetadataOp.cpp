@@ -135,6 +135,26 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "sizes",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::sizes);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::memref::ExtractStridedMetadataOp::sizes"),
+    nullptr,
+  },
+  {
+    "strides",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::strides);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::memref::ExtractStridedMetadataOp::strides"),
+    nullptr,
+  },
+  {
     "view_source",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

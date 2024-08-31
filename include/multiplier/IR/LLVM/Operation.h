@@ -467,7 +467,7 @@ class MX_EXPORT BrOp final : public Operation {
   ::mlir::LLVM::BrOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range dest_operands(void) const;
+  gap::generator<::mx::ir::Operand> dest_operands(void) const &;
   //::mlir::Block * dest(void) const;
   //::std::optional<LoopAnnotationAttr> loop_annotation(void) const;
 };
@@ -485,7 +485,7 @@ class MX_EXPORT CallIntrinsicOp final : public Operation {
   ::mlir::LLVM::CallIntrinsicOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range args(void) const;
+  gap::generator<::mx::ir::Operand> args(void) const &;
   ::mx::ir::Value results(void) const;
   std::string_view intrin(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
@@ -504,7 +504,7 @@ class MX_EXPORT CallOp final : public Operation {
   ::mlir::LLVM::CallOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range callee_operands(void) const;
+  gap::generator<::mx::ir::Operand> callee_operands(void) const &;
   ::mx::ir::Value result(void) const;
   //::std::optional<LLVMFunctionType> callee_type(void) const;
   std::optional<std::string_view> callee(void) const;
@@ -517,7 +517,7 @@ class MX_EXPORT CallOp final : public Operation {
   //::std::optional<ArrayAttr> tbaa(void) const;
   //::llvm::SmallVector<Value, 6> accessed_operands(void) const;
   //::mlir::CallInterfaceCallable callable_for_callee(void) const;
-  //::mlir::Operation::operand_range arg_operands(void) const;
+  gap::generator<::mx::ir::Operand> arg_operands(void) const &;
   //LLVMFunctionType callee_function_type(void) const;
 };
 static_assert(sizeof(CallOp) == sizeof(Operation));
@@ -569,8 +569,8 @@ class MX_EXPORT CondBrOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<IntegerType> condition(void) const;
-  //::mlir::Operation::operand_range true_dest_operands(void) const;
-  //::mlir::Operation::operand_range false_dest_operands(void) const;
+  gap::generator<::mx::ir::Operand> true_dest_operands(void) const &;
+  gap::generator<::mx::ir::Operand> false_dest_operands(void) const &;
   //::mlir::Block * true_dest(void) const;
   //::mlir::Block * false_dest(void) const;
   //::std::optional<ArrayRef<int>> branch_weights(void) const;
@@ -879,7 +879,7 @@ class MX_EXPORT GetElementPtrOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value base(void) const;
-  //::mlir::Operation::operand_range dynamic_indices(void) const;
+  gap::generator<::mx::ir::Operand> dynamic_indices(void) const &;
   ::mx::ir::Value res(void) const;
   //::llvm::ArrayRef<int> raw_constant_indices(void) const;
   ::mx::ir::Type elem_type(void) const;
@@ -988,7 +988,7 @@ class MX_EXPORT InlineAsmOp final : public Operation {
   ::mlir::LLVM::InlineAsmOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range operands(void) const;
+  gap::generator<::mx::ir::Operand> operands(void) const &;
   ::mx::ir::Value res(void) const;
   std::string_view asm_string(void) const;
   std::string_view constraints(void) const;
@@ -1066,9 +1066,9 @@ class MX_EXPORT InvokeOp final : public Operation {
   ::mlir::LLVM::InvokeOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range callee_operands(void) const;
-  //::mlir::Operation::operand_range normal_dest_operands(void) const;
-  //::mlir::Operation::operand_range unwind_dest_operands(void) const;
+  gap::generator<::mx::ir::Operand> callee_operands(void) const &;
+  gap::generator<::mx::ir::Operand> normal_dest_operands(void) const &;
+  gap::generator<::mx::ir::Operand> unwind_dest_operands(void) const &;
   //::mlir::Block * normal_dest(void) const;
   //::mlir::Block * unwind_dest(void) const;
   //::std::optional<LLVMFunctionType> callee_type(void) const;
@@ -1076,7 +1076,7 @@ class MX_EXPORT InvokeOp final : public Operation {
   //::std::optional<ArrayRef<int>> branch_weights(void) const;
   //::mlir::LLVM::cconv::CConv c_conv(void) const;
   //::mlir::CallInterfaceCallable callable_for_callee(void) const;
-  //::mlir::Operation::operand_range arg_operands(void) const;
+  gap::generator<::mx::ir::Operand> arg_operands(void) const &;
   //LLVMFunctionType callee_function_type(void) const;
 };
 static_assert(sizeof(InvokeOp) == sizeof(Operation));
@@ -1093,7 +1093,7 @@ class MX_EXPORT FuncOp final : public Operation {
   ::mlir::LLVM::LLVMFuncOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Region body(void) const;
+  std::optional<::mx::ir::Region> body(void) const;
   std::string_view sym_name(void) const;
   std::optional<std::string_view> sym_visibility(void) const;
   //::mlir::LLVM::LLVMFunctionType function_type(void) const;
@@ -1514,7 +1514,7 @@ class MX_EXPORT SwitchOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<IntegerType> value(void) const;
-  //::mlir::Operation::operand_range default_operands(void) const;
+  gap::generator<::mx::ir::Operand> default_operands(void) const &;
   //::mlir::OperandRangeRange case_operands(void) const;
   //::mlir::Block * default_destination(void) const;
   //::mlir::SuccessorRange case_destinations(void) const;
@@ -2597,7 +2597,7 @@ class MX_EXPORT MaskedLoadOp final : public Operation {
   // Imported methods:
   //::mlir::TypedValue<LLVMPointerType> data(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::Operation::operand_range pass_thru(void) const;
+  gap::generator<::mx::ir::Operand> pass_thru(void) const &;
   ::mx::ir::Value res(void) const;
   uint32_t alignment(void) const;
 };
@@ -4589,7 +4589,7 @@ class MX_EXPORT MaskedGatherOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value ptrs(void) const;
   ::mx::ir::Value mask(void) const;
-  //::mlir::Operation::operand_range pass_thru(void) const;
+  gap::generator<::mx::ir::Operand> pass_thru(void) const &;
   ::mx::ir::Value res(void) const;
   uint32_t alignment(void) const;
 };

@@ -101,6 +101,11 @@ std::optional<ArrayAttr> ArrayAttr::from(const ::mx::ir::Attribute &that) {
   return ::mlir::ArrayAttr(this->::mx::ir::Attribute::attr_);
 }
 
+size_t ArrayAttr::size(void) const {
+  auto val = underlying_repr().size();
+  return val;
+}
+
 bool ArrayAttr::empty(void) const {
   auto val = underlying_repr().empty();
   return val;
@@ -173,6 +178,11 @@ std::optional<DictionaryAttr> DictionaryAttr::from(const ::mx::ir::Attribute &th
 
 bool DictionaryAttr::empty(void) const {
   auto val = underlying_repr().empty();
+  return val;
+}
+
+size_t DictionaryAttr::size(void) const {
+  auto val = underlying_repr().size();
   return val;
 }
 
@@ -313,6 +323,11 @@ std::optional<StringAttr> StringAttr::from(const ::mx::ir::Attribute &that) {
 
 std::string StringAttr::str(void) const {
   auto val = underlying_repr().str();
+  return val;
+}
+
+size_t StringAttr::size(void) const {
+  auto val = underlying_repr().size();
   return val;
 }
 

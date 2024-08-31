@@ -145,6 +145,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "params",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::params);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::FunctionType::params"),
+    nullptr,
+  },
+  {
     "var_arg",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

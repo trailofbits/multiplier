@@ -125,6 +125,36 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyGetSetDef gProperties[] = {
   {
+    "callee_operands",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::callee_operands);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::InvokeOp::callee_operands"),
+    nullptr,
+  },
+  {
+    "normal_dest_operands",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::normal_dest_operands);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::InvokeOp::normal_dest_operands"),
+    nullptr,
+  },
+  {
+    "unwind_dest_operands",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::unwind_dest_operands);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::InvokeOp::unwind_dest_operands"),
+    nullptr,
+  },
+  {
     "callee",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -132,6 +162,16 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::llvm::InvokeOp::callee"),
+    nullptr,
+  },
+  {
+    "arg_operands",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::arg_operands);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::llvm::InvokeOp::arg_operands"),
     nullptr,
   },
   {}  // Sentinel.

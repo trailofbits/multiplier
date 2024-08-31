@@ -57,6 +57,16 @@ unsigned int FunctionType::num_params(void) const {
   return val;
 }
 
+gap::generator<::mx::ir::Type> FunctionType::params(void) const & {
+  auto range = underlying_repr().getParams();
+  for (auto el_ty : range) {
+    co_yield ::mx::ir::Type(
+        el_ty.getContext(),
+        reinterpret_cast<const mlir::TypeStorage *>(
+            el_ty.getAsOpaquePointer()));
+  }
+}
+
 bool FunctionType::var_arg(void) const {
   auto val = underlying_repr().getVarArg();
   return val;
@@ -132,6 +142,16 @@ std::string_view TargetExtType::ext_type_name(void) const {
     return std::string_view(val.data(), size);
   } else {
     return {};
+  }
+}
+
+gap::generator<::mx::ir::Type> TargetExtType::type_params(void) const & {
+  auto range = underlying_repr().getTypeParams();
+  for (auto el_ty : range) {
+    co_yield ::mx::ir::Type(
+        el_ty.getContext(),
+        reinterpret_cast<const mlir::TypeStorage *>(
+            el_ty.getAsOpaquePointer()));
   }
 }
 

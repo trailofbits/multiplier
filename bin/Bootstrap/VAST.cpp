@@ -198,6 +198,38 @@ static std::optional<pasta::Decl> GetDefinition(const pasta::NamedDecl &decl) {
 //  return p;
 //}
 
+static void IsRegionFalse(std::ostream &os, const char *val_name) {
+  os << val_name << ".empty()";
+}
+
+using IsFalseFunc = void(std::ostream &, const char *);
+
+struct OptionalMethod {
+  std::string_view op_name;
+  std::string_view method_name;
+  IsFalseFunc *is_false;
+};
+
+static const OptionalMethod kOptionalMethods[] = {
+  {"ForOp", "cond_region", IsRegionFalse},
+  {"ForOp", "incr_region", IsRegionFalse},
+  {"ForOp", "body_region", IsRegionFalse},
+  {"FuncOp", "body", IsRegionFalse},
+  {"IfOp", "else_region", IsRegionFalse},
+  {"VarDeclOp", "initializer", IsRegionFalse},
+  {"VarDeclOp", "allocation_size", IsRegionFalse},
+};
+
+static IsFalseFunc *IsOptionalReturn(std::string_view op_name,
+                                     std::string_view meth_name) {
+  for (const auto &[on, mn, is_false] : kOptionalMethods) {
+    if (on == op_name && mn == meth_name) {
+      return is_false;
+    }
+  }
+  return nullptr;
+}
+
 // Calculate a relative path given an absolute path. We want relative paths
 // located inside of Clang, LLVM, MLIR, or VAST.
 static std::string RelativePath(std::filesystem::path file_path) {
@@ -539,6 +571,44 @@ class OptionalTypeWrapper final : public TypeWrapper {
   }
 };
 
+class FalsyOptionalTypeWrapper final : public TypeWrapper {
+ private:
+  TypeWrapper * const next;
+  IsFalseFunc * const is_false;
+
+ public:
+  virtual ~FalsyOptionalTypeWrapper(void) = default;
+
+  explicit FalsyOptionalTypeWrapper(TypeWrapper *next_,
+                                    IsFalseFunc *is_false_)
+      : next(next_),
+        is_false(is_false_) {}
+
+  void ReturnType(std::ostream &os, const pasta::CXXMethodDecl &m) final {
+    os << "std::optional<";
+    next->ReturnType(os, m);
+    os << ">";
+  }
+
+  std::string_view CallMethod(std::ostream &os, const pasta::CXXMethodDecl &m,
+                              const std::string &indent) {
+    os << indent << "decltype(auto) val = underlying_repr()." << m.Name() << "();\n"
+       << indent << "if (";
+
+    is_false(os, "val");
+
+    os << ") {\n"
+       << indent << "  return std::nullopt;\n"
+       << indent << "}\n";
+    return "val";
+  }
+
+  void Implementation(std::ostream &os, const pasta::CXXMethodDecl &m,
+                      const std::string &indent, std::string_view val) final {
+    next->Implementation(os, m, indent, val);
+  }
+};
+
 class StringRefWrapper final : public TypeWrapper {
  public:
   virtual ~StringRefWrapper(void) = default;
@@ -693,6 +763,36 @@ class TypeTypeWrapper final : public TypeWrapper {
   }
 };
 
+class TypeGeneratorWrapper final : public TypeWrapper {
+ public:
+  virtual ~TypeGeneratorWrapper(void) = default;
+
+  void ReturnType(std::ostream &os, const pasta::CXXMethodDecl &) final {
+    os << "gap::generator<::mx::ir::Type>";
+  }
+
+  virtual std::string_view MethodRefKind(void) final {
+    return " &";
+  }
+
+  std::string_view CallMethod(std::ostream &os, const pasta::CXXMethodDecl &m,
+                              const std::string &indent) {
+    os << indent << "auto range = underlying_repr()." << m.Name() << "();\n";
+    return "range";
+  }
+
+  void Implementation(std::ostream &os, const pasta::CXXMethodDecl &m,
+                      const std::string &indent, std::string_view val) final {
+
+    os << indent << "for (auto el_ty : " << val << ") {\n"
+       << indent << "  co_yield ::mx::ir::Type(\n"
+       << indent << "      el_ty.getContext(),\n"
+       << indent << "      reinterpret_cast<const mlir::TypeStorage *>(\n"
+       << indent << "          el_ty.getAsOpaquePointer()));\n"
+       << indent << "}\n";
+  }
+};
+
 #define IDENTITY_WRAPPER(t) \
     {#t, new IdentityWrapper(#t)}, \
     {"std::optional<" #t ">", new OptionalTypeWrapper(new IdentityWrapper(#t))}, \
@@ -721,8 +821,11 @@ static std::unordered_map<std::string, TypeWrapper *> gReturnType{
   IDENTITY_WRAPPER(uint16_t),
   IDENTITY_WRAPPER(uint32_t),
   IDENTITY_WRAPPER(uint64_t),
+  IDENTITY_WRAPPER(size_t),
+  IDENTITY_WRAPPER(std::size_t),
   IDENTITY_WRAPPER(std::string),
   IDENTITY_WRAPPER(std::string_view),
+  {"llvm::StringRef", new StringRefWrapper},
   {"::llvm::StringRef", new StringRefWrapper},
   {"std::optional<StringRef>", new OptionalTypeWrapper(new StringRefWrapper)},
   {"::std::optional<StringRef>", new OptionalTypeWrapper(new StringRefWrapper)},
@@ -733,8 +836,27 @@ static std::unordered_map<std::string, TypeWrapper *> gReturnType{
   {"::mlir::Block&", new BlockWrapper},
   {"::mlir::Block &", new BlockWrapper},
   {"::mlir::Type", new TypeTypeWrapper},
+  {"::mlir::Type", new TypeTypeWrapper},
+  {"::mlir::TypedValue<LabelType>", new ValueWrapper},
+  {"mlir::Value", new ValueWrapper},
+  {"mlir::Region&", new RegionWrapper},
+  {"mlir::Region &", new RegionWrapper},
+  {"mlir::Block&", new BlockWrapper},
+  {"mlir::Block &", new BlockWrapper},
+  {"mlir::Type", new TypeTypeWrapper},
+  {"mlir::Type", new TypeTypeWrapper},
+  {"mlir::TypedValue<LabelType>", new ValueWrapper},
+  {"mlir_type", new TypeTypeWrapper},
   {"::mlir::mlir::Operation::result_range", new ValueGeneratorWrapper("::mx::ir::Result")},
   {"::mlir::mlir::Operation::operand_range", new ValueGeneratorWrapper("::mx::ir::Operand")},
+  {"::mlir::Operation::result_range", new ValueGeneratorWrapper("::mx::ir::Result")},
+  {"::mlir::Operation::operand_range", new ValueGeneratorWrapper("::mx::ir::Operand")},
+  {"mlir::Operation::result_range", new ValueGeneratorWrapper("::mx::ir::Result")},
+  {"mlir::Operation::operand_range", new ValueGeneratorWrapper("::mx::ir::Operand")},
+  {"::llvm::ArrayRef<Type>", new TypeGeneratorWrapper},
+  {"llvm::ArrayRef<Type>", new TypeGeneratorWrapper},
+  {"gap::generator<Type>", new TypeGeneratorWrapper},
+  {"::gap::generator<Type>", new TypeGeneratorWrapper},
 };
 
 void CodeGenerator::Summarize(void) {
@@ -785,23 +907,31 @@ static void DoMethod(const pasta::CXXMethodDecl &meth,
       TokensToString(pasta::PrintedTokenRange::Create(return_type));
 
   TypeWrapper *ret_wrapper = gReturnType[return_type_str];
-  if (ret_wrapper) {
-    hpp << "  ";
-    ret_wrapper->ReturnType(hpp, meth);
-    hpp << " " << api_name << "(void) const" << ret_wrapper->MethodRefKind()
-        << ";\n";
+  std::optional<FalsyOptionalTypeWrapper> opt_wrapper;
 
-    ret_wrapper->ReturnType(cpp, meth);
-    cpp << " " << ent_class_name << "::" << api_name << "(void) const"
-        << ret_wrapper->MethodRefKind() << " {\n";
-    std::string_view val = ret_wrapper->CallMethod(cpp, meth, "  ");
-    ret_wrapper->Implementation(cpp, meth, "  ", val);
-    cpp << "}\n\n";
-
-  } else {
+  if (!ret_wrapper) {
     hpp << "  //" << return_type_str << " " << api_name
         << "(void) const;\n";
+    return;
   }
+
+  // Wrap in optional.
+  if (auto is_false = IsOptionalReturn(ent_class_name, api_name)) {
+    opt_wrapper.emplace(ret_wrapper, is_false);
+    ret_wrapper = &(opt_wrapper.value());
+  }
+
+  hpp << "  ";
+  ret_wrapper->ReturnType(hpp, meth);
+  hpp << " " << api_name << "(void) const" << ret_wrapper->MethodRefKind()
+      << ";\n";
+
+  ret_wrapper->ReturnType(cpp, meth);
+  cpp << " " << ent_class_name << "::" << api_name << "(void) const"
+      << ret_wrapper->MethodRefKind() << " {\n";
+  std::string_view val = ret_wrapper->CallMethod(cpp, meth, "  ");
+  ret_wrapper->Implementation(cpp, meth, "  ", val);
+  cpp << "}\n\n";
 }
 
 void CodeGenerator::RunOnOps(void) {

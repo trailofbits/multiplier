@@ -69,6 +69,7 @@ class AffineMapAttr(multiplier.ir.builtin.Attribute):
     ...
 
 class ArrayAttr(multiplier.ir.builtin.Attribute):
+  size: int
   empty: bool
 
   @staticmethod
@@ -123,6 +124,7 @@ class DenseResourceElementsAttr(multiplier.ir.builtin.Attribute):
 
 class DictionaryAttr(multiplier.ir.builtin.Attribute):
   empty: bool
+  size: int
 
   @staticmethod
   def static_kind() -> multiplier.ir.AttributeKind:
@@ -203,6 +205,7 @@ class StridedLayoutAttr(multiplier.ir.builtin.Attribute):
 
 class StringAttr(multiplier.ir.builtin.Attribute):
   str: str
+  size: int
   empty: bool
   value: str
   type: multiplier.ir.Type
@@ -303,6 +306,8 @@ class ModuleOp(multiplier.ir.builtin.Operation):
     ...
 
 class UnrealizedConversionCastOp(multiplier.ir.builtin.Operation):
+  inputs: Iterable[multiplier.ir.Operand]
+  outputs: Iterable[multiplier.ir.Result]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -560,6 +565,7 @@ class RankedTensorType(multiplier.ir.builtin.Type):
     ...
 
 class TupleType(multiplier.ir.builtin.Type):
+  size: int
 
   @staticmethod
   def static_kind() -> multiplier.ir.TypeKind:

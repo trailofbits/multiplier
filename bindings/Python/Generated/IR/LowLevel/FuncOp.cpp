@@ -165,6 +165,36 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "callable_results",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::callable_results);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::ll::FuncOp::callable_results"),
+    nullptr,
+  },
+  {
+    "argument_types",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::argument_types);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::ll::FuncOp::argument_types"),
+    nullptr,
+  },
+  {
+    "result_types",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::result_types);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::ll::FuncOp::result_types"),
+    nullptr,
+  },
+  {
     "is_declaration",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

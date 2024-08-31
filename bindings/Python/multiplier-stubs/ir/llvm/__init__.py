@@ -682,6 +682,7 @@ class BitcastOp(multiplier.ir.llvm.Operation):
     ...
 
 class BrOp(multiplier.ir.llvm.Operation):
+  dest_operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -696,6 +697,7 @@ class BrOp(multiplier.ir.llvm.Operation):
     ...
 
 class CallIntrinsicOp(multiplier.ir.llvm.Operation):
+  args: Iterable[multiplier.ir.Operand]
   results: multiplier.ir.Value
   intrin: str
 
@@ -712,8 +714,10 @@ class CallIntrinsicOp(multiplier.ir.llvm.Operation):
     ...
 
 class CallOp(multiplier.ir.llvm.Operation):
+  callee_operands: Iterable[multiplier.ir.Operand]
   result: multiplier.ir.Value
   callee: Optional[str]
+  arg_operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -759,6 +763,8 @@ class ComdatSelectorOp(multiplier.ir.llvm.Operation):
     ...
 
 class CondBrOp(multiplier.ir.llvm.Operation):
+  true_dest_operands: Iterable[multiplier.ir.Operand]
+  false_dest_operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1034,6 +1040,7 @@ class FreezeOp(multiplier.ir.llvm.Operation):
 
 class GetElementPtrOp(multiplier.ir.llvm.Operation):
   base: multiplier.ir.Value
+  dynamic_indices: Iterable[multiplier.ir.Operand]
   res: multiplier.ir.Value
   elem_type: multiplier.ir.Type
   inbounds: bool
@@ -1119,6 +1126,7 @@ class ICmpOp(multiplier.ir.llvm.Operation):
     ...
 
 class InlineAsmOp(multiplier.ir.llvm.Operation):
+  operands: Iterable[multiplier.ir.Operand]
   res: multiplier.ir.Value
   asm_string: str
   constraints: str
@@ -1188,7 +1196,11 @@ class IntToPtrOp(multiplier.ir.llvm.Operation):
     ...
 
 class InvokeOp(multiplier.ir.llvm.Operation):
+  callee_operands: Iterable[multiplier.ir.Operand]
+  normal_dest_operands: Iterable[multiplier.ir.Operand]
+  unwind_dest_operands: Iterable[multiplier.ir.Operand]
   callee: Optional[str]
+  arg_operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1203,7 +1215,7 @@ class InvokeOp(multiplier.ir.llvm.Operation):
     ...
 
 class FuncOp(multiplier.ir.llvm.Operation):
-  body: multiplier.ir.Region
+  body: Optional[multiplier.ir.Region]
   sym_name: str
   sym_visibility: Optional[str]
   dso_local: bool
@@ -1565,6 +1577,7 @@ class SubOp(multiplier.ir.llvm.Operation):
     ...
 
 class SwitchOp(multiplier.ir.llvm.Operation):
+  default_operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2524,6 +2537,7 @@ class RoundAndCastToNearestLongOp(multiplier.ir.llvm.Operation):
 
 class MaskedLoadOp(multiplier.ir.llvm.Operation):
   mask: multiplier.ir.Value
+  pass_thru: Iterable[multiplier.ir.Operand]
   res: multiplier.ir.Value
   alignment: int
 
@@ -4271,6 +4285,7 @@ class MaskedExpandLoadOp(multiplier.ir.llvm.Operation):
 class MaskedGatherOp(multiplier.ir.llvm.Operation):
   ptrs: multiplier.ir.Value
   mask: multiplier.ir.Value
+  pass_thru: Iterable[multiplier.ir.Operand]
   res: multiplier.ir.Value
   alignment: int
 
@@ -4618,6 +4633,7 @@ class ArrayType(multiplier.ir.llvm.Type):
 class FunctionType(multiplier.ir.llvm.Type):
   is_var_arg: bool
   num_params: int
+  params: Iterable[multiplier.ir.Type]
   var_arg: bool
 
   @staticmethod
@@ -4664,6 +4680,7 @@ class ScalableVectorType(multiplier.ir.llvm.Type):
 class TargetExtType(multiplier.ir.llvm.Type):
   supports_mem_ops: bool
   ext_type_name: str
+  type_params: Iterable[multiplier.ir.Type]
 
   @staticmethod
   def static_kind() -> multiplier.ir.TypeKind:

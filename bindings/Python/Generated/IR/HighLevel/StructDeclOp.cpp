@@ -145,6 +145,36 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "field_types",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::field_types);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::hl::StructDeclOp::field_types"),
+    nullptr,
+  },
+  {
+    "defined_name",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->defined_name());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::hl::StructDeclOp::defined_name"),
+    nullptr,
+  },
+  {
+    "defined_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->defined_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::hl::StructDeclOp::defined_type"),
+    nullptr,
+  },
+  {
     "is_complete_definition",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
@@ -152,6 +182,16 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::hl::StructDeclOp::is_complete_definition"),
+    nullptr,
+  },
+  {
+    "fields_block",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->fields_block());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::hl::StructDeclOp::fields_block"),
     nullptr,
   },
   {}  // Sentinel.

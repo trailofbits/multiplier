@@ -125,6 +125,26 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyGetSetDef gProperties[] = {
   {
+    "arg_operands",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::arg_operands);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::hl::CallOp::arg_operands"),
+    nullptr,
+  },
+  {
+    "results",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::results);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::hl::CallOp::results"),
+    nullptr,
+  },
+  {
     "callee",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

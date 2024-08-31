@@ -144,6 +144,16 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::ir::hl::SizeOfExprOp::expr"),
     nullptr,
   },
+  {
+    "value",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->value());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::hl::SizeOfExprOp::value"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

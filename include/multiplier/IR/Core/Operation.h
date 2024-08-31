@@ -74,7 +74,7 @@ class MX_EXPORT ImplicitReturnOp final : public Operation {
   ::vast::core::ImplicitReturnOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range result(void) const;
+  gap::generator<::mx::ir::Operand> result(void) const &;
 };
 static_assert(sizeof(ImplicitReturnOp) == sizeof(Operation));
 
@@ -126,7 +126,7 @@ class MX_EXPORT SelectOp final : public Operation {
   ::mx::ir::Value cond(void) const;
   ::mx::ir::Value then_region(void) const;
   ::mx::ir::Value else_region(void) const;
-  //::mlir::Operation::result_range results(void) const;
+  gap::generator<::mx::ir::Result> results(void) const &;
 };
 static_assert(sizeof(SelectOp) == sizeof(Operation));
 

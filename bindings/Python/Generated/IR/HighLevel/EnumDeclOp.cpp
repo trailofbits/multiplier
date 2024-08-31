@@ -154,6 +154,16 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::ir::hl::EnumDeclOp::is_complete"),
     nullptr,
   },
+  {
+    "constants_block",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->constants_block());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::hl::EnumDeclOp::constants_block"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

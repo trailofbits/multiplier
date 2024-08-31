@@ -134,6 +134,26 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::ir::ll::CondBrOp::cond"),
     nullptr,
   },
+  {
+    "true_operands",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::true_operands);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::ll::CondBrOp::true_operands"),
+    nullptr,
+  },
+  {
+    "false_operands",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::false_operands);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::ll::CondBrOp::false_operands"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace
