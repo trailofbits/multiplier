@@ -1,5 +1,4 @@
 // Copyright (c) 2022-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -191,7 +190,8 @@ struct FragmentCollector {
       std::optional<FileLocationOfFragment> floc,
       mx::EntityOffset begin_index,
       mx::EntityOffset end_index,
-      const pasta::Decl &decl);
+      const pasta::Decl &decl,
+      const void *parent_entity=nullptr);
 
   template <typename CreateParsedTokens>
   PendingFragmentPtr CreatePendingFragment(
@@ -2691,7 +2691,8 @@ PendingFragmentPtr FragmentCollector::CreateFloatingDeclFragment(
     std::optional<FileLocationOfFragment> floc,
     mx::EntityOffset begin_index,
     mx::EntityOffset end_index,
-    const pasta::Decl &decl) {
+    const pasta::Decl &decl,
+    const void *parent_entity) {
 
   // If this is a builtin declaration, then we want the fragment hash to be
   // generic across the whole program, not specific to this file. For example,
@@ -2753,7 +2754,7 @@ PendingFragmentPtr FragmentCollector::CreateFloatingDeclFragment(
       end_index,
       std::move(decls),
       {}  /* empty macros */,
-      nullptr  /* no parent entity */,
+      parent_entity,
       false  /* Using printed tokens. A bit of a lie, but we don't want to
               * trigger token tree rebuilding. */);
 
@@ -2953,10 +2954,14 @@ void FragmentCollector::FillPendingFragments(EntityGroupRange group_range) {
       } else if (!IsLambda(decl) && !IsImplicitMethod(decl) &&
                  (IsInjectedForwardDeclaration(decl) ||
                   !floc || decl.IsImplicit())) {
-        CHECK(!er.parent);
+
+        CHECK(!er.parent || IsInjectedForwardDeclaration(decl))
+            << "Unexpected parent entity"
+            << PrefixedLocation(decl, " at or near ")
+            << " on main job file " << main_file_path;
 
         pending_fragments.emplace_back(CreateFloatingDeclFragment(
-            floc, begin_index, end_index, decl));
+            floc, begin_index, end_index, decl, er.parent));
 
       // These are generally template instantiations.
       } else if (er.parent) {

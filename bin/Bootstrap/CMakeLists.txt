@@ -1,6 +1,5 @@
 #
 # Copyright (c) 2022-present, Trail of Bits, Inc.
-# All rights reserved.
 #
 # This source code is licensed in accordance with the terms specified in
 # the LICENSE file found in the root directory of this source tree.
@@ -23,7 +22,7 @@ target_link_libraries("mx-bootstrap"
 
 target_compile_features("mx-bootstrap"
   PUBLIC
-    cxx_std_20
+    cxx_std_23
 )
 
 set_target_properties("mx-bootstrap"

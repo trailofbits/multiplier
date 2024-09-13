@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -156,7 +155,7 @@ static std::string MethodName(const std::string &name) {
   }
 
   new_name = CapitalCaseToSnakeCase(new_name);
-  if (new_name == "int") {
+  if (new_name == "int" || new_name == "assert") {
     new_name.push_back('_');
   }
 
@@ -202,32 +201,38 @@ static void IsRegionFalse(std::ostream &os, const char *val_name) {
   os << val_name << ".empty()";
 }
 
+static void GetRegionValue(std::ostream &os, const char *val_name) {
+  os << val_name;
+}
+
 using IsFalseFunc = void(std::ostream &, const char *);
+using GetOptValueFunc = void(std::ostream &, const char *);
 
 struct OptionalMethod {
   std::string_view op_name;
   std::string_view method_name;
   IsFalseFunc *is_false;
+  GetOptValueFunc *get_value;
 };
 
 static const OptionalMethod kOptionalMethods[] = {
-  {"ForOp", "cond_region", IsRegionFalse},
-  {"ForOp", "incr_region", IsRegionFalse},
-  {"ForOp", "body_region", IsRegionFalse},
-  {"FuncOp", "body", IsRegionFalse},
-  {"IfOp", "else_region", IsRegionFalse},
-  {"VarDeclOp", "initializer", IsRegionFalse},
-  {"VarDeclOp", "allocation_size", IsRegionFalse},
+  {"ForOp", "cond_region", IsRegionFalse, GetRegionValue},
+  {"ForOp", "incr_region", IsRegionFalse, GetRegionValue},
+  {"ForOp", "body_region", IsRegionFalse, GetRegionValue},
+  {"FuncOp", "body", IsRegionFalse, GetRegionValue},
+  {"IfOp", "else_region", IsRegionFalse, GetRegionValue},
+  {"VarDeclOp", "initializer", IsRegionFalse, GetRegionValue},
+  {"VarDeclOp", "allocation_size", IsRegionFalse, GetRegionValue},
 };
 
-static IsFalseFunc *IsOptionalReturn(std::string_view op_name,
-                                     std::string_view meth_name) {
-  for (const auto &[on, mn, is_false] : kOptionalMethods) {
+static std::pair<IsFalseFunc *, GetOptValueFunc *>
+IsOptionalReturn(std::string_view op_name, std::string_view meth_name) {
+  for (auto [on, mn, is_false, get_value] : kOptionalMethods) {
     if (on == op_name && mn == meth_name) {
-      return is_false;
+      return {is_false, get_value};
     }
   }
-  return nullptr;
+  return {nullptr, nullptr};
 }
 
 // Calculate a relative path given an absolute path. We want relative paths
@@ -575,14 +580,17 @@ class FalsyOptionalTypeWrapper final : public TypeWrapper {
  private:
   TypeWrapper * const next;
   IsFalseFunc * const is_false;
+  GetOptValueFunc * const get_value;
 
  public:
   virtual ~FalsyOptionalTypeWrapper(void) = default;
 
   explicit FalsyOptionalTypeWrapper(TypeWrapper *next_,
-                                    IsFalseFunc *is_false_)
+                                    IsFalseFunc *is_false_,
+                                    GetOptValueFunc *get_value_)
       : next(next_),
-        is_false(is_false_) {}
+        is_false(is_false_),
+        get_value(get_value_) {}
 
   void ReturnType(std::ostream &os, const pasta::CXXMethodDecl &m) final {
     os << "std::optional<";
@@ -592,14 +600,20 @@ class FalsyOptionalTypeWrapper final : public TypeWrapper {
 
   std::string_view CallMethod(std::ostream &os, const pasta::CXXMethodDecl &m,
                               const std::string &indent) {
-    os << indent << "decltype(auto) val = underlying_repr()." << m.Name() << "();\n"
+    os << indent << "decltype(auto) opt_val = underlying_repr()." << m.Name() << "();\n"
        << indent << "if (";
 
-    is_false(os, "val");
+    is_false(os, "opt_val");
 
     os << ") {\n"
        << indent << "  return std::nullopt;\n"
-       << indent << "}\n";
+       << indent << "}\n"
+       << indent << "auto &val = ";
+
+    get_value(os, "opt_val");
+
+    os << ";\n";
+
     return "val";
   }
 
@@ -916,8 +930,9 @@ static void DoMethod(const pasta::CXXMethodDecl &meth,
   }
 
   // Wrap in optional.
-  if (auto is_false = IsOptionalReturn(ent_class_name, api_name)) {
-    opt_wrapper.emplace(ret_wrapper, is_false);
+  auto [is_false, get_value] = IsOptionalReturn(ent_class_name, api_name);
+  if (is_false && get_value) {
+    opt_wrapper.emplace(ret_wrapper, is_false, get_value);
     ret_wrapper = &(opt_wrapper.value());
   }
 
@@ -952,7 +967,6 @@ void CodeGenerator::RunOnOps(void) {
 
   summary_irhpp
       << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-      << "// All rights reserved.\n"
       << "//\n"
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -970,7 +984,6 @@ void CodeGenerator::RunOnOps(void) {
 
   hpp
       << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-      << "// All rights reserved.\n"
       << "//\n"
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -993,7 +1006,6 @@ void CodeGenerator::RunOnOps(void) {
     std::ofstream dialect_hpp(mx_inc / "IR" / dialect.our_dir_name / "Dialect.h");
     dialect_hpp
         << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-        << "// All rights reserved.\n"
         << "//\n"
         << "// This source code is licensed in accordance with the terms specified in\n"
         << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -1043,7 +1055,6 @@ void CodeGenerator::RunOnOps(void) {
 
   cpp
       << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-      << "// All rights reserved.\n"
       << "//\n"
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -1074,7 +1085,6 @@ void CodeGenerator::RunOnOps(void) {
   cpp.open(mx_lib / "IR" / "OperationKind.cpp");  // In lib.
   cpp
       << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-      << "// All rights reserved.\n"
       << "//\n"
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -1139,7 +1149,6 @@ void CodeGenerator::RunOnOps(void) {
 
     hpp
         << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-        << "// All rights reserved.\n"
         << "//\n"
         << "// This source code is licensed in accordance with the terms specified in\n"
         << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -1173,7 +1182,6 @@ void CodeGenerator::RunOnOps(void) {
 
     cpp
         << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-        << "// All rights reserved.\n"
         << "//\n"
         << "// This source code is licensed in accordance with the terms specified in\n"
         << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -1323,7 +1331,6 @@ void CodeGenerator::RunOnTypes(void) {
 
   hpp
       << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-      << "// All rights reserved.\n"
       << "//\n"
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -1364,7 +1371,6 @@ void CodeGenerator::RunOnTypes(void) {
 
   cpp
       << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-      << "// All rights reserved.\n"
       << "//\n"
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -1395,7 +1401,6 @@ void CodeGenerator::RunOnTypes(void) {
   cpp.open(mx_lib / "IR" / "TypeKind.cpp");  // In lib.
   cpp
       << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-      << "// All rights reserved.\n"
       << "//\n"
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -1456,7 +1461,6 @@ void CodeGenerator::RunOnTypes(void) {
 
     hpp
         << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-        << "// All rights reserved.\n"
         << "//\n"
         << "// This source code is licensed in accordance with the terms specified in\n"
         << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -1479,7 +1483,6 @@ void CodeGenerator::RunOnTypes(void) {
 
     cpp
         << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-        << "// All rights reserved.\n"
         << "//\n"
         << "// This source code is licensed in accordance with the terms specified in\n"
         << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -1610,7 +1613,6 @@ void CodeGenerator::RunOnAttrs(void) {
 
   hpp
       << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-      << "// All rights reserved.\n"
       << "//\n"
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -1651,7 +1653,6 @@ void CodeGenerator::RunOnAttrs(void) {
 
   cpp
       << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-      << "// All rights reserved.\n"
       << "//\n"
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -1683,7 +1684,6 @@ void CodeGenerator::RunOnAttrs(void) {
   cpp.open(mx_lib / "IR" / "AttributeKind.cpp");  // In lib.
   cpp
       << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-      << "// All rights reserved.\n"
       << "//\n"
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -1748,7 +1748,6 @@ void CodeGenerator::RunOnAttrs(void) {
 
     hpp
         << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-        << "// All rights reserved.\n"
         << "//\n"
         << "// This source code is licensed in accordance with the terms specified in\n"
         << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -1772,7 +1771,6 @@ void CodeGenerator::RunOnAttrs(void) {
 
     cpp
         << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-        << "// All rights reserved.\n"
         << "//\n"
         << "// This source code is licensed in accordance with the terms specified in\n"
         << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -2216,7 +2214,7 @@ int main(int argc, char *argv[]) {
   std::vector<const char *> cc_args{
       exe_path.c_str(),
       "-x", "c++",
-      "-std=c++20",
+      "-std=c++23",
       "-c", __FILE__,
       "-o", "/dev/null",
       "-isystem", argv[1],  // Install include dir.

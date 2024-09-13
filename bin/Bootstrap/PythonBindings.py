@@ -1,4 +1,9 @@
-# Copyright (c) 2023 Trail of Bits, Inc., all rights reserved.
+#
+# Copyright (c) 2023-present, Trail of Bits, Inc.
+#
+# This source code is licensed in accordance with the terms specified in
+# the LICENSE file found in the root directory of this source tree.
+#
 
 from argparse import ArgumentParser
 import collections
@@ -18,7 +23,6 @@ MX_BINDINGS_DIR = os.path.join(MX_DIR, "bindings")
 MX_BINDINGS_PYTHON_DIR = os.path.join(MX_BINDINGS_DIR, "Python")
 
 TYPES_CPP = """// Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -37,7 +41,6 @@ PyTypeObject gTypes[{}] = {{}};
 
 
 FORWARD_H_PREFIX = """// Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -63,7 +66,6 @@ FORWARD_H_SUFFIX = "}  // namespace mx\n"
 
 STUB_PREFIX = """#
 # Copyright (c) 2023-present, Trail of Bits, Inc.
-# All rights reserved.
 #
 # This source code is licensed in accordance with the terms specified in
 # the LICENSE file found in the root directory of this source tree.
@@ -152,7 +154,6 @@ CLASS_STUB_FOOTER = "  pass\n"
 
 
 MODULE_CPP_PREFIX = """// Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -285,7 +286,6 @@ MODULE_CPP_SUFFIX = """
 
 
 CLASS_HEADER = """// Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -312,7 +312,6 @@ CLASS_HEADER = """// Copyright (c) 2023-present, Trail of Bits, Inc.
 
 
 ENUM_HEADER = """// Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -915,7 +914,6 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
 
 BINDING_CPP_HEADER = """// Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.

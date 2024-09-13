@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -35,6 +34,7 @@ const char *EnumeratorName(ir::AttributeKind kind) {
     case ir::AttributeKind::BUILTIN_BOOL: return "BUILTIN_BOOL";
     case ir::AttributeKind::BUILTIN_FLAT_SYMBOL_REF: return "BUILTIN_FLAT_SYMBOL_REF";
     case ir::AttributeKind::BUILTIN_DENSE_INT_ELEMENTS: return "BUILTIN_DENSE_INT_ELEMENTS";
+    case ir::AttributeKind::BUILTIN_DATA_LAYOUT_SPEC: return "BUILTIN_DATA_LAYOUT_SPEC";
     case ir::AttributeKind::LLVM_C_CONV: return "LLVM_C_CONV";
     case ir::AttributeKind::LLVM_COMDAT: return "LLVM_COMDAT";
     case ir::AttributeKind::LLVM_LINKAGE: return "LLVM_LINKAGE";
@@ -84,6 +84,9 @@ const char *EnumeratorName(ir::AttributeKind kind) {
     case ir::AttributeKind::HL_FORMAT: return "HL_FORMAT";
     case ir::AttributeKind::HL_SECTION: return "HL_SECTION";
     case ir::AttributeKind::HL_ALIAS: return "HL_ALIAS";
+    case ir::AttributeKind::HL_ERROR: return "HL_ERROR";
+    case ir::AttributeKind::HL_COUNTED_BY: return "HL_COUNTED_BY";
+    case ir::AttributeKind::HL_CLEANUP: return "HL_CLEANUP";
     case ir::AttributeKind::HL_ALIGNED: return "HL_ALIGNED";
     case ir::AttributeKind::HL_ALWAYS_INLINE: return "HL_ALWAYS_INLINE";
     case ir::AttributeKind::HL_NO_INLINE: return "HL_NO_INLINE";
@@ -107,6 +110,8 @@ const char *EnumeratorName(ir::AttributeKind kind) {
     case ir::AttributeKind::HL_NO_CF_CHECK: return "HL_NO_CF_CHECK";
     case ir::AttributeKind::HL_AVAILABLE_ONLY_IN_DEFAULT_EVAL_METHOD: return "HL_AVAILABLE_ONLY_IN_DEFAULT_EVAL_METHOD";
     case ir::AttributeKind::HL_AVAILABILITY_ATTR: return "HL_AVAILABILITY_ATTR";
+    case ir::AttributeKind::HL_FALLTHROUGH: return "HL_FALLTHROUGH";
+    case ir::AttributeKind::HL_NO_PROFILE_INSTRUMENT_FUNCTION: return "HL_NO_PROFILE_INSTRUMENT_FUNCTION";
     case ir::AttributeKind::HL_ASM_LABEL: return "HL_ASM_LABEL";
     case ir::AttributeKind::HL_MODE: return "HL_MODE";
     case ir::AttributeKind::HL_BUILTIN: return "HL_BUILTIN";
@@ -114,6 +119,8 @@ const char *EnumeratorName(ir::AttributeKind kind) {
     case ir::AttributeKind::HL_ALLOC_SIZE: return "HL_ALLOC_SIZE";
     case ir::AttributeKind::HL_DEPRECATED: return "HL_DEPRECATED";
     case ir::AttributeKind::HL_MAX_FIELD_ALIGNMENT: return "HL_MAX_FIELD_ALIGNMENT";
+    case ir::AttributeKind::HL_VISIBILITY: return "HL_VISIBILITY";
+    case ir::AttributeKind::HL_ASSUME_ALIGNED: return "HL_ASSUME_ALIGNED";
     case ir::AttributeKind::HL_CV_QUALIFIERS: return "HL_CV_QUALIFIERS";
     case ir::AttributeKind::HL_UCV_QUALIFIERS: return "HL_UCV_QUALIFIERS";
     case ir::AttributeKind::HL_CVR_QUALIFIERS: return "HL_CVR_QUALIFIERS";
@@ -154,6 +161,7 @@ bool IsBuiltinAttributeKind(ir::AttributeKind kind) {
     case mx::ir::AttributeKind::BUILTIN_BOOL:
     case mx::ir::AttributeKind::BUILTIN_FLAT_SYMBOL_REF:
     case mx::ir::AttributeKind::BUILTIN_DENSE_INT_ELEMENTS:
+    case mx::ir::AttributeKind::BUILTIN_DATA_LAYOUT_SPEC:
       return true;
   }
 }
@@ -240,6 +248,9 @@ bool IsHighLevelAttributeKind(ir::AttributeKind kind) {
     case mx::ir::AttributeKind::HL_FORMAT:
     case mx::ir::AttributeKind::HL_SECTION:
     case mx::ir::AttributeKind::HL_ALIAS:
+    case mx::ir::AttributeKind::HL_ERROR:
+    case mx::ir::AttributeKind::HL_COUNTED_BY:
+    case mx::ir::AttributeKind::HL_CLEANUP:
     case mx::ir::AttributeKind::HL_ALIGNED:
     case mx::ir::AttributeKind::HL_ALWAYS_INLINE:
     case mx::ir::AttributeKind::HL_NO_INLINE:
@@ -263,6 +274,8 @@ bool IsHighLevelAttributeKind(ir::AttributeKind kind) {
     case mx::ir::AttributeKind::HL_NO_CF_CHECK:
     case mx::ir::AttributeKind::HL_AVAILABLE_ONLY_IN_DEFAULT_EVAL_METHOD:
     case mx::ir::AttributeKind::HL_AVAILABILITY_ATTR:
+    case mx::ir::AttributeKind::HL_FALLTHROUGH:
+    case mx::ir::AttributeKind::HL_NO_PROFILE_INSTRUMENT_FUNCTION:
     case mx::ir::AttributeKind::HL_ASM_LABEL:
     case mx::ir::AttributeKind::HL_MODE:
     case mx::ir::AttributeKind::HL_BUILTIN:
@@ -270,6 +283,8 @@ bool IsHighLevelAttributeKind(ir::AttributeKind kind) {
     case mx::ir::AttributeKind::HL_ALLOC_SIZE:
     case mx::ir::AttributeKind::HL_DEPRECATED:
     case mx::ir::AttributeKind::HL_MAX_FIELD_ALIGNMENT:
+    case mx::ir::AttributeKind::HL_VISIBILITY:
+    case mx::ir::AttributeKind::HL_ASSUME_ALIGNED:
     case mx::ir::AttributeKind::HL_CV_QUALIFIERS:
     case mx::ir::AttributeKind::HL_UCV_QUALIFIERS:
     case mx::ir::AttributeKind::HL_CVR_QUALIFIERS:

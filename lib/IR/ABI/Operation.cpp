@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -91,15 +90,6 @@ gap::generator<::mx::ir::Operand> CallExecutionOp::args(void) const & {
 ::mx::ir::Region CallExecutionOp::body(void) const {
   auto &val = underlying_repr().getBody();
   return ::mx::ir::Region(module_, val);
-}
-
-std::string_view CallExecutionOp::callee(void) const {
-  auto val = underlying_repr().getCallee();
-  if (auto size = val.size()) {
-    return std::string_view(val.data(), size);
-  } else {
-    return {};
-  }
 }
 
 gap::generator<::mx::ir::Operand> CallExecutionOp::arg_operands(void) const & {
@@ -268,11 +258,11 @@ std::optional<FuncOp> FuncOp::producing(const ::mx::ir::Value &that) {
 }
 
 std::optional<::mx::ir::Region> FuncOp::body(void) const {
-  auto opt_val = underlying_repr().getBody();
-  if (!opt_val) {
+  decltype(auto) opt_val = underlying_repr().getBody();
+  if (opt_val.empty()) {
     return std::nullopt;
   }
-  auto &val = opt_val.value();
+  auto &val = opt_val;
   return ::mx::ir::Region(module_, val);
 }
 

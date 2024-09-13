@@ -1,6 +1,5 @@
 #
 # Copyright (c) 2023-present, Trail of Bits, Inc.
-# All rights reserved.
 #
 # This source code is licensed in accordance with the terms specified in
 # the LICENSE file found in the root directory of this source tree.
@@ -166,6 +165,25 @@ class LazyOp(multiplier.ir.core.Operation):
 
   @staticmethod
   def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.core.LazyOp]:
+    ...
+
+class ModuleOp(multiplier.ir.core.Operation):
+  body: multiplier.ir.Region
+  sym_name: Optional[str]
+  name: Optional[str]
+  is_optional_symbol: bool
+  default_dialect: str
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.OperationKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Operation) -> Optional[multiplier.ir.core.ModuleOp]:
+    ...
+
+  @staticmethod
+  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.core.ModuleOp]:
     ...
 
 class ScopeOp(multiplier.ir.core.Operation):

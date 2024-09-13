@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -33,6 +32,7 @@ class UnitAttr;
 class BoolAttr;
 class FlatSymbolRefAttr;
 class DenseIntElementsAttr;
+class DataLayoutSpecAttr;
 }  // namespace mlir
 namespace mx::ir::builtin {
 
@@ -417,5 +417,20 @@ class MX_EXPORT DenseIntElementsAttr final : public Attribute {
   //iterator end(void) const;
 };
 static_assert(sizeof(DenseIntElementsAttr) == sizeof(Attribute));
+
+class MX_EXPORT DataLayoutSpecAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::BUILTIN_DATA_LAYOUT_SPEC;
+  }
+
+  static std::optional<DataLayoutSpecAttr> from(const ::mx::ir::Attribute &that);
+
+  ::mlir::DataLayoutSpecAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //DataLayoutEntryListRef entries(void) const;
+};
+static_assert(sizeof(DataLayoutSpecAttr) == sizeof(Attribute));
 
 }  // namespace mx::ir::builtin

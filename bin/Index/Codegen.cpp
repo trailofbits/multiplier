@@ -1,5 +1,4 @@
 // Copyright (c) 2022-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -8,6 +7,11 @@
 
 #define VAST_ENABLE_EXCEPTIONS
 #include <vast/Util/Warnings.hpp>
+
+// Hack to get around `std::unique_ptr` issue with a `struct DelimitedScope`.
+#define LLVM_SUPPORT_SCOPEDPRINTER_H
+
+#include "ScopedPrinter.h"
 
 VAST_RELAX_WARNINGS
 #include <clang/AST/ASTContext.h>
@@ -22,6 +26,7 @@ VAST_RELAX_WARNINGS
 #include <mlir/InitAllDialects.h>
 VAST_UNRELAX_WARNINGS
 
+#include <algorithm>
 #include <exception>
 #include <glog/logging.h>
 
@@ -399,7 +404,7 @@ class PreprocessingVisitorProxy : public vast::cg::fallthrough_list_node {
   }
 };
 
-class CodeGenPolicy final : public vast::cg::policy_base {
+class CodeGenPolicy final : public vast::cg::codegen_policy {
  private:
   const EntityMapper &em;
   std::unordered_set<mx::RawEntityId> fragment_indexes;
@@ -421,7 +426,7 @@ class CodeGenPolicy final : public vast::cg::policy_base {
     return false;
   };
 
-  enum vast::cg::missing_return_policy missing_return_policy(
+  enum vast::cg::missing_return_policy get_missing_return_policy(
       const vast::cg::clang_function *) const final {
     return vast::cg::missing_return_policy::emit_trap;
   }
@@ -452,7 +457,7 @@ class CodeGenPolicy final : public vast::cg::policy_base {
   }
 };
 
-static std::optional<vast::owning_module_ref> CreateModule(
+static std::optional<vast::owning_mlir_module_ref> CreateModule(
     const pasta::AST &ast, const EntityMapper &em,
     std::vector<mx::PackedFragmentId> fragment_ids) try {
 
@@ -496,7 +501,7 @@ static std::optional<vast::owning_module_ref> CreateModule(
 }
 
 static std::optional<std::string> DumpToString(
-    vast::owning_module_ref &mlir_module) {
+    vast::owning_mlir_module_ref &mlir_module) {
   std::string result;
   llvm::raw_string_ostream os(result);
   mlir::BytecodeWriterConfig config("MX");
@@ -549,7 +554,7 @@ std::string CodeGenerator::GenerateSourceIR(
   flags.enableDebugInfo(true, false);
 
   // Nifty for debugging, to see what the MLIR looked like.
-  if (true) {
+  if (false) {
     std::error_code ec;
     std::string out_file =
         (std::filesystem::path("/tmp/src/") / ast.MainFile().Path().filename()).generic_string();

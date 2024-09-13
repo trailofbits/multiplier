@@ -1,6 +1,5 @@
 #
 # Copyright (c) 2023-present, Trail of Bits, Inc.
-# All rights reserved.
 #
 # This source code is licensed in accordance with the terms specified in
 # the LICENSE file found in the root directory of this source tree.
@@ -52,7 +51,6 @@ class CallExecutionOp(multiplier.ir.abi.Operation):
   args: Iterable[multiplier.ir.Operand]
   result: multiplier.ir.Value
   body: multiplier.ir.Region
-  callee: str
   arg_operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod

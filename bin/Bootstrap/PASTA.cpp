@@ -1,5 +1,4 @@
 // Copyright (c) 2022-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -923,7 +922,6 @@ bool CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
   std::ofstream os(include_dir / dir_name / (enum_name + ".h"), std::ios::trunc | std::ios::out);
   os
       << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
-      << "// All rights reserved.\n"
       << "//\n"
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -2028,7 +2026,6 @@ MethodListPtr CodeGenerator::RunOnClass(
                    std::ios::trunc | std::ios::out);
   os
       << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
-      << "// All rights reserved.\n"
       << "//\n"
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -3980,7 +3977,6 @@ void CodeGenerator::RunOnClassHierarchies(void) {
 
   schema_os
       << "# Copyright (c) 2022-present, Trail of Bits, Inc.\n"
-      << "# All rights reserved.\n"
       << "#\n"
       << "# This source code is licensed in accordance with the terms specified in\n"
       << "# the LICENSE file found in the root directory of this source tree.\n\n"
@@ -3991,7 +3987,6 @@ void CodeGenerator::RunOnClassHierarchies(void) {
 
   lib_pasta_cpp_os
       << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
-      << "// All rights reserved.\n"
       << "//\n"
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -4003,7 +3998,6 @@ void CodeGenerator::RunOnClassHierarchies(void) {
 
   serialize_inc_os
       << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
-      << "// All rights reserved.\n"
       << "//\n"
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -4183,7 +4177,6 @@ void CodeGenerator::RunOnClassHierarchies(void) {
 
   serialize_h_os
       << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
-      << "// All rights reserved.\n"
       << "//\n"
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -4196,7 +4189,6 @@ void CodeGenerator::RunOnClassHierarchies(void) {
 
   serialize_cpp_os
       << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
-      << "// All rights reserved.\n"
       << "//\n"
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -4226,7 +4218,6 @@ void CodeGenerator::RunOnClassHierarchies(void) {
 
   ast_h_os
       << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
-      << "// All rights reserved.\n"
       << "//\n"
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -4235,7 +4226,6 @@ void CodeGenerator::RunOnClassHierarchies(void) {
 
   frontend_h_os
       << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
-      << "// All rights reserved.\n"
       << "//\n"
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -4249,7 +4239,6 @@ void CodeGenerator::RunOnClassHierarchies(void) {
 
   lib_pasta_h_os
       << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
-      << "// All rights reserved.\n"
       << "//\n"
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -4310,7 +4299,6 @@ void CodeGenerator::RunOnClassHierarchies(void) {
 
     fs
         << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
-        << "// All rights reserved.\n"
         << "//\n"
         << "// This source code is licensed in accordance with the terms specified in\n"
         << "// the LICENSE file found in the root directory of this source tree.\n\n"

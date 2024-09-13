@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -73,7 +72,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1275]) || tp >= &(gTypes[1287])) {
+  if (tp < &(gTypes[1283]) || tp >= &(gTypes[1295])) {
     return std::nullopt;
   }
 
@@ -90,47 +89,47 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::ir::abi::CallArgsOp::static_kind():
-      tp = &(gTypes[1276]);
-      break;
-
-    case mx::ir::abi::CallExecutionOp::static_kind():
-      tp = &(gTypes[1277]);
-      break;
-
-    case mx::ir::abi::CallOp::static_kind():
-      tp = &(gTypes[1278]);
-      break;
-
-    case mx::ir::abi::CallRetsOp::static_kind():
-      tp = &(gTypes[1279]);
-      break;
-
-    case mx::ir::abi::DirectOp::static_kind():
-      tp = &(gTypes[1280]);
-      break;
-
-    case mx::ir::abi::EpilogueOp::static_kind():
-      tp = &(gTypes[1281]);
-      break;
-
-    case mx::ir::abi::FuncOp::static_kind():
-      tp = &(gTypes[1282]);
-      break;
-
-    case mx::ir::abi::IndirectOp::static_kind():
-      tp = &(gTypes[1283]);
-      break;
-
-    case mx::ir::abi::PrologueOp::static_kind():
       tp = &(gTypes[1284]);
       break;
 
-    case mx::ir::abi::RetDirectOp::static_kind():
+    case mx::ir::abi::CallExecutionOp::static_kind():
       tp = &(gTypes[1285]);
       break;
 
-    case mx::ir::abi::YieldOp::static_kind():
+    case mx::ir::abi::CallOp::static_kind():
       tp = &(gTypes[1286]);
+      break;
+
+    case mx::ir::abi::CallRetsOp::static_kind():
+      tp = &(gTypes[1287]);
+      break;
+
+    case mx::ir::abi::DirectOp::static_kind():
+      tp = &(gTypes[1288]);
+      break;
+
+    case mx::ir::abi::EpilogueOp::static_kind():
+      tp = &(gTypes[1289]);
+      break;
+
+    case mx::ir::abi::FuncOp::static_kind():
+      tp = &(gTypes[1290]);
+      break;
+
+    case mx::ir::abi::IndirectOp::static_kind():
+      tp = &(gTypes[1291]);
+      break;
+
+    case mx::ir::abi::PrologueOp::static_kind():
+      tp = &(gTypes[1292]);
+      break;
+
+    case mx::ir::abi::RetDirectOp::static_kind():
+      tp = &(gTypes[1293]);
+      break;
+
+    case mx::ir::abi::YieldOp::static_kind():
+      tp = &(gTypes[1294]);
       break;
 
   }
@@ -198,7 +197,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1275]);
+  PyTypeObject * const tp = &(gTypes[1283]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -213,12 +212,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[990].tp_hash;
-  tp->tp_richcompare = gTypes[990].tp_richcompare;
+  tp->tp_hash = gTypes[998].tp_hash;
+  tp->tp_richcompare = gTypes[998].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[990]);
+  tp->tp_base = &(gTypes[998]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

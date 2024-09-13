@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -36,6 +35,7 @@ enum class AttributeKind : unsigned {
   BUILTIN_BOOL,
   BUILTIN_FLAT_SYMBOL_REF,
   BUILTIN_DENSE_INT_ELEMENTS,
+  BUILTIN_DATA_LAYOUT_SPEC,
   LLVM_C_CONV,
   LLVM_COMDAT,
   LLVM_LINKAGE,
@@ -85,6 +85,9 @@ enum class AttributeKind : unsigned {
   HL_FORMAT,
   HL_SECTION,
   HL_ALIAS,
+  HL_ERROR,
+  HL_COUNTED_BY,
+  HL_CLEANUP,
   HL_ALIGNED,
   HL_ALWAYS_INLINE,
   HL_NO_INLINE,
@@ -108,6 +111,8 @@ enum class AttributeKind : unsigned {
   HL_NO_CF_CHECK,
   HL_AVAILABLE_ONLY_IN_DEFAULT_EVAL_METHOD,
   HL_AVAILABILITY_ATTR,
+  HL_FALLTHROUGH,
+  HL_NO_PROFILE_INSTRUMENT_FUNCTION,
   HL_ASM_LABEL,
   HL_MODE,
   HL_BUILTIN,
@@ -115,6 +120,8 @@ enum class AttributeKind : unsigned {
   HL_ALLOC_SIZE,
   HL_DEPRECATED,
   HL_MAX_FIELD_ALIGNMENT,
+  HL_VISIBILITY,
+  HL_ASSUME_ALIGNED,
   HL_CV_QUALIFIERS,
   HL_UCV_QUALIFIERS,
   HL_CVR_QUALIFIERS,
@@ -135,7 +142,7 @@ inline static const char *EnumerationName(ir::AttributeKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(ir::AttributeKind) {
-  return 112;
+  return 120;
 }
 
 MX_EXPORT const char *EnumeratorName(ir::AttributeKind);

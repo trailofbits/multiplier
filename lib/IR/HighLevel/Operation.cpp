@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -384,6 +383,29 @@ std::optional<AssignOp> AssignOp::producing(const ::mx::ir::Value &that) {
 ::mx::ir::Value AssignOp::result(void) const {
   auto val = underlying_repr().getResult();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+std::optional<AttributedStmtOp> AttributedStmtOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_ATTRIBUTED_STMT) {
+    return reinterpret_cast<const AttributedStmtOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<AttributedStmtOp> AttributedStmtOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::AttributedStmt AttributedStmtOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::AttributedStmt(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Region AttributedStmtOp::body(void) const {
+  auto &val = underlying_repr().getBody();
+  return ::mx::ir::Region(module_, val);
 }
 
 std::optional<BinAShrAssignOp> BinAShrAssignOp::from(const ::mx::ir::Operation &that) {
@@ -881,6 +903,67 @@ std::optional<BinXorOp> BinXorOp::producing(const ::mx::ir::Value &that) {
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
+std::optional<BinaryCondOp> BinaryCondOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_BINARY_COND) {
+    return reinterpret_cast<const BinaryCondOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<BinaryCondOp> BinaryCondOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::BinaryCondOp BinaryCondOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::BinaryCondOp(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Value BinaryCondOp::result(void) const {
+  auto val = underlying_repr().getResult();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Region BinaryCondOp::common_region(void) const {
+  auto &val = underlying_repr().getCommonRegion();
+  return ::mx::ir::Region(module_, val);
+}
+
+::mx::ir::Region BinaryCondOp::cond_region(void) const {
+  auto &val = underlying_repr().getCondRegion();
+  return ::mx::ir::Region(module_, val);
+}
+
+::mx::ir::Region BinaryCondOp::then_region(void) const {
+  auto &val = underlying_repr().getThenRegion();
+  return ::mx::ir::Region(module_, val);
+}
+
+::mx::ir::Region BinaryCondOp::else_region(void) const {
+  auto &val = underlying_repr().getElseRegion();
+  return ::mx::ir::Region(module_, val);
+}
+
+std::optional<BreakOp> BreakOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_BREAK) {
+    return reinterpret_cast<const BreakOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<BreakOp> BreakOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::BreakOp BreakOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::BreakOp(this->::mx::ir::Operation::op_);
+}
+
 std::optional<BuiltinBitCastOp> BuiltinBitCastOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_BUILTIN_BITCAST) {
     return reinterpret_cast<const BuiltinBitCastOp &>(that);
@@ -907,6 +990,59 @@ std::optional<BuiltinBitCastOp> BuiltinBitCastOp::producing(const ::mx::ir::Valu
 ::mx::ir::Value BuiltinBitCastOp::result(void) const {
   auto val = underlying_repr().getResult();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+std::optional<BuiltinTypesCompatiblePOp> BuiltinTypesCompatiblePOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_BUILTIN_TYPES_COMPATIBLE_P_TYPE) {
+    return reinterpret_cast<const BuiltinTypesCompatiblePOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<BuiltinTypesCompatiblePOp> BuiltinTypesCompatiblePOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::BuiltinTypesCompatiblePOp BuiltinTypesCompatiblePOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::BuiltinTypesCompatiblePOp(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Value BuiltinTypesCompatiblePOp::result(void) const {
+  auto val = underlying_repr().getResult();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Type BuiltinTypesCompatiblePOp::type1(void) const {
+  auto mlir_type = underlying_repr().getType1();
+  return ::mx::ir::Type(
+      mlir_type.getContext(),
+      reinterpret_cast<const mlir::TypeStorage *>(
+          mlir_type.getAsOpaquePointer()));
+}
+
+::mx::ir::Type BuiltinTypesCompatiblePOp::type2(void) const {
+  auto mlir_type = underlying_repr().getType2();
+  return ::mx::ir::Type(
+      mlir_type.getContext(),
+      reinterpret_cast<const mlir::TypeStorage *>(
+          mlir_type.getAsOpaquePointer()));
+}
+
+bool BuiltinTypesCompatiblePOp::compatible(void) const {
+  auto val = underlying_repr().getCompatible();
+  return val;
+}
+
+std::optional<bool> BuiltinTypesCompatiblePOp::value(void) const {
+  auto opt_val = underlying_repr().getValue();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  return val;
 }
 
 std::optional<CStyleCastOp> CStyleCastOp::from(const ::mx::ir::Operation &that) {
@@ -976,6 +1112,95 @@ std::string_view CallOp::callee(void) const {
   } else {
     return {};
   }
+}
+
+std::optional<CaseOp> CaseOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_CASE) {
+    return reinterpret_cast<const CaseOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<CaseOp> CaseOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::CaseOp CaseOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::CaseOp(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Region CaseOp::lhs(void) const {
+  auto &val = underlying_repr().getLhs();
+  return ::mx::ir::Region(module_, val);
+}
+
+::mx::ir::Region CaseOp::body(void) const {
+  auto &val = underlying_repr().getBody();
+  return ::mx::ir::Region(module_, val);
+}
+
+std::optional<ChooseExprOp> ChooseExprOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_CHOOSE_EXPR) {
+    return reinterpret_cast<const ChooseExprOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<ChooseExprOp> ChooseExprOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::ChooseExprOp ChooseExprOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::ChooseExprOp(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Value ChooseExprOp::result(void) const {
+  auto val = underlying_repr().getResult();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Region ChooseExprOp::cond_region(void) const {
+  auto &val = underlying_repr().getCondRegion();
+  return ::mx::ir::Region(module_, val);
+}
+
+::mx::ir::Region ChooseExprOp::then_region(void) const {
+  auto &val = underlying_repr().getThenRegion();
+  return ::mx::ir::Region(module_, val);
+}
+
+::mx::ir::Region ChooseExprOp::else_region(void) const {
+  auto &val = underlying_repr().getElseRegion();
+  return ::mx::ir::Region(module_, val);
+}
+
+std::optional<bool> ChooseExprOp::cond_true(void) const {
+  auto opt_val = underlying_repr().getCondTrue();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  return val;
+}
+
+std::optional<bool> ChooseExprOp::is_condition_true(void) const {
+  auto opt_val = underlying_repr().isConditionTrue();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  return val;
+}
+
+bool ChooseExprOp::is_condition_dependent(void) const {
+  auto val = underlying_repr().isConditionDependent();
+  return val;
 }
 
 std::optional<ClassDeclOp> ClassDeclOp::from(const ::mx::ir::Operation &that) {
@@ -1076,6 +1301,67 @@ std::optional<CompoundLiteralOp> CompoundLiteralOp::producing(const ::mx::ir::Va
   return ::mx::ir::Region(module_, val);
 }
 
+std::optional<CondOp> CondOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_COND) {
+    return reinterpret_cast<const CondOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<CondOp> CondOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::CondOp CondOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::CondOp(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Value CondOp::result(void) const {
+  auto val = underlying_repr().getResult();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Region CondOp::cond_region(void) const {
+  auto &val = underlying_repr().getCondRegion();
+  return ::mx::ir::Region(module_, val);
+}
+
+::mx::ir::Region CondOp::then_region(void) const {
+  auto &val = underlying_repr().getThenRegion();
+  return ::mx::ir::Region(module_, val);
+}
+
+::mx::ir::Region CondOp::else_region(void) const {
+  auto &val = underlying_repr().getElseRegion();
+  return ::mx::ir::Region(module_, val);
+}
+
+std::optional<CondYieldOp> CondYieldOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_COND_YIELD) {
+    return reinterpret_cast<const CondYieldOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<CondYieldOp> CondYieldOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::CondYieldOp CondYieldOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::CondYieldOp(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Value CondYieldOp::result(void) const {
+  auto val = underlying_repr().getResult();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
 std::optional<ConstantOp> ConstantOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_CONST) {
     return reinterpret_cast<const ConstantOp &>(that);
@@ -1097,6 +1383,24 @@ std::optional<ConstantOp> ConstantOp::producing(const ::mx::ir::Value &that) {
 ::mx::ir::Value ConstantOp::result(void) const {
   auto val = underlying_repr().getResult();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+std::optional<ContinueOp> ContinueOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_CONTINUE) {
+    return reinterpret_cast<const ContinueOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<ContinueOp> ContinueOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::ContinueOp ContinueOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::ContinueOp(this->::mx::ir::Operation::op_);
 }
 
 std::optional<CxxBaseSpecifierOp> CxxBaseSpecifierOp::from(const ::mx::ir::Operation &that) {
@@ -1193,6 +1497,29 @@ std::optional<DeclRefOp> DeclRefOp::producing(const ::mx::ir::Value &that) {
 ::mx::ir::Value DeclRefOp::result(void) const {
   auto val = underlying_repr().getResult();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+std::optional<DefaultOp> DefaultOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_DEFAULT) {
+    return reinterpret_cast<const DefaultOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<DefaultOp> DefaultOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::DefaultOp DefaultOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::DefaultOp(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Region DefaultOp::body(void) const {
+  auto &val = underlying_repr().getBody();
+  return ::mx::ir::Region(module_, val);
 }
 
 std::optional<DerefOp> DerefOp::from(const ::mx::ir::Operation &that) {
@@ -1421,6 +1748,52 @@ std::optional<DivUOp> DivUOp::producing(const ::mx::ir::Value &that) {
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
+std::optional<DoOp> DoOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_DO) {
+    return reinterpret_cast<const DoOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<DoOp> DoOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::DoOp DoOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::DoOp(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Region DoOp::body_region(void) const {
+  auto &val = underlying_repr().getBodyRegion();
+  return ::mx::ir::Region(module_, val);
+}
+
+::mx::ir::Region DoOp::cond_region(void) const {
+  auto &val = underlying_repr().getCondRegion();
+  return ::mx::ir::Region(module_, val);
+}
+
+std::optional<EmptyDeclOp> EmptyDeclOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_EMPTY_DECL) {
+    return reinterpret_cast<const EmptyDeclOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<EmptyDeclOp> EmptyDeclOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::EmptyDeclOp EmptyDeclOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::EmptyDeclOp(this->::mx::ir::Operation::op_);
+}
+
 std::optional<EnumConstantOp> EnumConstantOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_ENUM_CONST) {
     return reinterpret_cast<const EnumConstantOp &>(that);
@@ -1444,8 +1817,8 @@ std::optional<EnumConstantOp> EnumConstantOp::producing(const ::mx::ir::Value &t
   return ::mx::ir::Region(module_, val);
 }
 
-std::string_view EnumConstantOp::name(void) const {
-  auto val = underlying_repr().getName();
+std::string_view EnumConstantOp::sym_name(void) const {
+  auto val = underlying_repr().getSymName();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);
   } else {
@@ -1476,8 +1849,8 @@ std::optional<EnumDeclOp> EnumDeclOp::producing(const ::mx::ir::Value &that) {
   return ::mx::ir::Region(module_, val);
 }
 
-std::string_view EnumDeclOp::name(void) const {
-  auto val = underlying_repr().getName();
+std::string_view EnumDeclOp::sym_name(void) const {
+  auto val = underlying_repr().getSymName();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);
   } else {
@@ -1634,8 +2007,8 @@ std::optional<FieldDeclOp> FieldDeclOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::FieldDeclOp(this->::mx::ir::Operation::op_);
 }
 
-std::string_view FieldDeclOp::name(void) const {
-  auto val = underlying_repr().getName();
+std::string_view FieldDeclOp::sym_name(void) const {
+  auto val = underlying_repr().getSymName();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);
   } else {
@@ -1660,305 +2033,31 @@ std::optional<unsigned int> FieldDeclOp::bits(void) const {
   return val;
 }
 
-std::optional<FuncRefOp> FuncRefOp::from(const ::mx::ir::Operation &that) {
-  if (that.kind() == OperationKind::HL_FUNCREF) {
-    return reinterpret_cast<const FuncRefOp &>(that);
+std::optional<FileScopeAsmOp> FileScopeAsmOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_FILE_SCOPE_ASM) {
+    return reinterpret_cast<const FileScopeAsmOp &>(that);
   }
   return std::nullopt;
 }
 
-std::optional<FuncRefOp> FuncRefOp::producing(const ::mx::ir::Value &that) {
+std::optional<FileScopeAsmOp> FileScopeAsmOp::producing(const ::mx::ir::Value &that) {
   if (auto op = ::mx::ir::Operation::producing(that)) {
     return from(op.value());
   }
   return std::nullopt;
 }
 
-::vast::hl::FuncRefOp FuncRefOp::underlying_repr(void) const noexcept {
-  return ::vast::hl::FuncRefOp(this->::mx::ir::Operation::op_);
+::vast::hl::FileScopeAsmOp FileScopeAsmOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::FileScopeAsmOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value FuncRefOp::result(void) const {
-  auto val = underlying_repr().getResult();
-  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
-}
-
-std::string_view FuncRefOp::function(void) const {
-  auto val = underlying_repr().getFunction();
+std::string_view FileScopeAsmOp::asm_string(void) const {
+  auto val = underlying_repr().getAsmString();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);
   } else {
     return {};
   }
-}
-
-std::optional<GlobalRefOp> GlobalRefOp::from(const ::mx::ir::Operation &that) {
-  if (that.kind() == OperationKind::HL_GLOBREF) {
-    return reinterpret_cast<const GlobalRefOp &>(that);
-  }
-  return std::nullopt;
-}
-
-std::optional<GlobalRefOp> GlobalRefOp::producing(const ::mx::ir::Value &that) {
-  if (auto op = ::mx::ir::Operation::producing(that)) {
-    return from(op.value());
-  }
-  return std::nullopt;
-}
-
-::vast::hl::GlobalRefOp GlobalRefOp::underlying_repr(void) const noexcept {
-  return ::vast::hl::GlobalRefOp(this->::mx::ir::Operation::op_);
-}
-
-::mx::ir::Value GlobalRefOp::result(void) const {
-  auto val = underlying_repr().getResult();
-  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
-}
-
-std::string_view GlobalRefOp::global(void) const {
-  auto val = underlying_repr().getGlobal();
-  if (auto size = val.size()) {
-    return std::string_view(val.data(), size);
-  } else {
-    return {};
-  }
-}
-
-std::optional<BinaryCondOp> BinaryCondOp::from(const ::mx::ir::Operation &that) {
-  if (that.kind() == OperationKind::HL_BINARY_COND) {
-    return reinterpret_cast<const BinaryCondOp &>(that);
-  }
-  return std::nullopt;
-}
-
-std::optional<BinaryCondOp> BinaryCondOp::producing(const ::mx::ir::Value &that) {
-  if (auto op = ::mx::ir::Operation::producing(that)) {
-    return from(op.value());
-  }
-  return std::nullopt;
-}
-
-::vast::hl::BinaryCondOp BinaryCondOp::underlying_repr(void) const noexcept {
-  return ::vast::hl::BinaryCondOp(this->::mx::ir::Operation::op_);
-}
-
-::mx::ir::Value BinaryCondOp::result(void) const {
-  auto val = underlying_repr().getResult();
-  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
-}
-
-::mx::ir::Region BinaryCondOp::common_region(void) const {
-  auto &val = underlying_repr().getCommonRegion();
-  return ::mx::ir::Region(module_, val);
-}
-
-::mx::ir::Region BinaryCondOp::cond_region(void) const {
-  auto &val = underlying_repr().getCondRegion();
-  return ::mx::ir::Region(module_, val);
-}
-
-::mx::ir::Region BinaryCondOp::then_region(void) const {
-  auto &val = underlying_repr().getThenRegion();
-  return ::mx::ir::Region(module_, val);
-}
-
-::mx::ir::Region BinaryCondOp::else_region(void) const {
-  auto &val = underlying_repr().getElseRegion();
-  return ::mx::ir::Region(module_, val);
-}
-
-std::optional<BreakOp> BreakOp::from(const ::mx::ir::Operation &that) {
-  if (that.kind() == OperationKind::HL_BREAK) {
-    return reinterpret_cast<const BreakOp &>(that);
-  }
-  return std::nullopt;
-}
-
-std::optional<BreakOp> BreakOp::producing(const ::mx::ir::Value &that) {
-  if (auto op = ::mx::ir::Operation::producing(that)) {
-    return from(op.value());
-  }
-  return std::nullopt;
-}
-
-::vast::hl::BreakOp BreakOp::underlying_repr(void) const noexcept {
-  return ::vast::hl::BreakOp(this->::mx::ir::Operation::op_);
-}
-
-std::optional<CaseOp> CaseOp::from(const ::mx::ir::Operation &that) {
-  if (that.kind() == OperationKind::HL_CASE) {
-    return reinterpret_cast<const CaseOp &>(that);
-  }
-  return std::nullopt;
-}
-
-std::optional<CaseOp> CaseOp::producing(const ::mx::ir::Value &that) {
-  if (auto op = ::mx::ir::Operation::producing(that)) {
-    return from(op.value());
-  }
-  return std::nullopt;
-}
-
-::vast::hl::CaseOp CaseOp::underlying_repr(void) const noexcept {
-  return ::vast::hl::CaseOp(this->::mx::ir::Operation::op_);
-}
-
-::mx::ir::Region CaseOp::lhs(void) const {
-  auto &val = underlying_repr().getLhs();
-  return ::mx::ir::Region(module_, val);
-}
-
-::mx::ir::Region CaseOp::body(void) const {
-  auto &val = underlying_repr().getBody();
-  return ::mx::ir::Region(module_, val);
-}
-
-std::optional<CondOp> CondOp::from(const ::mx::ir::Operation &that) {
-  if (that.kind() == OperationKind::HL_COND) {
-    return reinterpret_cast<const CondOp &>(that);
-  }
-  return std::nullopt;
-}
-
-std::optional<CondOp> CondOp::producing(const ::mx::ir::Value &that) {
-  if (auto op = ::mx::ir::Operation::producing(that)) {
-    return from(op.value());
-  }
-  return std::nullopt;
-}
-
-::vast::hl::CondOp CondOp::underlying_repr(void) const noexcept {
-  return ::vast::hl::CondOp(this->::mx::ir::Operation::op_);
-}
-
-::mx::ir::Value CondOp::result(void) const {
-  auto val = underlying_repr().getResult();
-  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
-}
-
-::mx::ir::Region CondOp::cond_region(void) const {
-  auto &val = underlying_repr().getCondRegion();
-  return ::mx::ir::Region(module_, val);
-}
-
-::mx::ir::Region CondOp::then_region(void) const {
-  auto &val = underlying_repr().getThenRegion();
-  return ::mx::ir::Region(module_, val);
-}
-
-::mx::ir::Region CondOp::else_region(void) const {
-  auto &val = underlying_repr().getElseRegion();
-  return ::mx::ir::Region(module_, val);
-}
-
-std::optional<CondYieldOp> CondYieldOp::from(const ::mx::ir::Operation &that) {
-  if (that.kind() == OperationKind::HL_COND_YIELD) {
-    return reinterpret_cast<const CondYieldOp &>(that);
-  }
-  return std::nullopt;
-}
-
-std::optional<CondYieldOp> CondYieldOp::producing(const ::mx::ir::Value &that) {
-  if (auto op = ::mx::ir::Operation::producing(that)) {
-    return from(op.value());
-  }
-  return std::nullopt;
-}
-
-::vast::hl::CondYieldOp CondYieldOp::underlying_repr(void) const noexcept {
-  return ::vast::hl::CondYieldOp(this->::mx::ir::Operation::op_);
-}
-
-::mx::ir::Value CondYieldOp::result(void) const {
-  auto val = underlying_repr().getResult();
-  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
-}
-
-std::optional<ContinueOp> ContinueOp::from(const ::mx::ir::Operation &that) {
-  if (that.kind() == OperationKind::HL_CONTINUE) {
-    return reinterpret_cast<const ContinueOp &>(that);
-  }
-  return std::nullopt;
-}
-
-std::optional<ContinueOp> ContinueOp::producing(const ::mx::ir::Value &that) {
-  if (auto op = ::mx::ir::Operation::producing(that)) {
-    return from(op.value());
-  }
-  return std::nullopt;
-}
-
-::vast::hl::ContinueOp ContinueOp::underlying_repr(void) const noexcept {
-  return ::vast::hl::ContinueOp(this->::mx::ir::Operation::op_);
-}
-
-std::optional<DefaultOp> DefaultOp::from(const ::mx::ir::Operation &that) {
-  if (that.kind() == OperationKind::HL_DEFAULT) {
-    return reinterpret_cast<const DefaultOp &>(that);
-  }
-  return std::nullopt;
-}
-
-std::optional<DefaultOp> DefaultOp::producing(const ::mx::ir::Value &that) {
-  if (auto op = ::mx::ir::Operation::producing(that)) {
-    return from(op.value());
-  }
-  return std::nullopt;
-}
-
-::vast::hl::DefaultOp DefaultOp::underlying_repr(void) const noexcept {
-  return ::vast::hl::DefaultOp(this->::mx::ir::Operation::op_);
-}
-
-::mx::ir::Region DefaultOp::body(void) const {
-  auto &val = underlying_repr().getBody();
-  return ::mx::ir::Region(module_, val);
-}
-
-std::optional<DoOp> DoOp::from(const ::mx::ir::Operation &that) {
-  if (that.kind() == OperationKind::HL_DO) {
-    return reinterpret_cast<const DoOp &>(that);
-  }
-  return std::nullopt;
-}
-
-std::optional<DoOp> DoOp::producing(const ::mx::ir::Value &that) {
-  if (auto op = ::mx::ir::Operation::producing(that)) {
-    return from(op.value());
-  }
-  return std::nullopt;
-}
-
-::vast::hl::DoOp DoOp::underlying_repr(void) const noexcept {
-  return ::vast::hl::DoOp(this->::mx::ir::Operation::op_);
-}
-
-::mx::ir::Region DoOp::body_region(void) const {
-  auto &val = underlying_repr().getBodyRegion();
-  return ::mx::ir::Region(module_, val);
-}
-
-::mx::ir::Region DoOp::cond_region(void) const {
-  auto &val = underlying_repr().getCondRegion();
-  return ::mx::ir::Region(module_, val);
-}
-
-std::optional<EmptyDeclOp> EmptyDeclOp::from(const ::mx::ir::Operation &that) {
-  if (that.kind() == OperationKind::HL_EMPTY_DECL) {
-    return reinterpret_cast<const EmptyDeclOp &>(that);
-  }
-  return std::nullopt;
-}
-
-std::optional<EmptyDeclOp> EmptyDeclOp::producing(const ::mx::ir::Value &that) {
-  if (auto op = ::mx::ir::Operation::producing(that)) {
-    return from(op.value());
-  }
-  return std::nullopt;
-}
-
-::vast::hl::EmptyDeclOp EmptyDeclOp::underlying_repr(void) const noexcept {
-  return ::vast::hl::EmptyDeclOp(this->::mx::ir::Operation::op_);
 }
 
 std::optional<ForOp> ForOp::from(const ::mx::ir::Operation &that) {
@@ -1980,29 +2079,29 @@ std::optional<ForOp> ForOp::producing(const ::mx::ir::Value &that) {
 }
 
 std::optional<::mx::ir::Region> ForOp::cond_region(void) const {
-  auto opt_val = underlying_repr().getCondRegion();
-  if (!opt_val) {
+  decltype(auto) opt_val = underlying_repr().getCondRegion();
+  if (opt_val.empty()) {
     return std::nullopt;
   }
-  auto &val = opt_val.value();
+  auto &val = opt_val;
   return ::mx::ir::Region(module_, val);
 }
 
 std::optional<::mx::ir::Region> ForOp::incr_region(void) const {
-  auto opt_val = underlying_repr().getIncrRegion();
-  if (!opt_val) {
+  decltype(auto) opt_val = underlying_repr().getIncrRegion();
+  if (opt_val.empty()) {
     return std::nullopt;
   }
-  auto &val = opt_val.value();
+  auto &val = opt_val;
   return ::mx::ir::Region(module_, val);
 }
 
 std::optional<::mx::ir::Region> ForOp::body_region(void) const {
-  auto opt_val = underlying_repr().getBodyRegion();
-  if (!opt_val) {
+  decltype(auto) opt_val = underlying_repr().getBodyRegion();
+  if (opt_val.empty()) {
     return std::nullopt;
   }
-  auto &val = opt_val.value();
+  auto &val = opt_val;
   return ::mx::ir::Region(module_, val);
 }
 
@@ -2025,11 +2124,11 @@ std::optional<FuncOp> FuncOp::producing(const ::mx::ir::Value &that) {
 }
 
 std::optional<::mx::ir::Region> FuncOp::body(void) const {
-  auto opt_val = underlying_repr().getBody();
-  if (!opt_val) {
+  decltype(auto) opt_val = underlying_repr().getBody();
+  if (opt_val.empty()) {
     return std::nullopt;
   }
-  auto &val = opt_val.value();
+  auto &val = opt_val;
   return ::mx::ir::Region(module_, val);
 }
 
@@ -2095,6 +2194,141 @@ bool FuncOp::is_declaration(void) const {
   return val;
 }
 
+std::optional<FuncRefOp> FuncRefOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_FUNCREF) {
+    return reinterpret_cast<const FuncRefOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<FuncRefOp> FuncRefOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::FuncRefOp FuncRefOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::FuncRefOp(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Value FuncRefOp::result(void) const {
+  auto val = underlying_repr().getResult();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+std::string_view FuncRefOp::function(void) const {
+  auto val = underlying_repr().getFunction();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
+std::optional<GenericAssocExprOp> GenericAssocExprOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_GENERIC_ASOC) {
+    return reinterpret_cast<const GenericAssocExprOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<GenericAssocExprOp> GenericAssocExprOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::GenericAssocExpr GenericAssocExprOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::GenericAssocExpr(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Value GenericAssocExprOp::result(void) const {
+  auto val = underlying_repr().getResult();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Region GenericAssocExprOp::body(void) const {
+  auto &val = underlying_repr().getBody();
+  return ::mx::ir::Region(module_, val);
+}
+
+std::optional<GenericSelectionExprOp> GenericSelectionExprOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_GENERIC_EXPR) {
+    return reinterpret_cast<const GenericSelectionExprOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<GenericSelectionExprOp> GenericSelectionExprOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::GenericSelectionExpr GenericSelectionExprOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::GenericSelectionExpr(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Value GenericSelectionExprOp::result(void) const {
+  auto val = underlying_repr().getResult();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Region GenericSelectionExprOp::control(void) const {
+  auto &val = underlying_repr().getControl();
+  return ::mx::ir::Region(module_, val);
+}
+
+::mx::ir::Region GenericSelectionExprOp::body(void) const {
+  auto &val = underlying_repr().getBody();
+  return ::mx::ir::Region(module_, val);
+}
+
+bool GenericSelectionExprOp::is_expr_predicate(void) const {
+  auto val = underlying_repr().isExprPredicate();
+  return val;
+}
+
+bool GenericSelectionExprOp::is_type_predicate(void) const {
+  auto val = underlying_repr().isTypePredicate();
+  return val;
+}
+
+std::optional<GlobalRefOp> GlobalRefOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_GLOBREF) {
+    return reinterpret_cast<const GlobalRefOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<GlobalRefOp> GlobalRefOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::GlobalRefOp GlobalRefOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::GlobalRefOp(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Value GlobalRefOp::result(void) const {
+  auto val = underlying_repr().getResult();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+std::string_view GlobalRefOp::global(void) const {
+  auto val = underlying_repr().getGlobal();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
 std::optional<GotoStmtOp> GotoStmtOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_GOTO) {
     return reinterpret_cast<const GotoStmtOp &>(that);
@@ -2147,323 +2381,17 @@ std::optional<IfOp> IfOp::producing(const ::mx::ir::Value &that) {
 }
 
 std::optional<::mx::ir::Region> IfOp::else_region(void) const {
-  auto opt_val = underlying_repr().getElseRegion();
-  if (!opt_val) {
+  decltype(auto) opt_val = underlying_repr().getElseRegion();
+  if (opt_val.empty()) {
     return std::nullopt;
   }
-  auto &val = opt_val.value();
+  auto &val = opt_val;
   return ::mx::ir::Region(module_, val);
 }
 
 bool IfOp::has_else(void) const {
   auto val = underlying_repr().hasElse();
   return val;
-}
-
-std::optional<IndirectGotoStmtOp> IndirectGotoStmtOp::from(const ::mx::ir::Operation &that) {
-  if (that.kind() == OperationKind::HL_INDIRECT_GOTO) {
-    return reinterpret_cast<const IndirectGotoStmtOp &>(that);
-  }
-  return std::nullopt;
-}
-
-std::optional<IndirectGotoStmtOp> IndirectGotoStmtOp::producing(const ::mx::ir::Value &that) {
-  if (auto op = ::mx::ir::Operation::producing(that)) {
-    return from(op.value());
-  }
-  return std::nullopt;
-}
-
-::vast::hl::IndirectGotoStmt IndirectGotoStmtOp::underlying_repr(void) const noexcept {
-  return ::vast::hl::IndirectGotoStmt(this->::mx::ir::Operation::op_);
-}
-
-::mx::ir::Region IndirectGotoStmtOp::target(void) const {
-  auto &val = underlying_repr().getTarget();
-  return ::mx::ir::Region(module_, val);
-}
-
-std::optional<LabelDeclOp> LabelDeclOp::from(const ::mx::ir::Operation &that) {
-  if (that.kind() == OperationKind::HL_LABEL_DECL) {
-    return reinterpret_cast<const LabelDeclOp &>(that);
-  }
-  return std::nullopt;
-}
-
-std::optional<LabelDeclOp> LabelDeclOp::producing(const ::mx::ir::Value &that) {
-  if (auto op = ::mx::ir::Operation::producing(that)) {
-    return from(op.value());
-  }
-  return std::nullopt;
-}
-
-::vast::hl::LabelDeclOp LabelDeclOp::underlying_repr(void) const noexcept {
-  return ::vast::hl::LabelDeclOp(this->::mx::ir::Operation::op_);
-}
-
-::mx::ir::Value LabelDeclOp::result(void) const {
-  auto val = underlying_repr().getResult();
-  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
-}
-
-std::string_view LabelDeclOp::name(void) const {
-  auto val = underlying_repr().getName();
-  if (auto size = val.size()) {
-    return std::string_view(val.data(), size);
-  } else {
-    return {};
-  }
-}
-
-std::optional<LabelStmtOp> LabelStmtOp::from(const ::mx::ir::Operation &that) {
-  if (that.kind() == OperationKind::HL_LABEL) {
-    return reinterpret_cast<const LabelStmtOp &>(that);
-  }
-  return std::nullopt;
-}
-
-std::optional<LabelStmtOp> LabelStmtOp::producing(const ::mx::ir::Value &that) {
-  if (auto op = ::mx::ir::Operation::producing(that)) {
-    return from(op.value());
-  }
-  return std::nullopt;
-}
-
-::vast::hl::LabelStmt LabelStmtOp::underlying_repr(void) const noexcept {
-  return ::vast::hl::LabelStmt(this->::mx::ir::Operation::op_);
-}
-
-::mx::ir::Value LabelStmtOp::label(void) const {
-  auto val = underlying_repr().getLabel();
-  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
-}
-
-::mx::ir::Region LabelStmtOp::body(void) const {
-  auto &val = underlying_repr().getBody();
-  return ::mx::ir::Region(module_, val);
-}
-
-std::optional<SkipStmtOp> SkipStmtOp::from(const ::mx::ir::Operation &that) {
-  if (that.kind() == OperationKind::HL_SKIP) {
-    return reinterpret_cast<const SkipStmtOp &>(that);
-  }
-  return std::nullopt;
-}
-
-std::optional<SkipStmtOp> SkipStmtOp::producing(const ::mx::ir::Value &that) {
-  if (auto op = ::mx::ir::Operation::producing(that)) {
-    return from(op.value());
-  }
-  return std::nullopt;
-}
-
-::vast::hl::SkipStmt SkipStmtOp::underlying_repr(void) const noexcept {
-  return ::vast::hl::SkipStmt(this->::mx::ir::Operation::op_);
-}
-
-std::optional<SwitchOp> SwitchOp::from(const ::mx::ir::Operation &that) {
-  if (that.kind() == OperationKind::HL_SWITCH) {
-    return reinterpret_cast<const SwitchOp &>(that);
-  }
-  return std::nullopt;
-}
-
-std::optional<SwitchOp> SwitchOp::producing(const ::mx::ir::Value &that) {
-  if (auto op = ::mx::ir::Operation::producing(that)) {
-    return from(op.value());
-  }
-  return std::nullopt;
-}
-
-::vast::hl::SwitchOp SwitchOp::underlying_repr(void) const noexcept {
-  return ::vast::hl::SwitchOp(this->::mx::ir::Operation::op_);
-}
-
-::mx::ir::Region SwitchOp::cond_region(void) const {
-  auto &val = underlying_repr().getCondRegion();
-  return ::mx::ir::Region(module_, val);
-}
-
-std::optional<TypeYieldOp> TypeYieldOp::from(const ::mx::ir::Operation &that) {
-  if (that.kind() == OperationKind::HL_TYPE_YIELD) {
-    return reinterpret_cast<const TypeYieldOp &>(that);
-  }
-  return std::nullopt;
-}
-
-std::optional<TypeYieldOp> TypeYieldOp::producing(const ::mx::ir::Value &that) {
-  if (auto op = ::mx::ir::Operation::producing(that)) {
-    return from(op.value());
-  }
-  return std::nullopt;
-}
-
-::vast::hl::TypeYieldOp TypeYieldOp::underlying_repr(void) const noexcept {
-  return ::vast::hl::TypeYieldOp(this->::mx::ir::Operation::op_);
-}
-
-::mx::ir::Value TypeYieldOp::result(void) const {
-  auto val = underlying_repr().getResult();
-  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
-}
-
-::mx::ir::Type TypeYieldOp::yielded(void) const {
-  auto mlir_type = underlying_repr().getYielded();
-  return ::mx::ir::Type(
-      mlir_type.getContext(),
-      reinterpret_cast<const mlir::TypeStorage *>(
-          mlir_type.getAsOpaquePointer()));
-}
-
-std::optional<ValueYieldOp> ValueYieldOp::from(const ::mx::ir::Operation &that) {
-  if (that.kind() == OperationKind::HL_VALUE_YIELD) {
-    return reinterpret_cast<const ValueYieldOp &>(that);
-  }
-  return std::nullopt;
-}
-
-std::optional<ValueYieldOp> ValueYieldOp::producing(const ::mx::ir::Value &that) {
-  if (auto op = ::mx::ir::Operation::producing(that)) {
-    return from(op.value());
-  }
-  return std::nullopt;
-}
-
-::vast::hl::ValueYieldOp ValueYieldOp::underlying_repr(void) const noexcept {
-  return ::vast::hl::ValueYieldOp(this->::mx::ir::Operation::op_);
-}
-
-::mx::ir::Value ValueYieldOp::result(void) const {
-  auto val = underlying_repr().getResult();
-  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
-}
-
-std::optional<VarDeclOp> VarDeclOp::from(const ::mx::ir::Operation &that) {
-  if (that.kind() == OperationKind::HL_VAR) {
-    return reinterpret_cast<const VarDeclOp &>(that);
-  }
-  return std::nullopt;
-}
-
-std::optional<VarDeclOp> VarDeclOp::producing(const ::mx::ir::Value &that) {
-  if (auto op = ::mx::ir::Operation::producing(that)) {
-    return from(op.value());
-  }
-  return std::nullopt;
-}
-
-::vast::hl::VarDeclOp VarDeclOp::underlying_repr(void) const noexcept {
-  return ::vast::hl::VarDeclOp(this->::mx::ir::Operation::op_);
-}
-
-::mx::ir::Value VarDeclOp::result(void) const {
-  auto val = underlying_repr().getResult();
-  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
-}
-
-std::optional<::mx::ir::Region> VarDeclOp::initializer(void) const {
-  auto opt_val = underlying_repr().getInitializer();
-  if (!opt_val) {
-    return std::nullopt;
-  }
-  auto &val = opt_val.value();
-  return ::mx::ir::Region(module_, val);
-}
-
-std::optional<::mx::ir::Region> VarDeclOp::allocation_size(void) const {
-  auto opt_val = underlying_repr().getAllocationSize();
-  if (!opt_val) {
-    return std::nullopt;
-  }
-  auto &val = opt_val.value();
-  return ::mx::ir::Region(module_, val);
-}
-
-std::string_view VarDeclOp::name(void) const {
-  auto val = underlying_repr().getName();
-  if (auto size = val.size()) {
-    return std::string_view(val.data(), size);
-  } else {
-    return {};
-  }
-}
-
-bool VarDeclOp::has_local_storage(void) const {
-  auto val = underlying_repr().hasLocalStorage();
-  return val;
-}
-
-bool VarDeclOp::is_local_var_decl(void) const {
-  auto val = underlying_repr().isLocalVarDecl();
-  return val;
-}
-
-bool VarDeclOp::is_static_local(void) const {
-  auto val = underlying_repr().isStaticLocal();
-  return val;
-}
-
-bool VarDeclOp::has_external_storage(void) const {
-  auto val = underlying_repr().hasExternalStorage();
-  return val;
-}
-
-bool VarDeclOp::has_global_storage(void) const {
-  auto val = underlying_repr().hasGlobalStorage();
-  return val;
-}
-
-bool VarDeclOp::is_static_data_member(void) const {
-  auto val = underlying_repr().isStaticDataMember();
-  return val;
-}
-
-bool VarDeclOp::is_in_file_context(void) const {
-  auto val = underlying_repr().isInFileContext();
-  return val;
-}
-
-bool VarDeclOp::is_in_function_or_method_context(void) const {
-  auto val = underlying_repr().isInFunctionOrMethodContext();
-  return val;
-}
-
-bool VarDeclOp::is_in_record_context(void) const {
-  auto val = underlying_repr().isInRecordContext();
-  return val;
-}
-
-bool VarDeclOp::is_file_var_decl(void) const {
-  auto val = underlying_repr().isFileVarDecl();
-  return val;
-}
-
-std::optional<WhileOp> WhileOp::from(const ::mx::ir::Operation &that) {
-  if (that.kind() == OperationKind::HL_WHILE) {
-    return reinterpret_cast<const WhileOp &>(that);
-  }
-  return std::nullopt;
-}
-
-std::optional<WhileOp> WhileOp::producing(const ::mx::ir::Value &that) {
-  if (auto op = ::mx::ir::Operation::producing(that)) {
-    return from(op.value());
-  }
-  return std::nullopt;
-}
-
-::vast::hl::WhileOp WhileOp::underlying_repr(void) const noexcept {
-  return ::vast::hl::WhileOp(this->::mx::ir::Operation::op_);
-}
-
-::mx::ir::Region WhileOp::cond_region(void) const {
-  auto &val = underlying_repr().getCondRegion();
-  return ::mx::ir::Region(module_, val);
-}
-
-::mx::ir::Region WhileOp::body_region(void) const {
-  auto &val = underlying_repr().getBodyRegion();
-  return ::mx::ir::Region(module_, val);
 }
 
 std::optional<ImagOp> ImagOp::from(const ::mx::ir::Operation &that) {
@@ -2559,6 +2487,29 @@ gap::generator<::mx::ir::Result> IndirectCallOp::results(void) const & {
   }
 }
 
+std::optional<IndirectGotoStmtOp> IndirectGotoStmtOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_INDIRECT_GOTO) {
+    return reinterpret_cast<const IndirectGotoStmtOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<IndirectGotoStmtOp> IndirectGotoStmtOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::IndirectGotoStmt IndirectGotoStmtOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::IndirectGotoStmt(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Region IndirectGotoStmtOp::target(void) const {
+  auto &val = underlying_repr().getTarget();
+  return ::mx::ir::Region(module_, val);
+}
+
 std::optional<InitListExprOp> InitListExprOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_INITLIST) {
     return reinterpret_cast<const InitListExprOp &>(that);
@@ -2638,6 +2589,66 @@ std::optional<LNotOp> LNotOp::producing(const ::mx::ir::Value &that) {
 ::mx::ir::Value LNotOp::res(void) const {
   auto val = underlying_repr().getRes();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+std::optional<LabelDeclOp> LabelDeclOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_LABEL_DECL) {
+    return reinterpret_cast<const LabelDeclOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<LabelDeclOp> LabelDeclOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::LabelDeclOp LabelDeclOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::LabelDeclOp(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Value LabelDeclOp::result(void) const {
+  auto val = underlying_repr().getResult();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+std::string_view LabelDeclOp::sym_name(void) const {
+  auto val = underlying_repr().getSymName();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
+std::optional<LabelStmtOp> LabelStmtOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_LABEL) {
+    return reinterpret_cast<const LabelStmtOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<LabelStmtOp> LabelStmtOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::LabelStmt LabelStmtOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::LabelStmt(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Value LabelStmtOp::label(void) const {
+  auto val = underlying_repr().getLabel();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Region LabelStmtOp::body(void) const {
+  auto &val = underlying_repr().getBody();
+  return ::mx::ir::Region(module_, val);
 }
 
 std::optional<MinusOp> MinusOp::from(const ::mx::ir::Operation &that) {
@@ -2826,6 +2837,24 @@ std::optional<NotOp> NotOp::producing(const ::mx::ir::Value &that) {
 ::mx::ir::Value NotOp::result(void) const {
   auto val = underlying_repr().getResult();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+std::optional<NullStmtOp> NullStmtOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_NULL) {
+    return reinterpret_cast<const NullStmtOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<NullStmtOp> NullStmtOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::NullStmt NullStmtOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::NullStmt(this->::mx::ir::Operation::op_);
 }
 
 std::optional<OffsetOfExprOp> OffsetOfExprOp::from(const ::mx::ir::Operation &that) {
@@ -3172,8 +3201,8 @@ std::optional<RecordMemberOp> RecordMemberOp::producing(const ::mx::ir::Value &t
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-std::string_view RecordMemberOp::name(void) const {
-  auto val = underlying_repr().getName();
+std::string_view RecordMemberOp::field(void) const {
+  auto val = underlying_repr().getField();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);
   } else {
@@ -3473,6 +3502,39 @@ std::size_t SizeOfTypeOp::value(void) const {
   return val;
 }
 
+std::optional<StaticAssertDeclOp> StaticAssertDeclOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_STATIC_ASSERT) {
+    return reinterpret_cast<const StaticAssertDeclOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<StaticAssertDeclOp> StaticAssertDeclOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::StaticAssertDecl StaticAssertDeclOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::StaticAssertDecl(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Region StaticAssertDeclOp::assert_(void) const {
+  auto &val = underlying_repr().getAssert();
+  return ::mx::ir::Region(module_, val);
+}
+
+::mx::ir::Region StaticAssertDeclOp::message(void) const {
+  auto &val = underlying_repr().getMessage();
+  return ::mx::ir::Region(module_, val);
+}
+
+bool StaticAssertDeclOp::failed(void) const {
+  auto val = underlying_repr().getFailed();
+  return val;
+}
+
 std::optional<StmtExprOp> StmtExprOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_STMT_EXPR) {
     return reinterpret_cast<const StmtExprOp &>(that);
@@ -3524,8 +3586,8 @@ std::optional<StructDeclOp> StructDeclOp::producing(const ::mx::ir::Value &that)
   return ::mx::ir::Region(module_, val);
 }
 
-std::string_view StructDeclOp::name(void) const {
-  auto val = underlying_repr().getName();
+std::string_view StructDeclOp::sym_name(void) const {
+  auto val = underlying_repr().getSymName();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);
   } else {
@@ -3540,15 +3602,6 @@ gap::generator<::mx::ir::Type> StructDeclOp::field_types(void) const & {
         el_ty.getContext(),
         reinterpret_cast<const mlir::TypeStorage *>(
             el_ty.getAsOpaquePointer()));
-  }
-}
-
-std::string_view StructDeclOp::defined_name(void) const {
-  auto val = underlying_repr().getDefinedName();
-  if (auto size = val.size()) {
-    return std::string_view(val.data(), size);
-  } else {
-    return {};
   }
 }
 
@@ -3735,6 +3788,29 @@ std::optional<SubscriptOp> SubscriptOp::producing(const ::mx::ir::Value &that) {
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
+std::optional<SwitchOp> SwitchOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_SWITCH) {
+    return reinterpret_cast<const SwitchOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<SwitchOp> SwitchOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::SwitchOp SwitchOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::SwitchOp(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Region SwitchOp::cond_region(void) const {
+  auto &val = underlying_repr().getCondRegion();
+  return ::mx::ir::Region(module_, val);
+}
+
 std::optional<ThisOp> ThisOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_THIS) {
     return reinterpret_cast<const ThisOp &>(that);
@@ -3799,8 +3875,8 @@ std::optional<TypeAliasOp> TypeAliasOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::TypeAliasOp(this->::mx::ir::Operation::op_);
 }
 
-std::string_view TypeAliasOp::name(void) const {
-  auto val = underlying_repr().getName();
+std::string_view TypeAliasOp::sym_name(void) const {
+  auto val = underlying_repr().getSymName();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);
   } else {
@@ -3810,14 +3886,6 @@ std::string_view TypeAliasOp::name(void) const {
 
 ::mx::ir::Type TypeAliasOp::type(void) const {
   auto mlir_type = underlying_repr().getType();
-  return ::mx::ir::Type(
-      mlir_type.getContext(),
-      reinterpret_cast<const mlir::TypeStorage *>(
-          mlir_type.getAsOpaquePointer()));
-}
-
-::mx::ir::Type TypeAliasOp::defined_type(void) const {
-  auto mlir_type = underlying_repr().getDefinedType();
   return ::mx::ir::Type(
       mlir_type.getContext(),
       reinterpret_cast<const mlir::TypeStorage *>(
@@ -3842,13 +3910,21 @@ std::optional<TypeDeclOp> TypeDeclOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::TypeDeclOp(this->::mx::ir::Operation::op_);
 }
 
-std::string_view TypeDeclOp::name(void) const {
-  auto val = underlying_repr().getName();
+std::string_view TypeDeclOp::sym_name(void) const {
+  auto val = underlying_repr().getSymName();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);
   } else {
     return {};
   }
+}
+
+::mx::ir::Type TypeDeclOp::type(void) const {
+  auto mlir_type = underlying_repr().getType();
+  return ::mx::ir::Type(
+      mlir_type.getContext(),
+      reinterpret_cast<const mlir::TypeStorage *>(
+          mlir_type.getAsOpaquePointer()));
 }
 
 ::mx::ir::Type TypeDeclOp::defined_type(void) const {
@@ -3877,8 +3953,8 @@ std::optional<TypeDefOp> TypeDefOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::TypeDefOp(this->::mx::ir::Operation::op_);
 }
 
-std::string_view TypeDefOp::name(void) const {
-  auto val = underlying_repr().getName();
+std::string_view TypeDefOp::sym_name(void) const {
+  auto val = underlying_repr().getSymName();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);
   } else {
@@ -3942,6 +4018,37 @@ std::string_view TypeOfExprOp::name(void) const {
           mlir_type.getAsOpaquePointer()));
 }
 
+std::optional<TypeYieldOp> TypeYieldOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_TYPE_YIELD) {
+    return reinterpret_cast<const TypeYieldOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<TypeYieldOp> TypeYieldOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::TypeYieldOp TypeYieldOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::TypeYieldOp(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Value TypeYieldOp::result(void) const {
+  auto val = underlying_repr().getResult();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+::mx::ir::Type TypeYieldOp::yielded(void) const {
+  auto mlir_type = underlying_repr().getYielded();
+  return ::mx::ir::Type(
+      mlir_type.getContext(),
+      reinterpret_cast<const mlir::TypeStorage *>(
+          mlir_type.getAsOpaquePointer()));
+}
+
 std::optional<UnionDeclOp> UnionDeclOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_UNION) {
     return reinterpret_cast<const UnionDeclOp &>(that);
@@ -3965,8 +4072,8 @@ std::optional<UnionDeclOp> UnionDeclOp::producing(const ::mx::ir::Value &that) {
   return ::mx::ir::Region(module_, val);
 }
 
-std::string_view UnionDeclOp::name(void) const {
-  auto val = underlying_repr().getName();
+std::string_view UnionDeclOp::sym_name(void) const {
+  auto val = underlying_repr().getSymName();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);
   } else {
@@ -3981,15 +4088,6 @@ gap::generator<::mx::ir::Type> UnionDeclOp::field_types(void) const & {
         el_ty.getContext(),
         reinterpret_cast<const mlir::TypeStorage *>(
             el_ty.getAsOpaquePointer()));
-  }
-}
-
-std::string_view UnionDeclOp::defined_name(void) const {
-  auto val = underlying_repr().getDefinedName();
-  if (auto size = val.size()) {
-    return std::string_view(val.data(), size);
-  } else {
-    return {};
   }
 }
 
@@ -4055,6 +4153,157 @@ std::optional<VAArgExprOp> VAArgExprOp::producing(const ::mx::ir::Value &that) {
 ::mx::ir::Value VAArgExprOp::result(void) const {
   auto val = underlying_repr().getResult();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+std::optional<ValueYieldOp> ValueYieldOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_VALUE_YIELD) {
+    return reinterpret_cast<const ValueYieldOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<ValueYieldOp> ValueYieldOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::ValueYieldOp ValueYieldOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::ValueYieldOp(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Value ValueYieldOp::result(void) const {
+  auto val = underlying_repr().getResult();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+std::optional<VarDeclOp> VarDeclOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_VAR) {
+    return reinterpret_cast<const VarDeclOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<VarDeclOp> VarDeclOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::VarDeclOp VarDeclOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::VarDeclOp(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Value VarDeclOp::result(void) const {
+  auto val = underlying_repr().getResult();
+  return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+std::optional<::mx::ir::Region> VarDeclOp::initializer(void) const {
+  decltype(auto) opt_val = underlying_repr().getInitializer();
+  if (opt_val.empty()) {
+    return std::nullopt;
+  }
+  auto &val = opt_val;
+  return ::mx::ir::Region(module_, val);
+}
+
+std::optional<::mx::ir::Region> VarDeclOp::allocation_size(void) const {
+  decltype(auto) opt_val = underlying_repr().getAllocationSize();
+  if (opt_val.empty()) {
+    return std::nullopt;
+  }
+  auto &val = opt_val;
+  return ::mx::ir::Region(module_, val);
+}
+
+std::string_view VarDeclOp::sym_name(void) const {
+  auto val = underlying_repr().getSymName();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
+bool VarDeclOp::has_local_storage(void) const {
+  auto val = underlying_repr().hasLocalStorage();
+  return val;
+}
+
+bool VarDeclOp::is_local_var_decl(void) const {
+  auto val = underlying_repr().isLocalVarDecl();
+  return val;
+}
+
+bool VarDeclOp::is_static_local(void) const {
+  auto val = underlying_repr().isStaticLocal();
+  return val;
+}
+
+bool VarDeclOp::has_external_storage(void) const {
+  auto val = underlying_repr().hasExternalStorage();
+  return val;
+}
+
+bool VarDeclOp::has_global_storage(void) const {
+  auto val = underlying_repr().hasGlobalStorage();
+  return val;
+}
+
+bool VarDeclOp::is_static_data_member(void) const {
+  auto val = underlying_repr().isStaticDataMember();
+  return val;
+}
+
+bool VarDeclOp::is_in_file_context(void) const {
+  auto val = underlying_repr().isInFileContext();
+  return val;
+}
+
+bool VarDeclOp::is_in_function_or_method_context(void) const {
+  auto val = underlying_repr().isInFunctionOrMethodContext();
+  return val;
+}
+
+bool VarDeclOp::is_in_record_context(void) const {
+  auto val = underlying_repr().isInRecordContext();
+  return val;
+}
+
+bool VarDeclOp::is_file_var_decl(void) const {
+  auto val = underlying_repr().isFileVarDecl();
+  return val;
+}
+
+std::optional<WhileOp> WhileOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::HL_WHILE) {
+    return reinterpret_cast<const WhileOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<WhileOp> WhileOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::hl::WhileOp WhileOp::underlying_repr(void) const noexcept {
+  return ::vast::hl::WhileOp(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Region WhileOp::cond_region(void) const {
+  auto &val = underlying_repr().getCondRegion();
+  return ::mx::ir::Region(module_, val);
+}
+
+::mx::ir::Region WhileOp::body_region(void) const {
+  auto &val = underlying_repr().getBodyRegion();
+  return ::mx::ir::Region(module_, val);
 }
 
 }  // namespace mx::ir::hl

@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -12,6 +11,7 @@
 
 #include <mlir/Dialect/LLVMIR/LLVMDialect.h>
 #include <mlir/Dialect/MemRef/IR/MemRef.h>
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 
 namespace mx::ir::builtin {
 std::optional<Attribute> Attribute::from(const ::mx::ir::Attribute &that) {
@@ -422,6 +422,17 @@ std::optional<DenseIntElementsAttr> DenseIntElementsAttr::from(const ::mx::ir::A
 
 ::mlir::DenseIntElementsAttr DenseIntElementsAttr::underlying_repr(void) const noexcept {
   return ::mlir::DenseIntElementsAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<DataLayoutSpecAttr> DataLayoutSpecAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::BUILTIN_DATA_LAYOUT_SPEC) {
+    return reinterpret_cast<const DataLayoutSpecAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::mlir::DataLayoutSpecAttr DataLayoutSpecAttr::underlying_repr(void) const noexcept {
+  return ::mlir::DataLayoutSpecAttr(this->::mx::ir::Attribute::attr_);
 }
 
 }  // namespace mx::ir::builtin

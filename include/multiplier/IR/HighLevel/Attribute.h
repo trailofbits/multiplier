@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -15,6 +14,9 @@ class AnnotationAttr;
 class FormatAttr;
 class SectionAttr;
 class AliasAttr;
+class ErrorAttr;
+class CountedByAttr;
+class CleanupAttr;
 class AlignedAttr;
 class AlwaysInlineAttr;
 class NoInlineAttr;
@@ -38,6 +40,8 @@ class GNUInlineAttr;
 class NoCfCheckAttr;
 class AvailableOnlyInDefaultEvalMethodAttr;
 class AvailabilityAttrAttr;
+class FallthroughAttr;
+class NoProfileInstrumentFunctionAttr;
 class AsmLabelAttr;
 class ModeAttr;
 class BuiltinAttr;
@@ -45,6 +49,8 @@ class AllocAlignAttr;
 class AllocSizeAttr;
 class DeprecatedAttr;
 class MaxFieldAlignmentAttr;
+class VisibilityAttr;
+class AssumeAlignedAttr;
 class CVQualifiersAttr;
 class UCVQualifiersAttr;
 class CVRQualifiersAttr;
@@ -117,6 +123,51 @@ class MX_EXPORT AliasAttr final : public Attribute {
   //::mlir::StringAttr name(void) const;
 };
 static_assert(sizeof(AliasAttr) == sizeof(Attribute));
+
+class MX_EXPORT ErrorAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::HL_ERROR;
+  }
+
+  static std::optional<ErrorAttr> from(const ::mx::ir::Attribute &that);
+
+  ::vast::hl::ErrorAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //::mlir::StringAttr name(void) const;
+};
+static_assert(sizeof(ErrorAttr) == sizeof(Attribute));
+
+class MX_EXPORT CountedByAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::HL_COUNTED_BY;
+  }
+
+  static std::optional<CountedByAttr> from(const ::mx::ir::Attribute &that);
+
+  ::vast::hl::CountedByAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //::mlir::FlatSymbolRefAttr symbol(void) const;
+};
+static_assert(sizeof(CountedByAttr) == sizeof(Attribute));
+
+class MX_EXPORT CleanupAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::HL_CLEANUP;
+  }
+
+  static std::optional<CleanupAttr> from(const ::mx::ir::Attribute &that);
+
+  ::vast::hl::CleanupAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //::mlir::SymbolRefAttr symbol(void) const;
+};
+static_assert(sizeof(CleanupAttr) == sizeof(Attribute));
 
 class MX_EXPORT AlignedAttr final : public Attribute {
  public:
@@ -440,6 +491,34 @@ class MX_EXPORT AvailabilityAttrAttr final : public Attribute {
 };
 static_assert(sizeof(AvailabilityAttrAttr) == sizeof(Attribute));
 
+class MX_EXPORT FallthroughAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::HL_FALLTHROUGH;
+  }
+
+  static std::optional<FallthroughAttr> from(const ::mx::ir::Attribute &that);
+
+  ::vast::hl::FallthroughAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+};
+static_assert(sizeof(FallthroughAttr) == sizeof(Attribute));
+
+class MX_EXPORT NoProfileInstrumentFunctionAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::HL_NO_PROFILE_INSTRUMENT_FUNCTION;
+  }
+
+  static std::optional<NoProfileInstrumentFunctionAttr> from(const ::mx::ir::Attribute &that);
+
+  ::vast::hl::NoProfileInstrumentFunctionAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+};
+static_assert(sizeof(NoProfileInstrumentFunctionAttr) == sizeof(Attribute));
+
 class MX_EXPORT AsmLabelAttr final : public Attribute {
  public:
   inline static constexpr AttributeKind static_kind(void) {
@@ -547,6 +626,37 @@ class MX_EXPORT MaxFieldAlignmentAttr final : public Attribute {
   unsigned int alignment(void) const;
 };
 static_assert(sizeof(MaxFieldAlignmentAttr) == sizeof(Attribute));
+
+class MX_EXPORT VisibilityAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::HL_VISIBILITY;
+  }
+
+  static std::optional<VisibilityAttr> from(const ::mx::ir::Attribute &that);
+
+  ::vast::hl::VisibilityAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //::vast::hl::Visibility value(void) const;
+};
+static_assert(sizeof(VisibilityAttr) == sizeof(Attribute));
+
+class MX_EXPORT AssumeAlignedAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::HL_ASSUME_ALIGNED;
+  }
+
+  static std::optional<AssumeAlignedAttr> from(const ::mx::ir::Attribute &that);
+
+  ::vast::hl::AssumeAlignedAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //llvm::APInt alignment(void) const;
+  //llvm::APInt offset(void) const;
+};
+static_assert(sizeof(AssumeAlignedAttr) == sizeof(Attribute));
 
 class MX_EXPORT CVQualifiersAttr final : public Attribute {
  public:

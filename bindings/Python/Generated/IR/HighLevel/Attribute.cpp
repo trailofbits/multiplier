@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -73,7 +72,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[937]) || tp >= &(gTypes[976])) {
+  if (tp < &(gTypes[938]) || tp >= &(gTypes[984])) {
     return std::nullopt;
   }
 
@@ -90,155 +89,183 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::ir::hl::AnnotationAttr::static_kind():
-      tp = &(gTypes[938]);
-      break;
-
-    case mx::ir::hl::FormatAttr::static_kind():
       tp = &(gTypes[939]);
       break;
 
-    case mx::ir::hl::SectionAttr::static_kind():
+    case mx::ir::hl::FormatAttr::static_kind():
       tp = &(gTypes[940]);
       break;
 
-    case mx::ir::hl::AliasAttr::static_kind():
+    case mx::ir::hl::SectionAttr::static_kind():
       tp = &(gTypes[941]);
       break;
 
-    case mx::ir::hl::AlignedAttr::static_kind():
+    case mx::ir::hl::AliasAttr::static_kind():
       tp = &(gTypes[942]);
       break;
 
-    case mx::ir::hl::AlwaysInlineAttr::static_kind():
+    case mx::ir::hl::ErrorAttr::static_kind():
       tp = &(gTypes[943]);
       break;
 
-    case mx::ir::hl::NoInlineAttr::static_kind():
+    case mx::ir::hl::CountedByAttr::static_kind():
       tp = &(gTypes[944]);
       break;
 
-    case mx::ir::hl::ConstAttr::static_kind():
+    case mx::ir::hl::CleanupAttr::static_kind():
       tp = &(gTypes[945]);
       break;
 
-    case mx::ir::hl::LoaderUninitializedAttr::static_kind():
+    case mx::ir::hl::AlignedAttr::static_kind():
       tp = &(gTypes[946]);
       break;
 
-    case mx::ir::hl::NoInstrumentFunctionAttr::static_kind():
+    case mx::ir::hl::AlwaysInlineAttr::static_kind():
       tp = &(gTypes[947]);
       break;
 
-    case mx::ir::hl::PackedAttr::static_kind():
+    case mx::ir::hl::NoInlineAttr::static_kind():
       tp = &(gTypes[948]);
       break;
 
-    case mx::ir::hl::PureAttr::static_kind():
+    case mx::ir::hl::ConstAttr::static_kind():
       tp = &(gTypes[949]);
       break;
 
-    case mx::ir::hl::WarnUnusedResultAttr::static_kind():
+    case mx::ir::hl::LoaderUninitializedAttr::static_kind():
       tp = &(gTypes[950]);
       break;
 
-    case mx::ir::hl::RestrictAttr::static_kind():
+    case mx::ir::hl::NoInstrumentFunctionAttr::static_kind():
       tp = &(gTypes[951]);
       break;
 
-    case mx::ir::hl::NoThrowAttr::static_kind():
+    case mx::ir::hl::PackedAttr::static_kind():
       tp = &(gTypes[952]);
       break;
 
-    case mx::ir::hl::NonNullAttr::static_kind():
+    case mx::ir::hl::PureAttr::static_kind():
       tp = &(gTypes[953]);
       break;
 
-    case mx::ir::hl::LeafAttr::static_kind():
+    case mx::ir::hl::WarnUnusedResultAttr::static_kind():
       tp = &(gTypes[954]);
       break;
 
-    case mx::ir::hl::ColdAttr::static_kind():
+    case mx::ir::hl::RestrictAttr::static_kind():
       tp = &(gTypes[955]);
       break;
 
-    case mx::ir::hl::TransparentUnionAttr::static_kind():
+    case mx::ir::hl::NoThrowAttr::static_kind():
       tp = &(gTypes[956]);
       break;
 
-    case mx::ir::hl::ReturnsTwiceAttr::static_kind():
+    case mx::ir::hl::NonNullAttr::static_kind():
       tp = &(gTypes[957]);
       break;
 
-    case mx::ir::hl::MayAliasAttr::static_kind():
+    case mx::ir::hl::LeafAttr::static_kind():
       tp = &(gTypes[958]);
       break;
 
-    case mx::ir::hl::UnusedAttr::static_kind():
+    case mx::ir::hl::ColdAttr::static_kind():
       tp = &(gTypes[959]);
       break;
 
-    case mx::ir::hl::UsedAttr::static_kind():
+    case mx::ir::hl::TransparentUnionAttr::static_kind():
       tp = &(gTypes[960]);
       break;
 
-    case mx::ir::hl::GNUInlineAttr::static_kind():
+    case mx::ir::hl::ReturnsTwiceAttr::static_kind():
       tp = &(gTypes[961]);
       break;
 
-    case mx::ir::hl::NoCfCheckAttr::static_kind():
+    case mx::ir::hl::MayAliasAttr::static_kind():
       tp = &(gTypes[962]);
       break;
 
-    case mx::ir::hl::AvailableOnlyInDefaultEvalMethodAttr::static_kind():
+    case mx::ir::hl::UnusedAttr::static_kind():
       tp = &(gTypes[963]);
       break;
 
-    case mx::ir::hl::AvailabilityAttrAttr::static_kind():
+    case mx::ir::hl::UsedAttr::static_kind():
       tp = &(gTypes[964]);
       break;
 
-    case mx::ir::hl::AsmLabelAttr::static_kind():
+    case mx::ir::hl::GNUInlineAttr::static_kind():
       tp = &(gTypes[965]);
       break;
 
-    case mx::ir::hl::ModeAttr::static_kind():
+    case mx::ir::hl::NoCfCheckAttr::static_kind():
       tp = &(gTypes[966]);
       break;
 
-    case mx::ir::hl::BuiltinAttr::static_kind():
+    case mx::ir::hl::AvailableOnlyInDefaultEvalMethodAttr::static_kind():
       tp = &(gTypes[967]);
       break;
 
-    case mx::ir::hl::AllocAlignAttr::static_kind():
+    case mx::ir::hl::AvailabilityAttrAttr::static_kind():
       tp = &(gTypes[968]);
       break;
 
-    case mx::ir::hl::AllocSizeAttr::static_kind():
+    case mx::ir::hl::FallthroughAttr::static_kind():
       tp = &(gTypes[969]);
       break;
 
-    case mx::ir::hl::DeprecatedAttr::static_kind():
+    case mx::ir::hl::NoProfileInstrumentFunctionAttr::static_kind():
       tp = &(gTypes[970]);
       break;
 
-    case mx::ir::hl::MaxFieldAlignmentAttr::static_kind():
+    case mx::ir::hl::AsmLabelAttr::static_kind():
       tp = &(gTypes[971]);
       break;
 
-    case mx::ir::hl::CVQualifiersAttr::static_kind():
+    case mx::ir::hl::ModeAttr::static_kind():
       tp = &(gTypes[972]);
       break;
 
-    case mx::ir::hl::UCVQualifiersAttr::static_kind():
+    case mx::ir::hl::BuiltinAttr::static_kind():
       tp = &(gTypes[973]);
       break;
 
-    case mx::ir::hl::CVRQualifiersAttr::static_kind():
+    case mx::ir::hl::AllocAlignAttr::static_kind():
       tp = &(gTypes[974]);
       break;
 
-    case mx::ir::hl::OffsetOfNodeAttr::static_kind():
+    case mx::ir::hl::AllocSizeAttr::static_kind():
       tp = &(gTypes[975]);
+      break;
+
+    case mx::ir::hl::DeprecatedAttr::static_kind():
+      tp = &(gTypes[976]);
+      break;
+
+    case mx::ir::hl::MaxFieldAlignmentAttr::static_kind():
+      tp = &(gTypes[977]);
+      break;
+
+    case mx::ir::hl::VisibilityAttr::static_kind():
+      tp = &(gTypes[978]);
+      break;
+
+    case mx::ir::hl::AssumeAlignedAttr::static_kind():
+      tp = &(gTypes[979]);
+      break;
+
+    case mx::ir::hl::CVQualifiersAttr::static_kind():
+      tp = &(gTypes[980]);
+      break;
+
+    case mx::ir::hl::UCVQualifiersAttr::static_kind():
+      tp = &(gTypes[981]);
+      break;
+
+    case mx::ir::hl::CVRQualifiersAttr::static_kind():
+      tp = &(gTypes[982]);
+      break;
+
+    case mx::ir::hl::OffsetOfNodeAttr::static_kind():
+      tp = &(gTypes[983]);
       break;
 
   }
@@ -306,7 +333,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[937]);
+  PyTypeObject * const tp = &(gTypes[938]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

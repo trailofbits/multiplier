@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -17,7 +16,8 @@
 #include <string>
 
 #include <mlir/Dialect/LLVMIR/LLVMDialect.h>
-#include <vast/Dialect/Core/CoreOps.hpp>
+#include <vast/Dialect/Dialects.hpp>
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 
 namespace mx::ir::core {
 std::optional<Operation> Operation::from(const ::mx::ir::Operation &that) {
@@ -144,6 +144,69 @@ std::optional<LazyOp> LazyOp::producing(const ::mx::ir::Value &that) {
 ::mx::ir::Region LazyOp::lazy(void) const {
   auto &val = underlying_repr().getLazy();
   return ::mx::ir::Region(module_, val);
+}
+
+std::optional<ModuleOp> ModuleOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::CORE_MODULE) {
+    return reinterpret_cast<const ModuleOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<ModuleOp> ModuleOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::core::ModuleOp ModuleOp::underlying_repr(void) const noexcept {
+  return ::vast::core::ModuleOp(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Region ModuleOp::body(void) const {
+  auto &val = underlying_repr().getBody();
+  return ::mx::ir::Region(module_, val);
+}
+
+std::optional<std::string_view> ModuleOp::sym_name(void) const {
+  auto opt_val = underlying_repr().getSymName();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
+std::optional<std::string_view> ModuleOp::name(void) const {
+  auto opt_val = underlying_repr().getName();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
+bool ModuleOp::is_optional_symbol(void) const {
+  auto val = underlying_repr().isOptionalSymbol();
+  return val;
+}
+
+std::string_view ModuleOp::default_dialect(void) const {
+  auto val = underlying_repr().getDefaultDialect();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
 }
 
 std::optional<ScopeOp> ScopeOp::from(const ::mx::ir::Operation &that) {

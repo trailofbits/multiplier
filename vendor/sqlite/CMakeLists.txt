@@ -1,6 +1,5 @@
 #
 # Copyright (c) 2022-present, Trail of Bits, Inc.
-# All rights reserved.
 #
 # This source code is licensed in accordance with the terms specified in
 # the LICENSE file found in the root directory of this source tree.
@@ -15,8 +14,8 @@ endif()
 
 FetchContent_Declare(
   sqlite
-  URL      https://www.sqlite.org/2024/sqlite-amalgamation-3460000.zip
-  URL_HASH SHA3_256=1221eed70de626871912bfca144c00411f0c30d3c2b7935cff3963b63370ef7c
+  URL      https://www.sqlite.org/2024/sqlite-amalgamation-3460100.zip
+  URL_HASH SHA3_256=af6aae8d3eccc608857c63cf56efbadc70da48b5c719446b353ed88dded1e288
 )
 
 FetchContent_MakeAvailable(sqlite)

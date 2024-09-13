@@ -1,6 +1,5 @@
 #
 # Copyright (c) 2023-present, Trail of Bits, Inc.
-# All rights reserved.
 #
 # This source code is licensed in accordance with the terms specified in
 # the LICENSE file found in the root directory of this source tree.
@@ -58,9 +57,9 @@ set_target_properties("mx-python"
     POSITION_INDEPENDENT_CODE
       YES
     COMPILE_FEATURES
-      cxx_std_20
+      cxx_std_23
     INTERFACE_COMPILE_FEATURES
-      cxx_std_20
+      cxx_std_23
 
     # Make sure we have the right output name, e.g.
     # `multiplier.cpython-312-darwin.so`.

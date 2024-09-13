@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -63,7 +62,7 @@ class MX_EXPORT CallExecutionOp final : public Operation {
   gap::generator<::mx::ir::Operand> args(void) const &;
   ::mx::ir::Value result(void) const;
   ::mx::ir::Region body(void) const;
-  std::string_view callee(void) const;
+  //::mlir::SymbolRefAttr callee(void) const;
   //::mlir::CallInterfaceCallable callable_for_callee(void) const;
   gap::generator<::mx::ir::Operand> arg_operands(void) const &;
 };

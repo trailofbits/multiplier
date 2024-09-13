@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -31,6 +30,7 @@
    _builtin(BoolAttr, AttributeKind::BUILTIN_BOOL, mlir::BoolAttr) \
    _builtin(FlatSymbolRefAttr, AttributeKind::BUILTIN_FLAT_SYMBOL_REF, mlir::FlatSymbolRefAttr) \
    _builtin(DenseIntElementsAttr, AttributeKind::BUILTIN_DENSE_INT_ELEMENTS, mlir::DenseIntElementsAttr) \
+   _builtin(DataLayoutSpecAttr, AttributeKind::BUILTIN_DATA_LAYOUT_SPEC, mlir::DataLayoutSpecAttr) \
    _llvm(CConvAttr, AttributeKind::LLVM_C_CONV, mlir::LLVM::CConvAttr) \
    _llvm(ComdatAttr, AttributeKind::LLVM_COMDAT, mlir::LLVM::ComdatAttr) \
    _llvm(LinkageAttr, AttributeKind::LLVM_LINKAGE, mlir::LLVM::LinkageAttr) \
@@ -80,6 +80,9 @@
    _hl(FormatAttr, AttributeKind::HL_FORMAT, vast::hl::FormatAttr) \
    _hl(SectionAttr, AttributeKind::HL_SECTION, vast::hl::SectionAttr) \
    _hl(AliasAttr, AttributeKind::HL_ALIAS, vast::hl::AliasAttr) \
+   _hl(ErrorAttr, AttributeKind::HL_ERROR, vast::hl::ErrorAttr) \
+   _hl(CountedByAttr, AttributeKind::HL_COUNTED_BY, vast::hl::CountedByAttr) \
+   _hl(CleanupAttr, AttributeKind::HL_CLEANUP, vast::hl::CleanupAttr) \
    _hl(AlignedAttr, AttributeKind::HL_ALIGNED, vast::hl::AlignedAttr) \
    _hl(AlwaysInlineAttr, AttributeKind::HL_ALWAYS_INLINE, vast::hl::AlwaysInlineAttr) \
    _hl(NoInlineAttr, AttributeKind::HL_NO_INLINE, vast::hl::NoInlineAttr) \
@@ -103,6 +106,8 @@
    _hl(NoCfCheckAttr, AttributeKind::HL_NO_CF_CHECK, vast::hl::NoCfCheckAttr) \
    _hl(AvailableOnlyInDefaultEvalMethodAttr, AttributeKind::HL_AVAILABLE_ONLY_IN_DEFAULT_EVAL_METHOD, vast::hl::AvailableOnlyInDefaultEvalMethodAttr) \
    _hl(AvailabilityAttrAttr, AttributeKind::HL_AVAILABILITY_ATTR, vast::hl::AvailabilityAttrAttr) \
+   _hl(FallthroughAttr, AttributeKind::HL_FALLTHROUGH, vast::hl::FallthroughAttr) \
+   _hl(NoProfileInstrumentFunctionAttr, AttributeKind::HL_NO_PROFILE_INSTRUMENT_FUNCTION, vast::hl::NoProfileInstrumentFunctionAttr) \
    _hl(AsmLabelAttr, AttributeKind::HL_ASM_LABEL, vast::hl::AsmLabelAttr) \
    _hl(ModeAttr, AttributeKind::HL_MODE, vast::hl::ModeAttr) \
    _hl(BuiltinAttr, AttributeKind::HL_BUILTIN, vast::hl::BuiltinAttr) \
@@ -110,6 +115,8 @@
    _hl(AllocSizeAttr, AttributeKind::HL_ALLOC_SIZE, vast::hl::AllocSizeAttr) \
    _hl(DeprecatedAttr, AttributeKind::HL_DEPRECATED, vast::hl::DeprecatedAttr) \
    _hl(MaxFieldAlignmentAttr, AttributeKind::HL_MAX_FIELD_ALIGNMENT, vast::hl::MaxFieldAlignmentAttr) \
+   _hl(VisibilityAttr, AttributeKind::HL_VISIBILITY, vast::hl::VisibilityAttr) \
+   _hl(AssumeAlignedAttr, AttributeKind::HL_ASSUME_ALIGNED, vast::hl::AssumeAlignedAttr) \
    _hl(CVQualifiersAttr, AttributeKind::HL_CV_QUALIFIERS, vast::hl::CVQualifiersAttr) \
    _hl(UCVQualifiersAttr, AttributeKind::HL_UCV_QUALIFIERS, vast::hl::UCVQualifiersAttr) \
    _hl(CVRQualifiersAttr, AttributeKind::HL_CVR_QUALIFIERS, vast::hl::CVRQualifiersAttr) \
@@ -122,5 +129,5 @@
    _core(GlobalLinkageKindAttr, AttributeKind::CORE_GLOBAL_LINKAGE_KIND, vast::core::GlobalLinkageKindAttr) \
    _meta(IdentifierAttr, AttributeKind::META_IDENTIFIER, vast::meta::IdentifierAttr)
 
-#define MX_IR_NUM_MLIR_ATTRIBUTES 112
+#define MX_IR_NUM_MLIR_ATTRIBUTES 120
 

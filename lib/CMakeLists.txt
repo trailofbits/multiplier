@@ -1,6 +1,5 @@
 #
 # Copyright (c) 2021-present, Trail of Bits, Inc.
-# All rights reserved.
 #
 # This source code is licensed in accordance with the terms specified in
 # the LICENSE file found in the root directory of this source tree.
@@ -258,9 +257,9 @@ set_target_properties("mx-api"
     POSITION_INDEPENDENT_CODE
       YES
     COMPILE_FEATURES
-      cxx_std_20
+      cxx_std_23
     INTERFACE_COMPILE_FEATURES
-      cxx_std_20
+      cxx_std_23
 )
 
 add_library("multiplier" SHARED
@@ -294,9 +293,9 @@ set_target_properties("multiplier"
     POSITION_INDEPENDENT_CODE
       YES
     COMPILE_FEATURES
-      cxx_std_20
+      cxx_std_23
     INTERFACE_COMPILE_FEATURES
-      cxx_std_20
+      cxx_std_23
 
     # NOTE(pag): This is important! We need to emulate the shape of the
     #            install directories, so that install targets behave in the

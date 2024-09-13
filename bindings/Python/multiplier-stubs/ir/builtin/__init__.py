@@ -1,6 +1,5 @@
 #
 # Copyright (c) 2023-present, Trail of Bits, Inc.
-# All rights reserved.
 #
 # This source code is licensed in accordance with the terms specified in
 # the LICENSE file found in the root directory of this source tree.
@@ -277,6 +276,16 @@ class DenseIntElementsAttr(multiplier.ir.builtin.Attribute):
 
   @staticmethod
   def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.builtin.DenseIntElementsAttr]:
+    ...
+
+class DataLayoutSpecAttr(multiplier.ir.builtin.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.builtin.DataLayoutSpecAttr]:
     ...
 
 class Operation(multiplier.ir.Operation):

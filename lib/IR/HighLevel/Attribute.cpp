@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -64,6 +63,39 @@ std::optional<AliasAttr> AliasAttr::from(const ::mx::ir::Attribute &that) {
 
 ::vast::hl::AliasAttr AliasAttr::underlying_repr(void) const noexcept {
   return ::vast::hl::AliasAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<ErrorAttr> ErrorAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::HL_ERROR) {
+    return reinterpret_cast<const ErrorAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::vast::hl::ErrorAttr ErrorAttr::underlying_repr(void) const noexcept {
+  return ::vast::hl::ErrorAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<CountedByAttr> CountedByAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::HL_COUNTED_BY) {
+    return reinterpret_cast<const CountedByAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::vast::hl::CountedByAttr CountedByAttr::underlying_repr(void) const noexcept {
+  return ::vast::hl::CountedByAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<CleanupAttr> CleanupAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::HL_CLEANUP) {
+    return reinterpret_cast<const CleanupAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::vast::hl::CleanupAttr CleanupAttr::underlying_repr(void) const noexcept {
+  return ::vast::hl::CleanupAttr(this->::mx::ir::Attribute::attr_);
 }
 
 std::optional<AlignedAttr> AlignedAttr::from(const ::mx::ir::Attribute &that) {
@@ -319,6 +351,28 @@ std::optional<AvailabilityAttrAttr> AvailabilityAttrAttr::from(const ::mx::ir::A
   return ::vast::hl::AvailabilityAttrAttr(this->::mx::ir::Attribute::attr_);
 }
 
+std::optional<FallthroughAttr> FallthroughAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::HL_FALLTHROUGH) {
+    return reinterpret_cast<const FallthroughAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::vast::hl::FallthroughAttr FallthroughAttr::underlying_repr(void) const noexcept {
+  return ::vast::hl::FallthroughAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<NoProfileInstrumentFunctionAttr> NoProfileInstrumentFunctionAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::HL_NO_PROFILE_INSTRUMENT_FUNCTION) {
+    return reinterpret_cast<const NoProfileInstrumentFunctionAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::vast::hl::NoProfileInstrumentFunctionAttr NoProfileInstrumentFunctionAttr::underlying_repr(void) const noexcept {
+  return ::vast::hl::NoProfileInstrumentFunctionAttr(this->::mx::ir::Attribute::attr_);
+}
+
 std::optional<AsmLabelAttr> AsmLabelAttr::from(const ::mx::ir::Attribute &that) {
   if (that.kind() == AttributeKind::HL_ASM_LABEL) {
     return reinterpret_cast<const AsmLabelAttr &>(that);
@@ -424,6 +478,28 @@ std::optional<MaxFieldAlignmentAttr> MaxFieldAlignmentAttr::from(const ::mx::ir:
 unsigned int MaxFieldAlignmentAttr::alignment(void) const {
   auto val = underlying_repr().getAlignment();
   return val;
+}
+
+std::optional<VisibilityAttr> VisibilityAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::HL_VISIBILITY) {
+    return reinterpret_cast<const VisibilityAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::vast::hl::VisibilityAttr VisibilityAttr::underlying_repr(void) const noexcept {
+  return ::vast::hl::VisibilityAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<AssumeAlignedAttr> AssumeAlignedAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::HL_ASSUME_ALIGNED) {
+    return reinterpret_cast<const AssumeAlignedAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::vast::hl::AssumeAlignedAttr AssumeAlignedAttr::underlying_repr(void) const noexcept {
+  return ::vast::hl::AssumeAlignedAttr(this->::mx::ir::Attribute::attr_);
 }
 
 std::optional<CVQualifiersAttr> CVQualifiersAttr::from(const ::mx::ir::Attribute &that) {

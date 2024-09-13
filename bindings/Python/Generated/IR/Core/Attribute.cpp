@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -73,7 +72,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[976]) || tp >= &(gTypes[983])) {
+  if (tp < &(gTypes[984]) || tp >= &(gTypes[991])) {
     return std::nullopt;
   }
 
@@ -90,27 +89,27 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::ir::core::BooleanAttr::static_kind():
-      tp = &(gTypes[977]);
+      tp = &(gTypes[985]);
       break;
 
     case mx::ir::core::IntegerAttr::static_kind():
-      tp = &(gTypes[978]);
+      tp = &(gTypes[986]);
       break;
 
     case mx::ir::core::FloatAttr::static_kind():
-      tp = &(gTypes[979]);
+      tp = &(gTypes[987]);
       break;
 
     case mx::ir::core::VoidAttr::static_kind():
-      tp = &(gTypes[980]);
+      tp = &(gTypes[988]);
       break;
 
     case mx::ir::core::SourceLanguageAttr::static_kind():
-      tp = &(gTypes[981]);
+      tp = &(gTypes[989]);
       break;
 
     case mx::ir::core::GlobalLinkageKindAttr::static_kind():
-      tp = &(gTypes[982]);
+      tp = &(gTypes[990]);
       break;
 
   }
@@ -178,7 +177,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[976]);
+  PyTypeObject * const tp = &(gTypes[984]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
