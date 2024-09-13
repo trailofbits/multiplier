@@ -134,13 +134,13 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "res",
+    "result",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->res());
+          return ::mx::to_python(T_cast(self)->result());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::llvm::CoroEndOp::res"),
+    PyDoc_STR("Wrapper for mx::ir::llvm::CoroEndOp::result"),
     nullptr,
   },
   {}  // Sentinel.

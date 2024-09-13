@@ -351,8 +351,8 @@ class GetGlobalOp(multiplier.ir.memref.Operation):
     ...
 
 class GlobalOp(multiplier.ir.memref.Operation):
-  sym_name: str
-  sym_visibility: Optional[str]
+  name: str
+  visibility: Optional[str]
   constant: bool
   alignment: Optional[int]
   is_external: bool

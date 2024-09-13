@@ -279,9 +279,9 @@ class MX_EXPORT AShrOp final : public Operation {
   ::mlir::LLVM::AShrOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(AShrOp) == sizeof(Operation));
 
@@ -297,9 +297,9 @@ class MX_EXPORT AddOp final : public Operation {
   ::mlir::LLVM::AddOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::IntegerOverflowFlags overflow_flags(void) const;
 };
 static_assert(sizeof(AddOp) == sizeof(Operation));
@@ -316,8 +316,8 @@ class MX_EXPORT AddrSpaceCastOp final : public Operation {
   ::mlir::LLVM::AddrSpaceCastOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value arg(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value argument(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(AddrSpaceCastOp) == sizeof(Operation));
 
@@ -333,7 +333,7 @@ class MX_EXPORT AddressOfOp final : public Operation {
   ::mlir::LLVM::AddressOfOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<LLVMPointerType> res(void) const;
+  //::mlir::TypedValue<LLVMPointerType> result(void) const;
   std::string_view global_name(void) const;
 };
 static_assert(sizeof(AddressOfOp) == sizeof(Operation));
@@ -351,7 +351,7 @@ class MX_EXPORT AllocaOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<IntegerType> array_size(void) const;
-  //::mlir::TypedValue<LLVMPointerType> res(void) const;
+  //::mlir::TypedValue<LLVMPointerType> result(void) const;
   std::optional<unsigned long long> alignment(void) const;
   ::mx::ir::Type elem_type(void) const;
   bool inalloca(void) const;
@@ -373,9 +373,9 @@ class MX_EXPORT AndOp final : public Operation {
   ::mlir::LLVM::AndOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(AndOp) == sizeof(Operation));
 
@@ -393,8 +393,8 @@ class MX_EXPORT AtomicCmpXchgOp final : public Operation {
   // Imported methods:
   //::mlir::TypedValue<LLVMPointerType> ptr(void) const;
   ::mx::ir::Value cmp(void) const;
-  ::mx::ir::Value val(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value value(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::AtomicOrdering success_ordering(void) const;
   //::mlir::LLVM::AtomicOrdering failure_ordering(void) const;
   std::optional<std::string_view> syncscope(void) const;
@@ -422,8 +422,8 @@ class MX_EXPORT AtomicRMWOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<LLVMPointerType> ptr(void) const;
-  ::mx::ir::Value val(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value value(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::AtomicBinOp bin_op(void) const;
   //::mlir::LLVM::AtomicOrdering ordering(void) const;
   std::optional<std::string_view> syncscope(void) const;
@@ -449,8 +449,8 @@ class MX_EXPORT BitcastOp final : public Operation {
   ::mlir::LLVM::BitcastOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value arg(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value argument(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(BitcastOp) == sizeof(Operation));
 
@@ -484,7 +484,7 @@ class MX_EXPORT CallIntrinsicOp final : public Operation {
   ::mlir::LLVM::CallIntrinsicOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  gap::generator<::mx::ir::Operand> args(void) const &;
+  gap::generator<::mx::ir::Operand> arguments(void) const &;
   ::mx::ir::Value results(void) const;
   std::string_view intrin(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
@@ -534,7 +534,7 @@ class MX_EXPORT ComdatOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Region body(void) const;
-  std::string_view sym_name(void) const;
+  std::string_view name(void) const;
 };
 static_assert(sizeof(ComdatOp) == sizeof(Operation));
 
@@ -550,7 +550,7 @@ class MX_EXPORT ComdatSelectorOp final : public Operation {
   ::mlir::LLVM::ComdatSelectorOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  std::string_view sym_name(void) const;
+  std::string_view name(void) const;
   //::mlir::LLVM::comdat::Comdat comdat(void) const;
 };
 static_assert(sizeof(ComdatSelectorOp) == sizeof(Operation));
@@ -589,7 +589,7 @@ class MX_EXPORT ConstantOp final : public Operation {
   ::mlir::LLVM::ConstantOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::Attribute value(void) const;
 };
 static_assert(sizeof(ConstantOp) == sizeof(Operation));
@@ -608,7 +608,7 @@ class MX_EXPORT ExtractElementOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value vector(void) const;
   //::mlir::TypedValue<IntegerType> position(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(ExtractElementOp) == sizeof(Operation));
 
@@ -625,7 +625,7 @@ class MX_EXPORT ExtractValueOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value container(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::llvm::ArrayRef<long long> position(void) const;
 };
 static_assert(sizeof(ExtractValueOp) == sizeof(Operation));
@@ -642,9 +642,9 @@ class MX_EXPORT FAddOp final : public Operation {
   ::mlir::LLVM::FAddOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(FAddOp) == sizeof(Operation));
@@ -661,9 +661,9 @@ class MX_EXPORT FCmpOp final : public Operation {
   ::mlir::LLVM::FCmpOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FCmpPredicate predicate(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
@@ -681,9 +681,9 @@ class MX_EXPORT FDivOp final : public Operation {
   ::mlir::LLVM::FDivOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(FDivOp) == sizeof(Operation));
@@ -700,9 +700,9 @@ class MX_EXPORT FMulOp final : public Operation {
   ::mlir::LLVM::FMulOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(FMulOp) == sizeof(Operation));
@@ -720,7 +720,7 @@ class MX_EXPORT FNegOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value operand(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(FNegOp) == sizeof(Operation));
@@ -737,8 +737,8 @@ class MX_EXPORT FPExtOp final : public Operation {
   ::mlir::LLVM::FPExtOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value arg(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value argument(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(FPExtOp) == sizeof(Operation));
 
@@ -754,8 +754,8 @@ class MX_EXPORT FPToSIOp final : public Operation {
   ::mlir::LLVM::FPToSIOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value arg(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value argument(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(FPToSIOp) == sizeof(Operation));
 
@@ -771,8 +771,8 @@ class MX_EXPORT FPToUIOp final : public Operation {
   ::mlir::LLVM::FPToUIOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value arg(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value argument(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(FPToUIOp) == sizeof(Operation));
 
@@ -788,8 +788,8 @@ class MX_EXPORT FPTruncOp final : public Operation {
   ::mlir::LLVM::FPTruncOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value arg(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value argument(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(FPTruncOp) == sizeof(Operation));
 
@@ -805,9 +805,9 @@ class MX_EXPORT FRemOp final : public Operation {
   ::mlir::LLVM::FRemOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(FRemOp) == sizeof(Operation));
@@ -824,9 +824,9 @@ class MX_EXPORT FSubOp final : public Operation {
   ::mlir::LLVM::FSubOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(FSubOp) == sizeof(Operation));
@@ -860,8 +860,8 @@ class MX_EXPORT FreezeOp final : public Operation {
   ::mlir::LLVM::FreezeOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value val(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value value(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(FreezeOp) == sizeof(Operation));
 
@@ -879,7 +879,7 @@ class MX_EXPORT GetElementPtrOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value base(void) const;
   gap::generator<::mx::ir::Operand> dynamic_indices(void) const &;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::llvm::ArrayRef<int> raw_constant_indices(void) const;
   ::mx::ir::Type elem_type(void) const;
   bool inbounds(void) const;
@@ -937,7 +937,7 @@ class MX_EXPORT GlobalOp final : public Operation {
   ::mx::ir::Region initializer(void) const;
   ::mx::ir::Type global_type(void) const;
   bool constant(void) const;
-  std::string_view sym_name(void) const;
+  std::string_view name(void) const;
   //::mlir::LLVM::Linkage linkage(void) const;
   bool dso_local(void) const;
   bool thread_local__(void) const;
@@ -968,9 +968,9 @@ class MX_EXPORT ICmpOp final : public Operation {
   ::mlir::LLVM::ICmpOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::ICmpPredicate predicate(void) const;
 };
 static_assert(sizeof(ICmpOp) == sizeof(Operation));
@@ -988,8 +988,8 @@ class MX_EXPORT InlineAsmOp final : public Operation {
 
   // Imported methods:
   gap::generator<::mx::ir::Operand> operands(void) const &;
-  ::mx::ir::Value res(void) const;
-  std::string_view asm_string(void) const;
+  ::mx::ir::Value result(void) const;
+  std::string_view assembly(void) const;
   std::string_view constraints(void) const;
   bool has_side_effects(void) const;
   bool is_align_stack(void) const;
@@ -1013,7 +1013,7 @@ class MX_EXPORT InsertElementOp final : public Operation {
   ::mx::ir::Value vector(void) const;
   ::mx::ir::Value value(void) const;
   //::mlir::TypedValue<IntegerType> position(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(InsertElementOp) == sizeof(Operation));
 
@@ -1031,7 +1031,7 @@ class MX_EXPORT InsertValueOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value container(void) const;
   ::mx::ir::Value value(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::llvm::ArrayRef<long long> position(void) const;
 };
 static_assert(sizeof(InsertValueOp) == sizeof(Operation));
@@ -1048,8 +1048,8 @@ class MX_EXPORT IntToPtrOp final : public Operation {
   ::mlir::LLVM::IntToPtrOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value arg(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value argument(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(IntToPtrOp) == sizeof(Operation));
 
@@ -1093,8 +1093,8 @@ class MX_EXPORT FuncOp final : public Operation {
 
   // Imported methods:
   std::optional<::mx::ir::Region> body(void) const;
-  std::string_view sym_name(void) const;
-  std::optional<std::string_view> sym_visibility(void) const;
+  std::string_view name(void) const;
+  std::optional<std::string_view> visibility(void) const;
   //::mlir::LLVM::LLVMFunctionType function_type(void) const;
   //::mlir::LLVM::Linkage linkage(void) const;
   bool dso_local(void) const;
@@ -1141,9 +1141,9 @@ class MX_EXPORT LShrOp final : public Operation {
   ::mlir::LLVM::LShrOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(LShrOp) == sizeof(Operation));
 
@@ -1159,7 +1159,7 @@ class MX_EXPORT LandingpadOp final : public Operation {
   ::mlir::LLVM::LandingpadOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   bool cleanup(void) const;
 };
 static_assert(sizeof(LandingpadOp) == sizeof(Operation));
@@ -1193,7 +1193,7 @@ class MX_EXPORT LoadOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<LLVMPointerType> addr(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   std::optional<unsigned long long> alignment(void) const;
   bool volatile__(void) const;
   bool nontemporal(void) const;
@@ -1220,9 +1220,9 @@ class MX_EXPORT MulOp final : public Operation {
   ::mlir::LLVM::MulOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::IntegerOverflowFlags overflow_flags(void) const;
 };
 static_assert(sizeof(MulOp) == sizeof(Operation));
@@ -1239,7 +1239,7 @@ class MX_EXPORT NoneTokenOp final : public Operation {
   ::mlir::LLVM::NoneTokenOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(NoneTokenOp) == sizeof(Operation));
 
@@ -1255,9 +1255,9 @@ class MX_EXPORT OrOp final : public Operation {
   ::mlir::LLVM::OrOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(OrOp) == sizeof(Operation));
 
@@ -1273,7 +1273,7 @@ class MX_EXPORT PoisonOp final : public Operation {
   ::mlir::LLVM::PoisonOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(PoisonOp) == sizeof(Operation));
 
@@ -1289,8 +1289,8 @@ class MX_EXPORT PtrToIntOp final : public Operation {
   ::mlir::LLVM::PtrToIntOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value arg(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value argument(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(PtrToIntOp) == sizeof(Operation));
 
@@ -1322,7 +1322,7 @@ class MX_EXPORT ReturnOp final : public Operation {
   ::mlir::LLVM::ReturnOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value arg(void) const;
+  ::mx::ir::Value argument(void) const;
 };
 static_assert(sizeof(ReturnOp) == sizeof(Operation));
 
@@ -1338,9 +1338,9 @@ class MX_EXPORT SDivOp final : public Operation {
   ::mlir::LLVM::SDivOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(SDivOp) == sizeof(Operation));
 
@@ -1356,8 +1356,8 @@ class MX_EXPORT SExtOp final : public Operation {
   ::mlir::LLVM::SExtOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value arg(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value argument(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(SExtOp) == sizeof(Operation));
 
@@ -1373,8 +1373,8 @@ class MX_EXPORT SIToFPOp final : public Operation {
   ::mlir::LLVM::SIToFPOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value arg(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value argument(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(SIToFPOp) == sizeof(Operation));
 
@@ -1390,9 +1390,9 @@ class MX_EXPORT SRemOp final : public Operation {
   ::mlir::LLVM::SRemOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(SRemOp) == sizeof(Operation));
 
@@ -1411,7 +1411,7 @@ class MX_EXPORT SelectOp final : public Operation {
   ::mx::ir::Value condition(void) const;
   ::mx::ir::Value true_value(void) const;
   ::mx::ir::Value false_value(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(SelectOp) == sizeof(Operation));
@@ -1428,9 +1428,9 @@ class MX_EXPORT ShlOp final : public Operation {
   ::mlir::LLVM::ShlOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::IntegerOverflowFlags overflow_flags(void) const;
 };
 static_assert(sizeof(ShlOp) == sizeof(Operation));
@@ -1449,7 +1449,7 @@ class MX_EXPORT ShuffleVectorOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value v1(void) const;
   ::mx::ir::Value v2(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::llvm::ArrayRef<int> mask(void) const;
 };
 static_assert(sizeof(ShuffleVectorOp) == sizeof(Operation));
@@ -1493,9 +1493,9 @@ class MX_EXPORT SubOp final : public Operation {
   ::mlir::LLVM::SubOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::IntegerOverflowFlags overflow_flags(void) const;
 };
 static_assert(sizeof(SubOp) == sizeof(Operation));
@@ -1535,8 +1535,8 @@ class MX_EXPORT TruncOp final : public Operation {
   ::mlir::LLVM::TruncOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value arg(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value argument(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(TruncOp) == sizeof(Operation));
 
@@ -1552,9 +1552,9 @@ class MX_EXPORT UDivOp final : public Operation {
   ::mlir::LLVM::UDivOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(UDivOp) == sizeof(Operation));
 
@@ -1570,8 +1570,8 @@ class MX_EXPORT UIToFPOp final : public Operation {
   ::mlir::LLVM::UIToFPOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value arg(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value argument(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(UIToFPOp) == sizeof(Operation));
 
@@ -1587,9 +1587,9 @@ class MX_EXPORT URemOp final : public Operation {
   ::mlir::LLVM::URemOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(URemOp) == sizeof(Operation));
 
@@ -1605,7 +1605,7 @@ class MX_EXPORT UndefOp final : public Operation {
   ::mlir::LLVM::UndefOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(UndefOp) == sizeof(Operation));
 
@@ -1636,9 +1636,9 @@ class MX_EXPORT XOrOp final : public Operation {
   ::mlir::LLVM::XOrOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(XOrOp) == sizeof(Operation));
 
@@ -1654,8 +1654,8 @@ class MX_EXPORT ZExtOp final : public Operation {
   ::mlir::LLVM::ZExtOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value arg(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value argument(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(ZExtOp) == sizeof(Operation));
 
@@ -1671,7 +1671,7 @@ class MX_EXPORT ZeroOp final : public Operation {
   ::mlir::LLVM::ZeroOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(ZeroOp) == sizeof(Operation));
 
@@ -1688,7 +1688,7 @@ class MX_EXPORT AbsOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   bool is_int_min_poison(void) const;
 };
 static_assert(sizeof(AbsOp) == sizeof(Operation));
@@ -1709,7 +1709,7 @@ class MX_EXPORT AnnotationOp final : public Operation {
   //::mlir::TypedValue<LLVMPointerType> annotation(void) const;
   //::mlir::TypedValue<LLVMPointerType> file_name(void) const;
   //::mlir::TypedValue<IntegerType> line(void) const;
-  //::mlir::TypedValue<IntegerType> res(void) const;
+  //::mlir::TypedValue<IntegerType> result(void) const;
 };
 static_assert(sizeof(AnnotationOp) == sizeof(Operation));
 
@@ -1742,7 +1742,7 @@ class MX_EXPORT BitReverseOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(BitReverseOp) == sizeof(Operation));
 
@@ -1759,7 +1759,7 @@ class MX_EXPORT ByteSwapOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(ByteSwapOp) == sizeof(Operation));
 
@@ -1777,7 +1777,7 @@ class MX_EXPORT CopySignOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value a(void) const;
   ::mx::ir::Value b(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(CopySignOp) == sizeof(Operation));
@@ -1794,7 +1794,7 @@ class MX_EXPORT CoroAlignOp final : public Operation {
   ::mlir::LLVM::CoroAlignOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(CoroAlignOp) == sizeof(Operation));
 
@@ -1812,7 +1812,7 @@ class MX_EXPORT CoroBeginOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value token(void) const;
   //::mlir::TypedValue<LLVMPointerType> mem(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(CoroBeginOp) == sizeof(Operation));
 
@@ -1831,7 +1831,7 @@ class MX_EXPORT CoroEndOp final : public Operation {
   //::mlir::TypedValue<LLVMPointerType> handle(void) const;
   //::mlir::TypedValue<IntegerType> unwind(void) const;
   ::mx::ir::Value retvals(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(CoroEndOp) == sizeof(Operation));
 
@@ -1849,7 +1849,7 @@ class MX_EXPORT CoroFreeOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value id(void) const;
   //::mlir::TypedValue<LLVMPointerType> handle(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(CoroFreeOp) == sizeof(Operation));
 
@@ -1869,7 +1869,7 @@ class MX_EXPORT CoroIdOp final : public Operation {
   //::mlir::TypedValue<LLVMPointerType> promise(void) const;
   //::mlir::TypedValue<LLVMPointerType> coroaddr(void) const;
   //::mlir::TypedValue<LLVMPointerType> fnaddrs(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(CoroIdOp) == sizeof(Operation));
 
@@ -1888,7 +1888,7 @@ class MX_EXPORT CoroPromiseOp final : public Operation {
   //::mlir::TypedValue<LLVMPointerType> handle(void) const;
   //::mlir::TypedValue<IntegerType> align(void) const;
   //::mlir::TypedValue<IntegerType> from(void) const;
-  //::mlir::TypedValue<LLVMPointerType> res(void) const;
+  //::mlir::TypedValue<LLVMPointerType> result(void) const;
 };
 static_assert(sizeof(CoroPromiseOp) == sizeof(Operation));
 
@@ -1921,7 +1921,7 @@ class MX_EXPORT CoroSaveOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<LLVMPointerType> handle(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(CoroSaveOp) == sizeof(Operation));
 
@@ -1937,7 +1937,7 @@ class MX_EXPORT CoroSizeOp final : public Operation {
   ::mlir::LLVM::CoroSizeOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(CoroSizeOp) == sizeof(Operation));
 
@@ -1955,7 +1955,7 @@ class MX_EXPORT CoroSuspendOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value save(void) const;
   //::mlir::TypedValue<IntegerType> final(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(CoroSuspendOp) == sizeof(Operation));
 
@@ -1972,7 +1972,7 @@ class MX_EXPORT CosOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(CosOp) == sizeof(Operation));
@@ -1990,7 +1990,7 @@ class MX_EXPORT CountLeadingZerosOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   bool is_zero_poison(void) const;
 };
 static_assert(sizeof(CountLeadingZerosOp) == sizeof(Operation));
@@ -2008,7 +2008,7 @@ class MX_EXPORT CountTrailingZerosOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   bool is_zero_poison(void) const;
 };
 static_assert(sizeof(CountTrailingZerosOp) == sizeof(Operation));
@@ -2026,7 +2026,7 @@ class MX_EXPORT CtPopOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(CtPopOp) == sizeof(Operation));
 
@@ -2110,7 +2110,7 @@ class MX_EXPORT EhTypeidForOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<LLVMPointerType> type_info(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(EhTypeidForOp) == sizeof(Operation));
 
@@ -2127,7 +2127,7 @@ class MX_EXPORT Exp2Op final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(Exp2Op) == sizeof(Operation));
@@ -2145,7 +2145,7 @@ class MX_EXPORT ExpOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(ExpOp) == sizeof(Operation));
@@ -2162,9 +2162,9 @@ class MX_EXPORT ExpectOp final : public Operation {
   ::mlir::LLVM::ExpectOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<IntegerType> val(void) const;
+  //::mlir::TypedValue<IntegerType> value(void) const;
   //::mlir::TypedValue<IntegerType> expected(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(ExpectOp) == sizeof(Operation));
 
@@ -2180,9 +2180,9 @@ class MX_EXPORT ExpectWithProbabilityOp final : public Operation {
   ::mlir::LLVM::ExpectWithProbabilityOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<IntegerType> val(void) const;
+  //::mlir::TypedValue<IntegerType> value(void) const;
   //::mlir::TypedValue<IntegerType> expected(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::llvm::APFloat prob(void) const;
 };
 static_assert(sizeof(ExpectWithProbabilityOp) == sizeof(Operation));
@@ -2200,7 +2200,7 @@ class MX_EXPORT FAbsOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(FAbsOp) == sizeof(Operation));
@@ -2218,7 +2218,7 @@ class MX_EXPORT FCeilOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(FCeilOp) == sizeof(Operation));
@@ -2236,7 +2236,7 @@ class MX_EXPORT FFloorOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(FFloorOp) == sizeof(Operation));
@@ -2256,7 +2256,7 @@ class MX_EXPORT FMAOp final : public Operation {
   ::mx::ir::Value a(void) const;
   ::mx::ir::Value b(void) const;
   ::mx::ir::Value c(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(FMAOp) == sizeof(Operation));
@@ -2276,7 +2276,7 @@ class MX_EXPORT FMulAddOp final : public Operation {
   ::mx::ir::Value a(void) const;
   ::mx::ir::Value b(void) const;
   ::mx::ir::Value c(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(FMulAddOp) == sizeof(Operation));
@@ -2294,7 +2294,7 @@ class MX_EXPORT FTruncOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(FTruncOp) == sizeof(Operation));
@@ -2314,7 +2314,7 @@ class MX_EXPORT FShlOp final : public Operation {
   ::mx::ir::Value a(void) const;
   ::mx::ir::Value b(void) const;
   ::mx::ir::Value c(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(FShlOp) == sizeof(Operation));
 
@@ -2333,7 +2333,7 @@ class MX_EXPORT FShrOp final : public Operation {
   ::mx::ir::Value a(void) const;
   ::mx::ir::Value b(void) const;
   ::mx::ir::Value c(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(FShrOp) == sizeof(Operation));
 
@@ -2351,7 +2351,7 @@ class MX_EXPORT GetActiveLaneMaskOp final : public Operation {
   // Imported methods:
   //::mlir::TypedValue<IntegerType> base(void) const;
   //::mlir::TypedValue<IntegerType> n(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(GetActiveLaneMaskOp) == sizeof(Operation));
 
@@ -2386,7 +2386,7 @@ class MX_EXPORT InvariantStartOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<LLVMPointerType> ptr(void) const;
-  //::mlir::TypedValue<LLVMPointerType> res(void) const;
+  //::mlir::TypedValue<LLVMPointerType> result(void) const;
   uint64_t size(void) const;
 };
 static_assert(sizeof(InvariantStartOp) == sizeof(Operation));
@@ -2403,8 +2403,8 @@ class MX_EXPORT IsConstantOp final : public Operation {
   ::mlir::LLVM::IsConstantOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value val(void) const;
-  //::mlir::TypedValue<IntegerType> res(void) const;
+  ::mx::ir::Value value(void) const;
+  //::mlir::TypedValue<IntegerType> result(void) const;
 };
 static_assert(sizeof(IsConstantOp) == sizeof(Operation));
 
@@ -2421,7 +2421,7 @@ class MX_EXPORT IsFPClassOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   uint32_t bit(void) const;
 };
 static_assert(sizeof(IsFPClassOp) == sizeof(Operation));
@@ -2472,8 +2472,8 @@ class MX_EXPORT RoundAndCastToLongLongOp final : public Operation {
   ::mlir::LLVM::LlrintOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value val(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value value(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(RoundAndCastToLongLongOp) == sizeof(Operation));
 
@@ -2489,8 +2489,8 @@ class MX_EXPORT RoundAndCastToNearestLongLongOp final : public Operation {
   ::mlir::LLVM::LlroundOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value val(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value value(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(RoundAndCastToNearestLongLongOp) == sizeof(Operation));
 
@@ -2507,7 +2507,7 @@ class MX_EXPORT Log10Op final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(Log10Op) == sizeof(Operation));
@@ -2525,7 +2525,7 @@ class MX_EXPORT Log2Op final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(Log2Op) == sizeof(Operation));
@@ -2543,7 +2543,7 @@ class MX_EXPORT LogOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(LogOp) == sizeof(Operation));
@@ -2560,8 +2560,8 @@ class MX_EXPORT RoundAndCastToLongOp final : public Operation {
   ::mlir::LLVM::LrintOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value val(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value value(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(RoundAndCastToLongOp) == sizeof(Operation));
 
@@ -2577,8 +2577,8 @@ class MX_EXPORT RoundAndCastToNearestLongOp final : public Operation {
   ::mlir::LLVM::LroundOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value val(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value value(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(RoundAndCastToNearestLongOp) == sizeof(Operation));
 
@@ -2597,7 +2597,7 @@ class MX_EXPORT MaskedLoadOp final : public Operation {
   //::mlir::TypedValue<LLVMPointerType> data(void) const;
   ::mx::ir::Value mask(void) const;
   gap::generator<::mx::ir::Operand> pass_thru(void) const &;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   uint32_t alignment(void) const;
 };
 static_assert(sizeof(MaskedLoadOp) == sizeof(Operation));
@@ -2635,7 +2635,7 @@ class MX_EXPORT MatrixColumnMajorLoadOp final : public Operation {
   // Imported methods:
   //::mlir::TypedValue<LLVMPointerType> data(void) const;
   //::mlir::TypedValue<IntegerType> stride(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   bool is_volatile(void) const;
   uint32_t rows(void) const;
   uint32_t columns(void) const;
@@ -2675,9 +2675,9 @@ class MX_EXPORT MatrixMultiplyOp final : public Operation {
   ::mlir::LLVM::MatrixMultiplyOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
+  ::mx::ir::Value result(void) const;
   uint32_t lhs_rows(void) const;
   uint32_t lhs_columns(void) const;
   uint32_t rhs_columns(void) const;
@@ -2697,7 +2697,7 @@ class MX_EXPORT MatrixTransposeOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value matrix(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   uint32_t rows(void) const;
   uint32_t columns(void) const;
 };
@@ -2717,7 +2717,7 @@ class MX_EXPORT MaxNumOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value a(void) const;
   ::mx::ir::Value b(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(MaxNumOp) == sizeof(Operation));
@@ -2736,7 +2736,7 @@ class MX_EXPORT MaximumOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value a(void) const;
   ::mx::ir::Value b(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(MaximumOp) == sizeof(Operation));
@@ -2753,8 +2753,8 @@ class MX_EXPORT MemcpyInlineOp final : public Operation {
   ::mlir::LLVM::MemcpyInlineOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<LLVMPointerType> dst(void) const;
-  //::mlir::TypedValue<LLVMPointerType> src(void) const;
+  //::mlir::TypedValue<LLVMPointerType> destination(void) const;
+  //::mlir::TypedValue<LLVMPointerType> source(void) const;
   //::mlir::APInt len(void) const;
   bool is_volatile(void) const;
   //::std::optional<ArrayAttr> access_groups(void) const;
@@ -2777,8 +2777,8 @@ class MX_EXPORT MemcpyOp final : public Operation {
   ::mlir::LLVM::MemcpyOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<LLVMPointerType> dst(void) const;
-  //::mlir::TypedValue<LLVMPointerType> src(void) const;
+  //::mlir::TypedValue<LLVMPointerType> destination(void) const;
+  //::mlir::TypedValue<LLVMPointerType> source(void) const;
   //::mlir::TypedValue<IntegerType> len(void) const;
   bool is_volatile(void) const;
   //::std::optional<ArrayAttr> access_groups(void) const;
@@ -2801,8 +2801,8 @@ class MX_EXPORT MemmoveOp final : public Operation {
   ::mlir::LLVM::MemmoveOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<LLVMPointerType> dst(void) const;
-  //::mlir::TypedValue<LLVMPointerType> src(void) const;
+  //::mlir::TypedValue<LLVMPointerType> destination(void) const;
+  //::mlir::TypedValue<LLVMPointerType> source(void) const;
   //::mlir::TypedValue<IntegerType> len(void) const;
   bool is_volatile(void) const;
   //::std::optional<ArrayAttr> access_groups(void) const;
@@ -2825,8 +2825,8 @@ class MX_EXPORT MemsetOp final : public Operation {
   ::mlir::LLVM::MemsetOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<LLVMPointerType> dst(void) const;
-  //::mlir::TypedValue<IntegerType> val(void) const;
+  //::mlir::TypedValue<LLVMPointerType> destination(void) const;
+  //::mlir::TypedValue<IntegerType> value(void) const;
   //::mlir::TypedValue<IntegerType> len(void) const;
   bool is_volatile(void) const;
   //::std::optional<ArrayAttr> access_groups(void) const;
@@ -2851,7 +2851,7 @@ class MX_EXPORT MinNumOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value a(void) const;
   ::mx::ir::Value b(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(MinNumOp) == sizeof(Operation));
@@ -2870,7 +2870,7 @@ class MX_EXPORT MinimumOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value a(void) const;
   ::mx::ir::Value b(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(MinimumOp) == sizeof(Operation));
@@ -2888,7 +2888,7 @@ class MX_EXPORT RoundToNearbyIntOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(RoundToNearbyIntOp) == sizeof(Operation));
@@ -2921,9 +2921,9 @@ class MX_EXPORT PowIOp final : public Operation {
   ::mlir::LLVM::PowIOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value val(void) const;
+  ::mx::ir::Value value(void) const;
   //::mlir::TypedValue<IntegerType> power(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(PowIOp) == sizeof(Operation));
@@ -2942,7 +2942,7 @@ class MX_EXPORT FPowOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value a(void) const;
   ::mx::ir::Value b(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(FPowOp) == sizeof(Operation));
@@ -2983,7 +2983,7 @@ class MX_EXPORT PtrAnnotationOp final : public Operation {
   //::mlir::TypedValue<LLVMPointerType> file_name(void) const;
   //::mlir::TypedValue<IntegerType> line(void) const;
   //::mlir::TypedValue<LLVMPointerType> attr(void) const;
-  //::mlir::TypedValue<LLVMPointerType> res(void) const;
+  //::mlir::TypedValue<LLVMPointerType> result(void) const;
 };
 static_assert(sizeof(PtrAnnotationOp) == sizeof(Operation));
 
@@ -3000,7 +3000,7 @@ class MX_EXPORT RoundToIntOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(RoundToIntOp) == sizeof(Operation));
@@ -3018,7 +3018,7 @@ class MX_EXPORT RoundToNearestEvenOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(RoundToNearestEvenOp) == sizeof(Operation));
@@ -3036,7 +3036,7 @@ class MX_EXPORT RoundToNearestOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(RoundToNearestOp) == sizeof(Operation));
@@ -3055,7 +3055,7 @@ class MX_EXPORT SAddSatOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value a(void) const;
   ::mx::ir::Value b(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(SAddSatOp) == sizeof(Operation));
 
@@ -3071,7 +3071,7 @@ class MX_EXPORT SAddWithOverflowOp final : public Operation {
   ::mlir::LLVM::SAddWithOverflowOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(SAddWithOverflowOp) == sizeof(Operation));
 
@@ -3089,7 +3089,7 @@ class MX_EXPORT SMaxOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value a(void) const;
   ::mx::ir::Value b(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(SMaxOp) == sizeof(Operation));
 
@@ -3107,7 +3107,7 @@ class MX_EXPORT SMinOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value a(void) const;
   ::mx::ir::Value b(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(SMinOp) == sizeof(Operation));
 
@@ -3123,7 +3123,7 @@ class MX_EXPORT SMulWithOverflowOp final : public Operation {
   ::mlir::LLVM::SMulWithOverflowOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(SMulWithOverflowOp) == sizeof(Operation));
 
@@ -3140,7 +3140,7 @@ class MX_EXPORT SSACopyOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value operand(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(SSACopyOp) == sizeof(Operation));
 
@@ -3158,7 +3158,7 @@ class MX_EXPORT SShlSatOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value a(void) const;
   ::mx::ir::Value b(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(SShlSatOp) == sizeof(Operation));
 
@@ -3176,7 +3176,7 @@ class MX_EXPORT SSubSatOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value a(void) const;
   ::mx::ir::Value b(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(SSubSatOp) == sizeof(Operation));
 
@@ -3192,7 +3192,7 @@ class MX_EXPORT SSubWithOverflowOp final : public Operation {
   ::mlir::LLVM::SSubWithOverflowOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(SSubWithOverflowOp) == sizeof(Operation));
 
@@ -3209,7 +3209,7 @@ class MX_EXPORT SinOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(SinOp) == sizeof(Operation));
@@ -3227,7 +3227,7 @@ class MX_EXPORT SqrtOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(SqrtOp) == sizeof(Operation));
@@ -3260,7 +3260,7 @@ class MX_EXPORT StackSaveOp final : public Operation {
   ::mlir::LLVM::StackSaveOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(StackSaveOp) == sizeof(Operation));
 
@@ -3276,7 +3276,7 @@ class MX_EXPORT StepVectorOp final : public Operation {
   ::mlir::LLVM::StepVectorOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(StepVectorOp) == sizeof(Operation));
 
@@ -3293,7 +3293,7 @@ class MX_EXPORT ThreadLocalAddressOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<LLVMPointerType> global(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(ThreadLocalAddressOp) == sizeof(Operation));
 
@@ -3326,7 +3326,7 @@ class MX_EXPORT UAddSatOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value a(void) const;
   ::mx::ir::Value b(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(UAddSatOp) == sizeof(Operation));
 
@@ -3342,7 +3342,7 @@ class MX_EXPORT UAddWithOverflowOp final : public Operation {
   ::mlir::LLVM::UAddWithOverflowOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(UAddWithOverflowOp) == sizeof(Operation));
 
@@ -3376,7 +3376,7 @@ class MX_EXPORT UMaxOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value a(void) const;
   ::mx::ir::Value b(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(UMaxOp) == sizeof(Operation));
 
@@ -3394,7 +3394,7 @@ class MX_EXPORT UMinOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value a(void) const;
   ::mx::ir::Value b(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(UMinOp) == sizeof(Operation));
 
@@ -3410,7 +3410,7 @@ class MX_EXPORT UMulWithOverflowOp final : public Operation {
   ::mlir::LLVM::UMulWithOverflowOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(UMulWithOverflowOp) == sizeof(Operation));
 
@@ -3428,7 +3428,7 @@ class MX_EXPORT UShlSatOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value a(void) const;
   ::mx::ir::Value b(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(UShlSatOp) == sizeof(Operation));
 
@@ -3446,7 +3446,7 @@ class MX_EXPORT USubSatOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value a(void) const;
   ::mx::ir::Value b(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(USubSatOp) == sizeof(Operation));
 
@@ -3462,7 +3462,7 @@ class MX_EXPORT USubWithOverflowOp final : public Operation {
   ::mlir::LLVM::USubWithOverflowOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(USubWithOverflowOp) == sizeof(Operation));
 
@@ -3478,11 +3478,11 @@ class MX_EXPORT VPAShrOp final : public Operation {
   ::mlir::LLVM::VPAShrOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPAShrOp) == sizeof(Operation));
 
@@ -3498,11 +3498,11 @@ class MX_EXPORT VPAddOp final : public Operation {
   ::mlir::LLVM::VPAddOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPAddOp) == sizeof(Operation));
 
@@ -3518,11 +3518,11 @@ class MX_EXPORT VPAndOp final : public Operation {
   ::mlir::LLVM::VPAndOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPAndOp) == sizeof(Operation));
 
@@ -3538,11 +3538,11 @@ class MX_EXPORT VPFAddOp final : public Operation {
   ::mlir::LLVM::VPFAddOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPFAddOp) == sizeof(Operation));
 
@@ -3558,11 +3558,11 @@ class MX_EXPORT VPFDivOp final : public Operation {
   ::mlir::LLVM::VPFDivOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPFDivOp) == sizeof(Operation));
 
@@ -3583,7 +3583,7 @@ class MX_EXPORT VPFMulAddOp final : public Operation {
   ::mx::ir::Value op3(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPFMulAddOp) == sizeof(Operation));
 
@@ -3599,11 +3599,11 @@ class MX_EXPORT VPFMulOp final : public Operation {
   ::mlir::LLVM::VPFMulOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPFMulOp) == sizeof(Operation));
 
@@ -3622,7 +3622,7 @@ class MX_EXPORT VPFNegOp final : public Operation {
   ::mx::ir::Value op(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPFNegOp) == sizeof(Operation));
 
@@ -3638,10 +3638,10 @@ class MX_EXPORT VPFPExtOp final : public Operation {
   ::mlir::LLVM::VPFPExtOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value src(void) const;
+  ::mx::ir::Value source(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPFPExtOp) == sizeof(Operation));
 
@@ -3657,10 +3657,10 @@ class MX_EXPORT VPFPToSIOp final : public Operation {
   ::mlir::LLVM::VPFPToSIOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value src(void) const;
+  ::mx::ir::Value source(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPFPToSIOp) == sizeof(Operation));
 
@@ -3676,10 +3676,10 @@ class MX_EXPORT VPFPToUIOp final : public Operation {
   ::mlir::LLVM::VPFPToUIOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value src(void) const;
+  ::mx::ir::Value source(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPFPToUIOp) == sizeof(Operation));
 
@@ -3695,10 +3695,10 @@ class MX_EXPORT VPFPTruncOp final : public Operation {
   ::mlir::LLVM::VPFPTruncOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value src(void) const;
+  ::mx::ir::Value source(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPFPTruncOp) == sizeof(Operation));
 
@@ -3714,11 +3714,11 @@ class MX_EXPORT VPFRemOp final : public Operation {
   ::mlir::LLVM::VPFRemOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPFRemOp) == sizeof(Operation));
 
@@ -3734,11 +3734,11 @@ class MX_EXPORT VPFSubOp final : public Operation {
   ::mlir::LLVM::VPFSubOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPFSubOp) == sizeof(Operation));
 
@@ -3759,7 +3759,7 @@ class MX_EXPORT VPFmaOp final : public Operation {
   ::mx::ir::Value op3(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPFmaOp) == sizeof(Operation));
 
@@ -3775,10 +3775,10 @@ class MX_EXPORT VPIntToPtrOp final : public Operation {
   ::mlir::LLVM::VPIntToPtrOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value src(void) const;
+  ::mx::ir::Value source(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPIntToPtrOp) == sizeof(Operation));
 
@@ -3794,11 +3794,11 @@ class MX_EXPORT VPLShrOp final : public Operation {
   ::mlir::LLVM::VPLShrOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPLShrOp) == sizeof(Operation));
 
@@ -3817,7 +3817,7 @@ class MX_EXPORT VPLoadOp final : public Operation {
   //::mlir::TypedValue<LLVMPointerType> ptr(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPLoadOp) == sizeof(Operation));
 
@@ -3837,7 +3837,7 @@ class MX_EXPORT VPMergeMinOp final : public Operation {
   ::mx::ir::Value true_val(void) const;
   ::mx::ir::Value false_val(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPMergeMinOp) == sizeof(Operation));
 
@@ -3853,11 +3853,11 @@ class MX_EXPORT VPMulOp final : public Operation {
   ::mlir::LLVM::VPMulOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPMulOp) == sizeof(Operation));
 
@@ -3873,11 +3873,11 @@ class MX_EXPORT VPOrOp final : public Operation {
   ::mlir::LLVM::VPOrOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPOrOp) == sizeof(Operation));
 
@@ -3893,10 +3893,10 @@ class MX_EXPORT VPPtrToIntOp final : public Operation {
   ::mlir::LLVM::VPPtrToIntOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value src(void) const;
+  ::mx::ir::Value source(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPPtrToIntOp) == sizeof(Operation));
 
@@ -3913,10 +3913,10 @@ class MX_EXPORT VPReduceAddOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<IntegerType> satrt_value(void) const;
-  ::mx::ir::Value val(void) const;
+  ::mx::ir::Value value(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPReduceAddOp) == sizeof(Operation));
 
@@ -3933,10 +3933,10 @@ class MX_EXPORT VPReduceAndOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<IntegerType> satrt_value(void) const;
-  ::mx::ir::Value val(void) const;
+  ::mx::ir::Value value(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPReduceAndOp) == sizeof(Operation));
 
@@ -3953,10 +3953,10 @@ class MX_EXPORT VPReduceFAddOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<FloatType> satrt_value(void) const;
-  ::mx::ir::Value val(void) const;
+  ::mx::ir::Value value(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPReduceFAddOp) == sizeof(Operation));
 
@@ -3973,10 +3973,10 @@ class MX_EXPORT VPReduceFMaxOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<FloatType> satrt_value(void) const;
-  ::mx::ir::Value val(void) const;
+  ::mx::ir::Value value(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPReduceFMaxOp) == sizeof(Operation));
 
@@ -3993,10 +3993,10 @@ class MX_EXPORT VPReduceFMinOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<FloatType> satrt_value(void) const;
-  ::mx::ir::Value val(void) const;
+  ::mx::ir::Value value(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPReduceFMinOp) == sizeof(Operation));
 
@@ -4013,10 +4013,10 @@ class MX_EXPORT VPReduceFMulOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<FloatType> satrt_value(void) const;
-  ::mx::ir::Value val(void) const;
+  ::mx::ir::Value value(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPReduceFMulOp) == sizeof(Operation));
 
@@ -4033,10 +4033,10 @@ class MX_EXPORT VPReduceMulOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<IntegerType> satrt_value(void) const;
-  ::mx::ir::Value val(void) const;
+  ::mx::ir::Value value(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPReduceMulOp) == sizeof(Operation));
 
@@ -4053,10 +4053,10 @@ class MX_EXPORT VPReduceOrOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<IntegerType> satrt_value(void) const;
-  ::mx::ir::Value val(void) const;
+  ::mx::ir::Value value(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPReduceOrOp) == sizeof(Operation));
 
@@ -4073,10 +4073,10 @@ class MX_EXPORT VPReduceSMaxOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<IntegerType> satrt_value(void) const;
-  ::mx::ir::Value val(void) const;
+  ::mx::ir::Value value(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPReduceSMaxOp) == sizeof(Operation));
 
@@ -4093,10 +4093,10 @@ class MX_EXPORT VPReduceSMinOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<IntegerType> satrt_value(void) const;
-  ::mx::ir::Value val(void) const;
+  ::mx::ir::Value value(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPReduceSMinOp) == sizeof(Operation));
 
@@ -4113,10 +4113,10 @@ class MX_EXPORT VPReduceUMaxOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<IntegerType> satrt_value(void) const;
-  ::mx::ir::Value val(void) const;
+  ::mx::ir::Value value(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPReduceUMaxOp) == sizeof(Operation));
 
@@ -4133,10 +4133,10 @@ class MX_EXPORT VPReduceUMinOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<IntegerType> satrt_value(void) const;
-  ::mx::ir::Value val(void) const;
+  ::mx::ir::Value value(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPReduceUMinOp) == sizeof(Operation));
 
@@ -4153,10 +4153,10 @@ class MX_EXPORT VPReduceXorOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<IntegerType> satrt_value(void) const;
-  ::mx::ir::Value val(void) const;
+  ::mx::ir::Value value(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPReduceXorOp) == sizeof(Operation));
 
@@ -4172,11 +4172,11 @@ class MX_EXPORT VPSDivOp final : public Operation {
   ::mlir::LLVM::VPSDivOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPSDivOp) == sizeof(Operation));
 
@@ -4192,10 +4192,10 @@ class MX_EXPORT VPSExtOp final : public Operation {
   ::mlir::LLVM::VPSExtOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value src(void) const;
+  ::mx::ir::Value source(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPSExtOp) == sizeof(Operation));
 
@@ -4211,10 +4211,10 @@ class MX_EXPORT VPSIToFPOp final : public Operation {
   ::mlir::LLVM::VPSIToFPOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value src(void) const;
+  ::mx::ir::Value source(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPSIToFPOp) == sizeof(Operation));
 
@@ -4230,11 +4230,11 @@ class MX_EXPORT VPSRemOp final : public Operation {
   ::mlir::LLVM::VPSRemOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPSRemOp) == sizeof(Operation));
 
@@ -4254,7 +4254,7 @@ class MX_EXPORT VPSelectMinOp final : public Operation {
   ::mx::ir::Value true_val(void) const;
   ::mx::ir::Value false_val(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPSelectMinOp) == sizeof(Operation));
 
@@ -4270,11 +4270,11 @@ class MX_EXPORT VPShlOp final : public Operation {
   ::mlir::LLVM::VPShlOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPShlOp) == sizeof(Operation));
 
@@ -4290,7 +4290,7 @@ class MX_EXPORT VPStoreOp final : public Operation {
   ::mlir::LLVM::VPStoreOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value val(void) const;
+  ::mx::ir::Value value(void) const;
   //::mlir::TypedValue<LLVMPointerType> ptr(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
@@ -4313,7 +4313,7 @@ class MX_EXPORT VPStridedLoadOp final : public Operation {
   //::mlir::TypedValue<IntegerType> stride(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPStridedLoadOp) == sizeof(Operation));
 
@@ -4329,7 +4329,7 @@ class MX_EXPORT VPStridedStoreOp final : public Operation {
   ::mlir::LLVM::VPStridedStoreOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value val(void) const;
+  ::mx::ir::Value value(void) const;
   //::mlir::TypedValue<LLVMPointerType> ptr(void) const;
   //::mlir::TypedValue<IntegerType> stride(void) const;
   ::mx::ir::Value mask(void) const;
@@ -4349,11 +4349,11 @@ class MX_EXPORT VPSubOp final : public Operation {
   ::mlir::LLVM::VPSubOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPSubOp) == sizeof(Operation));
 
@@ -4369,10 +4369,10 @@ class MX_EXPORT VPTruncOp final : public Operation {
   ::mlir::LLVM::VPTruncOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value src(void) const;
+  ::mx::ir::Value source(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPTruncOp) == sizeof(Operation));
 
@@ -4388,11 +4388,11 @@ class MX_EXPORT VPUDivOp final : public Operation {
   ::mlir::LLVM::VPUDivOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPUDivOp) == sizeof(Operation));
 
@@ -4408,10 +4408,10 @@ class MX_EXPORT VPUIToFPOp final : public Operation {
   ::mlir::LLVM::VPUIToFPOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value src(void) const;
+  ::mx::ir::Value source(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPUIToFPOp) == sizeof(Operation));
 
@@ -4427,11 +4427,11 @@ class MX_EXPORT VPURemOp final : public Operation {
   ::mlir::LLVM::VPURemOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPURemOp) == sizeof(Operation));
 
@@ -4447,11 +4447,11 @@ class MX_EXPORT VPXorOp final : public Operation {
   ::mlir::LLVM::VPXorOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPXorOp) == sizeof(Operation));
 
@@ -4467,10 +4467,10 @@ class MX_EXPORT VPZExtOp final : public Operation {
   ::mlir::LLVM::VPZExtOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value src(void) const;
+  ::mx::ir::Value source(void) const;
   ::mx::ir::Value mask(void) const;
   //::mlir::TypedValue<IntegerType> evl(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VPZExtOp) == sizeof(Operation));
 
@@ -4503,7 +4503,7 @@ class MX_EXPORT VaEndOp final : public Operation {
   ::mlir::LLVM::VaEndOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<LLVMPointerType> arg_list(void) const;
+  //::mlir::TypedValue<LLVMPointerType> argument_list(void) const;
 };
 static_assert(sizeof(VaEndOp) == sizeof(Operation));
 
@@ -4519,7 +4519,7 @@ class MX_EXPORT VaStartOp final : public Operation {
   ::mlir::LLVM::VaStartOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<LLVMPointerType> arg_list(void) const;
+  //::mlir::TypedValue<LLVMPointerType> argument_list(void) const;
 };
 static_assert(sizeof(VaStartOp) == sizeof(Operation));
 
@@ -4535,7 +4535,7 @@ class MX_EXPORT VarAnnotationOp final : public Operation {
   ::mlir::LLVM::VarAnnotation underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<LLVMPointerType> val(void) const;
+  //::mlir::TypedValue<LLVMPointerType> value(void) const;
   //::mlir::TypedValue<LLVMPointerType> annotation(void) const;
   //::mlir::TypedValue<LLVMPointerType> file_name(void) const;
   //::mlir::TypedValue<IntegerType> line(void) const;
@@ -4570,7 +4570,7 @@ class MX_EXPORT MaskedExpandLoadOp final : public Operation {
   ::mlir::LLVM::masked_expandload underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(MaskedExpandLoadOp) == sizeof(Operation));
 
@@ -4589,7 +4589,7 @@ class MX_EXPORT MaskedGatherOp final : public Operation {
   ::mx::ir::Value ptrs(void) const;
   ::mx::ir::Value mask(void) const;
   gap::generator<::mx::ir::Operand> pass_thru(void) const &;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   uint32_t alignment(void) const;
 };
 static_assert(sizeof(MaskedGatherOp) == sizeof(Operation));
@@ -4626,7 +4626,7 @@ class MX_EXPORT VectorExtractOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value srcvec(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   uint64_t pos(void) const;
   uint64_t src_vector_bit_width(void) const;
   uint64_t res_vector_bit_width(void) const;
@@ -4647,7 +4647,7 @@ class MX_EXPORT VectorInsertOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value dstvec(void) const;
   ::mx::ir::Value srcvec(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   uint64_t pos(void) const;
   uint64_t src_vector_bit_width(void) const;
   uint64_t dst_vector_bit_width(void) const;
@@ -4667,7 +4667,7 @@ class MX_EXPORT VectorReduceAddOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VectorReduceAddOp) == sizeof(Operation));
 
@@ -4684,7 +4684,7 @@ class MX_EXPORT VectorReduceAndOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VectorReduceAndOp) == sizeof(Operation));
 
@@ -4702,7 +4702,7 @@ class MX_EXPORT VectorReduceFAddOp final : public Operation {
   // Imported methods:
   //::mlir::TypedValue<FloatType> start_value(void) const;
   ::mx::ir::Value input(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(VectorReduceFAddOp) == sizeof(Operation));
@@ -4720,7 +4720,7 @@ class MX_EXPORT VectorReduceFMaxOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(VectorReduceFMaxOp) == sizeof(Operation));
@@ -4738,7 +4738,7 @@ class MX_EXPORT VectorReduceFMaximumOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(VectorReduceFMaximumOp) == sizeof(Operation));
@@ -4756,7 +4756,7 @@ class MX_EXPORT VectorReduceFMinOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(VectorReduceFMinOp) == sizeof(Operation));
@@ -4774,7 +4774,7 @@ class MX_EXPORT VectorReduceFMinimumOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(VectorReduceFMinimumOp) == sizeof(Operation));
@@ -4793,7 +4793,7 @@ class MX_EXPORT VectorReduceFMulOp final : public Operation {
   // Imported methods:
   //::mlir::TypedValue<FloatType> start_value(void) const;
   ::mx::ir::Value input(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
   //::mlir::LLVM::FastmathFlags fastmath_flags(void) const;
 };
 static_assert(sizeof(VectorReduceFMulOp) == sizeof(Operation));
@@ -4811,7 +4811,7 @@ class MX_EXPORT VectorReduceMulOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VectorReduceMulOp) == sizeof(Operation));
 
@@ -4828,7 +4828,7 @@ class MX_EXPORT VectorReduceOrOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VectorReduceOrOp) == sizeof(Operation));
 
@@ -4845,7 +4845,7 @@ class MX_EXPORT VectorReduceSMaxOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VectorReduceSMaxOp) == sizeof(Operation));
 
@@ -4862,7 +4862,7 @@ class MX_EXPORT VectorReduceSMinOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VectorReduceSMinOp) == sizeof(Operation));
 
@@ -4879,7 +4879,7 @@ class MX_EXPORT VectorReduceUMaxOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VectorReduceUMaxOp) == sizeof(Operation));
 
@@ -4896,7 +4896,7 @@ class MX_EXPORT VectorReduceUMinOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VectorReduceUMinOp) == sizeof(Operation));
 
@@ -4913,7 +4913,7 @@ class MX_EXPORT VectorReduceXorOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value in(void) const;
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VectorReduceXorOp) == sizeof(Operation));
 
@@ -4929,7 +4929,7 @@ class MX_EXPORT VScaleOp final : public Operation {
   ::mlir::LLVM::vscale underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value res(void) const;
+  ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(VScaleOp) == sizeof(Operation));
 

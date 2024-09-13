@@ -124,13 +124,13 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyGetSetDef gProperties[] = {
   {
-    "assert_",
+    "assertion",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->assert_());
+          return ::mx::to_python(T_cast(self)->assertion());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::hl::StaticAssertDeclOp::assert_"),
+    PyDoc_STR("Wrapper for mx::ir::hl::StaticAssertDeclOp::assertion"),
     nullptr,
   },
   {

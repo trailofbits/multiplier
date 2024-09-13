@@ -48,7 +48,7 @@ class CallArgsOp(multiplier.ir.abi.Operation):
     ...
 
 class CallExecutionOp(multiplier.ir.abi.Operation):
-  args: Iterable[multiplier.ir.Operand]
+  arguments: Iterable[multiplier.ir.Operand]
   result: multiplier.ir.Value
   body: multiplier.ir.Region
   arg_operands: Iterable[multiplier.ir.Operand]
@@ -66,7 +66,7 @@ class CallExecutionOp(multiplier.ir.abi.Operation):
     ...
 
 class CallOp(multiplier.ir.abi.Operation):
-  args: Iterable[multiplier.ir.Operand]
+  arguments: Iterable[multiplier.ir.Operand]
   results: Iterable[multiplier.ir.Result]
   callee: str
   arg_operands: Iterable[multiplier.ir.Operand]
@@ -133,8 +133,9 @@ class EpilogueOp(multiplier.ir.abi.Operation):
 
 class FuncOp(multiplier.ir.abi.Operation):
   body: Optional[multiplier.ir.Region]
-  sym_name: str
-  sym_visibility: Optional[str]
+  name: str
+  function_type: multiplier.ir.Type
+  visibility: Optional[str]
   is_var_arg: bool
   callable_results: Iterable[multiplier.ir.Type]
   argument_types: Iterable[multiplier.ir.Type]

@@ -143,6 +143,16 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::ir::hl::GenericAssocExprOp::body"),
     nullptr,
   },
+  {
+    "match_type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->match_type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::hl::GenericAssocExprOp::match_type"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace

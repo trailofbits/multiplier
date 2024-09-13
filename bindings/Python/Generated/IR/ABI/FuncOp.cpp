@@ -134,23 +134,33 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "sym_name",
+    "name",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->sym_name());
+          return ::mx::to_python(T_cast(self)->name());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::abi::FuncOp::sym_name"),
+    PyDoc_STR("Wrapper for mx::ir::abi::FuncOp::name"),
     nullptr,
   },
   {
-    "sym_visibility",
+    "function_type",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->sym_visibility());
+          return ::mx::to_python(T_cast(self)->function_type());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::abi::FuncOp::sym_visibility"),
+    PyDoc_STR("Wrapper for mx::ir::abi::FuncOp::function_type"),
+    nullptr,
+  },
+  {
+    "visibility",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->visibility());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::abi::FuncOp::visibility"),
     nullptr,
   },
   {

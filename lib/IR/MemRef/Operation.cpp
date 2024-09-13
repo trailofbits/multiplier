@@ -641,7 +641,7 @@ std::optional<GlobalOp> GlobalOp::producing(const ::mx::ir::Value &that) {
   return ::mlir::memref::GlobalOp(this->::mx::ir::Operation::op_);
 }
 
-std::string_view GlobalOp::sym_name(void) const {
+std::string_view GlobalOp::name(void) const {
   auto val = underlying_repr().getSymName();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);
@@ -650,7 +650,7 @@ std::string_view GlobalOp::sym_name(void) const {
   }
 }
 
-std::optional<std::string_view> GlobalOp::sym_visibility(void) const {
+std::optional<std::string_view> GlobalOp::visibility(void) const {
   auto opt_val = underlying_repr().getSymVisibility();
   if (!opt_val) {
     return std::nullopt;

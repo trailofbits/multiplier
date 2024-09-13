@@ -134,13 +134,13 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "init",
+    "initializer",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->init());
+          return ::mx::to_python(T_cast(self)->initializer());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::hl::CompoundLiteralOp::init"),
+    PyDoc_STR("Wrapper for mx::ir::hl::CompoundLiteralOp::initializer"),
     nullptr,
   },
   {}  // Sentinel.

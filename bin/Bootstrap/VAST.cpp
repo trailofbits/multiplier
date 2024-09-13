@@ -147,6 +147,35 @@ class CodeGenerator {
   void RunOnAttrs(void);
 };
 
+static const std::map<std::string, std::string> kMethodRenames = {
+  {"lhs", "left"},
+  {"rhs", "right"},
+  {"src", "source"},
+  {"dst", "destination"},
+  {"expr", "expression"},
+  {"val", "value"},
+  {"arg", "argument"},
+  {"args", "arguments"},
+  {"cond_region", "condition_region"},
+  {"decl", "declaration"},
+  {"sym_name", "name"},
+  {"sym_visibility", "visibility"},
+  {"subexpr", "nested_expression"},
+  {"asm_string", "assembly"},
+  {"is_expr_predicate", "is_expression_predicate"},
+  {"init", "initializer"},
+  {"res", "result"},
+  {"assert", "assertion"},
+  {"substmt", "nested_statement"},
+  {"arg_list", "argument_list"},
+  {"is_local_var_decl", "is_local_variable_declaration"},
+  {"is_static_local", "is_static_local_variable_declaration"},
+  {"is_file_var_decl", "is_file_variable_declaration"},
+  {"int", "integer_value"},
+  {"s_int", "signed_integer_value"},
+  {"u_int", "unsigned_integer_value"},
+};
+
 static std::string MethodName(const std::string &name) {
   std::string new_name = Capitalize(name);
 
@@ -155,8 +184,9 @@ static std::string MethodName(const std::string &name) {
   }
 
   new_name = CapitalCaseToSnakeCase(new_name);
-  if (new_name == "int" || new_name == "assert") {
-    new_name.push_back('_');
+  auto name_it = kMethodRenames.find(new_name);
+  if (name_it != kMethodRenames.end()) {
+    return name_it->second;
   }
 
   return new_name;
@@ -223,6 +253,9 @@ static const OptionalMethod kOptionalMethods[] = {
   {"IfOp", "else_region", IsRegionFalse, GetRegionValue},
   {"VarDeclOp", "initializer", IsRegionFalse, GetRegionValue},
   {"VarDeclOp", "allocation_size", IsRegionFalse, GetRegionValue},
+  {"CaseOp", "body", IsRegionFalse, GetRegionValue},
+  {"DefaultOp", "body", IsRegionFalse, GetRegionValue},
+  {"BinaryCondOp", "common_region", IsRegionFalse, GetRegionValue},
 };
 
 static std::pair<IsFalseFunc *, GetOptValueFunc *>
@@ -749,6 +782,32 @@ class ValueGeneratorWrapper final : public TypeWrapper {
   }
 };
 
+class RegionGeneratorWrapper final : public TypeWrapper {
+ public:
+  virtual ~RegionGeneratorWrapper(void) = default;
+
+  void ReturnType(std::ostream &os, const pasta::CXXMethodDecl &) final {
+    os << "gap::generator<::mx::ir::Region>";
+  }
+
+  virtual std::string_view MethodRefKind(void) final {
+    return " &";
+  }
+
+  std::string_view CallMethod(std::ostream &os, const pasta::CXXMethodDecl &m,
+                              const std::string &indent) {
+    os << indent << "decltype(auto) regions = underlying_repr()." << m.Name() << "();\n";
+    return "regions";
+  }
+
+  void Implementation(std::ostream &os, const pasta::CXXMethodDecl &m,
+                      const std::string &indent, std::string_view val) final {
+    os << indent << "for (auto &region : " << val << ") {\n"
+       << indent << "  co_yield ::mx::ir::Region(module_, &region);\n"
+       << indent << "}\n";
+  }
+};
+
 class TypeTypeWrapper final : public TypeWrapper {
  public:
   virtual ~TypeTypeWrapper(void) = default;
@@ -871,6 +930,17 @@ static std::unordered_map<std::string, TypeWrapper *> gReturnType{
   {"llvm::ArrayRef<Type>", new TypeGeneratorWrapper},
   {"gap::generator<Type>", new TypeGeneratorWrapper},
   {"::gap::generator<Type>", new TypeGeneratorWrapper},
+  {"llvm::SmallVector<Type, 1>", new TypeGeneratorWrapper},
+  {"llvm::SmallVector<Type, 2>", new TypeGeneratorWrapper},
+  {"llvm::SmallVector<Type, 3>", new TypeGeneratorWrapper},
+  {"llvm::SmallVector<Type, 4>", new TypeGeneratorWrapper},
+  {"llvm::SmallVector<Type, 5>", new TypeGeneratorWrapper},
+  {"llvm::SmallVector<Type, 6>", new TypeGeneratorWrapper},
+  {"llvm::SmallVector<Type, 7>", new TypeGeneratorWrapper},
+  {"llvm::SmallVector<Type, 8>", new TypeGeneratorWrapper},
+  {"::std::optional<Type>", new OptionalTypeWrapper(new TypeTypeWrapper)},
+  {"::vast::core::FunctionType", new TypeTypeWrapper},
+  {"::mlir::MutableArrayRef<Region>", new RegionGeneratorWrapper},
 };
 
 void CodeGenerator::Summarize(void) {

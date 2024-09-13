@@ -59,7 +59,7 @@ class MX_EXPORT CallExecutionOp final : public Operation {
   ::vast::abi::CallExecutionOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  gap::generator<::mx::ir::Operand> args(void) const &;
+  gap::generator<::mx::ir::Operand> arguments(void) const &;
   ::mx::ir::Value result(void) const;
   ::mx::ir::Region body(void) const;
   //::mlir::SymbolRefAttr callee(void) const;
@@ -80,7 +80,7 @@ class MX_EXPORT CallOp final : public Operation {
   ::vast::abi::CallOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  gap::generator<::mx::ir::Operand> args(void) const &;
+  gap::generator<::mx::ir::Operand> arguments(void) const &;
   gap::generator<::mx::ir::Result> results(void) const &;
   std::string_view callee(void) const;
   //::mlir::CallInterfaceCallable callable_for_callee(void) const;
@@ -152,10 +152,10 @@ class MX_EXPORT FuncOp final : public Operation {
 
   // Imported methods:
   std::optional<::mx::ir::Region> body(void) const;
-  std::string_view sym_name(void) const;
-  //::vast::core::FunctionType function_type(void) const;
+  std::string_view name(void) const;
+  ::mx::ir::Type function_type(void) const;
   //::std::optional<GlobalLinkageKind> linkage(void) const;
-  std::optional<std::string_view> sym_visibility(void) const;
+  std::optional<std::string_view> visibility(void) const;
   //::std::optional<ArrayAttr> arg_attrs(void) const;
   //::std::optional<ArrayAttr> res_attrs(void) const;
   bool is_var_arg(void) const;

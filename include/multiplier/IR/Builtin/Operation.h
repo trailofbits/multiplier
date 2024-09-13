@@ -34,9 +34,8 @@ class MX_EXPORT ModuleOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Region body_region(void) const;
-  std::optional<std::string_view> sym_name(void) const;
-  std::optional<std::string_view> sym_visibility(void) const;
   std::optional<std::string_view> name(void) const;
+  std::optional<std::string_view> visibility(void) const;
   bool is_optional_symbol(void) const;
   //DataLayoutSpecInterface data_layout_spec(void) const;
   std::string_view default_dialect(void) const;

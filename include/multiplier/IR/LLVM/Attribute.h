@@ -467,7 +467,7 @@ class MX_EXPORT DIGlobalVariableExpressionAttr final : public Attribute {
 
   // Imported methods:
   //DIGlobalVariableAttr var(void) const;
-  //DIExpressionAttr expr(void) const;
+  //DIExpressionAttr expression(void) const;
 };
 static_assert(sizeof(DIGlobalVariableExpressionAttr) == sizeof(Attribute));
 
@@ -544,7 +544,7 @@ class MX_EXPORT DILocalVariableAttr final : public Attribute {
   //StringAttr name(void) const;
   //DIFileAttr file(void) const;
   unsigned int line(void) const;
-  unsigned int arg(void) const;
+  unsigned int argument(void) const;
   unsigned int align_in_bits(void) const;
   //DITypeAttr type(void) const;
 };

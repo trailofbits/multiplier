@@ -134,13 +134,13 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "substmt",
+    "nested_statement",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->substmt());
+          return ::mx::to_python(T_cast(self)->nested_statement());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::hl::StmtExprOp::substmt"),
+    PyDoc_STR("Wrapper for mx::ir::hl::StmtExprOp::nested_statement"),
     nullptr,
   },
   {}  // Sentinel.

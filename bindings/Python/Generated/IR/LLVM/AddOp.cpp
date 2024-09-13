@@ -124,33 +124,33 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyGetSetDef gProperties[] = {
   {
-    "lhs",
+    "left",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->lhs());
+          return ::mx::to_python(T_cast(self)->left());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::llvm::AddOp::lhs"),
+    PyDoc_STR("Wrapper for mx::ir::llvm::AddOp::left"),
     nullptr,
   },
   {
-    "rhs",
+    "right",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->rhs());
+          return ::mx::to_python(T_cast(self)->right());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::llvm::AddOp::rhs"),
+    PyDoc_STR("Wrapper for mx::ir::llvm::AddOp::right"),
     nullptr,
   },
   {
-    "res",
+    "result",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->res());
+          return ::mx::to_python(T_cast(self)->result());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::llvm::AddOp::res"),
+    PyDoc_STR("Wrapper for mx::ir::llvm::AddOp::result"),
     nullptr,
   },
   {}  // Sentinel.

@@ -75,7 +75,7 @@ std::optional<CallExecutionOp> CallExecutionOp::producing(const ::mx::ir::Value 
   return ::vast::abi::CallExecutionOp(this->::mx::ir::Operation::op_);
 }
 
-gap::generator<::mx::ir::Operand> CallExecutionOp::args(void) const & {
+gap::generator<::mx::ir::Operand> CallExecutionOp::arguments(void) const & {
   auto range = underlying_repr().getArgs();
   for (auto val : range) {
     co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
@@ -117,7 +117,7 @@ std::optional<CallOp> CallOp::producing(const ::mx::ir::Value &that) {
   return ::vast::abi::CallOp(this->::mx::ir::Operation::op_);
 }
 
-gap::generator<::mx::ir::Operand> CallOp::args(void) const & {
+gap::generator<::mx::ir::Operand> CallOp::arguments(void) const & {
   auto range = underlying_repr().getArgs();
   for (auto val : range) {
     co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
@@ -266,7 +266,7 @@ std::optional<::mx::ir::Region> FuncOp::body(void) const {
   return ::mx::ir::Region(module_, val);
 }
 
-std::string_view FuncOp::sym_name(void) const {
+std::string_view FuncOp::name(void) const {
   auto val = underlying_repr().getSymName();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);
@@ -275,7 +275,15 @@ std::string_view FuncOp::sym_name(void) const {
   }
 }
 
-std::optional<std::string_view> FuncOp::sym_visibility(void) const {
+::mx::ir::Type FuncOp::function_type(void) const {
+  auto mlir_type = underlying_repr().getFunctionType();
+  return ::mx::ir::Type(
+      mlir_type.getContext(),
+      reinterpret_cast<const mlir::TypeStorage *>(
+          mlir_type.getAsOpaquePointer()));
+}
+
+std::optional<std::string_view> FuncOp::visibility(void) const {
   auto opt_val = underlying_repr().getSymVisibility();
   if (!opt_val) {
     return std::nullopt;

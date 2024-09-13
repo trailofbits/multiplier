@@ -265,7 +265,7 @@ std::optional<Symbol> RefOp::referenced_symbol(void) const noexcept {
   switch (kind()) {
     case OperationKind::HL_REF: {
       auto decl_ref = reinterpret_cast<const DeclRefOp &>(*this);
-      if (auto op = Operation::producing(decl_ref.decl())) {
+      if (auto op = Operation::producing(decl_ref.declaration())) {
         return op->defined_symbol();
       }
       break;

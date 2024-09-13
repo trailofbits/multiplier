@@ -124,13 +124,13 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyGetSetDef gProperties[] = {
   {
-    "val",
+    "value",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->val());
+          return ::mx::to_python(T_cast(self)->value());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::llvm::VPStridedStoreOp::val"),
+    PyDoc_STR("Wrapper for mx::ir::llvm::VPStridedStoreOp::value"),
     nullptr,
   },
   {

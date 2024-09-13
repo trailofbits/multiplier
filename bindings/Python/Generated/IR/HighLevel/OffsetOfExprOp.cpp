@@ -134,6 +134,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "array_index_exprs",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::array_index_exprs);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::hl::OffsetOfExprOp::array_index_exprs"),
+    nullptr,
+  },
+  {
     "source",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

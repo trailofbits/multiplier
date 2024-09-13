@@ -154,13 +154,23 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "is_expr_predicate",
+    "control_type",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_expr_predicate());
+          return ::mx::to_python(T_cast(self)->control_type());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::hl::GenericSelectionExprOp::is_expr_predicate"),
+    PyDoc_STR("Wrapper for mx::ir::hl::GenericSelectionExprOp::control_type"),
+    nullptr,
+  },
+  {
+    "is_expression_predicate",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_expression_predicate());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::hl::GenericSelectionExprOp::is_expression_predicate"),
     nullptr,
   },
   {

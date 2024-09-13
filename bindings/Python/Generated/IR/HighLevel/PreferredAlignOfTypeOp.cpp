@@ -134,13 +134,13 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "arg",
+    "argument",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->arg());
+          return ::mx::to_python(T_cast(self)->argument());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::hl::PreferredAlignOfTypeOp::arg"),
+    PyDoc_STR("Wrapper for mx::ir::hl::PreferredAlignOfTypeOp::argument"),
     nullptr,
   },
   {}  // Sentinel.

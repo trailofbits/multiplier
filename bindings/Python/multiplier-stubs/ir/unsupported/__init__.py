@@ -49,6 +49,7 @@ class UnsupportedDeclOp(multiplier.ir.unsupported.Operation):
 
 class UnsupportedStmtOp(multiplier.ir.unsupported.Operation):
   result: multiplier.ir.Value
+  children: Iterable[multiplier.ir.Region]
   name: str
 
   @staticmethod

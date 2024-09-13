@@ -45,12 +45,12 @@ std::optional<BinLAndOp> BinLAndOp::producing(const ::mx::ir::Value &that) {
   return ::vast::core::BinLAndOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value BinLAndOp::lhs(void) const {
+::mx::ir::Value BinLAndOp::left(void) const {
   auto val = underlying_repr().getLhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value BinLAndOp::rhs(void) const {
+::mx::ir::Value BinLAndOp::right(void) const {
   auto val = underlying_repr().getRhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -78,12 +78,12 @@ std::optional<BinLOrOp> BinLOrOp::producing(const ::mx::ir::Value &that) {
   return ::vast::core::BinLOrOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value BinLOrOp::lhs(void) const {
+::mx::ir::Value BinLOrOp::left(void) const {
   auto val = underlying_repr().getLhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value BinLOrOp::rhs(void) const {
+::mx::ir::Value BinLOrOp::right(void) const {
   auto val = underlying_repr().getRhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -169,21 +169,8 @@ std::optional<ModuleOp> ModuleOp::producing(const ::mx::ir::Value &that) {
   return ::mx::ir::Region(module_, val);
 }
 
-std::optional<std::string_view> ModuleOp::sym_name(void) const {
-  auto opt_val = underlying_repr().getSymName();
-  if (!opt_val) {
-    return std::nullopt;
-  }
-  auto &val = opt_val.value();
-  if (auto size = val.size()) {
-    return std::string_view(val.data(), size);
-  } else {
-    return {};
-  }
-}
-
 std::optional<std::string_view> ModuleOp::name(void) const {
-  auto opt_val = underlying_repr().getName();
+  auto opt_val = underlying_repr().getSymName();
   if (!opt_val) {
     return std::nullopt;
   }

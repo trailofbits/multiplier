@@ -103,8 +103,8 @@ class Operation(multiplier.ir.Operation):
     ...
 
 class BinLAndOp(multiplier.ir.core.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
   result: multiplier.ir.Value
 
   @staticmethod
@@ -120,8 +120,8 @@ class BinLAndOp(multiplier.ir.core.Operation):
     ...
 
 class BinLOrOp(multiplier.ir.core.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
   result: multiplier.ir.Value
 
   @staticmethod
@@ -169,7 +169,6 @@ class LazyOp(multiplier.ir.core.Operation):
 
 class ModuleOp(multiplier.ir.core.Operation):
   body: multiplier.ir.Region
-  sym_name: Optional[str]
   name: Optional[str]
   is_optional_symbol: bool
   default_dialect: str

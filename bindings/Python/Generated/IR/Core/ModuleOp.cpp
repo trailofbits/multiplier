@@ -134,16 +134,6 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "sym_name",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->sym_name());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::ir::core::ModuleOp::sym_name"),
-    nullptr,
-  },
-  {
     "name",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

@@ -124,13 +124,13 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyGetSetDef gProperties[] = {
   {
-    "lhs",
+    "left",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->lhs());
+          return ::mx::to_python(T_cast(self)->left());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::hl::CaseOp::lhs"),
+    PyDoc_STR("Wrapper for mx::ir::hl::CaseOp::left"),
     nullptr,
   },
   {

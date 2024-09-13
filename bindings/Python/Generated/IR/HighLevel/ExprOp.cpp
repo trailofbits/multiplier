@@ -134,13 +134,13 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "subexpr",
+    "nested_expression",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->subexpr());
+          return ::mx::to_python(T_cast(self)->nested_expression());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::hl::ExprOp::subexpr"),
+    PyDoc_STR("Wrapper for mx::ir::hl::ExprOp::nested_expression"),
     nullptr,
   },
   {}  // Sentinel.

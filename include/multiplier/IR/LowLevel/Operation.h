@@ -100,7 +100,7 @@ class MX_EXPORT ConcatOp final : public Operation {
   ::vast::ll::Concat underlying_repr(void) const noexcept;
 
   // Imported methods:
-  gap::generator<::mx::ir::Operand> args(void) const &;
+  gap::generator<::mx::ir::Operand> arguments(void) const &;
   ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(ConcatOp) == sizeof(Operation));
@@ -155,7 +155,7 @@ class MX_EXPORT ExtractOp final : public Operation {
   ::vast::ll::Extract underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value arg(void) const;
+  ::mx::ir::Value argument(void) const;
   ::mx::ir::Value result(void) const;
   //::mlir::TypedAttr from(void) const;
   //::mlir::TypedAttr to(void) const;
@@ -227,10 +227,10 @@ class MX_EXPORT FuncOp final : public Operation {
 
   // Imported methods:
   std::optional<::mx::ir::Region> body(void) const;
-  std::string_view sym_name(void) const;
-  //::vast::core::FunctionType function_type(void) const;
+  std::string_view name(void) const;
+  ::mx::ir::Type function_type(void) const;
   //::std::optional<GlobalLinkageKind> linkage(void) const;
-  std::optional<std::string_view> sym_visibility(void) const;
+  std::optional<std::string_view> visibility(void) const;
   //::std::optional<ArrayAttr> arg_attrs(void) const;
   //::std::optional<ArrayAttr> res_attrs(void) const;
   bool is_var_arg(void) const;
@@ -338,7 +338,7 @@ class MX_EXPORT StoreOp final : public Operation {
   ::vast::ll::Store underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value val(void) const;
+  ::mx::ir::Value value(void) const;
   //::mlir::TypedValue<ElementTypeInterface> ptr(void) const;
 };
 static_assert(sizeof(StoreOp) == sizeof(Operation));

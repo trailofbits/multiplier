@@ -146,9 +146,9 @@ class FloatAttr(multiplier.ir.builtin.Attribute):
     ...
 
 class IntegerAttr(multiplier.ir.builtin.Attribute):
-  int_: int
-  s_int: int
-  u_int: int
+  integer_value: int
+  signed_integer_value: int
+  unsigned_integer_value: int
   type: multiplier.ir.Type
 
   @staticmethod
@@ -296,9 +296,8 @@ class Operation(multiplier.ir.Operation):
 
 class ModuleOp(multiplier.ir.builtin.Operation):
   body_region: multiplier.ir.Region
-  sym_name: Optional[str]
-  sym_visibility: Optional[str]
   name: Optional[str]
+  visibility: Optional[str]
   is_optional_symbol: bool
   default_dialect: str
 

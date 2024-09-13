@@ -124,13 +124,23 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyGetSetDef gProperties[] = {
   {
-    "cond_region",
+    "condition_region",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->cond_region());
+          return ::mx::to_python(T_cast(self)->condition_region());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::hl::SwitchOp::cond_region"),
+    PyDoc_STR("Wrapper for mx::ir::hl::SwitchOp::condition_region"),
+    nullptr,
+  },
+  {
+    "cases",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::cases);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::hl::SwitchOp::cases"),
     nullptr,
   },
   {}  // Sentinel.

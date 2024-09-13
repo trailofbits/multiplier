@@ -134,23 +134,23 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "val",
+    "value",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->val());
+          return ::mx::to_python(T_cast(self)->value());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::llvm::AtomicCmpXchgOp::val"),
+    PyDoc_STR("Wrapper for mx::ir::llvm::AtomicCmpXchgOp::value"),
     nullptr,
   },
   {
-    "res",
+    "result",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->res());
+          return ::mx::to_python(T_cast(self)->result());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::llvm::AtomicCmpXchgOp::res"),
+    PyDoc_STR("Wrapper for mx::ir::llvm::AtomicCmpXchgOp::result"),
     nullptr,
   },
   {

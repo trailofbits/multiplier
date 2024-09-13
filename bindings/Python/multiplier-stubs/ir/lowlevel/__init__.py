@@ -78,7 +78,7 @@ class BrOp(multiplier.ir.lowlevel.Operation):
     ...
 
 class ConcatOp(multiplier.ir.lowlevel.Operation):
-  args: Iterable[multiplier.ir.Operand]
+  arguments: Iterable[multiplier.ir.Operand]
   result: multiplier.ir.Value
 
   @staticmethod
@@ -127,7 +127,7 @@ class CondScopeRetOp(multiplier.ir.lowlevel.Operation):
     ...
 
 class ExtractOp(multiplier.ir.lowlevel.Operation):
-  arg: multiplier.ir.Value
+  argument: multiplier.ir.Value
   result: multiplier.ir.Value
   size: int
 
@@ -192,8 +192,9 @@ class LoadOp(multiplier.ir.lowlevel.Operation):
 
 class FuncOp(multiplier.ir.lowlevel.Operation):
   body: Optional[multiplier.ir.Region]
-  sym_name: str
-  sym_visibility: Optional[str]
+  name: str
+  function_type: multiplier.ir.Type
+  visibility: Optional[str]
   is_var_arg: bool
   callable_results: Iterable[multiplier.ir.Type]
   argument_types: Iterable[multiplier.ir.Type]
@@ -289,7 +290,7 @@ class ScopeRetOp(multiplier.ir.lowlevel.Operation):
     ...
 
 class StoreOp(multiplier.ir.lowlevel.Operation):
-  val: multiplier.ir.Value
+  value: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:

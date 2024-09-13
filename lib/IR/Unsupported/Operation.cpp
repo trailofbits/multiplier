@@ -82,6 +82,13 @@ std::optional<UnsupportedStmtOp> UnsupportedStmtOp::producing(const ::mx::ir::Va
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
+gap::generator<::mx::ir::Region> UnsupportedStmtOp::children(void) const & {
+  decltype(auto) regions = underlying_repr().getChildren();
+  for (auto &region : regions) {
+    co_yield ::mx::ir::Region(module_, &region);
+  }
+}
+
 std::string_view UnsupportedStmtOp::name(void) const {
   auto val = underlying_repr().getName();
   if (auto size = val.size()) {

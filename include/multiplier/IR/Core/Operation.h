@@ -38,8 +38,8 @@ class MX_EXPORT BinLAndOp final : public Operation {
   ::vast::core::BinLAndOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
   ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(BinLAndOp) == sizeof(Operation));
@@ -56,8 +56,8 @@ class MX_EXPORT BinLOrOp final : public Operation {
   ::vast::core::BinLOrOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
   ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(BinLOrOp) == sizeof(Operation));
@@ -108,7 +108,6 @@ class MX_EXPORT ModuleOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Region body(void) const;
-  std::optional<std::string_view> sym_name(void) const;
   std::optional<std::string_view> name(void) const;
   bool is_optional_symbol(void) const;
   //mlir::DataLayoutSpecInterface data_layout_spec(void) const;

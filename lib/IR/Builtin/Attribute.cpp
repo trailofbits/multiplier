@@ -221,17 +221,17 @@ std::optional<IntegerAttr> IntegerAttr::from(const ::mx::ir::Attribute &that) {
   return ::mlir::IntegerAttr(this->::mx::ir::Attribute::attr_);
 }
 
-int64_t IntegerAttr::int_(void) const {
+int64_t IntegerAttr::integer_value(void) const {
   auto val = underlying_repr().getInt();
   return val;
 }
 
-int64_t IntegerAttr::s_int(void) const {
+int64_t IntegerAttr::signed_integer_value(void) const {
   auto val = underlying_repr().getSInt();
   return val;
 }
 
-uint64_t IntegerAttr::u_int(void) const {
+uint64_t IntegerAttr::unsigned_integer_value(void) const {
   auto val = underlying_repr().getUInt();
   return val;
 }

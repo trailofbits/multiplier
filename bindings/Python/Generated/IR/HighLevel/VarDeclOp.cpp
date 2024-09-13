@@ -154,13 +154,13 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "sym_name",
+    "name",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->sym_name());
+          return ::mx::to_python(T_cast(self)->name());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::hl::VarDeclOp::sym_name"),
+    PyDoc_STR("Wrapper for mx::ir::hl::VarDeclOp::name"),
     nullptr,
   },
   {
@@ -174,23 +174,23 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "is_local_var_decl",
+    "is_local_variable_declaration",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_local_var_decl());
+          return ::mx::to_python(T_cast(self)->is_local_variable_declaration());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::hl::VarDeclOp::is_local_var_decl"),
+    PyDoc_STR("Wrapper for mx::ir::hl::VarDeclOp::is_local_variable_declaration"),
     nullptr,
   },
   {
-    "is_static_local",
+    "is_static_local_variable_declaration",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_static_local());
+          return ::mx::to_python(T_cast(self)->is_static_local_variable_declaration());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::hl::VarDeclOp::is_static_local"),
+    PyDoc_STR("Wrapper for mx::ir::hl::VarDeclOp::is_static_local_variable_declaration"),
     nullptr,
   },
   {
@@ -254,13 +254,13 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "is_file_var_decl",
+    "is_file_variable_declaration",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->is_file_var_decl());
+          return ::mx::to_python(T_cast(self)->is_file_variable_declaration());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::hl::VarDeclOp::is_file_var_decl"),
+    PyDoc_STR("Wrapper for mx::ir::hl::VarDeclOp::is_file_variable_declaration"),
     nullptr,
   },
   {}  // Sentinel.

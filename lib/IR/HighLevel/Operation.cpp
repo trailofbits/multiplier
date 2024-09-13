@@ -65,12 +65,12 @@ std::optional<AddFAssignOp> AddFAssignOp::producing(const ::mx::ir::Value &that)
   return ::vast::hl::AddFAssignOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value AddFAssignOp::src(void) const {
+::mx::ir::Value AddFAssignOp::source(void) const {
   auto val = underlying_repr().getSrc();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value AddFAssignOp::dst(void) const {
+::mx::ir::Value AddFAssignOp::destination(void) const {
   auto val = underlying_repr().getDst();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -98,12 +98,12 @@ std::optional<AddFOp> AddFOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::AddFOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value AddFOp::lhs(void) const {
+::mx::ir::Value AddFOp::left(void) const {
   auto val = underlying_repr().getLhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value AddFOp::rhs(void) const {
+::mx::ir::Value AddFOp::right(void) const {
   auto val = underlying_repr().getRhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -131,12 +131,12 @@ std::optional<AddIAssignOp> AddIAssignOp::producing(const ::mx::ir::Value &that)
   return ::vast::hl::AddIAssignOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value AddIAssignOp::src(void) const {
+::mx::ir::Value AddIAssignOp::source(void) const {
   auto val = underlying_repr().getSrc();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value AddIAssignOp::dst(void) const {
+::mx::ir::Value AddIAssignOp::destination(void) const {
   auto val = underlying_repr().getDst();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -164,12 +164,12 @@ std::optional<AddIOp> AddIOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::AddIOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value AddIOp::lhs(void) const {
+::mx::ir::Value AddIOp::left(void) const {
   auto val = underlying_repr().getLhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value AddIOp::rhs(void) const {
+::mx::ir::Value AddIOp::right(void) const {
   auto val = underlying_repr().getRhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -258,7 +258,7 @@ std::optional<AlignOfExprOp> AlignOfExprOp::producing(const ::mx::ir::Value &tha
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Region AlignOfExprOp::expr(void) const {
+::mx::ir::Region AlignOfExprOp::expression(void) const {
   auto &val = underlying_repr().getExpr();
   return ::mx::ir::Region(module_, val);
 }
@@ -286,7 +286,7 @@ std::optional<AlignOfTypeOp> AlignOfTypeOp::producing(const ::mx::ir::Value &tha
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Type AlignOfTypeOp::arg(void) const {
+::mx::ir::Type AlignOfTypeOp::argument(void) const {
   auto mlir_type = underlying_repr().getArg();
   return ::mx::ir::Type(
       mlir_type.getContext(),
@@ -370,12 +370,12 @@ std::optional<AssignOp> AssignOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::AssignOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value AssignOp::src(void) const {
+::mx::ir::Value AssignOp::source(void) const {
   auto val = underlying_repr().getSrc();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value AssignOp::dst(void) const {
+::mx::ir::Value AssignOp::destination(void) const {
   auto val = underlying_repr().getDst();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -426,12 +426,12 @@ std::optional<BinAShrAssignOp> BinAShrAssignOp::producing(const ::mx::ir::Value 
   return ::vast::hl::BinAShrAssignOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value BinAShrAssignOp::src(void) const {
+::mx::ir::Value BinAShrAssignOp::source(void) const {
   auto val = underlying_repr().getSrc();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value BinAShrAssignOp::dst(void) const {
+::mx::ir::Value BinAShrAssignOp::destination(void) const {
   auto val = underlying_repr().getDst();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -459,12 +459,12 @@ std::optional<BinAShrOp> BinAShrOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::BinAShrOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value BinAShrOp::lhs(void) const {
+::mx::ir::Value BinAShrOp::left(void) const {
   auto val = underlying_repr().getLhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value BinAShrOp::rhs(void) const {
+::mx::ir::Value BinAShrOp::right(void) const {
   auto val = underlying_repr().getRhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -492,12 +492,12 @@ std::optional<BinAndAssignOp> BinAndAssignOp::producing(const ::mx::ir::Value &t
   return ::vast::hl::BinAndAssignOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value BinAndAssignOp::src(void) const {
+::mx::ir::Value BinAndAssignOp::source(void) const {
   auto val = underlying_repr().getSrc();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value BinAndAssignOp::dst(void) const {
+::mx::ir::Value BinAndAssignOp::destination(void) const {
   auto val = underlying_repr().getDst();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -525,12 +525,12 @@ std::optional<BinAndOp> BinAndOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::BinAndOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value BinAndOp::lhs(void) const {
+::mx::ir::Value BinAndOp::left(void) const {
   auto val = underlying_repr().getLhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value BinAndOp::rhs(void) const {
+::mx::ir::Value BinAndOp::right(void) const {
   auto val = underlying_repr().getRhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -558,12 +558,12 @@ std::optional<BinCommaOp> BinCommaOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::BinComma(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value BinCommaOp::lhs(void) const {
+::mx::ir::Value BinCommaOp::left(void) const {
   auto val = underlying_repr().getLhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value BinCommaOp::rhs(void) const {
+::mx::ir::Value BinCommaOp::right(void) const {
   auto val = underlying_repr().getRhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -596,12 +596,12 @@ std::optional<BinLAndOp> BinLAndOp::producing(const ::mx::ir::Value &that) {
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Region BinLAndOp::lhs(void) const {
+::mx::ir::Region BinLAndOp::left(void) const {
   auto &val = underlying_repr().getLhs();
   return ::mx::ir::Region(module_, val);
 }
 
-::mx::ir::Region BinLAndOp::rhs(void) const {
+::mx::ir::Region BinLAndOp::right(void) const {
   auto &val = underlying_repr().getRhs();
   return ::mx::ir::Region(module_, val);
 }
@@ -629,12 +629,12 @@ std::optional<BinLOrOp> BinLOrOp::producing(const ::mx::ir::Value &that) {
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Region BinLOrOp::lhs(void) const {
+::mx::ir::Region BinLOrOp::left(void) const {
   auto &val = underlying_repr().getLhs();
   return ::mx::ir::Region(module_, val);
 }
 
-::mx::ir::Region BinLOrOp::rhs(void) const {
+::mx::ir::Region BinLOrOp::right(void) const {
   auto &val = underlying_repr().getRhs();
   return ::mx::ir::Region(module_, val);
 }
@@ -657,12 +657,12 @@ std::optional<BinLShrAssignOp> BinLShrAssignOp::producing(const ::mx::ir::Value 
   return ::vast::hl::BinLShrAssignOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value BinLShrAssignOp::src(void) const {
+::mx::ir::Value BinLShrAssignOp::source(void) const {
   auto val = underlying_repr().getSrc();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value BinLShrAssignOp::dst(void) const {
+::mx::ir::Value BinLShrAssignOp::destination(void) const {
   auto val = underlying_repr().getDst();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -690,12 +690,12 @@ std::optional<BinLShrOp> BinLShrOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::BinLShrOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value BinLShrOp::lhs(void) const {
+::mx::ir::Value BinLShrOp::left(void) const {
   auto val = underlying_repr().getLhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value BinLShrOp::rhs(void) const {
+::mx::ir::Value BinLShrOp::right(void) const {
   auto val = underlying_repr().getRhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -723,12 +723,12 @@ std::optional<BinOrAssignOp> BinOrAssignOp::producing(const ::mx::ir::Value &tha
   return ::vast::hl::BinOrAssignOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value BinOrAssignOp::src(void) const {
+::mx::ir::Value BinOrAssignOp::source(void) const {
   auto val = underlying_repr().getSrc();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value BinOrAssignOp::dst(void) const {
+::mx::ir::Value BinOrAssignOp::destination(void) const {
   auto val = underlying_repr().getDst();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -756,12 +756,12 @@ std::optional<BinOrOp> BinOrOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::BinOrOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value BinOrOp::lhs(void) const {
+::mx::ir::Value BinOrOp::left(void) const {
   auto val = underlying_repr().getLhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value BinOrOp::rhs(void) const {
+::mx::ir::Value BinOrOp::right(void) const {
   auto val = underlying_repr().getRhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -789,12 +789,12 @@ std::optional<BinShlAssignOp> BinShlAssignOp::producing(const ::mx::ir::Value &t
   return ::vast::hl::BinShlAssignOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value BinShlAssignOp::src(void) const {
+::mx::ir::Value BinShlAssignOp::source(void) const {
   auto val = underlying_repr().getSrc();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value BinShlAssignOp::dst(void) const {
+::mx::ir::Value BinShlAssignOp::destination(void) const {
   auto val = underlying_repr().getDst();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -822,12 +822,12 @@ std::optional<BinShlOp> BinShlOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::BinShlOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value BinShlOp::lhs(void) const {
+::mx::ir::Value BinShlOp::left(void) const {
   auto val = underlying_repr().getLhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value BinShlOp::rhs(void) const {
+::mx::ir::Value BinShlOp::right(void) const {
   auto val = underlying_repr().getRhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -855,12 +855,12 @@ std::optional<BinXorAssignOp> BinXorAssignOp::producing(const ::mx::ir::Value &t
   return ::vast::hl::BinXorAssignOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value BinXorAssignOp::src(void) const {
+::mx::ir::Value BinXorAssignOp::source(void) const {
   auto val = underlying_repr().getSrc();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value BinXorAssignOp::dst(void) const {
+::mx::ir::Value BinXorAssignOp::destination(void) const {
   auto val = underlying_repr().getDst();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -888,12 +888,12 @@ std::optional<BinXorOp> BinXorOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::BinXorOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value BinXorOp::lhs(void) const {
+::mx::ir::Value BinXorOp::left(void) const {
   auto val = underlying_repr().getLhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value BinXorOp::rhs(void) const {
+::mx::ir::Value BinXorOp::right(void) const {
   auto val = underlying_repr().getRhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -926,12 +926,16 @@ std::optional<BinaryCondOp> BinaryCondOp::producing(const ::mx::ir::Value &that)
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Region BinaryCondOp::common_region(void) const {
-  auto &val = underlying_repr().getCommonRegion();
+std::optional<::mx::ir::Region> BinaryCondOp::common_region(void) const {
+  decltype(auto) opt_val = underlying_repr().getCommonRegion();
+  if (opt_val.empty()) {
+    return std::nullopt;
+  }
+  auto &val = opt_val;
   return ::mx::ir::Region(module_, val);
 }
 
-::mx::ir::Region BinaryCondOp::cond_region(void) const {
+::mx::ir::Region BinaryCondOp::condition_region(void) const {
   auto &val = underlying_repr().getCondRegion();
   return ::mx::ir::Region(module_, val);
 }
@@ -1036,6 +1040,16 @@ bool BuiltinTypesCompatiblePOp::compatible(void) const {
   return val;
 }
 
+gap::generator<::mx::ir::Type> BuiltinTypesCompatiblePOp::arguments(void) const & {
+  auto range = underlying_repr().getArgs();
+  for (auto el_ty : range) {
+    co_yield ::mx::ir::Type(
+        el_ty.getContext(),
+        reinterpret_cast<const mlir::TypeStorage *>(
+            el_ty.getAsOpaquePointer()));
+  }
+}
+
 std::optional<bool> BuiltinTypesCompatiblePOp::value(void) const {
   auto opt_val = underlying_repr().getValue();
   if (!opt_val) {
@@ -1132,13 +1146,17 @@ std::optional<CaseOp> CaseOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::CaseOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Region CaseOp::lhs(void) const {
+::mx::ir::Region CaseOp::left(void) const {
   auto &val = underlying_repr().getLhs();
   return ::mx::ir::Region(module_, val);
 }
 
-::mx::ir::Region CaseOp::body(void) const {
-  auto &val = underlying_repr().getBody();
+std::optional<::mx::ir::Region> CaseOp::body(void) const {
+  decltype(auto) opt_val = underlying_repr().getBody();
+  if (opt_val.empty()) {
+    return std::nullopt;
+  }
+  auto &val = opt_val;
   return ::mx::ir::Region(module_, val);
 }
 
@@ -1165,7 +1183,7 @@ std::optional<ChooseExprOp> ChooseExprOp::producing(const ::mx::ir::Value &that)
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Region ChooseExprOp::cond_region(void) const {
+::mx::ir::Region ChooseExprOp::condition_region(void) const {
   auto &val = underlying_repr().getCondRegion();
   return ::mx::ir::Region(module_, val);
 }
@@ -1258,12 +1276,12 @@ std::optional<CmpOp> CmpOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::CmpOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value CmpOp::lhs(void) const {
+::mx::ir::Value CmpOp::left(void) const {
   auto val = underlying_repr().getLhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value CmpOp::rhs(void) const {
+::mx::ir::Value CmpOp::right(void) const {
   auto val = underlying_repr().getRhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -1296,7 +1314,7 @@ std::optional<CompoundLiteralOp> CompoundLiteralOp::producing(const ::mx::ir::Va
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Region CompoundLiteralOp::init(void) const {
+::mx::ir::Region CompoundLiteralOp::initializer(void) const {
   auto &val = underlying_repr().getInit();
   return ::mx::ir::Region(module_, val);
 }
@@ -1324,7 +1342,7 @@ std::optional<CondOp> CondOp::producing(const ::mx::ir::Value &that) {
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Region CondOp::cond_region(void) const {
+::mx::ir::Region CondOp::condition_region(void) const {
   auto &val = underlying_repr().getCondRegion();
   return ::mx::ir::Region(module_, val);
 }
@@ -1489,7 +1507,7 @@ std::optional<DeclRefOp> DeclRefOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::DeclRefOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value DeclRefOp::decl(void) const {
+::mx::ir::Value DeclRefOp::declaration(void) const {
   auto val = underlying_repr().getDecl();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -1517,8 +1535,12 @@ std::optional<DefaultOp> DefaultOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::DefaultOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Region DefaultOp::body(void) const {
-  auto &val = underlying_repr().getBody();
+std::optional<::mx::ir::Region> DefaultOp::body(void) const {
+  decltype(auto) opt_val = underlying_repr().getBody();
+  if (opt_val.empty()) {
+    return std::nullopt;
+  }
+  auto &val = opt_val;
   return ::mx::ir::Region(module_, val);
 }
 
@@ -1568,12 +1590,12 @@ std::optional<DivFAssignOp> DivFAssignOp::producing(const ::mx::ir::Value &that)
   return ::vast::hl::DivFAssignOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value DivFAssignOp::src(void) const {
+::mx::ir::Value DivFAssignOp::source(void) const {
   auto val = underlying_repr().getSrc();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value DivFAssignOp::dst(void) const {
+::mx::ir::Value DivFAssignOp::destination(void) const {
   auto val = underlying_repr().getDst();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -1601,12 +1623,12 @@ std::optional<DivFOp> DivFOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::DivFOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value DivFOp::lhs(void) const {
+::mx::ir::Value DivFOp::left(void) const {
   auto val = underlying_repr().getLhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value DivFOp::rhs(void) const {
+::mx::ir::Value DivFOp::right(void) const {
   auto val = underlying_repr().getRhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -1634,12 +1656,12 @@ std::optional<DivSAssignOp> DivSAssignOp::producing(const ::mx::ir::Value &that)
   return ::vast::hl::DivSAssignOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value DivSAssignOp::src(void) const {
+::mx::ir::Value DivSAssignOp::source(void) const {
   auto val = underlying_repr().getSrc();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value DivSAssignOp::dst(void) const {
+::mx::ir::Value DivSAssignOp::destination(void) const {
   auto val = underlying_repr().getDst();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -1667,12 +1689,12 @@ std::optional<DivSOp> DivSOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::DivSOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value DivSOp::lhs(void) const {
+::mx::ir::Value DivSOp::left(void) const {
   auto val = underlying_repr().getLhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value DivSOp::rhs(void) const {
+::mx::ir::Value DivSOp::right(void) const {
   auto val = underlying_repr().getRhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -1700,12 +1722,12 @@ std::optional<DivUAssignOp> DivUAssignOp::producing(const ::mx::ir::Value &that)
   return ::vast::hl::DivUAssignOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value DivUAssignOp::src(void) const {
+::mx::ir::Value DivUAssignOp::source(void) const {
   auto val = underlying_repr().getSrc();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value DivUAssignOp::dst(void) const {
+::mx::ir::Value DivUAssignOp::destination(void) const {
   auto val = underlying_repr().getDst();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -1733,12 +1755,12 @@ std::optional<DivUOp> DivUOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::DivUOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value DivUOp::lhs(void) const {
+::mx::ir::Value DivUOp::left(void) const {
   auto val = underlying_repr().getLhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value DivUOp::rhs(void) const {
+::mx::ir::Value DivUOp::right(void) const {
   auto val = underlying_repr().getRhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -1771,7 +1793,7 @@ std::optional<DoOp> DoOp::producing(const ::mx::ir::Value &that) {
   return ::mx::ir::Region(module_, val);
 }
 
-::mx::ir::Region DoOp::cond_region(void) const {
+::mx::ir::Region DoOp::condition_region(void) const {
   auto &val = underlying_repr().getCondRegion();
   return ::mx::ir::Region(module_, val);
 }
@@ -1812,12 +1834,12 @@ std::optional<EnumConstantOp> EnumConstantOp::producing(const ::mx::ir::Value &t
   return ::vast::hl::EnumConstantOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Region EnumConstantOp::init(void) const {
+::mx::ir::Region EnumConstantOp::initializer(void) const {
   auto &val = underlying_repr().getInit();
   return ::mx::ir::Region(module_, val);
 }
 
-std::string_view EnumConstantOp::sym_name(void) const {
+std::string_view EnumConstantOp::name(void) const {
   auto val = underlying_repr().getSymName();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);
@@ -1849,13 +1871,25 @@ std::optional<EnumDeclOp> EnumDeclOp::producing(const ::mx::ir::Value &that) {
   return ::mx::ir::Region(module_, val);
 }
 
-std::string_view EnumDeclOp::sym_name(void) const {
+std::string_view EnumDeclOp::name(void) const {
   auto val = underlying_repr().getSymName();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);
   } else {
     return {};
   }
+}
+
+std::optional<::mx::ir::Type> EnumDeclOp::type(void) const {
+  auto opt_val = underlying_repr().getType();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  return ::mx::ir::Type(
+      val.getContext(),
+      reinterpret_cast<const mlir::TypeStorage *>(
+          val.getAsOpaquePointer()));
 }
 
 bool EnumDeclOp::is_complete(void) const {
@@ -1923,7 +1957,7 @@ std::optional<ExprOp> ExprOp::producing(const ::mx::ir::Value &that) {
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Region ExprOp::subexpr(void) const {
+::mx::ir::Region ExprOp::nested_expression(void) const {
   auto &val = underlying_repr().getSubexpr();
   return ::mx::ir::Region(module_, val);
 }
@@ -1974,12 +2008,12 @@ std::optional<FCmpOp> FCmpOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::FCmpOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value FCmpOp::lhs(void) const {
+::mx::ir::Value FCmpOp::left(void) const {
   auto val = underlying_repr().getLhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value FCmpOp::rhs(void) const {
+::mx::ir::Value FCmpOp::right(void) const {
   auto val = underlying_repr().getRhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -2007,7 +2041,7 @@ std::optional<FieldDeclOp> FieldDeclOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::FieldDeclOp(this->::mx::ir::Operation::op_);
 }
 
-std::string_view FieldDeclOp::sym_name(void) const {
+std::string_view FieldDeclOp::name(void) const {
   auto val = underlying_repr().getSymName();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);
@@ -2051,7 +2085,7 @@ std::optional<FileScopeAsmOp> FileScopeAsmOp::producing(const ::mx::ir::Value &t
   return ::vast::hl::FileScopeAsmOp(this->::mx::ir::Operation::op_);
 }
 
-std::string_view FileScopeAsmOp::asm_string(void) const {
+std::string_view FileScopeAsmOp::assembly(void) const {
   auto val = underlying_repr().getAsmString();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);
@@ -2078,12 +2112,8 @@ std::optional<ForOp> ForOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::ForOp(this->::mx::ir::Operation::op_);
 }
 
-std::optional<::mx::ir::Region> ForOp::cond_region(void) const {
-  decltype(auto) opt_val = underlying_repr().getCondRegion();
-  if (opt_val.empty()) {
-    return std::nullopt;
-  }
-  auto &val = opt_val;
+::mx::ir::Region ForOp::condition_region(void) const {
+  auto &val = underlying_repr().getCondRegion();
   return ::mx::ir::Region(module_, val);
 }
 
@@ -2132,7 +2162,7 @@ std::optional<::mx::ir::Region> FuncOp::body(void) const {
   return ::mx::ir::Region(module_, val);
 }
 
-std::string_view FuncOp::sym_name(void) const {
+std::string_view FuncOp::name(void) const {
   auto val = underlying_repr().getSymName();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);
@@ -2141,7 +2171,15 @@ std::string_view FuncOp::sym_name(void) const {
   }
 }
 
-std::optional<std::string_view> FuncOp::sym_visibility(void) const {
+::mx::ir::Type FuncOp::function_type(void) const {
+  auto mlir_type = underlying_repr().getFunctionType();
+  return ::mx::ir::Type(
+      mlir_type.getContext(),
+      reinterpret_cast<const mlir::TypeStorage *>(
+          mlir_type.getAsOpaquePointer()));
+}
+
+std::optional<std::string_view> FuncOp::visibility(void) const {
   auto opt_val = underlying_repr().getSymVisibility();
   if (!opt_val) {
     return std::nullopt;
@@ -2254,6 +2292,18 @@ std::optional<GenericAssocExprOp> GenericAssocExprOp::producing(const ::mx::ir::
   return ::mx::ir::Region(module_, val);
 }
 
+std::optional<::mx::ir::Type> GenericAssocExprOp::match_type(void) const {
+  auto opt_val = underlying_repr().getMatchType();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  return ::mx::ir::Type(
+      val.getContext(),
+      reinterpret_cast<const mlir::TypeStorage *>(
+          val.getAsOpaquePointer()));
+}
+
 std::optional<GenericSelectionExprOp> GenericSelectionExprOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::HL_GENERIC_EXPR) {
     return reinterpret_cast<const GenericSelectionExprOp &>(that);
@@ -2287,7 +2337,19 @@ std::optional<GenericSelectionExprOp> GenericSelectionExprOp::producing(const ::
   return ::mx::ir::Region(module_, val);
 }
 
-bool GenericSelectionExprOp::is_expr_predicate(void) const {
+std::optional<::mx::ir::Type> GenericSelectionExprOp::control_type(void) const {
+  auto opt_val = underlying_repr().getControlType();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  return ::mx::ir::Type(
+      val.getContext(),
+      reinterpret_cast<const mlir::TypeStorage *>(
+          val.getAsOpaquePointer()));
+}
+
+bool GenericSelectionExprOp::is_expression_predicate(void) const {
   auto val = underlying_repr().isExprPredicate();
   return val;
 }
@@ -2370,7 +2432,7 @@ std::optional<IfOp> IfOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::IfOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Region IfOp::cond_region(void) const {
+::mx::ir::Region IfOp::condition_region(void) const {
   auto &val = underlying_repr().getCondRegion();
   return ::mx::ir::Region(module_, val);
 }
@@ -2412,7 +2474,7 @@ std::optional<ImagOp> ImagOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::ImagOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value ImagOp::arg(void) const {
+::mx::ir::Value ImagOp::argument(void) const {
   auto val = underlying_repr().getArg();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -2558,7 +2620,7 @@ std::optional<InitializedConstantOp> InitializedConstantOp::producing(const ::mx
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Region InitializedConstantOp::init(void) const {
+::mx::ir::Region InitializedConstantOp::initializer(void) const {
   auto &val = underlying_repr().getInit();
   return ::mx::ir::Region(module_, val);
 }
@@ -2581,12 +2643,12 @@ std::optional<LNotOp> LNotOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::LNotOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value LNotOp::arg(void) const {
+::mx::ir::Value LNotOp::argument(void) const {
   auto val = underlying_repr().getArg();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value LNotOp::res(void) const {
+::mx::ir::Value LNotOp::result(void) const {
   auto val = underlying_repr().getRes();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -2614,7 +2676,7 @@ std::optional<LabelDeclOp> LabelDeclOp::producing(const ::mx::ir::Value &that) {
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-std::string_view LabelDeclOp::sym_name(void) const {
+std::string_view LabelDeclOp::name(void) const {
   auto val = underlying_repr().getSymName();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);
@@ -2669,7 +2731,7 @@ std::optional<MinusOp> MinusOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::MinusOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value MinusOp::arg(void) const {
+::mx::ir::Value MinusOp::argument(void) const {
   auto val = underlying_repr().getArg();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -2697,12 +2759,12 @@ std::optional<MulFAssignOp> MulFAssignOp::producing(const ::mx::ir::Value &that)
   return ::vast::hl::MulFAssignOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value MulFAssignOp::src(void) const {
+::mx::ir::Value MulFAssignOp::source(void) const {
   auto val = underlying_repr().getSrc();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value MulFAssignOp::dst(void) const {
+::mx::ir::Value MulFAssignOp::destination(void) const {
   auto val = underlying_repr().getDst();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -2730,12 +2792,12 @@ std::optional<MulFOp> MulFOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::MulFOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value MulFOp::lhs(void) const {
+::mx::ir::Value MulFOp::left(void) const {
   auto val = underlying_repr().getLhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value MulFOp::rhs(void) const {
+::mx::ir::Value MulFOp::right(void) const {
   auto val = underlying_repr().getRhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -2763,12 +2825,12 @@ std::optional<MulIAssignOp> MulIAssignOp::producing(const ::mx::ir::Value &that)
   return ::vast::hl::MulIAssignOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value MulIAssignOp::src(void) const {
+::mx::ir::Value MulIAssignOp::source(void) const {
   auto val = underlying_repr().getSrc();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value MulIAssignOp::dst(void) const {
+::mx::ir::Value MulIAssignOp::destination(void) const {
   auto val = underlying_repr().getDst();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -2796,12 +2858,12 @@ std::optional<MulIOp> MulIOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::MulIOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value MulIOp::lhs(void) const {
+::mx::ir::Value MulIOp::left(void) const {
   auto val = underlying_repr().getLhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value MulIOp::rhs(void) const {
+::mx::ir::Value MulIOp::right(void) const {
   auto val = underlying_repr().getRhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -2829,7 +2891,7 @@ std::optional<NotOp> NotOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::NotOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value NotOp::arg(void) const {
+::mx::ir::Value NotOp::argument(void) const {
   auto val = underlying_repr().getArg();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -2880,6 +2942,13 @@ std::optional<OffsetOfExprOp> OffsetOfExprOp::producing(const ::mx::ir::Value &t
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
+gap::generator<::mx::ir::Region> OffsetOfExprOp::array_index_exprs(void) const & {
+  decltype(auto) regions = underlying_repr().getArrayIndexExprs();
+  for (auto &region : regions) {
+    co_yield ::mx::ir::Region(module_, &region);
+  }
+}
+
 ::mx::ir::Type OffsetOfExprOp::source(void) const {
   auto mlir_type = underlying_repr().getSource();
   return ::mx::ir::Type(
@@ -2906,7 +2975,7 @@ std::optional<OpaqueValueExprOp> OpaqueValueExprOp::producing(const ::mx::ir::Va
   return ::vast::hl::OpaqueValueExpr(this->::mx::ir::Operation::op_);
 }
 
-gap::generator<::mx::ir::Operand> OpaqueValueExprOp::arg(void) const & {
+gap::generator<::mx::ir::Operand> OpaqueValueExprOp::argument(void) const & {
   auto range = underlying_repr().getArg();
   for (auto val : range) {
     co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
@@ -2936,7 +3005,7 @@ std::optional<PlusOp> PlusOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::PlusOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value PlusOp::arg(void) const {
+::mx::ir::Value PlusOp::argument(void) const {
   auto val = underlying_repr().getArg();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -2964,7 +3033,7 @@ std::optional<PostDecOp> PostDecOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::PostDecOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value PostDecOp::arg(void) const {
+::mx::ir::Value PostDecOp::argument(void) const {
   auto val = underlying_repr().getArg();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -2992,7 +3061,7 @@ std::optional<PostIncOp> PostIncOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::PostIncOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value PostIncOp::arg(void) const {
+::mx::ir::Value PostIncOp::argument(void) const {
   auto val = underlying_repr().getArg();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -3020,7 +3089,7 @@ std::optional<PreDecOp> PreDecOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::PreDecOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value PreDecOp::arg(void) const {
+::mx::ir::Value PreDecOp::argument(void) const {
   auto val = underlying_repr().getArg();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -3048,7 +3117,7 @@ std::optional<PreIncOp> PreIncOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::PreIncOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value PreIncOp::arg(void) const {
+::mx::ir::Value PreIncOp::argument(void) const {
   auto val = underlying_repr().getArg();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -3109,7 +3178,7 @@ std::optional<PreferredAlignOfExprOp> PreferredAlignOfExprOp::producing(const ::
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Region PreferredAlignOfExprOp::expr(void) const {
+::mx::ir::Region PreferredAlignOfExprOp::expression(void) const {
   auto &val = underlying_repr().getExpr();
   return ::mx::ir::Region(module_, val);
 }
@@ -3137,7 +3206,7 @@ std::optional<PreferredAlignOfTypeOp> PreferredAlignOfTypeOp::producing(const ::
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Type PreferredAlignOfTypeOp::arg(void) const {
+::mx::ir::Type PreferredAlignOfTypeOp::argument(void) const {
   auto mlir_type = underlying_repr().getArg();
   return ::mx::ir::Type(
       mlir_type.getContext(),
@@ -3163,7 +3232,7 @@ std::optional<RealOp> RealOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::RealOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value RealOp::arg(void) const {
+::mx::ir::Value RealOp::argument(void) const {
   auto val = underlying_repr().getArg();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -3228,12 +3297,12 @@ std::optional<RemFAssignOp> RemFAssignOp::producing(const ::mx::ir::Value &that)
   return ::vast::hl::RemFAssignOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value RemFAssignOp::src(void) const {
+::mx::ir::Value RemFAssignOp::source(void) const {
   auto val = underlying_repr().getSrc();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value RemFAssignOp::dst(void) const {
+::mx::ir::Value RemFAssignOp::destination(void) const {
   auto val = underlying_repr().getDst();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -3261,12 +3330,12 @@ std::optional<RemFOp> RemFOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::RemFOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value RemFOp::lhs(void) const {
+::mx::ir::Value RemFOp::left(void) const {
   auto val = underlying_repr().getLhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value RemFOp::rhs(void) const {
+::mx::ir::Value RemFOp::right(void) const {
   auto val = underlying_repr().getRhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -3294,12 +3363,12 @@ std::optional<RemSAssignOp> RemSAssignOp::producing(const ::mx::ir::Value &that)
   return ::vast::hl::RemSAssignOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value RemSAssignOp::src(void) const {
+::mx::ir::Value RemSAssignOp::source(void) const {
   auto val = underlying_repr().getSrc();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value RemSAssignOp::dst(void) const {
+::mx::ir::Value RemSAssignOp::destination(void) const {
   auto val = underlying_repr().getDst();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -3327,12 +3396,12 @@ std::optional<RemSOp> RemSOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::RemSOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value RemSOp::lhs(void) const {
+::mx::ir::Value RemSOp::left(void) const {
   auto val = underlying_repr().getLhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value RemSOp::rhs(void) const {
+::mx::ir::Value RemSOp::right(void) const {
   auto val = underlying_repr().getRhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -3360,12 +3429,12 @@ std::optional<RemUAssignOp> RemUAssignOp::producing(const ::mx::ir::Value &that)
   return ::vast::hl::RemUAssignOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value RemUAssignOp::src(void) const {
+::mx::ir::Value RemUAssignOp::source(void) const {
   auto val = underlying_repr().getSrc();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value RemUAssignOp::dst(void) const {
+::mx::ir::Value RemUAssignOp::destination(void) const {
   auto val = underlying_repr().getDst();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -3393,12 +3462,12 @@ std::optional<RemUOp> RemUOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::RemUOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value RemUOp::lhs(void) const {
+::mx::ir::Value RemUOp::left(void) const {
   auto val = underlying_repr().getLhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value RemUOp::rhs(void) const {
+::mx::ir::Value RemUOp::right(void) const {
   auto val = underlying_repr().getRhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -3456,7 +3525,7 @@ std::optional<SizeOfExprOp> SizeOfExprOp::producing(const ::mx::ir::Value &that)
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Region SizeOfExprOp::expr(void) const {
+::mx::ir::Region SizeOfExprOp::expression(void) const {
   auto &val = underlying_repr().getExpr();
   return ::mx::ir::Region(module_, val);
 }
@@ -3489,7 +3558,7 @@ std::optional<SizeOfTypeOp> SizeOfTypeOp::producing(const ::mx::ir::Value &that)
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Type SizeOfTypeOp::arg(void) const {
+::mx::ir::Type SizeOfTypeOp::argument(void) const {
   auto mlir_type = underlying_repr().getArg();
   return ::mx::ir::Type(
       mlir_type.getContext(),
@@ -3520,7 +3589,7 @@ std::optional<StaticAssertDeclOp> StaticAssertDeclOp::producing(const ::mx::ir::
   return ::vast::hl::StaticAssertDecl(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Region StaticAssertDeclOp::assert_(void) const {
+::mx::ir::Region StaticAssertDeclOp::assertion(void) const {
   auto &val = underlying_repr().getAssert();
   return ::mx::ir::Region(module_, val);
 }
@@ -3558,7 +3627,7 @@ std::optional<StmtExprOp> StmtExprOp::producing(const ::mx::ir::Value &that) {
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Region StmtExprOp::substmt(void) const {
+::mx::ir::Region StmtExprOp::nested_statement(void) const {
   auto &val = underlying_repr().getSubstmt();
   return ::mx::ir::Region(module_, val);
 }
@@ -3586,7 +3655,7 @@ std::optional<StructDeclOp> StructDeclOp::producing(const ::mx::ir::Value &that)
   return ::mx::ir::Region(module_, val);
 }
 
-std::string_view StructDeclOp::sym_name(void) const {
+std::string_view StructDeclOp::name(void) const {
   auto val = underlying_repr().getSymName();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);
@@ -3641,12 +3710,12 @@ std::optional<SubFAssignOp> SubFAssignOp::producing(const ::mx::ir::Value &that)
   return ::vast::hl::SubFAssignOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value SubFAssignOp::src(void) const {
+::mx::ir::Value SubFAssignOp::source(void) const {
   auto val = underlying_repr().getSrc();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value SubFAssignOp::dst(void) const {
+::mx::ir::Value SubFAssignOp::destination(void) const {
   auto val = underlying_repr().getDst();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -3674,12 +3743,12 @@ std::optional<SubFOp> SubFOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::SubFOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value SubFOp::lhs(void) const {
+::mx::ir::Value SubFOp::left(void) const {
   auto val = underlying_repr().getLhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value SubFOp::rhs(void) const {
+::mx::ir::Value SubFOp::right(void) const {
   auto val = underlying_repr().getRhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -3707,12 +3776,12 @@ std::optional<SubIAssignOp> SubIAssignOp::producing(const ::mx::ir::Value &that)
   return ::vast::hl::SubIAssignOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value SubIAssignOp::src(void) const {
+::mx::ir::Value SubIAssignOp::source(void) const {
   auto val = underlying_repr().getSrc();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value SubIAssignOp::dst(void) const {
+::mx::ir::Value SubIAssignOp::destination(void) const {
   auto val = underlying_repr().getDst();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -3740,12 +3809,12 @@ std::optional<SubIOp> SubIOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::SubIOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value SubIOp::lhs(void) const {
+::mx::ir::Value SubIOp::left(void) const {
   auto val = underlying_repr().getLhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value SubIOp::rhs(void) const {
+::mx::ir::Value SubIOp::right(void) const {
   auto val = underlying_repr().getRhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -3806,9 +3875,16 @@ std::optional<SwitchOp> SwitchOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::SwitchOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Region SwitchOp::cond_region(void) const {
+::mx::ir::Region SwitchOp::condition_region(void) const {
   auto &val = underlying_repr().getCondRegion();
   return ::mx::ir::Region(module_, val);
+}
+
+gap::generator<::mx::ir::Region> SwitchOp::cases(void) const & {
+  decltype(auto) regions = underlying_repr().getCases();
+  for (auto &region : regions) {
+    co_yield ::mx::ir::Region(module_, &region);
+  }
 }
 
 std::optional<ThisOp> ThisOp::from(const ::mx::ir::Operation &that) {
@@ -3875,7 +3951,7 @@ std::optional<TypeAliasOp> TypeAliasOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::TypeAliasOp(this->::mx::ir::Operation::op_);
 }
 
-std::string_view TypeAliasOp::sym_name(void) const {
+std::string_view TypeAliasOp::name(void) const {
   auto val = underlying_repr().getSymName();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);
@@ -3910,7 +3986,7 @@ std::optional<TypeDeclOp> TypeDeclOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::TypeDeclOp(this->::mx::ir::Operation::op_);
 }
 
-std::string_view TypeDeclOp::sym_name(void) const {
+std::string_view TypeDeclOp::name(void) const {
   auto val = underlying_repr().getSymName();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);
@@ -3953,7 +4029,7 @@ std::optional<TypeDefOp> TypeDefOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::TypeDefOp(this->::mx::ir::Operation::op_);
 }
 
-std::string_view TypeDefOp::sym_name(void) const {
+std::string_view TypeDefOp::name(void) const {
   auto val = underlying_repr().getSymName();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);
@@ -3996,7 +4072,7 @@ std::optional<TypeOfExprOp> TypeOfExprOp::producing(const ::mx::ir::Value &that)
   return ::vast::hl::TypeOfExprOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Region TypeOfExprOp::expr(void) const {
+::mx::ir::Region TypeOfExprOp::expression(void) const {
   auto &val = underlying_repr().getExpr();
   return ::mx::ir::Region(module_, val);
 }
@@ -4072,7 +4148,7 @@ std::optional<UnionDeclOp> UnionDeclOp::producing(const ::mx::ir::Value &that) {
   return ::mx::ir::Region(module_, val);
 }
 
-std::string_view UnionDeclOp::sym_name(void) const {
+std::string_view UnionDeclOp::name(void) const {
   auto val = underlying_repr().getSymName();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);
@@ -4145,7 +4221,7 @@ std::optional<VAArgExprOp> VAArgExprOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::VAArgExpr(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value VAArgExprOp::arg_list(void) const {
+::mx::ir::Value VAArgExprOp::argument_list(void) const {
   auto val = underlying_repr().getArgList();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -4219,7 +4295,7 @@ std::optional<::mx::ir::Region> VarDeclOp::allocation_size(void) const {
   return ::mx::ir::Region(module_, val);
 }
 
-std::string_view VarDeclOp::sym_name(void) const {
+std::string_view VarDeclOp::name(void) const {
   auto val = underlying_repr().getSymName();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);
@@ -4233,12 +4309,12 @@ bool VarDeclOp::has_local_storage(void) const {
   return val;
 }
 
-bool VarDeclOp::is_local_var_decl(void) const {
+bool VarDeclOp::is_local_variable_declaration(void) const {
   auto val = underlying_repr().isLocalVarDecl();
   return val;
 }
 
-bool VarDeclOp::is_static_local(void) const {
+bool VarDeclOp::is_static_local_variable_declaration(void) const {
   auto val = underlying_repr().isStaticLocal();
   return val;
 }
@@ -4273,7 +4349,7 @@ bool VarDeclOp::is_in_record_context(void) const {
   return val;
 }
 
-bool VarDeclOp::is_file_var_decl(void) const {
+bool VarDeclOp::is_file_variable_declaration(void) const {
   auto val = underlying_repr().isFileVarDecl();
   return val;
 }
@@ -4296,7 +4372,7 @@ std::optional<WhileOp> WhileOp::producing(const ::mx::ir::Value &that) {
   return ::vast::hl::WhileOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Region WhileOp::cond_region(void) const {
+::mx::ir::Region WhileOp::condition_region(void) const {
   auto &val = underlying_repr().getCondRegion();
   return ::mx::ir::Region(module_, val);
 }

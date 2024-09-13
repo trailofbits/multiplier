@@ -134,23 +134,23 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "lhs",
+    "left",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->lhs());
+          return ::mx::to_python(T_cast(self)->left());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::hl::BinLAndOp::lhs"),
+    PyDoc_STR("Wrapper for mx::ir::hl::BinLAndOp::left"),
     nullptr,
   },
   {
-    "rhs",
+    "right",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->rhs());
+          return ::mx::to_python(T_cast(self)->right());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::hl::BinLAndOp::rhs"),
+    PyDoc_STR("Wrapper for mx::ir::hl::BinLAndOp::right"),
     nullptr,
   },
   {}  // Sentinel.

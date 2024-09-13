@@ -124,13 +124,13 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyGetSetDef gProperties[] = {
   {
-    "arg_list",
+    "argument_list",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->arg_list());
+          return ::mx::to_python(T_cast(self)->argument_list());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::hl::VAArgExprOp::arg_list"),
+    PyDoc_STR("Wrapper for mx::ir::hl::VAArgExprOp::argument_list"),
     nullptr,
   },
   {

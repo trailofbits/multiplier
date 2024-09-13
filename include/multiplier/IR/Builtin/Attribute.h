@@ -222,9 +222,9 @@ class MX_EXPORT IntegerAttr final : public Attribute {
   ::mlir::IntegerAttr underlying_repr(void) const noexcept;
 
   // Imported methods:
-  int64_t int_(void) const;
-  int64_t s_int(void) const;
-  uint64_t u_int(void) const;
+  int64_t integer_value(void) const;
+  int64_t signed_integer_value(void) const;
+  uint64_t unsigned_integer_value(void) const;
   //APSInt aps_int(void) const;
   ::mx::ir::Type type(void) const;
   //APInt value(void) const;

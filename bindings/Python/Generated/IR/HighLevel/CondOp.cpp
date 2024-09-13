@@ -134,13 +134,13 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "cond_region",
+    "condition_region",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->cond_region());
+          return ::mx::to_python(T_cast(self)->condition_region());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::hl::CondOp::cond_region"),
+    PyDoc_STR("Wrapper for mx::ir::hl::CondOp::condition_region"),
     nullptr,
   },
   {

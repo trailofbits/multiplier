@@ -426,7 +426,7 @@ unsigned int DILocalVariableAttr::line(void) const {
   return val;
 }
 
-unsigned int DILocalVariableAttr::arg(void) const {
+unsigned int DILocalVariableAttr::argument(void) const {
   auto val = underlying_repr().getArg();
   return val;
 }

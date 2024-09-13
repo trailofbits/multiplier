@@ -273,7 +273,7 @@ class MX_EXPORT CollapseShapeOp final : public Operation {
   ::mlir::memref::CollapseShapeOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<MemRefType> src(void) const;
+  //::mlir::TypedValue<MemRefType> source(void) const;
   //::mlir::TypedValue<MemRefType> result(void) const;
   //::mlir::ArrayAttr reassociation(void) const;
   //SmallVector<AffineMap, 4> reassociation_maps(void) const;
@@ -388,7 +388,7 @@ class MX_EXPORT ExpandShapeOp final : public Operation {
   ::mlir::memref::ExpandShapeOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<MemRefType> src(void) const;
+  //::mlir::TypedValue<MemRefType> source(void) const;
   //::mlir::TypedValue<MemRefType> result(void) const;
   //::mlir::ArrayAttr reassociation(void) const;
   //SmallVector<AffineMap, 4> reassociation_maps(void) const;
@@ -470,8 +470,8 @@ class MX_EXPORT GlobalOp final : public Operation {
   ::mlir::memref::GlobalOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  std::string_view sym_name(void) const;
-  std::optional<std::string_view> sym_visibility(void) const;
+  std::string_view name(void) const;
+  std::optional<std::string_view> visibility(void) const;
   //::mlir::MemRefType type(void) const;
   //::std::optional<Attribute> initial_value(void) const;
   bool constant(void) const;

@@ -124,13 +124,13 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyGetSetDef gProperties[] = {
   {
-    "src",
+    "source",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->src());
+          return ::mx::to_python(T_cast(self)->source());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::llvm::VPUIToFPOp::src"),
+    PyDoc_STR("Wrapper for mx::ir::llvm::VPUIToFPOp::source"),
     nullptr,
   },
   {
@@ -144,13 +144,13 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "res",
+    "result",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->res());
+          return ::mx::to_python(T_cast(self)->result());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::llvm::VPUIToFPOp::res"),
+    PyDoc_STR("Wrapper for mx::ir::llvm::VPUIToFPOp::result"),
     nullptr,
   },
   {}  // Sentinel.

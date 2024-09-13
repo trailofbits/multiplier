@@ -124,23 +124,23 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyGetSetDef gProperties[] = {
   {
-    "init",
+    "initializer",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->init());
+          return ::mx::to_python(T_cast(self)->initializer());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::hl::EnumConstantOp::init"),
+    PyDoc_STR("Wrapper for mx::ir::hl::EnumConstantOp::initializer"),
     nullptr,
   },
   {
-    "sym_name",
+    "name",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->sym_name());
+          return ::mx::to_python(T_cast(self)->name());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::hl::EnumConstantOp::sym_name"),
+    PyDoc_STR("Wrapper for mx::ir::hl::EnumConstantOp::name"),
     nullptr,
   },
   {}  // Sentinel.

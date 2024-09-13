@@ -123,7 +123,7 @@ std::optional<ConcatOp> ConcatOp::producing(const ::mx::ir::Value &that) {
   return ::vast::ll::Concat(this->::mx::ir::Operation::op_);
 }
 
-gap::generator<::mx::ir::Operand> ConcatOp::args(void) const & {
+gap::generator<::mx::ir::Operand> ConcatOp::arguments(void) const & {
   auto range = underlying_repr().getArgs();
   for (auto val : range) {
     co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
@@ -220,7 +220,7 @@ std::optional<ExtractOp> ExtractOp::producing(const ::mx::ir::Value &that) {
   return ::vast::ll::Extract(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value ExtractOp::arg(void) const {
+::mx::ir::Value ExtractOp::argument(void) const {
   auto val = underlying_repr().getArg();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -343,7 +343,7 @@ std::optional<::mx::ir::Region> FuncOp::body(void) const {
   return ::mx::ir::Region(module_, val);
 }
 
-std::string_view FuncOp::sym_name(void) const {
+std::string_view FuncOp::name(void) const {
   auto val = underlying_repr().getSymName();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);
@@ -352,7 +352,15 @@ std::string_view FuncOp::sym_name(void) const {
   }
 }
 
-std::optional<std::string_view> FuncOp::sym_visibility(void) const {
+::mx::ir::Type FuncOp::function_type(void) const {
+  auto mlir_type = underlying_repr().getFunctionType();
+  return ::mx::ir::Type(
+      mlir_type.getContext(),
+      reinterpret_cast<const mlir::TypeStorage *>(
+          mlir_type.getAsOpaquePointer()));
+}
+
+std::optional<std::string_view> FuncOp::visibility(void) const {
   auto opt_val = underlying_repr().getSymVisibility();
   if (!opt_val) {
     return std::nullopt;
@@ -549,7 +557,7 @@ std::optional<StoreOp> StoreOp::producing(const ::mx::ir::Value &that) {
   return ::vast::ll::Store(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value StoreOp::val(void) const {
+::mx::ir::Value StoreOp::value(void) const {
   auto val = underlying_repr().getVal();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }

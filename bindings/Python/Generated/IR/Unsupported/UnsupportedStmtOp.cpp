@@ -134,6 +134,16 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
+    "children",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::children);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::unsup::UnsupportedStmtOp::children"),
+    nullptr,
+  },
+  {
     "name",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {

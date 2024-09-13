@@ -124,13 +124,13 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyGetSetDef gProperties[] = {
   {
-    "asm_string",
+    "assembly",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->asm_string());
+          return ::mx::to_python(T_cast(self)->assembly());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::hl::FileScopeAsmOp::asm_string"),
+    PyDoc_STR("Wrapper for mx::ir::hl::FileScopeAsmOp::assembly"),
     nullptr,
   },
   {}  // Sentinel.
