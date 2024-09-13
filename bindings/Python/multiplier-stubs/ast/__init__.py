@@ -17334,7 +17334,7 @@ class AllocAlignAttr(multiplier.ast.InheritableAttr):
     ...
 
 class AlignedAttr(multiplier.ast.InheritableAttr):
-  alignment: int
+  alignment: Optional[int]
   alignment_expression: Optional[multiplier.ast.Expr]
   alignment_type: Optional[multiplier.ast.Type]
   cached_alignment_value: Optional[int]
