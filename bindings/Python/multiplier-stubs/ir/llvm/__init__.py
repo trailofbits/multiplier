@@ -1,6 +1,5 @@
 #
 # Copyright (c) 2023-present, Trail of Bits, Inc.
-# All rights reserved.
 #
 # This source code is licensed in accordance with the terms specified in
 # the LICENSE file found in the root directory of this source tree.
@@ -315,7 +314,7 @@ class DILexicalBlockFileAttr(multiplier.ir.llvm.Attribute):
 
 class DILocalVariableAttr(multiplier.ir.llvm.Attribute):
   line: int
-  arg: int
+  argument: int
   align_in_bits: int
 
   @staticmethod
@@ -527,9 +526,9 @@ class Operation(multiplier.ir.Operation):
     ...
 
 class AShrOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
-  res: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -544,9 +543,9 @@ class AShrOp(multiplier.ir.llvm.Operation):
     ...
 
 class AddOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
-  res: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -561,8 +560,8 @@ class AddOp(multiplier.ir.llvm.Operation):
     ...
 
 class AddrSpaceCastOp(multiplier.ir.llvm.Operation):
-  arg: multiplier.ir.Value
-  res: multiplier.ir.Value
+  argument: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -609,9 +608,9 @@ class AllocaOp(multiplier.ir.llvm.Operation):
     ...
 
 class AndOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
-  res: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -627,8 +626,8 @@ class AndOp(multiplier.ir.llvm.Operation):
 
 class AtomicCmpXchgOp(multiplier.ir.llvm.Operation):
   cmp: multiplier.ir.Value
-  val: multiplier.ir.Value
-  res: multiplier.ir.Value
+  value: multiplier.ir.Value
+  result: multiplier.ir.Value
   syncscope: Optional[str]
   alignment: Optional[int]
   weak: bool
@@ -647,8 +646,8 @@ class AtomicCmpXchgOp(multiplier.ir.llvm.Operation):
     ...
 
 class AtomicRMWOp(multiplier.ir.llvm.Operation):
-  val: multiplier.ir.Value
-  res: multiplier.ir.Value
+  value: multiplier.ir.Value
+  result: multiplier.ir.Value
   syncscope: Optional[str]
   alignment: Optional[int]
   volatile__: bool
@@ -666,8 +665,8 @@ class AtomicRMWOp(multiplier.ir.llvm.Operation):
     ...
 
 class BitcastOp(multiplier.ir.llvm.Operation):
-  arg: multiplier.ir.Value
-  res: multiplier.ir.Value
+  argument: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -682,6 +681,7 @@ class BitcastOp(multiplier.ir.llvm.Operation):
     ...
 
 class BrOp(multiplier.ir.llvm.Operation):
+  dest_operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -696,6 +696,7 @@ class BrOp(multiplier.ir.llvm.Operation):
     ...
 
 class CallIntrinsicOp(multiplier.ir.llvm.Operation):
+  arguments: Iterable[multiplier.ir.Operand]
   results: multiplier.ir.Value
   intrin: str
 
@@ -712,8 +713,10 @@ class CallIntrinsicOp(multiplier.ir.llvm.Operation):
     ...
 
 class CallOp(multiplier.ir.llvm.Operation):
+  callee_operands: Iterable[multiplier.ir.Operand]
   result: multiplier.ir.Value
   callee: Optional[str]
+  arg_operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -729,7 +732,7 @@ class CallOp(multiplier.ir.llvm.Operation):
 
 class ComdatOp(multiplier.ir.llvm.Operation):
   body: multiplier.ir.Region
-  sym_name: str
+  name: str
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -744,7 +747,7 @@ class ComdatOp(multiplier.ir.llvm.Operation):
     ...
 
 class ComdatSelectorOp(multiplier.ir.llvm.Operation):
-  sym_name: str
+  name: str
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -759,6 +762,8 @@ class ComdatSelectorOp(multiplier.ir.llvm.Operation):
     ...
 
 class CondBrOp(multiplier.ir.llvm.Operation):
+  true_dest_operands: Iterable[multiplier.ir.Operand]
+  false_dest_operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -773,7 +778,7 @@ class CondBrOp(multiplier.ir.llvm.Operation):
     ...
 
 class ConstantOp(multiplier.ir.llvm.Operation):
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -789,7 +794,7 @@ class ConstantOp(multiplier.ir.llvm.Operation):
 
 class ExtractElementOp(multiplier.ir.llvm.Operation):
   vector: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -805,7 +810,7 @@ class ExtractElementOp(multiplier.ir.llvm.Operation):
 
 class ExtractValueOp(multiplier.ir.llvm.Operation):
   container: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -820,9 +825,9 @@ class ExtractValueOp(multiplier.ir.llvm.Operation):
     ...
 
 class FAddOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
-  res: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -837,9 +842,9 @@ class FAddOp(multiplier.ir.llvm.Operation):
     ...
 
 class FCmpOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
-  res: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -854,9 +859,9 @@ class FCmpOp(multiplier.ir.llvm.Operation):
     ...
 
 class FDivOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
-  res: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -871,9 +876,9 @@ class FDivOp(multiplier.ir.llvm.Operation):
     ...
 
 class FMulOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
-  res: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -889,7 +894,7 @@ class FMulOp(multiplier.ir.llvm.Operation):
 
 class FNegOp(multiplier.ir.llvm.Operation):
   operand: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -904,8 +909,8 @@ class FNegOp(multiplier.ir.llvm.Operation):
     ...
 
 class FPExtOp(multiplier.ir.llvm.Operation):
-  arg: multiplier.ir.Value
-  res: multiplier.ir.Value
+  argument: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -920,8 +925,8 @@ class FPExtOp(multiplier.ir.llvm.Operation):
     ...
 
 class FPToSIOp(multiplier.ir.llvm.Operation):
-  arg: multiplier.ir.Value
-  res: multiplier.ir.Value
+  argument: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -936,8 +941,8 @@ class FPToSIOp(multiplier.ir.llvm.Operation):
     ...
 
 class FPToUIOp(multiplier.ir.llvm.Operation):
-  arg: multiplier.ir.Value
-  res: multiplier.ir.Value
+  argument: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -952,8 +957,8 @@ class FPToUIOp(multiplier.ir.llvm.Operation):
     ...
 
 class FPTruncOp(multiplier.ir.llvm.Operation):
-  arg: multiplier.ir.Value
-  res: multiplier.ir.Value
+  argument: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -968,9 +973,9 @@ class FPTruncOp(multiplier.ir.llvm.Operation):
     ...
 
 class FRemOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
-  res: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -985,9 +990,9 @@ class FRemOp(multiplier.ir.llvm.Operation):
     ...
 
 class FSubOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
-  res: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1017,8 +1022,8 @@ class FenceOp(multiplier.ir.llvm.Operation):
     ...
 
 class FreezeOp(multiplier.ir.llvm.Operation):
-  val: multiplier.ir.Value
-  res: multiplier.ir.Value
+  value: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1034,7 +1039,8 @@ class FreezeOp(multiplier.ir.llvm.Operation):
 
 class GetElementPtrOp(multiplier.ir.llvm.Operation):
   base: multiplier.ir.Value
-  res: multiplier.ir.Value
+  dynamic_indices: Iterable[multiplier.ir.Operand]
+  result: multiplier.ir.Value
   elem_type: multiplier.ir.Type
   inbounds: bool
 
@@ -1082,7 +1088,7 @@ class GlobalOp(multiplier.ir.llvm.Operation):
   initializer: multiplier.ir.Region
   global_type: multiplier.ir.Type
   constant: bool
-  sym_name: str
+  name: str
   dso_local: bool
   thread_local__: bool
   alignment: Optional[int]
@@ -1102,9 +1108,9 @@ class GlobalOp(multiplier.ir.llvm.Operation):
     ...
 
 class ICmpOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
-  res: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1119,8 +1125,9 @@ class ICmpOp(multiplier.ir.llvm.Operation):
     ...
 
 class InlineAsmOp(multiplier.ir.llvm.Operation):
-  res: multiplier.ir.Value
-  asm_string: str
+  operands: Iterable[multiplier.ir.Operand]
+  result: multiplier.ir.Value
+  assembly: str
   constraints: str
   has_side_effects: bool
   is_align_stack: bool
@@ -1140,7 +1147,7 @@ class InlineAsmOp(multiplier.ir.llvm.Operation):
 class InsertElementOp(multiplier.ir.llvm.Operation):
   vector: multiplier.ir.Value
   value: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1157,7 +1164,7 @@ class InsertElementOp(multiplier.ir.llvm.Operation):
 class InsertValueOp(multiplier.ir.llvm.Operation):
   container: multiplier.ir.Value
   value: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1172,8 +1179,8 @@ class InsertValueOp(multiplier.ir.llvm.Operation):
     ...
 
 class IntToPtrOp(multiplier.ir.llvm.Operation):
-  arg: multiplier.ir.Value
-  res: multiplier.ir.Value
+  argument: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1188,7 +1195,11 @@ class IntToPtrOp(multiplier.ir.llvm.Operation):
     ...
 
 class InvokeOp(multiplier.ir.llvm.Operation):
+  callee_operands: Iterable[multiplier.ir.Operand]
+  normal_dest_operands: Iterable[multiplier.ir.Operand]
+  unwind_dest_operands: Iterable[multiplier.ir.Operand]
   callee: Optional[str]
+  arg_operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1203,9 +1214,9 @@ class InvokeOp(multiplier.ir.llvm.Operation):
     ...
 
 class FuncOp(multiplier.ir.llvm.Operation):
-  body: multiplier.ir.Region
-  sym_name: str
-  sym_visibility: Optional[str]
+  body: Optional[multiplier.ir.Region]
+  name: str
+  visibility: Optional[str]
   dso_local: bool
   personality: Optional[str]
   garbage_collector: Optional[str]
@@ -1234,9 +1245,9 @@ class FuncOp(multiplier.ir.llvm.Operation):
     ...
 
 class LShrOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
-  res: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1251,7 +1262,7 @@ class LShrOp(multiplier.ir.llvm.Operation):
     ...
 
 class LandingpadOp(multiplier.ir.llvm.Operation):
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
   cleanup: bool
 
   @staticmethod
@@ -1281,7 +1292,7 @@ class LinkerOptionsOp(multiplier.ir.llvm.Operation):
     ...
 
 class LoadOp(multiplier.ir.llvm.Operation):
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
   alignment: Optional[int]
   volatile__: bool
   nontemporal: bool
@@ -1301,9 +1312,9 @@ class LoadOp(multiplier.ir.llvm.Operation):
     ...
 
 class MulOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
-  res: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1318,7 +1329,7 @@ class MulOp(multiplier.ir.llvm.Operation):
     ...
 
 class NoneTokenOp(multiplier.ir.llvm.Operation):
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1333,9 +1344,9 @@ class NoneTokenOp(multiplier.ir.llvm.Operation):
     ...
 
 class OrOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
-  res: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1350,7 +1361,7 @@ class OrOp(multiplier.ir.llvm.Operation):
     ...
 
 class PoisonOp(multiplier.ir.llvm.Operation):
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1365,8 +1376,8 @@ class PoisonOp(multiplier.ir.llvm.Operation):
     ...
 
 class PtrToIntOp(multiplier.ir.llvm.Operation):
-  arg: multiplier.ir.Value
-  res: multiplier.ir.Value
+  argument: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1396,7 +1407,7 @@ class ResumeOp(multiplier.ir.llvm.Operation):
     ...
 
 class ReturnOp(multiplier.ir.llvm.Operation):
-  arg: multiplier.ir.Value
+  argument: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1411,9 +1422,9 @@ class ReturnOp(multiplier.ir.llvm.Operation):
     ...
 
 class SDivOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
-  res: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1428,8 +1439,8 @@ class SDivOp(multiplier.ir.llvm.Operation):
     ...
 
 class SExtOp(multiplier.ir.llvm.Operation):
-  arg: multiplier.ir.Value
-  res: multiplier.ir.Value
+  argument: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1444,8 +1455,8 @@ class SExtOp(multiplier.ir.llvm.Operation):
     ...
 
 class SIToFPOp(multiplier.ir.llvm.Operation):
-  arg: multiplier.ir.Value
-  res: multiplier.ir.Value
+  argument: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1460,9 +1471,9 @@ class SIToFPOp(multiplier.ir.llvm.Operation):
     ...
 
 class SRemOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
-  res: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1480,7 +1491,7 @@ class SelectOp(multiplier.ir.llvm.Operation):
   condition: multiplier.ir.Value
   true_value: multiplier.ir.Value
   false_value: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1495,9 +1506,9 @@ class SelectOp(multiplier.ir.llvm.Operation):
     ...
 
 class ShlOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
-  res: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1514,7 +1525,7 @@ class ShlOp(multiplier.ir.llvm.Operation):
 class ShuffleVectorOp(multiplier.ir.llvm.Operation):
   v1: multiplier.ir.Value
   v2: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1548,9 +1559,9 @@ class StoreOp(multiplier.ir.llvm.Operation):
     ...
 
 class SubOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
-  res: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1565,6 +1576,7 @@ class SubOp(multiplier.ir.llvm.Operation):
     ...
 
 class SwitchOp(multiplier.ir.llvm.Operation):
+  default_operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1579,8 +1591,8 @@ class SwitchOp(multiplier.ir.llvm.Operation):
     ...
 
 class TruncOp(multiplier.ir.llvm.Operation):
-  arg: multiplier.ir.Value
-  res: multiplier.ir.Value
+  argument: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1595,9 +1607,9 @@ class TruncOp(multiplier.ir.llvm.Operation):
     ...
 
 class UDivOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
-  res: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1612,8 +1624,8 @@ class UDivOp(multiplier.ir.llvm.Operation):
     ...
 
 class UIToFPOp(multiplier.ir.llvm.Operation):
-  arg: multiplier.ir.Value
-  res: multiplier.ir.Value
+  argument: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1628,9 +1640,9 @@ class UIToFPOp(multiplier.ir.llvm.Operation):
     ...
 
 class URemOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
-  res: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1645,7 +1657,7 @@ class URemOp(multiplier.ir.llvm.Operation):
     ...
 
 class UndefOp(multiplier.ir.llvm.Operation):
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1674,9 +1686,9 @@ class UnreachableOp(multiplier.ir.llvm.Operation):
     ...
 
 class XOrOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
-  res: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1691,8 +1703,8 @@ class XOrOp(multiplier.ir.llvm.Operation):
     ...
 
 class ZExtOp(multiplier.ir.llvm.Operation):
-  arg: multiplier.ir.Value
-  res: multiplier.ir.Value
+  argument: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1707,7 +1719,7 @@ class ZExtOp(multiplier.ir.llvm.Operation):
     ...
 
 class ZeroOp(multiplier.ir.llvm.Operation):
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1723,7 +1735,7 @@ class ZeroOp(multiplier.ir.llvm.Operation):
 
 class AbsOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
   is_int_min_poison: bool
 
   @staticmethod
@@ -1768,7 +1780,7 @@ class AssumeOp(multiplier.ir.llvm.Operation):
 
 class BitReverseOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1784,7 +1796,7 @@ class BitReverseOp(multiplier.ir.llvm.Operation):
 
 class ByteSwapOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1801,7 +1813,7 @@ class ByteSwapOp(multiplier.ir.llvm.Operation):
 class CopySignOp(multiplier.ir.llvm.Operation):
   a: multiplier.ir.Value
   b: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1816,7 +1828,7 @@ class CopySignOp(multiplier.ir.llvm.Operation):
     ...
 
 class CoroAlignOp(multiplier.ir.llvm.Operation):
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1832,7 +1844,7 @@ class CoroAlignOp(multiplier.ir.llvm.Operation):
 
 class CoroBeginOp(multiplier.ir.llvm.Operation):
   token: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1848,7 +1860,7 @@ class CoroBeginOp(multiplier.ir.llvm.Operation):
 
 class CoroEndOp(multiplier.ir.llvm.Operation):
   retvals: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1864,7 +1876,7 @@ class CoroEndOp(multiplier.ir.llvm.Operation):
 
 class CoroFreeOp(multiplier.ir.llvm.Operation):
   id: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1879,7 +1891,7 @@ class CoroFreeOp(multiplier.ir.llvm.Operation):
     ...
 
 class CoroIdOp(multiplier.ir.llvm.Operation):
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1922,7 +1934,7 @@ class CoroResumeOp(multiplier.ir.llvm.Operation):
     ...
 
 class CoroSaveOp(multiplier.ir.llvm.Operation):
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1937,7 +1949,7 @@ class CoroSaveOp(multiplier.ir.llvm.Operation):
     ...
 
 class CoroSizeOp(multiplier.ir.llvm.Operation):
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1953,7 +1965,7 @@ class CoroSizeOp(multiplier.ir.llvm.Operation):
 
 class CoroSuspendOp(multiplier.ir.llvm.Operation):
   save: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1969,7 +1981,7 @@ class CoroSuspendOp(multiplier.ir.llvm.Operation):
 
 class CosOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -1985,7 +1997,7 @@ class CosOp(multiplier.ir.llvm.Operation):
 
 class CountLeadingZerosOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
   is_zero_poison: bool
 
   @staticmethod
@@ -2002,7 +2014,7 @@ class CountLeadingZerosOp(multiplier.ir.llvm.Operation):
 
 class CountTrailingZerosOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
   is_zero_poison: bool
 
   @staticmethod
@@ -2019,7 +2031,7 @@ class CountTrailingZerosOp(multiplier.ir.llvm.Operation):
 
 class CtPopOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2091,7 +2103,7 @@ class DebugTrapOp(multiplier.ir.llvm.Operation):
     ...
 
 class EhTypeidForOp(multiplier.ir.llvm.Operation):
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2107,7 +2119,7 @@ class EhTypeidForOp(multiplier.ir.llvm.Operation):
 
 class Exp2Op(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2123,7 +2135,7 @@ class Exp2Op(multiplier.ir.llvm.Operation):
 
 class ExpOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2138,7 +2150,7 @@ class ExpOp(multiplier.ir.llvm.Operation):
     ...
 
 class ExpectOp(multiplier.ir.llvm.Operation):
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2153,7 +2165,7 @@ class ExpectOp(multiplier.ir.llvm.Operation):
     ...
 
 class ExpectWithProbabilityOp(multiplier.ir.llvm.Operation):
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2169,7 +2181,7 @@ class ExpectWithProbabilityOp(multiplier.ir.llvm.Operation):
 
 class FAbsOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2185,7 +2197,7 @@ class FAbsOp(multiplier.ir.llvm.Operation):
 
 class FCeilOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2201,7 +2213,7 @@ class FCeilOp(multiplier.ir.llvm.Operation):
 
 class FFloorOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2219,7 +2231,7 @@ class FMAOp(multiplier.ir.llvm.Operation):
   a: multiplier.ir.Value
   b: multiplier.ir.Value
   c: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2237,7 +2249,7 @@ class FMulAddOp(multiplier.ir.llvm.Operation):
   a: multiplier.ir.Value
   b: multiplier.ir.Value
   c: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2253,7 +2265,7 @@ class FMulAddOp(multiplier.ir.llvm.Operation):
 
 class FTruncOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2271,7 +2283,7 @@ class FShlOp(multiplier.ir.llvm.Operation):
   a: multiplier.ir.Value
   b: multiplier.ir.Value
   c: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2289,7 +2301,7 @@ class FShrOp(multiplier.ir.llvm.Operation):
   a: multiplier.ir.Value
   b: multiplier.ir.Value
   c: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2304,7 +2316,7 @@ class FShrOp(multiplier.ir.llvm.Operation):
     ...
 
 class GetActiveLaneMaskOp(multiplier.ir.llvm.Operation):
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2349,7 +2361,7 @@ class InvariantStartOp(multiplier.ir.llvm.Operation):
     ...
 
 class IsConstantOp(multiplier.ir.llvm.Operation):
-  val: multiplier.ir.Value
+  value: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2365,7 +2377,7 @@ class IsConstantOp(multiplier.ir.llvm.Operation):
 
 class IsFPClassOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
   bit: int
 
   @staticmethod
@@ -2411,8 +2423,8 @@ class LifetimeStartOp(multiplier.ir.llvm.Operation):
     ...
 
 class RoundAndCastToLongLongOp(multiplier.ir.llvm.Operation):
-  val: multiplier.ir.Value
-  res: multiplier.ir.Value
+  value: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2427,8 +2439,8 @@ class RoundAndCastToLongLongOp(multiplier.ir.llvm.Operation):
     ...
 
 class RoundAndCastToNearestLongLongOp(multiplier.ir.llvm.Operation):
-  val: multiplier.ir.Value
-  res: multiplier.ir.Value
+  value: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2444,7 +2456,7 @@ class RoundAndCastToNearestLongLongOp(multiplier.ir.llvm.Operation):
 
 class Log10Op(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2460,7 +2472,7 @@ class Log10Op(multiplier.ir.llvm.Operation):
 
 class Log2Op(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2476,7 +2488,7 @@ class Log2Op(multiplier.ir.llvm.Operation):
 
 class LogOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2491,8 +2503,8 @@ class LogOp(multiplier.ir.llvm.Operation):
     ...
 
 class RoundAndCastToLongOp(multiplier.ir.llvm.Operation):
-  val: multiplier.ir.Value
-  res: multiplier.ir.Value
+  value: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2507,8 +2519,8 @@ class RoundAndCastToLongOp(multiplier.ir.llvm.Operation):
     ...
 
 class RoundAndCastToNearestLongOp(multiplier.ir.llvm.Operation):
-  val: multiplier.ir.Value
-  res: multiplier.ir.Value
+  value: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2524,7 +2536,8 @@ class RoundAndCastToNearestLongOp(multiplier.ir.llvm.Operation):
 
 class MaskedLoadOp(multiplier.ir.llvm.Operation):
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  pass_thru: Iterable[multiplier.ir.Operand]
+  result: multiplier.ir.Value
   alignment: int
 
   @staticmethod
@@ -2557,7 +2570,7 @@ class MaskedStoreOp(multiplier.ir.llvm.Operation):
     ...
 
 class MatrixColumnMajorLoadOp(multiplier.ir.llvm.Operation):
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
   is_volatile: bool
   rows: int
   columns: int
@@ -2593,9 +2606,9 @@ class MatrixColumnMajorStoreOp(multiplier.ir.llvm.Operation):
     ...
 
 class MatrixMultiplyOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
-  res: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
+  result: multiplier.ir.Value
   lhs_rows: int
   lhs_columns: int
   rhs_columns: int
@@ -2614,7 +2627,7 @@ class MatrixMultiplyOp(multiplier.ir.llvm.Operation):
 
 class MatrixTransposeOp(multiplier.ir.llvm.Operation):
   matrix: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
   rows: int
   columns: int
 
@@ -2633,7 +2646,7 @@ class MatrixTransposeOp(multiplier.ir.llvm.Operation):
 class MaxNumOp(multiplier.ir.llvm.Operation):
   a: multiplier.ir.Value
   b: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2650,7 +2663,7 @@ class MaxNumOp(multiplier.ir.llvm.Operation):
 class MaximumOp(multiplier.ir.llvm.Operation):
   a: multiplier.ir.Value
   b: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2727,7 +2740,7 @@ class MemsetOp(multiplier.ir.llvm.Operation):
 class MinNumOp(multiplier.ir.llvm.Operation):
   a: multiplier.ir.Value
   b: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2744,7 +2757,7 @@ class MinNumOp(multiplier.ir.llvm.Operation):
 class MinimumOp(multiplier.ir.llvm.Operation):
   a: multiplier.ir.Value
   b: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2760,7 +2773,7 @@ class MinimumOp(multiplier.ir.llvm.Operation):
 
 class RoundToNearbyIntOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2789,8 +2802,8 @@ class NoAliasScopeDeclOp(multiplier.ir.llvm.Operation):
     ...
 
 class PowIOp(multiplier.ir.llvm.Operation):
-  val: multiplier.ir.Value
-  res: multiplier.ir.Value
+  value: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2807,7 +2820,7 @@ class PowIOp(multiplier.ir.llvm.Operation):
 class FPowOp(multiplier.ir.llvm.Operation):
   a: multiplier.ir.Value
   b: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2854,7 +2867,7 @@ class PtrAnnotationOp(multiplier.ir.llvm.Operation):
 
 class RoundToIntOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2870,7 +2883,7 @@ class RoundToIntOp(multiplier.ir.llvm.Operation):
 
 class RoundToNearestEvenOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2886,7 +2899,7 @@ class RoundToNearestEvenOp(multiplier.ir.llvm.Operation):
 
 class RoundToNearestOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2903,7 +2916,7 @@ class RoundToNearestOp(multiplier.ir.llvm.Operation):
 class SAddSatOp(multiplier.ir.llvm.Operation):
   a: multiplier.ir.Value
   b: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2918,7 +2931,7 @@ class SAddSatOp(multiplier.ir.llvm.Operation):
     ...
 
 class SAddWithOverflowOp(multiplier.ir.llvm.Operation):
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2935,7 +2948,7 @@ class SAddWithOverflowOp(multiplier.ir.llvm.Operation):
 class SMaxOp(multiplier.ir.llvm.Operation):
   a: multiplier.ir.Value
   b: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2952,7 +2965,7 @@ class SMaxOp(multiplier.ir.llvm.Operation):
 class SMinOp(multiplier.ir.llvm.Operation):
   a: multiplier.ir.Value
   b: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2967,7 +2980,7 @@ class SMinOp(multiplier.ir.llvm.Operation):
     ...
 
 class SMulWithOverflowOp(multiplier.ir.llvm.Operation):
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -2983,7 +2996,7 @@ class SMulWithOverflowOp(multiplier.ir.llvm.Operation):
 
 class SSACopyOp(multiplier.ir.llvm.Operation):
   operand: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3000,7 +3013,7 @@ class SSACopyOp(multiplier.ir.llvm.Operation):
 class SShlSatOp(multiplier.ir.llvm.Operation):
   a: multiplier.ir.Value
   b: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3017,7 +3030,7 @@ class SShlSatOp(multiplier.ir.llvm.Operation):
 class SSubSatOp(multiplier.ir.llvm.Operation):
   a: multiplier.ir.Value
   b: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3032,7 +3045,7 @@ class SSubSatOp(multiplier.ir.llvm.Operation):
     ...
 
 class SSubWithOverflowOp(multiplier.ir.llvm.Operation):
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3048,7 +3061,7 @@ class SSubWithOverflowOp(multiplier.ir.llvm.Operation):
 
 class SinOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3064,7 +3077,7 @@ class SinOp(multiplier.ir.llvm.Operation):
 
 class SqrtOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3093,7 +3106,7 @@ class StackRestoreOp(multiplier.ir.llvm.Operation):
     ...
 
 class StackSaveOp(multiplier.ir.llvm.Operation):
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3108,7 +3121,7 @@ class StackSaveOp(multiplier.ir.llvm.Operation):
     ...
 
 class StepVectorOp(multiplier.ir.llvm.Operation):
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3123,7 +3136,7 @@ class StepVectorOp(multiplier.ir.llvm.Operation):
     ...
 
 class ThreadLocalAddressOp(multiplier.ir.llvm.Operation):
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3154,7 +3167,7 @@ class TrapOp(multiplier.ir.llvm.Operation):
 class UAddSatOp(multiplier.ir.llvm.Operation):
   a: multiplier.ir.Value
   b: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3169,7 +3182,7 @@ class UAddSatOp(multiplier.ir.llvm.Operation):
     ...
 
 class UAddWithOverflowOp(multiplier.ir.llvm.Operation):
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3201,7 +3214,7 @@ class UBSanTrapOp(multiplier.ir.llvm.Operation):
 class UMaxOp(multiplier.ir.llvm.Operation):
   a: multiplier.ir.Value
   b: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3218,7 +3231,7 @@ class UMaxOp(multiplier.ir.llvm.Operation):
 class UMinOp(multiplier.ir.llvm.Operation):
   a: multiplier.ir.Value
   b: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3233,7 +3246,7 @@ class UMinOp(multiplier.ir.llvm.Operation):
     ...
 
 class UMulWithOverflowOp(multiplier.ir.llvm.Operation):
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3250,7 +3263,7 @@ class UMulWithOverflowOp(multiplier.ir.llvm.Operation):
 class UShlSatOp(multiplier.ir.llvm.Operation):
   a: multiplier.ir.Value
   b: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3267,7 +3280,7 @@ class UShlSatOp(multiplier.ir.llvm.Operation):
 class USubSatOp(multiplier.ir.llvm.Operation):
   a: multiplier.ir.Value
   b: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3282,7 +3295,7 @@ class USubSatOp(multiplier.ir.llvm.Operation):
     ...
 
 class USubWithOverflowOp(multiplier.ir.llvm.Operation):
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3297,10 +3310,10 @@ class USubWithOverflowOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPAShrOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3315,10 +3328,10 @@ class VPAShrOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPAddOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3333,10 +3346,10 @@ class VPAddOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPAndOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3351,10 +3364,10 @@ class VPAndOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPFAddOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3369,10 +3382,10 @@ class VPFAddOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPFDivOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3391,7 +3404,7 @@ class VPFMulAddOp(multiplier.ir.llvm.Operation):
   op2: multiplier.ir.Value
   op3: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3406,10 +3419,10 @@ class VPFMulAddOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPFMulOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3426,7 +3439,7 @@ class VPFMulOp(multiplier.ir.llvm.Operation):
 class VPFNegOp(multiplier.ir.llvm.Operation):
   op: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3441,9 +3454,9 @@ class VPFNegOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPFPExtOp(multiplier.ir.llvm.Operation):
-  src: multiplier.ir.Value
+  source: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3458,9 +3471,9 @@ class VPFPExtOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPFPToSIOp(multiplier.ir.llvm.Operation):
-  src: multiplier.ir.Value
+  source: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3475,9 +3488,9 @@ class VPFPToSIOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPFPToUIOp(multiplier.ir.llvm.Operation):
-  src: multiplier.ir.Value
+  source: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3492,9 +3505,9 @@ class VPFPToUIOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPFPTruncOp(multiplier.ir.llvm.Operation):
-  src: multiplier.ir.Value
+  source: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3509,10 +3522,10 @@ class VPFPTruncOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPFRemOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3527,10 +3540,10 @@ class VPFRemOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPFSubOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3549,7 +3562,7 @@ class VPFmaOp(multiplier.ir.llvm.Operation):
   op2: multiplier.ir.Value
   op3: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3564,9 +3577,9 @@ class VPFmaOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPIntToPtrOp(multiplier.ir.llvm.Operation):
-  src: multiplier.ir.Value
+  source: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3581,10 +3594,10 @@ class VPIntToPtrOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPLShrOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3600,7 +3613,7 @@ class VPLShrOp(multiplier.ir.llvm.Operation):
 
 class VPLoadOp(multiplier.ir.llvm.Operation):
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3618,7 +3631,7 @@ class VPMergeMinOp(multiplier.ir.llvm.Operation):
   cond: multiplier.ir.Value
   true_val: multiplier.ir.Value
   false_val: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3633,10 +3646,10 @@ class VPMergeMinOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPMulOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3651,10 +3664,10 @@ class VPMulOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPOrOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3669,9 +3682,9 @@ class VPOrOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPPtrToIntOp(multiplier.ir.llvm.Operation):
-  src: multiplier.ir.Value
+  source: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3686,9 +3699,9 @@ class VPPtrToIntOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPReduceAddOp(multiplier.ir.llvm.Operation):
-  val: multiplier.ir.Value
+  value: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3703,9 +3716,9 @@ class VPReduceAddOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPReduceAndOp(multiplier.ir.llvm.Operation):
-  val: multiplier.ir.Value
+  value: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3720,9 +3733,9 @@ class VPReduceAndOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPReduceFAddOp(multiplier.ir.llvm.Operation):
-  val: multiplier.ir.Value
+  value: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3737,9 +3750,9 @@ class VPReduceFAddOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPReduceFMaxOp(multiplier.ir.llvm.Operation):
-  val: multiplier.ir.Value
+  value: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3754,9 +3767,9 @@ class VPReduceFMaxOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPReduceFMinOp(multiplier.ir.llvm.Operation):
-  val: multiplier.ir.Value
+  value: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3771,9 +3784,9 @@ class VPReduceFMinOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPReduceFMulOp(multiplier.ir.llvm.Operation):
-  val: multiplier.ir.Value
+  value: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3788,9 +3801,9 @@ class VPReduceFMulOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPReduceMulOp(multiplier.ir.llvm.Operation):
-  val: multiplier.ir.Value
+  value: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3805,9 +3818,9 @@ class VPReduceMulOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPReduceOrOp(multiplier.ir.llvm.Operation):
-  val: multiplier.ir.Value
+  value: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3822,9 +3835,9 @@ class VPReduceOrOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPReduceSMaxOp(multiplier.ir.llvm.Operation):
-  val: multiplier.ir.Value
+  value: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3839,9 +3852,9 @@ class VPReduceSMaxOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPReduceSMinOp(multiplier.ir.llvm.Operation):
-  val: multiplier.ir.Value
+  value: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3856,9 +3869,9 @@ class VPReduceSMinOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPReduceUMaxOp(multiplier.ir.llvm.Operation):
-  val: multiplier.ir.Value
+  value: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3873,9 +3886,9 @@ class VPReduceUMaxOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPReduceUMinOp(multiplier.ir.llvm.Operation):
-  val: multiplier.ir.Value
+  value: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3890,9 +3903,9 @@ class VPReduceUMinOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPReduceXorOp(multiplier.ir.llvm.Operation):
-  val: multiplier.ir.Value
+  value: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3907,10 +3920,10 @@ class VPReduceXorOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPSDivOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3925,9 +3938,9 @@ class VPSDivOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPSExtOp(multiplier.ir.llvm.Operation):
-  src: multiplier.ir.Value
+  source: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3942,9 +3955,9 @@ class VPSExtOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPSIToFPOp(multiplier.ir.llvm.Operation):
-  src: multiplier.ir.Value
+  source: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3959,10 +3972,10 @@ class VPSIToFPOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPSRemOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3980,7 +3993,7 @@ class VPSelectMinOp(multiplier.ir.llvm.Operation):
   cond: multiplier.ir.Value
   true_val: multiplier.ir.Value
   false_val: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -3995,10 +4008,10 @@ class VPSelectMinOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPShlOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -4013,7 +4026,7 @@ class VPShlOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPStoreOp(multiplier.ir.llvm.Operation):
-  val: multiplier.ir.Value
+  value: multiplier.ir.Value
   mask: multiplier.ir.Value
 
   @staticmethod
@@ -4030,7 +4043,7 @@ class VPStoreOp(multiplier.ir.llvm.Operation):
 
 class VPStridedLoadOp(multiplier.ir.llvm.Operation):
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -4045,7 +4058,7 @@ class VPStridedLoadOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPStridedStoreOp(multiplier.ir.llvm.Operation):
-  val: multiplier.ir.Value
+  value: multiplier.ir.Value
   mask: multiplier.ir.Value
 
   @staticmethod
@@ -4061,10 +4074,10 @@ class VPStridedStoreOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPSubOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -4079,9 +4092,9 @@ class VPSubOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPTruncOp(multiplier.ir.llvm.Operation):
-  src: multiplier.ir.Value
+  source: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -4096,10 +4109,10 @@ class VPTruncOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPUDivOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -4114,9 +4127,9 @@ class VPUDivOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPUIToFPOp(multiplier.ir.llvm.Operation):
-  src: multiplier.ir.Value
+  source: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -4131,10 +4144,10 @@ class VPUIToFPOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPURemOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -4149,10 +4162,10 @@ class VPURemOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPXorOp(multiplier.ir.llvm.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -4167,9 +4180,9 @@ class VPXorOp(multiplier.ir.llvm.Operation):
     ...
 
 class VPZExtOp(multiplier.ir.llvm.Operation):
-  src: multiplier.ir.Value
+  source: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -4254,7 +4267,7 @@ class MaskedCompressStoreOp(multiplier.ir.llvm.Operation):
     ...
 
 class MaskedExpandLoadOp(multiplier.ir.llvm.Operation):
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -4271,7 +4284,8 @@ class MaskedExpandLoadOp(multiplier.ir.llvm.Operation):
 class MaskedGatherOp(multiplier.ir.llvm.Operation):
   ptrs: multiplier.ir.Value
   mask: multiplier.ir.Value
-  res: multiplier.ir.Value
+  pass_thru: Iterable[multiplier.ir.Operand]
+  result: multiplier.ir.Value
   alignment: int
 
   @staticmethod
@@ -4306,7 +4320,7 @@ class MaskedScatterOp(multiplier.ir.llvm.Operation):
 
 class VectorExtractOp(multiplier.ir.llvm.Operation):
   srcvec: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
   pos: int
   src_vector_bit_width: int
   res_vector_bit_width: int
@@ -4326,7 +4340,7 @@ class VectorExtractOp(multiplier.ir.llvm.Operation):
 class VectorInsertOp(multiplier.ir.llvm.Operation):
   dstvec: multiplier.ir.Value
   srcvec: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
   pos: int
   src_vector_bit_width: int
   dst_vector_bit_width: int
@@ -4345,7 +4359,7 @@ class VectorInsertOp(multiplier.ir.llvm.Operation):
 
 class VectorReduceAddOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -4361,7 +4375,7 @@ class VectorReduceAddOp(multiplier.ir.llvm.Operation):
 
 class VectorReduceAndOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -4377,7 +4391,7 @@ class VectorReduceAndOp(multiplier.ir.llvm.Operation):
 
 class VectorReduceFAddOp(multiplier.ir.llvm.Operation):
   input: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -4393,7 +4407,7 @@ class VectorReduceFAddOp(multiplier.ir.llvm.Operation):
 
 class VectorReduceFMaxOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -4409,7 +4423,7 @@ class VectorReduceFMaxOp(multiplier.ir.llvm.Operation):
 
 class VectorReduceFMaximumOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -4425,7 +4439,7 @@ class VectorReduceFMaximumOp(multiplier.ir.llvm.Operation):
 
 class VectorReduceFMinOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -4441,7 +4455,7 @@ class VectorReduceFMinOp(multiplier.ir.llvm.Operation):
 
 class VectorReduceFMinimumOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -4457,7 +4471,7 @@ class VectorReduceFMinimumOp(multiplier.ir.llvm.Operation):
 
 class VectorReduceFMulOp(multiplier.ir.llvm.Operation):
   input: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -4473,7 +4487,7 @@ class VectorReduceFMulOp(multiplier.ir.llvm.Operation):
 
 class VectorReduceMulOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -4489,7 +4503,7 @@ class VectorReduceMulOp(multiplier.ir.llvm.Operation):
 
 class VectorReduceOrOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -4505,7 +4519,7 @@ class VectorReduceOrOp(multiplier.ir.llvm.Operation):
 
 class VectorReduceSMaxOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -4521,7 +4535,7 @@ class VectorReduceSMaxOp(multiplier.ir.llvm.Operation):
 
 class VectorReduceSMinOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -4537,7 +4551,7 @@ class VectorReduceSMinOp(multiplier.ir.llvm.Operation):
 
 class VectorReduceUMaxOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -4553,7 +4567,7 @@ class VectorReduceUMaxOp(multiplier.ir.llvm.Operation):
 
 class VectorReduceUMinOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -4569,7 +4583,7 @@ class VectorReduceUMinOp(multiplier.ir.llvm.Operation):
 
 class VectorReduceXorOp(multiplier.ir.llvm.Operation):
   IN: multiplier.ir.Value
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -4584,7 +4598,7 @@ class VectorReduceXorOp(multiplier.ir.llvm.Operation):
     ...
 
 class VScaleOp(multiplier.ir.llvm.Operation):
-  res: multiplier.ir.Value
+  result: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -4618,6 +4632,7 @@ class ArrayType(multiplier.ir.llvm.Type):
 class FunctionType(multiplier.ir.llvm.Type):
   is_var_arg: bool
   num_params: int
+  params: Iterable[multiplier.ir.Type]
   var_arg: bool
 
   @staticmethod
@@ -4664,6 +4679,7 @@ class ScalableVectorType(multiplier.ir.llvm.Type):
 class TargetExtType(multiplier.ir.llvm.Type):
   supports_mem_ops: bool
   ext_type_name: str
+  type_params: Iterable[multiplier.ir.Type]
 
   @staticmethod
   def static_kind() -> multiplier.ir.TypeKind:

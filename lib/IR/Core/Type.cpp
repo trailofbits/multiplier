@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -45,6 +44,26 @@ unsigned int FunctionType::num_inputs(void) const {
 unsigned int FunctionType::num_results(void) const {
   auto val = underlying_repr().getNumResults();
   return val;
+}
+
+gap::generator<::mx::ir::Type> FunctionType::inputs(void) const & {
+  auto range = underlying_repr().getInputs();
+  for (auto el_ty : range) {
+    co_yield ::mx::ir::Type(
+        el_ty.getContext(),
+        reinterpret_cast<const mlir::TypeStorage *>(
+            el_ty.getAsOpaquePointer()));
+  }
+}
+
+gap::generator<::mx::ir::Type> FunctionType::results(void) const & {
+  auto range = underlying_repr().getResults();
+  for (auto el_ty : range) {
+    co_yield ::mx::ir::Type(
+        el_ty.getContext(),
+        reinterpret_cast<const mlir::TypeStorage *>(
+            el_ty.getAsOpaquePointer()));
+  }
 }
 
 bool FunctionType::var_arg(void) const {

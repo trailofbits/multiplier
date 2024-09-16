@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -73,7 +72,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1269]) || tp >= &(gTypes[1270])) {
+  if (tp < &(gTypes[1277]) || tp >= &(gTypes[1278])) {
     return std::nullopt;
   }
 
@@ -90,7 +89,7 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::ir::memref::ReinterpretCastOp::static_kind():
-      tp = &(gTypes[1269]);
+      tp = &(gTypes[1277]);
       break;
 
   }
@@ -124,6 +123,46 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
 namespace {
 static PyGetSetDef gProperties[] = {
+  {
+    "offsets",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::offsets);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::memref::ReinterpretCastOp::offsets"),
+    nullptr,
+  },
+  {
+    "sizes",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::sizes);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::memref::ReinterpretCastOp::sizes"),
+    nullptr,
+  },
+  {
+    "strides",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::strides);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::memref::ReinterpretCastOp::strides"),
+    nullptr,
+  },
+  {
+    "dynamic_sizes",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::dynamic_sizes);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::memref::ReinterpretCastOp::dynamic_sizes"),
+    nullptr,
+  },
   {
     "result_rank",
     reinterpret_cast<getter>(
@@ -216,7 +255,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1269]);
+  PyTypeObject * const tp = &(gTypes[1277]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -231,12 +270,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[1243].tp_hash;
-  tp->tp_richcompare = gTypes[1243].tp_richcompare;
+  tp->tp_hash = gTypes[1251].tp_hash;
+  tp->tp_richcompare = gTypes[1251].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[1243]);
+  tp->tp_base = &(gTypes[1251]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

@@ -1,12 +1,11 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
 // Auto-generated file; do not modify!
 
-#include <multiplier/IR/HighLevel/Operation.h>
+#include <multiplier/IR/HighLevel/Attribute.h>
 
 #include <multiplier/AST.h>
 #include <multiplier/Fragment.h>
@@ -27,7 +26,7 @@
 #pragma GCC diagnostic ignored "-Wc99-extensions"
 #pragma GCC diagnostic ignored "-Wunused-function"
 namespace {
-using T = mx::ir::hl::SkipStmtOp;
+using T = mx::ir::hl::ErrorAttr;
 
 struct O final : public ::PyObject {
 
@@ -73,7 +72,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1377]) || tp >= &(gTypes[1378])) {
+  if (tp < &(gTypes[943]) || tp >= &(gTypes[944])) {
     return std::nullopt;
   }
 
@@ -89,8 +88,8 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       tp = gType;
       break;
 
-    case mx::ir::hl::SkipStmtOp::static_kind():
-      tp = &(gTypes[1377]);
+    case mx::ir::hl::ErrorAttr::static_kind():
+      tp = &(gTypes[943]);
       break;
 
   }
@@ -115,7 +114,7 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
   }
 
   auto tp_obj = reinterpret_cast<BorrowedPyObject *>(gType);
-  if (0 != PyModule_AddObjectRef(module, "SkipStmtOp", tp_obj)) {
+  if (0 != PyModule_AddObjectRef(module, "ErrorAttr", tp_obj)) {
     return false;
   }
 
@@ -145,7 +144,7 @@ static PyMethodDef gMethods[] = {
           return nullptr;
         }),
     METH_FASTCALL | METH_STATIC,
-    PyDoc_STR("Wrapper for mx::ir::hl::SkipStmtOp::static_kind"),
+    PyDoc_STR("Wrapper for mx::ir::hl::ErrorAttr::static_kind"),
   },
   {
     "FROM",
@@ -153,7 +152,7 @@ static PyMethodDef gMethods[] = {
         +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
           (void) args;
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::ir::Operation>(args[0]);
+            auto arg_0 = ::mx::from_python<mx::ir::Attribute>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -166,28 +165,7 @@ static PyMethodDef gMethods[] = {
           return nullptr;
         }),
     METH_FASTCALL | METH_STATIC,
-    PyDoc_STR("Wrapper for mx::ir::hl::SkipStmtOp::from"),
-  },
-  {
-    "producing",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          (void) args;
-          while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::ir::Value>(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(T::producing(arg_0.value()));
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'producing'";
-          return nullptr;
-        }),
-    METH_FASTCALL | METH_STATIC,
-    PyDoc_STR("Wrapper for mx::ir::hl::SkipStmtOp::producing"),
+    PyDoc_STR("Wrapper for mx::ir::hl::ErrorAttr::from"),
   },
   {}  // Sentinel.
 };
@@ -196,7 +174,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1377]);
+  PyTypeObject * const tp = &(gTypes[943]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -205,28 +183,28 @@ PyTypeObject *InitType(void) noexcept {
     }
     PyObject_Free(obj);
   };
-  tp->tp_name = "multiplier.ir.highlevel.SkipStmtOp";
+  tp->tp_name = "multiplier.ir.highlevel.ErrorAttr";
   tp->tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_DISALLOW_INSTANTIATION;
-  tp->tp_doc = PyDoc_STR("Wrapper for mx::ir::hl::::SkipStmtOp");
+  tp->tp_doc = PyDoc_STR("Wrapper for mx::ir::hl::::ErrorAttr");
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[1307].tp_hash;
-  tp->tp_richcompare = gTypes[1307].tp_richcompare;
+  tp->tp_hash = gTypes[938].tp_hash;
+  tp->tp_richcompare = gTypes[938].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[1307]);
+  tp->tp_base = &(gTypes[938]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)
-          << "'SkipStmtOp.__init__' does not take any keyword arguments";
+          << "'ErrorAttr.__init__' does not take any keyword arguments";
       return -1;
     }
 
     if (!args || !PySequence_Check(args)) {
       PyErrorStreamer(PyExc_TypeError)
-          << "Invalid positional arguments passed to 'SkipStmtOp.__init__'";
+          << "Invalid positional arguments passed to 'ErrorAttr.__init__'";
       return -1;
     }
 
@@ -236,7 +214,7 @@ PyTypeObject *InitType(void) noexcept {
     (void) obj;
     (void) num_args;
     PyErrorStreamer(PyExc_TypeError)
-        << "Class 'SkipStmtOp' cannot be directly instantiated";
+        << "Class 'ErrorAttr' cannot be directly instantiated";
     return -1;
 
   };

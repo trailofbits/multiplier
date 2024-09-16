@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -55,6 +54,16 @@ bool FunctionType::is_var_arg(void) const {
 unsigned int FunctionType::num_params(void) const {
   auto val = underlying_repr().getNumParams();
   return val;
+}
+
+gap::generator<::mx::ir::Type> FunctionType::params(void) const & {
+  auto range = underlying_repr().getParams();
+  for (auto el_ty : range) {
+    co_yield ::mx::ir::Type(
+        el_ty.getContext(),
+        reinterpret_cast<const mlir::TypeStorage *>(
+            el_ty.getAsOpaquePointer()));
+  }
 }
 
 bool FunctionType::var_arg(void) const {
@@ -132,6 +141,16 @@ std::string_view TargetExtType::ext_type_name(void) const {
     return std::string_view(val.data(), size);
   } else {
     return {};
+  }
+}
+
+gap::generator<::mx::ir::Type> TargetExtType::type_params(void) const & {
+  auto range = underlying_repr().getTypeParams();
+  for (auto el_ty : range) {
+    co_yield ::mx::ir::Type(
+        el_ty.getContext(),
+        reinterpret_cast<const mlir::TypeStorage *>(
+            el_ty.getAsOpaquePointer()));
   }
 }
 

@@ -1,6 +1,5 @@
 #
 # Copyright (c) 2023-present, Trail of Bits, Inc.
-# All rights reserved.
 #
 # This source code is licensed in accordance with the terms specified in
 # the LICENSE file found in the root directory of this source tree.
@@ -17335,7 +17334,7 @@ class AllocAlignAttr(multiplier.ast.InheritableAttr):
     ...
 
 class AlignedAttr(multiplier.ast.InheritableAttr):
-  alignment: int
+  alignment: Optional[int]
   alignment_expression: Optional[multiplier.ast.Expr]
   alignment_type: Optional[multiplier.ast.Type]
   cached_alignment_value: Optional[int]

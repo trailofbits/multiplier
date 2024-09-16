@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -35,9 +34,8 @@ class MX_EXPORT ModuleOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Region body_region(void) const;
-  std::optional<std::string_view> sym_name(void) const;
-  std::optional<std::string_view> sym_visibility(void) const;
   std::optional<std::string_view> name(void) const;
+  std::optional<std::string_view> visibility(void) const;
   bool is_optional_symbol(void) const;
   //DataLayoutSpecInterface data_layout_spec(void) const;
   std::string_view default_dialect(void) const;
@@ -56,8 +54,8 @@ class MX_EXPORT UnrealizedConversionCastOp final : public Operation {
   ::mlir::UnrealizedConversionCastOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range inputs(void) const;
-  //::mlir::Operation::result_range outputs(void) const;
+  gap::generator<::mx::ir::Operand> inputs(void) const &;
+  gap::generator<::mx::ir::Result> outputs(void) const &;
 };
 static_assert(sizeof(UnrealizedConversionCastOp) == sizeof(Operation));
 

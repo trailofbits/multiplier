@@ -1,5 +1,4 @@
 // Copyright (c) 2022-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -2415,7 +2414,13 @@ void SerializeAlignedAttr(const PendingFragment &pf, const EntityMapper &es, mx:
   (void) b;
   (void) e;
   SerializeInheritableAttr(pf, es, b, e, nullptr);
-  b.setVal12(e.Alignment());
+  auto v12 = e.Alignment();
+  if (v12) {
+    b.setVal12(static_cast<uint32_t>(v12.value()));
+    b.setVal15(true);
+  } else {
+    b.setVal15(false);
+  }
   auto v10 = e.AlignmentExpression();
   if (v10) {
     auto id10 = es.EntityId(v10.value());
@@ -2433,18 +2438,18 @@ void SerializeAlignedAttr(const PendingFragment &pf, const EntityMapper &es, mx:
   auto v25 = e.CachedAlignmentValue();
   if (v25) {
     b.setVal25(static_cast<uint32_t>(v25.value()));
-    b.setVal15(true);
+    b.setVal16(true);
   } else {
-    b.setVal15(false);
+    b.setVal16(false);
   }
   b.setVal13(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
-  b.setVal16(e.IsAlignas());
-  b.setVal17(e.IsAlignmentDependent());
-  b.setVal18(e.IsAlignmentErrorDependent());
-  b.setVal19(e.IsAlignmentExpression());
-  b.setVal29(e.IsC11());
-  b.setVal30(e.IsDeclspec());
-  b.setVal31(e.IsGNU());
+  b.setVal17(e.IsAlignas());
+  b.setVal18(e.IsAlignmentDependent());
+  b.setVal19(e.IsAlignmentErrorDependent());
+  b.setVal29(e.IsAlignmentExpression());
+  b.setVal30(e.IsC11());
+  b.setVal31(e.IsDeclspec());
+  b.setVal32(e.IsGNU());
 }
 
 void SerializeAlignNaturalAttr(const PendingFragment &pf, const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AlignNaturalAttr &e, const TokenTree *) {

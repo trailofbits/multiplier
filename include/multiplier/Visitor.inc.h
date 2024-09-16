@@ -1,5 +1,4 @@
 // Copyright (c) 2022-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -9927,18 +9926,18 @@ MX_END_VISIT_ATTR(AllocAlignAttr)
 MX_BEGIN_VISIT_ATTR(AlignedAttr)
   MX_ENTER_VISIT_AlignedAttr
   MX_VISIT_BASE(AlignedAttr, InheritableAttr)
-  MX_VISIT_INT(AlignedAttr, alignment, 12, MX_APPLY_METHOD, Alignment, uint32_t, NthAttr)
+  MX_VISIT_OPTIONAL_INT(AlignedAttr, alignment, 12, MX_APPLY_METHOD, Alignment, , NthAttr)
   MX_VISIT_OPTIONAL_ENTITY(AlignedAttr, alignment_expression, 10, MX_APPLY_METHOD, AlignmentExpression, Expr, NthAttr)
   MX_VISIT_OPTIONAL_ENTITY(AlignedAttr, alignment_type, 23, MX_APPLY_METHOD, AlignmentType, Type, NthAttr)
   MX_VISIT_OPTIONAL_INT(AlignedAttr, cached_alignment_value, 25, MX_APPLY_METHOD, CachedAlignmentValue, , NthAttr)
   MX_VISIT_ENUM(AlignedAttr, semantic_spelling, 13, MX_APPLY_METHOD, SemanticSpelling, AlignedAttrSpelling, NthAttr)
-  MX_VISIT_BOOL(AlignedAttr, is_alignas, 16, MX_APPLY_METHOD, IsAlignas, bool, NthAttr)
-  MX_VISIT_BOOL(AlignedAttr, is_alignment_dependent, 17, MX_APPLY_METHOD, IsAlignmentDependent, bool, NthAttr)
-  MX_VISIT_BOOL(AlignedAttr, is_alignment_error_dependent, 18, MX_APPLY_METHOD, IsAlignmentErrorDependent, bool, NthAttr)
-  MX_VISIT_BOOL(AlignedAttr, is_alignment_expression, 19, MX_APPLY_METHOD, IsAlignmentExpression, bool, NthAttr)
-  MX_VISIT_BOOL(AlignedAttr, is_c11, 29, MX_APPLY_METHOD, IsC11, bool, NthAttr)
-  MX_VISIT_BOOL(AlignedAttr, is_declspec, 30, MX_APPLY_METHOD, IsDeclspec, bool, NthAttr)
-  MX_VISIT_BOOL(AlignedAttr, is_gnu, 31, MX_APPLY_METHOD, IsGNU, bool, NthAttr)
+  MX_VISIT_BOOL(AlignedAttr, is_alignas, 17, MX_APPLY_METHOD, IsAlignas, bool, NthAttr)
+  MX_VISIT_BOOL(AlignedAttr, is_alignment_dependent, 18, MX_APPLY_METHOD, IsAlignmentDependent, bool, NthAttr)
+  MX_VISIT_BOOL(AlignedAttr, is_alignment_error_dependent, 19, MX_APPLY_METHOD, IsAlignmentErrorDependent, bool, NthAttr)
+  MX_VISIT_BOOL(AlignedAttr, is_alignment_expression, 29, MX_APPLY_METHOD, IsAlignmentExpression, bool, NthAttr)
+  MX_VISIT_BOOL(AlignedAttr, is_c11, 30, MX_APPLY_METHOD, IsC11, bool, NthAttr)
+  MX_VISIT_BOOL(AlignedAttr, is_declspec, 31, MX_APPLY_METHOD, IsDeclspec, bool, NthAttr)
+  MX_VISIT_BOOL(AlignedAttr, is_gnu, 32, MX_APPLY_METHOD, IsGNU, bool, NthAttr)
   MX_EXIT_VISIT_AlignedAttr
 MX_END_VISIT_ATTR(AlignedAttr)
 

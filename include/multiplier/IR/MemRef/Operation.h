@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -82,7 +81,7 @@ class MX_EXPORT AtomicRMWOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value value(void) const;
   //::mlir::TypedValue<MemRefType> memref(void) const;
-  //::mlir::Operation::operand_range indices(void) const;
+  gap::generator<::mx::ir::Operand> indices(void) const &;
   ::mx::ir::Value result(void) const;
   //::mlir::arith::AtomicRMWKind kind(void) const;
   //MemRefType mem_ref_type(void) const;
@@ -135,7 +134,7 @@ class MX_EXPORT GenericAtomicRMWOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<MemRefType> memref(void) const;
-  //::mlir::Operation::operand_range indices(void) const;
+  gap::generator<::mx::ir::Operand> indices(void) const &;
   ::mx::ir::Value result(void) const;
   ::mx::ir::Region atomic_body(void) const;
   //Region & body(void) const;
@@ -157,7 +156,7 @@ class MX_EXPORT LoadOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<MemRefType> memref(void) const;
-  //::mlir::Operation::operand_range indices(void) const;
+  gap::generator<::mx::ir::Operand> indices(void) const &;
   ::mx::ir::Value result(void) const;
   bool nontemporal(void) const;
   //Value mem_ref(void) const;
@@ -177,8 +176,8 @@ class MX_EXPORT AllocOp final : public Operation {
   ::mlir::memref::AllocOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range dynamic_sizes(void) const;
-  //::mlir::Operation::operand_range symbol_operands(void) const;
+  gap::generator<::mx::ir::Operand> dynamic_sizes(void) const &;
+  gap::generator<::mx::ir::Operand> symbol_operands(void) const &;
   //::mlir::TypedValue<MemRefType> memref(void) const;
   std::optional<unsigned long long> alignment(void) const;
   //StringRef alignment_attr_str_name(void) const;
@@ -199,8 +198,8 @@ class MX_EXPORT AllocaOp final : public Operation {
   ::mlir::memref::AllocaOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range dynamic_sizes(void) const;
-  //::mlir::Operation::operand_range symbol_operands(void) const;
+  gap::generator<::mx::ir::Operand> dynamic_sizes(void) const &;
+  gap::generator<::mx::ir::Operand> symbol_operands(void) const &;
   //::mlir::TypedValue<MemRefType> memref(void) const;
   std::optional<unsigned long long> alignment(void) const;
   //::llvm::SmallVector<MemorySlot, 3> promotable_slots(void) const;
@@ -223,7 +222,7 @@ class MX_EXPORT AllocaScopeOp final : public Operation {
   ::mlir::memref::AllocaScopeOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::result_range results(void) const;
+  gap::generator<::mx::ir::Result> results(void) const &;
   ::mx::ir::Region body_region(void) const;
 };
 static_assert(sizeof(AllocaScopeOp) == sizeof(Operation));
@@ -240,7 +239,7 @@ class MX_EXPORT AllocaScopeReturnOp final : public Operation {
   ::mlir::memref::AllocaScopeReturnOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range results(void) const;
+  gap::generator<::mx::ir::Operand> results(void) const &;
 };
 static_assert(sizeof(AllocaScopeReturnOp) == sizeof(Operation));
 
@@ -274,7 +273,7 @@ class MX_EXPORT CollapseShapeOp final : public Operation {
   ::mlir::memref::CollapseShapeOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<MemRefType> src(void) const;
+  //::mlir::TypedValue<MemRefType> source(void) const;
   //::mlir::TypedValue<MemRefType> result(void) const;
   //::mlir::ArrayAttr reassociation(void) const;
   //SmallVector<AffineMap, 4> reassociation_maps(void) const;
@@ -336,7 +335,7 @@ class MX_EXPORT DMAStartOp final : public Operation {
   ::mlir::memref::DmaStartOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range operands(void) const;
+  gap::generator<::mx::ir::Operand> operands(void) const &;
   //Value src_mem_ref(void) const;
   unsigned int src_mem_ref_rank(void) const;
   //operand_range src_indices(void) const;
@@ -371,7 +370,7 @@ class MX_EXPORT DMAWaitOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<MemRefType> tag_mem_ref(void) const;
-  //::mlir::Operation::operand_range tag_indices(void) const;
+  gap::generator<::mx::ir::Operand> tag_indices(void) const &;
   //::mlir::TypedValue<IndexType> num_elements(void) const;
   unsigned int tag_mem_ref_rank(void) const;
 };
@@ -389,7 +388,7 @@ class MX_EXPORT ExpandShapeOp final : public Operation {
   ::mlir::memref::ExpandShapeOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::TypedValue<MemRefType> src(void) const;
+  //::mlir::TypedValue<MemRefType> source(void) const;
   //::mlir::TypedValue<MemRefType> result(void) const;
   //::mlir::ArrayAttr reassociation(void) const;
   //SmallVector<AffineMap, 4> reassociation_maps(void) const;
@@ -433,8 +432,8 @@ class MX_EXPORT ExtractStridedMetadataOp final : public Operation {
   //::mlir::TypedValue<MemRefType> source(void) const;
   ::mx::ir::Value base_buffer(void) const;
   //::mlir::TypedValue<IndexType> offset(void) const;
-  //::mlir::Operation::result_range sizes(void) const;
-  //::mlir::Operation::result_range strides(void) const;
+  gap::generator<::mx::ir::Result> sizes(void) const &;
+  gap::generator<::mx::ir::Result> strides(void) const &;
   //SmallVector<OpFoldResult, 6> constified_mixed_sizes(void) const;
   //SmallVector<OpFoldResult, 6> constified_mixed_strides(void) const;
   //OpFoldResult constified_mixed_offset(void) const;
@@ -471,8 +470,8 @@ class MX_EXPORT GlobalOp final : public Operation {
   ::mlir::memref::GlobalOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  std::string_view sym_name(void) const;
-  std::optional<std::string_view> sym_visibility(void) const;
+  std::string_view name(void) const;
+  std::optional<std::string_view> visibility(void) const;
   //::mlir::MemRefType type(void) const;
   //::std::optional<Attribute> initial_value(void) const;
   bool constant(void) const;
@@ -514,7 +513,7 @@ class MX_EXPORT PrefetchOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<MemRefType> memref(void) const;
-  //::mlir::Operation::operand_range indices(void) const;
+  gap::generator<::mx::ir::Operand> indices(void) const &;
   bool is_write(void) const;
   uint32_t locality_hint(void) const;
   bool is_data_cache(void) const;
@@ -573,14 +572,14 @@ class MX_EXPORT ReinterpretCastOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<BaseMemRefType> source(void) const;
-  //::mlir::Operation::operand_range offsets(void) const;
-  //::mlir::Operation::operand_range sizes(void) const;
-  //::mlir::Operation::operand_range strides(void) const;
+  gap::generator<::mx::ir::Operand> offsets(void) const &;
+  gap::generator<::mx::ir::Operand> sizes(void) const &;
+  gap::generator<::mx::ir::Operand> strides(void) const &;
   //::mlir::TypedValue<MemRefType> result(void) const;
   //::llvm::ArrayRef<long long> static_offsets(void) const;
   //::llvm::ArrayRef<long long> static_sizes(void) const;
   //::llvm::ArrayRef<long long> static_strides(void) const;
-  //::mlir::Operation::operand_range dynamic_sizes(void) const;
+  gap::generator<::mx::ir::Operand> dynamic_sizes(void) const &;
   //MemRefType type(void) const;
   //Value view_source(void) const;
   unsigned int result_rank(void) const;
@@ -626,7 +625,7 @@ class MX_EXPORT StoreOp final : public Operation {
   // Imported methods:
   ::mx::ir::Value value(void) const;
   //::mlir::TypedValue<MemRefType> memref(void) const;
-  //::mlir::Operation::operand_range indices(void) const;
+  gap::generator<::mx::ir::Operand> indices(void) const &;
   bool nontemporal(void) const;
   //Value value_to_store(void) const;
   //Value mem_ref(void) const;
@@ -666,7 +665,7 @@ class MX_EXPORT ViewOp final : public Operation {
   // Imported methods:
   //::mlir::TypedValue<MemRefType> source(void) const;
   //::mlir::TypedValue<IndexType> byte_shift(void) const;
-  //::mlir::Operation::operand_range sizes(void) const;
+  gap::generator<::mx::ir::Operand> sizes(void) const &;
   ::mx::ir::Value view_source(void) const;
   //MemRefType type(void) const;
   //operand_range dynamic_sizes(void) const;
@@ -686,15 +685,15 @@ class MX_EXPORT SubViewOp final : public Operation {
 
   // Imported methods:
   //::mlir::TypedValue<MemRefType> source(void) const;
-  //::mlir::Operation::operand_range offsets(void) const;
-  //::mlir::Operation::operand_range sizes(void) const;
-  //::mlir::Operation::operand_range strides(void) const;
+  gap::generator<::mx::ir::Operand> offsets(void) const &;
+  gap::generator<::mx::ir::Operand> sizes(void) const &;
+  gap::generator<::mx::ir::Operand> strides(void) const &;
   //::mlir::TypedValue<MemRefType> result(void) const;
   //::llvm::ArrayRef<long long> static_offsets(void) const;
   //::llvm::ArrayRef<long long> static_sizes(void) const;
   //::llvm::ArrayRef<long long> static_strides(void) const;
   ::mx::ir::Value view_source(void) const;
-  //::mlir::Operation::operand_range dynamic_sizes(void) const;
+  gap::generator<::mx::ir::Operand> dynamic_sizes(void) const &;
   //MemRefType source_type(void) const;
   //MemRefType type(void) const;
   //std::array<unsigned int, 3> array_attr_max_ranks(void) const;

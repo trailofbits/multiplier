@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -73,7 +72,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1378]) || tp >= &(gTypes[1379])) {
+  if (tp < &(gTypes[1433]) || tp >= &(gTypes[1434])) {
     return std::nullopt;
   }
 
@@ -90,7 +89,7 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::ir::hl::SwitchOp::static_kind():
-      tp = &(gTypes[1378]);
+      tp = &(gTypes[1433]);
       break;
 
   }
@@ -125,13 +124,23 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyGetSetDef gProperties[] = {
   {
-    "cond_region",
+    "condition_region",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->cond_region());
+          return ::mx::to_python(T_cast(self)->condition_region());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::hl::SwitchOp::cond_region"),
+    PyDoc_STR("Wrapper for mx::ir::hl::SwitchOp::condition_region"),
+    nullptr,
+  },
+  {
+    "cases",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::cases);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::hl::SwitchOp::cases"),
     nullptr,
   },
   {}  // Sentinel.
@@ -206,7 +215,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1378]);
+  PyTypeObject * const tp = &(gTypes[1433]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -221,12 +230,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[1307].tp_hash;
-  tp->tp_richcompare = gTypes[1307].tp_richcompare;
+  tp->tp_hash = gTypes[1315].tp_hash;
+  tp->tp_richcompare = gTypes[1315].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[1307]);
+  tp->tp_base = &(gTypes[1315]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

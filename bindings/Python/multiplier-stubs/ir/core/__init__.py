@@ -1,6 +1,5 @@
 #
 # Copyright (c) 2023-present, Trail of Bits, Inc.
-# All rights reserved.
 #
 # This source code is licensed in accordance with the terms specified in
 # the LICENSE file found in the root directory of this source tree.
@@ -104,8 +103,8 @@ class Operation(multiplier.ir.Operation):
     ...
 
 class BinLAndOp(multiplier.ir.core.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
   result: multiplier.ir.Value
 
   @staticmethod
@@ -121,8 +120,8 @@ class BinLAndOp(multiplier.ir.core.Operation):
     ...
 
 class BinLOrOp(multiplier.ir.core.Operation):
-  lhs: multiplier.ir.Value
-  rhs: multiplier.ir.Value
+  left: multiplier.ir.Value
+  right: multiplier.ir.Value
   result: multiplier.ir.Value
 
   @staticmethod
@@ -138,6 +137,7 @@ class BinLOrOp(multiplier.ir.core.Operation):
     ...
 
 class ImplicitReturnOp(multiplier.ir.core.Operation):
+  result: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -167,6 +167,24 @@ class LazyOp(multiplier.ir.core.Operation):
   def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.core.LazyOp]:
     ...
 
+class ModuleOp(multiplier.ir.core.Operation):
+  body: multiplier.ir.Region
+  name: Optional[str]
+  is_optional_symbol: bool
+  default_dialect: str
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.OperationKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Operation) -> Optional[multiplier.ir.core.ModuleOp]:
+    ...
+
+  @staticmethod
+  def producing(val: multiplier.ir.Value) -> Optional[multiplier.ir.core.ModuleOp]:
+    ...
+
 class ScopeOp(multiplier.ir.core.Operation):
   body: multiplier.ir.Region
 
@@ -186,6 +204,7 @@ class SelectOp(multiplier.ir.core.Operation):
   cond: multiplier.ir.Value
   then_region: multiplier.ir.Value
   else_region: multiplier.ir.Value
+  results: Iterable[multiplier.ir.Result]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -209,6 +228,8 @@ class FunctionType(multiplier.ir.core.Type):
   is_var_arg: bool
   num_inputs: int
   num_results: int
+  inputs: Iterable[multiplier.ir.Type]
+  results: Iterable[multiplier.ir.Type]
   var_arg: bool
 
   @staticmethod

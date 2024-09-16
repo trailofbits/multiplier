@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -17,7 +16,8 @@
 #include <string>
 
 #include <mlir/Dialect/LLVMIR/LLVMDialect.h>
-#include <vast/Dialect/Core/CoreOps.hpp>
+#include <vast/Dialect/Dialects.hpp>
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 
 namespace mx::ir::core {
 std::optional<Operation> Operation::from(const ::mx::ir::Operation &that) {
@@ -45,12 +45,12 @@ std::optional<BinLAndOp> BinLAndOp::producing(const ::mx::ir::Value &that) {
   return ::vast::core::BinLAndOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value BinLAndOp::lhs(void) const {
+::mx::ir::Value BinLAndOp::left(void) const {
   auto val = underlying_repr().getLhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value BinLAndOp::rhs(void) const {
+::mx::ir::Value BinLAndOp::right(void) const {
   auto val = underlying_repr().getRhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -78,12 +78,12 @@ std::optional<BinLOrOp> BinLOrOp::producing(const ::mx::ir::Value &that) {
   return ::vast::core::BinLOrOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value BinLOrOp::lhs(void) const {
+::mx::ir::Value BinLOrOp::left(void) const {
   auto val = underlying_repr().getLhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
-::mx::ir::Value BinLOrOp::rhs(void) const {
+::mx::ir::Value BinLOrOp::right(void) const {
   auto val = underlying_repr().getRhs();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -109,6 +109,13 @@ std::optional<ImplicitReturnOp> ImplicitReturnOp::producing(const ::mx::ir::Valu
 
 ::vast::core::ImplicitReturnOp ImplicitReturnOp::underlying_repr(void) const noexcept {
   return ::vast::core::ImplicitReturnOp(this->::mx::ir::Operation::op_);
+}
+
+gap::generator<::mx::ir::Operand> ImplicitReturnOp::result(void) const & {
+  auto range = underlying_repr().getResult();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
 }
 
 std::optional<LazyOp> LazyOp::from(const ::mx::ir::Operation &that) {
@@ -137,6 +144,56 @@ std::optional<LazyOp> LazyOp::producing(const ::mx::ir::Value &that) {
 ::mx::ir::Region LazyOp::lazy(void) const {
   auto &val = underlying_repr().getLazy();
   return ::mx::ir::Region(module_, val);
+}
+
+std::optional<ModuleOp> ModuleOp::from(const ::mx::ir::Operation &that) {
+  if (that.kind() == OperationKind::CORE_MODULE) {
+    return reinterpret_cast<const ModuleOp &>(that);
+  }
+  return std::nullopt;
+}
+
+std::optional<ModuleOp> ModuleOp::producing(const ::mx::ir::Value &that) {
+  if (auto op = ::mx::ir::Operation::producing(that)) {
+    return from(op.value());
+  }
+  return std::nullopt;
+}
+
+::vast::core::ModuleOp ModuleOp::underlying_repr(void) const noexcept {
+  return ::vast::core::ModuleOp(this->::mx::ir::Operation::op_);
+}
+
+::mx::ir::Region ModuleOp::body(void) const {
+  auto &val = underlying_repr().getBody();
+  return ::mx::ir::Region(module_, val);
+}
+
+std::optional<std::string_view> ModuleOp::name(void) const {
+  auto opt_val = underlying_repr().getSymName();
+  if (!opt_val) {
+    return std::nullopt;
+  }
+  auto &val = opt_val.value();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
+}
+
+bool ModuleOp::is_optional_symbol(void) const {
+  auto val = underlying_repr().isOptionalSymbol();
+  return val;
+}
+
+std::string_view ModuleOp::default_dialect(void) const {
+  auto val = underlying_repr().getDefaultDialect();
+  if (auto size = val.size()) {
+    return std::string_view(val.data(), size);
+  } else {
+    return {};
+  }
 }
 
 std::optional<ScopeOp> ScopeOp::from(const ::mx::ir::Operation &that) {
@@ -193,6 +250,13 @@ std::optional<SelectOp> SelectOp::producing(const ::mx::ir::Value &that) {
 ::mx::ir::Value SelectOp::else_region(void) const {
   auto val = underlying_repr().getElseRegion();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+gap::generator<::mx::ir::Result> SelectOp::results(void) const & {
+  auto range = underlying_repr().getResults();
+  for (auto val : range) {
+    co_yield ::mx::ir::Result(module_, val.getAsOpaquePointer());
+  }
 }
 
 }  // namespace mx::ir::core

@@ -1,6 +1,5 @@
 #
 # Copyright (c) 2023-present, Trail of Bits, Inc.
-# All rights reserved.
 #
 # This source code is licensed in accordance with the terms specified in
 # the LICENSE file found in the root directory of this source tree.
@@ -50,6 +49,7 @@ class UnsupportedDeclOp(multiplier.ir.unsupported.Operation):
 
 class UnsupportedStmtOp(multiplier.ir.unsupported.Operation):
   result: multiplier.ir.Value
+  children: Iterable[multiplier.ir.Region]
   name: str
 
   @staticmethod

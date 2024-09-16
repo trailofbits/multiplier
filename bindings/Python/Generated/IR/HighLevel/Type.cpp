@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -73,7 +72,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1480]) || tp >= &(gTypes[1515])) {
+  if (tp < &(gTypes[1496]) || tp >= &(gTypes[1531])) {
     return std::nullopt;
   }
 
@@ -90,139 +89,139 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::ir::hl::RecordType::static_kind():
-      tp = &(gTypes[1481]);
-      break;
-
-    case mx::ir::hl::EnumType::static_kind():
-      tp = &(gTypes[1482]);
-      break;
-
-    case mx::ir::hl::TypedefType::static_kind():
-      tp = &(gTypes[1483]);
-      break;
-
-    case mx::ir::hl::ElaboratedType::static_kind():
-      tp = &(gTypes[1484]);
-      break;
-
-    case mx::ir::hl::LabelType::static_kind():
-      tp = &(gTypes[1485]);
-      break;
-
-    case mx::ir::hl::ParenType::static_kind():
-      tp = &(gTypes[1486]);
-      break;
-
-    case mx::ir::hl::LValueType::static_kind():
-      tp = &(gTypes[1487]);
-      break;
-
-    case mx::ir::hl::RValueType::static_kind():
-      tp = &(gTypes[1488]);
-      break;
-
-    case mx::ir::hl::VoidType::static_kind():
-      tp = &(gTypes[1489]);
-      break;
-
-    case mx::ir::hl::BoolType::static_kind():
-      tp = &(gTypes[1490]);
-      break;
-
-    case mx::ir::hl::CharType::static_kind():
-      tp = &(gTypes[1491]);
-      break;
-
-    case mx::ir::hl::ShortType::static_kind():
-      tp = &(gTypes[1492]);
-      break;
-
-    case mx::ir::hl::IntType::static_kind():
-      tp = &(gTypes[1493]);
-      break;
-
-    case mx::ir::hl::LongType::static_kind():
-      tp = &(gTypes[1494]);
-      break;
-
-    case mx::ir::hl::LongLongType::static_kind():
-      tp = &(gTypes[1495]);
-      break;
-
-    case mx::ir::hl::Int128Type::static_kind():
-      tp = &(gTypes[1496]);
-      break;
-
-    case mx::ir::hl::HalfType::static_kind():
       tp = &(gTypes[1497]);
       break;
 
-    case mx::ir::hl::BFloat16Type::static_kind():
+    case mx::ir::hl::EnumType::static_kind():
       tp = &(gTypes[1498]);
       break;
 
-    case mx::ir::hl::FloatType::static_kind():
+    case mx::ir::hl::TypedefType::static_kind():
       tp = &(gTypes[1499]);
       break;
 
-    case mx::ir::hl::DoubleType::static_kind():
+    case mx::ir::hl::ElaboratedType::static_kind():
       tp = &(gTypes[1500]);
       break;
 
-    case mx::ir::hl::LongDoubleType::static_kind():
+    case mx::ir::hl::LabelType::static_kind():
       tp = &(gTypes[1501]);
       break;
 
-    case mx::ir::hl::Float128Type::static_kind():
+    case mx::ir::hl::ParenType::static_kind():
       tp = &(gTypes[1502]);
       break;
 
-    case mx::ir::hl::ComplexType::static_kind():
+    case mx::ir::hl::LValueType::static_kind():
       tp = &(gTypes[1503]);
       break;
 
-    case mx::ir::hl::PointerType::static_kind():
+    case mx::ir::hl::RValueType::static_kind():
       tp = &(gTypes[1504]);
       break;
 
-    case mx::ir::hl::ArrayType::static_kind():
+    case mx::ir::hl::VoidType::static_kind():
       tp = &(gTypes[1505]);
       break;
 
-    case mx::ir::hl::VectorType::static_kind():
+    case mx::ir::hl::BoolType::static_kind():
       tp = &(gTypes[1506]);
       break;
 
-    case mx::ir::hl::DecayedType::static_kind():
+    case mx::ir::hl::CharType::static_kind():
       tp = &(gTypes[1507]);
       break;
 
-    case mx::ir::hl::AttributedType::static_kind():
+    case mx::ir::hl::ShortType::static_kind():
       tp = &(gTypes[1508]);
       break;
 
-    case mx::ir::hl::AdjustedType::static_kind():
+    case mx::ir::hl::IntType::static_kind():
       tp = &(gTypes[1509]);
       break;
 
-    case mx::ir::hl::ReferenceType::static_kind():
+    case mx::ir::hl::LongType::static_kind():
       tp = &(gTypes[1510]);
       break;
 
-    case mx::ir::hl::TypeOfExprType::static_kind():
+    case mx::ir::hl::LongLongType::static_kind():
       tp = &(gTypes[1511]);
       break;
 
-    case mx::ir::hl::TypeOfTypeType::static_kind():
+    case mx::ir::hl::Int128Type::static_kind():
       tp = &(gTypes[1512]);
       break;
 
-    case mx::ir::hl::AutoType::static_kind():
+    case mx::ir::hl::HalfType::static_kind():
       tp = &(gTypes[1513]);
       break;
 
-    case mx::ir::hl::AtomicType::static_kind():
+    case mx::ir::hl::BFloat16Type::static_kind():
       tp = &(gTypes[1514]);
+      break;
+
+    case mx::ir::hl::FloatType::static_kind():
+      tp = &(gTypes[1515]);
+      break;
+
+    case mx::ir::hl::DoubleType::static_kind():
+      tp = &(gTypes[1516]);
+      break;
+
+    case mx::ir::hl::LongDoubleType::static_kind():
+      tp = &(gTypes[1517]);
+      break;
+
+    case mx::ir::hl::Float128Type::static_kind():
+      tp = &(gTypes[1518]);
+      break;
+
+    case mx::ir::hl::ComplexType::static_kind():
+      tp = &(gTypes[1519]);
+      break;
+
+    case mx::ir::hl::PointerType::static_kind():
+      tp = &(gTypes[1520]);
+      break;
+
+    case mx::ir::hl::ArrayType::static_kind():
+      tp = &(gTypes[1521]);
+      break;
+
+    case mx::ir::hl::VectorType::static_kind():
+      tp = &(gTypes[1522]);
+      break;
+
+    case mx::ir::hl::DecayedType::static_kind():
+      tp = &(gTypes[1523]);
+      break;
+
+    case mx::ir::hl::AttributedType::static_kind():
+      tp = &(gTypes[1524]);
+      break;
+
+    case mx::ir::hl::AdjustedType::static_kind():
+      tp = &(gTypes[1525]);
+      break;
+
+    case mx::ir::hl::ReferenceType::static_kind():
+      tp = &(gTypes[1526]);
+      break;
+
+    case mx::ir::hl::TypeOfExprType::static_kind():
+      tp = &(gTypes[1527]);
+      break;
+
+    case mx::ir::hl::TypeOfTypeType::static_kind():
+      tp = &(gTypes[1528]);
+      break;
+
+    case mx::ir::hl::AutoType::static_kind():
+      tp = &(gTypes[1529]);
+      break;
+
+    case mx::ir::hl::AtomicType::static_kind():
+      tp = &(gTypes[1530]);
       break;
 
   }
@@ -290,7 +289,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1480]);
+  PyTypeObject * const tp = &(gTypes[1496]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -305,12 +304,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[1445].tp_hash;
-  tp->tp_richcompare = gTypes[1445].tp_richcompare;
+  tp->tp_hash = gTypes[1461].tp_hash;
+  tp->tp_richcompare = gTypes[1461].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[1445]);
+  tp->tp_base = &(gTypes[1461]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

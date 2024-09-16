@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -73,7 +72,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1175]) || tp >= &(gTypes[1176])) {
+  if (tp < &(gTypes[1183]) || tp >= &(gTypes[1184])) {
     return std::nullopt;
   }
 
@@ -90,7 +89,7 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::ir::llvm::VPFPToSIOp::static_kind():
-      tp = &(gTypes[1175]);
+      tp = &(gTypes[1183]);
       break;
 
   }
@@ -125,13 +124,13 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyGetSetDef gProperties[] = {
   {
-    "src",
+    "source",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->src());
+          return ::mx::to_python(T_cast(self)->source());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::llvm::VPFPToSIOp::src"),
+    PyDoc_STR("Wrapper for mx::ir::llvm::VPFPToSIOp::source"),
     nullptr,
   },
   {
@@ -145,13 +144,13 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "res",
+    "result",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->res());
+          return ::mx::to_python(T_cast(self)->result());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::llvm::VPFPToSIOp::res"),
+    PyDoc_STR("Wrapper for mx::ir::llvm::VPFPToSIOp::result"),
     nullptr,
   },
   {}  // Sentinel.
@@ -226,7 +225,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1175]);
+  PyTypeObject * const tp = &(gTypes[1183]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -241,12 +240,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[994].tp_hash;
-  tp->tp_richcompare = gTypes[994].tp_richcompare;
+  tp->tp_hash = gTypes[1002].tp_hash;
+  tp->tp_richcompare = gTypes[1002].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[994]);
+  tp->tp_base = &(gTypes[1002]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

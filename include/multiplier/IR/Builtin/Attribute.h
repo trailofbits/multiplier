@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -33,6 +32,7 @@ class UnitAttr;
 class BoolAttr;
 class FlatSymbolRefAttr;
 class DenseIntElementsAttr;
+class DataLayoutSpecAttr;
 }  // namespace mlir
 namespace mx::ir::builtin {
 
@@ -107,7 +107,7 @@ class MX_EXPORT ArrayAttr final : public Attribute {
   // Imported methods:
   //iterator begin(void) const;
   //iterator end(void) const;
-  //size_t size(void) const;
+  size_t size(void) const;
   bool empty(void) const;
   //::llvm::ArrayRef<Attribute> value(void) const;
 };
@@ -189,7 +189,7 @@ class MX_EXPORT DictionaryAttr final : public Attribute {
   //iterator begin(void) const;
   //iterator end(void) const;
   bool empty(void) const;
-  //size_t size(void) const;
+  size_t size(void) const;
   //::llvm::ArrayRef<NamedAttribute> value(void) const;
 };
 static_assert(sizeof(DictionaryAttr) == sizeof(Attribute));
@@ -222,9 +222,9 @@ class MX_EXPORT IntegerAttr final : public Attribute {
   ::mlir::IntegerAttr underlying_repr(void) const noexcept;
 
   // Imported methods:
-  int64_t int_(void) const;
-  int64_t s_int(void) const;
-  uint64_t u_int(void) const;
+  int64_t integer_value(void) const;
+  int64_t signed_integer_value(void) const;
+  uint64_t unsigned_integer_value(void) const;
   //APSInt aps_int(void) const;
   ::mx::ir::Type type(void) const;
   //APInt value(void) const;
@@ -316,7 +316,7 @@ class MX_EXPORT StringAttr final : public Attribute {
   //StringRef strref(void) const;
   std::string str(void) const;
   //const char * data(void) const;
-  //size_t size(void) const;
+  size_t size(void) const;
   bool empty(void) const;
   //StringRef::iterator begin(void) const;
   //StringRef::iterator end(void) const;
@@ -417,5 +417,20 @@ class MX_EXPORT DenseIntElementsAttr final : public Attribute {
   //iterator end(void) const;
 };
 static_assert(sizeof(DenseIntElementsAttr) == sizeof(Attribute));
+
+class MX_EXPORT DataLayoutSpecAttr final : public Attribute {
+ public:
+  inline static constexpr AttributeKind static_kind(void) {
+    return AttributeKind::BUILTIN_DATA_LAYOUT_SPEC;
+  }
+
+  static std::optional<DataLayoutSpecAttr> from(const ::mx::ir::Attribute &that);
+
+  ::mlir::DataLayoutSpecAttr underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  //DataLayoutEntryListRef entries(void) const;
+};
+static_assert(sizeof(DataLayoutSpecAttr) == sizeof(Attribute));
 
 }  // namespace mx::ir::builtin

@@ -1,11 +1,11 @@
 // Copyright (c) 2021-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
 #include "Parser.h"
 
+#include <algorithm>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
@@ -14,6 +14,8 @@
 #include <string>
 #include <string_view>
 #include <vector>
+
+#include "ScopedPrinter.h"
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wbitfield-enum-conversion"

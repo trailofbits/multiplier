@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -73,7 +72,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[985]) || tp >= &(gTypes[988])) {
+  if (tp < &(gTypes[993]) || tp >= &(gTypes[996])) {
     return std::nullopt;
   }
 
@@ -90,11 +89,11 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::ir::Argument::static_kind():
-      tp = &(gTypes[986]);
+      tp = &(gTypes[994]);
       break;
 
     case mx::ir::Result::static_kind():
-      tp = &(gTypes[987]);
+      tp = &(gTypes[995]);
       break;
 
   }
@@ -171,7 +170,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[985]);
+  PyTypeObject * const tp = &(gTypes[993]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

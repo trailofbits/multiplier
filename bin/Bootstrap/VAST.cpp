@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -148,6 +147,35 @@ class CodeGenerator {
   void RunOnAttrs(void);
 };
 
+static const std::map<std::string, std::string> kMethodRenames = {
+  {"lhs", "left"},
+  {"rhs", "right"},
+  {"src", "source"},
+  {"dst", "destination"},
+  {"expr", "expression"},
+  {"val", "value"},
+  {"arg", "argument"},
+  {"args", "arguments"},
+  {"cond_region", "condition_region"},
+  {"decl", "declaration"},
+  {"sym_name", "name"},
+  {"sym_visibility", "visibility"},
+  {"subexpr", "nested_expression"},
+  {"asm_string", "assembly"},
+  {"is_expr_predicate", "is_expression_predicate"},
+  {"init", "initializer"},
+  {"res", "result"},
+  {"assert", "assertion"},
+  {"substmt", "nested_statement"},
+  {"arg_list", "argument_list"},
+  {"is_local_var_decl", "is_local_variable_declaration"},
+  {"is_static_local", "is_static_local_variable_declaration"},
+  {"is_file_var_decl", "is_file_variable_declaration"},
+  {"int", "integer_value"},
+  {"s_int", "signed_integer_value"},
+  {"u_int", "unsigned_integer_value"},
+};
+
 static std::string MethodName(const std::string &name) {
   std::string new_name = Capitalize(name);
 
@@ -156,8 +184,9 @@ static std::string MethodName(const std::string &name) {
   }
 
   new_name = CapitalCaseToSnakeCase(new_name);
-  if (new_name == "int") {
-    new_name.push_back('_');
+  auto name_it = kMethodRenames.find(new_name);
+  if (name_it != kMethodRenames.end()) {
+    return name_it->second;
   }
 
   return new_name;
@@ -197,6 +226,47 @@ static std::optional<pasta::Decl> GetDefinition(const pasta::NamedDecl &decl) {
 //
 //  return p;
 //}
+
+static void IsRegionFalse(std::ostream &os, const char *val_name) {
+  os << val_name << ".empty()";
+}
+
+static void GetRegionValue(std::ostream &os, const char *val_name) {
+  os << val_name;
+}
+
+using IsFalseFunc = void(std::ostream &, const char *);
+using GetOptValueFunc = void(std::ostream &, const char *);
+
+struct OptionalMethod {
+  std::string_view op_name;
+  std::string_view method_name;
+  IsFalseFunc *is_false;
+  GetOptValueFunc *get_value;
+};
+
+static const OptionalMethod kOptionalMethods[] = {
+  {"ForOp", "cond_region", IsRegionFalse, GetRegionValue},
+  {"ForOp", "incr_region", IsRegionFalse, GetRegionValue},
+  {"ForOp", "body_region", IsRegionFalse, GetRegionValue},
+  {"FuncOp", "body", IsRegionFalse, GetRegionValue},
+  {"IfOp", "else_region", IsRegionFalse, GetRegionValue},
+  {"VarDeclOp", "initializer", IsRegionFalse, GetRegionValue},
+  {"VarDeclOp", "allocation_size", IsRegionFalse, GetRegionValue},
+  {"CaseOp", "body", IsRegionFalse, GetRegionValue},
+  {"DefaultOp", "body", IsRegionFalse, GetRegionValue},
+  {"BinaryCondOp", "common_region", IsRegionFalse, GetRegionValue},
+};
+
+static std::pair<IsFalseFunc *, GetOptValueFunc *>
+IsOptionalReturn(std::string_view op_name, std::string_view meth_name) {
+  for (auto [on, mn, is_false, get_value] : kOptionalMethods) {
+    if (on == op_name && mn == meth_name) {
+      return {is_false, get_value};
+    }
+  }
+  return {nullptr, nullptr};
+}
 
 // Calculate a relative path given an absolute path. We want relative paths
 // located inside of Clang, LLVM, MLIR, or VAST.
@@ -539,6 +609,53 @@ class OptionalTypeWrapper final : public TypeWrapper {
   }
 };
 
+class FalsyOptionalTypeWrapper final : public TypeWrapper {
+ private:
+  TypeWrapper * const next;
+  IsFalseFunc * const is_false;
+  GetOptValueFunc * const get_value;
+
+ public:
+  virtual ~FalsyOptionalTypeWrapper(void) = default;
+
+  explicit FalsyOptionalTypeWrapper(TypeWrapper *next_,
+                                    IsFalseFunc *is_false_,
+                                    GetOptValueFunc *get_value_)
+      : next(next_),
+        is_false(is_false_),
+        get_value(get_value_) {}
+
+  void ReturnType(std::ostream &os, const pasta::CXXMethodDecl &m) final {
+    os << "std::optional<";
+    next->ReturnType(os, m);
+    os << ">";
+  }
+
+  std::string_view CallMethod(std::ostream &os, const pasta::CXXMethodDecl &m,
+                              const std::string &indent) {
+    os << indent << "decltype(auto) opt_val = underlying_repr()." << m.Name() << "();\n"
+       << indent << "if (";
+
+    is_false(os, "opt_val");
+
+    os << ") {\n"
+       << indent << "  return std::nullopt;\n"
+       << indent << "}\n"
+       << indent << "auto &val = ";
+
+    get_value(os, "opt_val");
+
+    os << ";\n";
+
+    return "val";
+  }
+
+  void Implementation(std::ostream &os, const pasta::CXXMethodDecl &m,
+                      const std::string &indent, std::string_view val) final {
+    next->Implementation(os, m, indent, val);
+  }
+};
+
 class StringRefWrapper final : public TypeWrapper {
  public:
   virtual ~StringRefWrapper(void) = default;
@@ -665,6 +782,32 @@ class ValueGeneratorWrapper final : public TypeWrapper {
   }
 };
 
+class RegionGeneratorWrapper final : public TypeWrapper {
+ public:
+  virtual ~RegionGeneratorWrapper(void) = default;
+
+  void ReturnType(std::ostream &os, const pasta::CXXMethodDecl &) final {
+    os << "gap::generator<::mx::ir::Region>";
+  }
+
+  virtual std::string_view MethodRefKind(void) final {
+    return " &";
+  }
+
+  std::string_view CallMethod(std::ostream &os, const pasta::CXXMethodDecl &m,
+                              const std::string &indent) {
+    os << indent << "decltype(auto) regions = underlying_repr()." << m.Name() << "();\n";
+    return "regions";
+  }
+
+  void Implementation(std::ostream &os, const pasta::CXXMethodDecl &m,
+                      const std::string &indent, std::string_view val) final {
+    os << indent << "for (auto &region : " << val << ") {\n"
+       << indent << "  co_yield ::mx::ir::Region(module_, &region);\n"
+       << indent << "}\n";
+  }
+};
+
 class TypeTypeWrapper final : public TypeWrapper {
  public:
   virtual ~TypeTypeWrapper(void) = default;
@@ -690,6 +833,36 @@ class TypeTypeWrapper final : public TypeWrapper {
        << indent << "    " << val << ".getContext(),\n"
        << indent << "    reinterpret_cast<const mlir::TypeStorage *>(\n"
        << indent << "        " << val << ".getAsOpaquePointer()));\n";
+  }
+};
+
+class TypeGeneratorWrapper final : public TypeWrapper {
+ public:
+  virtual ~TypeGeneratorWrapper(void) = default;
+
+  void ReturnType(std::ostream &os, const pasta::CXXMethodDecl &) final {
+    os << "gap::generator<::mx::ir::Type>";
+  }
+
+  virtual std::string_view MethodRefKind(void) final {
+    return " &";
+  }
+
+  std::string_view CallMethod(std::ostream &os, const pasta::CXXMethodDecl &m,
+                              const std::string &indent) {
+    os << indent << "auto range = underlying_repr()." << m.Name() << "();\n";
+    return "range";
+  }
+
+  void Implementation(std::ostream &os, const pasta::CXXMethodDecl &m,
+                      const std::string &indent, std::string_view val) final {
+
+    os << indent << "for (auto el_ty : " << val << ") {\n"
+       << indent << "  co_yield ::mx::ir::Type(\n"
+       << indent << "      el_ty.getContext(),\n"
+       << indent << "      reinterpret_cast<const mlir::TypeStorage *>(\n"
+       << indent << "          el_ty.getAsOpaquePointer()));\n"
+       << indent << "}\n";
   }
 };
 
@@ -721,8 +894,11 @@ static std::unordered_map<std::string, TypeWrapper *> gReturnType{
   IDENTITY_WRAPPER(uint16_t),
   IDENTITY_WRAPPER(uint32_t),
   IDENTITY_WRAPPER(uint64_t),
+  IDENTITY_WRAPPER(size_t),
+  IDENTITY_WRAPPER(std::size_t),
   IDENTITY_WRAPPER(std::string),
   IDENTITY_WRAPPER(std::string_view),
+  {"llvm::StringRef", new StringRefWrapper},
   {"::llvm::StringRef", new StringRefWrapper},
   {"std::optional<StringRef>", new OptionalTypeWrapper(new StringRefWrapper)},
   {"::std::optional<StringRef>", new OptionalTypeWrapper(new StringRefWrapper)},
@@ -733,8 +909,38 @@ static std::unordered_map<std::string, TypeWrapper *> gReturnType{
   {"::mlir::Block&", new BlockWrapper},
   {"::mlir::Block &", new BlockWrapper},
   {"::mlir::Type", new TypeTypeWrapper},
+  {"::mlir::Type", new TypeTypeWrapper},
+  {"::mlir::TypedValue<LabelType>", new ValueWrapper},
+  {"mlir::Value", new ValueWrapper},
+  {"mlir::Region&", new RegionWrapper},
+  {"mlir::Region &", new RegionWrapper},
+  {"mlir::Block&", new BlockWrapper},
+  {"mlir::Block &", new BlockWrapper},
+  {"mlir::Type", new TypeTypeWrapper},
+  {"mlir::Type", new TypeTypeWrapper},
+  {"mlir::TypedValue<LabelType>", new ValueWrapper},
+  {"mlir_type", new TypeTypeWrapper},
   {"::mlir::mlir::Operation::result_range", new ValueGeneratorWrapper("::mx::ir::Result")},
   {"::mlir::mlir::Operation::operand_range", new ValueGeneratorWrapper("::mx::ir::Operand")},
+  {"::mlir::Operation::result_range", new ValueGeneratorWrapper("::mx::ir::Result")},
+  {"::mlir::Operation::operand_range", new ValueGeneratorWrapper("::mx::ir::Operand")},
+  {"mlir::Operation::result_range", new ValueGeneratorWrapper("::mx::ir::Result")},
+  {"mlir::Operation::operand_range", new ValueGeneratorWrapper("::mx::ir::Operand")},
+  {"::llvm::ArrayRef<Type>", new TypeGeneratorWrapper},
+  {"llvm::ArrayRef<Type>", new TypeGeneratorWrapper},
+  {"gap::generator<Type>", new TypeGeneratorWrapper},
+  {"::gap::generator<Type>", new TypeGeneratorWrapper},
+  {"llvm::SmallVector<Type, 1>", new TypeGeneratorWrapper},
+  {"llvm::SmallVector<Type, 2>", new TypeGeneratorWrapper},
+  {"llvm::SmallVector<Type, 3>", new TypeGeneratorWrapper},
+  {"llvm::SmallVector<Type, 4>", new TypeGeneratorWrapper},
+  {"llvm::SmallVector<Type, 5>", new TypeGeneratorWrapper},
+  {"llvm::SmallVector<Type, 6>", new TypeGeneratorWrapper},
+  {"llvm::SmallVector<Type, 7>", new TypeGeneratorWrapper},
+  {"llvm::SmallVector<Type, 8>", new TypeGeneratorWrapper},
+  {"::std::optional<Type>", new OptionalTypeWrapper(new TypeTypeWrapper)},
+  {"::vast::core::FunctionType", new TypeTypeWrapper},
+  {"::mlir::MutableArrayRef<Region>", new RegionGeneratorWrapper},
 };
 
 void CodeGenerator::Summarize(void) {
@@ -785,23 +991,32 @@ static void DoMethod(const pasta::CXXMethodDecl &meth,
       TokensToString(pasta::PrintedTokenRange::Create(return_type));
 
   TypeWrapper *ret_wrapper = gReturnType[return_type_str];
-  if (ret_wrapper) {
-    hpp << "  ";
-    ret_wrapper->ReturnType(hpp, meth);
-    hpp << " " << api_name << "(void) const" << ret_wrapper->MethodRefKind()
-        << ";\n";
+  std::optional<FalsyOptionalTypeWrapper> opt_wrapper;
 
-    ret_wrapper->ReturnType(cpp, meth);
-    cpp << " " << ent_class_name << "::" << api_name << "(void) const"
-        << ret_wrapper->MethodRefKind() << " {\n";
-    std::string_view val = ret_wrapper->CallMethod(cpp, meth, "  ");
-    ret_wrapper->Implementation(cpp, meth, "  ", val);
-    cpp << "}\n\n";
-
-  } else {
+  if (!ret_wrapper) {
     hpp << "  //" << return_type_str << " " << api_name
         << "(void) const;\n";
+    return;
   }
+
+  // Wrap in optional.
+  auto [is_false, get_value] = IsOptionalReturn(ent_class_name, api_name);
+  if (is_false && get_value) {
+    opt_wrapper.emplace(ret_wrapper, is_false, get_value);
+    ret_wrapper = &(opt_wrapper.value());
+  }
+
+  hpp << "  ";
+  ret_wrapper->ReturnType(hpp, meth);
+  hpp << " " << api_name << "(void) const" << ret_wrapper->MethodRefKind()
+      << ";\n";
+
+  ret_wrapper->ReturnType(cpp, meth);
+  cpp << " " << ent_class_name << "::" << api_name << "(void) const"
+      << ret_wrapper->MethodRefKind() << " {\n";
+  std::string_view val = ret_wrapper->CallMethod(cpp, meth, "  ");
+  ret_wrapper->Implementation(cpp, meth, "  ", val);
+  cpp << "}\n\n";
 }
 
 void CodeGenerator::RunOnOps(void) {
@@ -822,7 +1037,6 @@ void CodeGenerator::RunOnOps(void) {
 
   summary_irhpp
       << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-      << "// All rights reserved.\n"
       << "//\n"
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -840,7 +1054,6 @@ void CodeGenerator::RunOnOps(void) {
 
   hpp
       << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-      << "// All rights reserved.\n"
       << "//\n"
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -863,7 +1076,6 @@ void CodeGenerator::RunOnOps(void) {
     std::ofstream dialect_hpp(mx_inc / "IR" / dialect.our_dir_name / "Dialect.h");
     dialect_hpp
         << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-        << "// All rights reserved.\n"
         << "//\n"
         << "// This source code is licensed in accordance with the terms specified in\n"
         << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -913,7 +1125,6 @@ void CodeGenerator::RunOnOps(void) {
 
   cpp
       << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-      << "// All rights reserved.\n"
       << "//\n"
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -944,7 +1155,6 @@ void CodeGenerator::RunOnOps(void) {
   cpp.open(mx_lib / "IR" / "OperationKind.cpp");  // In lib.
   cpp
       << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-      << "// All rights reserved.\n"
       << "//\n"
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -1009,7 +1219,6 @@ void CodeGenerator::RunOnOps(void) {
 
     hpp
         << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-        << "// All rights reserved.\n"
         << "//\n"
         << "// This source code is licensed in accordance with the terms specified in\n"
         << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -1043,7 +1252,6 @@ void CodeGenerator::RunOnOps(void) {
 
     cpp
         << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-        << "// All rights reserved.\n"
         << "//\n"
         << "// This source code is licensed in accordance with the terms specified in\n"
         << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -1193,7 +1401,6 @@ void CodeGenerator::RunOnTypes(void) {
 
   hpp
       << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-      << "// All rights reserved.\n"
       << "//\n"
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -1234,7 +1441,6 @@ void CodeGenerator::RunOnTypes(void) {
 
   cpp
       << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-      << "// All rights reserved.\n"
       << "//\n"
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -1265,7 +1471,6 @@ void CodeGenerator::RunOnTypes(void) {
   cpp.open(mx_lib / "IR" / "TypeKind.cpp");  // In lib.
   cpp
       << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-      << "// All rights reserved.\n"
       << "//\n"
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -1326,7 +1531,6 @@ void CodeGenerator::RunOnTypes(void) {
 
     hpp
         << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-        << "// All rights reserved.\n"
         << "//\n"
         << "// This source code is licensed in accordance with the terms specified in\n"
         << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -1349,7 +1553,6 @@ void CodeGenerator::RunOnTypes(void) {
 
     cpp
         << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-        << "// All rights reserved.\n"
         << "//\n"
         << "// This source code is licensed in accordance with the terms specified in\n"
         << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -1480,7 +1683,6 @@ void CodeGenerator::RunOnAttrs(void) {
 
   hpp
       << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-      << "// All rights reserved.\n"
       << "//\n"
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -1521,7 +1723,6 @@ void CodeGenerator::RunOnAttrs(void) {
 
   cpp
       << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-      << "// All rights reserved.\n"
       << "//\n"
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -1553,7 +1754,6 @@ void CodeGenerator::RunOnAttrs(void) {
   cpp.open(mx_lib / "IR" / "AttributeKind.cpp");  // In lib.
   cpp
       << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-      << "// All rights reserved.\n"
       << "//\n"
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -1618,7 +1818,6 @@ void CodeGenerator::RunOnAttrs(void) {
 
     hpp
         << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-        << "// All rights reserved.\n"
         << "//\n"
         << "// This source code is licensed in accordance with the terms specified in\n"
         << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -1642,7 +1841,6 @@ void CodeGenerator::RunOnAttrs(void) {
 
     cpp
         << "// Copyright (c) 2023-present, Trail of Bits, Inc.\n"
-        << "// All rights reserved.\n"
         << "//\n"
         << "// This source code is licensed in accordance with the terms specified in\n"
         << "// the LICENSE file found in the root directory of this source tree.\n\n"
@@ -2086,7 +2284,7 @@ int main(int argc, char *argv[]) {
   std::vector<const char *> cc_args{
       exe_path.c_str(),
       "-x", "c++",
-      "-std=c++20",
+      "-std=c++23",
       "-c", __FILE__,
       "-o", "/dev/null",
       "-isystem", argv[1],  // Install include dir.

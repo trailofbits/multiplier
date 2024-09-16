@@ -1,6 +1,5 @@
 #
 # Copyright (c) 2023-present, Trail of Bits, Inc.
-# All rights reserved.
 #
 # This source code is licensed in accordance with the terms specified in
 # the LICENSE file found in the root directory of this source tree.
@@ -69,6 +68,7 @@ class AffineMapAttr(multiplier.ir.builtin.Attribute):
     ...
 
 class ArrayAttr(multiplier.ir.builtin.Attribute):
+  size: int
   empty: bool
 
   @staticmethod
@@ -123,6 +123,7 @@ class DenseResourceElementsAttr(multiplier.ir.builtin.Attribute):
 
 class DictionaryAttr(multiplier.ir.builtin.Attribute):
   empty: bool
+  size: int
 
   @staticmethod
   def static_kind() -> multiplier.ir.AttributeKind:
@@ -145,9 +146,9 @@ class FloatAttr(multiplier.ir.builtin.Attribute):
     ...
 
 class IntegerAttr(multiplier.ir.builtin.Attribute):
-  int_: int
-  s_int: int
-  u_int: int
+  integer_value: int
+  signed_integer_value: int
+  unsigned_integer_value: int
   type: multiplier.ir.Type
 
   @staticmethod
@@ -203,6 +204,7 @@ class StridedLayoutAttr(multiplier.ir.builtin.Attribute):
 
 class StringAttr(multiplier.ir.builtin.Attribute):
   str: str
+  size: int
   empty: bool
   value: str
   type: multiplier.ir.Type
@@ -276,6 +278,16 @@ class DenseIntElementsAttr(multiplier.ir.builtin.Attribute):
   def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.builtin.DenseIntElementsAttr]:
     ...
 
+class DataLayoutSpecAttr(multiplier.ir.builtin.Attribute):
+
+  @staticmethod
+  def static_kind() -> multiplier.ir.AttributeKind:
+    ...
+
+  @staticmethod
+  def FROM(that: multiplier.ir.Attribute) -> Optional[multiplier.ir.builtin.DataLayoutSpecAttr]:
+    ...
+
 class Operation(multiplier.ir.Operation):
 
   @staticmethod
@@ -284,9 +296,8 @@ class Operation(multiplier.ir.Operation):
 
 class ModuleOp(multiplier.ir.builtin.Operation):
   body_region: multiplier.ir.Region
-  sym_name: Optional[str]
-  sym_visibility: Optional[str]
   name: Optional[str]
+  visibility: Optional[str]
   is_optional_symbol: bool
   default_dialect: str
 
@@ -303,6 +314,8 @@ class ModuleOp(multiplier.ir.builtin.Operation):
     ...
 
 class UnrealizedConversionCastOp(multiplier.ir.builtin.Operation):
+  inputs: Iterable[multiplier.ir.Operand]
+  outputs: Iterable[multiplier.ir.Result]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -560,6 +573,7 @@ class RankedTensorType(multiplier.ir.builtin.Type):
     ...
 
 class TupleType(multiplier.ir.builtin.Type):
+  size: int
 
   @staticmethod
   def static_kind() -> multiplier.ir.TypeKind:

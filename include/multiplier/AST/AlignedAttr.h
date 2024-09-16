@@ -1,5 +1,4 @@
 // Copyright (c) 2022-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -55,7 +54,7 @@ class MX_EXPORT AlignedAttr : public InheritableAttr {
   static std::optional<AlignedAttr> from(const VariantEntity &e);
   static std::optional<AlignedAttr> from(const TokenContext &t);
 
-  uint32_t alignment(void) const;
+  std::optional<uint32_t> alignment(void) const;
   std::optional<Expr> alignment_expression(void) const;
   std::optional<Type> alignment_type(void) const;
   std::optional<uint32_t> cached_alignment_value(void) const;

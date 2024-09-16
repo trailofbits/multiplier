@@ -1,5 +1,4 @@
 # Copyright (c) 2022-present, Trail of Bits, Inc.
-# All rights reserved.
 #
 # This source code is licensed in accordance with the terms specified in
 # the LICENSE file found in the root directory of this source tree.
@@ -572,14 +571,15 @@ struct Attr @0xe5b70746662da9f3{
   val29 @21 :Bool;
   val30 @22 :Bool;
   val31 @23 :Bool;
-  val11 @24 :Text;
-  val24 @25 :Text;
-  val26 @26 :Text;
-  val7 @27 :UInt16;
-  val20 @28 :UInt16;
-  val12 @29 :UInt32;
-  val25 @30 :UInt32;
-  val27 @31 :UInt32;
+  val32 @24 :Bool;
+  val11 @25 :Text;
+  val24 @26 :Text;
+  val26 @27 :Text;
+  val7 @28 :UInt16;
+  val20 @29 :UInt16;
+  val12 @30 :UInt32;
+  val25 @31 :UInt32;
+  val27 @32 :UInt32;
 }
 
 struct Macro @0xf88157fb8bf2eeff{

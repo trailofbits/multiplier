@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -99,6 +98,13 @@ std::optional<BrOp> BrOp::producing(const ::mx::ir::Value &that) {
   return ::vast::ll::Br(this->::mx::ir::Operation::op_);
 }
 
+gap::generator<::mx::ir::Operand> BrOp::operands(void) const & {
+  auto range = underlying_repr().getOperands();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
 std::optional<ConcatOp> ConcatOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::LL_CONCAT) {
     return reinterpret_cast<const ConcatOp &>(that);
@@ -115,6 +121,13 @@ std::optional<ConcatOp> ConcatOp::producing(const ::mx::ir::Value &that) {
 
 ::vast::ll::Concat ConcatOp::underlying_repr(void) const noexcept {
   return ::vast::ll::Concat(this->::mx::ir::Operation::op_);
+}
+
+gap::generator<::mx::ir::Operand> ConcatOp::arguments(void) const & {
+  auto range = underlying_repr().getArgs();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
 }
 
 ::mx::ir::Value ConcatOp::result(void) const {
@@ -145,6 +158,20 @@ std::optional<CondBrOp> CondBrOp::producing(const ::mx::ir::Value &that) {
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
+gap::generator<::mx::ir::Operand> CondBrOp::true_operands(void) const & {
+  auto range = underlying_repr().getTrueOperands();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
+gap::generator<::mx::ir::Operand> CondBrOp::false_operands(void) const & {
+  auto range = underlying_repr().getFalseOperands();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
 std::optional<CondScopeRetOp> CondScopeRetOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::LL_COND_SCOPE_RET) {
     return reinterpret_cast<const CondScopeRetOp &>(that);
@@ -168,6 +195,13 @@ std::optional<CondScopeRetOp> CondScopeRetOp::producing(const ::mx::ir::Value &t
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
+gap::generator<::mx::ir::Operand> CondScopeRetOp::dest_operands(void) const & {
+  auto range = underlying_repr().getDestOperands();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
 std::optional<ExtractOp> ExtractOp::from(const ::mx::ir::Operation &that) {
   if (that.kind() == OperationKind::LL_EXTRACT) {
     return reinterpret_cast<const ExtractOp &>(that);
@@ -186,7 +220,7 @@ std::optional<ExtractOp> ExtractOp::producing(const ::mx::ir::Value &that) {
   return ::vast::ll::Extract(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value ExtractOp::arg(void) const {
+::mx::ir::Value ExtractOp::argument(void) const {
   auto val = underlying_repr().getArg();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
@@ -194,6 +228,11 @@ std::optional<ExtractOp> ExtractOp::producing(const ::mx::ir::Value &that) {
 ::mx::ir::Value ExtractOp::result(void) const {
   auto val = underlying_repr().getResult();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+std::size_t ExtractOp::size(void) const {
+  auto val = underlying_repr().size();
+  return val;
 }
 
 std::optional<InitializeVarOp> InitializeVarOp::from(const ::mx::ir::Operation &that) {
@@ -217,6 +256,13 @@ std::optional<InitializeVarOp> InitializeVarOp::producing(const ::mx::ir::Value 
 ::mx::ir::Value InitializeVarOp::var(void) const {
   auto val = underlying_repr().getVar();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+gap::generator<::mx::ir::Operand> InitializeVarOp::elements(void) const & {
+  auto range = underlying_repr().getElements();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
 }
 
 ::mx::ir::Value InitializeVarOp::result(void) const {
@@ -288,12 +334,16 @@ std::optional<FuncOp> FuncOp::producing(const ::mx::ir::Value &that) {
   return ::vast::ll::FuncOp(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Region FuncOp::body(void) const {
-  auto &val = underlying_repr().getBody();
+std::optional<::mx::ir::Region> FuncOp::body(void) const {
+  decltype(auto) opt_val = underlying_repr().getBody();
+  if (opt_val.empty()) {
+    return std::nullopt;
+  }
+  auto &val = opt_val;
   return ::mx::ir::Region(module_, val);
 }
 
-std::string_view FuncOp::sym_name(void) const {
+std::string_view FuncOp::name(void) const {
   auto val = underlying_repr().getSymName();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);
@@ -302,7 +352,15 @@ std::string_view FuncOp::sym_name(void) const {
   }
 }
 
-std::optional<std::string_view> FuncOp::sym_visibility(void) const {
+::mx::ir::Type FuncOp::function_type(void) const {
+  auto mlir_type = underlying_repr().getFunctionType();
+  return ::mx::ir::Type(
+      mlir_type.getContext(),
+      reinterpret_cast<const mlir::TypeStorage *>(
+          mlir_type.getAsOpaquePointer()));
+}
+
+std::optional<std::string_view> FuncOp::visibility(void) const {
   auto opt_val = underlying_repr().getSymVisibility();
   if (!opt_val) {
     return std::nullopt;
@@ -318,6 +376,36 @@ std::optional<std::string_view> FuncOp::sym_visibility(void) const {
 bool FuncOp::is_var_arg(void) const {
   auto val = underlying_repr().isVarArg();
   return val;
+}
+
+gap::generator<::mx::ir::Type> FuncOp::callable_results(void) const & {
+  auto range = underlying_repr().getCallableResults();
+  for (auto el_ty : range) {
+    co_yield ::mx::ir::Type(
+        el_ty.getContext(),
+        reinterpret_cast<const mlir::TypeStorage *>(
+            el_ty.getAsOpaquePointer()));
+  }
+}
+
+gap::generator<::mx::ir::Type> FuncOp::argument_types(void) const & {
+  auto range = underlying_repr().getArgumentTypes();
+  for (auto el_ty : range) {
+    co_yield ::mx::ir::Type(
+        el_ty.getContext(),
+        reinterpret_cast<const mlir::TypeStorage *>(
+            el_ty.getAsOpaquePointer()));
+  }
+}
+
+gap::generator<::mx::ir::Type> FuncOp::result_types(void) const & {
+  auto range = underlying_repr().getResultTypes();
+  for (auto el_ty : range) {
+    co_yield ::mx::ir::Type(
+        el_ty.getContext(),
+        reinterpret_cast<const mlir::TypeStorage *>(
+            el_ty.getAsOpaquePointer()));
+  }
 }
 
 bool FuncOp::is_declaration(void) const {
@@ -358,8 +446,8 @@ uint32_t StructGEPOp::idx(void) const {
   return val;
 }
 
-std::string_view StructGEPOp::name(void) const {
-  auto val = underlying_repr().getName();
+std::string_view StructGEPOp::field(void) const {
+  auto val = underlying_repr().getField();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);
   } else {
@@ -383,6 +471,13 @@ std::optional<ReturnOp> ReturnOp::producing(const ::mx::ir::Value &that) {
 
 ::vast::ll::ReturnOp ReturnOp::underlying_repr(void) const noexcept {
   return ::vast::ll::ReturnOp(this->::mx::ir::Operation::op_);
+}
+
+gap::generator<::mx::ir::Operand> ReturnOp::result(void) const & {
+  auto range = underlying_repr().getResult();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
 }
 
 std::optional<ScopeOp> ScopeOp::from(const ::mx::ir::Operation &that) {
@@ -462,7 +557,7 @@ std::optional<StoreOp> StoreOp::producing(const ::mx::ir::Value &that) {
   return ::vast::ll::Store(this->::mx::ir::Operation::op_);
 }
 
-::mx::ir::Value StoreOp::val(void) const {
+::mx::ir::Value StoreOp::value(void) const {
   auto val = underlying_repr().getVal();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }

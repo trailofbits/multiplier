@@ -1,5 +1,4 @@
 // Copyright (c) 2022-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -8,6 +7,11 @@
 
 #define VAST_ENABLE_EXCEPTIONS
 #include <vast/Util/Warnings.hpp>
+
+// Hack to get around `std::unique_ptr` issue with a `struct DelimitedScope`.
+#define LLVM_SUPPORT_SCOPEDPRINTER_H
+
+#include "ScopedPrinter.h"
 
 VAST_RELAX_WARNINGS
 #include <clang/AST/ASTContext.h>
@@ -22,6 +26,7 @@ VAST_RELAX_WARNINGS
 #include <mlir/InitAllDialects.h>
 VAST_UNRELAX_WARNINGS
 
+#include <algorithm>
 #include <exception>
 #include <glog/logging.h>
 
@@ -276,6 +281,9 @@ class PreprocessingVisitorProxy : public vast::cg::fallthrough_list_node {
   clang::ASTContext &ast_context;
   const EntityMapper &em;
 
+  int in_ce{0};
+  const vast::cg::clang_stmt *expected_ce{nullptr};
+
  public:
   PreprocessingVisitorProxy(clang::ASTContext &ast_context_,
                             const EntityMapper &em_)
@@ -317,11 +325,72 @@ class PreprocessingVisitorProxy : public vast::cg::fallthrough_list_node {
   vast::operation visit(const vast::cg::clang_stmt *raw_stmt,
                         vast::cg::scope_context &scope) override {
     auto eid = em.EntityId(raw_stmt);
-    if (eid == mx::kInvalidEntityId) {
-      return {};
+    if (eid != mx::kInvalidEntityId) {
+      return next->visit(raw_stmt, scope);
     }
 
-    return next->visit(raw_stmt, scope);
+    if (clang::isa<clang::ConstantExpr>(raw_stmt) ||
+        expected_ce == raw_stmt) {
+      ++in_ce;
+      auto ret = next->visit(raw_stmt, scope);
+      --in_ce;
+      return ret;
+    }
+
+    if (in_ce ||
+        clang::isa<clang::IntegerLiteral>(raw_stmt) ||
+        clang::isa<clang::ImaginaryLiteral>(raw_stmt) ||
+        clang::isa<clang::FloatingLiteral>(raw_stmt) ||
+        clang::isa<clang::FixedPointLiteral>(raw_stmt) ||
+        clang::isa<clang::CharacterLiteral>(raw_stmt) ||
+        clang::isa<clang::StringLiteral>(raw_stmt) ||
+        clang::isa<clang::ObjCStringLiteral>(raw_stmt) ||
+        clang::isa<clang::ObjCDictionaryLiteral>(raw_stmt) ||
+        clang::isa<clang::ObjCArrayLiteral>(raw_stmt)) {
+      return next->visit(raw_stmt, scope);
+    }
+
+    raw_stmt->dumpColor();
+    return {};
+  }
+
+  vast::operation visit(const vast::cg::clang_decl *raw_decl,
+                        vast::cg::scope_context &scope) override {
+
+    // Avoid having to lift constant expressions in enumerators. These will
+    // often be in different fragments.
+    if (auto enumerator = clang::dyn_cast<clang::EnumConstantDecl>(
+            const_cast<vast::cg::clang_decl *>(raw_decl))) {
+      auto old_init = enumerator->getInitExpr();
+      enumerator->setInitExpr(nullptr);
+      auto ret = next->visit(raw_decl, scope);
+      enumerator->setInitExpr(old_init);
+      return ret;
+    }
+
+    const auto old_expected_ce = expected_ce;
+
+    // VAST doesn't (yet) lift the field bitfield expressions, but if it
+    // eventually does, then mark them as expected constant expressions. They
+    // might be in different fragments. The expressions do, however, need to be
+    // present for the calculation of the bitfield with.
+    if (auto field = clang::dyn_cast<clang::FieldDecl>(raw_decl)) {
+      expected_ce = field->getBitWidth();
+    }
+
+    auto ret = next->visit(raw_decl, scope);
+    expected_ce = old_expected_ce;
+
+    // VAST will sometimes set the wrong visibility. We don't really care about
+    // the visibility.
+    if (clang::isa<clang::FunctionDecl>(raw_decl)) {
+      if (auto fn = mlir::dyn_cast<vast::hl::FuncOp>(ret)) {
+        mlir::SymbolTable::setSymbolVisibility(
+            fn, vast::cg::mlir_visibility::Public);
+      }
+    }
+
+    return ret;
   }
 
  private:
@@ -335,7 +404,7 @@ class PreprocessingVisitorProxy : public vast::cg::fallthrough_list_node {
   }
 };
 
-class CodeGenPolicy final : public vast::cg::policy_base {
+class CodeGenPolicy final : public vast::cg::codegen_policy {
  private:
   const EntityMapper &em;
   std::unordered_set<mx::RawEntityId> fragment_indexes;
@@ -357,7 +426,7 @@ class CodeGenPolicy final : public vast::cg::policy_base {
     return false;
   };
 
-  enum vast::cg::missing_return_policy missing_return_policy(
+  enum vast::cg::missing_return_policy get_missing_return_policy(
       const vast::cg::clang_function *) const final {
     return vast::cg::missing_return_policy::emit_trap;
   }
@@ -388,7 +457,7 @@ class CodeGenPolicy final : public vast::cg::policy_base {
   }
 };
 
-static std::optional<vast::owning_module_ref> CreateModule(
+static std::optional<vast::owning_mlir_module_ref> CreateModule(
     const pasta::AST &ast, const EntityMapper &em,
     std::vector<mx::PackedFragmentId> fragment_ids) try {
 
@@ -432,7 +501,7 @@ static std::optional<vast::owning_module_ref> CreateModule(
 }
 
 static std::optional<std::string> DumpToString(
-    vast::owning_module_ref &mlir_module) {
+    vast::owning_mlir_module_ref &mlir_module) {
   std::string result;
   llvm::raw_string_ostream os(result);
   mlir::BytecodeWriterConfig config("MX");
@@ -485,7 +554,7 @@ std::string CodeGenerator::GenerateSourceIR(
   flags.enableDebugInfo(true, false);
 
   // Nifty for debugging, to see what the MLIR looked like.
-  if (true) {
+  if (false) {
     std::error_code ec;
     std::string out_file =
         (std::filesystem::path("/tmp/src/") / ast.MainFile().Path().filename()).generic_string();
@@ -495,7 +564,6 @@ std::string CodeGenerator::GenerateSourceIR(
     } else {
       LOG(ERROR) << ec.message();
     }
-    os.close();
   }
 
   if (auto result = DumpToString(mod.value())) {

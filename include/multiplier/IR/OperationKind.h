@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -337,6 +336,7 @@ enum class OperationKind : unsigned {
   HL_ALIGNOF_TYPE,  // hl.alignof.type
   HL_ASM,  // hl.asm
   HL_ASSIGN,  // hl.assign
+  HL_ATTRIBUTED_STMT,  // hl.attributed_stmt
   HL_ASSIGN_BIN_ASHR,  // hl.assign.bin.ashr
   HL_BIN_ASHR,  // hl.bin.ashr
   HL_ASSIGN_BIN_AND,  // hl.assign.bin.and
@@ -352,16 +352,25 @@ enum class OperationKind : unsigned {
   HL_BIN_SHL,  // hl.bin.shl
   HL_ASSIGN_BIN_XOR,  // hl.assign.bin.xor
   HL_BIN_XOR,  // hl.bin.xor
+  HL_BINARY_COND,  // hl.binary_cond
+  HL_BREAK,  // hl.break
   HL_BUILTIN_BITCAST,  // hl.builtin_bitcast
+  HL_BUILTIN_TYPES_COMPATIBLE_P_TYPE,  // hl.builtin_types_compatible_p.type
   HL_CSTYLE_CAST,  // hl.cstyle_cast
   HL_CALL,  // hl.call
+  HL_CASE,  // hl.case
+  HL_CHOOSE_EXPR,  // hl.choose_expr
   HL_CLASS,  // hl.class
   HL_CMP,  // hl.cmp
   HL_COMPOUND_LITERAL,  // hl.compound_literal
+  HL_COND,  // hl.cond
+  HL_COND_YIELD,  // hl.cond.yield
   HL_CONST,  // hl.const
+  HL_CONTINUE,  // hl.continue
   HL_BASE,  // hl.base
   HL_CXXSTRUCT,  // hl.cxxstruct
   HL_REF,  // hl.ref
+  HL_DEFAULT,  // hl.default
   HL_DEREF,  // hl.deref
   HL_ASSIGN_FDIV,  // hl.assign.fdiv
   HL_FDIV,  // hl.fdiv
@@ -369,6 +378,8 @@ enum class OperationKind : unsigned {
   HL_SDIV,  // hl.sdiv
   HL_ASSIGN_UDIV,  // hl.assign.udiv
   HL_UDIV,  // hl.udiv
+  HL_DO,  // hl.do
+  HL_EMPTY_DECL,  // hl.empty.decl
   HL_ENUM_CONST,  // hl.enum.const
   HL_ENUM,  // hl.enum
   HL_ENUMREF,  // hl.enumref
@@ -376,42 +387,31 @@ enum class OperationKind : unsigned {
   HL_GNU_EXTENSION,  // hl.gnu.extension
   HL_FCMP,  // hl.fcmp
   HL_FIELD,  // hl.field
-  HL_FUNCREF,  // hl.funcref
-  HL_GLOBREF,  // hl.globref
-  HL_BINARY_COND,  // hl.binary_cond
-  HL_BREAK,  // hl.break
-  HL_CASE,  // hl.case
-  HL_COND,  // hl.cond
-  HL_COND_YIELD,  // hl.cond.yield
-  HL_CONTINUE,  // hl.continue
-  HL_DEFAULT,  // hl.default
-  HL_DO,  // hl.do
-  HL_EMPTY_DECL,  // hl.empty.decl
+  HL_FILE_SCOPE_ASM,  // hl.file_scope_asm
   HL_FOR,  // hl.for
   HL_FUNC,  // hl.func
+  HL_FUNCREF,  // hl.funcref
+  HL_GENERIC_ASOC,  // hl.generic_asoc
+  HL_GENERIC_EXPR,  // hl.generic_expr
+  HL_GLOBREF,  // hl.globref
   HL_GOTO,  // hl.goto
   HL_IF,  // hl.if
-  HL_INDIRECT_GOTO,  // hl.indirect_goto
-  HL_LABEL_DECL,  // hl.label.decl
-  HL_LABEL,  // hl.label
-  HL_SKIP,  // hl.skip
-  HL_SWITCH,  // hl.switch
-  HL_TYPE_YIELD,  // hl.type.yield
-  HL_VALUE_YIELD,  // hl.value.yield
-  HL_VAR,  // hl.var
-  HL_WHILE,  // hl.while
   HL_IMAG,  // hl.imag
   HL_IMPLICIT_CAST,  // hl.implicit_cast
   HL_INDIRECT_CALL,  // hl.indirect_call
+  HL_INDIRECT_GOTO,  // hl.indirect_goto
   HL_INITLIST,  // hl.initlist
   HL_CONST_INIT,  // hl.const.init
   HL_LNOT,  // hl.lnot
+  HL_LABEL_DECL,  // hl.label.decl
+  HL_LABEL,  // hl.label
   HL_MINUS,  // hl.minus
   HL_ASSIGN_FMUL,  // hl.assign.fmul
   HL_FMUL,  // hl.fmul
   HL_ASSIGN_MUL,  // hl.assign.mul
   HL_MUL,  // hl.mul
   HL_NOT,  // hl.not
+  HL_NULL,  // hl.null
   HL_OFFSETOF_EXPR,  // hl.offsetof.expr
   HL_OPAQUE_EXPR,  // hl.opaque_expr
   HL_PLUS,  // hl.plus
@@ -433,6 +433,7 @@ enum class OperationKind : unsigned {
   HL_RETURN,  // hl.return
   HL_SIZEOF_EXPR,  // hl.sizeof.expr
   HL_SIZEOF_TYPE,  // hl.sizeof.type
+  HL_STATIC_ASSERT,  // hl.static_assert
   HL_STMT_EXPR,  // hl.stmt.expr
   HL_STRUCT,  // hl.struct
   HL_ASSIGN_FSUB,  // hl.assign.fsub
@@ -440,19 +441,25 @@ enum class OperationKind : unsigned {
   HL_ASSIGN_SUB,  // hl.assign.sub
   HL_SUB,  // hl.sub
   HL_SUBSCRIPT,  // hl.subscript
+  HL_SWITCH,  // hl.switch
   HL_THIS,  // hl.this
   HL_TRANSLATION_UNIT,  // hl.translation_unit
   HL_ALIAS,  // hl.alias
   HL_TYPE,  // hl.type
   HL_TYPEDEF,  // hl.typedef
   HL_TYPEOF_EXPR,  // hl.typeof.expr
+  HL_TYPE_YIELD,  // hl.type.yield
   HL_UNION,  // hl.union
   HL_UNREACHABLE,  // hl.unreachable
   HL_VA_ARG_EXPR,  // hl.va_arg_expr
+  HL_VALUE_YIELD,  // hl.value.yield
+  HL_VAR,  // hl.var
+  HL_WHILE,  // hl.while
   CORE_BIN_LAND,  // core.bin.land
   CORE_BIN_LOR,  // core.bin.lor
   CORE_IMPLICIT_RETURN,  // core.implicit.return
   CORE_LAZY_OP,  // core.lazy.op
+  CORE_MODULE,  // core.module
   CORE_SCOPE,  // core.scope
   CORE_SELECT,  // core.select
   UNSUP_DECL,  // unsup.decl
@@ -466,7 +473,7 @@ inline static const char *EnumerationName(ir::OperationKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(ir::OperationKind) {
-  return 443;
+  return 451;
 }
 
 MX_EXPORT const char *EnumeratorName(ir::OperationKind);

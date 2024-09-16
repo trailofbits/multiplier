@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -125,33 +124,33 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 namespace {
 static PyGetSetDef gProperties[] = {
   {
-    "int_",
+    "integer_value",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->int_());
+          return ::mx::to_python(T_cast(self)->integer_value());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::builtin::IntegerAttr::int_"),
+    PyDoc_STR("Wrapper for mx::ir::builtin::IntegerAttr::integer_value"),
     nullptr,
   },
   {
-    "s_int",
+    "signed_integer_value",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->s_int());
+          return ::mx::to_python(T_cast(self)->signed_integer_value());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::builtin::IntegerAttr::s_int"),
+    PyDoc_STR("Wrapper for mx::ir::builtin::IntegerAttr::signed_integer_value"),
     nullptr,
   },
   {
-    "u_int",
+    "unsigned_integer_value",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->u_int());
+          return ::mx::to_python(T_cast(self)->unsigned_integer_value());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::builtin::IntegerAttr::u_int"),
+    PyDoc_STR("Wrapper for mx::ir::builtin::IntegerAttr::unsigned_integer_value"),
     nullptr,
   },
   {

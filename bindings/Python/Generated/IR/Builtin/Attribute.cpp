@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -73,7 +72,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[868]) || tp >= &(gTypes[891])) {
+  if (tp < &(gTypes[868]) || tp >= &(gTypes[892])) {
     return std::nullopt;
   }
 
@@ -175,6 +174,10 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
 
     case mx::ir::builtin::DenseIntElementsAttr::static_kind():
       tp = &(gTypes[890]);
+      break;
+
+    case mx::ir::builtin::DataLayoutSpecAttr::static_kind():
+      tp = &(gTypes[891]);
       break;
 
   }

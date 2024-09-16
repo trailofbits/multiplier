@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -81,6 +80,13 @@ std::optional<UnsupportedStmtOp> UnsupportedStmtOp::producing(const ::mx::ir::Va
 ::mx::ir::Value UnsupportedStmtOp::result(void) const {
   auto val = underlying_repr().getResult();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+gap::generator<::mx::ir::Region> UnsupportedStmtOp::children(void) const & {
+  decltype(auto) regions = underlying_repr().getChildren();
+  for (auto &region : regions) {
+    co_yield ::mx::ir::Region(module_, &region);
+  }
 }
 
 std::string_view UnsupportedStmtOp::name(void) const {

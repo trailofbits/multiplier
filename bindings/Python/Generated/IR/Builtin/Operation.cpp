@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -73,7 +72,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[991]) || tp >= &(gTypes[994])) {
+  if (tp < &(gTypes[999]) || tp >= &(gTypes[1002])) {
     return std::nullopt;
   }
 
@@ -90,11 +89,11 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::ir::builtin::ModuleOp::static_kind():
-      tp = &(gTypes[992]);
+      tp = &(gTypes[1000]);
       break;
 
     case mx::ir::builtin::UnrealizedConversionCastOp::static_kind():
-      tp = &(gTypes[993]);
+      tp = &(gTypes[1001]);
       break;
 
   }
@@ -162,7 +161,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[991]);
+  PyTypeObject * const tp = &(gTypes[999]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -177,12 +176,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[990].tp_hash;
-  tp->tp_richcompare = gTypes[990].tp_richcompare;
+  tp->tp_hash = gTypes[998].tp_hash;
+  tp->tp_richcompare = gTypes[998].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[990]);
+  tp->tp_base = &(gTypes[998]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

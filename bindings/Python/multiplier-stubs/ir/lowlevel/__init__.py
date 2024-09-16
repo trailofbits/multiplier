@@ -1,6 +1,5 @@
 #
 # Copyright (c) 2023-present, Trail of Bits, Inc.
-# All rights reserved.
 #
 # This source code is licensed in accordance with the terms specified in
 # the LICENSE file found in the root directory of this source tree.
@@ -64,6 +63,7 @@ class ArgAllocaOp(multiplier.ir.lowlevel.Operation):
     ...
 
 class BrOp(multiplier.ir.lowlevel.Operation):
+  operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -78,6 +78,7 @@ class BrOp(multiplier.ir.lowlevel.Operation):
     ...
 
 class ConcatOp(multiplier.ir.lowlevel.Operation):
+  arguments: Iterable[multiplier.ir.Operand]
   result: multiplier.ir.Value
 
   @staticmethod
@@ -94,6 +95,8 @@ class ConcatOp(multiplier.ir.lowlevel.Operation):
 
 class CondBrOp(multiplier.ir.lowlevel.Operation):
   cond: multiplier.ir.Value
+  true_operands: Iterable[multiplier.ir.Operand]
+  false_operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -109,6 +112,7 @@ class CondBrOp(multiplier.ir.lowlevel.Operation):
 
 class CondScopeRetOp(multiplier.ir.lowlevel.Operation):
   cond: multiplier.ir.Value
+  dest_operands: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -123,8 +127,9 @@ class CondScopeRetOp(multiplier.ir.lowlevel.Operation):
     ...
 
 class ExtractOp(multiplier.ir.lowlevel.Operation):
-  arg: multiplier.ir.Value
+  argument: multiplier.ir.Value
   result: multiplier.ir.Value
+  size: int
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -140,6 +145,7 @@ class ExtractOp(multiplier.ir.lowlevel.Operation):
 
 class InitializeVarOp(multiplier.ir.lowlevel.Operation):
   var: multiplier.ir.Value
+  elements: Iterable[multiplier.ir.Operand]
   result: multiplier.ir.Value
 
   @staticmethod
@@ -185,10 +191,14 @@ class LoadOp(multiplier.ir.lowlevel.Operation):
     ...
 
 class FuncOp(multiplier.ir.lowlevel.Operation):
-  body: multiplier.ir.Region
-  sym_name: str
-  sym_visibility: Optional[str]
+  body: Optional[multiplier.ir.Region]
+  name: str
+  function_type: multiplier.ir.Type
+  visibility: Optional[str]
   is_var_arg: bool
+  callable_results: Iterable[multiplier.ir.Type]
+  argument_types: Iterable[multiplier.ir.Type]
+  result_types: Iterable[multiplier.ir.Type]
   is_declaration: bool
 
   @staticmethod
@@ -207,7 +217,7 @@ class StructGEPOp(multiplier.ir.lowlevel.Operation):
   record: multiplier.ir.Value
   element: multiplier.ir.Value
   idx: int
-  name: str
+  field: str
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -222,6 +232,7 @@ class StructGEPOp(multiplier.ir.lowlevel.Operation):
     ...
 
 class ReturnOp(multiplier.ir.lowlevel.Operation):
+  result: Iterable[multiplier.ir.Operand]
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:
@@ -279,7 +290,7 @@ class ScopeRetOp(multiplier.ir.lowlevel.Operation):
     ...
 
 class StoreOp(multiplier.ir.lowlevel.Operation):
-  val: multiplier.ir.Value
+  value: multiplier.ir.Value
 
   @staticmethod
   def static_kind() -> multiplier.ir.OperationKind:

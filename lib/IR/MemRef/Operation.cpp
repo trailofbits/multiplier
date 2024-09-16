@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -73,6 +72,13 @@ std::optional<AtomicRMWOp> AtomicRMWOp::producing(const ::mx::ir::Value &that) {
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
+gap::generator<::mx::ir::Operand> AtomicRMWOp::indices(void) const & {
+  auto range = underlying_repr().getIndices();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
 ::mx::ir::Value AtomicRMWOp::result(void) const {
   auto val = underlying_repr().getResult();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
@@ -137,6 +143,13 @@ std::optional<GenericAtomicRMWOp> GenericAtomicRMWOp::producing(const ::mx::ir::
   return ::mlir::memref::GenericAtomicRMWOp(this->::mx::ir::Operation::op_);
 }
 
+gap::generator<::mx::ir::Operand> GenericAtomicRMWOp::indices(void) const & {
+  auto range = underlying_repr().getIndices();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
 ::mx::ir::Value GenericAtomicRMWOp::result(void) const {
   auto val = underlying_repr().getResult();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
@@ -163,6 +176,13 @@ std::optional<LoadOp> LoadOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::memref::LoadOp LoadOp::underlying_repr(void) const noexcept {
   return ::mlir::memref::LoadOp(this->::mx::ir::Operation::op_);
+}
+
+gap::generator<::mx::ir::Operand> LoadOp::indices(void) const & {
+  auto range = underlying_repr().getIndices();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
 }
 
 ::mx::ir::Value LoadOp::result(void) const {
@@ -193,6 +213,20 @@ std::optional<AllocOp> AllocOp::producing(const ::mx::ir::Value &that) {
   return ::mlir::memref::AllocOp(this->::mx::ir::Operation::op_);
 }
 
+gap::generator<::mx::ir::Operand> AllocOp::dynamic_sizes(void) const & {
+  auto range = underlying_repr().getDynamicSizes();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
+gap::generator<::mx::ir::Operand> AllocOp::symbol_operands(void) const & {
+  auto range = underlying_repr().getSymbolOperands();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
 std::optional<unsigned long long> AllocOp::alignment(void) const {
   auto opt_val = underlying_repr().getAlignment();
   if (!opt_val) {
@@ -218,6 +252,20 @@ std::optional<AllocaOp> AllocaOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::memref::AllocaOp AllocaOp::underlying_repr(void) const noexcept {
   return ::mlir::memref::AllocaOp(this->::mx::ir::Operation::op_);
+}
+
+gap::generator<::mx::ir::Operand> AllocaOp::dynamic_sizes(void) const & {
+  auto range = underlying_repr().getDynamicSizes();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
+gap::generator<::mx::ir::Operand> AllocaOp::symbol_operands(void) const & {
+  auto range = underlying_repr().getSymbolOperands();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
 }
 
 std::optional<unsigned long long> AllocaOp::alignment(void) const {
@@ -247,6 +295,13 @@ std::optional<AllocaScopeOp> AllocaScopeOp::producing(const ::mx::ir::Value &tha
   return ::mlir::memref::AllocaScopeOp(this->::mx::ir::Operation::op_);
 }
 
+gap::generator<::mx::ir::Result> AllocaScopeOp::results(void) const & {
+  auto range = underlying_repr().getResults();
+  for (auto val : range) {
+    co_yield ::mx::ir::Result(module_, val.getAsOpaquePointer());
+  }
+}
+
 ::mx::ir::Region AllocaScopeOp::body_region(void) const {
   auto &val = underlying_repr().getBodyRegion();
   return ::mx::ir::Region(module_, val);
@@ -268,6 +323,13 @@ std::optional<AllocaScopeReturnOp> AllocaScopeReturnOp::producing(const ::mx::ir
 
 ::mlir::memref::AllocaScopeReturnOp AllocaScopeReturnOp::underlying_repr(void) const noexcept {
   return ::mlir::memref::AllocaScopeReturnOp(this->::mx::ir::Operation::op_);
+}
+
+gap::generator<::mx::ir::Operand> AllocaScopeReturnOp::results(void) const & {
+  auto range = underlying_repr().getResults();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
 }
 
 std::optional<CastOp> CastOp::from(const ::mx::ir::Operation &that) {
@@ -374,6 +436,13 @@ std::optional<DMAStartOp> DMAStartOp::producing(const ::mx::ir::Value &that) {
   return ::mlir::memref::DmaStartOp(this->::mx::ir::Operation::op_);
 }
 
+gap::generator<::mx::ir::Operand> DMAStartOp::operands(void) const & {
+  auto range = underlying_repr().getOperands();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
 unsigned int DMAStartOp::src_mem_ref_rank(void) const {
   auto val = underlying_repr().getSrcMemRefRank();
   return val;
@@ -435,6 +504,13 @@ std::optional<DMAWaitOp> DMAWaitOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::memref::DmaWaitOp DMAWaitOp::underlying_repr(void) const noexcept {
   return ::mlir::memref::DmaWaitOp(this->::mx::ir::Operation::op_);
+}
+
+gap::generator<::mx::ir::Operand> DMAWaitOp::tag_indices(void) const & {
+  auto range = underlying_repr().getTagIndices();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
 }
 
 unsigned int DMAWaitOp::tag_mem_ref_rank(void) const {
@@ -501,6 +577,20 @@ std::optional<ExtractStridedMetadataOp> ExtractStridedMetadataOp::producing(cons
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
+gap::generator<::mx::ir::Result> ExtractStridedMetadataOp::sizes(void) const & {
+  auto range = underlying_repr().getSizes();
+  for (auto val : range) {
+    co_yield ::mx::ir::Result(module_, val.getAsOpaquePointer());
+  }
+}
+
+gap::generator<::mx::ir::Result> ExtractStridedMetadataOp::strides(void) const & {
+  auto range = underlying_repr().getStrides();
+  for (auto val : range) {
+    co_yield ::mx::ir::Result(module_, val.getAsOpaquePointer());
+  }
+}
+
 ::mx::ir::Value ExtractStridedMetadataOp::view_source(void) const {
   auto val = underlying_repr().getViewSource();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
@@ -551,7 +641,7 @@ std::optional<GlobalOp> GlobalOp::producing(const ::mx::ir::Value &that) {
   return ::mlir::memref::GlobalOp(this->::mx::ir::Operation::op_);
 }
 
-std::string_view GlobalOp::sym_name(void) const {
+std::string_view GlobalOp::name(void) const {
   auto val = underlying_repr().getSymName();
   if (auto size = val.size()) {
     return std::string_view(val.data(), size);
@@ -560,7 +650,7 @@ std::string_view GlobalOp::sym_name(void) const {
   }
 }
 
-std::optional<std::string_view> GlobalOp::sym_visibility(void) const {
+std::optional<std::string_view> GlobalOp::visibility(void) const {
   auto opt_val = underlying_repr().getSymVisibility();
   if (!opt_val) {
     return std::nullopt;
@@ -631,6 +721,13 @@ std::optional<PrefetchOp> PrefetchOp::producing(const ::mx::ir::Value &that) {
 
 ::mlir::memref::PrefetchOp PrefetchOp::underlying_repr(void) const noexcept {
   return ::mlir::memref::PrefetchOp(this->::mx::ir::Operation::op_);
+}
+
+gap::generator<::mx::ir::Operand> PrefetchOp::indices(void) const & {
+  auto range = underlying_repr().getIndices();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
 }
 
 bool PrefetchOp::is_write(void) const {
@@ -711,6 +808,34 @@ std::optional<ReinterpretCastOp> ReinterpretCastOp::producing(const ::mx::ir::Va
   return ::mlir::memref::ReinterpretCastOp(this->::mx::ir::Operation::op_);
 }
 
+gap::generator<::mx::ir::Operand> ReinterpretCastOp::offsets(void) const & {
+  auto range = underlying_repr().getOffsets();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
+gap::generator<::mx::ir::Operand> ReinterpretCastOp::sizes(void) const & {
+  auto range = underlying_repr().getSizes();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
+gap::generator<::mx::ir::Operand> ReinterpretCastOp::strides(void) const & {
+  auto range = underlying_repr().getStrides();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
+gap::generator<::mx::ir::Operand> ReinterpretCastOp::dynamic_sizes(void) const & {
+  auto range = underlying_repr().getDynamicSizes();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
 unsigned int ReinterpretCastOp::result_rank(void) const {
   auto val = underlying_repr().getResultRank();
   return val;
@@ -762,6 +887,13 @@ std::optional<StoreOp> StoreOp::producing(const ::mx::ir::Value &that) {
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
 }
 
+gap::generator<::mx::ir::Operand> StoreOp::indices(void) const & {
+  auto range = underlying_repr().getIndices();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
 bool StoreOp::nontemporal(void) const {
   auto val = underlying_repr().getNontemporal();
   return val;
@@ -803,6 +935,13 @@ std::optional<ViewOp> ViewOp::producing(const ::mx::ir::Value &that) {
   return ::mlir::memref::ViewOp(this->::mx::ir::Operation::op_);
 }
 
+gap::generator<::mx::ir::Operand> ViewOp::sizes(void) const & {
+  auto range = underlying_repr().getSizes();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
 ::mx::ir::Value ViewOp::view_source(void) const {
   auto val = underlying_repr().getViewSource();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
@@ -826,9 +965,37 @@ std::optional<SubViewOp> SubViewOp::producing(const ::mx::ir::Value &that) {
   return ::mlir::memref::SubViewOp(this->::mx::ir::Operation::op_);
 }
 
+gap::generator<::mx::ir::Operand> SubViewOp::offsets(void) const & {
+  auto range = underlying_repr().getOffsets();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
+gap::generator<::mx::ir::Operand> SubViewOp::sizes(void) const & {
+  auto range = underlying_repr().getSizes();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
+gap::generator<::mx::ir::Operand> SubViewOp::strides(void) const & {
+  auto range = underlying_repr().getStrides();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
+}
+
 ::mx::ir::Value SubViewOp::view_source(void) const {
   auto val = underlying_repr().getViewSource();
   return ::mx::ir::Value(module_, val.getAsOpaquePointer());
+}
+
+gap::generator<::mx::ir::Operand> SubViewOp::dynamic_sizes(void) const & {
+  auto range = underlying_repr().getDynamicSizes();
+  for (auto val : range) {
+    co_yield ::mx::ir::Operand(module_, val.getAsOpaquePointer());
+  }
 }
 
 unsigned int SubViewOp::offset_size_and_stride_start_operand_index(void) const {

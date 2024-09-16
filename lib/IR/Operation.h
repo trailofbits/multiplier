@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -329,6 +328,7 @@
    _hl("hl.alignof.type", OperationKind::HL_ALIGNOF_TYPE, vast::hl::AlignOfTypeOp) \
    _hl("hl.asm", OperationKind::HL_ASM, vast::hl::AsmOp) \
    _hl("hl.assign", OperationKind::HL_ASSIGN, vast::hl::AssignOp) \
+   _hl("hl.attributed_stmt", OperationKind::HL_ATTRIBUTED_STMT, vast::hl::AttributedStmt) \
    _hl("hl.assign.bin.ashr", OperationKind::HL_ASSIGN_BIN_ASHR, vast::hl::BinAShrAssignOp) \
    _hl("hl.bin.ashr", OperationKind::HL_BIN_ASHR, vast::hl::BinAShrOp) \
    _hl("hl.assign.bin.and", OperationKind::HL_ASSIGN_BIN_AND, vast::hl::BinAndAssignOp) \
@@ -344,16 +344,25 @@
    _hl("hl.bin.shl", OperationKind::HL_BIN_SHL, vast::hl::BinShlOp) \
    _hl("hl.assign.bin.xor", OperationKind::HL_ASSIGN_BIN_XOR, vast::hl::BinXorAssignOp) \
    _hl("hl.bin.xor", OperationKind::HL_BIN_XOR, vast::hl::BinXorOp) \
+   _hl("hl.binary_cond", OperationKind::HL_BINARY_COND, vast::hl::BinaryCondOp) \
+   _hl("hl.break", OperationKind::HL_BREAK, vast::hl::BreakOp) \
    _hl("hl.builtin_bitcast", OperationKind::HL_BUILTIN_BITCAST, vast::hl::BuiltinBitCastOp) \
+   _hl("hl.builtin_types_compatible_p.type", OperationKind::HL_BUILTIN_TYPES_COMPATIBLE_P_TYPE, vast::hl::BuiltinTypesCompatiblePOp) \
    _hl("hl.cstyle_cast", OperationKind::HL_CSTYLE_CAST, vast::hl::CStyleCastOp) \
    _hl("hl.call", OperationKind::HL_CALL, vast::hl::CallOp) \
+   _hl("hl.case", OperationKind::HL_CASE, vast::hl::CaseOp) \
+   _hl("hl.choose_expr", OperationKind::HL_CHOOSE_EXPR, vast::hl::ChooseExprOp) \
    _hl("hl.class", OperationKind::HL_CLASS, vast::hl::ClassDeclOp) \
    _hl("hl.cmp", OperationKind::HL_CMP, vast::hl::CmpOp) \
    _hl("hl.compound_literal", OperationKind::HL_COMPOUND_LITERAL, vast::hl::CompoundLiteralOp) \
+   _hl("hl.cond", OperationKind::HL_COND, vast::hl::CondOp) \
+   _hl("hl.cond.yield", OperationKind::HL_COND_YIELD, vast::hl::CondYieldOp) \
    _hl("hl.const", OperationKind::HL_CONST, vast::hl::ConstantOp) \
+   _hl("hl.continue", OperationKind::HL_CONTINUE, vast::hl::ContinueOp) \
    _hl("hl.base", OperationKind::HL_BASE, vast::hl::CxxBaseSpecifierOp) \
    _hl("hl.cxxstruct", OperationKind::HL_CXXSTRUCT, vast::hl::CxxStructDeclOp) \
    _hl("hl.ref", OperationKind::HL_REF, vast::hl::DeclRefOp) \
+   _hl("hl.default", OperationKind::HL_DEFAULT, vast::hl::DefaultOp) \
    _hl("hl.deref", OperationKind::HL_DEREF, vast::hl::Deref) \
    _hl("hl.assign.fdiv", OperationKind::HL_ASSIGN_FDIV, vast::hl::DivFAssignOp) \
    _hl("hl.fdiv", OperationKind::HL_FDIV, vast::hl::DivFOp) \
@@ -361,6 +370,8 @@
    _hl("hl.sdiv", OperationKind::HL_SDIV, vast::hl::DivSOp) \
    _hl("hl.assign.udiv", OperationKind::HL_ASSIGN_UDIV, vast::hl::DivUAssignOp) \
    _hl("hl.udiv", OperationKind::HL_UDIV, vast::hl::DivUOp) \
+   _hl("hl.do", OperationKind::HL_DO, vast::hl::DoOp) \
+   _hl("hl.empty.decl", OperationKind::HL_EMPTY_DECL, vast::hl::EmptyDeclOp) \
    _hl("hl.enum.const", OperationKind::HL_ENUM_CONST, vast::hl::EnumConstantOp) \
    _hl("hl.enum", OperationKind::HL_ENUM, vast::hl::EnumDeclOp) \
    _hl("hl.enumref", OperationKind::HL_ENUMREF, vast::hl::EnumRefOp) \
@@ -368,42 +379,31 @@
    _hl("hl.gnu.extension", OperationKind::HL_GNU_EXTENSION, vast::hl::ExtensionOp) \
    _hl("hl.fcmp", OperationKind::HL_FCMP, vast::hl::FCmpOp) \
    _hl("hl.field", OperationKind::HL_FIELD, vast::hl::FieldDeclOp) \
-   _hl("hl.funcref", OperationKind::HL_FUNCREF, vast::hl::FuncRefOp) \
-   _hl("hl.globref", OperationKind::HL_GLOBREF, vast::hl::GlobalRefOp) \
-   _hl("hl.binary_cond", OperationKind::HL_BINARY_COND, vast::hl::BinaryCondOp) \
-   _hl("hl.break", OperationKind::HL_BREAK, vast::hl::BreakOp) \
-   _hl("hl.case", OperationKind::HL_CASE, vast::hl::CaseOp) \
-   _hl("hl.cond", OperationKind::HL_COND, vast::hl::CondOp) \
-   _hl("hl.cond.yield", OperationKind::HL_COND_YIELD, vast::hl::CondYieldOp) \
-   _hl("hl.continue", OperationKind::HL_CONTINUE, vast::hl::ContinueOp) \
-   _hl("hl.default", OperationKind::HL_DEFAULT, vast::hl::DefaultOp) \
-   _hl("hl.do", OperationKind::HL_DO, vast::hl::DoOp) \
-   _hl("hl.empty.decl", OperationKind::HL_EMPTY_DECL, vast::hl::EmptyDeclOp) \
+   _hl("hl.file_scope_asm", OperationKind::HL_FILE_SCOPE_ASM, vast::hl::FileScopeAsmOp) \
    _hl("hl.for", OperationKind::HL_FOR, vast::hl::ForOp) \
    _hl("hl.func", OperationKind::HL_FUNC, vast::hl::FuncOp) \
+   _hl("hl.funcref", OperationKind::HL_FUNCREF, vast::hl::FuncRefOp) \
+   _hl("hl.generic_asoc", OperationKind::HL_GENERIC_ASOC, vast::hl::GenericAssocExpr) \
+   _hl("hl.generic_expr", OperationKind::HL_GENERIC_EXPR, vast::hl::GenericSelectionExpr) \
+   _hl("hl.globref", OperationKind::HL_GLOBREF, vast::hl::GlobalRefOp) \
    _hl("hl.goto", OperationKind::HL_GOTO, vast::hl::GotoStmt) \
    _hl("hl.if", OperationKind::HL_IF, vast::hl::IfOp) \
-   _hl("hl.indirect_goto", OperationKind::HL_INDIRECT_GOTO, vast::hl::IndirectGotoStmt) \
-   _hl("hl.label.decl", OperationKind::HL_LABEL_DECL, vast::hl::LabelDeclOp) \
-   _hl("hl.label", OperationKind::HL_LABEL, vast::hl::LabelStmt) \
-   _hl("hl.skip", OperationKind::HL_SKIP, vast::hl::SkipStmt) \
-   _hl("hl.switch", OperationKind::HL_SWITCH, vast::hl::SwitchOp) \
-   _hl("hl.type.yield", OperationKind::HL_TYPE_YIELD, vast::hl::TypeYieldOp) \
-   _hl("hl.value.yield", OperationKind::HL_VALUE_YIELD, vast::hl::ValueYieldOp) \
-   _hl("hl.var", OperationKind::HL_VAR, vast::hl::VarDeclOp) \
-   _hl("hl.while", OperationKind::HL_WHILE, vast::hl::WhileOp) \
    _hl("hl.imag", OperationKind::HL_IMAG, vast::hl::ImagOp) \
    _hl("hl.implicit_cast", OperationKind::HL_IMPLICIT_CAST, vast::hl::ImplicitCastOp) \
    _hl("hl.indirect_call", OperationKind::HL_INDIRECT_CALL, vast::hl::IndirectCallOp) \
+   _hl("hl.indirect_goto", OperationKind::HL_INDIRECT_GOTO, vast::hl::IndirectGotoStmt) \
    _hl("hl.initlist", OperationKind::HL_INITLIST, vast::hl::InitListExpr) \
    _hl("hl.const.init", OperationKind::HL_CONST_INIT, vast::hl::InitializedConstantOp) \
    _hl("hl.lnot", OperationKind::HL_LNOT, vast::hl::LNotOp) \
+   _hl("hl.label.decl", OperationKind::HL_LABEL_DECL, vast::hl::LabelDeclOp) \
+   _hl("hl.label", OperationKind::HL_LABEL, vast::hl::LabelStmt) \
    _hl("hl.minus", OperationKind::HL_MINUS, vast::hl::MinusOp) \
    _hl("hl.assign.fmul", OperationKind::HL_ASSIGN_FMUL, vast::hl::MulFAssignOp) \
    _hl("hl.fmul", OperationKind::HL_FMUL, vast::hl::MulFOp) \
    _hl("hl.assign.mul", OperationKind::HL_ASSIGN_MUL, vast::hl::MulIAssignOp) \
    _hl("hl.mul", OperationKind::HL_MUL, vast::hl::MulIOp) \
    _hl("hl.not", OperationKind::HL_NOT, vast::hl::NotOp) \
+   _hl("hl.null", OperationKind::HL_NULL, vast::hl::NullStmt) \
    _hl("hl.offsetof.expr", OperationKind::HL_OFFSETOF_EXPR, vast::hl::OffsetOfExprOp) \
    _hl("hl.opaque_expr", OperationKind::HL_OPAQUE_EXPR, vast::hl::OpaqueValueExpr) \
    _hl("hl.plus", OperationKind::HL_PLUS, vast::hl::PlusOp) \
@@ -425,6 +425,7 @@
    _hl("hl.return", OperationKind::HL_RETURN, vast::hl::ReturnOp) \
    _hl("hl.sizeof.expr", OperationKind::HL_SIZEOF_EXPR, vast::hl::SizeOfExprOp) \
    _hl("hl.sizeof.type", OperationKind::HL_SIZEOF_TYPE, vast::hl::SizeOfTypeOp) \
+   _hl("hl.static_assert", OperationKind::HL_STATIC_ASSERT, vast::hl::StaticAssertDecl) \
    _hl("hl.stmt.expr", OperationKind::HL_STMT_EXPR, vast::hl::StmtExprOp) \
    _hl("hl.struct", OperationKind::HL_STRUCT, vast::hl::StructDeclOp) \
    _hl("hl.assign.fsub", OperationKind::HL_ASSIGN_FSUB, vast::hl::SubFAssignOp) \
@@ -432,23 +433,29 @@
    _hl("hl.assign.sub", OperationKind::HL_ASSIGN_SUB, vast::hl::SubIAssignOp) \
    _hl("hl.sub", OperationKind::HL_SUB, vast::hl::SubIOp) \
    _hl("hl.subscript", OperationKind::HL_SUBSCRIPT, vast::hl::SubscriptOp) \
+   _hl("hl.switch", OperationKind::HL_SWITCH, vast::hl::SwitchOp) \
    _hl("hl.this", OperationKind::HL_THIS, vast::hl::ThisOp) \
    _hl("hl.translation_unit", OperationKind::HL_TRANSLATION_UNIT, vast::hl::TranslationUnitOp) \
    _hl("hl.alias", OperationKind::HL_ALIAS, vast::hl::TypeAliasOp) \
    _hl("hl.type", OperationKind::HL_TYPE, vast::hl::TypeDeclOp) \
    _hl("hl.typedef", OperationKind::HL_TYPEDEF, vast::hl::TypeDefOp) \
    _hl("hl.typeof.expr", OperationKind::HL_TYPEOF_EXPR, vast::hl::TypeOfExprOp) \
+   _hl("hl.type.yield", OperationKind::HL_TYPE_YIELD, vast::hl::TypeYieldOp) \
    _hl("hl.union", OperationKind::HL_UNION, vast::hl::UnionDeclOp) \
    _hl("hl.unreachable", OperationKind::HL_UNREACHABLE, vast::hl::UnreachableOp) \
    _hl("hl.va_arg_expr", OperationKind::HL_VA_ARG_EXPR, vast::hl::VAArgExpr) \
+   _hl("hl.value.yield", OperationKind::HL_VALUE_YIELD, vast::hl::ValueYieldOp) \
+   _hl("hl.var", OperationKind::HL_VAR, vast::hl::VarDeclOp) \
+   _hl("hl.while", OperationKind::HL_WHILE, vast::hl::WhileOp) \
    _core("core.bin.land", OperationKind::CORE_BIN_LAND, vast::core::BinLAndOp) \
    _core("core.bin.lor", OperationKind::CORE_BIN_LOR, vast::core::BinLOrOp) \
    _core("core.implicit.return", OperationKind::CORE_IMPLICIT_RETURN, vast::core::ImplicitReturnOp) \
    _core("core.lazy.op", OperationKind::CORE_LAZY_OP, vast::core::LazyOp) \
+   _core("core.module", OperationKind::CORE_MODULE, vast::core::ModuleOp) \
    _core("core.scope", OperationKind::CORE_SCOPE, vast::core::ScopeOp) \
    _core("core.select", OperationKind::CORE_SELECT, vast::core::SelectOp) \
    _unsup("unsup.decl", OperationKind::UNSUP_DECL, vast::unsup::UnsupportedDecl) \
    _unsup("unsup.stmt", OperationKind::UNSUP_STMT, vast::unsup::UnsupportedStmt)
 
-#define MX_IR_NUM_MLIR_OPS 442
+#define MX_IR_NUM_MLIR_OPS 450
 

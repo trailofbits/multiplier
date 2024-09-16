@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -52,7 +51,7 @@ class MX_EXPORT UnsupportedStmtOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value result(void) const;
-  //::mlir::MutableArrayRef<Region> children(void) const;
+  gap::generator<::mx::ir::Region> children(void) const &;
   std::string_view name(void) const;
 };
 static_assert(sizeof(UnsupportedStmtOp) == sizeof(Operation));

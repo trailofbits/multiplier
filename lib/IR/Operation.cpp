@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -266,7 +265,7 @@ std::optional<Symbol> RefOp::referenced_symbol(void) const noexcept {
   switch (kind()) {
     case OperationKind::HL_REF: {
       auto decl_ref = reinterpret_cast<const DeclRefOp &>(*this);
-      if (auto op = Operation::producing(decl_ref.decl())) {
+      if (auto op = Operation::producing(decl_ref.declaration())) {
         return op->defined_symbol();
       }
       break;

@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -73,7 +72,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1282]) || tp >= &(gTypes[1283])) {
+  if (tp < &(gTypes[1290]) || tp >= &(gTypes[1291])) {
     return std::nullopt;
   }
 
@@ -90,7 +89,7 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::ir::abi::FuncOp::static_kind():
-      tp = &(gTypes[1282]);
+      tp = &(gTypes[1290]);
       break;
 
   }
@@ -135,23 +134,33 @@ static PyGetSetDef gProperties[] = {
     nullptr,
   },
   {
-    "sym_name",
+    "name",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->sym_name());
+          return ::mx::to_python(T_cast(self)->name());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::abi::FuncOp::sym_name"),
+    PyDoc_STR("Wrapper for mx::ir::abi::FuncOp::name"),
     nullptr,
   },
   {
-    "sym_visibility",
+    "function_type",
     reinterpret_cast<getter>(
         +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->sym_visibility());
+          return ::mx::to_python(T_cast(self)->function_type());
         }),
     nullptr,
-    PyDoc_STR("Wrapper for mx::ir::abi::FuncOp::sym_visibility"),
+    PyDoc_STR("Wrapper for mx::ir::abi::FuncOp::function_type"),
+    nullptr,
+  },
+  {
+    "visibility",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->visibility());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::abi::FuncOp::visibility"),
     nullptr,
   },
   {
@@ -162,6 +171,36 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::ir::abi::FuncOp::is_var_arg"),
+    nullptr,
+  },
+  {
+    "callable_results",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::callable_results);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::abi::FuncOp::callable_results"),
+    nullptr,
+  },
+  {
+    "argument_types",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::argument_types);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::abi::FuncOp::argument_types"),
+    nullptr,
+  },
+  {
+    "result_types",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::result_types);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::ir::abi::FuncOp::result_types"),
     nullptr,
   },
   {
@@ -246,7 +285,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1282]);
+  PyTypeObject * const tp = &(gTypes[1290]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -261,12 +300,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[1275].tp_hash;
-  tp->tp_richcompare = gTypes[1275].tp_richcompare;
+  tp->tp_hash = gTypes[1283].tp_hash;
+  tp->tp_richcompare = gTypes[1283].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[1275]);
+  tp->tp_base = &(gTypes[1283]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

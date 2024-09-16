@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -373,7 +372,7 @@ class MX_EXPORT TupleType final : public Type {
   ::mlir::TupleType underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //size_t size(void) const;
+  size_t size(void) const;
   //iterator begin(void) const;
   //iterator end(void) const;
   //ArrayRef<Type> types(void) const;

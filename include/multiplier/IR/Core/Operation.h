@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -15,6 +14,7 @@ class BinLAndOp;
 class BinLOrOp;
 class ImplicitReturnOp;
 class LazyOp;
+class ModuleOp;
 class ScopeOp;
 class SelectOp;
 }  // namespace vast::core
@@ -38,8 +38,8 @@ class MX_EXPORT BinLAndOp final : public Operation {
   ::vast::core::BinLAndOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
   ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(BinLAndOp) == sizeof(Operation));
@@ -56,8 +56,8 @@ class MX_EXPORT BinLOrOp final : public Operation {
   ::vast::core::BinLOrOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Value lhs(void) const;
-  ::mx::ir::Value rhs(void) const;
+  ::mx::ir::Value left(void) const;
+  ::mx::ir::Value right(void) const;
   ::mx::ir::Value result(void) const;
 };
 static_assert(sizeof(BinLOrOp) == sizeof(Operation));
@@ -74,7 +74,7 @@ class MX_EXPORT ImplicitReturnOp final : public Operation {
   ::vast::core::ImplicitReturnOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range result(void) const;
+  gap::generator<::mx::ir::Operand> result(void) const &;
 };
 static_assert(sizeof(ImplicitReturnOp) == sizeof(Operation));
 
@@ -94,6 +94,26 @@ class MX_EXPORT LazyOp final : public Operation {
   ::mx::ir::Region lazy(void) const;
 };
 static_assert(sizeof(LazyOp) == sizeof(Operation));
+
+class MX_EXPORT ModuleOp final : public Operation {
+ public:
+  inline static constexpr OperationKind static_kind(void) {
+    return OperationKind::CORE_MODULE;
+  }
+
+  static std::optional<ModuleOp> from(const ::mx::ir::Operation &that);
+  static std::optional<ModuleOp> producing(const ::mx::ir::Value &val);
+
+  ::vast::core::ModuleOp underlying_repr(void) const noexcept;
+
+  // Imported methods:
+  ::mx::ir::Region body(void) const;
+  std::optional<std::string_view> name(void) const;
+  bool is_optional_symbol(void) const;
+  //mlir::DataLayoutSpecInterface data_layout_spec(void) const;
+  std::string_view default_dialect(void) const;
+};
+static_assert(sizeof(ModuleOp) == sizeof(Operation));
 
 class MX_EXPORT ScopeOp final : public Operation {
  public:
@@ -126,7 +146,7 @@ class MX_EXPORT SelectOp final : public Operation {
   ::mx::ir::Value cond(void) const;
   ::mx::ir::Value then_region(void) const;
   ::mx::ir::Value else_region(void) const;
-  //::mlir::Operation::result_range results(void) const;
+  gap::generator<::mx::ir::Result> results(void) const &;
 };
 static_assert(sizeof(SelectOp) == sizeof(Operation));
 

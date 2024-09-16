@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -363,6 +362,11 @@ std::optional<TupleType> TupleType::from(const ::mx::ir::Type &that) {
 
 ::mlir::TupleType TupleType::underlying_repr(void) const noexcept {
   return ::mlir::TupleType(this->::mx::ir::Type::type_);
+}
+
+size_t TupleType::size(void) const {
+  auto val = underlying_repr().size();
+  return val;
 }
 
 std::optional<UnrankedMemRefType> UnrankedMemRefType::from(const ::mx::ir::Type &that) {

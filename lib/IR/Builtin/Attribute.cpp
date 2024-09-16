@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -12,6 +11,7 @@
 
 #include <mlir/Dialect/LLVMIR/LLVMDialect.h>
 #include <mlir/Dialect/MemRef/IR/MemRef.h>
+#include <vast/Dialect/HighLevel/HighLevelOps.hpp>
 
 namespace mx::ir::builtin {
 std::optional<Attribute> Attribute::from(const ::mx::ir::Attribute &that) {
@@ -101,6 +101,11 @@ std::optional<ArrayAttr> ArrayAttr::from(const ::mx::ir::Attribute &that) {
   return ::mlir::ArrayAttr(this->::mx::ir::Attribute::attr_);
 }
 
+size_t ArrayAttr::size(void) const {
+  auto val = underlying_repr().size();
+  return val;
+}
+
 bool ArrayAttr::empty(void) const {
   auto val = underlying_repr().empty();
   return val;
@@ -176,6 +181,11 @@ bool DictionaryAttr::empty(void) const {
   return val;
 }
 
+size_t DictionaryAttr::size(void) const {
+  auto val = underlying_repr().size();
+  return val;
+}
+
 std::optional<FloatAttr> FloatAttr::from(const ::mx::ir::Attribute &that) {
   if (that.kind() == AttributeKind::BUILTIN_FLOAT) {
     return reinterpret_cast<const FloatAttr &>(that);
@@ -211,17 +221,17 @@ std::optional<IntegerAttr> IntegerAttr::from(const ::mx::ir::Attribute &that) {
   return ::mlir::IntegerAttr(this->::mx::ir::Attribute::attr_);
 }
 
-int64_t IntegerAttr::int_(void) const {
+int64_t IntegerAttr::integer_value(void) const {
   auto val = underlying_repr().getInt();
   return val;
 }
 
-int64_t IntegerAttr::s_int(void) const {
+int64_t IntegerAttr::signed_integer_value(void) const {
   auto val = underlying_repr().getSInt();
   return val;
 }
 
-uint64_t IntegerAttr::u_int(void) const {
+uint64_t IntegerAttr::unsigned_integer_value(void) const {
   auto val = underlying_repr().getUInt();
   return val;
 }
@@ -316,6 +326,11 @@ std::string StringAttr::str(void) const {
   return val;
 }
 
+size_t StringAttr::size(void) const {
+  auto val = underlying_repr().size();
+  return val;
+}
+
 bool StringAttr::empty(void) const {
   auto val = underlying_repr().empty();
   return val;
@@ -407,6 +422,17 @@ std::optional<DenseIntElementsAttr> DenseIntElementsAttr::from(const ::mx::ir::A
 
 ::mlir::DenseIntElementsAttr DenseIntElementsAttr::underlying_repr(void) const noexcept {
   return ::mlir::DenseIntElementsAttr(this->::mx::ir::Attribute::attr_);
+}
+
+std::optional<DataLayoutSpecAttr> DataLayoutSpecAttr::from(const ::mx::ir::Attribute &that) {
+  if (that.kind() == AttributeKind::BUILTIN_DATA_LAYOUT_SPEC) {
+    return reinterpret_cast<const DataLayoutSpecAttr &>(that);
+  }
+  return std::nullopt;
+}
+
+::mlir::DataLayoutSpecAttr DataLayoutSpecAttr::underlying_repr(void) const noexcept {
+  return ::mlir::DataLayoutSpecAttr(this->::mx::ir::Attribute::attr_);
 }
 
 }  // namespace mx::ir::builtin

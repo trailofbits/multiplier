@@ -1,5 +1,4 @@
 // Copyright (c) 2023-present, Trail of Bits, Inc.
-// All rights reserved.
 //
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
@@ -43,7 +42,7 @@ class MX_EXPORT CallArgsOp final : public Operation {
   ::vast::abi::CallArgsOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::result_range results(void) const;
+  gap::generator<::mx::ir::Result> results(void) const &;
   ::mx::ir::Region body(void) const;
 };
 static_assert(sizeof(CallArgsOp) == sizeof(Operation));
@@ -60,12 +59,12 @@ class MX_EXPORT CallExecutionOp final : public Operation {
   ::vast::abi::CallExecutionOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range args(void) const;
+  gap::generator<::mx::ir::Operand> arguments(void) const &;
   ::mx::ir::Value result(void) const;
   ::mx::ir::Region body(void) const;
-  std::string_view callee(void) const;
+  //::mlir::SymbolRefAttr callee(void) const;
   //::mlir::CallInterfaceCallable callable_for_callee(void) const;
-  //::mlir::Operation::operand_range arg_operands(void) const;
+  gap::generator<::mx::ir::Operand> arg_operands(void) const &;
 };
 static_assert(sizeof(CallExecutionOp) == sizeof(Operation));
 
@@ -81,11 +80,11 @@ class MX_EXPORT CallOp final : public Operation {
   ::vast::abi::CallOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range args(void) const;
-  //::mlir::Operation::result_range results(void) const;
+  gap::generator<::mx::ir::Operand> arguments(void) const &;
+  gap::generator<::mx::ir::Result> results(void) const &;
   std::string_view callee(void) const;
   //::mlir::CallInterfaceCallable callable_for_callee(void) const;
-  //::mlir::Operation::operand_range arg_operands(void) const;
+  gap::generator<::mx::ir::Operand> arg_operands(void) const &;
 };
 static_assert(sizeof(CallOp) == sizeof(Operation));
 
@@ -101,7 +100,7 @@ class MX_EXPORT CallRetsOp final : public Operation {
   ::vast::abi::CallRetsOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::result_range results(void) const;
+  gap::generator<::mx::ir::Result> results(void) const &;
   ::mx::ir::Region body(void) const;
 };
 static_assert(sizeof(CallRetsOp) == sizeof(Operation));
@@ -118,8 +117,8 @@ class MX_EXPORT DirectOp final : public Operation {
   ::vast::abi::DirectOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range value(void) const;
-  //::mlir::Operation::result_range result(void) const;
+  gap::generator<::mx::ir::Operand> value(void) const &;
+  gap::generator<::mx::ir::Result> result(void) const &;
 };
 static_assert(sizeof(DirectOp) == sizeof(Operation));
 
@@ -135,7 +134,7 @@ class MX_EXPORT EpilogueOp final : public Operation {
   ::vast::abi::EpilogueOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::result_range results(void) const;
+  gap::generator<::mx::ir::Result> results(void) const &;
   ::mx::ir::Region body(void) const;
 };
 static_assert(sizeof(EpilogueOp) == sizeof(Operation));
@@ -152,20 +151,20 @@ class MX_EXPORT FuncOp final : public Operation {
   ::vast::abi::FuncOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  ::mx::ir::Region body(void) const;
-  std::string_view sym_name(void) const;
-  //::vast::core::FunctionType function_type(void) const;
+  std::optional<::mx::ir::Region> body(void) const;
+  std::string_view name(void) const;
+  ::mx::ir::Type function_type(void) const;
   //::std::optional<GlobalLinkageKind> linkage(void) const;
-  std::optional<std::string_view> sym_visibility(void) const;
+  std::optional<std::string_view> visibility(void) const;
   //::std::optional<ArrayAttr> arg_attrs(void) const;
   //::std::optional<ArrayAttr> res_attrs(void) const;
   bool is_var_arg(void) const;
   //::mlir::Region * callable_region(void) const;
-  //llvm::ArrayRef<Type> callable_results(void) const;
+  gap::generator<::mx::ir::Type> callable_results(void) const &;
   //::mlir::ArrayAttr callable_arg_attrs(void) const;
   //::mlir::ArrayAttr callable_res_attrs(void) const;
-  //llvm::ArrayRef<Type> argument_types(void) const;
-  //llvm::ArrayRef<Type> result_types(void) const;
+  gap::generator<::mx::ir::Type> argument_types(void) const &;
+  gap::generator<::mx::ir::Type> result_types(void) const &;
   bool is_declaration(void) const;
 };
 static_assert(sizeof(FuncOp) == sizeof(Operation));
@@ -199,7 +198,7 @@ class MX_EXPORT PrologueOp final : public Operation {
   ::vast::abi::PrologueOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::result_range results(void) const;
+  gap::generator<::mx::ir::Result> results(void) const &;
   ::mx::ir::Region body(void) const;
 };
 static_assert(sizeof(PrologueOp) == sizeof(Operation));
@@ -217,7 +216,7 @@ class MX_EXPORT RetDirectOp final : public Operation {
 
   // Imported methods:
   ::mx::ir::Value value(void) const;
-  //::mlir::Operation::result_range result(void) const;
+  gap::generator<::mx::ir::Result> result(void) const &;
 };
 static_assert(sizeof(RetDirectOp) == sizeof(Operation));
 
@@ -233,8 +232,8 @@ class MX_EXPORT YieldOp final : public Operation {
   ::vast::abi::YieldOp underlying_repr(void) const noexcept;
 
   // Imported methods:
-  //::mlir::Operation::operand_range values(void) const;
-  //::mlir::Operation::result_range result(void) const;
+  gap::generator<::mx::ir::Operand> values(void) const &;
+  gap::generator<::mx::ir::Result> result(void) const &;
 };
 static_assert(sizeof(YieldOp) == sizeof(Operation));
 
