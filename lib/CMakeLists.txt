@@ -257,9 +257,9 @@ set_target_properties("mx-api"
     POSITION_INDEPENDENT_CODE
       YES
     COMPILE_FEATURES
-      cxx_std_23
+      "cxx_std_${CMAKE_CXX_STANDARD}"
     INTERFACE_COMPILE_FEATURES
-      cxx_std_23
+      "cxx_std_${CMAKE_CXX_STANDARD}"
 )
 
 add_library("multiplier" SHARED
@@ -293,9 +293,9 @@ set_target_properties("multiplier"
     POSITION_INDEPENDENT_CODE
       YES
     COMPILE_FEATURES
-      cxx_std_23
+      "cxx_std_${CMAKE_CXX_STANDARD}"
     INTERFACE_COMPILE_FEATURES
-      cxx_std_23
+      "cxx_std_${CMAKE_CXX_STANDARD}"
 
     # NOTE(pag): This is important! We need to emulate the shape of the
     #            install directories, so that install targets behave in the

@@ -7,7 +7,7 @@
 
 set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type")
 set(CMAKE_EXPORT_COMPILE_COMMANDS true CACHE BOOL "Generate the compile_commands.json file (forced)" FORCE)
-set(CMAKE_CXX_STANDARD 23 CACHE STRING "C++ standard version")
+set(CMAKE_CXX_STANDARD 20 CACHE STRING "C++ standard version")
 
 set(MX_INSTALL_LIB_DIR "${CMAKE_INSTALL_LIBDIR}" CACHE PATH "Directory in which Multiplier libraries will be installed")
 set(MX_INSTALL_BIN_DIR "${CMAKE_INSTALL_BINDIR}" CACHE PATH "Directory in which Multiplier binaries will be installed")

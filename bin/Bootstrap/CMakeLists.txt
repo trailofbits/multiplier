@@ -22,7 +22,7 @@ target_link_libraries("mx-bootstrap"
 
 target_compile_features("mx-bootstrap"
   PUBLIC
-    cxx_std_23
+    "cxx_std_${CMAKE_CXX_STANDARD}"
 )
 
 set_target_properties("mx-bootstrap"

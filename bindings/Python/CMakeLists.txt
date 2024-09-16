@@ -57,9 +57,9 @@ set_target_properties("mx-python"
     POSITION_INDEPENDENT_CODE
       YES
     COMPILE_FEATURES
-      cxx_std_23
+      "cxx_std_${CMAKE_CXX_STANDARD}"
     INTERFACE_COMPILE_FEATURES
-      cxx_std_23
+      "cxx_std_${CMAKE_CXX_STANDARD}"
 
     # Make sure we have the right output name, e.g.
     # `multiplier.cpython-312-darwin.so`.
