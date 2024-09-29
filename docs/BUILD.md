@@ -192,8 +192,8 @@ cmake \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX="${WORKSPACE_DIR}/install" \
     -DCMAKE_LINKER_TYPE=LLD \
-    -DCMAKE_C_COMPILER="$(which clang-17)" \
-    -DCMAKE_CXX_COMPILER="$(which clang++-17)" \
+    -DCMAKE_C_COMPILER="$(which clang-18)" \
+    -DCMAKE_CXX_COMPILER="$(which clang++-18)" \
     -DMX_ENABLE_INSTALL=ON \
     -DMX_ENABLE_PYTHON_BINDINGS=ON \
     -GNinja \
