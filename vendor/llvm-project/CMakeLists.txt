@@ -15,8 +15,6 @@ if(NOT MX_USE_VENDORED_CLANG)
   endif()
 endif()
 
-find_package(zstd CONFIG REQUIRED QUIET HINTS "${MX_VENDOR_INSTALL_DIR}")
-
 set(src_dir "${CMAKE_CURRENT_LIST_DIR}/src")
 set(build_dir "${CMAKE_CURRENT_BINARY_DIR}/build")
 
@@ -93,9 +91,8 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         -DLLVM_INCLUDE_TESTS:BOOL=OFF
                         -DLLVM_INCLUDE_TOOLS:BOOL=ON
                         -DLLVM_INSTALL_UTILS:BOOL=ON
-                        -DLLVM_ENABLE_ZSTD:BOOL=ON
+                        -DLLVM_ENABLE_ZSTD:BOOL=OFF
                         -DLLVM_ENABLE_LLD:BOOL=${LLVM_ENABLE_LLD}
-                        "-Dzstd_DIR=${zstd_DIR}"
                         "${src_dir}/llvm"
                WORKING_DIRECTORY "${build_dir}")
 
