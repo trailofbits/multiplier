@@ -57,26 +57,43 @@ if(NOT TARGET gflags::gflags)
   endif()
 endif()
 
-find_package(Filesystem REQUIRED COMPONENTS Final Experimental)
-find_package(CapnProto CONFIG REQUIRED)
-find_package(xxHash CONFIG REQUIRED)
-find_package(zstd CONFIG REQUIRED)
+find_package(Filesystem REQUIRED COMPONENTS Final Experimental GLOBAL)
+find_package(CapnProto CONFIG REQUIRED GLOBAL)
+find_package(xxHash CONFIG REQUIRED GLOBAL)
+find_package(zstd CONFIG REQUIRED GLOBAL)
+
+find_path(ZSTD_INCLUDE_DIRS
+  NAMES zstd.h
+  HINTS "${MX_VENDOR_INSTALL_DIR}/${MX_INSTALL_INCLUDE_DIR}"
+        "${CMAKE_INSTALL_PREFIX}/${MX_INSTALL_INCLUDE_DIR}")
+
+find_library(ZSTD_LIBRARIES
+  NAMES zstd
+  HINTS "${MX_VENDOR_INSTALL_DIR}/${MX_INSTALL_LIB_DIR}"
+        "${CMAKE_INSTALL_PREFIX}/${MX_INSTALL_LIB_DIR}")
+
 if(NOT TARGET zstd::libzstd_static)
-  message(FATAL_ERROR "Cannot find appropriate static zstd target; known targets are ${zstd_LIBRARIES}")
+  add_library(zstd::libzstd_static STATIC IMPORTED)
+  set_target_properties(zstd::libzstd_static PROPERTIES
+    INTERFACE_COMPILE_FEATURES "cxx_std_${CMAKE_CXX_STANDARD}"
+    INTERFACE_INCLUDE_DIRECTORIES ${ZSTD_INCLUDE_DIRS}
+    INTERFACE_LINK_LIBRARIES ${ZSTD_LIBRARIES}
+  )
 endif()
+
 if(NOT TARGET zstd::zstd)
   add_library(zstd::zstd ALIAS zstd::libzstd_static)
 endif()
 
-find_package(gap CONFIG REQUIRED)
-find_package(Clang CONFIG REQUIRED)
-find_package(pasta CONFIG REQUIRED)
-find_package(glog CONFIG REQUIRED)
-find_package(reproc++ CONFIG REQUIRED)
-find_package(RocksDB CONFIG REQUIRED)
-find_package(LLVM CONFIG REQUIRED)
-find_package(MLIR CONFIG REQUIRED)
-find_package(VAST CONFIG REQUIRED)
+find_package(gap CONFIG REQUIRED GLOBAL)
+find_package(glog CONFIG REQUIRED GLOBAL)
+find_package(reproc++ CONFIG REQUIRED GLOBAL)
+find_package(RocksDB CONFIG REQUIRED GLOBAL)
+find_package(LLVM CONFIG REQUIRED GLOBAL)
+find_package(MLIR CONFIG REQUIRED GLOBAL)
+find_package(VAST CONFIG REQUIRED GLOBAL)
+find_package(Clang CONFIG REQUIRED GLOBAL)
+find_package(pasta CONFIG REQUIRED GLOBAL)
 
 include("cmake/mlir.cmake")
 include("cmake/vast.cmake")
