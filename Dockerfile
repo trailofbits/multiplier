@@ -1,51 +1,86 @@
 ARG IMAGE=ubuntu:22.04
-FROM --platform=linux/amd64 ${IMAGE} as builder
+ARG PLATFORM=linux/amd64
+FROM --platform=${PLATFORM} ${IMAGE} AS builder
 ENV INSTALL_DIR=/work/install
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-# Install dependencies
-RUN apt-get update \
-    && apt-get install --no-install-recommends -y curl gnupg software-properties-common lsb-release \
-    && sudo apt remove --purge --auto-remove cmake \
-    && sudo apt update \
-    && sudo apt clean all \
-    && wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null \
-    && sudo apt-add-repository "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main" \
-    && sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6AF7F09730B3F0A4 \
-    && sudo apt update \
-    && sudo apt install kitware-archive-keyring \
-    && sudo rm /etc/apt/trusted.gpg.d/kitware.gpg \
-    && curl -sSL https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - \
-    && echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-18 main" | tee -a /etc/apt/sources.list \
-    && echo "deb-src http://apt.llvm.org/jammy/ llvm-toolchain-jammy-18 main" | tee -a /etc/apt/sources.list \
-    && add-apt-repository ppa:ubuntu-toolchain-r/test \
-    && apt-get install --no-install-recommends -y \
-        gpg zip unzip tar git \
-        pkg-config ninja-build ccache cmake build-essential \
-        doctest-dev \
-        clang-18 lld-18 \
-        python3.11 python3.11-dev \
-    && curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11 \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+ARG CLANG_VERSION=18
+ARG LLVM_BUILD=f36f80d
+
+RUN apt-get update && \
+    export DEBIAN_FRONTEND=noninteractive && \
+    apt-get install -yq \
+        --no-install-recommends \
+        software-properties-common \
+        pkg-config \
+        cmake \
+        make \
+        curl \
+        wget \
+        unzip \
+        clang \
+        flex \
+        bison \
+        xz-utils \
+        zlib1g-dev \
+        libncurses5-dev \
+        libssl-dev \
+        git \
+        ninja-build \
+        lld \
+        libzstd-dev \
+        python3.11 \
+        python3.11-dev \
+        gcc && \
+        apt-get clean && \
+        rm -rf /var/lib/apt/lists/*
+
+SHELL [ "/bin/bash", "-o", "pipefail", "-c" ]
+
+RUN curl -sl https://apt.llvm.org/llvm.sh --output llvm.sh && \
+    bash llvm.sh ${CLANG_VERSION} && \
+    update-alternatives --install /usr/bin/clang clang /usr/bin/clang-${CLANG_VERSION} 20 \
+      --slave /usr/bin/clang++ clang++ /usr/bin/clang++-${CLANG_VERSION} && \
+    wget https://github.com/Kitware/CMake/releases/download/v3.30.6/cmake-3.30.6-linux-x86_64.sh \
+      -q -O /tmp/cmake-install.sh && \
+    chmod u+x /tmp/cmake-install.sh && \
+    mkdir /opt/cmake-3.30.6 && \
+    /tmp/cmake-install.sh --skip-license --prefix=/opt/cmake-3.30.6 && \
+    rm /tmp/cmake-install.sh && \
+    ln -s /opt/cmake-3.30.6/bin/* /usr/local/bin
+
 WORKDIR /work
+
 RUN mkdir src build
 
 COPY . /work/src/multiplier
-RUN cmake \
-    -S '/work/src/multiplier' \
-    -B '/work/build/multiplier' \
-    -G Ninja \
-    -DCMAKE_LINKER_TYPE=LLD \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_C_COMPILER="$(which clang-18)" \
-    -DCMAKE_CXX_COMPILER="$(which clang++-18)" \
-    -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
-    -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=TRUE
 
-RUN cmake --build '/work/build/multiplier' --target install
+RUN mkdir -p ${INSTALL_DIR} && \
+    curl -L https://github.com/trail-of-forks/llvm-project/releases/download/${LLVM_BUILD}/llvm-pasta-${LLVM_BUILD}.tar.xz -o llvm-pasta-${LLVM_BUILD}.tar.xz && \
+    tar -xJf llvm-pasta-*.tar.xz -C ${INSTALL_DIR} && \
+    rm llvm-pasta-*.tar.xz
+
+RUN cmake \
+    -S /work/src/multiplier \
+    -B /work/build/multiplier \
+    -GNinja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} \
+    -DCMAKE_PREFIX_PATH=${INSTALL_DIR} \
+    -DCMAKE_EXE_LINKER_FLAGS="--ld-path=$(which ld.lld-${CLANG_VERSION})" \
+    -DCMAKE_MODULE_LINKER_FLAGS="--ld-path=$(which ld.lld-${CLANG_VERSION})" \
+    -DCMAKE_SHARED_LINKER_FLAGS="--ld-path=$(which ld.lld-${CLANG_VERSION})" \
+    -DCMAKE_C_COMPILER="$(which clang-${CLANG_VERSION})" \
+    -DCMAKE_CXX_COMPILER="$(which clang++-${CLANG_VERSION})" \
+    -DLLVM_DIR="${INSTALL_DIR}/lib/cmake/llvm" \
+    -DMLIR_DIR="${INSTALL_DIR}/lib/cmake/mlir" \
+    -DClang_DIR="${INSTALL_DIR}/lib/cmake/clang" \
+    -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=TRUE \
+    -DMX_USE_VENDORED_CLANG=OFF \
+    -DMX_ENABLE_INSTALL=ON /work/src/multiplier && \
+    cmake --build /work/build/multiplier --target install
+
 RUN chmod +x /work/install/bin/*
 ENV PATH="/work/install/bin:${PATH}"
 
-FROM --platform=linux/amd64 ${IMAGE} as release
+FROM --platform=${PLATFORM} ${IMAGE} AS release
 COPY --from=builder /work/install /work/install
