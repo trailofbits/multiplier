@@ -6,6 +6,7 @@ ENV INSTALL_DIR=/work/install
 ARG CLANG_VERSION=18
 ARG LLVM_BUILD=f36f80d
 
+# Install dependencies
 RUN apt-get update && \
     export DEBIAN_FRONTEND=noninteractive && \
     apt-get install -yq \
@@ -36,6 +37,7 @@ RUN apt-get update && \
 
 SHELL [ "/bin/bash", "-o", "pipefail", "-c" ]
 
+# Install clang and cmake
 RUN curl -sl https://apt.llvm.org/llvm.sh --output llvm.sh && \
     bash llvm.sh ${CLANG_VERSION} && \
     update-alternatives --install /usr/bin/clang clang /usr/bin/clang-${CLANG_VERSION} 20 \
@@ -54,11 +56,13 @@ RUN mkdir src build
 
 COPY . /work/src/multiplier
 
+# Install pre-built llvm 18.1 libraries
 RUN mkdir -p ${INSTALL_DIR} && \
     curl -L https://github.com/trail-of-forks/llvm-project/releases/download/${LLVM_BUILD}/llvm-pasta-${LLVM_BUILD}.tar.xz -o llvm-pasta-${LLVM_BUILD}.tar.xz && \
     tar -xJf llvm-pasta-*.tar.xz -C ${INSTALL_DIR} && \
     rm llvm-pasta-*.tar.xz
 
+# Configure and build multiplier with pre-built llvm libraries
 RUN cmake \
     -S /work/src/multiplier \
     -B /work/build/multiplier \
@@ -82,5 +86,6 @@ RUN cmake \
 RUN chmod +x /work/install/bin/*
 ENV PATH="/work/install/bin:${PATH}"
 
+# Copy multiplier binaries from builder
 FROM --platform=${PLATFORM} ${IMAGE} AS release
 COPY --from=builder /work/install /work/install
