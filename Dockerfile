@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.4
 ARG IMAGE=ubuntu:22.04
 ARG PLATFORM=linux/amd64
 FROM --platform=${PLATFORM} ${IMAGE} AS builder
@@ -52,10 +53,6 @@ RUN curl -sl https://apt.llvm.org/llvm.sh --output llvm.sh && \
 
 WORKDIR /work
 
-RUN mkdir src build
-
-COPY . /work/src/multiplier
-
 # Install pre-built llvm 18.1 libraries
 RUN mkdir -p ${INSTALL_DIR} && \
     curl -L https://github.com/trail-of-forks/llvm-project/releases/download/${LLVM_BUILD}/llvm-pasta-${LLVM_BUILD}.tar.xz -o llvm-pasta-${LLVM_BUILD}.tar.xz && \
@@ -63,7 +60,9 @@ RUN mkdir -p ${INSTALL_DIR} && \
     rm llvm-pasta-*.tar.xz
 
 # Configure and build multiplier with pre-built llvm libraries
-RUN cmake \
+RUN --mount=type=bind,source=.,target=/work/src/multiplier \
+    --mount=type=tmpfs,target=/work/build \
+    cmake \
     -S /work/src/multiplier \
     -B /work/build/multiplier \
     -GNinja \
@@ -80,7 +79,7 @@ RUN cmake \
     -DClang_DIR="${INSTALL_DIR}/lib/cmake/clang" \
     -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=TRUE \
     -DMX_USE_VENDORED_CLANG=OFF \
-    -DMX_ENABLE_INSTALL=ON /work/src/multiplier && \
+    -DMX_ENABLE_INSTALL=ON && \
     cmake --build /work/build/multiplier --target install
 
 RUN chmod +x /work/install/bin/*
@@ -88,4 +87,9 @@ ENV PATH="/work/install/bin:${PATH}"
 
 # Copy multiplier binaries from builder
 FROM --platform=${PLATFORM} ${IMAGE} AS release
+RUN apt-get update && \
+    export DEBIAN_FRONTEND=noninteractive && \
+    apt-get install -yq --no-install-recommends libatomic1 && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 COPY --from=builder /work/install /work/install
