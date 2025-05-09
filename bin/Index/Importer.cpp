@@ -577,7 +577,8 @@ static const std::string_view kMLLVM("-mllvm");
 static bool IsOptNeedingFixing(std::string_view arg) {
   return arg == kOptNoStdInc || arg == kOptNoStdIncxx ||
          arg == kOptNoBuiltinInc || arg == kOptNoStdSystemInc ||
-         arg.starts_with("-fsanitize=");
+         arg.starts_with("-fsanitize=") ||
+         arg.starts_with("-mrelocation-model");
 }
 
 static bool IsOpt1NeedingFixing(std::string_view arg) {
