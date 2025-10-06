@@ -25,6 +25,12 @@ class Subprocess {
       std::string *input=nullptr,
       std::string *output=nullptr,
       std::string *error=nullptr);
+ private:
+  static std::variant<int, std::error_code> ExecuteFork(
+      const std::vector<std::string> &cmd,
+      const std::unordered_map<std::string, std::string> *env,
+      std::string *input, std::string *output, std::string *error);
+  static bool IsRunningInDocker();
 };
 
 }  // namespace indexer

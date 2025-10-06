@@ -50,8 +50,13 @@ compile commands.
       --target /path/to/compile_commands.json \   # Compile commands
       --workspace /path/to/workspace \            # Workspace directory
       --env /path/to/environment-vars \           # Saved environment variables
-      --show_progress                             # Show progress indicators
+      --show_progress \                           # Show progress indicators
+      --reproc_mode/--fork_mode                   # use reproc lib or traditional fork way
 ```
+
+**Note:** Use the `--reproc_mode` option to launch Multiplier with the `reproc` library.
+Alternatively, the `--fork_mode` option enables the traditional `fork+exec` method for
+executing programs. It also serves as a fallback when `--reproc_mode` fails, such as in certain Docker environments.
 
 **Note:** You generally should run `mx-index` on the same machine / environment
 as the build. `mx-index` will invoke the original build compiler in the original

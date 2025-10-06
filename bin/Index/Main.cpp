@@ -71,6 +71,9 @@ DEFINE_string(workspace, "mx-workspace",
 
 DEFINE_bool(generate_sourceir, false, "Generate SourceIR from the top-level declarations");
 
+DEFINE_bool(fork_mode, false, "Use --fork_mode if running inside docker");
+DEFINE_bool(reproc_mode, false, "Use --reproc_mode to use reproc library");
+
 namespace {
 
 std::unique_ptr<llvm::MemoryBuffer>
@@ -165,6 +168,8 @@ int main(int argc, char *argv[], char *envp[]) {
      << " [--env PATH_TO_COPIED_ENV_VARS]\n"
      << " [--show_progress]\n"
      << " [--generate_sourceir]\n"
+     << " --fork_mode\n"
+     << " --reproc_mode\n"
      << " --db DATABASE\n"
      << " --workspace INDEXER_WORKSPACE_DIR\n"
      << " --target COMPILE_COMMANDS\n";
@@ -187,7 +192,13 @@ int main(int argc, char *argv[], char *envp[]) {
   if (FLAGS_target.empty()) {
     std::cerr
         << "Must specify a path to a target file to import with --target. "
-           "Use - or /dev/stdin to read from stdin.";
+           "Use - or /dev/stdin to read from stdin.\n";
+    return EXIT_FAILURE;
+  }
+
+  if (!FLAGS_reproc_mode && !FLAGS_fork_mode) {
+    std::cerr
+        << "Must specify --reproc_mode or --fork_mode\n";
     return EXIT_FAILURE;
   }
 
