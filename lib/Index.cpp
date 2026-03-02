@@ -5,6 +5,7 @@
 
 #include <multiplier/Index.h>
 
+#include <algorithm>
 #include <cassert>
 #include <multiplier/AST/Attr.h>
 #include <multiplier/AST/Designator.h>
