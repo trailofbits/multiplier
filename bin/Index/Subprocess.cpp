@@ -354,11 +354,11 @@ Subprocess::Execute(const std::vector<std::string>& cmd,
   // Check if running in Docker and use fork+exec if so
   bool insideDocker = IsRunningInDocker();
   if (!FLAGS_reproc_mode) {
+    if (FLAGS_fork_mode) {
+      LOG(INFO) << "Using fork+exec (forced by --fork_mode)" << std::endl;
+      return ExecuteFork(cmd, env, input, output, error);
+    }
     if (insideDocker) {
-      if (!FLAGS_fork_mode) {
-        LOG(ERROR) << "Docker environment found. Use --fork_mode";
-        _exit(1);
-      }
       LOG(INFO) << "Executing fork+exec way for Docker environments" << std::endl;
       return ExecuteFork(cmd, env, input, output, error);
     }

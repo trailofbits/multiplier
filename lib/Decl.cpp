@@ -5,6 +5,7 @@
 
 #include "Decl.h"
 
+#include <algorithm>
 #include <multiplier/AST/ClassTemplateDecl.h>
 #include <multiplier/AST/ClassTemplatePartialSpecializationDecl.h>
 #include <multiplier/AST/CXXMethodDecl.h>

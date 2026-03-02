@@ -5,6 +5,7 @@
 
 #include "Stmt.h"
 
+#include <algorithm>
 #include <multiplier/Index.h>
 #include <multiplier/Frontend/MacroSubstitution.h>
 
