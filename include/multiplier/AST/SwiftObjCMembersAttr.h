@@ -17,11 +17,6 @@ class Attr;
 class File;
 class SwiftObjCMembersAttr;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT SwiftObjCMembersAttr : public Attr {
  private:

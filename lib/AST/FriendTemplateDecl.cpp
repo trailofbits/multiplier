@@ -14,8 +14,6 @@
 #include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/Type.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../Decl.h"
 
@@ -83,17 +81,10 @@ bool FriendTemplateDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<FriendTemplateDecl> FriendTemplateDecl::from(const ir::Operation &op) {
-  if (auto val = Decl::from(op)) {
-    return from_base(val.value());
-  }
-  return std::nullopt;
-}
-
-gap::generator<std::pair<FriendTemplateDecl, ir::Operation>> FriendTemplateDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kFriendTemplateDeclDerivedKinds)) {
-    if (auto val = from_base(res.first)) {
-      co_yield std::pair<FriendTemplateDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
+gap::generator<FriendTemplateDecl> FriendTemplateDecl::in(const Compilation &tu) {
+  for (Decl res : Decl::in(tu, kFriendTemplateDeclDerivedKinds)) {
+    if (auto val = from_base(res)) {
+      co_yield val.value();
     }
   }
 }

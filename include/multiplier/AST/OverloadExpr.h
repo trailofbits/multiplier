@@ -22,11 +22,6 @@ class OverloadExpr;
 class Stmt;
 class Token;
 class ValueStmt;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT OverloadExpr : public Expr {
  private:
@@ -41,8 +36,7 @@ class MX_EXPORT OverloadExpr : public Expr {
   static gap::generator<OverloadExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<OverloadExpr> from(const ir::Operation &op);
-  static gap::generator<std::pair<OverloadExpr, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<OverloadExpr> in(const Compilation &tu);
   static gap::generator<OverloadExpr> containing(const Decl &decl);
   static gap::generator<OverloadExpr> containing(const std::optional<Decl> &decl);
 

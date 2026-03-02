@@ -21,11 +21,6 @@ class ObjCMethodDecl;
 class Stmt;
 class Token;
 class ValueStmt;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT ObjCArrayLiteral : public Expr {
  private:
@@ -40,8 +35,7 @@ class MX_EXPORT ObjCArrayLiteral : public Expr {
   static gap::generator<ObjCArrayLiteral> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<ObjCArrayLiteral> from(const ir::Operation &op);
-  static gap::generator<std::pair<ObjCArrayLiteral, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<ObjCArrayLiteral> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_ARRAY_LITERAL;
   }

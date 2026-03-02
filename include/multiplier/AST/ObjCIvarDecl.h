@@ -24,11 +24,6 @@ class ObjCIvarDecl;
 class Stmt;
 class Token;
 class ValueDecl;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT ObjCIvarDecl : public FieldDecl {
  private:
@@ -45,8 +40,7 @@ class MX_EXPORT ObjCIvarDecl : public FieldDecl {
   static gap::generator<ObjCIvarDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<ObjCIvarDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<ObjCIvarDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<ObjCIvarDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_IVAR;
   }

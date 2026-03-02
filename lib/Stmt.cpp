@@ -29,6 +29,27 @@ SpecificEntityId<StmtId> Stmt::id(void) const {
   return eid;
 }
 
+gap::generator<Stmt> Stmt::in(const Compilation &tu) {
+  auto frags = tu.fragments();
+  for (Fragment frag : frags) {
+    for (Stmt stmt : Stmt::in(frag)) {
+      co_yield std::move(stmt);
+    }
+  }
+}
+
+gap::generator<Stmt> Stmt::in(const Compilation &tu,
+                              std::span<const StmtKind> kinds) {
+  auto frags = tu.fragments();
+  for (Fragment frag : frags) {
+    for (Stmt stmt : Stmt::in(frag)) {
+      if (std::find(kinds.begin(), kinds.end(), stmt.kind()) != kinds.end()) {
+        co_yield std::move(stmt);
+      }
+    }
+  }
+}
+
 // Public methods for derived classes
 
 // Included to make sure to distinguish from `call_return_type`

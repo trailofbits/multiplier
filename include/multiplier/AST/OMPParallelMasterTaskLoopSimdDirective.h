@@ -21,11 +21,6 @@ class OMPLoopDirective;
 class OMPParallelMasterTaskLoopSimdDirective;
 class Stmt;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT OMPParallelMasterTaskLoopSimdDirective : public OMPLoopDirective {
  private:
@@ -41,8 +36,7 @@ class MX_EXPORT OMPParallelMasterTaskLoopSimdDirective : public OMPLoopDirective
   static gap::generator<OMPParallelMasterTaskLoopSimdDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<OMPParallelMasterTaskLoopSimdDirective> from(const ir::Operation &op);
-  static gap::generator<std::pair<OMPParallelMasterTaskLoopSimdDirective, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<OMPParallelMasterTaskLoopSimdDirective> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_PARALLEL_MASTER_TASK_LOOP_SIMD_DIRECTIVE;
   }

@@ -13,8 +13,6 @@
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/Frontend/Token.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../File.h"
 #include "../Fragment.h"

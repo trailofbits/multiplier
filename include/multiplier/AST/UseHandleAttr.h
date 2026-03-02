@@ -19,11 +19,6 @@ class InheritableAttr;
 class InheritableParamAttr;
 class Token;
 class UseHandleAttr;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT UseHandleAttr : public InheritableParamAttr {
  private:

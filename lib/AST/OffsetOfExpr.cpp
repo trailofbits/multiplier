@@ -13,8 +13,6 @@
 #include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/ValueStmt.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../Stmt.h"
 
@@ -82,17 +80,10 @@ bool OffsetOfExpr::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<OffsetOfExpr> OffsetOfExpr::from(const ir::Operation &op) {
-  if (auto val = Stmt::from(op)) {
-    return from_base(val.value());
-  }
-  return std::nullopt;
-}
-
-gap::generator<std::pair<OffsetOfExpr, ir::Operation>> OffsetOfExpr::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kOffsetOfExprDerivedKinds)) {
-    if (auto val = from_base(res.first)) {
-      co_yield std::pair<OffsetOfExpr, ir::Operation>(std::move(val.value()), std::move(res.second));
+gap::generator<OffsetOfExpr> OffsetOfExpr::in(const Compilation &tu) {
+  for (Stmt res : Stmt::in(tu, kOffsetOfExprDerivedKinds)) {
+    if (auto val = from_base(res)) {
+      co_yield val.value();
     }
   }
 }

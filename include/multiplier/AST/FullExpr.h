@@ -20,11 +20,6 @@ class FullExpr;
 class Stmt;
 class Token;
 class ValueStmt;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT FullExpr : public Expr {
  private:
@@ -39,8 +34,7 @@ class MX_EXPORT FullExpr : public Expr {
   static gap::generator<FullExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<FullExpr> from(const ir::Operation &op);
-  static gap::generator<std::pair<FullExpr, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<FullExpr> in(const Compilation &tu);
   static gap::generator<FullExpr> containing(const Decl &decl);
   static gap::generator<FullExpr> containing(const std::optional<Decl> &decl);
 

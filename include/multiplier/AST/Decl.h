@@ -40,11 +40,6 @@ class File;
 class Stmt;
 class Token;
 class TokenRange;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT Decl {
  public:
@@ -62,8 +57,7 @@ class MX_EXPORT Decl {
   friend class TokenContext;
   friend class Type;
   friend class DeclImpl;
-  friend class ir::Operation;
-  friend class ir::Value;
+
 
   std::shared_ptr<const DeclImpl> impl;
   static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);
@@ -103,9 +97,8 @@ class MX_EXPORT Decl {
   static gap::generator<Decl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<Decl> from(const ir::Operation &op);
-  static gap::generator<std::pair<Decl, ir::Operation>> in(const Compilation &tu);
-  static gap::generator<std::pair<Decl, ir::Operation>> in(const Compilation &tu, std::span<const DeclKind> kinds);
+  static gap::generator<Decl> in(const Compilation &tu);
+  static gap::generator<Decl> in(const Compilation &tu, std::span<const DeclKind> kinds);
 
   static gap::generator<Decl> containing(const Decl &decl);
   static gap::generator<Decl> containing(const std::optional<Decl> &decl);

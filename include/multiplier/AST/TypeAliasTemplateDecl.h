@@ -21,11 +21,6 @@ class Stmt;
 class TemplateDecl;
 class Token;
 class TypeAliasTemplateDecl;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT TypeAliasTemplateDecl : public RedeclarableTemplateDecl {
  private:
@@ -41,8 +36,7 @@ class MX_EXPORT TypeAliasTemplateDecl : public RedeclarableTemplateDecl {
   static gap::generator<TypeAliasTemplateDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<TypeAliasTemplateDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<TypeAliasTemplateDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<TypeAliasTemplateDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::TYPE_ALIAS_TEMPLATE;
   }

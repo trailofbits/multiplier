@@ -21,11 +21,6 @@ class Stmt;
 class Token;
 class UnresolvedLookupExpr;
 class ValueStmt;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT UnresolvedLookupExpr : public OverloadExpr {
  private:
@@ -41,8 +36,7 @@ class MX_EXPORT UnresolvedLookupExpr : public OverloadExpr {
   static gap::generator<UnresolvedLookupExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<UnresolvedLookupExpr> from(const ir::Operation &op);
-  static gap::generator<std::pair<UnresolvedLookupExpr, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<UnresolvedLookupExpr> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::UNRESOLVED_LOOKUP_EXPR;
   }

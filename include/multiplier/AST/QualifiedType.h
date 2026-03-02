@@ -17,11 +17,6 @@ class Index;
 class QualifiedType;
 class Token;
 class Type;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT QualifiedType : public Type {
  private:

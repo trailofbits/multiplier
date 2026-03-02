@@ -22,11 +22,6 @@ class ParmVarDecl;
 class Stmt;
 class Token;
 class Type;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT BlockDecl : public Decl {
  private:
@@ -39,8 +34,7 @@ class MX_EXPORT BlockDecl : public Decl {
   static gap::generator<BlockDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<BlockDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<BlockDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<BlockDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::BLOCK;
   }

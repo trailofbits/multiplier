@@ -27,11 +27,6 @@ class TemplateParameterList;
 class Token;
 class Type;
 class TypeDecl;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT ClassTemplatePartialSpecializationDecl : public ClassTemplateSpecializationDecl {
  private:
@@ -50,8 +45,7 @@ class MX_EXPORT ClassTemplatePartialSpecializationDecl : public ClassTemplateSpe
   static gap::generator<ClassTemplatePartialSpecializationDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<ClassTemplatePartialSpecializationDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<ClassTemplatePartialSpecializationDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<ClassTemplatePartialSpecializationDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CLASS_TEMPLATE_PARTIAL_SPECIALIZATION;
   }

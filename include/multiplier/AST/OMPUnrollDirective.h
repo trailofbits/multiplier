@@ -21,11 +21,6 @@ class OMPLoopTransformationDirective;
 class OMPUnrollDirective;
 class Stmt;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT OMPUnrollDirective : public OMPLoopTransformationDirective {
  private:
@@ -41,8 +36,7 @@ class MX_EXPORT OMPUnrollDirective : public OMPLoopTransformationDirective {
   static gap::generator<OMPUnrollDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<OMPUnrollDirective> from(const ir::Operation &op);
-  static gap::generator<std::pair<OMPUnrollDirective, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<OMPUnrollDirective> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_UNROLL_DIRECTIVE;
   }

@@ -2454,8 +2454,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         << FriendOf(class_os, class_name, "TokenContext")
         << FriendOf(class_os, class_name, "Type")
         << FriendOf(class_os, class_name, class_name + "Impl")
-        << "  friend class ir::Operation;\n"
-        << "  friend class ir::Value;\n\n"
+        << "\n\n"
         << "  std::shared_ptr<const " << class_name << "Impl> impl;\n";
 
     if (class_name == base_name) {
@@ -2837,35 +2836,25 @@ MethodListPtr CodeGenerator::RunOnClass(
 
   if (is_declaration || is_statement) {
     class_os
-        << "  static std::optional<" << class_name
-        << "> from(const ir::Operation &op);\n"
-        << "  static gap::generator<std::pair<" << class_name
-        << ", ir::Operation>> in(const Compilation &tu);\n";
+        << "  static gap::generator<" << class_name
+        << "> in(const Compilation &tu);\n";
 
     // The base class methods are all manually implemented.
     if (class_name == base_name) {
       class_os
-          << "  static gap::generator<std::pair<" << class_name
-          << ", ir::Operation>> in(const Compilation &tu, std::span<const "
+          << "  static gap::generator<" << class_name
+          << "> in(const Compilation &tu, std::span<const "
           << base_name << "Kind> kinds);\n\n";
     
     } else {
       lib_cpp_os
-          << "std::optional<" << class_name
-          << "> " << class_name << "::from(const ir::Operation &op) {\n"
-          << "  if (auto val = " << base_name << "::from(op)) {\n"
-          << "    return from_base(val.value());\n"
-          << "  }\n"
-          << "  return std::nullopt;\n"
-          << "}\n\n"
-          << "gap::generator<std::pair<" << class_name << ", ir::Operation>> "
+          << "gap::generator<" << class_name << "> "
           << class_name << "::in(const Compilation &tu) {\n"
-          << "  for (std::pair<" << base_name << ", ir::Operation> res : "
+          << "  for (" << base_name << " res : "
           << base_name << "::in(tu, k" << class_name
           << "DerivedKinds)) {\n"
-          << "    if (auto val = from_base(res.first)) {\n"
-          << "      co_yield std::pair<" << class_name << ", ir::Operation>("
-          << "std::move(val.value()), std::move(res.second));\n"
+          << "    if (auto val = from_base(res)) {\n"
+          << "      co_yield val.value();\n"
           << "    }\n"
           << "  }\n"
           << "}\n\n";
@@ -3939,10 +3928,6 @@ MethodListPtr CodeGenerator::RunOnClass(
   }
 
   os
-      << "namespace ir {\n"
-      << "class Operation;\n"
-      << "class Value;\n"
-      << "}  // namespace ir\n\n"
       << "#if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)\n"
       << class_os.str()
       << late_class_os.str()
@@ -4333,10 +4318,6 @@ void CodeGenerator::RunOnClassHierarchies(void) {
           fs << "#include <multiplier/AST/" << derived_name << ".h>\n";
         }
       }
-    }
-
-    if (gDeclNames.count(name) || gStmtNames.count(name)) {
-      fs << "\n#include <multiplier/IR/HighLevel/Operation.h>\n"; 
     }
 
     if (!is_enum) {

@@ -21,11 +21,6 @@ class OMPLoopDirective;
 class OMPTargetParallelGenericLoopDirective;
 class Stmt;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT OMPTargetParallelGenericLoopDirective : public OMPLoopDirective {
  private:
@@ -41,8 +36,7 @@ class MX_EXPORT OMPTargetParallelGenericLoopDirective : public OMPLoopDirective 
   static gap::generator<OMPTargetParallelGenericLoopDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<OMPTargetParallelGenericLoopDirective> from(const ir::Operation &op);
-  static gap::generator<std::pair<OMPTargetParallelGenericLoopDirective, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<OMPTargetParallelGenericLoopDirective> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TARGET_PARALLEL_GENERIC_LOOP_DIRECTIVE;
   }

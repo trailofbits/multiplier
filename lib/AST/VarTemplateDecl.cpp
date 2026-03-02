@@ -14,8 +14,6 @@
 #include <multiplier/AST/TemplateDecl.h>
 #include <multiplier/Frontend/Token.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../Decl.h"
 
@@ -83,17 +81,10 @@ bool VarTemplateDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<VarTemplateDecl> VarTemplateDecl::from(const ir::Operation &op) {
-  if (auto val = Decl::from(op)) {
-    return from_base(val.value());
-  }
-  return std::nullopt;
-}
-
-gap::generator<std::pair<VarTemplateDecl, ir::Operation>> VarTemplateDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kVarTemplateDeclDerivedKinds)) {
-    if (auto val = from_base(res.first)) {
-      co_yield std::pair<VarTemplateDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
+gap::generator<VarTemplateDecl> VarTemplateDecl::in(const Compilation &tu) {
+  for (Decl res : Decl::in(tu, kVarTemplateDeclDerivedKinds)) {
+    if (auto val = from_base(res)) {
+      co_yield val.value();
     }
   }
 }

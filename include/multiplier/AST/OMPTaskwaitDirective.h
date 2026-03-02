@@ -19,11 +19,6 @@ class OMPExecutableDirective;
 class OMPTaskwaitDirective;
 class Stmt;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT OMPTaskwaitDirective : public OMPExecutableDirective {
  private:
@@ -37,8 +32,7 @@ class MX_EXPORT OMPTaskwaitDirective : public OMPExecutableDirective {
   static gap::generator<OMPTaskwaitDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<OMPTaskwaitDirective> from(const ir::Operation &op);
-  static gap::generator<std::pair<OMPTaskwaitDirective, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<OMPTaskwaitDirective> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TASKWAIT_DIRECTIVE;
   }

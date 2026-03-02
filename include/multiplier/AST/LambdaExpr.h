@@ -28,11 +28,6 @@ class TemplateParameterList;
 class Token;
 class TokenRange;
 class ValueStmt;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT LambdaExpr : public Expr {
  private:
@@ -47,8 +42,7 @@ class MX_EXPORT LambdaExpr : public Expr {
   static gap::generator<LambdaExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<LambdaExpr> from(const ir::Operation &op);
-  static gap::generator<std::pair<LambdaExpr, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<LambdaExpr> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::LAMBDA_EXPR;
   }

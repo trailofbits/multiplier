@@ -21,11 +21,6 @@ class Token;
 class TypeDecl;
 class TypedefDecl;
 class TypedefNameDecl;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT TypedefDecl : public TypedefNameDecl {
  private:
@@ -41,8 +36,7 @@ class MX_EXPORT TypedefDecl : public TypedefNameDecl {
   static gap::generator<TypedefDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<TypedefDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<TypedefDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<TypedefDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::TYPEDEF;
   }

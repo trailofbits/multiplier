@@ -18,11 +18,6 @@ class File;
 class InheritableAttr;
 class ObjCSubclassingRestrictedAttr;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT ObjCSubclassingRestrictedAttr : public InheritableAttr {
  private:

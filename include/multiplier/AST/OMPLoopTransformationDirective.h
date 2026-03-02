@@ -20,11 +20,6 @@ class OMPLoopBasedDirective;
 class OMPLoopTransformationDirective;
 class Stmt;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT OMPLoopTransformationDirective : public OMPLoopBasedDirective {
  private:
@@ -39,8 +34,7 @@ class MX_EXPORT OMPLoopTransformationDirective : public OMPLoopBasedDirective {
   static gap::generator<OMPLoopTransformationDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<OMPLoopTransformationDirective> from(const ir::Operation &op);
-  static gap::generator<std::pair<OMPLoopTransformationDirective, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<OMPLoopTransformationDirective> in(const Compilation &tu);
   static gap::generator<OMPLoopTransformationDirective> containing(const Decl &decl);
   static gap::generator<OMPLoopTransformationDirective> containing(const std::optional<Decl> &decl);
 

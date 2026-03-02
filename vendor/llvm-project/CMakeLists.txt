@@ -7,10 +7,9 @@
 
 if(NOT MX_USE_VENDORED_CLANG)
   find_package(LLVM CONFIG QUIET)
-  find_package(MLIR CONFIG QUIET)
   find_package(Clang CONFIG QUIET)
 
-  if(LLVM_FOUND AND MLIR_FOUND AND Clang_FOUND)
+  if(LLVM_FOUND AND Clang_FOUND)
     return()
   endif()
 endif()
@@ -30,7 +29,7 @@ if(NOT EXISTS "${src_dir}/llvm/CMakeLists.txt")
 endif()
 
 # This is the main build, setup and execute the nested build
-# to ensure the Clang and MLIR libraries exist before continuing
+# to ensure the Clang library exists before continuing
 
 # NOTE(pag): C++17 seems to be needed when building Clang on Linux, due to uses
 #            of `__is_constructible`.
@@ -63,7 +62,7 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         -DCMAKE_CXX_STANDARD=17
                         "-DCMAKE_INTERPROCEDURAL_OPTIMIZATION=${CMAKE_INTERPROCEDURAL_OPTIMIZATION}"
                         -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON
-                        "-DLLVM_ENABLE_PROJECTS=clang;mlir"
+                        "-DLLVM_ENABLE_PROJECTS=clang"
                         "-DLLVM_TARGETS_TO_BUILD=AArch64;X86;ARM"
                         "-DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD=ARM;WebAssembly"
                         "-DLLVM_ENABLE_RUNTIMES=libcxx;libcxxabi"
@@ -104,5 +103,4 @@ execute_process(COMMAND ${CMAKE_COMMAND} --build . --target install
                 WORKING_DIRECTORY "${build_dir}")
 
 find_package(LLVM CONFIG REQUIRED HINTS "${MX_VENDOR_INSTALL_DIR}" NO_DEFAULT_PATH)
-find_package(MLIR CONFIG REQUIRED HINTS "${MX_VENDOR_INSTALL_DIR}" NO_DEFAULT_PATH)
 find_package(Clang CONFIG REQUIRED PATHS "${MX_VENDOR_INSTALL_DIR}" NO_DEFAULT_PATH)

@@ -20,11 +20,6 @@ class SYCLUniqueStableNameExpr;
 class Stmt;
 class Token;
 class ValueStmt;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT SYCLUniqueStableNameExpr : public Expr {
  private:
@@ -39,8 +34,7 @@ class MX_EXPORT SYCLUniqueStableNameExpr : public Expr {
   static gap::generator<SYCLUniqueStableNameExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<SYCLUniqueStableNameExpr> from(const ir::Operation &op);
-  static gap::generator<std::pair<SYCLUniqueStableNameExpr, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<SYCLUniqueStableNameExpr> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SYCL_UNIQUE_STABLE_NAME_EXPR;
   }

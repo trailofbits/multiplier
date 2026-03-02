@@ -18,8 +18,6 @@
 #include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/ValueDecl.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../Decl.h"
 
@@ -87,17 +85,10 @@ bool CXXConstructorDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<CXXConstructorDecl> CXXConstructorDecl::from(const ir::Operation &op) {
-  if (auto val = Decl::from(op)) {
-    return from_base(val.value());
-  }
-  return std::nullopt;
-}
-
-gap::generator<std::pair<CXXConstructorDecl, ir::Operation>> CXXConstructorDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kCXXConstructorDeclDerivedKinds)) {
-    if (auto val = from_base(res.first)) {
-      co_yield std::pair<CXXConstructorDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
+gap::generator<CXXConstructorDecl> CXXConstructorDecl::in(const Compilation &tu) {
+  for (Decl res : Decl::in(tu, kCXXConstructorDeclDerivedKinds)) {
+    if (auto val = from_base(res)) {
+      co_yield val.value();
     }
   }
 }

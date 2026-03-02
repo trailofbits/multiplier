@@ -21,11 +21,6 @@ class LifetimeExtendedTemporaryDecl;
 class Stmt;
 class Token;
 class ValueDecl;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT LifetimeExtendedTemporaryDecl : public Decl {
  private:
@@ -38,8 +33,7 @@ class MX_EXPORT LifetimeExtendedTemporaryDecl : public Decl {
   static gap::generator<LifetimeExtendedTemporaryDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<LifetimeExtendedTemporaryDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<LifetimeExtendedTemporaryDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<LifetimeExtendedTemporaryDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::LIFETIME_EXTENDED_TEMPORARY;
   }

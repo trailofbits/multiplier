@@ -19,11 +19,6 @@ class File;
 class SEHFinallyStmt;
 class Stmt;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT SEHFinallyStmt : public Stmt {
  private:
@@ -36,8 +31,7 @@ class MX_EXPORT SEHFinallyStmt : public Stmt {
   static gap::generator<SEHFinallyStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<SEHFinallyStmt> from(const ir::Operation &op);
-  static gap::generator<std::pair<SEHFinallyStmt, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<SEHFinallyStmt> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SEH_FINALLY_STMT;
   }

@@ -20,11 +20,6 @@ class Stmt;
 class TemplateDecl;
 class TemplateParameterList;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT TemplateDecl : public NamedDecl {
  private:
@@ -38,8 +33,7 @@ class MX_EXPORT TemplateDecl : public NamedDecl {
   static gap::generator<TemplateDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<TemplateDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<TemplateDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<TemplateDecl> in(const Compilation &tu);
   static gap::generator<TemplateDecl> containing(const Decl &decl);
   static gap::generator<TemplateDecl> containing(const std::optional<Decl> &decl);
 

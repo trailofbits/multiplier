@@ -15,8 +15,6 @@
 #include <multiplier/AST/BinaryConditionalOperator.h>
 #include <multiplier/AST/ConditionalOperator.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../Stmt.h"
 
@@ -85,17 +83,10 @@ bool AbstractConditionalOperator::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<AbstractConditionalOperator> AbstractConditionalOperator::from(const ir::Operation &op) {
-  if (auto val = Stmt::from(op)) {
-    return from_base(val.value());
-  }
-  return std::nullopt;
-}
-
-gap::generator<std::pair<AbstractConditionalOperator, ir::Operation>> AbstractConditionalOperator::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kAbstractConditionalOperatorDerivedKinds)) {
-    if (auto val = from_base(res.first)) {
-      co_yield std::pair<AbstractConditionalOperator, ir::Operation>(std::move(val.value()), std::move(res.second));
+gap::generator<AbstractConditionalOperator> AbstractConditionalOperator::in(const Compilation &tu) {
+  for (Stmt res : Stmt::in(tu, kAbstractConditionalOperatorDerivedKinds)) {
+    if (auto val = from_base(res)) {
+      co_yield val.value();
     }
   }
 }

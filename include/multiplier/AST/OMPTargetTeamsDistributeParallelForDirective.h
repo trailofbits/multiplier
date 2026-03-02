@@ -22,11 +22,6 @@ class OMPLoopDirective;
 class OMPTargetTeamsDistributeParallelForDirective;
 class Stmt;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT OMPTargetTeamsDistributeParallelForDirective : public OMPLoopDirective {
  private:
@@ -42,8 +37,7 @@ class MX_EXPORT OMPTargetTeamsDistributeParallelForDirective : public OMPLoopDir
   static gap::generator<OMPTargetTeamsDistributeParallelForDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<OMPTargetTeamsDistributeParallelForDirective> from(const ir::Operation &op);
-  static gap::generator<std::pair<OMPTargetTeamsDistributeParallelForDirective, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<OMPTargetTeamsDistributeParallelForDirective> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_PARALLEL_FOR_DIRECTIVE;
   }

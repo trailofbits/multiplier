@@ -21,11 +21,6 @@ class Stmt;
 class Token;
 class ValueStmt;
 class VarDecl;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT FunctionParmPackExpr : public Expr {
  private:
@@ -40,8 +35,7 @@ class MX_EXPORT FunctionParmPackExpr : public Expr {
   static gap::generator<FunctionParmPackExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<FunctionParmPackExpr> from(const ir::Operation &op);
-  static gap::generator<std::pair<FunctionParmPackExpr, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<FunctionParmPackExpr> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::FUNCTION_PARM_PACK_EXPR;
   }

@@ -11,7 +11,6 @@
 #include <multiplier/Fragment.h>
 #include <multiplier/Frontend.h>
 #include <multiplier/Index.h>
-#include <multiplier/IR.h>
 #include <multiplier/Re2.h>
 
 #include <cassert>
@@ -1325,18 +1324,35 @@ static PyMethodDef gMethods[] = {
     PyDoc_STR("Wrapper for mx::Stmt::containing"),
   },
   {
+    "by_id",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          (void) args;
+          while (num_args == 2) {
+            auto arg_0 = ::mx::from_python<mx::Index>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+            auto arg_1 = ::mx::from_python<EntityId>(args[1]);
+            if (!arg_1.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(T::by_id(arg_0.value(), std::move(arg_1.value())));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'by_id'";
+          return nullptr;
+        }),
+    METH_FASTCALL | METH_STATIC,
+    PyDoc_STR("Wrapper for mx::Stmt::by_id"),
+  },
+  {
     "FROM",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
           (void) args;
-          while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::ir::Operation>(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(T::from(arg_0.value()));
-          }
           while (num_args == 1) {
             auto arg_0 = ::mx::from_python<mx::Stmt>(args[0]);
             if (!arg_0.has_value()) {
@@ -1362,7 +1378,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(T::from(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::CXXCtorInitializer, mx::Compilation, mx::ir::Operation>>(args[0]);
+            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::CXXCtorInitializer, mx::Compilation>>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -1384,31 +1400,6 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::Stmt::from"),
-  },
-  {
-    "by_id",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          (void) args;
-          while (num_args == 2) {
-            auto arg_0 = ::mx::from_python<mx::Index>(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-            auto arg_1 = ::mx::from_python<EntityId>(args[1]);
-            if (!arg_1.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(T::by_id(arg_0.value(), std::move(arg_1.value())));
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'by_id'";
-          return nullptr;
-        }),
-    METH_FASTCALL | METH_STATIC,
-    PyDoc_STR("Wrapper for mx::Stmt::by_id"),
   },
   {}  // Sentinel.
 };

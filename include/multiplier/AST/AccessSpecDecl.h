@@ -18,11 +18,6 @@ class Decl;
 class File;
 class Stmt;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT AccessSpecDecl : public Decl {
  private:
@@ -35,8 +30,7 @@ class MX_EXPORT AccessSpecDecl : public Decl {
   static gap::generator<AccessSpecDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<AccessSpecDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<AccessSpecDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<AccessSpecDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::ACCESS_SPEC;
   }

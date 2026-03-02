@@ -25,11 +25,6 @@ class Token;
 class TokenRange;
 class Type;
 class TypeDecl;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT EnumDecl : public TagDecl {
  private:
@@ -45,8 +40,7 @@ class MX_EXPORT EnumDecl : public TagDecl {
   static gap::generator<EnumDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<EnumDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<EnumDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<EnumDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::ENUM;
   }

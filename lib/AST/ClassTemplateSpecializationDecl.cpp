@@ -20,8 +20,6 @@
 #include <multiplier/AST/TypeDecl.h>
 #include <multiplier/AST/ClassTemplatePartialSpecializationDecl.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../Decl.h"
 
@@ -90,17 +88,10 @@ bool ClassTemplateSpecializationDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<ClassTemplateSpecializationDecl> ClassTemplateSpecializationDecl::from(const ir::Operation &op) {
-  if (auto val = Decl::from(op)) {
-    return from_base(val.value());
-  }
-  return std::nullopt;
-}
-
-gap::generator<std::pair<ClassTemplateSpecializationDecl, ir::Operation>> ClassTemplateSpecializationDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kClassTemplateSpecializationDeclDerivedKinds)) {
-    if (auto val = from_base(res.first)) {
-      co_yield std::pair<ClassTemplateSpecializationDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
+gap::generator<ClassTemplateSpecializationDecl> ClassTemplateSpecializationDecl::in(const Compilation &tu) {
+  for (Decl res : Decl::in(tu, kClassTemplateSpecializationDeclDerivedKinds)) {
+    if (auto val = from_base(res)) {
+      co_yield val.value();
     }
   }
 }

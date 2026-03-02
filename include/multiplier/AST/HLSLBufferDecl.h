@@ -19,11 +19,6 @@ class HLSLBufferDecl;
 class NamedDecl;
 class Stmt;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT HLSLBufferDecl : public NamedDecl {
  private:
@@ -37,8 +32,7 @@ class MX_EXPORT HLSLBufferDecl : public NamedDecl {
   static gap::generator<HLSLBufferDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<HLSLBufferDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<HLSLBufferDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<HLSLBufferDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::HLSL_BUFFER;
   }

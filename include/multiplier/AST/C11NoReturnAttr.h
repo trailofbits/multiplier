@@ -18,11 +18,6 @@ class C11NoReturnAttr;
 class File;
 class InheritableAttr;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT C11NoReturnAttr : public InheritableAttr {
  private:

@@ -21,11 +21,6 @@ class NamedDecl;
 class Stmt;
 class Token;
 class ValueDecl;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT MSPropertyDecl : public DeclaratorDecl {
  private:
@@ -41,8 +36,7 @@ class MX_EXPORT MSPropertyDecl : public DeclaratorDecl {
   static gap::generator<MSPropertyDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<MSPropertyDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<MSPropertyDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<MSPropertyDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::MS_PROPERTY;
   }

@@ -16,8 +16,6 @@
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/Frontend/Token.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../Decl.h"
 
@@ -85,17 +83,10 @@ bool ObjCCategoryImplDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<ObjCCategoryImplDecl> ObjCCategoryImplDecl::from(const ir::Operation &op) {
-  if (auto val = Decl::from(op)) {
-    return from_base(val.value());
-  }
-  return std::nullopt;
-}
-
-gap::generator<std::pair<ObjCCategoryImplDecl, ir::Operation>> ObjCCategoryImplDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kObjCCategoryImplDeclDerivedKinds)) {
-    if (auto val = from_base(res.first)) {
-      co_yield std::pair<ObjCCategoryImplDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
+gap::generator<ObjCCategoryImplDecl> ObjCCategoryImplDecl::in(const Compilation &tu) {
+  for (Decl res : Decl::in(tu, kObjCCategoryImplDeclDerivedKinds)) {
+    if (auto val = from_base(res)) {
+      co_yield val.value();
     }
   }
 }

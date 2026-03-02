@@ -14,8 +14,6 @@
 #include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/ValueStmt.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../Stmt.h"
 
@@ -83,17 +81,10 @@ bool ConstantExpr::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<ConstantExpr> ConstantExpr::from(const ir::Operation &op) {
-  if (auto val = Stmt::from(op)) {
-    return from_base(val.value());
-  }
-  return std::nullopt;
-}
-
-gap::generator<std::pair<ConstantExpr, ir::Operation>> ConstantExpr::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kConstantExprDerivedKinds)) {
-    if (auto val = from_base(res.first)) {
-      co_yield std::pair<ConstantExpr, ir::Operation>(std::move(val.value()), std::move(res.second));
+gap::generator<ConstantExpr> ConstantExpr::in(const Compilation &tu) {
+  for (Stmt res : Stmt::in(tu, kConstantExprDerivedKinds)) {
+    if (auto val = from_base(res)) {
+      co_yield val.value();
     }
   }
 }

@@ -15,7 +15,6 @@
 #include "Decl.h"
 #include "File.h"
 #include "Fragment.h"
-#include "IR/SourceIR.h"
 #include "Macro.h"
 #include "Pseudo.h"
 #include "Stmt.h"
@@ -182,29 +181,6 @@ gap::generator<File> Index::files(void) const & {
   }
 }
 
-std::optional<ir::Operation> Index::operation(RawEntityId id) const {
-  auto op_id = EntityId(id).Extract<OperationId>();
-  if (!op_id) {
-    return std::nullopt;
-  }
-
-  CompilationId compilation_id(op_id->compilation_id);
-  auto cptr = impl->CompilationFor(impl, EntityId(compilation_id).Pack());
-  if (!cptr) {
-    assert(false);
-    return std::nullopt;
-  }
-
-  if (auto source_ir = cptr->SourceIRPtr(compilation_id)) {
-    if (auto op = source_ir->OperationFor(source_ir, id)) {
-      return op;
-    }
-  }
-
-  assert(false);
-  return std::nullopt;
-}
-
 #define MX_DEFINE_GETTER(ns_path, type_name, lower_name, enum_name, category) \
   std::optional<ns_path type_name> Index::lower_name(RawEntityId id) const { \
     if (CategoryFromEntityId(id) == EntityCategory::enum_name) { \
@@ -218,7 +194,7 @@ std::optional<ir::Operation> Index::operation(RawEntityId id) const {
 MX_FOR_EACH_ENTITY_CATEGORY(MX_DEFINE_GETTER, MX_IGNORE_ENTITY_CATEGORY,
                             MX_DEFINE_GETTER, MX_DEFINE_GETTER,
                             MX_DEFINE_GETTER, MX_DEFINE_GETTER,
-                            MX_DEFINE_GETTER, MX_IGNORE_ENTITY_CATEGORY)
+                            MX_DEFINE_GETTER)
 #undef MX_DEFINE_GETTER
 
 // Download a fragment based off of an entity ID.
@@ -285,13 +261,6 @@ VariantEntity Index::entity(EntityId eid) const {
     }
     assert(false);
 
-  // It's an IR operation.
-  } else if (std::holds_alternative<OperationId>(vid)) {
-    if (auto op = operation(eid.Pack())) {
-      return op.value();
-    }
-    assert(false);
-
 #define MX_DISPATCH_GETTER(ns_path, type_name, lower_name, enum_name, category) \
     } else if (std::holds_alternative<type_name ## Id>(vid)) { \
       if (type_name ## ImplPtr eptr = impl->type_name ## For(impl, raw_id)) { \
@@ -305,7 +274,7 @@ VariantEntity Index::entity(EntityId eid) const {
     MX_FOR_EACH_ENTITY_CATEGORY(MX_DISPATCH_GETTER, MX_IGNORE_ENTITY_CATEGORY,
                                 MX_DISPATCH_GETTER, MX_DISPATCH_GETTER,
                                 MX_DISPATCH_GETTER, MX_DISPATCH_GETTER,
-                                MX_DISPATCH_GETTER, MX_IGNORE_ENTITY_CATEGORY)
+                                MX_DISPATCH_GETTER)
 #undef MX_DISPATCH_GETTER
 
 

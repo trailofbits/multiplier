@@ -14,8 +14,6 @@
 #include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/ConstructorUsingShadowDecl.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../Decl.h"
 
@@ -84,17 +82,10 @@ bool UsingShadowDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<UsingShadowDecl> UsingShadowDecl::from(const ir::Operation &op) {
-  if (auto val = Decl::from(op)) {
-    return from_base(val.value());
-  }
-  return std::nullopt;
-}
-
-gap::generator<std::pair<UsingShadowDecl, ir::Operation>> UsingShadowDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kUsingShadowDeclDerivedKinds)) {
-    if (auto val = from_base(res.first)) {
-      co_yield std::pair<UsingShadowDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
+gap::generator<UsingShadowDecl> UsingShadowDecl::in(const Compilation &tu) {
+  for (Decl res : Decl::in(tu, kUsingShadowDeclDerivedKinds)) {
+    if (auto val = from_base(res)) {
+      co_yield val.value();
     }
   }
 }

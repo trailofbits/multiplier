@@ -17,11 +17,6 @@ class Index;
 class Token;
 class Type;
 class TypeOfType;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT TypeOfType : public Type {
  private:

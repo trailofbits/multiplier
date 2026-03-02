@@ -20,11 +20,6 @@ class File;
 class Stmt;
 class Token;
 class ValueStmt;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT CXXScalarValueInitExpr : public Expr {
  private:
@@ -39,8 +34,7 @@ class MX_EXPORT CXXScalarValueInitExpr : public Expr {
   static gap::generator<CXXScalarValueInitExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<CXXScalarValueInitExpr> from(const ir::Operation &op);
-  static gap::generator<std::pair<CXXScalarValueInitExpr, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<CXXScalarValueInitExpr> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_SCALAR_VALUE_INIT_EXPR;
   }

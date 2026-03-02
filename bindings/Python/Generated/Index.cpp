@@ -11,7 +11,6 @@
 #include <multiplier/Fragment.h>
 #include <multiplier/Frontend.h>
 #include <multiplier/Index.h>
-#include <multiplier/IR.h>
 #include <multiplier/Re2.h>
 
 #include <cassert>
@@ -72,7 +71,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1535]) || tp >= &(gTypes[1536])) {
+  if (tp < &(gTypes[867]) || tp >= &(gTypes[868])) {
     return std::nullopt;
   }
 
@@ -303,15 +302,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(T::containing(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::CXXCtorInitializer, mx::Compilation, mx::ir::Operation>>(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(T::containing(arg_0.value()));
-          }
-          while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::ir::Operation>(args[0]);
+            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::CXXCtorInitializer, mx::Compilation>>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -761,36 +752,6 @@ static PyMethodDef gMethods[] = {
     PyDoc_STR("Wrapper for mx::Index::compilation"),
   },
   {
-    "operation",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          T *obj = T_cast(self);
-          (void) args;
-          while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<uint64_t>(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->operation(std::move(arg_0.value())));
-          }
-          while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<PackedOperationId>(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(obj->operation(std::move(arg_0.value())));
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'operation'";
-          return nullptr;
-        }),
-    METH_FASTCALL,
-    PyDoc_STR("Wrapper for mx::Index::operation"),
-  },
-  {
     "entity",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
@@ -841,7 +802,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1535]);
+  PyTypeObject * const tp = &(gTypes[867]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

@@ -23,11 +23,6 @@ class Stmt;
 class Token;
 class ValueDecl;
 class VarDecl;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT ImplicitParamDecl : public VarDecl {
  private:
@@ -44,8 +39,7 @@ class MX_EXPORT ImplicitParamDecl : public VarDecl {
   static gap::generator<ImplicitParamDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<ImplicitParamDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<ImplicitParamDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<ImplicitParamDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::IMPLICIT_PARAM;
   }

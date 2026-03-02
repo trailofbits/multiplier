@@ -49,8 +49,6 @@
 #include <multiplier/AST/OMPTeamsDistributeSimdDirective.h>
 #include <multiplier/AST/OMPTeamsGenericLoopDirective.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../Stmt.h"
 
@@ -152,17 +150,10 @@ bool OMPLoopDirective::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<OMPLoopDirective> OMPLoopDirective::from(const ir::Operation &op) {
-  if (auto val = Stmt::from(op)) {
-    return from_base(val.value());
-  }
-  return std::nullopt;
-}
-
-gap::generator<std::pair<OMPLoopDirective, ir::Operation>> OMPLoopDirective::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kOMPLoopDirectiveDerivedKinds)) {
-    if (auto val = from_base(res.first)) {
-      co_yield std::pair<OMPLoopDirective, ir::Operation>(std::move(val.value()), std::move(res.second));
+gap::generator<OMPLoopDirective> OMPLoopDirective::in(const Compilation &tu) {
+  for (Stmt res : Stmt::in(tu, kOMPLoopDirectiveDerivedKinds)) {
+    if (auto val = from_base(res)) {
+      co_yield val.value();
     }
   }
 }

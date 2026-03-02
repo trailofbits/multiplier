@@ -22,11 +22,6 @@ class IfStmt;
 class Stmt;
 class Token;
 class VarDecl;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT IfStmt : public Stmt {
  private:
@@ -39,8 +34,7 @@ class MX_EXPORT IfStmt : public Stmt {
   static gap::generator<IfStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<IfStmt> from(const ir::Operation &op);
-  static gap::generator<std::pair<IfStmt, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<IfStmt> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::IF_STMT;
   }

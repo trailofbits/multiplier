@@ -23,11 +23,6 @@ class ObjCContainerDecl;
 class ObjCImplDecl;
 class Stmt;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT ObjCCategoryImplDecl : public ObjCImplDecl {
  private:
@@ -43,8 +38,7 @@ class MX_EXPORT ObjCCategoryImplDecl : public ObjCImplDecl {
   static gap::generator<ObjCCategoryImplDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<ObjCCategoryImplDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<ObjCCategoryImplDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<ObjCCategoryImplDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_CATEGORY_IMPL;
   }

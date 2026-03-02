@@ -11,7 +11,6 @@
 #include <multiplier/AST/Type.h>
 #include <multiplier/Frontend/Macro.h>
 #include <multiplier/Frontend/Query.h>
-#include <multiplier/IR/Operation.h>
 #include <mutex>
 
 #include "Attr.h"
@@ -245,20 +244,8 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_DEFINE_CONTAINING,
                             MX_DEFINE_CONTAINING,
-                            MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DEFINE_CONTAINING
-
-// Return the file containing an operation.
-std::optional<File> File::containing(const ir::Operation &op) noexcept {
-  if (auto decl = Decl::from(op)) {
-    return File::containing(decl.value());
-  } else if (auto stmt = Stmt::from(op)) {
-    return File::containing(stmt.value());
-  } else {
-    return std::nullopt;
-  }
-}
 
 std::optional<File> File::containing(const VariantEntity &entity) noexcept {
 #define GET_FILE(ns_path, type_name, lower_name, enum_name, category) \
@@ -268,7 +255,7 @@ std::optional<File> File::containing(const VariantEntity &entity) noexcept {
 
   MX_FOR_EACH_ENTITY_CATEGORY(GET_FILE, GET_FILE, MX_IGNORE_ENTITY_CATEGORY,
                               GET_FILE, GET_FILE, GET_FILE,
-                              MX_IGNORE_ENTITY_CATEGORY, GET_FILE)
+                              MX_IGNORE_ENTITY_CATEGORY)
   return std::nullopt;
 #undef GET_FILE
 }

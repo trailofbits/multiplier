@@ -298,7 +298,6 @@ CLASS_HEADER = """// Copyright (c) 2023-present, Trail of Bits, Inc.
 #include <multiplier/Fragment.h>
 #include <multiplier/Frontend.h>
 #include <multiplier/Index.h>
-#include <multiplier/IR.h>
 #include <multiplier/Re2.h>
 
 #include <cassert>
@@ -495,12 +494,6 @@ inline static const T *T_cast(const void *obj) noexcept {{
 
 }}  // namespace
 """
-
-
-IR_TYPE_HASH = """[] (BorrowedPyObject *obj) -> Py_hash_t {{
-    return static_cast<Py_hash_t>(reinterpret_cast<uintptr_t>(T_cast(obj)->underlying_{}()));
-  }}"""
-
 
 TYPE_HASH = """[] (BorrowedPyObject *obj) -> Py_hash_t {
     return static_cast<Py_hash_t>(EntityId(T_cast(obj)->id()).Pack());
@@ -926,7 +919,6 @@ BINDING_CPP_HEADER = """// Copyright (c) 2023-present, Trail of Bits, Inc.
 #include <multiplier/Fragment.h>
 #include <multiplier/Frontend.h>
 #include <multiplier/Index.h>
-#include <multiplier/IR.h>
 #include <multiplier/Re2.h>
 #include <multiplier/Reference.h>
 
@@ -1331,18 +1323,6 @@ def _strip_optional_const_ref(schema: Schema) -> Schema:
     return schema
 
 
-_IR_BASE_CLASSES = ("Operation", "Region", "Block", "Type",
-                    "Attribute", "Value", "Operand")
-
-
-def _is_mlir_base_class(schema: ClassSchema) -> bool:
-  if schema.name not in _IR_BASE_CLASSES:
-    return False
-
-  return schema.namespaces and len(schema.namespaces) and \
-         schema.namespaces[-1] == 'ir'
-
-
 def wrap_class(schema: ClassSchema,
                offsets: Dict[ClassSchema, Tuple[int, int]],
                children: Dict[ClassSchema, List[ClassSchema]],
@@ -1412,9 +1392,6 @@ def wrap_class(schema: ClassSchema,
     id_method = schema.methods["id"]
     if _is_id_method(id_method):
       type_hash = TYPE_HASH
-
-  elif _is_mlir_base_class(schema):
-    type_hash = IR_TYPE_HASH.format(schema.name.lower())
 
   elif schema.name == "TokenTreeNode":
     type_hash = HASH_CODE_TYPE_HASH

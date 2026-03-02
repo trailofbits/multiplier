@@ -18,11 +18,6 @@ class File;
 class Stmt;
 class SwitchCase;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT SwitchCase : public Stmt {
  private:
@@ -35,8 +30,7 @@ class MX_EXPORT SwitchCase : public Stmt {
   static gap::generator<SwitchCase> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<SwitchCase> from(const ir::Operation &op);
-  static gap::generator<std::pair<SwitchCase, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<SwitchCase> in(const Compilation &tu);
   static gap::generator<SwitchCase> containing(const Decl &decl);
   static gap::generator<SwitchCase> containing(const std::optional<Decl> &decl);
 

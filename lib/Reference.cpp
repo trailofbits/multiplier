@@ -39,13 +39,8 @@ static OpaqueImplPtr ReferencedEntity(const EntityProviderPtr &ep,
     MX_FOR_EACH_ENTITY_CATEGORY(MX_DISPATCH_GETTER, MX_IGNORE_ENTITY_CATEGORY,
                                 MX_DISPATCH_GETTER, MX_DISPATCH_GETTER,
                                 MX_DISPATCH_GETTER, MX_DISPATCH_GETTER,
-                                MX_DISPATCH_GETTER, MX_IGNORE_ENTITY_CATEGORY)
+                                MX_DISPATCH_GETTER)
 #undef MX_DISPATCH_GETTER
-
-  // It's a reference to an IR oeration.
-  } else if (std::holds_alternative<OperationId>(vid)) {
-    // TODO(pag): Figure this out.
-    assert(false);
 
   // It's a reference to a parsed token resident in a fragment.
   } else if (std::holds_alternative<ParsedTokenId>(vid)) {
@@ -254,7 +249,6 @@ VariantEntity Reference::as_variant(void) const noexcept {
                                 DEFINE_REF_GETTER,
                                 DEFINE_REF_GETTER,
                                 DEFINE_REF_GETTER,
-                                DEFINE_REF_GETTER,
                                 DEFINE_REF_GETTER)
 #undef DEFINE_REF_GETTER
   }
@@ -300,11 +294,6 @@ gap::generator<Reference> Reference::from(const VariantEntity &entity) {
   return EmptyReferences();
 }
 
-std::optional<::mx::ir::Operation> Reference::as_operation(void) const noexcept {
-  assert(false);  // TODO(pag): Implement me.
-  return std::nullopt;
-}
-
 #define DEFINE_REF_GETTER(ns_path, type_name, lower_name, enum_name, category_) \
     std::optional<ns_path type_name> \
     Reference::as_ ## lower_name (void) const noexcept { \
@@ -325,8 +314,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(DEFINE_REF_GETTER,
                             DEFINE_REF_GETTER,
                             DEFINE_REF_GETTER,
                             DEFINE_REF_GETTER,
-                            DEFINE_REF_GETTER,
-                            MX_IGNORE_ENTITY_CATEGORY)
+                            DEFINE_REF_GETTER)
 
 #undef DEFINE_REF_GETTER
 

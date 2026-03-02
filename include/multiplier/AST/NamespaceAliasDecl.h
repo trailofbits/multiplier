@@ -20,11 +20,6 @@ class NamespaceAliasDecl;
 class NamespaceDecl;
 class Stmt;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT NamespaceAliasDecl : public NamedDecl {
  private:
@@ -38,8 +33,7 @@ class MX_EXPORT NamespaceAliasDecl : public NamedDecl {
   static gap::generator<NamespaceAliasDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<NamespaceAliasDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<NamespaceAliasDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<NamespaceAliasDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::NAMESPACE_ALIAS;
   }

@@ -73,14 +73,11 @@ File serialization             (663 / 663)           100% [|||||||||||||||||||||
 AST partitioning               (237 / 237)           100% [||||||||||||||||||||||||||||||||||||||||]
 Fragment serialization         (30601 / 30601)       100% [||||||||||||||||||||||||||||||||||||||||]
 Type serialization             (18416 / 18416)       100% [||||||||||||||||||||||||||||||||||||||||]
-SourceIR                       (  0 / 237)             0% [                                        ]
 
 mx-index --db /tmp/openssh.db --workspace /tmp/openssh.ws --target    246.65s user 48.49s system 523% cpu 56.417 total
 ```
 
 Here we told `mx-index` to save its database to `/tmp/openssh.db` (we'll need this soon), and its temporary workspace to the directory `/tmp/openssh.ws`. We can now delete `/tmp/openssh.ws`, as its only needed if we wanted to index additional projects into the same database.
-
-The `--generate_sourceir` flag is optional if you plan to do the Python scripting. It will produce a lot more errors as output, but the indexer should finish.
 
 ```bash
 rm -rf /tmp/openssh.ws

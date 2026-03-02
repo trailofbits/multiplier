@@ -21,11 +21,6 @@ class File;
 class RecordDecl;
 class Stmt;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT CapturedStmt : public Stmt {
  private:
@@ -38,8 +33,7 @@ class MX_EXPORT CapturedStmt : public Stmt {
   static gap::generator<CapturedStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<CapturedStmt> from(const ir::Operation &op);
-  static gap::generator<std::pair<CapturedStmt, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<CapturedStmt> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CAPTURED_STMT;
   }

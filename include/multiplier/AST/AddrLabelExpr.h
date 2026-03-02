@@ -21,11 +21,6 @@ class LabelDecl;
 class Stmt;
 class Token;
 class ValueStmt;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT AddrLabelExpr : public Expr {
  private:
@@ -40,8 +35,7 @@ class MX_EXPORT AddrLabelExpr : public Expr {
   static gap::generator<AddrLabelExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<AddrLabelExpr> from(const ir::Operation &op);
-  static gap::generator<std::pair<AddrLabelExpr, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<AddrLabelExpr> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::ADDR_LABEL_EXPR;
   }

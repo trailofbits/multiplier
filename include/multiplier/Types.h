@@ -18,10 +18,6 @@
 #include "Compiler.h"
 
 namespace mx {
-namespace ir {
-class Operation;
-enum class OperationKind : unsigned;
-}  // namespace ir
 
 class Token;
 
@@ -33,7 +29,7 @@ enum class TokenKind : unsigned short;
 enum class TypeKind : unsigned char;
 
 #define MX_IGNORE_ENTITY_CATEGORY(ns_path, type_name, lower_name, enum_name, category)
-#define MX_FOR_EACH_ENTITY_CATEGORY(file_, token_, type_, frag_, frag_offset_, pseudo_, tu_, ir_) \
+#define MX_FOR_EACH_ENTITY_CATEGORY(file_, token_, type_, frag_, frag_offset_, pseudo_, tu_) \
     frag_(::mx::, Fragment, fragment, FRAGMENT, 1) \
     frag_offset_(::mx::, Decl, declaration, DECLARATION, 2) \
     frag_offset_(::mx::, Stmt, statement, STATEMENT, 3) \
@@ -47,8 +43,7 @@ enum class TypeKind : unsigned char;
     pseudo_(::mx::, CXXBaseSpecifier, cxx_base_specifier, CXX_BASE_SPECIFIER, 11) \
     pseudo_(::mx::, Designator, designator, DESIGNATOR, 12) \
     pseudo_(::mx::, CXXCtorInitializer, cxx_ctor_initializer, CXX_CTOR_INITIALIZER, 13) \
-    tu_(::mx::, Compilation, compilation, COMPILATION, 14) \
-    ir_(::mx::ir::, Operation, operation, OPERATION, 15)
+    tu_(::mx::, Compilation, compilation, COMPILATION, 14)
 
 #define MX_DECLARE_ENTITY_CLASS(ns_path, type, lower, enum_, val) \
     class type;\
@@ -60,8 +55,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_CLASS,
                             MX_DECLARE_ENTITY_CLASS,
                             MX_DECLARE_ENTITY_CLASS,
                             MX_DECLARE_ENTITY_CLASS,
-                            MX_DECLARE_ENTITY_CLASS,
-                            MX_IGNORE_ENTITY_CATEGORY)
+                            MX_DECLARE_ENTITY_CLASS)
 #undef MX_DECLARE_ENTITY_CLASS
 
 using NotAnEntity = std::monostate;
@@ -70,7 +64,6 @@ enum class EntityCategory : int {
   NOT_AN_ENTITY,
 #define MX_DECLARE_ENTITY_CATEGORY_ENUM(ns_path, type, lower, enum_, val) enum_ = val,
   MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_CATEGORY_ENUM,
-                              MX_DECLARE_ENTITY_CATEGORY_ENUM,
                               MX_DECLARE_ENTITY_CATEGORY_ENUM,
                               MX_DECLARE_ENTITY_CATEGORY_ENUM,
                               MX_DECLARE_ENTITY_CATEGORY_ENUM,
@@ -109,7 +102,6 @@ using SignedEntityOffset = int32_t;
 inline static constexpr unsigned NumEnumerators(EntityCategory) {
 #define MX_COUNT_ENTITY_CATEGORIES(...) + 1u
   return 1 MX_FOR_EACH_ENTITY_CATEGORY(MX_COUNT_ENTITY_CATEGORIES,
-                                       MX_COUNT_ENTITY_CATEGORIES,
                                        MX_COUNT_ENTITY_CATEGORIES,
                                        MX_COUNT_ENTITY_CATEGORIES,
                                        MX_COUNT_ENTITY_CATEGORIES,
@@ -346,7 +338,7 @@ struct MX_EXPORT CXXCtorInitializerId final {
 };
 
 // Translation units represent a compilation. From a translation unit we can
-// get the compile command, the MLIR, etc.
+// get the compile command, etc.
 struct MX_EXPORT CompilationId {
 
   // The ID of the compilation/translation unit.
@@ -357,27 +349,6 @@ struct MX_EXPORT CompilationId {
 
   bool operator==(const CompilationId &) const noexcept = default;
   auto operator<=>(const CompilationId &) const noexcept = default;
-};
-
-// Identifies a serialized version of a `clang::Attr` or `pasta::Attr` inside
-// of a `Fragment`.
-struct MX_EXPORT OperationId final {
-  RawEntityId compilation_id;
-  ir::OperationKind kind;
-  EntityOffset offset;
-  EntityOffset level;
-
-  inline explicit OperationId(RawEntityId compilation_id_,
-                              ir::OperationKind kind_,
-                              EntityOffset offset_,
-                              EntityOffset level_)
-      : compilation_id(compilation_id_),
-        kind(kind_),
-        offset(offset_),
-        level(level_) {}
-
-  bool operator==(const OperationId &) const noexcept = default;
-  auto operator<=>(const OperationId &) const noexcept = default;
 };
 
 // Identifies a serialized fragment.
@@ -439,7 +410,6 @@ using VariantId = std::variant<
                                 MX_ENTITY_ID_VARIANT,
                                 MX_ENTITY_ID_VARIANT,
                                 MX_ENTITY_ID_VARIANT,
-                                MX_ENTITY_ID_VARIANT,
                                 MX_ENTITY_ID_VARIANT)
     ParsedTokenId, MacroTokenId, FileTokenId, TypeTokenId>;
 #undef MX_ENTITY_ID_VARIANT
@@ -478,7 +448,6 @@ class MX_EXPORT EntityId final {
   /* implicit */ EntityId(DesignatorId id);
   /* implicit */ EntityId(CXXCtorInitializerId id);
   /* implicit */ EntityId(CompilationId id);
-  /* implicit */ EntityId(OperationId id);
 
   template <typename T>
   /* implicit */ inline EntityId(SpecificEntityId<T>);
@@ -643,7 +612,6 @@ struct EntityTypeImpl;
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_MAP_ENTITY_TYPE,
                             MX_IGNORE_ENTITY_CATEGORY,
-                            MX_MAP_ENTITY_TYPE,
                             MX_MAP_ENTITY_TYPE,
                             MX_MAP_ENTITY_TYPE,
                             MX_MAP_ENTITY_TYPE,

@@ -20,8 +20,6 @@
 #include <multiplier/AST/CXXConversionDecl.h>
 #include <multiplier/AST/CXXDestructorDecl.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../Decl.h"
 
@@ -92,17 +90,10 @@ bool CXXMethodDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<CXXMethodDecl> CXXMethodDecl::from(const ir::Operation &op) {
-  if (auto val = Decl::from(op)) {
-    return from_base(val.value());
-  }
-  return std::nullopt;
-}
-
-gap::generator<std::pair<CXXMethodDecl, ir::Operation>> CXXMethodDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kCXXMethodDeclDerivedKinds)) {
-    if (auto val = from_base(res.first)) {
-      co_yield std::pair<CXXMethodDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
+gap::generator<CXXMethodDecl> CXXMethodDecl::in(const Compilation &tu) {
+  for (Decl res : Decl::in(tu, kCXXMethodDeclDerivedKinds)) {
+    if (auto val = from_base(res)) {
+      co_yield val.value();
     }
   }
 }

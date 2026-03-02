@@ -15,8 +15,6 @@
 #include <multiplier/AST/Type.h>
 #include <multiplier/AST/ValueStmt.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../Stmt.h"
 
@@ -84,17 +82,10 @@ bool SubstNonTypeTemplateParmExpr::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<SubstNonTypeTemplateParmExpr> SubstNonTypeTemplateParmExpr::from(const ir::Operation &op) {
-  if (auto val = Stmt::from(op)) {
-    return from_base(val.value());
-  }
-  return std::nullopt;
-}
-
-gap::generator<std::pair<SubstNonTypeTemplateParmExpr, ir::Operation>> SubstNonTypeTemplateParmExpr::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kSubstNonTypeTemplateParmExprDerivedKinds)) {
-    if (auto val = from_base(res.first)) {
-      co_yield std::pair<SubstNonTypeTemplateParmExpr, ir::Operation>(std::move(val.value()), std::move(res.second));
+gap::generator<SubstNonTypeTemplateParmExpr> SubstNonTypeTemplateParmExpr::in(const Compilation &tu) {
+  for (Stmt res : Stmt::in(tu, kSubstNonTypeTemplateParmExprDerivedKinds)) {
+    if (auto val = from_base(res)) {
+      co_yield val.value();
     }
   }
 }

@@ -8,7 +8,6 @@
 set(exe_name "mx-bootstrap-pasta")
 
 option(MX_BOOTSTRAP_PASTA "Set to ON to bootstrap PASTA" ON)
-option(MX_BOOTSTRAP_VAST "Set to ON to bootstrap VAST" ON)
 
 add_library("mx-bootstrap" STATIC
   "Bootstrap.cpp"
@@ -80,32 +79,3 @@ if(MX_BOOTSTRAP_PASTA)
       "Bootstrapping Multiplier"
   )
 endif(MX_BOOTSTRAP_PASTA)
-
-if(MX_BOOTSTRAP_VAST)
-  add_executable("mx-bootstrap-vast"
-    "VAST.cpp"
-    "${PROJECT_SOURCE_DIR}/bin/Index/Entity.h"
-  )
-  
-  target_link_libraries("mx-bootstrap-vast"
-    PRIVATE
-      "mx-bootstrap"
-
-      ${MLIR_LIBS}
-      ${VAST_LIBS}
-  )
-  
-  # Run `mx-bootstrap-vast` to auto-generate the files.
-  add_custom_command(
-    TARGET
-      "mx-bootstrap-vast"
-    POST_BUILD
-    COMMAND
-      "mx-bootstrap-vast"
-      "${install_include_dir}"
-      "${dependencies_include_dir}"
-      "${LLVM_INCLUDE_DIR}"
-    COMMENT
-      "Bootstrapping Multiplier"
-  )
-endif(MX_BOOTSTRAP_VAST)

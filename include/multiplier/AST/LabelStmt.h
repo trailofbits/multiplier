@@ -20,11 +20,6 @@ class LabelStmt;
 class Stmt;
 class Token;
 class ValueStmt;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT LabelStmt : public ValueStmt {
  private:
@@ -38,8 +33,7 @@ class MX_EXPORT LabelStmt : public ValueStmt {
   static gap::generator<LabelStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<LabelStmt> from(const ir::Operation &op);
-  static gap::generator<std::pair<LabelStmt, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<LabelStmt> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::LABEL_STMT;
   }

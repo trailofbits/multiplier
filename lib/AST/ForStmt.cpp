@@ -14,8 +14,6 @@
 #include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/VarDecl.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../Stmt.h"
 
@@ -83,17 +81,10 @@ bool ForStmt::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<ForStmt> ForStmt::from(const ir::Operation &op) {
-  if (auto val = Stmt::from(op)) {
-    return from_base(val.value());
-  }
-  return std::nullopt;
-}
-
-gap::generator<std::pair<ForStmt, ir::Operation>> ForStmt::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kForStmtDerivedKinds)) {
-    if (auto val = from_base(res.first)) {
-      co_yield std::pair<ForStmt, ir::Operation>(std::move(val.value()), std::move(res.second));
+gap::generator<ForStmt> ForStmt::in(const Compilation &tu) {
+  for (Stmt res : Stmt::in(tu, kForStmtDerivedKinds)) {
+    if (auto val = from_base(res)) {
+      co_yield val.value();
     }
   }
 }

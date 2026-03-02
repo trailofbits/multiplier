@@ -11,7 +11,6 @@
 #include <multiplier/Fragment.h>
 #include <multiplier/Frontend.h>
 #include <multiplier/Index.h>
-#include <multiplier/IR.h>
 #include <multiplier/Re2.h>
 
 #include <cassert>
@@ -119,16 +118,6 @@ static PyGetSetDef gProperties[] = {
         }),
     nullptr,
     PyDoc_STR("Wrapper for mx::Compilation::id"),
-    nullptr,
-  },
-  {
-    "ir",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->ir());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::Compilation::ir"),
     nullptr,
   },
   {
@@ -439,7 +428,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(T::containing(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::CXXCtorInitializer, mx::Compilation, mx::ir::Operation>>(args[0]);
+            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::CXXCtorInitializer, mx::Compilation>>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }

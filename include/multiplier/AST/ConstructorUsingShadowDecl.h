@@ -21,11 +21,6 @@ class NamedDecl;
 class Stmt;
 class Token;
 class UsingShadowDecl;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT ConstructorUsingShadowDecl : public UsingShadowDecl {
  private:
@@ -40,8 +35,7 @@ class MX_EXPORT ConstructorUsingShadowDecl : public UsingShadowDecl {
   static gap::generator<ConstructorUsingShadowDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<ConstructorUsingShadowDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<ConstructorUsingShadowDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<ConstructorUsingShadowDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CONSTRUCTOR_USING_SHADOW;
   }

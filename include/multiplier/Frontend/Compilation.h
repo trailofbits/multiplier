@@ -15,13 +15,6 @@
 #include "../Entity.h"
 
 namespace mx {
-namespace ir {
-class Operation;
-class SourceIRImpl;
-namespace builtin {
-class ModuleOp;
-}  // namespace builtin
-}  // namespace ir
 
 class CompilationImpl;
 class Decl;
@@ -50,8 +43,6 @@ class MX_EXPORT Compilation {
   friend class Index;
   friend class Reference;
   friend class Stmt;
-  friend class ir::SourceIRImpl;
-  friend class ir::Operation;
 
   CompilationImplPtr impl;
 
@@ -80,9 +71,6 @@ class MX_EXPORT Compilation {
 
   // Return the unique ID of this compilation.
   PackedCompilationId id(void) const noexcept;
-
-  // Returns source IR for the compilation.
-  std::optional<ir::builtin::ModuleOp> ir(void) const noexcept;
 
   // The fragments owned by this compilation. This will be a subset of all
   // observable fragments by this compilation, because some of them may be

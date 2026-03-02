@@ -20,11 +20,6 @@ class OMPArrayShapingExpr;
 class Stmt;
 class Token;
 class ValueStmt;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT OMPArrayShapingExpr : public Expr {
  private:
@@ -39,8 +34,7 @@ class MX_EXPORT OMPArrayShapingExpr : public Expr {
   static gap::generator<OMPArrayShapingExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<OMPArrayShapingExpr> from(const ir::Operation &op);
-  static gap::generator<std::pair<OMPArrayShapingExpr, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<OMPArrayShapingExpr> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_ARRAY_SHAPING_EXPR;
   }

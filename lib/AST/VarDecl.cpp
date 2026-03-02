@@ -22,8 +22,6 @@
 #include <multiplier/AST/VarTemplatePartialSpecializationDecl.h>
 #include <multiplier/AST/VarTemplateSpecializationDecl.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../Decl.h"
 
@@ -97,17 +95,10 @@ bool VarDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<VarDecl> VarDecl::from(const ir::Operation &op) {
-  if (auto val = Decl::from(op)) {
-    return from_base(val.value());
-  }
-  return std::nullopt;
-}
-
-gap::generator<std::pair<VarDecl, ir::Operation>> VarDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kVarDeclDerivedKinds)) {
-    if (auto val = from_base(res.first)) {
-      co_yield std::pair<VarDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
+gap::generator<VarDecl> VarDecl::in(const Compilation &tu) {
+  for (Decl res : Decl::in(tu, kVarDeclDerivedKinds)) {
+    if (auto val = from_base(res)) {
+      co_yield val.value();
     }
   }
 }

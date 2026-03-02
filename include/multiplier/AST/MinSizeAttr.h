@@ -18,11 +18,6 @@ class File;
 class InheritableAttr;
 class MinSizeAttr;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT MinSizeAttr : public InheritableAttr {
  private:

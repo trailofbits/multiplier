@@ -22,11 +22,6 @@ class OpaqueValueExpr;
 class Stmt;
 class Token;
 class ValueStmt;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT BinaryConditionalOperator : public AbstractConditionalOperator {
  private:
@@ -42,8 +37,7 @@ class MX_EXPORT BinaryConditionalOperator : public AbstractConditionalOperator {
   static gap::generator<BinaryConditionalOperator> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<BinaryConditionalOperator> from(const ir::Operation &op);
-  static gap::generator<std::pair<BinaryConditionalOperator, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<BinaryConditionalOperator> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::BINARY_CONDITIONAL_OPERATOR;
   }

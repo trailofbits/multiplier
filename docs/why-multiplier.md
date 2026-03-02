@@ -45,10 +45,9 @@ machine code located at different addresses. When you click on a call to
 Multiplier provides precise, and comprehensive code understanding capabilities
 by storing a compressed representation of build artifacts, called entities, in
 an index database. Entities in Multiplier's index include files, tokens, macro
-expansions, abstract syntax tree (AST) nodes, and compilations (represented with
-[MLIR](https://github.com/trailofbits/vast)). Each entity is uniquely identified
-by a 64 bit integer, and is available through scripting in C++ or
-[Python](https://www.python.org/) as a fully formed object with methods. For
+expansions, abstract syntax tree (AST) nodes, and compilations. Each entity is
+uniquely identified by a 64 bit integer, and is available through scripting in
+C++ or [Python](https://www.python.org/) as a fully formed object with methods. For
 example, the AST entities (declarations, statements, types, templates, etc.) are
 persistent forms of AST nodes found in [Clang](https://clang.llvm.org), and the
 methods available on these entities mirror those that can be called on those

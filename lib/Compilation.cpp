@@ -8,9 +8,7 @@
 #include <multiplier/Fragment.h>
 #include <multiplier/Frontend/DefineMacroDirective.h>
 #include <multiplier/Frontend/IncludePathLocation.h>
-#include <multiplier/IR/Builtin/Operation.h>
 
-#include "IR/SourceIR.h"
 #include "Reference.h"
 #include "Token.h"
 
@@ -30,31 +28,6 @@ CompilationImpl::CompilationImpl(
     EntityProviderPtr ep_, kj::Array<capnp::word> data_, RawEntityId id_)
     : EntityImpl<rpc::Compilation>(std::move(ep_), kj::mv(data_)),
       compilation_id(EntityId(id_).Extract<CompilationId>().value()) {}
-
-std::string_view CompilationImpl::SourceIR(void) const & noexcept {
-  if (reader.hasMlir()) {
-    if (auto mlir = reader.getMlir(); auto size = mlir.size()) {
-      return std::string_view(mlir.cStr(), size);
-    }
-  }
-  return kEmptyStringView;
-}
-
-// Return a pointer to the source IR object.
-std::shared_ptr<const ir::SourceIRImpl>
-CompilationImpl::SourceIRPtr(PackedCompilationId id) const & noexcept {
-  std::unique_lock<std::mutex> locker(source_ir_lock);
-
-  auto ir_obj = source_ir.lock();
-  if (!ir_obj) {
-    if (auto mlir = SourceIR(); !mlir.empty()) {
-      ir_obj = std::make_shared<const ir::SourceIRImpl>(id, ep, mlir);
-      source_ir = ir_obj;
-    }
-  }
-
-  return ir_obj;
-}
 
 PackedCompilationId Compilation::id(void) const noexcept {
   return impl->compilation_id;
@@ -363,18 +336,6 @@ Compilation::framework_directories(void) const & {
   for (rpc::IncludePath::Reader ip : reader.getFrameworkPaths()) {
     co_yield ReadIncludePath(std::move(ip));
   }
-}
-
-// Returns source IR for the compilation.
-std::optional<ir::builtin::ModuleOp> Compilation::ir(void) const noexcept {
-  if (auto ir_obj = impl->SourceIRPtr(id())) {
-    if (mlir::Operation *ptr = ir_obj->scope()) {
-      ir::Operation op(std::move(ir_obj), ptr);
-      return ir::builtin::ModuleOp::from(op);
-    }
-  }
-
-  return std::nullopt;
 }
 
 }  // namespace mx

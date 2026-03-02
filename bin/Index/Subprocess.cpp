@@ -8,6 +8,7 @@
 #include <glog/logging.h>
 
 #include <array>
+#include <csignal>
 #include <cstring>
 #include <errno.h>
 #include <fcntl.h>

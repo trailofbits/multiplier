@@ -14,8 +14,6 @@
 #include <multiplier/AST/Type.h>
 #include <multiplier/AST/ValueStmt.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../Stmt.h"
 
@@ -83,17 +81,10 @@ bool CXXTypeidExpr::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<CXXTypeidExpr> CXXTypeidExpr::from(const ir::Operation &op) {
-  if (auto val = Stmt::from(op)) {
-    return from_base(val.value());
-  }
-  return std::nullopt;
-}
-
-gap::generator<std::pair<CXXTypeidExpr, ir::Operation>> CXXTypeidExpr::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kCXXTypeidExprDerivedKinds)) {
-    if (auto val = from_base(res.first)) {
-      co_yield std::pair<CXXTypeidExpr, ir::Operation>(std::move(val.value()), std::move(res.second));
+gap::generator<CXXTypeidExpr> CXXTypeidExpr::in(const Compilation &tu) {
+  for (Stmt res : Stmt::in(tu, kCXXTypeidExprDerivedKinds)) {
+    if (auto val = from_base(res)) {
+      co_yield val.value();
     }
   }
 }

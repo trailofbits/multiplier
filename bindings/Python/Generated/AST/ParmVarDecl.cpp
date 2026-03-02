@@ -11,7 +11,6 @@
 #include <multiplier/Fragment.h>
 #include <multiplier/Frontend.h>
 #include <multiplier/Index.h>
-#include <multiplier/IR.h>
 #include <multiplier/Re2.h>
 
 #include <cassert>
@@ -418,67 +417,6 @@ static PyMethodDef gMethods[] = {
     PyDoc_STR("Wrapper for mx::ParmVarDecl::containing"),
   },
   {
-    "FROM",
-    reinterpret_cast<PyCFunction>(
-        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
-          (void) args;
-          while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::ir::Operation>(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(T::from(arg_0.value()));
-          }
-          while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::Decl>(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(T::from(arg_0.value()));
-          }
-          while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<std::optional<mx::Decl>>(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(T::from(arg_0.value()));
-          }
-          while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::Reference>(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(T::from(arg_0.value()));
-          }
-          while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::CXXCtorInitializer, mx::Compilation, mx::ir::Operation>>(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(T::from(arg_0.value()));
-          }
-          while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<mx::TokenContext>(args[0]);
-            if (!arg_0.has_value()) {
-              break;
-            }
-
-            return ::mx::to_python(T::from(arg_0.value()));
-          }
-
-          PyErrorStreamer(PyExc_TypeError)
-              << "Invalid arguments passed to 'FROM'";
-          return nullptr;
-        }),
-    METH_FASTCALL | METH_STATIC,
-    PyDoc_STR("Wrapper for mx::ParmVarDecl::from"),
-  },
-  {
     "static_kind",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
@@ -540,6 +478,59 @@ static PyMethodDef gMethods[] = {
         }),
     METH_FASTCALL | METH_STATIC,
     PyDoc_STR("Wrapper for mx::ParmVarDecl::from_base"),
+  },
+  {
+    "FROM",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<mx::Decl>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(T::from(arg_0.value()));
+          }
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<std::optional<mx::Decl>>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(T::from(arg_0.value()));
+          }
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<mx::Reference>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(T::from(arg_0.value()));
+          }
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::CXXCtorInitializer, mx::Compilation>>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(T::from(arg_0.value()));
+          }
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<mx::TokenContext>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(T::from(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'FROM'";
+          return nullptr;
+        }),
+    METH_FASTCALL | METH_STATIC,
+    PyDoc_STR("Wrapper for mx::ParmVarDecl::from"),
   },
   {}  // Sentinel.
 };

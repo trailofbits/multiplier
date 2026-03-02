@@ -15,8 +15,6 @@
 #include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/Type.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../Decl.h"
 
@@ -84,17 +82,10 @@ bool BlockDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<BlockDecl> BlockDecl::from(const ir::Operation &op) {
-  if (auto val = Decl::from(op)) {
-    return from_base(val.value());
-  }
-  return std::nullopt;
-}
-
-gap::generator<std::pair<BlockDecl, ir::Operation>> BlockDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kBlockDeclDerivedKinds)) {
-    if (auto val = from_base(res.first)) {
-      co_yield std::pair<BlockDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
+gap::generator<BlockDecl> BlockDecl::in(const Compilation &tu) {
+  for (Decl res : Decl::in(tu, kBlockDeclDerivedKinds)) {
+    if (auto val = from_base(res)) {
+      co_yield val.value();
     }
   }
 }

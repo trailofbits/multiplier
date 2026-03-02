@@ -35,11 +35,6 @@ class TagDecl;
 class TemplateParameterList;
 class Token;
 class TypeDecl;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT CXXRecordDecl : public RecordDecl {
  private:
@@ -56,8 +51,7 @@ class MX_EXPORT CXXRecordDecl : public RecordDecl {
   static gap::generator<CXXRecordDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<CXXRecordDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<CXXRecordDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<CXXRecordDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CXX_RECORD;
   }

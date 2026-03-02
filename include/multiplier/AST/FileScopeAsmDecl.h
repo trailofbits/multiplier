@@ -19,11 +19,6 @@ class FileScopeAsmDecl;
 class Stmt;
 class StringLiteral;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT FileScopeAsmDecl : public Decl {
  private:
@@ -36,8 +31,7 @@ class MX_EXPORT FileScopeAsmDecl : public Decl {
   static gap::generator<FileScopeAsmDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<FileScopeAsmDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<FileScopeAsmDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<FileScopeAsmDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::FILE_SCOPE_ASM;
   }

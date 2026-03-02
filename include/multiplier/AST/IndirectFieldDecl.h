@@ -22,11 +22,6 @@ class Stmt;
 class Token;
 class ValueDecl;
 class VarDecl;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT IndirectFieldDecl : public ValueDecl {
  private:
@@ -41,8 +36,7 @@ class MX_EXPORT IndirectFieldDecl : public ValueDecl {
   static gap::generator<IndirectFieldDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<IndirectFieldDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<IndirectFieldDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<IndirectFieldDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::INDIRECT_FIELD;
   }

@@ -43,7 +43,6 @@
 #include <llvm/Support/JSON.h>
 #pragma clang diagnostic pop
 
-#include "Codegen.h"
 #include "EntityMapper.h"
 #include "LabelEntitiesInFragment.h"
 #include "PASTA.h"
@@ -1122,22 +1121,6 @@ void GlobalIndexingState::PersistCompilation(
   // Set the main file ID. This is the ID of the primary source file that kicked
   // off all subsequent includes.
   cb.setMainFileId(em.EntityId(ast.MainFile()));
-
-  // Generate MLIR with VAST.
-  if (sourceir_progress) {
-    sourceir_progress->AddWork(1u);
-  }
-
-  if (std::string mlir = codegen.GenerateSourceIR(
-          ast, em, nm, std::move(fragment_ids));
-      !mlir.empty()) {
-    cb.setMlir(mlir);
-    if (sourceir_progress) {
-      sourceir_progress->Advance();
-    }
-  } else {
-    cb.initMlir(0u);
-  }
 
   // Add the compilation to the database.
   database.AddAsync(

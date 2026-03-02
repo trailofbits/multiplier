@@ -19,11 +19,6 @@ class File;
 class RequiresExprBodyDecl;
 class Stmt;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT RequiresExprBodyDecl : public Decl {
  private:
@@ -36,8 +31,7 @@ class MX_EXPORT RequiresExprBodyDecl : public Decl {
   static gap::generator<RequiresExprBodyDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<RequiresExprBodyDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<RequiresExprBodyDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<RequiresExprBodyDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::REQUIRES_EXPR_BODY;
   }

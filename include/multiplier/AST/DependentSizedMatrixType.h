@@ -18,11 +18,6 @@ class Expr;
 class MatrixType;
 class Token;
 class Type;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT DependentSizedMatrixType : public MatrixType {
  private:

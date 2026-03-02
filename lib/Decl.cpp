@@ -746,4 +746,25 @@ TokenRange NamedDecl::qualified_name(
   return TokenRange(std::move(tr), 0u, num_tokens);
 }
 
+gap::generator<Decl> Decl::in(const Compilation &tu) {
+  auto frags = tu.fragments();
+  for (Fragment frag : frags) {
+    for (Decl decl : Decl::in(frag)) {
+      co_yield std::move(decl);
+    }
+  }
+}
+
+gap::generator<Decl> Decl::in(const Compilation &tu,
+                              std::span<const DeclKind> kinds) {
+  auto frags = tu.fragments();
+  for (Fragment frag : frags) {
+    for (Decl decl : Decl::in(frag)) {
+      if (std::find(kinds.begin(), kinds.end(), decl.kind()) != kinds.end()) {
+        co_yield std::move(decl);
+      }
+    }
+  }
+}
+
 }  // namespace mx

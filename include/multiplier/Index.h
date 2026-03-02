@@ -26,16 +26,11 @@
 #include "Frontend/Macro.h"
 #include "Frontend/TokenKind.h"
 #include "Frontend/TokenCategory.h"
-#include "IR/Operation.h"
 #include "Fragment.h"
-#include "IR/Operation.h"
 #include "Iterator.h"
 #include "Reference.h"
 
 namespace mx {
-namespace ir {
-class Operation;
-}  // namespace ir
 
 class CachingEntityProvider;
 class Compilation;
@@ -70,7 +65,6 @@ using VariantEntity = std::variant<
                                             MX_DECLARE_ENTITY_VARIANT,
                                             MX_DECLARE_ENTITY_VARIANT,
                                             MX_DECLARE_ENTITY_VARIANT,
-                                            MX_DECLARE_ENTITY_VARIANT,
                                             MX_DECLARE_ENTITY_VARIANT)>;
 #undef MX_DECLARE_ENTITY_VARIANT
 
@@ -100,7 +94,6 @@ class MX_EXPORT Index final {
     friend class ns_path type_name;
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_FRIEND,
-                              MX_FRIEND,
                               MX_FRIEND,
                               MX_FRIEND,
                               MX_FRIEND,
@@ -149,8 +142,6 @@ class MX_EXPORT Index final {
   static std::optional<Index> containing(const Token &entity);
   static std::optional<Index> containing(const VariantEntity &entity);
 
-  static Index containing(const ir::Operation &entity);
-
   // Return the status of the index.
   IndexStatus status(bool block=false) const;
 
@@ -176,7 +167,7 @@ class MX_EXPORT Index final {
   MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_GETTER, MX_IGNORE_ENTITY_CATEGORY,
                               MX_DECLARE_GETTER, MX_DECLARE_GETTER,
                               MX_DECLARE_GETTER, MX_DECLARE_GETTER,
-                              MX_DECLARE_GETTER, MX_DECLARE_GETTER)
+                              MX_DECLARE_GETTER)
 #undef MX_DECLARE_GETTER
 
   template <typename T>
@@ -243,7 +234,6 @@ std::optional<T> Reference::as(void) const noexcept {
     }
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_REFERENCE_AS,
-                            MX_REFERENCE_AS,
                             MX_REFERENCE_AS,
                             MX_REFERENCE_AS,
                             MX_REFERENCE_AS,

@@ -19,11 +19,6 @@ class ExportDecl;
 class File;
 class Stmt;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT ExportDecl : public Decl {
  private:
@@ -36,8 +31,7 @@ class MX_EXPORT ExportDecl : public Decl {
   static gap::generator<ExportDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<ExportDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<ExportDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<ExportDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::EXPORT;
   }

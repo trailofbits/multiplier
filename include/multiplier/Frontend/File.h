@@ -15,9 +15,6 @@
 #include "Token.h"
 
 namespace mx {
-namespace ir {
-class Operation;
-}  // namespace ir
 
 class EntityProvider;
 class FileLocationCache;
@@ -38,8 +35,7 @@ class TokenTree;
                               MX_FORWARD_DECLARE,
                               MX_FORWARD_DECLARE,
                               MX_FORWARD_DECLARE,
-                              MX_FORWARD_DECLARE,
-                              MX_IGNORE_ENTITY_CATEGORY)
+                              MX_FORWARD_DECLARE)
 #undef MX_FORWARD_DECLARE
 
 using FragmentIdList = std::vector<PackedFragmentId>;
@@ -108,7 +104,6 @@ class MX_EXPORT File {
                               MX_FRIEND,
                               MX_FRIEND,
                               MX_FRIEND,
-                              MX_FRIEND,
                               MX_FRIEND)
 #undef MX_FRIEND
 
@@ -136,8 +131,7 @@ class MX_EXPORT File {
                               MX_DECLARE_CONTAINING,
                               MX_DECLARE_CONTAINING,
                               MX_DECLARE_CONTAINING,
-                              MX_IGNORE_ENTITY_CATEGORY,
-                              MX_DECLARE_CONTAINING)
+                              MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_CONTAINING
 
   // Return the file containing a specific token.

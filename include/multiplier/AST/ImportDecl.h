@@ -19,11 +19,6 @@ class ImportDecl;
 class Stmt;
 class Token;
 class TokenRange;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT ImportDecl : public Decl {
  private:
@@ -36,8 +31,7 @@ class MX_EXPORT ImportDecl : public Decl {
   static gap::generator<ImportDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<ImportDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<ImportDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<ImportDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::IMPORT;
   }

@@ -22,11 +22,6 @@ class ObjCProtocolDecl;
 class Stmt;
 class Token;
 class TokenRange;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT ObjCProtocolDecl : public ObjCContainerDecl {
  private:
@@ -41,8 +36,7 @@ class MX_EXPORT ObjCProtocolDecl : public ObjCContainerDecl {
   static gap::generator<ObjCProtocolDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<ObjCProtocolDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<ObjCProtocolDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<ObjCProtocolDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_PROTOCOL;
   }

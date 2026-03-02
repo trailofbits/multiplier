@@ -35,11 +35,6 @@ class Token;
 class TokenRange;
 class Type;
 class TypeImpl;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT Type {
  public:
@@ -55,8 +50,7 @@ class MX_EXPORT Type {
   friend class Stmt;
   friend class TokenContext;
   friend class TypeImpl;
-  friend class ir::Operation;
-  friend class ir::Value;
+
 
   std::shared_ptr<const TypeImpl> impl;
   static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);

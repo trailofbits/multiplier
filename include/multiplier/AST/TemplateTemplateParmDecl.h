@@ -20,11 +20,6 @@ class Stmt;
 class TemplateDecl;
 class TemplateTemplateParmDecl;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT TemplateTemplateParmDecl : public TemplateDecl {
  private:
@@ -39,8 +34,7 @@ class MX_EXPORT TemplateTemplateParmDecl : public TemplateDecl {
   static gap::generator<TemplateTemplateParmDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<TemplateTemplateParmDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<TemplateTemplateParmDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<TemplateTemplateParmDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::TEMPLATE_TEMPLATE_PARM;
   }

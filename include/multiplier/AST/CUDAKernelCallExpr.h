@@ -21,11 +21,6 @@ class File;
 class Stmt;
 class Token;
 class ValueStmt;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT CUDAKernelCallExpr : public CallExpr {
  private:
@@ -41,8 +36,7 @@ class MX_EXPORT CUDAKernelCallExpr : public CallExpr {
   static gap::generator<CUDAKernelCallExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<CUDAKernelCallExpr> from(const ir::Operation &op);
-  static gap::generator<std::pair<CUDAKernelCallExpr, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<CUDAKernelCallExpr> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CUDA_KERNEL_CALL_EXPR;
   }

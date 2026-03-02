@@ -20,8 +20,6 @@
 #include <multiplier/AST/ObjCInterfaceDecl.h>
 #include <multiplier/AST/ObjCProtocolDecl.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../Fragment.h"
 #include "../Decl.h"
@@ -94,17 +92,10 @@ bool ObjCContainerDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<ObjCContainerDecl> ObjCContainerDecl::from(const ir::Operation &op) {
-  if (auto val = Decl::from(op)) {
-    return from_base(val.value());
-  }
-  return std::nullopt;
-}
-
-gap::generator<std::pair<ObjCContainerDecl, ir::Operation>> ObjCContainerDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kObjCContainerDeclDerivedKinds)) {
-    if (auto val = from_base(res.first)) {
-      co_yield std::pair<ObjCContainerDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
+gap::generator<ObjCContainerDecl> ObjCContainerDecl::in(const Compilation &tu) {
+  for (Decl res : Decl::in(tu, kObjCContainerDeclDerivedKinds)) {
+    if (auto val = from_base(res)) {
+      co_yield val.value();
     }
   }
 }
