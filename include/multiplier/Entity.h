@@ -8,9 +8,6 @@
 #include "Types.h"
 
 namespace mx {
-namespace ir {
-class Operation;
-}  // namespace ir
 
 class DefineMacroDirective;
 class NamedDecl;
@@ -31,8 +28,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_FORWARD_DECLARE,
                             MX_FORWARD_DECLARE,
                             MX_FORWARD_DECLARE,
                             MX_FORWARD_DECLARE,
-                            MX_FORWARD_DECLARE,
-                            MX_IGNORE_ENTITY_CATEGORY)
+                            MX_FORWARD_DECLARE)
 #undef MX_FORWARD_DECLARE
 
 #define MX_DECLARE_ENTITY_VARIANT(ns_path, type_name, lower_name, enum_name, category) \
@@ -41,7 +37,6 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_FORWARD_DECLARE,
 using NotAnEntity = std::monostate;
 using VariantEntity = std::variant<
     NotAnEntity MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_VARIANT,
-                                            MX_DECLARE_ENTITY_VARIANT,
                                             MX_DECLARE_ENTITY_VARIANT,
                                             MX_DECLARE_ENTITY_VARIANT,
                                             MX_DECLARE_ENTITY_VARIANT,

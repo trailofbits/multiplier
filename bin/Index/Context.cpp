@@ -17,7 +17,6 @@
 #include <vector>
 #include <mutex>
 
-#include "Codegen.h"
 #include "NameMangler.h"
 #include "PendingFragment.h"
 
@@ -62,8 +61,6 @@ void GlobalIndexingState::InitializeProgressBars(void) {
 
   type_progress.reset(new ProgressBar("Type serialization",
                                       report_freq));
-
-  sourceir_progress.reset(new ProgressBar("SourceIR", report_freq));
 }
 
 }  // namespace indexer

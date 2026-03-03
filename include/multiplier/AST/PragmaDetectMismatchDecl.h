@@ -18,11 +18,6 @@ class File;
 class PragmaDetectMismatchDecl;
 class Stmt;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT PragmaDetectMismatchDecl : public Decl {
  private:
@@ -35,8 +30,7 @@ class MX_EXPORT PragmaDetectMismatchDecl : public Decl {
   static gap::generator<PragmaDetectMismatchDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<PragmaDetectMismatchDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<PragmaDetectMismatchDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<PragmaDetectMismatchDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::PRAGMA_DETECT_MISMATCH;
   }

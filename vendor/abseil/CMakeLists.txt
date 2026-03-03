@@ -30,6 +30,7 @@ execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory "${build_dir}")
 # (b) Nested CMake run. May need more -D... options than shown here.
 execute_process(COMMAND ${CMAKE_COMMAND}
                         -G "${CMAKE_GENERATOR}"
+                        -DCMAKE_POLICY_VERSION_MINIMUM=3.5
                         "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
                         "-DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
                         "-DCMAKE_INSTALL_PREFIX=${MX_VENDOR_INSTALL_DIR}"

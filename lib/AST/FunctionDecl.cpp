@@ -24,8 +24,6 @@
 #include <multiplier/AST/CXXDestructorDecl.h>
 #include <multiplier/AST/CXXMethodDecl.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../Fragment.h"
 #include "../Decl.h"
@@ -99,17 +97,10 @@ bool FunctionDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<FunctionDecl> FunctionDecl::from(const ir::Operation &op) {
-  if (auto val = Decl::from(op)) {
-    return from_base(val.value());
-  }
-  return std::nullopt;
-}
-
-gap::generator<std::pair<FunctionDecl, ir::Operation>> FunctionDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kFunctionDeclDerivedKinds)) {
-    if (auto val = from_base(res.first)) {
-      co_yield std::pair<FunctionDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
+gap::generator<FunctionDecl> FunctionDecl::in(const Compilation &tu) {
+  for (Decl res : Decl::in(tu, kFunctionDeclDerivedKinds)) {
+    if (auto val = from_base(res)) {
+      co_yield val.value();
     }
   }
 }

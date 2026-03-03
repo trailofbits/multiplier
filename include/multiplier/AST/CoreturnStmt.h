@@ -19,11 +19,6 @@ class Expr;
 class File;
 class Stmt;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT CoreturnStmt : public Stmt {
  private:
@@ -36,8 +31,7 @@ class MX_EXPORT CoreturnStmt : public Stmt {
   static gap::generator<CoreturnStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<CoreturnStmt> from(const ir::Operation &op);
-  static gap::generator<std::pair<CoreturnStmt, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<CoreturnStmt> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CORETURN_STMT;
   }

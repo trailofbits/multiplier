@@ -21,11 +21,6 @@ class File;
 class Stmt;
 class Token;
 class ValueStmt;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT CXXTemporaryObjectExpr : public CXXConstructExpr {
  private:
@@ -41,8 +36,7 @@ class MX_EXPORT CXXTemporaryObjectExpr : public CXXConstructExpr {
   static gap::generator<CXXTemporaryObjectExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<CXXTemporaryObjectExpr> from(const ir::Operation &op);
-  static gap::generator<std::pair<CXXTemporaryObjectExpr, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<CXXTemporaryObjectExpr> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_TEMPORARY_OBJECT_EXPR;
   }

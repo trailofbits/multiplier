@@ -7,7 +7,6 @@ The indexer, `mx-index`, is the core workhorse of Multiplier. Its job is to:
  * Partition those ASTs into fragments,
  * Identify the unique fragments,
  * Label all fragments and contained entities using their unique identifiers,
- * Generate SourceIR for newly discovered unique fragments,
  * Serialize the unique fragments.
  
 The indexer is a long-running server that also satisfies queries about the

@@ -20,11 +20,6 @@ class File;
 class ObjCAtSynchronizedStmt;
 class Stmt;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT ObjCAtSynchronizedStmt : public Stmt {
  private:
@@ -37,8 +32,7 @@ class MX_EXPORT ObjCAtSynchronizedStmt : public Stmt {
   static gap::generator<ObjCAtSynchronizedStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<ObjCAtSynchronizedStmt> from(const ir::Operation &op);
-  static gap::generator<std::pair<ObjCAtSynchronizedStmt, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<ObjCAtSynchronizedStmt> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_AT_SYNCHRONIZED_STMT;
   }

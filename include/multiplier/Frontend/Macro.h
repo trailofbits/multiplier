@@ -33,11 +33,6 @@ class Macro;
 class MacroImpl;
 class Token;
 class TokenRange;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 using PreprocessedEntity = std::variant<Macro, Token, Fragment>;
 class MX_EXPORT Macro {
@@ -54,8 +49,7 @@ class MX_EXPORT Macro {
   friend class TokenContext;
   friend class Type;
   friend class MacroImpl;
-  friend class ir::Operation;
-  friend class ir::Value;
+
 
   std::shared_ptr<const MacroImpl> impl;
   static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);

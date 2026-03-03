@@ -13,7 +13,6 @@
 #include <multiplier/Database.h>
 #include <string>
 
-#include "Codegen.h"
 #include "Executor.h"
 #include "ProgressBar.h"
 #include "Util.h"
@@ -31,7 +30,6 @@ enum class DeclKind : unsigned char;
 }  // namespace mx
 namespace indexer {
 
-class CodeGenerator;
 class GlobalIndexingState;
 class IdStore;
 class NameMangler;
@@ -67,16 +65,10 @@ class GlobalIndexingState {
   // Tracks progress in saving tokenized files.
   std::unique_ptr<ProgressBar> file_progress;
 
-  // Number of fragments for which we are attempting to generate source ir.
-  std::unique_ptr<ProgressBar> sourceir_progress;
-
   const unsigned num_workers;
 
   // Worker pool.
   Executor executor;
-
-  // MLIR code generator.
-  CodeGenerator codegen;
 
   // Write access to the index database.
   mx::DatabaseWriter &database;

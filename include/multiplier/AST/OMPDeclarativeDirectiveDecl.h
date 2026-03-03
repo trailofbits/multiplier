@@ -18,11 +18,6 @@ class File;
 class OMPDeclarativeDirectiveDecl;
 class Stmt;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT OMPDeclarativeDirectiveDecl : public Decl {
  private:
@@ -35,8 +30,7 @@ class MX_EXPORT OMPDeclarativeDirectiveDecl : public Decl {
   static gap::generator<OMPDeclarativeDirectiveDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<OMPDeclarativeDirectiveDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<OMPDeclarativeDirectiveDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<OMPDeclarativeDirectiveDecl> in(const Compilation &tu);
   static gap::generator<OMPDeclarativeDirectiveDecl> containing(const Decl &decl);
   static gap::generator<OMPDeclarativeDirectiveDecl> containing(const std::optional<Decl> &decl);
 

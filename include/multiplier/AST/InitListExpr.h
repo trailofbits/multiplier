@@ -21,11 +21,6 @@ class InitListExpr;
 class Stmt;
 class Token;
 class ValueStmt;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT InitListExpr : public Expr {
  private:
@@ -40,8 +35,7 @@ class MX_EXPORT InitListExpr : public Expr {
   static gap::generator<InitListExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<InitListExpr> from(const ir::Operation &op);
-  static gap::generator<std::pair<InitListExpr, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<InitListExpr> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::INIT_LIST_EXPR;
   }

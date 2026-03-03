@@ -23,11 +23,6 @@ class ObjCBridgedCastExpr;
 class Stmt;
 class Token;
 class ValueStmt;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT ObjCBridgedCastExpr : public ExplicitCastExpr {
  private:
@@ -44,8 +39,7 @@ class MX_EXPORT ObjCBridgedCastExpr : public ExplicitCastExpr {
   static gap::generator<ObjCBridgedCastExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<ObjCBridgedCastExpr> from(const ir::Operation &op);
-  static gap::generator<std::pair<ObjCBridgedCastExpr, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<ObjCBridgedCastExpr> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_BRIDGED_CAST_EXPR;
   }

@@ -21,11 +21,6 @@ class NamedDecl;
 class Stmt;
 class TemplateDecl;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT ConceptDecl : public TemplateDecl {
  private:
@@ -40,8 +35,7 @@ class MX_EXPORT ConceptDecl : public TemplateDecl {
   static gap::generator<ConceptDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<ConceptDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<ConceptDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<ConceptDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CONCEPT;
   }

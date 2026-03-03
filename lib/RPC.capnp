@@ -157,8 +157,7 @@ struct Fragment @0xe5f27760091f9a3a {
   relatedEntityId @14 :List(UInt64);
   
   # The translation unit from which this fragment was derived. We can find
-  # the compile command for a fragment there, if we need to reproduce the
-  # TU, and we can find its MLIR representation there too.
+  # the compile command for a fragment there, if we need to reproduce the TU.
   compilationId @15 :UInt64;
 
   # The entities from this fragment. These are lists-of-lists. The top-level
@@ -202,9 +201,6 @@ struct Compilation @0xc8b5fa5dd0739e82 {
   
   # The compile command for this compilation unit.
   command @6 :CompileCommand;
-  
-  # Source IR in text format
-  mlir @7 :Text;
 } 
 
 struct Type @0xd2d91de1b5fe2e03 {

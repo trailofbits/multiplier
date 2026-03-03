@@ -19,11 +19,6 @@ class OMPExecutableDirective;
 class OMPMasterDirective;
 class Stmt;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT OMPMasterDirective : public OMPExecutableDirective {
  private:
@@ -37,8 +32,7 @@ class MX_EXPORT OMPMasterDirective : public OMPExecutableDirective {
   static gap::generator<OMPMasterDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<OMPMasterDirective> from(const ir::Operation &op);
-  static gap::generator<std::pair<OMPMasterDirective, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<OMPMasterDirective> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_MASTER_DIRECTIVE;
   }

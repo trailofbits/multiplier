@@ -26,9 +26,6 @@
 #include "Type.h"
 
 namespace mx {
-namespace ir {
-class SourceIRImpl;
-}  // namespace ir
 
 std::optional<Fragment> Fragment::containing(const Fragment &child) noexcept {
   auto parent_id = child.impl->parent_fragment_id;
@@ -121,18 +118,6 @@ std::optional<Fragment> Fragment::containing(const Token &entity) noexcept {
   }
 }
 
-// Return the fragment containing an operation.
-std::optional<Fragment> Fragment::containing(
-    const ir::Operation &op) noexcept {
-  if (auto decl = Decl::from(op)) {
-    return Fragment::containing(decl.value());
-  } else if (auto stmt = Stmt::from(op)) {
-    return Fragment::containing(stmt.value());
-  }
-
-  return std::nullopt;
-}
-
 std::optional<Fragment> Fragment::containing(
     const VariantEntity &entity) noexcept {
 #define GET_FRAGMENT(ns_path, type_name, lower_name, enum_name, category) \
@@ -148,8 +133,7 @@ std::optional<Fragment> Fragment::containing(
                               GET_FRAGMENT,
                               GET_FRAGMENT,
                               GET_FRAGMENT,
-                              MX_IGNORE_ENTITY_CATEGORY,
-                              GET_FRAGMENT)
+                              MX_IGNORE_ENTITY_CATEGORY)
   return std::nullopt;
 #undef GET_FRAGMENT
 }

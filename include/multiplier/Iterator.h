@@ -11,9 +11,6 @@
 #include "Types.h"
 
 namespace mx {
-namespace ir {
-class Operation;
-}  // namespace ir
 
 class FragmentImpl;
 class TokenContextReader;
@@ -28,8 +25,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_FORWARD_DECLARE_ENTITY,
                             MX_FORWARD_DECLARE_ENTITY,
                             MX_FORWARD_DECLARE_ENTITY,
                             MX_FORWARD_DECLARE_ENTITY,
-                            MX_FORWARD_DECLARE_ENTITY,
-                            MX_IGNORE_ENTITY_CATEGORY)
+                            MX_FORWARD_DECLARE_ENTITY)
 #undef MX_FORWARD_DECLARE_ENTITY
 
 class IteratorEnd {};

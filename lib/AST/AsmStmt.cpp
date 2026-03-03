@@ -14,8 +14,6 @@
 #include <multiplier/AST/GCCAsmStmt.h>
 #include <multiplier/AST/MSAsmStmt.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../Stmt.h"
 
@@ -84,17 +82,10 @@ bool AsmStmt::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<AsmStmt> AsmStmt::from(const ir::Operation &op) {
-  if (auto val = Stmt::from(op)) {
-    return from_base(val.value());
-  }
-  return std::nullopt;
-}
-
-gap::generator<std::pair<AsmStmt, ir::Operation>> AsmStmt::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kAsmStmtDerivedKinds)) {
-    if (auto val = from_base(res.first)) {
-      co_yield std::pair<AsmStmt, ir::Operation>(std::move(val.value()), std::move(res.second));
+gap::generator<AsmStmt> AsmStmt::in(const Compilation &tu) {
+  for (Stmt res : Stmt::in(tu, kAsmStmtDerivedKinds)) {
+    if (auto val = from_base(res)) {
+      co_yield val.value();
     }
   }
 }

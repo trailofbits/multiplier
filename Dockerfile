@@ -75,7 +75,6 @@ RUN --mount=type=bind,source=.,target=/work/src/multiplier \
     -DCMAKE_C_COMPILER="$(which clang-${CLANG_VERSION})" \
     -DCMAKE_CXX_COMPILER="$(which clang++-${CLANG_VERSION})" \
     -DLLVM_DIR="${INSTALL_DIR}/lib/cmake/llvm" \
-    -DMLIR_DIR="${INSTALL_DIR}/lib/cmake/mlir" \
     -DClang_DIR="${INSTALL_DIR}/lib/cmake/clang" \
     -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=TRUE \
     -DMX_USE_VENDORED_CLANG=OFF \

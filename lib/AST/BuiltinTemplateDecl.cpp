@@ -13,8 +13,6 @@
 #include <multiplier/AST/TemplateDecl.h>
 #include <multiplier/Frontend/Token.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../Decl.h"
 
@@ -82,17 +80,10 @@ bool BuiltinTemplateDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<BuiltinTemplateDecl> BuiltinTemplateDecl::from(const ir::Operation &op) {
-  if (auto val = Decl::from(op)) {
-    return from_base(val.value());
-  }
-  return std::nullopt;
-}
-
-gap::generator<std::pair<BuiltinTemplateDecl, ir::Operation>> BuiltinTemplateDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kBuiltinTemplateDeclDerivedKinds)) {
-    if (auto val = from_base(res.first)) {
-      co_yield std::pair<BuiltinTemplateDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
+gap::generator<BuiltinTemplateDecl> BuiltinTemplateDecl::in(const Compilation &tu) {
+  for (Decl res : Decl::in(tu, kBuiltinTemplateDeclDerivedKinds)) {
+    if (auto val = from_base(res)) {
+      co_yield val.value();
     }
   }
 }

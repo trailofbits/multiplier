@@ -19,11 +19,6 @@ class File;
 class InheritableAttr;
 class Token;
 class VisibilityAttr;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT VisibilityAttr : public InheritableAttr {
  private:

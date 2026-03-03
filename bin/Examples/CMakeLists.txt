@@ -89,8 +89,5 @@ define_example("mx-taint-entity" "TaintEntity.cpp")
 define_example("mx-harness" "Harness.cpp")
 define_example("mx-print-type-token-graph" "PrintTypeTokenGraph.cpp")
 define_example("mx-find-linked-structures" "FindLinkedStructures.cpp")
-define_example("mx-count-sourceir" "CountSourceIR.cpp")
 define_example("mx-list-declarations-overlapping-macro-expansion"
   "ListDeclOverlappingMacroExpansions.cpp")
-
-# define_example("mx-print-sourceir" "PrintSourceIR.cpp")

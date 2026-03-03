@@ -19,11 +19,6 @@ class NamedDecl;
 class Stmt;
 class Token;
 class UnresolvedUsingIfExistsDecl;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT UnresolvedUsingIfExistsDecl : public NamedDecl {
  private:
@@ -37,8 +32,7 @@ class MX_EXPORT UnresolvedUsingIfExistsDecl : public NamedDecl {
   static gap::generator<UnresolvedUsingIfExistsDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<UnresolvedUsingIfExistsDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<UnresolvedUsingIfExistsDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<UnresolvedUsingIfExistsDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::UNRESOLVED_USING_IF_EXISTS;
   }

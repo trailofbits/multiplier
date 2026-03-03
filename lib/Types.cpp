@@ -13,8 +13,6 @@
 #include <multiplier/Frontend/File.h>
 #include <multiplier/Frontend/Macro.h>
 #include <multiplier/Frontend/TokenKind.h>
-#include <multiplier/IR/Operation.h>
-#include <multiplier/IR/OperationKind.h>
 
 namespace mx {
 namespace {
@@ -27,7 +25,6 @@ enum OtherKind : uint64_t {
   kFileToken,
   kTypeToken,
   kCompilation,
-  kOperation
 };
 
 // A code chunk with many tokens.
@@ -49,8 +46,6 @@ static constexpr uint64_t kNumTypeKinds = NumEnumerators(TypeKind{});
 static constexpr uint64_t kNumAttrKinds = NumEnumerators(AttrKind{});
 static constexpr uint64_t kNumTokenKinds = NumEnumerators(TokenKind{});
 static constexpr uint64_t kNumMacroKinds = NumEnumerators(MacroKind{});
-static constexpr uint64_t kNumOperationKinds
-    = NumEnumerators(ir::OperationKind{});
 
 // NOTE(pag): Keep up-to-date with `IdentifiedPseudo`.
 static constexpr uint64_t kNumPseudoKinds = 5u;
@@ -63,16 +58,12 @@ static_assert((kNumDeclKinds + kNumStmtKinds + kNumAttrKinds +
                kNumPseudoKinds) <=
               (1u << kSubKindNumBits));
 
-static constexpr uint64_t kNumOperationLevelBits = 3u;
 static constexpr unsigned kOtherKindBits = 3u;
 static constexpr unsigned kTokenKindNumBits = 9u;
 static_assert(NumEnumerators(TokenKind{}) <= (1u << kTokenKindNumBits));
 
 static constexpr unsigned kTypeKindNumBits = 6u;
 static_assert(kNumTypeKinds <= (1u << kTypeKindNumBits));
-
-static constexpr unsigned kOperationKindNumBits = 10u;
-static_assert(kNumOperationKinds <= (1u << kOperationKindNumBits));
 
 // A small X is a token in a code with less than `kNumTokensInBigCode`
 // tokens, and so we only need `kBigCodeIdNumBits` bits to represent the
@@ -183,15 +174,6 @@ union PackedEntityId {
     uint64_t is_fragment_entity:1u;
   } __attribute__((packed)) compilation;
 
-  struct {
-    uint64_t offset:24u;
-    uint64_t level:kNumOperationLevelBits;
-    uint64_t operation_kind:kOperationKindNumBits;
-    uint64_t compilation_id:23u;
-    uint64_t kind:kOtherKindBits;
-    uint64_t is_fragment_entity:1u;
-  } __attribute__((packed)) operation;
-
 } __attribute__((packed));
 
 static_assert(sizeof(PackedEntityId) == sizeof(uint64_t));
@@ -205,7 +187,6 @@ const char *EnumeratorName(EntityCategory e) noexcept {
     case EntityCategory::enum_name: return #enum_name;
 
     MX_FOR_EACH_ENTITY_CATEGORY(MX_ENTITY_CASE_NAME,
-                                MX_ENTITY_CASE_NAME,
                                 MX_ENTITY_CASE_NAME,
                                 MX_ENTITY_CASE_NAME,
                                 MX_ENTITY_CASE_NAME,
@@ -730,35 +711,6 @@ EntityId::EntityId(CompilationId id) {
   }
 }
 
-EntityId::EntityId(OperationId id) {
-  if (id.compilation_id && id.kind != ir::OperationKind::UNKNOWN) {
-    PackedEntityId packed = {};
-    packed.operation.is_fragment_entity = 0u;
-
-    packed.operation.compilation_id = id.compilation_id;
-    RETURN_EARLY_IF_NOT(packed.operation.compilation_id == id.compilation_id);
-
-    packed.operation.offset = id.offset;
-    RETURN_EARLY_IF_NOT(packed.operation.offset == id.offset);
-
-    packed.operation.level = id.level;
-    RETURN_EARLY_IF_NOT(packed.operation.level == id.level);
-
-    packed.operation.operation_kind = static_cast<uint64_t>(id.kind);
-    RETURN_EARLY_IF_NOT(packed.operation.operation_kind <= kNumOperationKinds);
-
-    packed.operation.kind =
-        static_cast<uint64_t>(OtherKind::kOperation);
-    opaque = packed.opaque;
-
-#ifndef NDEBUG
-    auto unpacked = Unpack();
-    assert(std::holds_alternative<OperationId>(unpacked));
-    assert(std::get<OperationId>(unpacked) == id);
-#endif
-  }
-}
-
 EntityId::EntityId(FileTokenId id) {
   if (id.file_id) {
     PackedEntityId packed = {};
@@ -791,7 +743,6 @@ struct IDFragment {
   inline int operator()(FileId) const noexcept { return mx::kInvalidEntityId; }
   inline int operator()(FileTokenId) const noexcept { return mx::kInvalidEntityId; }
   inline int operator()(CompilationId) const noexcept { return mx::kInvalidEntityId; }
-  inline int operator()(OperationId) const noexcept { return mx::kInvalidEntityId; }
   inline int operator()(TypeId) const noexcept { return mx::kInvalidEntityId; }
   inline int operator()(TypeTokenId) const noexcept { return mx::kInvalidEntityId; }
 
@@ -806,7 +757,6 @@ struct IDFragmentOffset {
   inline int operator()(FileId) const noexcept { return mx::kInvalidEntityId; }
   inline int operator()(FileTokenId) const noexcept { return mx::kInvalidEntityId; }
   inline int operator()(CompilationId) const noexcept { return mx::kInvalidEntityId; }
-  inline int operator()(OperationId) const noexcept { return mx::kInvalidEntityId; }
   inline int operator()(TypeId) const noexcept { return mx::kInvalidEntityId; }
   inline int operator()(TypeTokenId) const noexcept { return mx::kInvalidEntityId; }
 
@@ -827,7 +777,7 @@ struct IDKind {
   inline int operator()(CXXCtorInitializerId) const noexcept { return -1; }
   inline int operator()(CompilationId) const noexcept { return -1; }
 
-  // Applies to tokens, operations, decls, statements, types, attributes, etc.
+  // Applies to tokens, decls, statements, types, attributes, etc.
   template <typename T>
   inline int operator()(T t) const noexcept {
     return static_cast<int>(t.kind);
@@ -888,9 +838,6 @@ struct IDCategory {
   }
   inline EntityCategory operator()(CompilationId) const noexcept {
     return EntityCategory::COMPILATION;
-  }
-  inline EntityCategory operator()(OperationId) const noexcept {
-    return EntityCategory::OPERATION;
   }
   template <typename T>
   inline EntityCategory operator()(T) const noexcept {
@@ -1256,18 +1203,6 @@ VariantId EntityId::Unpack(void) const noexcept {
       case OtherKind::kCompilation: {
         if (packed.compilation.compilation_id) {
           return CompilationId(packed.compilation.compilation_id);
-        }
-        break;
-      }
-      case OtherKind::kOperation: {
-        if (packed.operation.compilation_id &&
-            packed.operation.operation_kind &&
-            packed.operation.operation_kind < kNumOperationKinds) {
-          return OperationId(
-              packed.operation.compilation_id,
-              static_cast<ir::OperationKind>(packed.operation.operation_kind),
-              packed.operation.offset,
-              packed.operation.level);
         }
         break;
       }

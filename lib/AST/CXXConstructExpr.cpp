@@ -15,8 +15,6 @@
 #include <multiplier/AST/ValueStmt.h>
 #include <multiplier/AST/CXXTemporaryObjectExpr.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../Fragment.h"
 #include "../Stmt.h"
@@ -86,17 +84,10 @@ bool CXXConstructExpr::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<CXXConstructExpr> CXXConstructExpr::from(const ir::Operation &op) {
-  if (auto val = Stmt::from(op)) {
-    return from_base(val.value());
-  }
-  return std::nullopt;
-}
-
-gap::generator<std::pair<CXXConstructExpr, ir::Operation>> CXXConstructExpr::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kCXXConstructExprDerivedKinds)) {
-    if (auto val = from_base(res.first)) {
-      co_yield std::pair<CXXConstructExpr, ir::Operation>(std::move(val.value()), std::move(res.second));
+gap::generator<CXXConstructExpr> CXXConstructExpr::in(const Compilation &tu) {
+  for (Stmt res : Stmt::in(tu, kCXXConstructExprDerivedKinds)) {
+    if (auto val = from_base(res)) {
+      co_yield val.value();
     }
   }
 }

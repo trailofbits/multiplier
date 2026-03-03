@@ -22,11 +22,6 @@ class Stmt;
 class TemplateArgument;
 class Token;
 class ValueStmt;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT SizeOfPackExpr : public Expr {
  private:
@@ -41,8 +36,7 @@ class MX_EXPORT SizeOfPackExpr : public Expr {
   static gap::generator<SizeOfPackExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<SizeOfPackExpr> from(const ir::Operation &op);
-  static gap::generator<std::pair<SizeOfPackExpr, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<SizeOfPackExpr> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SIZE_OF_PACK_EXPR;
   }

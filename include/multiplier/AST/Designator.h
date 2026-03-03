@@ -34,11 +34,6 @@ class FieldDecl;
 class File;
 class Token;
 class TokenRange;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT Designator {
  public:
@@ -57,8 +52,7 @@ class MX_EXPORT Designator {
   friend class TokenContext;
   friend class Type;
   friend class DesignatorImpl;
-  friend class ir::Operation;
-  friend class ir::Value;
+
 
   std::shared_ptr<const DesignatorImpl> impl;
   static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);

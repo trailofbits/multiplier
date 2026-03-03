@@ -22,11 +22,6 @@ class File;
 class Stmt;
 class Token;
 class ValueStmt;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT CXXFunctionalCastExpr : public ExplicitCastExpr {
  private:
@@ -43,8 +38,7 @@ class MX_EXPORT CXXFunctionalCastExpr : public ExplicitCastExpr {
   static gap::generator<CXXFunctionalCastExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<CXXFunctionalCastExpr> from(const ir::Operation &op);
-  static gap::generator<std::pair<CXXFunctionalCastExpr, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<CXXFunctionalCastExpr> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_FUNCTIONAL_CAST_EXPR;
   }

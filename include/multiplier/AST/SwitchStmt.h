@@ -22,11 +22,6 @@ class SwitchCase;
 class SwitchStmt;
 class Token;
 class VarDecl;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT SwitchStmt : public Stmt {
  private:
@@ -39,8 +34,7 @@ class MX_EXPORT SwitchStmt : public Stmt {
   static gap::generator<SwitchStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<SwitchStmt> from(const ir::Operation &op);
-  static gap::generator<std::pair<SwitchStmt, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<SwitchStmt> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SWITCH_STMT;
   }

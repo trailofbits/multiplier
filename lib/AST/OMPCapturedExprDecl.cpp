@@ -15,8 +15,6 @@
 #include <multiplier/AST/ValueDecl.h>
 #include <multiplier/AST/VarDecl.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../Decl.h"
 
@@ -84,17 +82,10 @@ bool OMPCapturedExprDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<OMPCapturedExprDecl> OMPCapturedExprDecl::from(const ir::Operation &op) {
-  if (auto val = Decl::from(op)) {
-    return from_base(val.value());
-  }
-  return std::nullopt;
-}
-
-gap::generator<std::pair<OMPCapturedExprDecl, ir::Operation>> OMPCapturedExprDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kOMPCapturedExprDeclDerivedKinds)) {
-    if (auto val = from_base(res.first)) {
-      co_yield std::pair<OMPCapturedExprDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
+gap::generator<OMPCapturedExprDecl> OMPCapturedExprDecl::in(const Compilation &tu) {
+  for (Decl res : Decl::in(tu, kOMPCapturedExprDeclDerivedKinds)) {
+    if (auto val = from_base(res)) {
+      co_yield val.value();
     }
   }
 }

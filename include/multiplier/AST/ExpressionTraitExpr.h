@@ -21,11 +21,6 @@ class File;
 class Stmt;
 class Token;
 class ValueStmt;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT ExpressionTraitExpr : public Expr {
  private:
@@ -40,8 +35,7 @@ class MX_EXPORT ExpressionTraitExpr : public Expr {
   static gap::generator<ExpressionTraitExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<ExpressionTraitExpr> from(const ir::Operation &op);
-  static gap::generator<std::pair<ExpressionTraitExpr, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<ExpressionTraitExpr> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::EXPRESSION_TRAIT_EXPR;
   }

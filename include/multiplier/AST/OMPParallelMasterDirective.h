@@ -20,11 +20,6 @@ class OMPExecutableDirective;
 class OMPParallelMasterDirective;
 class Stmt;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT OMPParallelMasterDirective : public OMPExecutableDirective {
  private:
@@ -38,8 +33,7 @@ class MX_EXPORT OMPParallelMasterDirective : public OMPExecutableDirective {
   static gap::generator<OMPParallelMasterDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<OMPParallelMasterDirective> from(const ir::Operation &op);
-  static gap::generator<std::pair<OMPParallelMasterDirective, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<OMPParallelMasterDirective> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_PARALLEL_MASTER_DIRECTIVE;
   }

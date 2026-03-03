@@ -23,11 +23,6 @@ class Stmt;
 class Token;
 class TokenRange;
 class ValueStmt;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT CXXNamedCastExpr : public ExplicitCastExpr {
  private:
@@ -44,8 +39,7 @@ class MX_EXPORT CXXNamedCastExpr : public ExplicitCastExpr {
   static gap::generator<CXXNamedCastExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<CXXNamedCastExpr> from(const ir::Operation &op);
-  static gap::generator<std::pair<CXXNamedCastExpr, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<CXXNamedCastExpr> in(const Compilation &tu);
   static gap::generator<CXXNamedCastExpr> containing(const Decl &decl);
   static gap::generator<CXXNamedCastExpr> containing(const std::optional<Decl> &decl);
 

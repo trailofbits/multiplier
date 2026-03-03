@@ -20,11 +20,6 @@ class MSPropertySubscriptExpr;
 class Stmt;
 class Token;
 class ValueStmt;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT MSPropertySubscriptExpr : public Expr {
  private:
@@ -39,8 +34,7 @@ class MX_EXPORT MSPropertySubscriptExpr : public Expr {
   static gap::generator<MSPropertySubscriptExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<MSPropertySubscriptExpr> from(const ir::Operation &op);
-  static gap::generator<std::pair<MSPropertySubscriptExpr, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<MSPropertySubscriptExpr> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::MS_PROPERTY_SUBSCRIPT_EXPR;
   }

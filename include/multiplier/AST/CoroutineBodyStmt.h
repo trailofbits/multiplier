@@ -21,11 +21,6 @@ class File;
 class Stmt;
 class Token;
 class VarDecl;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT CoroutineBodyStmt : public Stmt {
  private:
@@ -38,8 +33,7 @@ class MX_EXPORT CoroutineBodyStmt : public Stmt {
   static gap::generator<CoroutineBodyStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<CoroutineBodyStmt> from(const ir::Operation &op);
-  static gap::generator<std::pair<CoroutineBodyStmt, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<CoroutineBodyStmt> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::COROUTINE_BODY_STMT;
   }

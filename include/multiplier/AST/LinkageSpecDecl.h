@@ -20,11 +20,6 @@ class File;
 class LinkageSpecDecl;
 class Stmt;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT LinkageSpecDecl : public Decl {
  private:
@@ -37,8 +32,7 @@ class MX_EXPORT LinkageSpecDecl : public Decl {
   static gap::generator<LinkageSpecDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<LinkageSpecDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<LinkageSpecDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<LinkageSpecDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::LINKAGE_SPEC;
   }

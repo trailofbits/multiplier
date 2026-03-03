@@ -23,11 +23,6 @@ class OMPDeclareMapperDecl;
 class Stmt;
 class Token;
 class ValueDecl;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
  private:
@@ -43,8 +38,7 @@ class MX_EXPORT OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
   static gap::generator<OMPDeclareMapperDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<OMPDeclareMapperDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<OMPDeclareMapperDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<OMPDeclareMapperDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OMP_DECLARE_MAPPER;
   }

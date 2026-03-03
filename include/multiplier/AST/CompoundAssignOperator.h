@@ -22,11 +22,6 @@ class Stmt;
 class Token;
 class Type;
 class ValueStmt;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT CompoundAssignOperator : public BinaryOperator {
  private:
@@ -42,8 +37,7 @@ class MX_EXPORT CompoundAssignOperator : public BinaryOperator {
   static gap::generator<CompoundAssignOperator> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<CompoundAssignOperator> from(const ir::Operation &op);
-  static gap::generator<std::pair<CompoundAssignOperator, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<CompoundAssignOperator> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::COMPOUND_ASSIGN_OPERATOR;
   }

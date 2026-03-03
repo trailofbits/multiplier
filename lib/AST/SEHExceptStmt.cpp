@@ -13,8 +13,6 @@
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/Frontend/Token.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../Stmt.h"
 
@@ -82,17 +80,10 @@ bool SEHExceptStmt::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<SEHExceptStmt> SEHExceptStmt::from(const ir::Operation &op) {
-  if (auto val = Stmt::from(op)) {
-    return from_base(val.value());
-  }
-  return std::nullopt;
-}
-
-gap::generator<std::pair<SEHExceptStmt, ir::Operation>> SEHExceptStmt::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kSEHExceptStmtDerivedKinds)) {
-    if (auto val = from_base(res.first)) {
-      co_yield std::pair<SEHExceptStmt, ir::Operation>(std::move(val.value()), std::move(res.second));
+gap::generator<SEHExceptStmt> SEHExceptStmt::in(const Compilation &tu) {
+  for (Stmt res : Stmt::in(tu, kSEHExceptStmtDerivedKinds)) {
+    if (auto val = from_base(res)) {
+      co_yield val.value();
     }
   }
 }

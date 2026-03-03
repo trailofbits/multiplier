@@ -23,11 +23,6 @@ class Stmt;
 class Token;
 class ValueDecl;
 class VarDecl;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT DecompositionDecl : public VarDecl {
  private:
@@ -44,8 +39,7 @@ class MX_EXPORT DecompositionDecl : public VarDecl {
   static gap::generator<DecompositionDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<DecompositionDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<DecompositionDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<DecompositionDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::DECOMPOSITION;
   }

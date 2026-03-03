@@ -69,8 +69,6 @@ DEFINE_string(workspace, "mx-workspace",
               "is stored. When you're done indexing, and if you don't plan to add any additional "
               "targets into the index, then you can delete this directory.");
 
-DEFINE_bool(generate_sourceir, false, "Generate SourceIR from the top-level declarations");
-
 DEFINE_bool(fork_mode, false, "Use --fork_mode if running inside docker");
 DEFINE_bool(reproc_mode, false, "Use --reproc_mode to use reproc library");
 
@@ -167,7 +165,6 @@ int main(int argc, char *argv[], char *envp[]) {
      << " [--num_command_workers N]\n"
      << " [--env PATH_TO_COPIED_ENV_VARS]\n"
      << " [--show_progress]\n"
-     << " [--generate_sourceir]\n"
      << " --fork_mode\n"
      << " --reproc_mode\n"
      << " --db DATABASE\n"
@@ -233,10 +230,6 @@ int main(int argc, char *argv[], char *envp[]) {
 
   auto fs = pasta::FileSystem::CreateNative();
   pasta::FileManager fm(fs);
-
-  if (!FLAGS_generate_sourceir) {
-    context.codegen.Disable();
-  }
 
   std::filesystem::path path(FLAGS_target);
 

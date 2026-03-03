@@ -15,9 +15,6 @@
 #include "Frontend/File.h"
 
 namespace mx {
-namespace ir {
-class Operation;
-}  // namespace ir
 
 class EntityProvider;
 class Index;
@@ -37,8 +34,7 @@ class RegexQueryMatch;
                               MX_FORWARD_DECLARE,
                               MX_FORWARD_DECLARE,
                               MX_FORWARD_DECLARE,
-                              MX_FORWARD_DECLARE,
-                              MX_IGNORE_ENTITY_CATEGORY)
+                              MX_FORWARD_DECLARE)
 #undef MX_FORWARD_DECLARE
 
 using PreprocessedEntity = std::variant<Macro, Token, Fragment>;
@@ -64,7 +60,6 @@ class MX_EXPORT Fragment {
     friend class ns_path type_name;
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_FRIEND,
-                              MX_FRIEND,
                               MX_FRIEND,
                               MX_FRIEND,
                               MX_FRIEND,
@@ -105,7 +100,6 @@ class MX_EXPORT Fragment {
   static Fragment containing(const Designator &) noexcept;
   static std::optional<Fragment> containing(const Token &) noexcept;
   static Fragment containing(const Macro &) noexcept;
-  static std::optional<Fragment> containing(const ir::Operation &) noexcept;
   static std::optional<Fragment> containing(const VariantEntity &) noexcept;
 
   // Try to convert a variant entity into a fragment.

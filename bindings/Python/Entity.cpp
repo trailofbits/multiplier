@@ -10,7 +10,6 @@
 #include <multiplier/Frontend/File.h>
 #include <multiplier/Frontend/Macro.h>
 #include <multiplier/Frontend/Token.h>
-#include <multiplier/IR/Operation.h>
 #include <multiplier/AST/Attr.h>
 #include <multiplier/AST/CXXBaseSpecifier.h>
 #include <multiplier/AST/CXXCtorInitializer.h>
@@ -88,7 +87,6 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_CONVERT_FROM_PYTHON,
                             MX_CONVERT_FROM_PYTHON,
                             MX_CONVERT_FROM_PYTHON,
                             MX_CONVERT_FROM_PYTHON,
-                            MX_CONVERT_FROM_PYTHON,
                             MX_CONVERT_FROM_PYTHON)
 #undef MX_CONVERT_FROM_PYTHON
 
@@ -104,7 +102,6 @@ SharedPyObject *PythonBinding<VariantEntity>::to_python(
     }
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_CONVERT_TO_PYTHON,
-                            MX_CONVERT_TO_PYTHON,
                             MX_CONVERT_TO_PYTHON,
                             MX_CONVERT_TO_PYTHON,
                             MX_CONVERT_TO_PYTHON,

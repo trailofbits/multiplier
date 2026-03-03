@@ -13,8 +13,6 @@
 #include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/ValueStmt.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../Stmt.h"
 
@@ -82,17 +80,10 @@ bool MSPropertySubscriptExpr::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<MSPropertySubscriptExpr> MSPropertySubscriptExpr::from(const ir::Operation &op) {
-  if (auto val = Stmt::from(op)) {
-    return from_base(val.value());
-  }
-  return std::nullopt;
-}
-
-gap::generator<std::pair<MSPropertySubscriptExpr, ir::Operation>> MSPropertySubscriptExpr::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kMSPropertySubscriptExprDerivedKinds)) {
-    if (auto val = from_base(res.first)) {
-      co_yield std::pair<MSPropertySubscriptExpr, ir::Operation>(std::move(val.value()), std::move(res.second));
+gap::generator<MSPropertySubscriptExpr> MSPropertySubscriptExpr::in(const Compilation &tu) {
+  for (Stmt res : Stmt::in(tu, kMSPropertySubscriptExprDerivedKinds)) {
+    if (auto val = from_base(res)) {
+      co_yield val.value();
     }
   }
 }

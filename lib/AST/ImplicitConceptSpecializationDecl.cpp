@@ -12,8 +12,6 @@
 #include <multiplier/AST/TemplateArgument.h>
 #include <multiplier/Frontend/Token.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../Decl.h"
 
@@ -81,17 +79,10 @@ bool ImplicitConceptSpecializationDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<ImplicitConceptSpecializationDecl> ImplicitConceptSpecializationDecl::from(const ir::Operation &op) {
-  if (auto val = Decl::from(op)) {
-    return from_base(val.value());
-  }
-  return std::nullopt;
-}
-
-gap::generator<std::pair<ImplicitConceptSpecializationDecl, ir::Operation>> ImplicitConceptSpecializationDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kImplicitConceptSpecializationDeclDerivedKinds)) {
-    if (auto val = from_base(res.first)) {
-      co_yield std::pair<ImplicitConceptSpecializationDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
+gap::generator<ImplicitConceptSpecializationDecl> ImplicitConceptSpecializationDecl::in(const Compilation &tu) {
+  for (Decl res : Decl::in(tu, kImplicitConceptSpecializationDeclDerivedKinds)) {
+    if (auto val = from_base(res)) {
+      co_yield val.value();
     }
   }
 }

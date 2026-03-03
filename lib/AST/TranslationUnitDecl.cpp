@@ -12,8 +12,6 @@
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/Frontend/Token.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../Decl.h"
 
@@ -81,17 +79,10 @@ bool TranslationUnitDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<TranslationUnitDecl> TranslationUnitDecl::from(const ir::Operation &op) {
-  if (auto val = Decl::from(op)) {
-    return from_base(val.value());
-  }
-  return std::nullopt;
-}
-
-gap::generator<std::pair<TranslationUnitDecl, ir::Operation>> TranslationUnitDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kTranslationUnitDeclDerivedKinds)) {
-    if (auto val = from_base(res.first)) {
-      co_yield std::pair<TranslationUnitDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
+gap::generator<TranslationUnitDecl> TranslationUnitDecl::in(const Compilation &tu) {
+  for (Decl res : Decl::in(tu, kTranslationUnitDeclDerivedKinds)) {
+    if (auto val = from_base(res)) {
+      co_yield val.value();
     }
   }
 }

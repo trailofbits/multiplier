@@ -20,11 +20,6 @@ class OMPDeclarativeDirectiveDecl;
 class OMPThreadPrivateDecl;
 class Stmt;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT OMPThreadPrivateDecl : public OMPDeclarativeDirectiveDecl {
  private:
@@ -38,8 +33,7 @@ class MX_EXPORT OMPThreadPrivateDecl : public OMPDeclarativeDirectiveDecl {
   static gap::generator<OMPThreadPrivateDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<OMPThreadPrivateDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<OMPThreadPrivateDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<OMPThreadPrivateDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OMP_THREAD_PRIVATE;
   }

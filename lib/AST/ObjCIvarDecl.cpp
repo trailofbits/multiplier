@@ -16,8 +16,6 @@
 #include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/ValueDecl.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../Decl.h"
 
@@ -85,17 +83,10 @@ bool ObjCIvarDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<ObjCIvarDecl> ObjCIvarDecl::from(const ir::Operation &op) {
-  if (auto val = Decl::from(op)) {
-    return from_base(val.value());
-  }
-  return std::nullopt;
-}
-
-gap::generator<std::pair<ObjCIvarDecl, ir::Operation>> ObjCIvarDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kObjCIvarDeclDerivedKinds)) {
-    if (auto val = from_base(res.first)) {
-      co_yield std::pair<ObjCIvarDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
+gap::generator<ObjCIvarDecl> ObjCIvarDecl::in(const Compilation &tu) {
+  for (Decl res : Decl::in(tu, kObjCIvarDeclDerivedKinds)) {
+    if (auto val = from_base(res)) {
+      co_yield val.value();
     }
   }
 }

@@ -27,8 +27,6 @@
 #include <multiplier/AST/ClassTemplatePartialSpecializationDecl.h>
 #include <multiplier/AST/ClassTemplateSpecializationDecl.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../Decl.h"
 
@@ -98,17 +96,10 @@ bool CXXRecordDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<CXXRecordDecl> CXXRecordDecl::from(const ir::Operation &op) {
-  if (auto val = Decl::from(op)) {
-    return from_base(val.value());
-  }
-  return std::nullopt;
-}
-
-gap::generator<std::pair<CXXRecordDecl, ir::Operation>> CXXRecordDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kCXXRecordDeclDerivedKinds)) {
-    if (auto val = from_base(res.first)) {
-      co_yield std::pair<CXXRecordDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
+gap::generator<CXXRecordDecl> CXXRecordDecl::in(const Compilation &tu) {
+  for (Decl res : Decl::in(tu, kCXXRecordDeclDerivedKinds)) {
+    if (auto val = from_base(res)) {
+      co_yield val.value();
     }
   }
 }

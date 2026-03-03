@@ -21,11 +21,6 @@ class NamedDecl;
 class Stmt;
 class Token;
 class ValueDecl;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT EnumConstantDecl : public ValueDecl {
  private:
@@ -40,8 +35,7 @@ class MX_EXPORT EnumConstantDecl : public ValueDecl {
   static gap::generator<EnumConstantDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<EnumConstantDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<EnumConstantDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<EnumConstantDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::ENUM_CONSTANT;
   }

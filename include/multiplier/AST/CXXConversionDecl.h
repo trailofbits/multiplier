@@ -25,11 +25,6 @@ class Stmt;
 class Token;
 class Type;
 class ValueDecl;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT CXXConversionDecl : public CXXMethodDecl {
  private:
@@ -47,8 +42,7 @@ class MX_EXPORT CXXConversionDecl : public CXXMethodDecl {
   static gap::generator<CXXConversionDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<CXXConversionDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<CXXConversionDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<CXXConversionDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CXX_CONVERSION;
   }

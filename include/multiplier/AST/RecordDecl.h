@@ -24,11 +24,6 @@ class Stmt;
 class TagDecl;
 class Token;
 class TypeDecl;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT RecordDecl : public TagDecl {
  private:
@@ -44,8 +39,7 @@ class MX_EXPORT RecordDecl : public TagDecl {
   static gap::generator<RecordDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<RecordDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<RecordDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<RecordDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::RECORD;
   }

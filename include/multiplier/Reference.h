@@ -223,7 +223,6 @@ class MX_EXPORT Reference {
                               MX_FRIEND,
                               MX_FRIEND,
                               MX_FRIEND,
-                              MX_FRIEND,
                               MX_FRIEND)
 #undef MX_FRIEND
 
@@ -290,7 +289,6 @@ class MX_EXPORT Reference {
     std::optional<ns_path type_name> as_ ## lower_name (void) const noexcept;
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_REF_GETTER,
-                              MX_DECLARE_REF_GETTER,
                               MX_DECLARE_REF_GETTER,
                               MX_DECLARE_REF_GETTER,
                               MX_DECLARE_REF_GETTER,

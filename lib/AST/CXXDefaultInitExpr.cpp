@@ -14,8 +14,6 @@
 #include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/ValueStmt.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../Stmt.h"
 
@@ -83,17 +81,10 @@ bool CXXDefaultInitExpr::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<CXXDefaultInitExpr> CXXDefaultInitExpr::from(const ir::Operation &op) {
-  if (auto val = Stmt::from(op)) {
-    return from_base(val.value());
-  }
-  return std::nullopt;
-}
-
-gap::generator<std::pair<CXXDefaultInitExpr, ir::Operation>> CXXDefaultInitExpr::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kCXXDefaultInitExprDerivedKinds)) {
-    if (auto val = from_base(res.first)) {
-      co_yield std::pair<CXXDefaultInitExpr, ir::Operation>(std::move(val.value()), std::move(res.second));
+gap::generator<CXXDefaultInitExpr> CXXDefaultInitExpr::in(const Compilation &tu) {
+  for (Stmt res : Stmt::in(tu, kCXXDefaultInitExprDerivedKinds)) {
+    if (auto val = from_base(res)) {
+      co_yield val.value();
     }
   }
 }

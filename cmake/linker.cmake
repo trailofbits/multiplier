@@ -5,8 +5,6 @@
 # the LICENSE file found in the root directory of this source tree.
 #
 
-# MLIR requires that `lld` be used.
-
 if(PLATFORM_LINUX)
   set(CMAKE_EXE_LINKER_FLAGS_INIT "-fuse-ld=lld")
   set(CMAKE_MODULE_LINKER_FLAGS_INIT "-fuse-ld=lld")

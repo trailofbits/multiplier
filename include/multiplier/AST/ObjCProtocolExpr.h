@@ -21,11 +21,6 @@ class ObjCProtocolExpr;
 class Stmt;
 class Token;
 class ValueStmt;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT ObjCProtocolExpr : public Expr {
  private:
@@ -40,8 +35,7 @@ class MX_EXPORT ObjCProtocolExpr : public Expr {
   static gap::generator<ObjCProtocolExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<ObjCProtocolExpr> from(const ir::Operation &op);
-  static gap::generator<std::pair<ObjCProtocolExpr, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<ObjCProtocolExpr> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_PROTOCOL_EXPR;
   }

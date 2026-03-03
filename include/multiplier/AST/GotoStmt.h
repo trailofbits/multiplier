@@ -19,11 +19,6 @@ class GotoStmt;
 class LabelDecl;
 class Stmt;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT GotoStmt : public Stmt {
  private:
@@ -36,8 +31,7 @@ class MX_EXPORT GotoStmt : public Stmt {
   static gap::generator<GotoStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<GotoStmt> from(const ir::Operation &op);
-  static gap::generator<std::pair<GotoStmt, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<GotoStmt> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::GOTO_STMT;
   }

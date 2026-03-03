@@ -21,11 +21,6 @@ class Token;
 class Type;
 class ValueDecl;
 class VarDecl;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT ValueDecl : public NamedDecl {
  private:
@@ -39,8 +34,7 @@ class MX_EXPORT ValueDecl : public NamedDecl {
   static gap::generator<ValueDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<ValueDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<ValueDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<ValueDecl> in(const Compilation &tu);
   static gap::generator<ValueDecl> containing(const Decl &decl);
   static gap::generator<ValueDecl> containing(const std::optional<Decl> &decl);
 

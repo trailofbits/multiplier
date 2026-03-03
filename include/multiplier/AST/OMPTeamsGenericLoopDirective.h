@@ -21,11 +21,6 @@ class OMPLoopDirective;
 class OMPTeamsGenericLoopDirective;
 class Stmt;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT OMPTeamsGenericLoopDirective : public OMPLoopDirective {
  private:
@@ -41,8 +36,7 @@ class MX_EXPORT OMPTeamsGenericLoopDirective : public OMPLoopDirective {
   static gap::generator<OMPTeamsGenericLoopDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<OMPTeamsGenericLoopDirective> from(const ir::Operation &op);
-  static gap::generator<std::pair<OMPTeamsGenericLoopDirective, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<OMPTeamsGenericLoopDirective> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_TEAMS_GENERIC_LOOP_DIRECTIVE;
   }

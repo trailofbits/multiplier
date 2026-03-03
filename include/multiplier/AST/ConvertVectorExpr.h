@@ -20,11 +20,6 @@ class File;
 class Stmt;
 class Token;
 class ValueStmt;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT ConvertVectorExpr : public Expr {
  private:
@@ -39,8 +34,7 @@ class MX_EXPORT ConvertVectorExpr : public Expr {
   static gap::generator<ConvertVectorExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<ConvertVectorExpr> from(const ir::Operation &op);
-  static gap::generator<std::pair<ConvertVectorExpr, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<ConvertVectorExpr> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CONVERT_VECTOR_EXPR;
   }

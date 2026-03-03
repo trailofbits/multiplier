@@ -20,11 +20,6 @@ class LabelStmt;
 class NamedDecl;
 class Stmt;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT LabelDecl : public NamedDecl {
  private:
@@ -38,8 +33,7 @@ class MX_EXPORT LabelDecl : public NamedDecl {
   static gap::generator<LabelDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<LabelDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<LabelDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<LabelDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::LABEL;
   }

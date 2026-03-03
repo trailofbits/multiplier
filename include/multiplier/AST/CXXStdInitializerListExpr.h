@@ -20,11 +20,6 @@ class File;
 class Stmt;
 class Token;
 class ValueStmt;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT CXXStdInitializerListExpr : public Expr {
  private:
@@ -39,8 +34,7 @@ class MX_EXPORT CXXStdInitializerListExpr : public Expr {
   static gap::generator<CXXStdInitializerListExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<CXXStdInitializerListExpr> from(const ir::Operation &op);
-  static gap::generator<std::pair<CXXStdInitializerListExpr, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<CXXStdInitializerListExpr> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_STD_INITIALIZER_LIST_EXPR;
   }

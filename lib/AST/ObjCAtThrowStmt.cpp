@@ -12,8 +12,6 @@
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/Frontend/Token.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../Stmt.h"
 
@@ -81,17 +79,10 @@ bool ObjCAtThrowStmt::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<ObjCAtThrowStmt> ObjCAtThrowStmt::from(const ir::Operation &op) {
-  if (auto val = Stmt::from(op)) {
-    return from_base(val.value());
-  }
-  return std::nullopt;
-}
-
-gap::generator<std::pair<ObjCAtThrowStmt, ir::Operation>> ObjCAtThrowStmt::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kObjCAtThrowStmtDerivedKinds)) {
-    if (auto val = from_base(res.first)) {
-      co_yield std::pair<ObjCAtThrowStmt, ir::Operation>(std::move(val.value()), std::move(res.second));
+gap::generator<ObjCAtThrowStmt> ObjCAtThrowStmt::in(const Compilation &tu) {
+  for (Stmt res : Stmt::in(tu, kObjCAtThrowStmtDerivedKinds)) {
+    if (auto val = from_base(res)) {
+      co_yield val.value();
     }
   }
 }

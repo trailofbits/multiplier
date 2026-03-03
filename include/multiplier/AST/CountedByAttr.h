@@ -19,11 +19,6 @@ class File;
 class InheritableAttr;
 class Token;
 class TokenRange;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT CountedByAttr : public InheritableAttr {
  private:

@@ -24,11 +24,6 @@ class ValueDecl;
 class VarDecl;
 class VarTemplatePartialSpecializationDecl;
 class VarTemplateSpecializationDecl;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT VarTemplatePartialSpecializationDecl : public VarTemplateSpecializationDecl {
  private:
@@ -46,8 +41,7 @@ class MX_EXPORT VarTemplatePartialSpecializationDecl : public VarTemplateSpecial
   static gap::generator<VarTemplatePartialSpecializationDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<VarTemplatePartialSpecializationDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<VarTemplatePartialSpecializationDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<VarTemplatePartialSpecializationDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::VAR_TEMPLATE_PARTIAL_SPECIALIZATION;
   }

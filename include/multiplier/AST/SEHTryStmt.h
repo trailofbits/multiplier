@@ -21,11 +21,6 @@ class SEHFinallyStmt;
 class SEHTryStmt;
 class Stmt;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT SEHTryStmt : public Stmt {
  private:
@@ -38,8 +33,7 @@ class MX_EXPORT SEHTryStmt : public Stmt {
   static gap::generator<SEHTryStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<SEHTryStmt> from(const ir::Operation &op);
-  static gap::generator<std::pair<SEHTryStmt, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<SEHTryStmt> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::SEH_TRY_STMT;
   }

@@ -36,11 +36,6 @@ class IndirectFieldDecl;
 class Stmt;
 class Token;
 class TokenRange;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT CXXCtorInitializer {
  public:
@@ -58,8 +53,7 @@ class MX_EXPORT CXXCtorInitializer {
   friend class TokenContext;
   friend class Type;
   friend class CXXCtorInitializerImpl;
-  friend class ir::Operation;
-  friend class ir::Value;
+
 
   std::shared_ptr<const CXXCtorInitializerImpl> impl;
   static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);

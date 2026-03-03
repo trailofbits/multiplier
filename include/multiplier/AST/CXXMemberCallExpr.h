@@ -24,11 +24,6 @@ class Stmt;
 class Token;
 class Type;
 class ValueStmt;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT CXXMemberCallExpr : public CallExpr {
  private:
@@ -44,8 +39,7 @@ class MX_EXPORT CXXMemberCallExpr : public CallExpr {
   static gap::generator<CXXMemberCallExpr> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<CXXMemberCallExpr> from(const ir::Operation &op);
-  static gap::generator<std::pair<CXXMemberCallExpr, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<CXXMemberCallExpr> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_MEMBER_CALL_EXPR;
   }

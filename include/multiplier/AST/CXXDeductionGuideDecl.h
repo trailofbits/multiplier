@@ -26,11 +26,6 @@ class Stmt;
 class TemplateDecl;
 class Token;
 class ValueDecl;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT CXXDeductionGuideDecl : public FunctionDecl {
  private:
@@ -47,8 +42,7 @@ class MX_EXPORT CXXDeductionGuideDecl : public FunctionDecl {
   static gap::generator<CXXDeductionGuideDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<CXXDeductionGuideDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<CXXDeductionGuideDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<CXXDeductionGuideDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CXX_DEDUCTION_GUIDE;
   }

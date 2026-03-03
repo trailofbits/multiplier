@@ -21,11 +21,6 @@ class File;
 class Stmt;
 class Token;
 class ValueStmt;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT ConditionalOperator : public AbstractConditionalOperator {
  private:
@@ -41,8 +36,7 @@ class MX_EXPORT ConditionalOperator : public AbstractConditionalOperator {
   static gap::generator<ConditionalOperator> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<ConditionalOperator> from(const ir::Operation &op);
-  static gap::generator<std::pair<ConditionalOperator, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<ConditionalOperator> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CONDITIONAL_OPERATOR;
   }

@@ -11,8 +11,6 @@
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/Frontend/Token.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../Stmt.h"
 
@@ -80,17 +78,10 @@ bool CompoundStmt::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<CompoundStmt> CompoundStmt::from(const ir::Operation &op) {
-  if (auto val = Stmt::from(op)) {
-    return from_base(val.value());
-  }
-  return std::nullopt;
-}
-
-gap::generator<std::pair<CompoundStmt, ir::Operation>> CompoundStmt::in(const Compilation &tu) {
-  for (std::pair<Stmt, ir::Operation> res : Stmt::in(tu, kCompoundStmtDerivedKinds)) {
-    if (auto val = from_base(res.first)) {
-      co_yield std::pair<CompoundStmt, ir::Operation>(std::move(val.value()), std::move(res.second));
+gap::generator<CompoundStmt> CompoundStmt::in(const Compilation &tu) {
+  for (Stmt res : Stmt::in(tu, kCompoundStmtDerivedKinds)) {
+    if (auto val = from_base(res)) {
+      co_yield val.value();
     }
   }
 }

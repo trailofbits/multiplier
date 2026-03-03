@@ -90,13 +90,8 @@ find_package(glog CONFIG REQUIRED GLOBAL)
 find_package(reproc++ CONFIG REQUIRED GLOBAL)
 find_package(RocksDB CONFIG REQUIRED GLOBAL)
 find_package(LLVM CONFIG REQUIRED GLOBAL)
-find_package(MLIR CONFIG REQUIRED GLOBAL)
-find_package(VAST CONFIG REQUIRED GLOBAL)
 find_package(Clang CONFIG REQUIRED GLOBAL)
 find_package(pasta CONFIG REQUIRED GLOBAL)
-
-include("cmake/mlir.cmake")
-include("cmake/vast.cmake")
 
 if(MX_ENABLE_PYTHON_BINDINGS)
   find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Embed)

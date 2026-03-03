@@ -21,11 +21,6 @@ class GCCAsmStmt;
 class Stmt;
 class StringLiteral;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT GCCAsmStmt : public AsmStmt {
  private:
@@ -39,8 +34,7 @@ class MX_EXPORT GCCAsmStmt : public AsmStmt {
   static gap::generator<GCCAsmStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<GCCAsmStmt> from(const ir::Operation &op);
-  static gap::generator<std::pair<GCCAsmStmt, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<GCCAsmStmt> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::GCC_ASM_STMT;
   }

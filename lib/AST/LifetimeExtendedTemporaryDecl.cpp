@@ -13,8 +13,6 @@
 #include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/ValueDecl.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../Decl.h"
 
@@ -82,17 +80,10 @@ bool LifetimeExtendedTemporaryDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::from(const ir::Operation &op) {
-  if (auto val = Decl::from(op)) {
-    return from_base(val.value());
-  }
-  return std::nullopt;
-}
-
-gap::generator<std::pair<LifetimeExtendedTemporaryDecl, ir::Operation>> LifetimeExtendedTemporaryDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kLifetimeExtendedTemporaryDeclDerivedKinds)) {
-    if (auto val = from_base(res.first)) {
-      co_yield std::pair<LifetimeExtendedTemporaryDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
+gap::generator<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::in(const Compilation &tu) {
+  for (Decl res : Decl::in(tu, kLifetimeExtendedTemporaryDeclDerivedKinds)) {
+    if (auto val = from_base(res)) {
+      co_yield val.value();
     }
   }
 }

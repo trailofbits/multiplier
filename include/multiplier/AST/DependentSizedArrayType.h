@@ -19,11 +19,6 @@ class Expr;
 class Token;
 class TokenRange;
 class Type;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT DependentSizedArrayType : public ArrayType {
  private:

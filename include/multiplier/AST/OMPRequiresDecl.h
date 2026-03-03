@@ -19,11 +19,6 @@ class OMPDeclarativeDirectiveDecl;
 class OMPRequiresDecl;
 class Stmt;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT OMPRequiresDecl : public OMPDeclarativeDirectiveDecl {
  private:
@@ -37,8 +32,7 @@ class MX_EXPORT OMPRequiresDecl : public OMPDeclarativeDirectiveDecl {
   static gap::generator<OMPRequiresDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<OMPRequiresDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<OMPRequiresDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<OMPRequiresDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OMP_REQUIRES;
   }

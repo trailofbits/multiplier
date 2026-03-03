@@ -18,11 +18,6 @@ class File;
 class ObjCAtFinallyStmt;
 class Stmt;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT ObjCAtFinallyStmt : public Stmt {
  private:
@@ -35,8 +30,7 @@ class MX_EXPORT ObjCAtFinallyStmt : public Stmt {
   static gap::generator<ObjCAtFinallyStmt> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<ObjCAtFinallyStmt> from(const ir::Operation &op);
-  static gap::generator<std::pair<ObjCAtFinallyStmt, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<ObjCAtFinallyStmt> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_AT_FINALLY_STMT;
   }

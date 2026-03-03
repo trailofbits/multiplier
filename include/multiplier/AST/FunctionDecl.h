@@ -34,11 +34,6 @@ class Token;
 class TokenRange;
 class Type;
 class ValueDecl;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT FunctionDecl : public DeclaratorDecl {
  private:
@@ -54,8 +49,7 @@ class MX_EXPORT FunctionDecl : public DeclaratorDecl {
   static gap::generator<FunctionDecl> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<FunctionDecl> from(const ir::Operation &op);
-  static gap::generator<std::pair<FunctionDecl, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<FunctionDecl> in(const Compilation &tu);
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::FUNCTION;
   }

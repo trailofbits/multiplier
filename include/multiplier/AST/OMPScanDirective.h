@@ -19,11 +19,6 @@ class OMPExecutableDirective;
 class OMPScanDirective;
 class Stmt;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT OMPScanDirective : public OMPExecutableDirective {
  private:
@@ -37,8 +32,7 @@ class MX_EXPORT OMPScanDirective : public OMPExecutableDirective {
   static gap::generator<OMPScanDirective> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<OMPScanDirective> from(const ir::Operation &op);
-  static gap::generator<std::pair<OMPScanDirective, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<OMPScanDirective> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_SCAN_DIRECTIVE;
   }

@@ -18,8 +18,6 @@
 #include <multiplier/Frontend/Token.h>
 #include <multiplier/AST/Type.h>
 
-#include <multiplier/IR/HighLevel/Operation.h>
-
 #include "../EntityProvider.h"
 #include "../Fragment.h"
 #include "../Decl.h"
@@ -88,17 +86,10 @@ bool ObjCMethodDecl::contains(const Token &tok) const {
   return false;
 }
 
-std::optional<ObjCMethodDecl> ObjCMethodDecl::from(const ir::Operation &op) {
-  if (auto val = Decl::from(op)) {
-    return from_base(val.value());
-  }
-  return std::nullopt;
-}
-
-gap::generator<std::pair<ObjCMethodDecl, ir::Operation>> ObjCMethodDecl::in(const Compilation &tu) {
-  for (std::pair<Decl, ir::Operation> res : Decl::in(tu, kObjCMethodDeclDerivedKinds)) {
-    if (auto val = from_base(res.first)) {
-      co_yield std::pair<ObjCMethodDecl, ir::Operation>(std::move(val.value()), std::move(res.second));
+gap::generator<ObjCMethodDecl> ObjCMethodDecl::in(const Compilation &tu) {
+  for (Decl res : Decl::in(tu, kObjCMethodDeclDerivedKinds)) {
+    if (auto val = from_base(res)) {
+      co_yield val.value();
     }
   }
 }

@@ -35,11 +35,6 @@ class TemplateParameterList;
 class TemplateParameterListImpl;
 class Token;
 class TokenRange;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT TemplateParameterList {
  public:
@@ -57,8 +52,7 @@ class MX_EXPORT TemplateParameterList {
   friend class TokenContext;
   friend class Type;
   friend class TemplateParameterListImpl;
-  friend class ir::Operation;
-  friend class ir::Value;
+
 
   std::shared_ptr<const TemplateParameterListImpl> impl;
   static std::shared_ptr<EntityProvider> entity_provider_of(const Index &);

@@ -20,11 +20,6 @@ class File;
 class OMPCanonicalLoop;
 class Stmt;
 class Token;
-namespace ir {
-class Operation;
-class Value;
-}  // namespace ir
-
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class MX_EXPORT OMPCanonicalLoop : public Stmt {
  private:
@@ -37,8 +32,7 @@ class MX_EXPORT OMPCanonicalLoop : public Stmt {
   static gap::generator<OMPCanonicalLoop> containing(const Token &tok);
   bool contains(const Token &tok) const;
 
-  static std::optional<OMPCanonicalLoop> from(const ir::Operation &op);
-  static gap::generator<std::pair<OMPCanonicalLoop, ir::Operation>> in(const Compilation &tu);
+  static gap::generator<OMPCanonicalLoop> in(const Compilation &tu);
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_CANONICAL_LOOP;
   }
