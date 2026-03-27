@@ -13,6 +13,7 @@ set(binary_include_dir "${PROJECT_BINARY_DIR}/include/${lower_project_name}")
 # Auto-generate C++ headers and sources from our Cap'n Proto schemas.
 capnp_generate_cpp(MX_RPC_SOURCES MX_RPC_HEADERS RPC.capnp)
 capnp_generate_cpp(MX_AST_SOURCES MX_AST_HEADERS AST.capnp)  # Bootstrapped file.
+capnp_generate_cpp(MX_IR_SOURCES MX_IR_HEADERS IR.capnp)
 
 file(GLOB frontend_headers CONFIGURE_DEPENDS "${MX_BOOTSTRAP_INCLUDE_DIR}/Frontend/*.h")
 file(GLOB frontend_sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/Frontend/*.cpp")
@@ -29,6 +30,7 @@ configure_file(Version.cpp.in "${PROJECT_BINARY_DIR}/lib/Version.cpp" @ONLY)
 add_library("mx-serialize" INTERFACE
   ${MX_AST_SOURCES}
   ${MX_RPC_SOURCES}
+  ${MX_IR_SOURCES}
 )
 
 set_target_properties("mx-serialize"
@@ -51,7 +53,7 @@ target_link_libraries("mx-serialize"
 # Generate the commands to copy the headers into the binary include directory.
 set(copied_headers "")
 set(copy_headers_commands "")
-foreach(capnp_header_path ${MX_RPC_HEADERS} ${MX_AST_HEADERS})
+foreach(capnp_header_path ${MX_RPC_HEADERS} ${MX_AST_HEADERS} ${MX_IR_HEADERS})
   get_filename_component(header_name "${capnp_header_path}" NAME)
   set(output_header_path "${binary_include_dir}/${header_name}")
   list(APPEND copied_headers $<BUILD_INTERFACE:${output_header_path}>)

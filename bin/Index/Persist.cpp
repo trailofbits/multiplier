@@ -4,6 +4,7 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include "Context.h"
+#include "SerializeIR.h"
 
 #include <algorithm>
 #include <capnp/common.h>
@@ -966,6 +967,9 @@ void GlobalIndexingState::PersistFragment(
   //             index information about macros, we need to do it after calling
   //             `PersistTokenTree`.
   SerializePendingFragment(fb, database, pf);
+
+  // Generate and serialize IR for function bodies in this fragment.
+  GenerateAndSerializeIR(ast, pf, pf.em, fb, ir_progress);
 
   PersistTokenContexts(pf, fb);
   LinkEntitiesAcrossFragments(database, pf, mangler);

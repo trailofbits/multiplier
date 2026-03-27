@@ -61,6 +61,9 @@ void GlobalIndexingState::InitializeProgressBars(void) {
 
   type_progress.reset(new ProgressBar("Type serialization",
                                       report_freq));
+
+  ir_progress.reset(new ProgressBar("IR generation",
+                                     report_freq));
 }
 
 }  // namespace indexer

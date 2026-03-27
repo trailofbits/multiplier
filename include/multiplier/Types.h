@@ -96,6 +96,12 @@ struct DesignatorId;
 struct CXXCtorInitializerId;
 struct CompilationId;
 
+// IR entities.
+struct IRFunctionId;
+struct IRBlockId;
+struct IRInstructionId;
+struct IRObjectId;
+
 using EntityOffset = uint32_t;
 using SignedEntityOffset = int32_t;
 
@@ -337,6 +343,54 @@ struct MX_EXPORT CXXCtorInitializerId final {
   auto operator<=>(const CXXCtorInitializerId &) const noexcept = default;
 };
 
+// IR entity IDs. These follow the same packing scheme as pseudo entities:
+// (fragment_id, sub_kind, offset) where sub_kind is in the IR range.
+
+enum class IREntityKind : uint8_t {
+  IR_FUNCTION = 0,
+  IR_BLOCK = 1,
+  IR_INSTRUCTION = 2,
+  IR_OBJECT = 3,
+};
+
+inline static constexpr unsigned NumEnumerators(IREntityKind) {
+  return 4u;
+}
+
+struct MX_EXPORT IRFunctionId final {
+  RawEntityId fragment_id;
+  EntityOffset offset;
+  static constexpr IREntityKind kind = IREntityKind::IR_FUNCTION;
+  bool operator==(const IRFunctionId &) const noexcept = default;
+  auto operator<=>(const IRFunctionId &) const noexcept = default;
+};
+
+struct MX_EXPORT IRBlockId final {
+  RawEntityId fragment_id;
+  EntityOffset offset;
+  uint8_t block_kind;  // BlockKind enum value
+  static constexpr IREntityKind kind = IREntityKind::IR_BLOCK;
+  bool operator==(const IRBlockId &) const noexcept = default;
+  auto operator<=>(const IRBlockId &) const noexcept = default;
+};
+
+struct MX_EXPORT IRInstructionId final {
+  RawEntityId fragment_id;
+  EntityOffset offset;
+  uint8_t opcode;  // OpCode enum value
+  static constexpr IREntityKind kind = IREntityKind::IR_INSTRUCTION;
+  bool operator==(const IRInstructionId &) const noexcept = default;
+  auto operator<=>(const IRInstructionId &) const noexcept = default;
+};
+
+struct MX_EXPORT IRObjectId final {
+  RawEntityId fragment_id;
+  EntityOffset offset;
+  static constexpr IREntityKind kind = IREntityKind::IR_OBJECT;
+  bool operator==(const IRObjectId &) const noexcept = default;
+  auto operator<=>(const IRObjectId &) const noexcept = default;
+};
+
 // Translation units represent a compilation. From a translation unit we can
 // get the compile command, etc.
 struct MX_EXPORT CompilationId {
@@ -383,6 +437,14 @@ struct MX_EXPORT FragmentId final {
       : fragment_id(id_.fragment_id) {}
   inline /* implicit */ FragmentId(const CXXCtorInitializerId &id_)
       : fragment_id(id_.fragment_id) {}
+  inline /* implicit */ FragmentId(const IRFunctionId &id_)
+      : fragment_id(id_.fragment_id) {}
+  inline /* implicit */ FragmentId(const IRBlockId &id_)
+      : fragment_id(id_.fragment_id) {}
+  inline /* implicit */ FragmentId(const IRInstructionId &id_)
+      : fragment_id(id_.fragment_id) {}
+  inline /* implicit */ FragmentId(const IRObjectId &id_)
+      : fragment_id(id_.fragment_id) {}
 
   static std::optional<FragmentId> from(const EntityId &);
 };
@@ -411,7 +473,8 @@ using VariantId = std::variant<
                                 MX_ENTITY_ID_VARIANT,
                                 MX_ENTITY_ID_VARIANT,
                                 MX_ENTITY_ID_VARIANT)
-    ParsedTokenId, MacroTokenId, FileTokenId, TypeTokenId>;
+    ParsedTokenId, MacroTokenId, FileTokenId, TypeTokenId,
+    IRFunctionId, IRBlockId, IRInstructionId, IRObjectId>;
 #undef MX_ENTITY_ID_VARIANT
 
 template <typename T>
@@ -448,6 +511,10 @@ class MX_EXPORT EntityId final {
   /* implicit */ EntityId(DesignatorId id);
   /* implicit */ EntityId(CXXCtorInitializerId id);
   /* implicit */ EntityId(CompilationId id);
+  /* implicit */ EntityId(IRFunctionId id);
+  /* implicit */ EntityId(IRBlockId id);
+  /* implicit */ EntityId(IRInstructionId id);
+  /* implicit */ EntityId(IRObjectId id);
 
   template <typename T>
   /* implicit */ inline EntityId(SpecificEntityId<T>);
