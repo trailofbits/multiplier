@@ -25,6 +25,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_FORWARD_DECLARE_ENTITY,
                             MX_FORWARD_DECLARE_ENTITY,
                             MX_FORWARD_DECLARE_ENTITY,
                             MX_FORWARD_DECLARE_ENTITY,
+                            MX_FORWARD_DECLARE_ENTITY,
                             MX_FORWARD_DECLARE_ENTITY)
 #undef MX_FORWARD_DECLARE_ENTITY
 

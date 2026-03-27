@@ -39,7 +39,8 @@ static OpaqueImplPtr ReferencedEntity(const EntityProviderPtr &ep,
     MX_FOR_EACH_ENTITY_CATEGORY(MX_DISPATCH_GETTER, MX_IGNORE_ENTITY_CATEGORY,
                                 MX_DISPATCH_GETTER, MX_DISPATCH_GETTER,
                                 MX_DISPATCH_GETTER, MX_DISPATCH_GETTER,
-                                MX_DISPATCH_GETTER)
+                                MX_DISPATCH_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DISPATCH_GETTER
 
   // It's a reference to a parsed token resident in a fragment.
@@ -249,7 +250,8 @@ VariantEntity Reference::as_variant(void) const noexcept {
                                 DEFINE_REF_GETTER,
                                 DEFINE_REF_GETTER,
                                 DEFINE_REF_GETTER,
-                                DEFINE_REF_GETTER)
+                                DEFINE_REF_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY)
 #undef DEFINE_REF_GETTER
   }
   return NotAnEntity{};
@@ -314,7 +316,8 @@ MX_FOR_EACH_ENTITY_CATEGORY(DEFINE_REF_GETTER,
                             DEFINE_REF_GETTER,
                             DEFINE_REF_GETTER,
                             DEFINE_REF_GETTER,
-                            DEFINE_REF_GETTER)
+                            DEFINE_REF_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY)
 
 #undef DEFINE_REF_GETTER
 

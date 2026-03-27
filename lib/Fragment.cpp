@@ -133,6 +133,7 @@ std::optional<Fragment> Fragment::containing(
                               GET_FRAGMENT,
                               GET_FRAGMENT,
                               GET_FRAGMENT,
+                              MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY)
   return std::nullopt;
 #undef GET_FRAGMENT

@@ -195,7 +195,8 @@ gap::generator<File> Index::files(void) const & {
 MX_FOR_EACH_ENTITY_CATEGORY(MX_DEFINE_GETTER, MX_IGNORE_ENTITY_CATEGORY,
                             MX_DEFINE_GETTER, MX_DEFINE_GETTER,
                             MX_DEFINE_GETTER, MX_DEFINE_GETTER,
-                            MX_DEFINE_GETTER)
+                            MX_DEFINE_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DEFINE_GETTER
 
 // Download a fragment based off of an entity ID.
@@ -275,7 +276,8 @@ VariantEntity Index::entity(EntityId eid) const {
     MX_FOR_EACH_ENTITY_CATEGORY(MX_DISPATCH_GETTER, MX_IGNORE_ENTITY_CATEGORY,
                                 MX_DISPATCH_GETTER, MX_DISPATCH_GETTER,
                                 MX_DISPATCH_GETTER, MX_DISPATCH_GETTER,
-                                MX_DISPATCH_GETTER)
+                                MX_DISPATCH_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DISPATCH_GETTER
 
 

@@ -1078,7 +1078,8 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
                             MX_DECLARE_ENTITY_GETTER,
                             MX_DECLARE_FRAGMENT_OFFSET_GETTER,
                             MX_DECLARE_FRAGMENT_PSEUDO_GETTER,
-                            MX_DECLARE_ENTITY_GETTER)
+                            MX_DECLARE_ENTITY_GETTER,
+                              MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_ENTITY_GETTER
 #undef MX_DECLARE_FRAGMENT_OFFSET_GETTER
 #undef MX_DECLARE_FRAGMENT_PSEUDO_GETTER
@@ -1260,7 +1261,8 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_LIST_GETTER,
                             MX_DECLARE_ENTITY_LIST_GETTER,
                             MX_DECLARE_FRAGMENT_OFFSET_LIST_GETTER,
                             MX_DECLARE_FRAGMENT_PSEUDO_LIST_GETTER,
-                            MX_DECLARE_ENTITY_LIST_GETTER)
+                            MX_DECLARE_ENTITY_LIST_GETTER,
+                              MX_IGNORE_ENTITY_CATEGORY)
 
 #undef MX_DECLARE_ENTITY_LIST_GETTER
 #undef MX_DECLARE_FRAGMENT_OFFSET_LIST_GETTER
@@ -1382,7 +1384,8 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_DECLARE_FRAGMENT_OFFSET_LISTERS,
                             MX_IGNORE_ENTITY_CATEGORY,
-                            MX_IGNORE_ENTITY_CATEGORY)
+                            MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_FRAGMENT_OFFSET_LISTERS
 
 EntityProviderPtr EntityProvider::CreateFromDatabase(std::filesystem::path path) {

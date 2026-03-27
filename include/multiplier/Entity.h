@@ -6,6 +6,10 @@
 #pragma once
 
 #include "Types.h"
+#include "IR/Function.h"
+#include "IR/Block.h"
+#include "IR/Instruction.h"
+#include "IR/Object.h"
 
 namespace mx {
 
@@ -28,6 +32,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_FORWARD_DECLARE,
                             MX_FORWARD_DECLARE,
                             MX_FORWARD_DECLARE,
                             MX_FORWARD_DECLARE,
+                            MX_FORWARD_DECLARE,
                             MX_FORWARD_DECLARE)
 #undef MX_FORWARD_DECLARE
 
@@ -37,6 +42,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_FORWARD_DECLARE,
 using NotAnEntity = std::monostate;
 using VariantEntity = std::variant<
     NotAnEntity MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_VARIANT,
+                                            MX_DECLARE_ENTITY_VARIANT,
                                             MX_DECLARE_ENTITY_VARIANT,
                                             MX_DECLARE_ENTITY_VARIANT,
                                             MX_DECLARE_ENTITY_VARIANT,

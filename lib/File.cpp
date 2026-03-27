@@ -244,6 +244,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY,
                             MX_DEFINE_CONTAINING,
                             MX_DEFINE_CONTAINING,
+                            MX_IGNORE_ENTITY_CATEGORY,
                             MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DEFINE_CONTAINING
 
@@ -255,6 +256,7 @@ std::optional<File> File::containing(const VariantEntity &entity) noexcept {
 
   MX_FOR_EACH_ENTITY_CATEGORY(GET_FILE, GET_FILE, MX_IGNORE_ENTITY_CATEGORY,
                               GET_FILE, GET_FILE, GET_FILE,
+                              MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY)
   return std::nullopt;
 #undef GET_FILE
