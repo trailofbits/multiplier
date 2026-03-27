@@ -12,6 +12,7 @@ from enum import IntEnum
 from typing import Generator, Iterable, Mapping, Optional, overload, Sequence, Tuple
 import pathlib
 import multiplier
+import multiplier.ir
 import multiplier.ast
 import multiplier.frontend
 
@@ -726,7 +727,7 @@ class Compilation(multiplier.Entity):
 
   @overload
   @staticmethod
-  def containing(arg_0: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.Compilation]:
+  def containing(arg_0: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.frontend.Compilation]:
     ...
 
   @staticmethod
@@ -747,7 +748,7 @@ class Token(multiplier.Entity):
   containing_macro: Optional[multiplier.frontend.Macro]
 
   @staticmethod
-  def FROM(entity: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.Token]:
+  def FROM(entity: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.frontend.Token]:
     ...
 
   @staticmethod
@@ -755,7 +756,7 @@ class Token(multiplier.Entity):
     ...
 
   @staticmethod
-  def categorize(entity: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> multiplier.frontend.TokenCategory:
+  def categorize(entity: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> multiplier.frontend.TokenCategory:
     ...
 
   def location(self, arg_0: multiplier.frontend.FileLocationCache) -> Optional[Tuple[int, int]]:
@@ -916,11 +917,11 @@ class File(multiplier.Entity):
 
   @overload
   @staticmethod
-  def containing(arg_0: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.File]:
+  def containing(arg_0: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.frontend.File]:
     ...
 
   @staticmethod
-  def FROM(arg_0: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.File]:
+  def FROM(arg_0: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.frontend.File]:
     ...
 
   @staticmethod
@@ -1006,7 +1007,7 @@ class Macro(multiplier.Entity):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.Macro]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.frontend.Macro]:
     ...
 
   @overload
@@ -1075,7 +1076,7 @@ class MacroSubstitution(multiplier.frontend.Macro):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.MacroSubstitution]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.frontend.MacroSubstitution]:
     ...
 
   @overload
@@ -1140,7 +1141,7 @@ class MacroConcatenate(multiplier.frontend.MacroSubstitution):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.MacroConcatenate]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.frontend.MacroConcatenate]:
     ...
 
   @overload
@@ -1205,7 +1206,7 @@ class MacroStringify(multiplier.frontend.MacroSubstitution):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.MacroStringify]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.frontend.MacroStringify]:
     ...
 
   @overload
@@ -1273,7 +1274,7 @@ class MacroExpansion(multiplier.frontend.MacroSubstitution):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.MacroExpansion]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.frontend.MacroExpansion]:
     ...
 
   @overload
@@ -1342,7 +1343,7 @@ class MacroParameterSubstitution(multiplier.frontend.MacroSubstitution):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.MacroParameterSubstitution]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.frontend.MacroParameterSubstitution]:
     ...
 
   @overload
@@ -1407,7 +1408,7 @@ class MacroVAOpt(multiplier.frontend.Macro):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.MacroVAOpt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.frontend.MacroVAOpt]:
     ...
 
   @overload
@@ -1471,7 +1472,7 @@ class MacroVAOptArgument(multiplier.frontend.Macro):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.MacroVAOptArgument]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.frontend.MacroVAOptArgument]:
     ...
 
   @overload
@@ -1537,7 +1538,7 @@ class MacroArgument(multiplier.frontend.Macro):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.MacroArgument]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.frontend.MacroArgument]:
     ...
 
   @overload
@@ -1604,7 +1605,7 @@ class MacroParameter(multiplier.frontend.Macro):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.MacroParameter]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.frontend.MacroParameter]:
     ...
 
   @overload
@@ -1666,7 +1667,7 @@ class MacroDirective(multiplier.frontend.Macro):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.MacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.frontend.MacroDirective]:
     ...
 
   @overload
@@ -1737,7 +1738,7 @@ class DefineMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.DefineMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.frontend.DefineMacroDirective]:
     ...
 
   @overload
@@ -1801,7 +1802,7 @@ class PragmaMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.PragmaMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.frontend.PragmaMacroDirective]:
     ...
 
   @overload
@@ -1865,7 +1866,7 @@ class UndefineMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.UndefineMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.frontend.UndefineMacroDirective]:
     ...
 
   @overload
@@ -1929,7 +1930,7 @@ class OtherMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.OtherMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.frontend.OtherMacroDirective]:
     ...
 
   @overload
@@ -1989,7 +1990,7 @@ class ConditionalMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.ConditionalMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.frontend.ConditionalMacroDirective]:
     ...
 
   @overload
@@ -2053,7 +2054,7 @@ class EndIfMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.EndIfMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.frontend.EndIfMacroDirective]:
     ...
 
   @overload
@@ -2117,7 +2118,7 @@ class ElseMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.ElseMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.frontend.ElseMacroDirective]:
     ...
 
   @overload
@@ -2181,7 +2182,7 @@ class ElseIfNotDefinedMacroDirective(multiplier.frontend.ConditionalMacroDirecti
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.frontend.ElseIfNotDefinedMacroDirective]:
     ...
 
   @overload
@@ -2245,7 +2246,7 @@ class ElseIfDefinedMacroDirective(multiplier.frontend.ConditionalMacroDirective)
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.ElseIfDefinedMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.frontend.ElseIfDefinedMacroDirective]:
     ...
 
   @overload
@@ -2309,7 +2310,7 @@ class ElseIfMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.ElseIfMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.frontend.ElseIfMacroDirective]:
     ...
 
   @overload
@@ -2373,7 +2374,7 @@ class IfNotDefinedMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.IfNotDefinedMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.frontend.IfNotDefinedMacroDirective]:
     ...
 
   @overload
@@ -2437,7 +2438,7 @@ class IfDefinedMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.IfDefinedMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.frontend.IfDefinedMacroDirective]:
     ...
 
   @overload
@@ -2501,7 +2502,7 @@ class IfMacroDirective(multiplier.frontend.ConditionalMacroDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.IfMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.frontend.IfMacroDirective]:
     ...
 
   @overload
@@ -2562,7 +2563,7 @@ class IncludeLikeMacroDirective(multiplier.frontend.MacroDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.IncludeLikeMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.frontend.IncludeLikeMacroDirective]:
     ...
 
   @overload
@@ -2626,7 +2627,7 @@ class ImportMacroDirective(multiplier.frontend.IncludeLikeMacroDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.ImportMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.frontend.ImportMacroDirective]:
     ...
 
   @overload
@@ -2690,7 +2691,7 @@ class IncludeMacrosMacroDirective(multiplier.frontend.IncludeLikeMacroDirective)
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.IncludeMacrosMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.frontend.IncludeMacrosMacroDirective]:
     ...
 
   @overload
@@ -2754,7 +2755,7 @@ class IncludeNextMacroDirective(multiplier.frontend.IncludeLikeMacroDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.IncludeNextMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.frontend.IncludeNextMacroDirective]:
     ...
 
   @overload
@@ -2818,7 +2819,7 @@ class IncludeMacroDirective(multiplier.frontend.IncludeLikeMacroDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.frontend.IncludeMacroDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.frontend.IncludeMacroDirective]:
     ...
 
   @overload

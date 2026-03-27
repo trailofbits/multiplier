@@ -71,7 +71,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[603]) || tp >= &(gTypes[609])) {
+  if (tp < &(gTypes[607]) || tp >= &(gTypes[613])) {
     return std::nullopt;
   }
 
@@ -88,23 +88,23 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::CXXDynamicCastExpr::static_kind():
-      tp = &(gTypes[604]);
+      tp = &(gTypes[608]);
       break;
 
     case mx::CXXConstCastExpr::static_kind():
-      tp = &(gTypes[605]);
+      tp = &(gTypes[609]);
       break;
 
     case mx::CXXAddrspaceCastExpr::static_kind():
-      tp = &(gTypes[606]);
+      tp = &(gTypes[610]);
       break;
 
     case mx::CXXStaticCastExpr::static_kind():
-      tp = &(gTypes[607]);
+      tp = &(gTypes[611]);
       break;
 
     case mx::CXXReinterpretCastExpr::static_kind():
-      tp = &(gTypes[608]);
+      tp = &(gTypes[612]);
       break;
 
   }
@@ -358,7 +358,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(T::from(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::CXXCtorInitializer, mx::Compilation>>(args[0]);
+            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::CXXCtorInitializer, mx::Compilation, mx::IRFunction, mx::IRBlock, mx::IRInstruction, mx::IRObject>>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -388,7 +388,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[603]);
+  PyTypeObject * const tp = &(gTypes[607]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -403,12 +403,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[602].tp_hash;
-  tp->tp_richcompare = gTypes[602].tp_richcompare;
+  tp->tp_hash = gTypes[606].tp_hash;
+  tp->tp_richcompare = gTypes[606].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[602]);
+  tp->tp_base = &(gTypes[606]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)
