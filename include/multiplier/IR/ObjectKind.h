@@ -24,6 +24,10 @@ enum class ObjectKind : uint8_t {
   HEAP = 10,              // dynamically allocated (malloc, etc.)
 };
 
+inline static const char *EnumerationName(ObjectKind) {
+  return "ObjectKind";
+}
+
 const char *EnumeratorName(ObjectKind kind) noexcept;
 
 inline static constexpr unsigned NumEnumerators(ObjectKind) {

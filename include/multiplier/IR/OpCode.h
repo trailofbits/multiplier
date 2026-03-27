@@ -109,6 +109,10 @@ enum class OpCode : uint8_t {
 };
 
 // Returns the human-readable name of an opcode.
+inline static const char *EnumerationName(OpCode) {
+  return "OpCode";
+}
+
 const char *EnumeratorName(OpCode op) noexcept;
 
 inline static constexpr unsigned NumEnumerators(OpCode) {

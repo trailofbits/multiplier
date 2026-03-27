@@ -40,6 +40,10 @@ enum class BlockKind : uint8_t {
   GENERIC = 13,
 };
 
+inline static const char *EnumerationName(BlockKind) {
+  return "BlockKind";
+}
+
 const char *EnumeratorName(BlockKind kind) noexcept;
 
 inline static constexpr unsigned NumEnumerators(BlockKind) {

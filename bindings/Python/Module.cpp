@@ -66,6 +66,9 @@ static LoaderFunc * const gIRLoaders[] = {
   PythonBinding<mx::IRBlock>::load,
   PythonBinding<mx::IRInstruction>::load,
   PythonBinding<mx::IRObject>::load,
+  PythonBinding<mx::ir::OpCode>::load,
+  PythonBinding<mx::ir::ObjectKind>::load,
+  PythonBinding<mx::ir::BlockKind>::load,
 };
 
 // multiplier.ast

@@ -433,16 +433,36 @@ class Index(object):
   def compilation(self, id: multiplier.CompilationId) -> Optional[multiplier.frontend.Compilation]:
     ...
 
+  @overload
   def ir_function(self, id: int) -> Optional[multiplier.ir.IRFunction]:
     ...
 
+  @overload
+  def ir_function(self, id: multiplier.IRFunctionId) -> Optional[multiplier.ir.IRFunction]:
+    ...
+
+  @overload
   def ir_block(self, id: int) -> Optional[multiplier.ir.IRBlock]:
     ...
 
+  @overload
+  def ir_block(self, id: multiplier.IRBlockId) -> Optional[multiplier.ir.IRBlock]:
+    ...
+
+  @overload
   def ir_instruction(self, id: int) -> Optional[multiplier.ir.IRInstruction]:
     ...
 
+  @overload
+  def ir_instruction(self, id: multiplier.IRInstructionId) -> Optional[multiplier.ir.IRInstruction]:
+    ...
+
+  @overload
   def ir_object(self, id: int) -> Optional[multiplier.ir.IRObject]:
+    ...
+
+  @overload
+  def ir_object(self, id: multiplier.IRObjectId) -> Optional[multiplier.ir.IRObject]:
     ...
 
   def entity(self, eid: int) -> multiplier.Entity:

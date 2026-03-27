@@ -765,6 +765,14 @@ static PyMethodDef gMethods[] = {
 
             return ::mx::to_python(obj->ir_function(std::move(arg_0.value())));
           }
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<PackedIRFunctionId>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->ir_function(std::move(arg_0.value())));
+          }
 
           PyErrorStreamer(PyExc_TypeError)
               << "Invalid arguments passed to 'ir_function'";
@@ -781,6 +789,14 @@ static PyMethodDef gMethods[] = {
           (void) args;
           while (num_args == 1) {
             auto arg_0 = ::mx::from_python<uint64_t>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->ir_block(std::move(arg_0.value())));
+          }
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<PackedIRBlockId>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -809,6 +825,14 @@ static PyMethodDef gMethods[] = {
 
             return ::mx::to_python(obj->ir_instruction(std::move(arg_0.value())));
           }
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<PackedIRInstructionId>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->ir_instruction(std::move(arg_0.value())));
+          }
 
           PyErrorStreamer(PyExc_TypeError)
               << "Invalid arguments passed to 'ir_instruction'";
@@ -825,6 +849,14 @@ static PyMethodDef gMethods[] = {
           (void) args;
           while (num_args == 1) {
             auto arg_0 = ::mx::from_python<uint64_t>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->ir_object(std::move(arg_0.value())));
+          }
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<PackedIRObjectId>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }

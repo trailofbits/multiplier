@@ -360,6 +360,12 @@ enum class IREntityKind : uint8_t {
   IR_OBJECT = 3,
 };
 
+inline static const char *EnumerationName(IREntityKind) {
+  return "IREntityKind";
+}
+
+MX_EXPORT const char *EnumeratorName(IREntityKind) noexcept;
+
 inline static constexpr unsigned NumEnumerators(IREntityKind) {
   return 4u;
 }

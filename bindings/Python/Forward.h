@@ -1463,4 +1463,9 @@ class IncludeMacroDirective;
 enum class IndexStatus : uint32_t;
 class Index;
 class RegexQuery;
+namespace ir {
+enum class OpCode : uint8_t;
+enum class ObjectKind : uint8_t;
+enum class BlockKind : uint8_t;
+}  // namespace ir
 }  // namespace mx
