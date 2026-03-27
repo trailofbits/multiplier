@@ -165,8 +165,7 @@ class BulkInserterState {
         EncodeCategoryKind(mx::EntityCategory::enum_, -1), \
         CreateEntityIndexInsertQuery(mx::EntityCategory::enum_)); \
 
-  MX_FOR_EACH_ENTITY_CATEGORY(
-      MX_IGNORE_ENTITY_CATEGORY,
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
       MX_IGNORE_ENTITY_CATEGORY,
       MX_IGNORE_ENTITY_CATEGORY,
       MX_IGNORE_ENTITY_CATEGORY,
@@ -760,8 +759,7 @@ std::filesystem::path CreateDatabase(const std::filesystem::path &db_path_) {
       db.Execute(query); \
     } while (false);
 
-  MX_FOR_EACH_ENTITY_CATEGORY(
-      MX_IGNORE_ENTITY_CATEGORY,
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
       MX_IGNORE_ENTITY_CATEGORY,
       MX_IGNORE_ENTITY_CATEGORY,
       MX_IGNORE_ENTITY_CATEGORY,

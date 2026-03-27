@@ -6,6 +6,11 @@
 #include "Reference.h"
 
 #include <cassert>
+#include <multiplier/IR/Function.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Instruction.h>
+#include <multiplier/IR/Object.h>
+#include "IR/Impl.h"
 
 #include "Attr.h"
 #include "Compilation.h"
@@ -36,11 +41,14 @@ static OpaqueImplPtr ReferencedEntity(const EntityProviderPtr &ep,
     } else if (std::holds_alternative<type_name ## Id>(vid)) { \
       return OpaqueImplPtr(ep->type_name ## For(ep, raw_id)); \
 
-    MX_FOR_EACH_ENTITY_CATEGORY(MX_DISPATCH_GETTER, MX_IGNORE_ENTITY_CATEGORY,
-                                MX_DISPATCH_GETTER, MX_DISPATCH_GETTER,
-                                MX_DISPATCH_GETTER, MX_DISPATCH_GETTER,
-                                MX_DISPATCH_GETTER,
-                            MX_IGNORE_ENTITY_CATEGORY)
+    MX_FOR_EACH_ENTITY_CATEGORY(MX_DISPATCH_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DISPATCH_GETTER,
+                            MX_DISPATCH_GETTER,
+                            MX_DISPATCH_GETTER,
+                            MX_DISPATCH_GETTER,
+                            MX_DISPATCH_GETTER,
+                            MX_DISPATCH_GETTER)
 #undef MX_DISPATCH_GETTER
 
   // It's a reference to a parsed token resident in a fragment.
@@ -245,13 +253,13 @@ VariantEntity Reference::as_variant(void) const noexcept {
       break;
 
     MX_FOR_EACH_ENTITY_CATEGORY(DEFINE_REF_GETTER,
-                                DEFINE_REF_GETTER,
-                                DEFINE_REF_GETTER,
-                                DEFINE_REF_GETTER,
-                                DEFINE_REF_GETTER,
-                                DEFINE_REF_GETTER,
-                                DEFINE_REF_GETTER,
-                            MX_IGNORE_ENTITY_CATEGORY)
+                            DEFINE_REF_GETTER,
+                            DEFINE_REF_GETTER,
+                            DEFINE_REF_GETTER,
+                            DEFINE_REF_GETTER,
+                            DEFINE_REF_GETTER,
+                            DEFINE_REF_GETTER,
+                            DEFINE_REF_GETTER)
 #undef DEFINE_REF_GETTER
   }
   return NotAnEntity{};
@@ -317,7 +325,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(DEFINE_REF_GETTER,
                             DEFINE_REF_GETTER,
                             DEFINE_REF_GETTER,
                             DEFINE_REF_GETTER,
-                            MX_IGNORE_ENTITY_CATEGORY)
+                            DEFINE_REF_GETTER)
 
 #undef DEFINE_REF_GETTER
 

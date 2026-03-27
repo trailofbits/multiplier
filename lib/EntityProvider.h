@@ -9,10 +9,15 @@
 #include <multiplier/AST.capnp.h>
 #include <multiplier/Index.h>
 #include <multiplier/RPC.capnp.h>
+#include <multiplier/IR/Function.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Instruction.h>
+#include <multiplier/IR/Object.h>
 #include <optional>
 #include <string>
 
 #include "Entity.h"
+#include "IR/Impl.h"
 
 namespace mx {
 
@@ -128,7 +133,7 @@ class EntityProvider {
                               MX_DECLARE_ENTITY_GETTER,
                               MX_DECLARE_ENTITY_GETTER,
                               MX_DECLARE_ENTITY_GETTER,
-                              MX_IGNORE_ENTITY_CATEGORY)
+                              MX_DECLARE_ENTITY_GETTER)
 #undef MX_DECLARE_ENTITY_GETTER
 
 #define MX_DECLARE_ENTITY_LISTERS(ns_path, type_name, lower_name, enum_name, category) \

@@ -4,6 +4,11 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include "SQLiteEntityProvider.h"
+#include <multiplier/IR/Function.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Instruction.h>
+#include <multiplier/IR/Object.h>
+#include "IR/Impl.h"
 
 #include <algorithm>
 #include <array>
@@ -1073,16 +1078,24 @@ gap::generator<RawEntityId> SQLiteEntityProvider::FindSymbol(
 // Go make things like `EntityFor(ep, entity_id)`. E.g. go find a specific
 // declaration by its unique ID in the index.
 MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
-                            MX_IGNORE_ENTITY_CATEGORY,
-                            MX_DECLARE_ENTITY_GETTER,
-                            MX_DECLARE_ENTITY_GETTER,
-                            MX_DECLARE_FRAGMENT_OFFSET_GETTER,
-                            MX_DECLARE_FRAGMENT_PSEUDO_GETTER,
-                            MX_DECLARE_ENTITY_GETTER,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_DECLARE_ENTITY_GETTER,
+                              MX_DECLARE_ENTITY_GETTER,
+                              MX_DECLARE_FRAGMENT_OFFSET_GETTER,
+                              MX_DECLARE_FRAGMENT_PSEUDO_GETTER,
+                              MX_DECLARE_ENTITY_GETTER,
                               MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_ENTITY_GETTER
 #undef MX_DECLARE_FRAGMENT_OFFSET_GETTER
 #undef MX_DECLARE_FRAGMENT_PSEUDO_GETTER
+
+// IR entities are stored inside fragments, not in separate tables.
+// These stubs return nullptr; the read-side API will extract IR data
+// from the fragment's capnp message.
+IRFunctionImplPtr SQLiteEntityProvider::IRFunctionFor(const Ptr &, RawEntityId) { return {}; }
+IRBlockImplPtr SQLiteEntityProvider::IRBlockFor(const Ptr &, RawEntityId) { return {}; }
+IRInstructionImplPtr SQLiteEntityProvider::IRInstructionFor(const Ptr &, RawEntityId) { return {}; }
+IRObjectImplPtr SQLiteEntityProvider::IRObjectFor(const Ptr &, RawEntityId) { return {}; }
 
 // Get a list of `Decl`, `Stmt`, `Attr`, `Designator`, etc.
 #define MX_DECLARE_FRAGMENT_OFFSET_LIST_GETTER(ns_path, type_name, lower_name, enum_name, category) \
@@ -1256,17 +1269,23 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
 // Go make things like `EntitysFor(ep)`. E.g. find all declarations in the
 // index.
 MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_LIST_GETTER,
-                            MX_IGNORE_ENTITY_CATEGORY,
-                            MX_DECLARE_ENTITY_LIST_GETTER,
-                            MX_DECLARE_ENTITY_LIST_GETTER,
-                            MX_DECLARE_FRAGMENT_OFFSET_LIST_GETTER,
-                            MX_DECLARE_FRAGMENT_PSEUDO_LIST_GETTER,
-                            MX_DECLARE_ENTITY_LIST_GETTER,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_DECLARE_ENTITY_LIST_GETTER,
+                              MX_DECLARE_ENTITY_LIST_GETTER,
+                              MX_DECLARE_FRAGMENT_OFFSET_LIST_GETTER,
+                              MX_DECLARE_FRAGMENT_PSEUDO_LIST_GETTER,
+                              MX_DECLARE_ENTITY_LIST_GETTER,
                               MX_IGNORE_ENTITY_CATEGORY)
 
 #undef MX_DECLARE_ENTITY_LIST_GETTER
 #undef MX_DECLARE_FRAGMENT_OFFSET_LIST_GETTER
 #undef MX_DECLARE_FRAGMENT_PSEUDO_LIST_GETTER
+
+// IR entity list stubs.
+gap::generator<IRFunctionImplPtr> SQLiteEntityProvider::IRFunctionsFor(const Ptr &) & { co_return; }
+gap::generator<IRBlockImplPtr> SQLiteEntityProvider::IRBlocksFor(const Ptr &) & { co_return; }
+gap::generator<IRInstructionImplPtr> SQLiteEntityProvider::IRInstructionsFor(const Ptr &) & { co_return; }
+gap::generator<IRObjectImplPtr> SQLiteEntityProvider::IRObjectsFor(const Ptr &) & { co_return; }
 
 // Get all types of a specific kind.
 gap::generator<TypeImplPtr> SQLiteEntityProvider::TypesFor(
@@ -1379,12 +1398,12 @@ gap::generator<TypeImplPtr> SQLiteEntityProvider::TypesFor(
     }
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
-                            MX_IGNORE_ENTITY_CATEGORY,
-                            MX_IGNORE_ENTITY_CATEGORY,
-                            MX_IGNORE_ENTITY_CATEGORY,
-                            MX_DECLARE_FRAGMENT_OFFSET_LISTERS,
-                            MX_IGNORE_ENTITY_CATEGORY,
-                            MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_DECLARE_FRAGMENT_OFFSET_LISTERS,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_FRAGMENT_OFFSET_LISTERS
 

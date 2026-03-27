@@ -383,12 +383,12 @@ inline static RawEntityId DefinitionId(const Args&...) {
     }
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
-                            MX_IGNORE_ENTITY_CATEGORY,
-                            MX_IGNORE_ENTITY_CATEGORY,
-                            MX_IGNORE_ENTITY_CATEGORY,
-                            MX_DECLARE_FRAGMENT_OFFSET_LISTERS,
-                            MX_DECLARE_FRAGMENT_PSEUDO_LISTERS,
-                            MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_DECLARE_FRAGMENT_OFFSET_LISTERS,
+                              MX_DECLARE_FRAGMENT_PSEUDO_LISTERS,
+                              MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_FRAGMENT_OFFSET_LISTERS
 #undef MX_DECLARE_FRAGMENT_PSEUDO_LISTERS
