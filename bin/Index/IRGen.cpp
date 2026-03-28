@@ -1149,18 +1149,30 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
   if (auto ne = pasta::CXXNewExpr::From(e)) {
     InstructionIR inst;
     inst.source_entity_id = eid;
-    if (ne->IsArray()) {
-      inst.opcode = mx::ir::OpCode::NEW_ARRAY;
+    inst.type_entity_id = TypeEntityIdOf(ne->AllocatedType());
+
+    auto placement_args = ne->PlacementArguments();
+    bool is_placement = !placement_args.empty();
+    bool is_array = ne->IsArray();
+
+    if (is_placement) {
+      inst.opcode = is_array ? mx::ir::OpCode::PLACEMENT_NEW_ARRAY
+                             : mx::ir::OpCode::PLACEMENT_NEW;
+    } else {
+      inst.opcode = is_array ? mx::ir::OpCode::NEW_ARRAY
+                             : mx::ir::OpCode::NEW;
+    }
+
+    if (is_array) {
       if (auto sz = ne->ArraySize()) {
         inst.operand_indices.push_back(EmitRValue(*sz));
       }
-    } else {
-      inst.opcode = mx::ir::OpCode::NEW;
     }
-    inst.type_entity_id = TypeEntityIdOf(ne->AllocatedType());
-    for (const auto &arg : ne->PlacementArguments()) {
+
+    for (const auto &arg : placement_args) {
       inst.operand_indices.push_back(EmitRValue(arg));
     }
+
     return EmitInstruction(std::move(inst));
   }
 

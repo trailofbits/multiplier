@@ -83,6 +83,8 @@ const char *EnumeratorName(OpCode op) noexcept {
     case OpCode::VIRTUAL_METHOD_CALL: return "VIRTUAL_METHOD_CALL";
     case OpCode::NEW: return "NEW";
     case OpCode::NEW_ARRAY: return "NEW_ARRAY";
+    case OpCode::PLACEMENT_NEW: return "PLACEMENT_NEW";
+    case OpCode::PLACEMENT_NEW_ARRAY: return "PLACEMENT_NEW_ARRAY";
     case OpCode::DELETE: return "DELETE";
     case OpCode::DELETE_ARRAY: return "DELETE_ARRAY";
     case OpCode::UNKNOWN: return "UNKNOWN";

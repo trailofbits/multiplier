@@ -114,13 +114,15 @@ enum class OpCode : uint8_t {
   VIRTUAL_METHOD_CALL = 68,  // virtual/override method call (dynamic dispatch)
 
   // C++ new/delete
-  NEW = 69,                  // op[0..] = placement args; typeEntityId = allocated type
-  NEW_ARRAY = 70,            // op[0] = array size, op[1..] = placement args; typeEntityId = element type
-  DELETE = 71,               // op[0] = pointer to delete
-  DELETE_ARRAY = 72,         // op[0] = pointer to delete
+  NEW = 69,                  // typeEntityId = allocated type
+  NEW_ARRAY = 70,            // op[0] = array size; typeEntityId = element type
+  PLACEMENT_NEW = 71,        // op[0] = placement address, op[1..] = other placement args; typeEntityId = allocated type
+  PLACEMENT_NEW_ARRAY = 72,  // op[0] = array size, op[1] = placement address, op[2..] = other placement args
+  DELETE = 73,               // op[0] = pointer to delete
+  DELETE_ARRAY = 74,         // op[0] = pointer to delete
 
   // Unknown / unhandled expression
-  UNKNOWN = 73,
+  UNKNOWN = 75,
 };
 
 // Returns the human-readable name of an opcode.
@@ -131,7 +133,7 @@ inline static const char *EnumerationName(OpCode) {
 const char *EnumeratorName(OpCode op) noexcept;
 
 inline static constexpr unsigned NumEnumerators(OpCode) {
-  return 74u;
+  return 76u;
 }
 
 // Classification helpers.
