@@ -6,8 +6,11 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 #include <multiplier/IR.capnp.h>
 #include <multiplier/RPC.capnp.h>
+
+#include "IRGen.h"
 
 namespace pasta {
 class AST;
@@ -19,11 +22,19 @@ class EntityMapper;
 class PendingFragment;
 class ProgressBar;
 
-void GenerateAndSerializeIR(
+// Step 1: Generate IR for all function bodies in the fragment.
+// Returns the generated IR functions. Also populates the reverse map
+// on the EntityMapper (AST entity ID → IR instruction entity ID).
+std::vector<ir::FunctionIR> GenerateIR(
     const pasta::AST &ast,
     const PendingFragment &pf,
-    const EntityMapper &em,
-    mx::rpc::Fragment::Builder &fb,
+    EntityMapper &em,
     const std::unique_ptr<ProgressBar> &progress);
+
+// Step 2: Serialize previously-generated IR into the fragment proto.
+void SerializeIR(
+    const std::vector<ir::FunctionIR> &ir_functions,
+    const PendingFragment &pf,
+    mx::rpc::Fragment::Builder &fb);
 
 }  // namespace indexer

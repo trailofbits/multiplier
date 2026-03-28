@@ -50,6 +50,18 @@ mx::RawEntityId EntityMapper::ParentStmtId(const void *entity) const {
   }
 }
 
+mx::RawEntityId EntityMapper::IRInstructionId(const void *entity) const {
+  auto ast_eid = EntityId(entity);
+  if (ast_eid == mx::kInvalidEntityId) {
+    return mx::kInvalidEntityId;
+  }
+  auto it = ir_for_entity.find(ast_eid);
+  if (it != ir_for_entity.end()) {
+    return it->second;
+  }
+  return mx::kInvalidEntityId;
+}
+
 mx::RawEntityId EntityMapper::EntityId(const void *entity) const {
   if (!entity) {
     return mx::kInvalidEntityId;

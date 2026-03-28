@@ -2388,6 +2388,33 @@ MethodListPtr CodeGenerator::RunOnClass(
       make_parent("parent_statement", "MX_VISIT_STMT_LINK", "Stmt");
     }
 
+    // `*::ir_instruction()` -- the IR instruction corresponding to this entity.
+    if (class_name == "Decl" || class_name == "Stmt") {
+      auto sd = storage.AddMethod("UInt64");  // IR instruction entity ID.
+      auto [cd_getter_name, cd_setter_name, cd_init_name] = NamesFor(sd);
+
+      class_os
+          << "  std::optional<IRInstruction> ir_instruction(void) const;\n";
+
+      serialize_inc_os
+          << "  MX_VISIT_ENTITY_ID(" << class_name
+          << ", ir_instruction, " << sd << ")\n";
+
+      serialize_cpp_os
+          << "  b." << cd_setter_name << "(es.IRInstructionId(e));\n";
+
+      lib_cpp_os
+          << "std::optional<IRInstruction> " << class_name << "::ir_instruction(void) const {\n"
+          << "  if (auto id = impl->reader." << cd_getter_name << "(); "
+          << "id != kInvalidEntityId) {\n"
+          << "    if (auto eptr = impl->ep->IRInstructionFor(impl->ep, id)) {\n"
+          << "      return IRInstruction(std::move(eptr));\n"
+          << "    }\n"
+          << "  }\n"
+          << "  return std::nullopt;\n"
+          << "}\n\n";
+    }
+
     // `Decl::is_definition`
     if (class_name == "Decl") {
       const auto def = storage.AddMethod("Bool");

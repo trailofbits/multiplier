@@ -205,14 +205,17 @@ static void SerializeObject(
 
 }  // namespace
 
-void GenerateAndSerializeIR(
+std::vector<ir::FunctionIR> GenerateIR(
     const pasta::AST &ast,
     const PendingFragment &pf,
-    const EntityMapper &em,
-    mx::rpc::Fragment::Builder &fb,
+    EntityMapper &em,
     const std::unique_ptr<ProgressBar> &progress) {
 
   std::vector<ir::FunctionIR> ir_functions;
+  RawEntityId fragment_id = pf.fragment_id.Unpack().fragment_id;
+
+  // Track cumulative offsets for computing entity IDs.
+  uint32_t inst_offset = 0;
 
   for (const auto &decl : pf.top_level_decls) {
     auto func = pasta::FunctionDecl::From(decl);
@@ -221,16 +224,37 @@ void GenerateAndSerializeIR(
     ProgressBarWork ir_tracker(progress);
     ir::IRGenerator gen(ast, em);
     auto ir = gen.Generate(*func);
-    if (ir) {
-      ir_functions.push_back(std::move(*ir));
-    } else {
+    if (!ir) {
       DCHECK(false) << "IR generation returned nullopt for function with body";
+      continue;
     }
+
+    // Build the reverse map: AST entity ID → IR instruction entity ID.
+    // Each instruction's entity ID is (fragment_id, kIRInstruction sub_kind, offset).
+    for (uint32_t i = 0; i < ir->instructions.size(); ++i) {
+      auto &inst = ir->instructions[i];
+      if (inst.source_entity_id != kInvalidEntityId) {
+        auto ir_eid = mx::EntityId(mx::IRInstructionId{
+            fragment_id, inst_offset + i,
+            static_cast<uint8_t>(inst.opcode)}).Pack();
+        em.ir_for_entity[inst.source_entity_id] = ir_eid;
+      }
+    }
+
+    inst_offset += static_cast<uint32_t>(ir->instructions.size());
+    ir_functions.push_back(std::move(*ir));
   }
+
+  return ir_functions;
+}
+
+void SerializeIR(
+    const std::vector<ir::FunctionIR> &ir_functions,
+    const PendingFragment &pf,
+    mx::rpc::Fragment::Builder &fb) {
 
   if (ir_functions.empty()) return;
 
-  // Count total IR entities across all functions.
   uint32_t total_blocks = 0;
   uint32_t total_instructions = 0;
   uint32_t total_objects = 0;
@@ -240,7 +264,6 @@ void GenerateAndSerializeIR(
     total_objects += static_cast<uint32_t>(func.objects.size());
   }
 
-  // Initialize the flat lists in the fragment.
   auto frag_funcs = fb.initIrFunctions(ir_functions.size());
   auto frag_blocks = fb.initIrBlocks(total_blocks);
   auto frag_insts = fb.initIrInstructions(total_instructions);
@@ -255,12 +278,10 @@ void GenerateAndSerializeIR(
   for (size_t fi = 0; fi < ir_functions.size(); ++fi) {
     const auto &func = ir_functions[fi];
 
-    // Serialize objects.
     for (size_t oi = 0; oi < func.objects.size(); ++oi) {
       SerializeObject(frag_objs[obj_offset + oi], func.objects[oi]);
     }
 
-    // Serialize instructions.
     for (size_t ii = 0; ii < func.instructions.size(); ++ii) {
       SerializeInstruction(frag_insts[inst_offset + ii],
                            func.instructions[ii], func,
@@ -268,14 +289,12 @@ void GenerateAndSerializeIR(
                            block_offset, inst_offset);
     }
 
-    // Serialize blocks.
     for (size_t bi = 0; bi < func.blocks.size(); ++bi) {
       SerializeBlock(frag_blocks[block_offset + bi],
                      func.blocks[bi], func,
                      fragment_id, block_offset, inst_offset);
     }
 
-    // Serialize function.
     SerializeFunction(frag_funcs[fi], func,
                       fragment_id, block_offset, obj_offset);
 
