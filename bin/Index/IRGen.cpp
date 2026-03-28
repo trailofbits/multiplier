@@ -1399,6 +1399,40 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     }
   }
 
+  // CXXNullPtrLiteralExpr -- nullptr.
+  if (pasta::CXXNullPtrLiteralExpr::From(e)) {
+    InstructionIR inst;
+    inst.opcode = mx::ir::OpCode::CONST_NULL;
+    inst.source_entity_id = eid;
+    return EmitInstruction(std::move(inst));
+  }
+
+  // CXXBoolLiteralExpr -- true/false.
+  if (auto bl = pasta::CXXBoolLiteralExpr::From(e)) {
+    InstructionIR inst;
+    inst.opcode = mx::ir::OpCode::CONST_INT;
+    inst.source_entity_id = eid;
+    inst.int_value = bl->Value() ? 1 : 0;
+    inst.uint_value = bl->Value() ? 1 : 0;
+    inst.width = 1;
+    if (auto t = e.Type()) inst.type_entity_id = TypeEntityIdOf(*t);
+    return EmitInstruction(std::move(inst));
+  }
+
+  // ParenListExpr -- parenthesized list of expressions (template/initializer contexts).
+  if (auto ple = pasta::ParenListExpr::From(e)) {
+    auto children = ple->Children();
+    uint32_t last_idx = 0;
+    bool any = false;
+    for (const auto &child : children) {
+      if (auto child_expr = pasta::Expr::From(child)) {
+        last_idx = EmitRValue(*child_expr);
+        any = true;
+      }
+    }
+    if (any) return last_idx;
+  }
+
   // Unhandled expression -- emit UNKNOWN with the source entity ID so
   // the user can inspect what wasn't lowered.
   DCHECK(false) << "Unhandled expression kind in IR generation";
