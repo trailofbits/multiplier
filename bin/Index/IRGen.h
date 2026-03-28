@@ -43,7 +43,6 @@ namespace ir {
 
 struct BranchTargetIR {
   uint32_t block_index{0};
-  std::vector<uint32_t> arg_indices;
 };
 
 struct InstructionIR {
@@ -82,9 +81,7 @@ struct BlockIR {
   mx::ir::BlockKind kind{mx::ir::BlockKind::GENERIC};
 
   // Top-level instruction indices (roots of expression trees).
-  // Block arg defs come first (count = num_arguments).
   std::vector<uint32_t> instruction_indices;
-  uint8_t num_arguments{0};
 
   // Block indices.
   std::vector<uint32_t> successor_indices;

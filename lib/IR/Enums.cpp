@@ -12,7 +12,6 @@ namespace mx::ir {
 
 const char *EnumeratorName(OpCode op) noexcept {
   switch (op) {
-    case OpCode::BLOCK_ARG_DEF: return "BLOCK_ARG_DEF";
     case OpCode::CONST_INT: return "CONST_INT";
     case OpCode::CONST_FLOAT: return "CONST_FLOAT";
     case OpCode::CONST_NULL: return "CONST_NULL";

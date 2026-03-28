@@ -48,12 +48,6 @@ static void SerializeBranchTarget(
 
   bt.setBlockId(MakeBlockEid(func, fragment_id, ir_block_base_offset,
                               src.block_index));
-
-  auto args = bt.initArgs(src.arg_indices.size());
-  for (size_t i = 0; i < src.arg_indices.size(); ++i) {
-    args.set(i, MakeInstEid(func, fragment_id, ir_inst_base_offset,
-                             src.arg_indices[i]));
-  }
 }
 
 static void SerializeInstruction(
@@ -125,7 +119,6 @@ static void SerializeBlock(
     insts.set(i, MakeInstEid(func, fragment_id, ir_inst_base_offset,
                               src.instruction_indices[i]));
   }
-  bb.setNumArguments(src.num_arguments);
 
   auto succs = bb.initSuccessors(src.successor_indices.size());
   for (size_t i = 0; i < src.successor_indices.size(); ++i) {

@@ -50,7 +50,6 @@ struct Instruction @0xc6bb311936d9962b {
   # ---------- OpCode-specific fields ----------
   # Which fields are meaningful depends on the opcode:
   #
-  #   blockArgDef:    typeEntityId
   #   constInt:       intValue, uintValue, width
   #   constFloat:     floatValue, width
   #   alloca:         objectId
@@ -145,9 +144,6 @@ struct Instruction @0xc6bb311936d9962b {
 struct BranchTarget @0x8fcdc16a959ce793 {
   # IRBlockId entity ID of the target block.
   blockId @0 :UInt64;
-
-  # IRInstructionId entity IDs of values passed as block arguments.
-  args @1 :List(UInt64);
 }
 
 # ---------------------------------------------------------------------------
@@ -161,21 +157,17 @@ struct Block @0xb1141386bcc94b26 {
   # IRInstructionId entity IDs. These are ALL instructions belonging to this
   # block (including sub-expressions), laid out children-before-parents.
   # Top-level (statement-root) instructions have parentOffset == 0.
-  # Block argument defs come first (count = numArguments).
   instructions @1 :List(UInt64);
 
-  # How many of the leading top-level instructions are block argument defs.
-  numArguments @2 :UInt8;
-
   # IRBlockId entity IDs.
-  successors @3 :List(UInt64);
-  predecessors @4 :List(UInt64);
+  successors @2 :List(UInt64);
+  predecessors @3 :List(UInt64);
 
   # Dominator tree information (IRBlockId entity IDs).
-  dominators @5 :List(UInt64);
-  postDominators @6 :List(UInt64);
-  immediateDominator @7 :UInt64;      # 0 = none (entry block)
-  immediatePostDominator @8 :UInt64;  # 0 = none (exit blocks)
+  dominators @4 :List(UInt64);
+  postDominators @5 :List(UInt64);
+  immediateDominator @6 :UInt64;      # 0 = none (entry block)
+  immediatePostDominator @7 :UInt64;  # 0 = none (exit blocks)
 }
 
 # ---------------------------------------------------------------------------

@@ -63,6 +63,10 @@ Instructions under short-circuit operators or ternary branches are marked with `
 
 Variadic function calls emit a `VA_PACK` instruction grouping the variadic arguments, placed where the `...` parameter would be. The receiving side uses `VA_START`, `VA_ARG`, `VA_COPY`, `VA_END` opcodes.
 
+### Alloca-Based Memory Model
+
+All local variables use alloca/load/store, even non-address-taken ones. There are no SSA phi nodes or block arguments. The `LOCAL_VALUE`/`PARAMETER_VALUE` object kinds mark variables that *could* be promoted to SSA by a future `mem2reg` pass, but currently all variables go through memory.
+
 ### Dominator Trees
 
 Dominator and post-dominator trees are computed at index time (Cooper-Harvey-Kennedy algorithm) and stored directly on each block as entity ID lists. Immediate dominator/post-dominator are also stored.
@@ -71,7 +75,7 @@ Dominator and post-dominator trees are computed at index time (Cooper-Harvey-Ken
 
 - Pointer arithmetic lowering (ptr + int → GEP_INDEX)
 - C++ specific: constructors, destructors, new/delete, lambdas, exceptions
-- `mem2reg` pass to promote `LOCAL_VALUE`/`PARAMETER_VALUE` to SSA with block arguments
+- `mem2reg` pass to promote `LOCAL_VALUE`/`PARAMETER_VALUE` to SSA
 - Use-def chains
 - String literal content storage
 - Read-side C++ API (Value/BlockArgument/Instruction class hierarchy)
