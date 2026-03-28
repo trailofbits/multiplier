@@ -7,10 +7,14 @@
 
 #include "../Compiler.h"
 #include "../Types.h"
+#include "ObjectKind.h"
 #include <memory>
+#include <optional>
 
 namespace mx {
 
+class VarDecl;
+class Type;
 class IRObjectImpl;
 using IRObjectImplPtr = std::shared_ptr<const IRObjectImpl>;
 
@@ -18,6 +22,8 @@ class MX_EXPORT IRObject {
  private:
   friend class EntityProvider;
   friend class Index;
+  friend class IRFunction;
+  friend class IRInstruction;
   IRObjectImplPtr impl;
 
  public:
@@ -25,7 +31,16 @@ class MX_EXPORT IRObject {
   explicit IRObject(IRObjectImplPtr impl_)
       : impl(std::move(impl_)) {}
 
-  EntityId id(void) const { return EntityId(); }  // TODO
+  EntityId id(void) const;
+  ir::ObjectKind kind(void) const;
+
+  std::optional<VarDecl> source_declaration(void) const;
+  std::optional<Type> type(void) const;
+  uint32_t size_bytes(void) const;
+  uint32_t align_bytes(void) const;
+  bool needs_memory(void) const;
+
+  inline operator bool(void) const { return !!impl; }
 };
 
 }  // namespace mx

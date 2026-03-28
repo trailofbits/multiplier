@@ -5,29 +5,83 @@
 
 #pragma once
 
+#include <multiplier/Types.h>
+#include <multiplier/IR.capnp.h>
+#include <multiplier/RPC.capnp.h>
+
+#include "../Entity.h"
+
 namespace mx {
 
-// Stub Impl classes for IR entities. These will be fleshed out when
-// the read-side API is implemented.
+class FragmentImpl;
+using FragmentImplPtr = std::shared_ptr<const FragmentImpl>;
+
+// All IR entity impls hold a reference to the containing fragment
+// (keeps capnp data alive) plus the offset into the fragment's flat list.
+// The fragment_id is needed to construct entity IDs.
 
 class IRFunctionImpl {
  public:
-  virtual ~IRFunctionImpl(void) = default;
+  const FragmentImplPtr frag;
+  const unsigned offset;
+  const RawEntityId fragment_id;
+
+  IRFunctionImpl(FragmentImplPtr frag_, unsigned offset_,
+                 RawEntityId fragment_id_)
+      : frag(std::move(frag_)), offset(offset_),
+        fragment_id(fragment_id_) {}
+
+  rpc::ir::Function::Reader reader() const;
+
+  virtual ~IRFunctionImpl() = default;
 };
 
 class IRBlockImpl {
  public:
-  virtual ~IRBlockImpl(void) = default;
+  const FragmentImplPtr frag;
+  const unsigned offset;
+  const RawEntityId fragment_id;
+
+  IRBlockImpl(FragmentImplPtr frag_, unsigned offset_,
+              RawEntityId fragment_id_)
+      : frag(std::move(frag_)), offset(offset_),
+        fragment_id(fragment_id_) {}
+
+  rpc::ir::Block::Reader reader() const;
+
+  virtual ~IRBlockImpl() = default;
 };
 
 class IRInstructionImpl {
  public:
-  virtual ~IRInstructionImpl(void) = default;
+  const FragmentImplPtr frag;
+  const unsigned offset;
+  const RawEntityId fragment_id;
+
+  IRInstructionImpl(FragmentImplPtr frag_, unsigned offset_,
+                    RawEntityId fragment_id_)
+      : frag(std::move(frag_)), offset(offset_),
+        fragment_id(fragment_id_) {}
+
+  rpc::ir::Instruction::Reader reader() const;
+
+  virtual ~IRInstructionImpl() = default;
 };
 
 class IRObjectImpl {
  public:
-  virtual ~IRObjectImpl(void) = default;
+  const FragmentImplPtr frag;
+  const unsigned offset;
+  const RawEntityId fragment_id;
+
+  IRObjectImpl(FragmentImplPtr frag_, unsigned offset_,
+               RawEntityId fragment_id_)
+      : frag(std::move(frag_)), offset(offset_),
+        fragment_id(fragment_id_) {}
+
+  rpc::ir::Object::Reader reader() const;
+
+  virtual ~IRObjectImpl() = default;
 };
 
 }  // namespace mx
