@@ -1254,26 +1254,18 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     }
   }
 
-  // InitListExpr -- emit each initializer, return the last value.
+  // InitListExpr -- aggregate initialization. Operands are the initializer values.
   if (auto ile = pasta::InitListExpr::From(e)) {
-    uint32_t last_idx = 0;
-    bool first = true;
+    InstructionIR inst;
+    inst.opcode = mx::ir::OpCode::INIT_LIST;
+    inst.source_entity_id = eid;
+    if (auto t = e.Type()) inst.type_entity_id = TypeEntityIdOf(*t);
     for (const auto &child : ile->Children()) {
       if (auto child_expr = pasta::Expr::From(child)) {
-        last_idx = EmitRValue(*child_expr);
-        first = false;
+        inst.operand_indices.push_back(EmitRValue(*child_expr));
       }
     }
-    if (first) {
-      // Empty init list.
-      InstructionIR inst;
-      inst.opcode = mx::ir::OpCode::CONST_INT;
-      inst.source_entity_id = eid;
-      inst.int_value = 0;
-      inst.width = 32;
-      return EmitInstruction(std::move(inst));
-    }
-    return last_idx;
+    return EmitInstruction(std::move(inst));
   }
 
   // CompoundLiteralExpr -- emit the initializer.

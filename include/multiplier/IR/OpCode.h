@@ -104,8 +104,11 @@ enum class OpCode : uint8_t {
   VA_COPY = 64,           // copies va_list; op[0] = dest, op[1] = src
   VA_END = 65,            // releases va_list; op[0] = va_list
 
+  // Aggregate initialization
+  INIT_LIST = 66,          // {a, b, c} -- operands are the initializer values
+
   // Unknown / unhandled expression
-  UNKNOWN = 66,
+  UNKNOWN = 67,
 };
 
 // Returns the human-readable name of an opcode.
@@ -116,7 +119,7 @@ inline static const char *EnumerationName(OpCode) {
 const char *EnumeratorName(OpCode op) noexcept;
 
 inline static constexpr unsigned NumEnumerators(OpCode) {
-  return 67u;
+  return 68u;
 }
 
 // Classification helpers.

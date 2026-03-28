@@ -78,6 +78,7 @@ const char *EnumeratorName(OpCode op) noexcept {
     case OpCode::VA_ARG: return "VA_ARG";
     case OpCode::VA_COPY: return "VA_COPY";
     case OpCode::VA_END: return "VA_END";
+    case OpCode::INIT_LIST: return "INIT_LIST";
     case OpCode::UNKNOWN: return "UNKNOWN";
   }
   return "UNKNOWN";
