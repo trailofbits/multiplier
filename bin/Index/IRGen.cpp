@@ -1316,6 +1316,13 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     return EmitInstruction(std::move(inst));
   }
 
+  // PredefinedExpr (__func__, __FUNCTION__, __PRETTY_FUNCTION__) -- unwrap to the StringLiteral.
+  if (auto pe = pasta::PredefinedExpr::From(e)) {
+    if (auto fn = pe->FunctionName()) {
+      return EmitRValue(*fn);
+    }
+  }
+
   // Unhandled expression -- emit UNKNOWN with the source entity ID so
   // the user can inspect what wasn't lowered.
   DCHECK(false) << "Unhandled expression kind in IR generation";
