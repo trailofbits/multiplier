@@ -1419,23 +1419,8 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     return EmitInstruction(std::move(inst));
   }
 
-  // ParenListExpr -- parenthesized list of expressions (template/initializer contexts).
-  if (auto ple = pasta::ParenListExpr::From(e)) {
-    auto children = ple->Children();
-    uint32_t last_idx = 0;
-    bool any = false;
-    for (const auto &child : children) {
-      if (auto child_expr = pasta::Expr::From(child)) {
-        last_idx = EmitRValue(*child_expr);
-        any = true;
-      }
-    }
-    if (any) return last_idx;
-  }
-
-  // Unhandled expression -- emit UNKNOWN with the source entity ID so
-  // the user can inspect what wasn't lowered.
-  DCHECK(false) << "Unhandled expression kind in IR generation";
+  // Emit UNKNOWN for anything we haven't explicitly handled.
+  // The source_entity_id lets the user inspect the original AST node.
   InstructionIR inst;
   inst.opcode = mx::ir::OpCode::UNKNOWN;
   inst.source_entity_id = eid;
