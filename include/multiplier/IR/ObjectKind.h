@@ -22,6 +22,7 @@ enum class ObjectKind : uint8_t {
   RETURN_SLOT = 8,        // implicit return value storage
   ALLOCA = 9,             // dynamic alloca (VLA, etc.)
   HEAP = 10,              // dynamically allocated (malloc, etc.)
+  THIS_PARAMETER = 11,    // implicit 'this' pointer in C++ methods
 };
 
 inline static const char *EnumerationName(ObjectKind) {
@@ -31,7 +32,7 @@ inline static const char *EnumerationName(ObjectKind) {
 const char *EnumeratorName(ObjectKind kind) noexcept;
 
 inline static constexpr unsigned NumEnumerators(ObjectKind) {
-  return 11u;
+  return 12u;
 }
 
 // Is this an address-taken object that needs memory operations?
@@ -46,6 +47,7 @@ inline bool NeedsMemory(ObjectKind kind) {
     case ObjectKind::RETURN_SLOT:
     case ObjectKind::ALLOCA:
     case ObjectKind::HEAP:
+    case ObjectKind::THIS_PARAMETER:
       return true;
     case ObjectKind::LOCAL_VALUE:
     case ObjectKind::PARAMETER_VALUE:

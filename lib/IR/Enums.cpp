@@ -79,6 +79,12 @@ const char *EnumeratorName(OpCode op) noexcept {
     case OpCode::VA_COPY: return "VA_COPY";
     case OpCode::VA_END: return "VA_END";
     case OpCode::INIT_LIST: return "INIT_LIST";
+    case OpCode::METHOD_CALL: return "METHOD_CALL";
+    case OpCode::VIRTUAL_METHOD_CALL: return "VIRTUAL_METHOD_CALL";
+    case OpCode::NEW: return "NEW";
+    case OpCode::NEW_ARRAY: return "NEW_ARRAY";
+    case OpCode::DELETE: return "DELETE";
+    case OpCode::DELETE_ARRAY: return "DELETE_ARRAY";
     case OpCode::UNKNOWN: return "UNKNOWN";
   }
   return "UNKNOWN";
@@ -97,6 +103,7 @@ const char *EnumeratorName(ObjectKind kind) noexcept {
     case ObjectKind::RETURN_SLOT: return "RETURN_SLOT";
     case ObjectKind::ALLOCA: return "ALLOCA";
     case ObjectKind::HEAP: return "HEAP";
+    case ObjectKind::THIS_PARAMETER: return "THIS_PARAMETER";
   }
   return "UNKNOWN";
 }

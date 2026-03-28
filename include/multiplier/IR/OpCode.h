@@ -107,8 +107,20 @@ enum class OpCode : uint8_t {
   // Aggregate initialization
   INIT_LIST = 66,          // {a, b, c} -- operands are the initializer values
 
+  // Method calls (C++ instance/member function)
+  // op[0] = this/base object, op[1..] = arguments
+  // targetEntityId = CXXMethodDecl
+  METHOD_CALL = 67,          // non-virtual method call
+  VIRTUAL_METHOD_CALL = 68,  // virtual/override method call (dynamic dispatch)
+
+  // C++ new/delete
+  NEW = 69,                  // op[0..] = placement args; typeEntityId = allocated type
+  NEW_ARRAY = 70,            // op[0] = array size, op[1..] = placement args; typeEntityId = element type
+  DELETE = 71,               // op[0] = pointer to delete
+  DELETE_ARRAY = 72,         // op[0] = pointer to delete
+
   // Unknown / unhandled expression
-  UNKNOWN = 67,
+  UNKNOWN = 73,
 };
 
 // Returns the human-readable name of an opcode.
@@ -119,7 +131,7 @@ inline static const char *EnumerationName(OpCode) {
 const char *EnumeratorName(OpCode op) noexcept;
 
 inline static constexpr unsigned NumEnumerators(OpCode) {
-  return 68u;
+  return 74u;
 }
 
 // Classification helpers.
