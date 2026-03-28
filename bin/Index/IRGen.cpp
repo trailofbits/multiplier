@@ -1308,6 +1308,15 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     return EmitInstruction(std::move(inst));
   }
 
+  // CXXThisExpr -- implicit 'this' pointer, treat as a load of the implicit parameter.
+  if (pasta::CXXThisExpr::From(e)) {
+    InstructionIR inst;
+    inst.opcode = mx::ir::OpCode::LOAD;
+    inst.source_entity_id = eid;
+    if (auto t = e.Type()) inst.type_entity_id = TypeEntityIdOf(*t);
+    return EmitInstruction(std::move(inst));
+  }
+
   // PredefinedExpr (__func__, __FUNCTION__, __PRETTY_FUNCTION__) -- unwrap to the StringLiteral.
   if (auto pe = pasta::PredefinedExpr::From(e)) {
     if (auto fn = pe->FunctionName()) {
