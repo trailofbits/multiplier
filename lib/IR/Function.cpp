@@ -6,9 +6,13 @@
 #include <multiplier/IR/Function.h>
 #include <multiplier/IR/Block.h>
 #include <multiplier/IR/Object.h>
+#include <multiplier/AST/Decl.h>
+#include <multiplier/AST/FunctionDecl.h>
+#include <multiplier/Fragment.h>
 
 #include "Impl.h"
 #include "../Fragment.h"
+#include "../EntityProvider.h"
 
 namespace mx {
 
@@ -51,6 +55,34 @@ gap::generator<IRObject> IRFunction::objects(void) const & {
           impl->frag, oid->offset, impl->fragment_id));
     }
   }
+}
+
+std::optional<FunctionDecl> IRFunction::declaration(void) const {
+  if (!impl) return std::nullopt;
+  auto eid = impl->reader().getFuncDeclEntityId();
+  if (eid == kInvalidEntityId) return std::nullopt;
+  if (auto ptr = impl->frag->ep->DeclFor(impl->frag->ep, eid)) {
+    auto decl = Decl(std::move(ptr));
+    return FunctionDecl::from(decl);
+  }
+  return std::nullopt;
+}
+
+std::optional<IRFunction> IRFunction::from(const FunctionDecl &decl) {
+  auto frag = Fragment::containing(decl);
+  if (!frag.impl) return std::nullopt;
+
+  auto decl_eid = decl.id().Pack();
+  auto ir_funcs = frag.impl->reader.getIrFunctions();
+  auto frag_id = frag.impl->fragment_id;
+
+  for (unsigned i = 0; i < ir_funcs.size(); ++i) {
+    if (ir_funcs[i].getFuncDeclEntityId() == decl_eid) {
+      return IRFunction(std::make_shared<IRFunctionImpl>(
+          frag.impl, i, frag_id));
+    }
+  }
+  return std::nullopt;
 }
 
 }  // namespace mx

@@ -323,6 +323,13 @@ if(MX_ENABLE_INSTALL AND NOT MX_ENABLE_BOOTSTRAP)
     DESTINATION
       "${MX_INSTALL_INCLUDE_DIR}/${lower_project_name}"
   )
+  file(GLOB ir_headers CONFIGURE_DEPENDS "${source_include_dir}/IR/*.h")
+  install(
+    FILES
+      ${ir_headers}
+    DESTINATION
+      "${MX_INSTALL_INCLUDE_DIR}/${lower_project_name}/IR"
+  )
   install(
     TARGETS
       "multiplier"

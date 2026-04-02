@@ -1089,13 +1089,47 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
 #undef MX_DECLARE_FRAGMENT_OFFSET_GETTER
 #undef MX_DECLARE_FRAGMENT_PSEUDO_GETTER
 
-// IR entities are stored inside fragments, not in separate tables.
-// These stubs return nullptr; the read-side API will extract IR data
-// from the fragment's capnp message.
-IRFunctionImplPtr SQLiteEntityProvider::IRFunctionFor(const Ptr &, RawEntityId) { return {}; }
-IRBlockImplPtr SQLiteEntityProvider::IRBlockFor(const Ptr &, RawEntityId) { return {}; }
-IRInstructionImplPtr SQLiteEntityProvider::IRInstructionFor(const Ptr &, RawEntityId) { return {}; }
-IRObjectImplPtr SQLiteEntityProvider::IRObjectFor(const Ptr &, RawEntityId) { return {}; }
+// IR entities are stored inside fragments. Extract the fragment_id from the
+// entity ID, load the fragment, and create an impl with the offset.
+IRFunctionImplPtr SQLiteEntityProvider::IRFunctionFor(
+    const Ptr &self, RawEntityId raw_id) {
+  auto eid = EntityId(raw_id).Extract<IRFunctionId>();
+  if (!eid) return {};
+  auto frag = self->FragmentFor(self, PackedFragmentId(FragmentId(eid->fragment_id)));
+  if (!frag) return {};
+  return std::make_shared<IRFunctionImpl>(
+      std::move(frag), eid->offset, eid->fragment_id);
+}
+
+IRBlockImplPtr SQLiteEntityProvider::IRBlockFor(
+    const Ptr &self, RawEntityId raw_id) {
+  auto eid = EntityId(raw_id).Extract<IRBlockId>();
+  if (!eid) return {};
+  auto frag = self->FragmentFor(self, PackedFragmentId(FragmentId(eid->fragment_id)));
+  if (!frag) return {};
+  return std::make_shared<IRBlockImpl>(
+      std::move(frag), eid->offset, eid->fragment_id);
+}
+
+IRInstructionImplPtr SQLiteEntityProvider::IRInstructionFor(
+    const Ptr &self, RawEntityId raw_id) {
+  auto eid = EntityId(raw_id).Extract<IRInstructionId>();
+  if (!eid) return {};
+  auto frag = self->FragmentFor(self, PackedFragmentId(FragmentId(eid->fragment_id)));
+  if (!frag) return {};
+  return std::make_shared<IRInstructionImpl>(
+      std::move(frag), eid->offset, eid->fragment_id);
+}
+
+IRObjectImplPtr SQLiteEntityProvider::IRObjectFor(
+    const Ptr &self, RawEntityId raw_id) {
+  auto eid = EntityId(raw_id).Extract<IRObjectId>();
+  if (!eid) return {};
+  auto frag = self->FragmentFor(self, PackedFragmentId(FragmentId(eid->fragment_id)));
+  if (!frag) return {};
+  return std::make_shared<IRObjectImpl>(
+      std::move(frag), eid->offset, eid->fragment_id);
+}
 
 // Get a list of `Decl`, `Stmt`, `Attr`, `Designator`, etc.
 #define MX_DECLARE_FRAGMENT_OFFSET_LIST_GETTER(ns_path, type_name, lower_name, enum_name, category) \
