@@ -1141,15 +1141,20 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       bool rhs_ptr = rhs_type && pasta::PointerType::From(*rhs_type);
 
       if (arith_op == mx::ir::OpCode::ADD && (lhs_ptr || rhs_ptr)) {
-        // ptr + int or int + ptr → PTR_ADD(base, index)
         auto base_expr = lhs_ptr ? bo->LHS() : bo->RHS();
         auto idx_expr = lhs_ptr ? bo->RHS() : bo->LHS();
+        auto &ptr_type = lhs_ptr ? lhs_type : rhs_type;
         uint32_t base_idx = EmitRValue(base_expr);
         uint32_t idx_idx = EmitRValue(idx_expr);
         InstructionIR inst;
         inst.opcode = mx::ir::OpCode::PTR_ADD;
         inst.source_entity_id = eid;
         inst.operand_indices = {base_idx, idx_idx};
+        if (auto pt = pasta::PointerType::From(*ptr_type)) {
+          auto pointee = pt->PointeeType();
+          inst.type_entity_id = TypeEntityIdOf(pointee);
+          if (auto sz = TypeSizeBytes(pointee)) inst.size_bytes = *sz;
+        }
         return EmitInstruction(std::move(inst));
       }
 
@@ -1165,7 +1170,6 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       }
 
       if (arith_op == mx::ir::OpCode::SUB && lhs_ptr) {
-        // ptr - int → PTR_ADD(base, neg(index))
         uint32_t base_idx = EmitRValue(bo->LHS());
         uint32_t idx_idx = EmitRValue(bo->RHS());
         InstructionIR neg;
@@ -1176,6 +1180,11 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         inst.opcode = mx::ir::OpCode::PTR_ADD;
         inst.source_entity_id = eid;
         inst.operand_indices = {base_idx, neg_idx};
+        if (auto pt = pasta::PointerType::From(*lhs_type)) {
+          auto pointee = pt->PointeeType();
+          inst.type_entity_id = TypeEntityIdOf(pointee);
+          if (auto sz = TypeSizeBytes(pointee)) inst.size_bytes = *sz;
+        }
         return EmitInstruction(std::move(inst));
       }
 
@@ -1522,6 +1531,18 @@ uint32_t IRGenerator::EmitLValue(const pasta::Expr &e) {
     inst.opcode = mx::ir::OpCode::PTR_ADD;
     inst.source_entity_id = eid;
     inst.operand_indices = {base_idx, idx_idx};
+    // Element type from the base pointer/array type.
+    auto base_type = ase->Base().Type();
+    if (base_type) {
+      if (auto pt = pasta::PointerType::From(*base_type)) {
+        auto pointee = pt->PointeeType();
+        inst.type_entity_id = TypeEntityIdOf(pointee);
+        if (auto sz = TypeSizeBytes(pointee)) inst.size_bytes = *sz;
+      } else if (auto at = base_type->PointeeOrArrayElementType()) {
+        inst.type_entity_id = TypeEntityIdOf(*at);
+        if (auto sz = TypeSizeBytes(*at)) inst.size_bytes = *sz;
+      }
+    }
     return EmitInstruction(std::move(inst));
   }
 
