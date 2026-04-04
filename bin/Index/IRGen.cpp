@@ -1134,7 +1134,51 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         default: break;
       }
 
-      // TODO: pointer arithmetic (gepIndex, ptrDiff) -- need type checking.
+      // Check for pointer arithmetic.
+      auto lhs_type = bo->LHS().Type();
+      auto rhs_type = bo->RHS().Type();
+      bool lhs_ptr = lhs_type && pasta::PointerType::From(*lhs_type);
+      bool rhs_ptr = rhs_type && pasta::PointerType::From(*rhs_type);
+
+      if (arith_op == mx::ir::OpCode::ADD && (lhs_ptr || rhs_ptr)) {
+        // ptr + int or int + ptr → PTR_ADD(base, index)
+        auto base_expr = lhs_ptr ? bo->LHS() : bo->RHS();
+        auto idx_expr = lhs_ptr ? bo->RHS() : bo->LHS();
+        uint32_t base_idx = EmitRValue(base_expr);
+        uint32_t idx_idx = EmitRValue(idx_expr);
+        InstructionIR inst;
+        inst.opcode = mx::ir::OpCode::PTR_ADD;
+        inst.source_entity_id = eid;
+        inst.operand_indices = {base_idx, idx_idx};
+        return EmitInstruction(std::move(inst));
+      }
+
+      if (arith_op == mx::ir::OpCode::SUB && lhs_ptr && rhs_ptr) {
+        // ptr - ptr → PTR_DIFF
+        uint32_t lhs_idx = EmitRValue(bo->LHS());
+        uint32_t rhs_idx = EmitRValue(bo->RHS());
+        InstructionIR inst;
+        inst.opcode = mx::ir::OpCode::PTR_DIFF;
+        inst.source_entity_id = eid;
+        inst.operand_indices = {lhs_idx, rhs_idx};
+        return EmitInstruction(std::move(inst));
+      }
+
+      if (arith_op == mx::ir::OpCode::SUB && lhs_ptr) {
+        // ptr - int → PTR_ADD(base, neg(index))
+        uint32_t base_idx = EmitRValue(bo->LHS());
+        uint32_t idx_idx = EmitRValue(bo->RHS());
+        InstructionIR neg;
+        neg.opcode = mx::ir::OpCode::NEG;
+        neg.operand_indices = {idx_idx};
+        uint32_t neg_idx = EmitInstruction(std::move(neg));
+        InstructionIR inst;
+        inst.opcode = mx::ir::OpCode::PTR_ADD;
+        inst.source_entity_id = eid;
+        inst.operand_indices = {base_idx, neg_idx};
+        return EmitInstruction(std::move(inst));
+      }
+
       uint32_t lhs_idx = EmitRValue(bo->LHS());
       uint32_t rhs_idx = EmitRValue(bo->RHS());
       InstructionIR inst;
@@ -1470,16 +1514,14 @@ uint32_t IRGenerator::EmitLValue(const pasta::Expr &e) {
     return EmitInstruction(std::move(inst));
   }
 
-  // ArraySubscriptExpr.
+  // ArraySubscriptExpr -- pointer + index.
   if (auto ase = pasta::ArraySubscriptExpr::From(e)) {
     uint32_t base_idx = EmitRValue(ase->Base());
     uint32_t idx_idx = EmitRValue(ase->Index());
     InstructionIR inst;
-    inst.opcode = mx::ir::OpCode::GEP_INDEX;
+    inst.opcode = mx::ir::OpCode::PTR_ADD;
     inst.source_entity_id = eid;
     inst.operand_indices = {base_idx, idx_idx};
-    // TODO: compute element size from type.
-    inst.size_bytes = 1;
     return EmitInstruction(std::move(inst));
   }
 

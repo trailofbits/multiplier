@@ -20,7 +20,6 @@ const char *EnumeratorName(OpCode op) noexcept {
     case OpCode::STORE: return "STORE";
     case OpCode::ADDRESS_OF: return "ADDRESS_OF";
     case OpCode::GEP_FIELD: return "GEP_FIELD";
-    case OpCode::GEP_INDEX: return "GEP_INDEX";
     case OpCode::PTR_ADD: return "PTR_ADD";
     case OpCode::ADD: return "ADD";
     case OpCode::SUB: return "SUB";

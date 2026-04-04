@@ -23,103 +23,102 @@ enum class OpCode : uint8_t {
   STORE = 5,
   ADDRESS_OF = 6,
   GEP_FIELD = 7,
-  GEP_INDEX = 8,
-  PTR_ADD = 9,
+  PTR_ADD = 8,       // pointer + index; op[0]=base, op[1]=index
 
   // Binary arithmetic/logic
-  ADD = 10,
-  SUB = 11,
-  MUL = 12,
-  DIV = 13,
-  REM = 14,
-  BIT_AND = 15,
-  BIT_OR = 16,
-  BIT_XOR = 17,
-  SHL = 18,
-  SHR = 19,
-  LOGICAL_AND = 20,
-  LOGICAL_OR = 21,
-  PTR_DIFF = 22,
+  ADD = 9,
+  SUB = 10,
+  MUL = 11,
+  DIV = 12,
+  REM = 13,
+  BIT_AND = 14,
+  BIT_OR = 15,
+  BIT_XOR = 16,
+  SHL = 17,
+  SHR = 18,
+  LOGICAL_AND = 19,
+  LOGICAL_OR = 20,
+  PTR_DIFF = 21,
 
   // Comparison
-  CMP_EQ = 23,
-  CMP_NE = 24,
-  CMP_LT = 25,
-  CMP_LE = 26,
-  CMP_GT = 27,
-  CMP_GE = 28,
+  CMP_EQ = 22,
+  CMP_NE = 23,
+  CMP_LT = 24,
+  CMP_LE = 25,
+  CMP_GT = 26,
+  CMP_GE = 27,
 
   // Unary
-  NEG = 29,
-  BIT_NOT = 30,
-  LOGICAL_NOT = 31,
+  NEG = 28,
+  BIT_NOT = 29,
+  LOGICAL_NOT = 30,
 
   // Cast
-  CAST_SEXT = 32,
-  CAST_ZEXT = 33,
-  CAST_TRUNC = 34,
-  CAST_BITCAST = 35,
-  CAST_PTR_TO_INT = 36,
-  CAST_INT_TO_PTR = 37,
-  CAST_FP_TO_SI = 38,
-  CAST_SI_TO_FP = 39,
-  CAST_FP_TRUNC = 40,
-  CAST_FP_EXT = 41,
-  CAST_INT_CAST = 42,
-  CAST_FP_CAST = 43,
+  CAST_SEXT = 31,
+  CAST_ZEXT = 32,
+  CAST_TRUNC = 33,
+  CAST_BITCAST = 34,
+  CAST_PTR_TO_INT = 35,
+  CAST_INT_TO_PTR = 36,
+  CAST_FP_TO_SI = 37,
+  CAST_SI_TO_FP = 38,
+  CAST_FP_TRUNC = 39,
+  CAST_FP_EXT = 40,
+  CAST_INT_CAST = 41,
+  CAST_FP_CAST = 42,
 
   // Sizeof
-  SIZE_OF = 44,
+  SIZE_OF = 43,
 
   // Call
-  CALL = 45,
+  CALL = 44,
 
   // Compound
-  INC_DEC = 46,
-  COMPOUND_ASSIGN = 47,
+  INC_DEC = 45,
+  COMPOUND_ASSIGN = 46,
 
   // Misc
-  SELECT = 48,
-  COPY = 49,
+  SELECT = 47,
+  COPY = 48,
 
   // Terminators
-  COND_BRANCH = 50,
-  SWITCH = 51,
-  RET = 52,
-  UNREACHABLE = 53,
-  BREAK = 54,
-  CONTINUE = 55,
-  GOTO = 56,              // explicit goto label;
-  IMPLICIT_GOTO = 57,     // structural CFG edge (e.g., end of if-then → merge)
-  FALLTHROUGH = 58,       // explicit [[fallthrough]]
-  IMPLICIT_FALLTHROUGH = 59, // implicit (no break at end of case)
+  COND_BRANCH = 49,
+  SWITCH = 50,
+  RET = 51,
+  UNREACHABLE = 52,
+  BREAK = 53,
+  CONTINUE = 54,
+  GOTO = 55,              // explicit goto label;
+  IMPLICIT_GOTO = 56,     // structural CFG edge (e.g., end of if-then → merge)
+  FALLTHROUGH = 57,       // explicit [[fallthrough]]
+  IMPLICIT_FALLTHROUGH = 58, // implicit (no break at end of case)
 
   // Variadic argument handling
-  VA_PACK = 60,           // groups variadic args at call site; operands = the packed args
-  VA_START = 61,          // binds va_list to function's variadic pack; op[0] = va_list
-  VA_ARG = 62,            // reads next value from va_list; op[0] = va_list; typeEntityId = result type
-  VA_COPY = 63,           // copies va_list; op[0] = dest, op[1] = src
-  VA_END = 64,            // releases va_list; op[0] = va_list
+  VA_PACK = 59,           // groups variadic args at call site; operands = the packed args
+  VA_START = 60,          // binds va_list to function's variadic pack; op[0] = va_list
+  VA_ARG = 61,            // reads next value from va_list; op[0] = va_list; typeEntityId = result type
+  VA_COPY = 62,           // copies va_list; op[0] = dest, op[1] = src
+  VA_END = 63,            // releases va_list; op[0] = va_list
 
   // Aggregate initialization
-  INIT_LIST = 65,          // {a, b, c} -- operands are the initializer values
+  INIT_LIST = 64,          // {a, b, c} -- operands are the initializer values
 
   // Method calls (C++ instance/member function)
   // op[0] = this/base object, op[1..] = arguments
   // targetEntityId = CXXMethodDecl
-  METHOD_CALL = 66,          // non-virtual method call
-  VIRTUAL_METHOD_CALL = 67,  // virtual/override method call (dynamic dispatch)
+  METHOD_CALL = 65,          // non-virtual method call
+  VIRTUAL_METHOD_CALL = 66,  // virtual/override method call (dynamic dispatch)
 
   // C++ new/delete
-  NEW = 68,                  // typeEntityId = allocated type
-  NEW_ARRAY = 69,            // op[0] = array size; typeEntityId = element type
-  PLACEMENT_NEW = 70,        // op[0] = placement address, op[1..] = other placement args; typeEntityId = allocated type
-  PLACEMENT_NEW_ARRAY = 71,  // op[0] = array size, op[1] = placement address, op[2..] = other placement args
-  DELETE = 72,               // op[0] = pointer to delete
-  DELETE_ARRAY = 73,         // op[0] = pointer to delete
+  NEW = 67,                  // typeEntityId = allocated type
+  NEW_ARRAY = 68,            // op[0] = array size; typeEntityId = element type
+  PLACEMENT_NEW = 69,        // op[0] = placement address, op[1..] = other placement args; typeEntityId = allocated type
+  PLACEMENT_NEW_ARRAY = 70,  // op[0] = array size, op[1] = placement address, op[2..] = other placement args
+  DELETE = 71,               // op[0] = pointer to delete
+  DELETE_ARRAY = 72,         // op[0] = pointer to delete
 
   // Unknown / unhandled expression
-  UNKNOWN = 74,
+  UNKNOWN = 73,
 };
 
 // Returns the human-readable name of an opcode.
@@ -130,7 +129,7 @@ inline static const char *EnumerationName(OpCode) {
 const char *EnumeratorName(OpCode op) noexcept;
 
 inline static constexpr unsigned NumEnumerators(OpCode) {
-  return 75u;
+  return 74u;
 }
 
 // Classification helpers.
