@@ -105,54 +105,5 @@ bool IRInstruction::is_conditionally_executed(void) const {
   return (impl->reader().getFlags() & 0x4) != 0;
 }
 
-RawEntityId IRInstruction::target_entity_id(void) const {
-  if (!impl) return kInvalidEntityId;
-  return impl->reader().getTargetEntityId();
-}
-
-RawEntityId IRInstruction::type_entity_id(void) const {
-  if (!impl) return kInvalidEntityId;
-  return impl->reader().getTypeEntityId();
-}
-
-RawEntityId IRInstruction::object_entity_id(void) const {
-  if (!impl) return kInvalidEntityId;
-  return impl->reader().getObjectId();
-}
-
-int64_t IRInstruction::int_value(void) const {
-  if (!impl) return 0;
-  return impl->reader().getIntValue();
-}
-
-uint64_t IRInstruction::uint_value(void) const {
-  if (!impl) return 0;
-  return impl->reader().getUintValue();
-}
-
-double IRInstruction::float_value(void) const {
-  if (!impl) return 0.0;
-  return impl->reader().getFloatValue();
-}
-
-uint8_t IRInstruction::width(void) const {
-  if (!impl) return 0;
-  return impl->reader().getWidth();
-}
-
-uint32_t IRInstruction::size_bytes(void) const {
-  if (!impl) return 0;
-  return impl->reader().getSizeBytes();
-}
-
-uint8_t IRInstruction::flags(void) const {
-  if (!impl) return 0;
-  return impl->reader().getFlags();
-}
-
-ir::OpCode IRInstruction::compound_op(void) const {
-  if (!impl) return ir::OpCode::UNKNOWN;
-  return static_cast<ir::OpCode>(impl->reader().getCompoundOp());
-}
 
 }  // namespace mx

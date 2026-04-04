@@ -62,18 +62,6 @@ class MX_EXPORT IRInstruction {
   // Conditional execution.
   bool is_conditionally_executed(void) const;
 
-  // Raw field access (for derived classes / advanced usage).
-  RawEntityId target_entity_id(void) const;
-  RawEntityId type_entity_id(void) const;
-  RawEntityId object_entity_id(void) const;
-  int64_t int_value(void) const;
-  uint64_t uint_value(void) const;
-  double float_value(void) const;
-  uint8_t width(void) const;
-  uint32_t size_bytes(void) const;
-  uint8_t flags(void) const;
-  ir::OpCode compound_op(void) const;
-
   inline operator bool(void) const { return !!impl; }
 };
 
