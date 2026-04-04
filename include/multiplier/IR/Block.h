@@ -51,7 +51,6 @@ class MX_EXPORT IRBlock {
   gap::generator<IRBlock> post_dominators(void) const &;
   bool dominates(const IRBlock &other) const;
 
-  inline operator bool(void) const { return !!impl; }
 };
 
 }  // namespace mx

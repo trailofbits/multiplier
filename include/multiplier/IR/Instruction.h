@@ -62,7 +62,6 @@ class MX_EXPORT IRInstruction {
   // Conditional execution.
   bool is_conditionally_executed(void) const;
 
-  inline operator bool(void) const { return !!impl; }
 };
 
 }  // namespace mx

@@ -47,7 +47,6 @@ class MX_EXPORT IRFunction {
   // Find the IR for a FunctionDecl.
   static std::optional<IRFunction> from(const FunctionDecl &decl);
 
-  inline operator bool(void) const { return !!impl; }
 };
 
 }  // namespace mx

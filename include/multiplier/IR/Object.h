@@ -40,7 +40,6 @@ class MX_EXPORT IRObject {
   uint32_t align_bytes(void) const;
   bool needs_memory(void) const;
 
-  inline operator bool(void) const { return !!impl; }
 };
 
 }  // namespace mx
