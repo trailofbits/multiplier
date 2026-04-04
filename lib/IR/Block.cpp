@@ -11,6 +11,15 @@
 
 namespace mx {
 
+// Entity pool layout per block (starting at entityOffset):
+//   [inst0..instN, succ0..succN, pred0..predN,
+//    idom, dom0..domN, ipdom, pdom0..pdomN]
+
+static capnp::List<uint64_t, capnp::Kind::PRIMITIVE>::Reader
+GetEntityPool(const IRBlockImpl &impl) {
+  return impl.frag->reader.getIrEntityPool();
+}
+
 EntityId IRBlock::id(void) const {
   if (!impl) return {};
   IRBlockId bid;
@@ -27,7 +36,12 @@ ir::BlockKind IRBlock::kind(void) const {
 
 gap::generator<IRInstruction> IRBlock::all_instructions(void) const & {
   if (!impl) co_return;
-  for (auto eid : impl->reader().getInstructions()) {
+  auto r = impl->reader();
+  auto pool = GetEntityPool(*impl);
+  uint32_t base = r.getEntityOffset();
+  uint16_t n = r.getNumInstructions();
+  for (uint16_t i = 0; i < n; ++i) {
+    auto eid = pool[base + i];
     auto vid = EntityId(eid).Unpack();
     if (auto *iid = std::get_if<IRInstructionId>(&vid)) {
       co_yield IRInstruction(std::make_shared<IRInstructionImpl>(
@@ -38,9 +52,13 @@ gap::generator<IRInstruction> IRBlock::all_instructions(void) const & {
 
 gap::generator<IRInstruction> IRBlock::instructions(void) const & {
   if (!impl) co_return;
-  auto insts = impl->reader().getInstructions();
+  auto r = impl->reader();
+  auto pool = GetEntityPool(*impl);
   auto all_insts = impl->frag->reader.getIrInstructions();
-  for (auto eid : insts) {
+  uint32_t base = r.getEntityOffset();
+  uint16_t n = r.getNumInstructions();
+  for (uint16_t i = 0; i < n; ++i) {
+    auto eid = pool[base + i];
     auto vid = EntityId(eid).Unpack();
     if (auto *iid = std::get_if<IRInstructionId>(&vid)) {
       if (all_insts[iid->offset].getParentOffset() == 0) {
@@ -51,21 +69,23 @@ gap::generator<IRInstruction> IRBlock::instructions(void) const & {
   }
 }
 
-static std::optional<IRBlock> BlockFromEid(const FragmentImplPtr &frag,
-                                            RawEntityId fragment_id,
-                                            RawEntityId eid) {
+// Helper to read a block from a pool entity ID.
+static std::optional<IRBlock> BlockFromPoolEid(
+    const FragmentImplPtr &frag, RawEntityId fragment_id, uint64_t eid) {
   auto vid = EntityId(eid).Unpack();
   if (auto *bid = std::get_if<IRBlockId>(&vid)) {
-    return IRBlock(std::make_shared<IRBlockImpl>(frag, bid->offset,
-                                                  fragment_id));
+    return IRBlock(std::make_shared<IRBlockImpl>(frag, bid->offset, fragment_id));
   }
   return std::nullopt;
 }
 
 gap::generator<IRBlock> IRBlock::successors(void) const & {
   if (!impl) co_return;
-  for (auto eid : impl->reader().getSuccessors()) {
-    if (auto b = BlockFromEid(impl->frag, impl->fragment_id, eid)) {
+  auto r = impl->reader();
+  auto pool = GetEntityPool(*impl);
+  uint32_t base = r.getEntityOffset() + r.getNumInstructions();
+  for (uint16_t i = 0; i < r.getNumSuccessors(); ++i) {
+    if (auto b = BlockFromPoolEid(impl->frag, impl->fragment_id, pool[base + i])) {
       co_yield *b;
     }
   }
@@ -73,8 +93,11 @@ gap::generator<IRBlock> IRBlock::successors(void) const & {
 
 gap::generator<IRBlock> IRBlock::predecessors(void) const & {
   if (!impl) co_return;
-  for (auto eid : impl->reader().getPredecessors()) {
-    if (auto b = BlockFromEid(impl->frag, impl->fragment_id, eid)) {
+  auto r = impl->reader();
+  auto pool = GetEntityPool(*impl);
+  uint32_t base = r.getEntityOffset() + r.getNumInstructions() + r.getNumSuccessors();
+  for (uint16_t i = 0; i < r.getNumPredecessors(); ++i) {
+    if (auto b = BlockFromPoolEid(impl->frag, impl->fragment_id, pool[base + i])) {
       co_yield *b;
     }
   }
@@ -82,22 +105,32 @@ gap::generator<IRBlock> IRBlock::predecessors(void) const & {
 
 std::optional<IRBlock> IRBlock::immediate_dominator(void) const {
   if (!impl) return std::nullopt;
-  auto eid = impl->reader().getImmediateDominator();
-  if (eid == 0) return std::nullopt;
-  return BlockFromEid(impl->frag, impl->fragment_id, eid);
+  auto r = impl->reader();
+  if (r.getNumDominators() == 0) return std::nullopt;
+  auto pool = GetEntityPool(*impl);
+  uint32_t base = r.getEntityOffset() + r.getNumInstructions()
+      + r.getNumSuccessors() + r.getNumPredecessors();
+  return BlockFromPoolEid(impl->frag, impl->fragment_id, pool[base]);
 }
 
 std::optional<IRBlock> IRBlock::immediate_post_dominator(void) const {
   if (!impl) return std::nullopt;
-  auto eid = impl->reader().getImmediatePostDominator();
-  if (eid == 0) return std::nullopt;
-  return BlockFromEid(impl->frag, impl->fragment_id, eid);
+  auto r = impl->reader();
+  if (r.getNumPostDominators() == 0) return std::nullopt;
+  auto pool = GetEntityPool(*impl);
+  uint32_t base = r.getEntityOffset() + r.getNumInstructions()
+      + r.getNumSuccessors() + r.getNumPredecessors() + r.getNumDominators();
+  return BlockFromPoolEid(impl->frag, impl->fragment_id, pool[base]);
 }
 
 gap::generator<IRBlock> IRBlock::dominators(void) const & {
   if (!impl) co_return;
-  for (auto eid : impl->reader().getDominators()) {
-    if (auto b = BlockFromEid(impl->frag, impl->fragment_id, eid)) {
+  auto r = impl->reader();
+  auto pool = GetEntityPool(*impl);
+  uint32_t base = r.getEntityOffset() + r.getNumInstructions()
+      + r.getNumSuccessors() + r.getNumPredecessors();
+  for (uint16_t i = 0; i < r.getNumDominators(); ++i) {
+    if (auto b = BlockFromPoolEid(impl->frag, impl->fragment_id, pool[base + i])) {
       co_yield *b;
     }
   }
@@ -105,8 +138,12 @@ gap::generator<IRBlock> IRBlock::dominators(void) const & {
 
 gap::generator<IRBlock> IRBlock::post_dominators(void) const & {
   if (!impl) co_return;
-  for (auto eid : impl->reader().getPostDominators()) {
-    if (auto b = BlockFromEid(impl->frag, impl->fragment_id, eid)) {
+  auto r = impl->reader();
+  auto pool = GetEntityPool(*impl);
+  uint32_t base = r.getEntityOffset() + r.getNumInstructions()
+      + r.getNumSuccessors() + r.getNumPredecessors() + r.getNumDominators();
+  for (uint16_t i = 0; i < r.getNumPostDominators(); ++i) {
+    if (auto b = BlockFromPoolEid(impl->frag, impl->fragment_id, pool[base + i])) {
       co_yield *b;
     }
   }
@@ -115,8 +152,12 @@ gap::generator<IRBlock> IRBlock::post_dominators(void) const & {
 bool IRBlock::dominates(const IRBlock &other) const {
   if (!impl || !other.impl) return false;
   auto my_id = id().Pack();
-  for (auto eid : other.impl->reader().getDominators()) {
-    if (eid == my_id) return true;
+  auto r = other.impl->reader();
+  auto pool = GetEntityPool(*other.impl);
+  uint32_t base = r.getEntityOffset() + r.getNumInstructions()
+      + r.getNumSuccessors() + r.getNumPredecessors();
+  for (uint16_t i = 0; i < r.getNumDominators(); ++i) {
+    if (pool[base + i] == my_id) return true;
   }
   return false;
 }

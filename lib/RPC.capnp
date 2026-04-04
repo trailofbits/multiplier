@@ -188,6 +188,8 @@ struct Fragment @0xe5f27760091f9a3a {
   irBlocks @28 :List(IR.Block);
   irInstructions @29 :List(IR.Instruction);
   irObjects @30 :List(IR.Object);
+  irEntityPool @31 :List(UInt64);  # Shared entity ID pool for all IR entities
+  irIntPool @32 :List(Int64);      # Shared integer/constant pool
 }
 
 struct Compilation @0xc8b5fa5dd0739e82 {

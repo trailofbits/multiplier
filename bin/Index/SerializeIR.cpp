@@ -22,7 +22,7 @@ using mx::RawEntityId;
 using mx::kInvalidEntityId;
 
 // Helpers to construct entity IDs with embedded kind/opcode.
-static mx::RawEntityId MakeBlockEid(
+static RawEntityId MakeBlockEid(
     const ir::FunctionIR &func, RawEntityId fragment_id,
     uint32_t ir_block_base_offset, uint32_t local_block_idx) {
   auto bk = static_cast<uint8_t>(func.blocks[local_block_idx].kind);
@@ -30,7 +30,7 @@ static mx::RawEntityId MakeBlockEid(
   return mx::EntityId(bid).Pack();
 }
 
-static mx::RawEntityId MakeInstEid(
+static RawEntityId MakeInstEid(
     const ir::FunctionIR &func, RawEntityId fragment_id,
     uint32_t ir_inst_base_offset, uint32_t local_inst_idx) {
   auto op = static_cast<uint8_t>(func.instructions[local_inst_idx].opcode);
@@ -38,162 +38,166 @@ static mx::RawEntityId MakeInstEid(
   return mx::EntityId(iid).Pack();
 }
 
-static void SerializeBranchTarget(
-    mx::rpc::ir::BranchTarget::Builder bt,
-    const ir::BranchTargetIR &src,
-    const ir::FunctionIR &func,
-    RawEntityId fragment_id,
-    uint32_t ir_block_base_offset,
-    uint32_t ir_inst_base_offset) {
-
-  bt.setBlockId(MakeBlockEid(func, fragment_id, ir_block_base_offset,
-                              src.block_index));
+static RawEntityId MakeObjEid(RawEntityId fragment_id,
+                               uint32_t ir_obj_base_offset,
+                               uint32_t local_obj_idx) {
+  mx::IRObjectId oid{fragment_id, ir_obj_base_offset + local_obj_idx};
+  return mx::EntityId(oid).Pack();
 }
 
-static void SerializeInstruction(
-    mx::rpc::ir::Instruction::Builder ib,
-    const ir::InstructionIR &src,
+// Pool builder: accumulates entity IDs and int values, returns offsets.
+struct PoolBuilder {
+  std::vector<uint64_t> entities;
+  std::vector<int64_t> ints;
+
+  uint32_t AddEntity(uint64_t eid) {
+    uint32_t offset = static_cast<uint32_t>(entities.size());
+    entities.push_back(eid);
+    return offset;
+  }
+
+  uint32_t EntitySize() const {
+    return static_cast<uint32_t>(entities.size());
+  }
+
+  uint32_t AddInt(int64_t val) {
+    uint32_t offset = static_cast<uint32_t>(ints.size());
+    ints.push_back(val);
+    return offset;
+  }
+
+  uint32_t IntSize() const {
+    return static_cast<uint32_t>(ints.size());
+  }
+};
+
+// Determine number of extra entity pool entries after operands, based on opcode.
+static void EmitInstructionExtras(
+    PoolBuilder &pool,
+    const ir::InstructionIR &inst,
     const ir::FunctionIR &func,
     RawEntityId fragment_id,
-    uint32_t ir_obj_base_offset,
-    uint32_t ir_block_base_offset,
-    uint32_t ir_inst_base_offset) {
+    uint32_t obj_base, uint32_t block_base, uint32_t inst_base) {
 
-  ib.setOpcode(static_cast<uint8_t>(src.opcode));
-  ib.setSourceEntityId(src.source_entity_id);
+  using OC = mx::ir::OpCode;
 
-  auto ops = ib.initOperands(src.operand_indices.size());
-  for (size_t i = 0; i < src.operand_indices.size(); ++i) {
-    ops.set(i, MakeInstEid(func, fragment_id, ir_inst_base_offset,
-                            src.operand_indices[i]));
+  switch (inst.opcode) {
+    case OC::CALL:
+    case OC::METHOD_CALL:
+    case OC::VIRTUAL_METHOD_CALL:
+      pool.AddEntity(inst.target_entity_id);
+      break;
+
+    case OC::GEP_FIELD:
+      pool.AddEntity(inst.target_entity_id);
+      pool.AddEntity(inst.type_entity_id);
+      break;
+
+    case OC::PTR_ADD:
+      pool.AddEntity(inst.type_entity_id);
+      break;
+
+    case OC::LOAD:
+    case OC::CAST_SEXT: case OC::CAST_ZEXT: case OC::CAST_TRUNC:
+    case OC::CAST_BITCAST: case OC::CAST_PTR_TO_INT: case OC::CAST_INT_TO_PTR:
+    case OC::CAST_FP_TO_SI: case OC::CAST_SI_TO_FP: case OC::CAST_FP_TRUNC:
+    case OC::CAST_FP_EXT: case OC::CAST_INT_CAST: case OC::CAST_FP_CAST:
+    case OC::VA_ARG:
+      pool.AddEntity(inst.type_entity_id);
+      break;
+
+    case OC::ALLOCA:
+    case OC::ADDRESS_OF:
+      pool.AddEntity(MakeObjEid(fragment_id, obj_base, inst.object_index));
+      break;
+
+    case OC::SIZE_OF:
+      pool.AddEntity(inst.type_entity_id);
+      break;
+
+    case OC::NEW:
+    case OC::NEW_ARRAY:
+    case OC::PLACEMENT_NEW:
+    case OC::PLACEMENT_NEW_ARRAY:
+      pool.AddEntity(inst.type_entity_id);
+      break;
+
+    case OC::COND_BRANCH:
+      for (auto &bt : inst.branch_targets) {
+        pool.AddEntity(MakeBlockEid(func, fragment_id, block_base,
+                                     bt.block_index));
+      }
+      break;
+
+    case OC::GOTO: case OC::IMPLICIT_GOTO:
+    case OC::BREAK: case OC::CONTINUE:
+    case OC::FALLTHROUGH: case OC::IMPLICIT_FALLTHROUGH:
+      for (auto &bt : inst.branch_targets) {
+        pool.AddEntity(MakeBlockEid(func, fragment_id, block_base,
+                                     bt.block_index));
+      }
+      break;
+
+    case OC::SWITCH:
+      for (auto &bt : inst.branch_targets) {
+        pool.AddEntity(MakeBlockEid(func, fragment_id, block_base,
+                                     bt.block_index));
+      }
+      break;
+
+    default:
+      break;
   }
+}
 
-  if (src.opcode == mx::ir::OpCode::ALLOCA ||
-      src.opcode == mx::ir::OpCode::ADDRESS_OF) {
-    mx::IRObjectId oid{fragment_id, ir_obj_base_offset + src.object_index};
-    ib.setObjectId(mx::EntityId(oid).Pack());
-  }
+static uint32_t EmitInstructionConsts(
+    PoolBuilder &pool,
+    const ir::InstructionIR &inst) {
 
-  ib.setTypeEntityId(src.type_entity_id);
-  ib.setTargetEntityId(src.target_entity_id);
-  ib.setIntValue(src.int_value);
-  ib.setUintValue(src.uint_value);
-  ib.setFloatValue(src.float_value);
-  ib.setWidth(src.width);
-  ib.setSizeBytes(src.size_bytes);
-  ib.setFlags(src.flags);
-  ib.setCompoundOp(static_cast<uint8_t>(src.compound_op));
-  ib.setParentOffset(src.parent_offset);
+  using OC = mx::ir::OpCode;
+  uint32_t offset = pool.IntSize();
 
-  ib.setParentBlockId(MakeBlockEid(func, fragment_id, ir_block_base_offset,
-                                    src.parent_block_index));
+  switch (inst.opcode) {
+    case OC::CONST_INT:
+      pool.AddInt(inst.int_value);
+      pool.AddInt(static_cast<int64_t>(inst.uint_value));
+      break;
 
-  if (!src.branch_targets.empty()) {
-    auto bts = ib.initBranchTargets(src.branch_targets.size());
-    for (size_t i = 0; i < src.branch_targets.size(); ++i) {
-      SerializeBranchTarget(bts[i], src.branch_targets[i], func, fragment_id,
-                            ir_block_base_offset, ir_inst_base_offset);
+    case OC::CONST_FLOAT: {
+      int64_t bits;
+      static_assert(sizeof(double) == sizeof(int64_t));
+      memcpy(&bits, &inst.float_value, sizeof(bits));
+      pool.AddInt(bits);
+      break;
     }
+
+    case OC::SWITCH:
+      for (auto v : inst.switch_values) {
+        pool.AddInt(v);
+      }
+      break;
+
+    case OC::GEP_FIELD:
+      pool.AddInt(static_cast<int64_t>(inst.size_bytes));  // byte offset
+      break;
+
+    case OC::PTR_ADD:
+      pool.AddInt(static_cast<int64_t>(inst.size_bytes));  // element size
+      break;
+
+    case OC::COMPOUND_ASSIGN:
+      pool.AddInt(static_cast<int64_t>(inst.compound_op));
+      break;
+
+    case OC::INC_DEC:
+      pool.AddInt(static_cast<int64_t>(inst.size_bytes));  // ptr element size
+      break;
+
+    default:
+      return offset;  // no constants
   }
 
-  if (!src.switch_values.empty()) {
-    auto svs = ib.initSwitchValues(src.switch_values.size());
-    for (size_t i = 0; i < src.switch_values.size(); ++i) {
-      svs.set(i, src.switch_values[i]);
-    }
-  }
-}
-
-static void SerializeBlock(
-    mx::rpc::ir::Block::Builder bb,
-    const ir::BlockIR &src,
-    const ir::FunctionIR &func,
-    RawEntityId fragment_id,
-    uint32_t ir_block_base_offset,
-    uint32_t ir_inst_base_offset) {
-
-  bb.setKind(static_cast<uint8_t>(src.kind));
-
-  auto insts = bb.initInstructions(src.instruction_indices.size());
-  for (size_t i = 0; i < src.instruction_indices.size(); ++i) {
-    insts.set(i, MakeInstEid(func, fragment_id, ir_inst_base_offset,
-                              src.instruction_indices[i]));
-  }
-
-  auto succs = bb.initSuccessors(src.successor_indices.size());
-  for (size_t i = 0; i < src.successor_indices.size(); ++i) {
-    succs.set(i, MakeBlockEid(func, fragment_id, ir_block_base_offset,
-                               src.successor_indices[i]));
-  }
-
-  auto preds = bb.initPredecessors(src.predecessor_indices.size());
-  for (size_t i = 0; i < src.predecessor_indices.size(); ++i) {
-    preds.set(i, MakeBlockEid(func, fragment_id, ir_block_base_offset,
-                               src.predecessor_indices[i]));
-  }
-
-  auto doms = bb.initDominators(src.dominator_indices.size());
-  for (size_t i = 0; i < src.dominator_indices.size(); ++i) {
-    doms.set(i, MakeBlockEid(func, fragment_id, ir_block_base_offset,
-                              src.dominator_indices[i]));
-  }
-
-  auto pdoms = bb.initPostDominators(src.post_dominator_indices.size());
-  for (size_t i = 0; i < src.post_dominator_indices.size(); ++i) {
-    pdoms.set(i, MakeBlockEid(func, fragment_id, ir_block_base_offset,
-                               src.post_dominator_indices[i]));
-  }
-
-  if (src.immediate_dominator != UINT32_MAX) {
-    bb.setImmediateDominator(MakeBlockEid(func, fragment_id,
-                                           ir_block_base_offset,
-                                           src.immediate_dominator));
-  }
-
-  if (src.immediate_post_dominator != UINT32_MAX) {
-    bb.setImmediatePostDominator(MakeBlockEid(func, fragment_id,
-                                               ir_block_base_offset,
-                                               src.immediate_post_dominator));
-  }
-}
-
-static void SerializeFunction(
-    mx::rpc::ir::Function::Builder fb,
-    const ir::FunctionIR &src,
-    RawEntityId fragment_id,
-    uint32_t ir_block_base_offset,
-    uint32_t ir_obj_base_offset) {
-
-  fb.setFuncDeclEntityId(src.func_decl_entity_id);
-
-  auto blocks = fb.initBlocks(src.rpo_block_order.size());
-  for (size_t i = 0; i < src.rpo_block_order.size(); ++i) {
-    blocks.set(i, MakeBlockEid(src, fragment_id, ir_block_base_offset,
-                                src.rpo_block_order[i]));
-  }
-
-  auto objs = fb.initObjects(src.objects.size());
-  for (size_t i = 0; i < src.objects.size(); ++i) {
-    mx::IRObjectId oid{fragment_id,
-                        ir_obj_base_offset + static_cast<uint32_t>(i)};
-    objs.set(i, mx::EntityId(oid).Pack());
-  }
-
-  fb.setEntryBlockId(MakeBlockEid(src, fragment_id, ir_block_base_offset,
-                                   src.entry_block_index));
-}
-
-// Serialize an ObjectIR into a capnp Object builder.
-static void SerializeObject(
-    mx::rpc::ir::Object::Builder ob,
-    const ir::ObjectIR &src) {
-
-  ob.setSourceDeclId(src.source_decl_id);
-  // Name accessible via sourceDeclId -> NamedDecl::Name()
-  ob.setTypeEntityId(src.type_entity_id);
-  ob.setSizeBytes(src.size_bytes);
-  ob.setAlignBytes(src.align_bytes);
-  ob.setKind(static_cast<uint8_t>(src.kind));
+  return offset;
 }
 
 }  // namespace
@@ -207,7 +211,6 @@ std::vector<ir::FunctionIR> GenerateIR(
   std::vector<ir::FunctionIR> ir_functions;
   RawEntityId fragment_id = pf.fragment_id.Unpack().fragment_id;
 
-  // Track cumulative offsets for computing entity IDs.
   uint32_t inst_offset = 0;
 
   for (const auto &decl : pf.top_level_decls) {
@@ -222,11 +225,9 @@ std::vector<ir::FunctionIR> GenerateIR(
       continue;
     }
 
-    // Build the reverse map: AST entity ID → IR instruction entity ID.
-    // Each instruction's entity ID is (fragment_id, kIRInstruction sub_kind, offset).
     for (uint32_t i = 0; i < ir->instructions.size(); ++i) {
       auto &inst = ir->instructions[i];
-      if (inst.source_entity_id != kInvalidEntityId) {
+      if (inst.source_entity_id != mx::kInvalidEntityId) {
         auto ir_eid = mx::EntityId(mx::IRInstructionId{
             fragment_id, inst_offset + i,
             static_cast<uint8_t>(inst.opcode)}).Pack();
@@ -248,6 +249,9 @@ void SerializeIR(
 
   if (ir_functions.empty()) return;
 
+  RawEntityId fragment_id = pf.fragment_id.Unpack().fragment_id;
+
+  // Count totals.
   uint32_t total_blocks = 0;
   uint32_t total_instructions = 0;
   uint32_t total_objects = 0;
@@ -257,12 +261,14 @@ void SerializeIR(
     total_objects += static_cast<uint32_t>(func.objects.size());
   }
 
+  // Build the pools.
+  PoolBuilder pool;
+
+  // Pre-allocate output lists.
   auto frag_funcs = fb.initIrFunctions(ir_functions.size());
   auto frag_blocks = fb.initIrBlocks(total_blocks);
   auto frag_insts = fb.initIrInstructions(total_instructions);
   auto frag_objs = fb.initIrObjects(total_objects);
-
-  RawEntityId fragment_id = pf.fragment_id.Unpack().fragment_id;
 
   uint32_t block_offset = 0;
   uint32_t inst_offset = 0;
@@ -271,29 +277,139 @@ void SerializeIR(
   for (size_t fi = 0; fi < ir_functions.size(); ++fi) {
     const auto &func = ir_functions[fi];
 
+    // Serialize objects.
     for (size_t oi = 0; oi < func.objects.size(); ++oi) {
-      SerializeObject(frag_objs[obj_offset + oi], func.objects[oi]);
+      auto &src = func.objects[oi];
+      auto ob = frag_objs[obj_offset + oi];
+      ob.setSourceDeclId(src.source_decl_id);
+      ob.setTypeEntityId(src.type_entity_id);
+      ob.setSizeBytes(src.size_bytes);
+      ob.setAlignBytes(src.align_bytes);
+      ob.setKind(static_cast<uint8_t>(src.kind));
     }
 
+    // Serialize instructions.
     for (size_t ii = 0; ii < func.instructions.size(); ++ii) {
-      SerializeInstruction(frag_insts[inst_offset + ii],
-                           func.instructions[ii], func,
-                           fragment_id, obj_offset,
-                           block_offset, inst_offset);
+      const auto &src = func.instructions[ii];
+      auto ib = frag_insts[inst_offset + ii];
+
+      // Entity pool: [parentBlockId, sourceEntityId, op0..opN, ...extras]
+      uint32_t ent_start = pool.EntitySize();
+      pool.AddEntity(MakeBlockEid(func, fragment_id, block_offset,
+                                   src.parent_block_index));
+      pool.AddEntity(src.source_entity_id);
+      for (auto op_idx : src.operand_indices) {
+        pool.AddEntity(MakeInstEid(func, fragment_id, inst_offset, op_idx));
+      }
+      EmitInstructionExtras(pool, src, func, fragment_id,
+                            obj_offset, block_offset, inst_offset);
+
+      // Int pool.
+      uint32_t const_start = EmitInstructionConsts(pool, src);
+
+      ib.setEntityOffset(ent_start);
+      ib.setConstOffset(const_start);
+      ib.setParentOffset(static_cast<uint16_t>(src.parent_offset));
+      ib.setNumOperands(static_cast<uint8_t>(src.operand_indices.size()));
+      ib.setOpcode(static_cast<uint8_t>(src.opcode));
+      ib.setConstWidth(src.width);
+      ib.setFlags(src.flags);
     }
 
+    // Serialize blocks.
     for (size_t bi = 0; bi < func.blocks.size(); ++bi) {
-      SerializeBlock(frag_blocks[block_offset + bi],
-                     func.blocks[bi], func,
-                     fragment_id, block_offset, inst_offset);
+      const auto &src = func.blocks[bi];
+      auto bb = frag_blocks[block_offset + bi];
+
+      uint32_t ent_start = pool.EntitySize();
+
+      // Instructions.
+      for (auto idx : src.instruction_indices) {
+        pool.AddEntity(MakeInstEid(func, fragment_id, inst_offset, idx));
+      }
+
+      // Successors.
+      for (auto idx : src.successor_indices) {
+        pool.AddEntity(MakeBlockEid(func, fragment_id, block_offset, idx));
+      }
+
+      // Predecessors.
+      for (auto idx : src.predecessor_indices) {
+        pool.AddEntity(MakeBlockEid(func, fragment_id, block_offset, idx));
+      }
+
+      // Dominators (first = immediate dominator).
+      if (src.immediate_dominator != UINT32_MAX) {
+        pool.AddEntity(MakeBlockEid(func, fragment_id, block_offset,
+                                     src.immediate_dominator));
+      }
+      for (auto idx : src.dominator_indices) {
+        if (idx != src.immediate_dominator) {
+          pool.AddEntity(MakeBlockEid(func, fragment_id, block_offset, idx));
+        }
+      }
+
+      // Post-dominators (first = immediate post-dominator).
+      if (src.immediate_post_dominator != UINT32_MAX) {
+        pool.AddEntity(MakeBlockEid(func, fragment_id, block_offset,
+                                     src.immediate_post_dominator));
+      }
+      for (auto idx : src.post_dominator_indices) {
+        if (idx != src.immediate_post_dominator) {
+          pool.AddEntity(MakeBlockEid(func, fragment_id, block_offset, idx));
+        }
+      }
+
+      uint16_t num_doms = (src.immediate_dominator != UINT32_MAX ? 1 : 0)
+          + static_cast<uint16_t>(src.dominator_indices.size()
+              - (src.immediate_dominator != UINT32_MAX ? 1 : 0));
+      uint16_t num_pdoms = (src.immediate_post_dominator != UINT32_MAX ? 1 : 0)
+          + static_cast<uint16_t>(src.post_dominator_indices.size()
+              - (src.immediate_post_dominator != UINT32_MAX ? 1 : 0));
+
+      bb.setEntityOffset(ent_start);
+      bb.setNumInstructions(static_cast<uint16_t>(src.instruction_indices.size()));
+      bb.setNumSuccessors(static_cast<uint16_t>(src.successor_indices.size()));
+      bb.setNumPredecessors(static_cast<uint16_t>(src.predecessor_indices.size()));
+      bb.setNumDominators(num_doms);
+      bb.setNumPostDominators(num_pdoms);
+      bb.setKind(static_cast<uint8_t>(src.kind));
     }
 
-    SerializeFunction(frag_funcs[fi], func,
-                      fragment_id, block_offset, obj_offset);
+    // Serialize function.
+    {
+      auto ffb = frag_funcs[fi];
+      ffb.setFuncDeclEntityId(func.func_decl_entity_id);
+      ffb.setEntryBlockId(MakeBlockEid(func, fragment_id, block_offset,
+                                        func.entry_block_index));
+
+      // Function's block and object lists go into the entity pool.
+      uint32_t func_ent_start = pool.EntitySize();
+      for (auto idx : func.rpo_block_order) {
+        pool.AddEntity(MakeBlockEid(func, fragment_id, block_offset, idx));
+      }
+      for (uint32_t oi = 0; oi < func.objects.size(); ++oi) {
+        pool.AddEntity(MakeObjEid(fragment_id, obj_offset, oi));
+      }
+      ffb.setEntityOffset(func_ent_start);
+      ffb.setNumBlocks(static_cast<uint16_t>(func.rpo_block_order.size()));
+      ffb.setNumObjects(static_cast<uint16_t>(func.objects.size()));
+    }
 
     block_offset += static_cast<uint32_t>(func.blocks.size());
     inst_offset += static_cast<uint32_t>(func.instructions.size());
     obj_offset += static_cast<uint32_t>(func.objects.size());
+  }
+
+  // Write the pools into the fragment.
+  auto ep = fb.initIrEntityPool(pool.entities.size());
+  for (size_t i = 0; i < pool.entities.size(); ++i) {
+    ep.set(i, pool.entities[i]);
+  }
+
+  auto ip = fb.initIrIntPool(pool.ints.size());
+  for (size_t i = 0; i < pool.ints.size(); ++i) {
+    ip.set(i, pool.ints[i]);
   }
 }
 

@@ -78,6 +78,7 @@ add_custom_command(
   DEPENDS
     ${MX_RPC_HEADERS}
     ${MX_AST_HEADERS}
+    ${MX_IR_HEADERS}
 
   COMMENT
     "Exporting Cap'n Proto-generated headers"

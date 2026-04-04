@@ -9,16 +9,15 @@
 #include <multiplier/IR.capnp.h>
 #include <multiplier/RPC.capnp.h>
 
-#include "../Entity.h"
-
 namespace mx {
 
 class FragmentImpl;
+class EntityProvider;
 using FragmentImplPtr = std::shared_ptr<const FragmentImpl>;
 
 // All IR entity impls hold a reference to the containing fragment
 // (keeps capnp data alive) plus the offset into the fragment's flat list.
-// The fragment_id is needed to construct entity IDs.
+// The pools (entityPool, intPool) are accessed via frag->reader.
 
 class IRFunctionImpl {
  public:
@@ -32,7 +31,6 @@ class IRFunctionImpl {
         fragment_id(fragment_id_) {}
 
   rpc::ir::Function::Reader reader() const;
-
   virtual ~IRFunctionImpl() = default;
 };
 
@@ -48,7 +46,6 @@ class IRBlockImpl {
         fragment_id(fragment_id_) {}
 
   rpc::ir::Block::Reader reader() const;
-
   virtual ~IRBlockImpl() = default;
 };
 
@@ -64,7 +61,6 @@ class IRInstructionImpl {
         fragment_id(fragment_id_) {}
 
   rpc::ir::Instruction::Reader reader() const;
-
   virtual ~IRInstructionImpl() = default;
 };
 
@@ -80,7 +76,6 @@ class IRObjectImpl {
         fragment_id(fragment_id_) {}
 
   rpc::ir::Object::Reader reader() const;
-
   virtual ~IRObjectImpl() = default;
 };
 

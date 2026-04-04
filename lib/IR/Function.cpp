@@ -37,7 +37,12 @@ IRBlock IRFunction::entry_block(void) const {
 
 gap::generator<IRBlock> IRFunction::blocks(void) const & {
   if (!impl) co_return;
-  for (auto eid : impl->reader().getBlocks()) {
+  auto r = impl->reader();
+  auto pool = impl->frag->reader.getIrEntityPool();
+  uint32_t base = r.getEntityOffset();
+  uint16_t n = r.getNumBlocks();
+  for (uint16_t i = 0; i < n; ++i) {
+    auto eid = pool[base + i];
     auto vid = EntityId(eid).Unpack();
     if (auto *bid = std::get_if<IRBlockId>(&vid)) {
       co_yield IRBlock(std::make_shared<IRBlockImpl>(
@@ -48,7 +53,12 @@ gap::generator<IRBlock> IRFunction::blocks(void) const & {
 
 gap::generator<IRObject> IRFunction::objects(void) const & {
   if (!impl) co_return;
-  for (auto eid : impl->reader().getObjects()) {
+  auto r = impl->reader();
+  auto pool = impl->frag->reader.getIrEntityPool();
+  uint32_t base = r.getEntityOffset() + r.getNumBlocks();
+  uint16_t n = r.getNumObjects();
+  for (uint16_t i = 0; i < n; ++i) {
+    auto eid = pool[base + i];
     auto vid = EntityId(eid).Unpack();
     if (auto *oid = std::get_if<IRObjectId>(&vid)) {
       co_yield IRObject(std::make_shared<IRObjectImpl>(
