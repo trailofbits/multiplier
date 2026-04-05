@@ -218,6 +218,7 @@ class IRGenerator {
 
   // --- Pre-scan ---
   void ScanAddressTaken(const pasta::Stmt &s);
+  void EmitEntryBlockAllocas(const pasta::Stmt &body);
 
   // --- Post-processing ---
   void ComputeDominators();

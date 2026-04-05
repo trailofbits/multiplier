@@ -86,6 +86,10 @@ std::optional<FunctionIR> IRGenerator::Generate(
     uint32_t entry = NewBlock(mx::ir::BlockKind::ENTRY);
     func_.entry_block_index = entry;
     SwitchToBlock(entry);
+
+    // Emit all allocas in the entry block (before any control flow).
+    EmitEntryBlockAllocas(*body);
+
     EmitBody(*body);
 
     // Compute dominators and RPO.
@@ -216,6 +220,33 @@ void IRGenerator::ScanAddressTaken(const pasta::Stmt &s) {
   for (const auto &child : s.Children()) {
     ScanAddressTaken(child);
   }
+}
+
+void IRGenerator::EmitEntryBlockAllocas(const pasta::Stmt &body) {
+  // Walk the body to find all VarDecls and emit allocas in the entry block.
+  std::function<void(const pasta::Stmt &)> walk;
+  walk = [&](const pasta::Stmt &s) {
+    if (auto ds = pasta::DeclStmt::From(s)) {
+      for (const auto &decl : ds->Declarations()) {
+        auto vd = pasta::VarDecl::From(decl);
+        if (!vd) continue;
+        if (pasta::ParmVarDecl::From(decl)) continue;
+
+        uint32_t obj_idx = GetOrMakeObject(decl);
+
+        InstructionIR alloca_inst;
+        alloca_inst.opcode = mx::ir::OpCode::ALLOCA;
+        alloca_inst.source_entity_id = EntityIdOf(decl);
+        alloca_inst.object_index = obj_idx;
+        alloca_inst.type_entity_id = TypeEntityIdOf(vd->Type());
+        EmitTopLevel(std::move(alloca_inst));
+      }
+    }
+    for (const auto &child : s.Children()) {
+      walk(child);
+    }
+  };
+  walk(body);
 }
 
 // ---------------------------------------------------------------------------
@@ -671,18 +702,14 @@ void IRGenerator::EmitDeclStmt(const pasta::Stmt &s) {
   auto ds = pasta::DeclStmt::From(s);
   if (!ds) return;
 
+  // Allocas were already emitted in the entry block by EmitEntryBlockAllocas.
+  // Here we only emit the initialization store.
   for (const auto &decl : ds->Declarations()) {
     auto vd = pasta::VarDecl::From(decl);
     if (!vd) continue;
     if (pasta::ParmVarDecl::From(decl)) continue;
 
     uint32_t obj_idx = GetOrMakeObject(decl);
-
-    InstructionIR alloca_inst;
-    alloca_inst.opcode = mx::ir::OpCode::ALLOCA;
-    alloca_inst.source_entity_id = EntityIdOf(decl);
-    alloca_inst.object_index = obj_idx;
-    EmitTopLevel(std::move(alloca_inst));
 
     if (auto init = vd->Initializer()) {
       InstructionIR addr_inst;
