@@ -83,8 +83,6 @@ static void EmitInstructionExtras(
 
   switch (inst.opcode) {
     case OC::CALL:
-    case OC::METHOD_CALL:
-    case OC::VIRTUAL_METHOD_CALL:
       pool.AddEntity(inst.target_entity_id);
       break;
 
@@ -112,13 +110,6 @@ static void EmitInstructionExtras(
       break;
 
     case OC::SIZE_OF:
-      pool.AddEntity(inst.type_entity_id);
-      break;
-
-    case OC::NEW:
-    case OC::NEW_ARRAY:
-    case OC::PLACEMENT_NEW:
-    case OC::PLACEMENT_NEW_ARRAY:
       pool.AddEntity(inst.type_entity_id);
       break;
 

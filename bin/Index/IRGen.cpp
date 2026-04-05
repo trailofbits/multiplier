@@ -57,26 +57,8 @@ std::optional<FunctionIR> IRGenerator::Generate(
     label_blocks_.clear();
     case_blocks_.clear();
 
-    this_object_index_ = UINT32_MAX;
-
     // Pre-scan for address-taken variables.
     ScanAddressTaken(*body);
-
-    // For C++ instance methods, create an explicit 'this' parameter object.
-    if (auto method = pasta::CXXMethodDecl::From(func)) {
-      if (method->IsInstance()) {
-        ObjectIR obj;
-        obj.kind = mx::ir::ObjectKind::THIS_PARAMETER;
-        obj.source_decl_id = EntityIdOf(func);
-        if (auto this_type = method->ThisType()) {
-          obj.type_entity_id = TypeEntityIdOf(*this_type);
-          if (auto sz = TypeSizeBytes(*this_type)) obj.size_bytes = *sz;
-          if (auto al = TypeAlignBytes(*this_type)) obj.align_bytes = *al;
-        }
-        this_object_index_ = next_obj_index_++;
-        func_.objects.push_back(std::move(obj));
-      }
-    }
 
     // Create parameters as objects.
     for (const auto &param : func.Parameters()) {
@@ -1198,45 +1180,6 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     }
   }
 
-  // CXXNewExpr / CXXDeleteExpr.
-  if (auto ne = pasta::CXXNewExpr::From(e)) {
-    InstructionIR inst;
-    inst.source_entity_id = eid;
-    inst.type_entity_id = TypeEntityIdOf(ne->AllocatedType());
-
-    auto placement_args = ne->PlacementArguments();
-    bool is_placement = !placement_args.empty();
-    bool is_array = ne->IsArray();
-
-    if (is_placement) {
-      inst.opcode = is_array ? mx::ir::OpCode::PLACEMENT_NEW_ARRAY
-                             : mx::ir::OpCode::PLACEMENT_NEW;
-    } else {
-      inst.opcode = is_array ? mx::ir::OpCode::NEW_ARRAY
-                             : mx::ir::OpCode::NEW;
-    }
-
-    if (is_array) {
-      if (auto sz = ne->ArraySize()) {
-        inst.operand_indices.push_back(EmitRValue(*sz));
-      }
-    }
-
-    for (const auto &arg : placement_args) {
-      inst.operand_indices.push_back(EmitRValue(arg));
-    }
-
-    return EmitInstruction(std::move(inst));
-  }
-
-  if (auto de = pasta::CXXDeleteExpr::From(e)) {
-    InstructionIR inst;
-    inst.source_entity_id = eid;
-    inst.opcode = de->IsArrayForm() ? mx::ir::OpCode::DELETE_ARRAY
-                                     : mx::ir::OpCode::DELETE;
-    inst.operand_indices.push_back(EmitRValue(de->Argument()));
-    return EmitInstruction(std::move(inst));
-  }
 
   // Call expression (including member calls).
   if (auto ce = pasta::CallExpr::From(e)) {
@@ -1276,28 +1219,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     InstructionIR inst;
     inst.source_entity_id = eid;
 
-    // Detect member calls: op[0] = this, op[1..] = arguments.
-    auto member_ce = pasta::CXXMemberCallExpr::From(e);
-    if (member_ce) {
-      // Emit the implicit object (this) as the first operand.
-      inst.operand_indices.push_back(
-          EmitRValue(member_ce->ImplicitObjectArgument()));
-
-      // Determine if virtual dispatch.
-      if (direct_callee) {
-        if (auto method = pasta::CXXMethodDecl::From(*direct_callee)) {
-          inst.opcode = method->IsVirtual()
-                            ? mx::ir::OpCode::VIRTUAL_METHOD_CALL
-                            : mx::ir::OpCode::METHOD_CALL;
-        } else {
-          inst.opcode = mx::ir::OpCode::METHOD_CALL;
-        }
-      } else {
-        inst.opcode = mx::ir::OpCode::METHOD_CALL;
-      }
-    } else {
-      inst.opcode = mx::ir::OpCode::CALL;
-    }
+    inst.opcode = mx::ir::OpCode::CALL;
 
     if (direct_callee) {
       auto canon = direct_callee->CanonicalDeclaration();
@@ -1322,9 +1244,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       }
     } else {
       inst.target_entity_id = kInvalidEntityId;
-      if (!member_ce) {
-        inst.operand_indices.push_back(EmitRValue(ce->Callee()));
-      }
+      inst.operand_indices.push_back(EmitRValue(ce->Callee()));
       for (const auto &arg : ce->Arguments()) {
         inst.operand_indices.push_back(EmitRValue(arg));
       }
@@ -1429,21 +1349,6 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     return EmitInstruction(std::move(inst));
   }
 
-  // CXXThisExpr -- reference to the implicit 'this' parameter object.
-  if (pasta::CXXThisExpr::From(e)) {
-    if (this_object_index_ != UINT32_MAX) {
-      InstructionIR inst;
-      inst.opcode = mx::ir::OpCode::ADDRESS_OF;
-      inst.source_entity_id = eid;
-      inst.object_index = this_object_index_;
-      return EmitInstruction(std::move(inst));
-    }
-    // Fallback: no this object (shouldn't happen in valid C++).
-    InstructionIR inst;
-    inst.opcode = mx::ir::OpCode::CONST_NULL;
-    inst.source_entity_id = eid;
-    return EmitInstruction(std::move(inst));
-  }
 
   // PredefinedExpr (__func__, __FUNCTION__, __PRETTY_FUNCTION__) -- unwrap to the StringLiteral.
   if (auto pe = pasta::PredefinedExpr::From(e)) {

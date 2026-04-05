@@ -136,9 +136,6 @@ class IRGenerator {
   std::unordered_map<mx::RawEntityId, uint32_t> entity_to_object_;
   std::unordered_set<mx::RawEntityId> address_taken_;
 
-  // Index of the 'this' parameter object for C++ methods, or UINT32_MAX.
-  uint32_t this_object_index_{UINT32_MAX};
-
   // Break/continue targets: maps source entity ID of the enclosing
   // loop/switch to its exit (break) and continue-target blocks.
   struct LoopContext {
