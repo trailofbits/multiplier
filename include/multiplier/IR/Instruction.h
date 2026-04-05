@@ -49,6 +49,10 @@ class MX_EXPORT IRInstruction {
   std::optional<IRInstruction> parent_instruction(void) const;
   bool is_root(void) const;
 
+  // Use-def: who uses this instruction's value as an operand.
+  gap::generator<IRInstruction> users(void) const &;
+  unsigned num_users(void) const;
+
   // AST provenance.
   std::optional<Stmt> source_statement(void) const;
   RawEntityId source_entity_id(void) const;

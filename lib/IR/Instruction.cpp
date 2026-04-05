@@ -148,6 +148,22 @@ IRBlock IRInstruction::parent_block(void) const {
   return {};
 }
 
+gap::generator<IRInstruction> IRInstruction::users(void) const & {
+  if (!impl) co_return;
+  for (auto eid : impl->reader().getUsers()) {
+    auto vid = EntityId(eid).Unpack();
+    if (auto *iid = std::get_if<IRInstructionId>(&vid)) {
+      co_yield IRInstruction(std::make_shared<IRInstructionImpl>(
+          impl->frag, iid->offset, impl->fragment_id));
+    }
+  }
+}
+
+unsigned IRInstruction::num_users(void) const {
+  if (!impl) return 0;
+  return impl->reader().getUsers().size();
+}
+
 bool IRInstruction::is_terminator(void) const {
   return ir::IsTerminator(opcode());
 }

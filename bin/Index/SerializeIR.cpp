@@ -431,6 +431,33 @@ void SerializeIR(
     obj_offset += static_cast<uint32_t>(func.objects.size());
   }
 
+  // Compute use-def chains and write per-instruction users lists.
+  {
+    std::vector<uint8_t> opcodes(total_instructions);
+    std::vector<std::vector<uint32_t>> users(total_instructions);
+    {
+      uint32_t gi = 0;
+      for (const auto &func : ir_functions) {
+        for (uint32_t ii = 0; ii < func.instructions.size(); ++ii) {
+          opcodes[gi + ii] = static_cast<uint8_t>(func.instructions[ii].opcode);
+          for (auto op_idx : func.instructions[ii].operand_indices) {
+            users[gi + op_idx].push_back(gi + ii);
+          }
+        }
+        gi += static_cast<uint32_t>(func.instructions.size());
+      }
+    }
+
+    for (uint32_t gi = 0; gi < total_instructions; ++gi) {
+      auto &u = users[gi];
+      auto user_list = frag_insts[gi].initUsers(u.size());
+      for (size_t j = 0; j < u.size(); ++j) {
+        mx::IRInstructionId iid{fragment_id, u[j], opcodes[u[j]]};
+        user_list.set(j, mx::EntityId(iid).Pack());
+      }
+    }
+  }
+
   // Write the pools into the fragment.
   auto ep = fb.initIrEntityPool(pool.entities.size());
   for (size_t i = 0; i < pool.entities.size(); ++i) {
