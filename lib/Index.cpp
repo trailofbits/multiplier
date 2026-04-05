@@ -82,6 +82,10 @@ Index Index::from_database(std::filesystem::path path) {
   return EntityProvider::CreateFromDatabase(std::move(path));
 }
 
+IndexVersion Index::version(void) const {
+  return impl->GetIndexVersion();
+}
+
 Index Index::containing(const Compilation &entity) {
   return Index(entity.impl->ep);
 }

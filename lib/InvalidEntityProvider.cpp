@@ -24,6 +24,7 @@ unsigned InvalidEntityProvider::VersionNumber(const Ptr &) {
   return 0u;
 }
 
+IndexVersion InvalidEntityProvider::GetIndexVersion(void) { return {}; }
 void InvalidEntityProvider::VersionNumberChanged(unsigned) {}
 
 FilePathMap InvalidEntityProvider::ListFiles(const Ptr &) {

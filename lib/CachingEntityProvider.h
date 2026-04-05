@@ -73,6 +73,7 @@ class CachingEntityProvider final : public EntityProvider {
   unsigned VersionNumber(void) final;
   unsigned VersionNumber(const Ptr &) final;
 
+  IndexVersion GetIndexVersion(void) final;
   void VersionNumberChanged(unsigned) final;
 
   FilePathMap ListFiles(const Ptr &) final;

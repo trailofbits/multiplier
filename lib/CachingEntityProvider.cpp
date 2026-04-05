@@ -52,6 +52,12 @@ void CachingEntityProvider::ClearCacheLocked(unsigned new_version_number) {
   next->VersionNumberChanged(new_version_number);
 }
 
+IndexVersion CachingEntityProvider::GetIndexVersion(void) {
+  auto iv = next->GetIndexVersion();
+  iv.version = VersionNumber();
+  return iv;
+}
+
 void CachingEntityProvider::VersionNumberChanged(unsigned new_version_number) {
   std::lock_guard<std::recursive_mutex> locker(lock);
   if (new_version_number > version_number) {

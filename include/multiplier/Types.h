@@ -21,6 +21,25 @@ namespace mx {
 
 class Token;
 
+// Identifies a specific index and its version state.
+struct MX_EXPORT IndexVersion {
+  uint64_t index_id{0};     // Unique random ID for this index
+  unsigned version{0};       // Monotonically increasing version number
+
+  bool operator==(const IndexVersion &other) const noexcept {
+    return index_id == other.index_id && version == other.version;
+  }
+
+  bool operator!=(const IndexVersion &other) const noexcept {
+    return !(*this == other);
+  }
+
+  // Same index, possibly different version.
+  bool same_index(const IndexVersion &other) const noexcept {
+    return index_id == other.index_id;
+  }
+};
+
 enum class AttrKind : unsigned short;
 enum class DeclKind : unsigned char;
 enum class MacroKind : unsigned char;

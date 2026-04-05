@@ -73,6 +73,9 @@ class EntityProvider {
   // caches.
   virtual void VersionNumberChanged(unsigned new_version_number) = 0;
 
+  // Get the index version (unique ID + version number).
+  virtual IndexVersion GetIndexVersion(void) = 0;
+
   // Clear the cache.
   virtual void ClearCache(void) = 0;
 

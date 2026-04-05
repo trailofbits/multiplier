@@ -417,6 +417,17 @@ unsigned SQLiteEntityProvider::VersionNumber(const Ptr &) {
   return VersionNumber();
 }
 
+IndexVersion SQLiteEntityProvider::GetIndexVersion(void) {
+  IndexVersion iv;
+  iv.version = VersionNumber();
+  ImplPtr context = impl.Lock();
+  auto stmt = context->db.Prepare("SELECT id FROM index_id LIMIT 1");
+  if (stmt.ExecuteStep()) {
+    stmt.Row().Columns(iv.index_id);
+  }
+  return iv;
+}
+
 void SQLiteEntityProvider::VersionNumberChanged(unsigned) {
   dict.reset(new SQLiteDecompressionDictionary(db_path, dict.get()));
 }

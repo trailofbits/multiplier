@@ -10,6 +10,7 @@
 #include <cassert>
 #include <chrono>
 #include <deque>
+#include <random>
 #include <multiplier/AST/AttrKind.h>
 #include <multiplier/AST/DeclKind.h>
 #include <multiplier/AST/StmtKind.h>
@@ -616,10 +617,24 @@ void DatabaseWriterImpl::ExitDictionaries(void) {
   }
 }
 
-// Initialize the metadata table. It only stores one row of data.
+// Initialize the metadata table and generate a unique index ID.
 void DatabaseWriterImpl::InitMetadata(void) {
   add_version.BindValues(1u);
   add_version.Execute();
+
+  // Generate and store a unique index ID if not already present.
+  auto check = db.Prepare("SELECT COUNT(*) FROM index_id");
+  check.Execute();
+  int64_t count = 0;
+  check.Row().Columns(count);
+  if (count == 0) {
+    std::random_device rd;
+    std::mt19937_64 gen(rd());
+    uint64_t id = gen();
+    auto insert = db.Prepare("INSERT INTO index_id (id) VALUES (?1)");
+    insert.BindValues(id);
+    insert.Execute();
+  }
 }
 
 void DatabaseWriterImpl::BulkInserter(void) {

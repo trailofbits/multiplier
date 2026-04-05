@@ -130,6 +130,9 @@ class MX_EXPORT Index final {
   // by specifying the path to that database.
   static Index from_database(std::filesystem::path path);
 
+  // Get the index version (unique ID + version number).
+  IndexVersion version(void) const;
+
   static Index containing(const Compilation &entity);
   static Index containing(const CXXBaseSpecifier &entity);
   static Index containing(const CXXCtorInitializer &entity);
