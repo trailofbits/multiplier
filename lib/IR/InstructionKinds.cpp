@@ -454,32 +454,42 @@ IRBlock CondBranchInst::false_block(void) const {
 
 IRInstruction SwitchInst::selector(void) const { return nth_operand(0); }
 
-gap::generator<std::pair<int64_t, IRBlock>> SwitchInst::cases(void) const & {
+unsigned SwitchInst::num_cases(void) const {
+  auto ipool = GetIntPool(*impl);
+  return static_cast<unsigned>(ipool[impl->reader().getConstOffset()]);
+}
+
+std::optional<Type> SwitchInst::case_type(void) const {
+  auto pool = GetPool(*impl);
+  return ResolveType(*impl, pool[ExtraBase(impl->reader())]);
+}
+
+gap::generator<SwitchCaseValue> SwitchInst::cases(void) const & {
   auto pool = GetPool(*impl);
   auto ipool = GetIntPool(*impl);
-  auto base = ExtraBase(impl->reader());
-  auto const_base = impl->reader().getConstOffset();
-  // Switch extras: [block0, block1, ..., defaultBlock]
-  // Int pool: [caseVal0, caseVal1, ...]
-  // The last block in extras is the default.
   auto r = impl->reader();
-  uint32_t num_extras = pool.size() - base;  // rough estimate
-  // We need to count switch values from int pool to know how many cases.
-  // The number of case values is stored in the int pool during serialization.
-  // For now, use branch_targets count from operand structure.
-  // Actually, the extras are all the block entity IDs. The last one is default.
-  // The int pool has one value per non-default case.
-  // Count: look at how many int values were stored.
-  // This is tricky without knowing the count. Let's use a heuristic:
-  // cases = number of extras - 1 (last is default).
-  // But we don't know num_extras precisely.
-  // TODO: store case count explicitly.
-  co_return;
+  auto extra_base = ExtraBase(r);
+  auto const_base = r.getConstOffset();
+  int64_t nc = ipool[const_base];
+
+  for (int64_t i = 0; i < nc; ++i) {
+    SwitchCaseValue cv;
+    cv.low = ipool[const_base + 1 + i * 2];
+    cv.high = ipool[const_base + 2 + i * 2];
+    cv.block = MakeBlock(*impl, pool[extra_base + 1 + i]);
+    co_yield cv;
+  }
 }
 
 std::optional<IRBlock> SwitchInst::default_block(void) const {
-  // The last block in extras is the default.
-  // TODO: need explicit count.
+  auto pool = GetPool(*impl);
+  auto ipool = GetIntPool(*impl);
+  auto r = impl->reader();
+  int64_t nc = ipool[r.getConstOffset()];
+  auto extra_base = ExtraBase(r);
+  // Default is the last block: skip caseType + nc case blocks.
+  auto b = MakeBlock(*impl, pool[extra_base + 1 + nc]);
+  if (b.id().Pack() != 0) return b;
   return std::nullopt;
 }
 

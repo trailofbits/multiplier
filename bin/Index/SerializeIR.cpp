@@ -130,6 +130,8 @@ static void EmitInstructionExtras(
       break;
 
     case OC::SWITCH:
+      // Extras: [caseType, case0_block, case1_block, ..., default_block]
+      pool.AddEntity(inst.type_entity_id);  // case integral type
       for (auto &bt : inst.branch_targets) {
         pool.AddEntity(MakeBlockEid(func, fragment_id, block_base,
                                      bt.block_index));
@@ -163,8 +165,11 @@ static uint32_t EmitInstructionConsts(
     }
 
     case OC::SWITCH:
-      for (auto v : inst.switch_values) {
-        pool.AddInt(v);
+      // Int pool: [num_cases, case0_low, case0_high, case1_low, case1_high, ...]
+      pool.AddInt(static_cast<int64_t>(inst.switch_cases.size()));
+      for (auto &sc : inst.switch_cases) {
+        pool.AddInt(sc.low);
+        pool.AddInt(sc.high);
       }
       break;
 

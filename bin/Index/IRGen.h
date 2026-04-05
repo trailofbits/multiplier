@@ -70,7 +70,15 @@ struct InstructionIR {
 
   // Terminator data.
   std::vector<BranchTargetIR> branch_targets;
-  std::vector<int64_t> switch_values;
+
+  // Switch case values: pairs of (low, high) for each case.
+  // Normal case: low == high. Range case (GCC extension): low < high.
+  // The last branch_target has no corresponding switch_case (it's the default).
+  struct SwitchCase {
+    int64_t low{0};
+    int64_t high{0};
+  };
+  std::vector<SwitchCase> switch_cases;
 };
 
 struct BlockIR {

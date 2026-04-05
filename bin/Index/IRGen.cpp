@@ -576,7 +576,9 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
 
   // Collect case/default statements and create a block for each.
   struct CaseInfo {
-    std::optional<int64_t> value;  // nullopt = default
+    int64_t low{0};
+    int64_t high{0};
+    bool is_default{false};
     uint32_t block_index;
   };
   std::vector<CaseInfo> cases;
@@ -585,23 +587,37 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
   std::function<void(const pasta::Stmt &)> collect_cases;
   collect_cases = [&](const pasta::Stmt &stmt) {
     if (auto cs = pasta::CaseStmt::From(stmt)) {
-      int64_t val = 0;
+      int64_t low = 0, high = 0;
       auto *raw_lhs = reinterpret_cast<const clang::Expr *>(
           cs->LHS().RawStmt());
       if (raw_lhs) {
         clang::Expr::EvalResult result;
         if (raw_lhs->EvaluateAsInt(result, ctx_)) {
-          val = result.Val.getInt().getSExtValue();
+          low = result.Val.getInt().getSExtValue();
+          high = low;
+        }
+      }
+      // GNU range case: case low ... high:
+      if (cs->CaseStatementIsGNURange()) {
+        if (auto rhs = cs->RHS()) {
+          auto *raw_rhs = reinterpret_cast<const clang::Expr *>(
+              rhs->RawStmt());
+          if (raw_rhs) {
+            clang::Expr::EvalResult result;
+            if (raw_rhs->EvaluateAsInt(result, ctx_)) {
+              high = result.Val.getInt().getSExtValue();
+            }
+          }
         }
       }
       uint32_t block = NewBlock(mx::ir::BlockKind::SWITCH_CASE);
-      cases.push_back({val, block});
+      cases.push_back({low, high, false, block});
       case_blocks_[EntityIdOf(stmt)] = block;
       return;
     }
     if (auto ds = pasta::DefaultStmt::From(stmt)) {
       uint32_t block = NewBlock(mx::ir::BlockKind::SWITCH_DEFAULT);
-      cases.push_back({std::nullopt, block});
+      cases.push_back({0, 0, true, block});
       case_blocks_[EntityIdOf(stmt)] = block;
       return;
     }
@@ -612,17 +628,36 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
   collect_cases(body);
 
   // Build switch terminator.
+  // Branch targets: case blocks first, then default block last.
+  // switch_cases: one SwitchCase per non-default case.
   InstructionIR term;
   term.opcode = mx::ir::OpCode::SWITCH;
   term.source_entity_id = EntityIdOf(s);
   term.operand_indices = {cond_idx};
+
+  // Store the case type from the selector expression.
+  auto cond_type = sw->Condition().Type();
+  if (cond_type) term.type_entity_id = TypeEntityIdOf(*cond_type);
+
+  // Non-default cases first.
   for (const auto &ci : cases) {
+    if (ci.is_default) continue;
     BranchTargetIR target;
     target.block_index = ci.block_index;
     term.branch_targets.push_back(target);
-    term.switch_values.push_back(ci.value.value_or(0));
+    term.switch_cases.push_back({ci.low, ci.high});
     AddEdge(current_block_index_, ci.block_index);
   }
+
+  // Default block last.
+  for (const auto &ci : cases) {
+    if (!ci.is_default) continue;
+    BranchTargetIR target;
+    target.block_index = ci.block_index;
+    term.branch_targets.push_back(target);
+    AddEdge(current_block_index_, ci.block_index);
+  }
+
   EmitTopLevel(std::move(term));
 
   // Push switch context so break statements work.

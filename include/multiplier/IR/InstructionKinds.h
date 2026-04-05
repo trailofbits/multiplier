@@ -243,12 +243,21 @@ class MX_EXPORT CondBranchInst : public IRInstruction {
   IRBlock false_block(void) const;
 };
 
+struct SwitchCaseValue {
+  int64_t low;   // For normal cases, low == high.
+  int64_t high;  // For GNU range cases (case 1...5), low < high.
+  IRBlock block;
+  bool is_range(void) const { return low != high; }
+};
+
 class MX_EXPORT SwitchInst : public IRInstruction {
  public:
   MX_DECLARE_IR_INSTRUCTION(SwitchInst)
   IRInstruction selector(void) const;
-  gap::generator<std::pair<int64_t, IRBlock>> cases(void) const &;
+  std::optional<Type> case_type(void) const;
+  gap::generator<SwitchCaseValue> cases(void) const &;
   std::optional<IRBlock> default_block(void) const;
+  unsigned num_cases(void) const;
 };
 
 class MX_EXPORT UnreachableInst : public IRInstruction {
