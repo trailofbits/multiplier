@@ -279,19 +279,59 @@ void SerializeIR(
       ob.setKind(static_cast<uint8_t>(src.kind));
     }
 
+    // Build reverse map: instruction index → block index.
+    std::vector<uint32_t> inst_to_block(func.instructions.size(), UINT32_MAX);
+    for (uint32_t bi = 0; bi < func.blocks.size(); ++bi) {
+      for (auto idx : func.blocks[bi].instruction_indices) {
+        inst_to_block[idx] = bi;
+        // Also mark all sub-expression instructions (walk operands).
+        std::function<void(uint32_t)> mark = [&](uint32_t i) {
+          inst_to_block[i] = bi;
+          for (auto op : func.instructions[i].operand_indices) {
+            mark(op);
+          }
+        };
+        mark(idx);
+      }
+    }
+
     // Serialize instructions.
     for (size_t ii = 0; ii < func.instructions.size(); ++ii) {
       const auto &src = func.instructions[ii];
       auto ib = frag_insts[inst_offset + ii];
 
-      // Entity pool: [parentBlockId, sourceEntityId, op0..opN, ...extras]
+      // Entity pool: [parentBlockOrInst, sourceEntityId, (type?), op0..opN, ...extras]
       uint32_t ent_start = pool.EntitySize();
-      pool.AddEntity(MakeBlockEid(func, fragment_id, block_offset,
-                                   src.parent_block_index));
+
+      // Position 0: parent (block for roots, instruction for sub-exprs).
+      if (src.parent_instruction_index == UINT32_MAX) {
+        pool.AddEntity(MakeBlockEid(func, fragment_id, block_offset,
+                                     inst_to_block[ii]));
+      } else {
+        pool.AddEntity(MakeInstEid(func, fragment_id, inst_offset,
+                                    src.parent_instruction_index));
+      }
+
+      // Position 1: source entity ID.
       pool.AddEntity(src.source_entity_id);
+
+      // Position 2 (value-producing only): result type.
+      if (!mx::ir::IsTerminator(src.opcode) &&
+          src.opcode != mx::ir::OpCode::STORE &&
+          src.opcode != mx::ir::OpCode::VA_START &&
+          src.opcode != mx::ir::OpCode::VA_END &&
+          src.opcode != mx::ir::OpCode::VA_COPY &&
+          src.opcode != mx::ir::OpCode::VA_PACK &&
+          src.opcode != mx::ir::OpCode::UNKNOWN) {
+        pool.AddEntity(src.type_entity_id);
+      }
+
+      // Operands.
       for (auto op_idx : src.operand_indices) {
         pool.AddEntity(MakeInstEid(func, fragment_id, inst_offset, op_idx));
       }
+
+      // Opcode-specific extras.
       EmitInstructionExtras(pool, src, func, fragment_id,
                             obj_offset, block_offset, inst_offset);
 
@@ -300,7 +340,6 @@ void SerializeIR(
 
       ib.setEntityOffset(ent_start);
       ib.setConstOffset(const_start);
-      ib.setParentOffset(static_cast<uint16_t>(src.parent_offset));
       ib.setNumOperands(static_cast<uint8_t>(src.operand_indices.size()));
       ib.setOpcode(static_cast<uint8_t>(src.opcode));
       ib.setConstWidth(src.width);

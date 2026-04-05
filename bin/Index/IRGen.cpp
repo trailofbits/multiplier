@@ -92,6 +92,9 @@ std::optional<FunctionIR> IRGenerator::Generate(
     ComputeDominators();
     ComputeRPO();
 
+    // Verify block structure.
+    VerifyBlocks();
+
     LOG(INFO) << "Generated IR for function entity "
               << func_.func_decl_entity_id
               << ": " << func_.blocks.size() << " blocks, "
@@ -279,7 +282,6 @@ uint32_t IRGenerator::GetOrMakeObject(const pasta::Decl &decl) {
 // ---------------------------------------------------------------------------
 
 uint32_t IRGenerator::EmitInstruction(InstructionIR inst) {
-  inst.parent_block_index = current_block_index_;
   uint32_t idx = static_cast<uint32_t>(func_.instructions.size());
   func_.instructions.push_back(std::move(inst));
   return idx;
@@ -288,6 +290,8 @@ uint32_t IRGenerator::EmitInstruction(InstructionIR inst) {
 uint32_t IRGenerator::EmitTopLevel(InstructionIR inst) {
   uint32_t idx = EmitInstruction(std::move(inst));
   func_.blocks[current_block_index_].instruction_indices.push_back(idx);
+  // Root: parent instruction is none, parent block is the current block.
+  func_.instructions[idx].parent_instruction_index = UINT32_MAX;
   SetOperandParents(idx);
   return idx;
 }
@@ -295,13 +299,7 @@ uint32_t IRGenerator::EmitTopLevel(InstructionIR inst) {
 void IRGenerator::SetOperandParents(uint32_t inst_idx) {
   auto &inst = func_.instructions[inst_idx];
   for (auto op_idx : inst.operand_indices) {
-    // parent_offset = distance from child to parent in the flat list.
-    // Since children are emitted before parents (post-order), parent is
-    // at a higher index.
-    func_.instructions[op_idx].parent_offset = inst_idx - op_idx;
-    // Recursively set parents for sub-operands that don't already have one.
-    // (Only set if they're direct children -- deeper nesting is handled
-    // by the recursive EmitRValue calls which already set up the tree.)
+    func_.instructions[op_idx].parent_instruction_index = inst_idx;
   }
 }
 
@@ -776,6 +774,15 @@ void IRGenerator::EmitLabelStmt(const pasta::Stmt &s) {
 uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
   auto eid = EntityIdOf(e);
 
+  // Helper: emit instruction with result type from expression e.
+  auto expr_type = e.Type();
+  auto emit_typed = [&](InstructionIR inst) -> uint32_t {
+    if (expr_type && inst.type_entity_id == kInvalidEntityId) {
+      inst.type_entity_id = TypeEntityIdOf(*expr_type);
+    }
+    return EmitInstruction(std::move(inst));
+  };
+
   // Integer literal -- use Clang's evaluated value.
   if (auto il = pasta::IntegerLiteral::From(e)) {
     InstructionIR inst;
@@ -792,7 +799,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         if (ty) inst.type_entity_id = TypeEntityIdOf(*ty);
       }
     }
-    return EmitInstruction(std::move(inst));
+    return emit_typed(std::move(inst));
   }
 
   // Floating literal -- use Clang's evaluated value.
@@ -810,7 +817,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       inst.width = static_cast<uint8_t>(
           ctx_.getTypeSize(raw->getType()));
     }
-    return EmitInstruction(std::move(inst));
+    return emit_typed(std::move(inst));
   }
 
   // Character literal -- use Clang's value.
@@ -823,7 +830,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       inst.int_value = raw->getValue();
     }
     inst.width = 8;
-    return EmitInstruction(std::move(inst));
+    return emit_typed(std::move(inst));
   }
 
   // String literal.
@@ -838,7 +845,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     inst.opcode = mx::ir::OpCode::ADDRESS_OF;
     inst.source_entity_id = eid;
     inst.object_index = obj_idx;
-    return EmitInstruction(std::move(inst));
+    return emit_typed(std::move(inst));
   }
 
   // Paren expr -- unwrap.
@@ -871,7 +878,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       inst.source_entity_id = eid;
       if (maybe_type) inst.type_entity_id = TypeEntityIdOf(*maybe_type);
       inst.operand_indices = {addr_idx};
-      return EmitInstruction(std::move(inst));
+      return emit_typed(std::move(inst));
     }
     if (ck == pasta::CastKind::kArrayToPointerDecay ||
         ck == pasta::CastKind::kNoOperation) {
@@ -884,7 +891,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       InstructionIR inst;
       inst.opcode = mx::ir::OpCode::CONST_NULL;
       inst.source_entity_id = eid;
-      return EmitInstruction(std::move(inst));
+      return emit_typed(std::move(inst));
     }
     if (ck == pasta::CastKind::kIntegralToBoolean) {
       uint32_t sub_idx = EmitRValue(sub);
@@ -896,7 +903,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       inst.opcode = mx::ir::OpCode::CMP_NE;
       inst.source_entity_id = eid;
       inst.operand_indices = {sub_idx, zero_idx};
-      return EmitInstruction(std::move(inst));
+      return emit_typed(std::move(inst));
     }
 
     // Map cast kinds to IR opcodes.
@@ -917,7 +924,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     inst.source_entity_id = eid;
     if (maybe_type) inst.type_entity_id = TypeEntityIdOf(*maybe_type);
     inst.operand_indices = {sub_idx};
-    return EmitInstruction(std::move(inst));
+    return emit_typed(std::move(inst));
   }
 
   // Explicit cast -- use same CastKind dispatch as implicit casts.
@@ -946,7 +953,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     inst.source_entity_id = eid;
     if (auto t = e.Type()) inst.type_entity_id = TypeEntityIdOf(*t);
     inst.operand_indices = {sub_idx};
-    return EmitInstruction(std::move(inst));
+    return emit_typed(std::move(inst));
   }
 
   // Other CastExpr -- pass through.
@@ -968,7 +975,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         inst.source_entity_id = eid;
         if (auto t__ = e.Type()) inst.type_entity_id = TypeEntityIdOf(*t__);
         inst.operand_indices = {ptr_idx};
-        return EmitInstruction(std::move(inst));
+        return emit_typed(std::move(inst));
       }
       if (oc == pasta::UnaryOperatorKind::kPreIncrement ||
           oc == pasta::UnaryOperatorKind::kPreDecrement ||
@@ -985,7 +992,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         if (oc == pasta::UnaryOperatorKind::kPreIncrement ||
             oc == pasta::UnaryOperatorKind::kPreDecrement) f |= 2;
         inst.flags = f;
-        return EmitInstruction(std::move(inst));
+        return emit_typed(std::move(inst));
       }
       if (oc == pasta::UnaryOperatorKind::kMinus) {
         uint32_t sub_idx = EmitRValue(sub);
@@ -993,7 +1000,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         inst.opcode = mx::ir::OpCode::NEG;
         inst.source_entity_id = eid;
         inst.operand_indices = {sub_idx};
-        return EmitInstruction(std::move(inst));
+        return emit_typed(std::move(inst));
       }
       if (oc == pasta::UnaryOperatorKind::kPlus) return EmitRValue(sub);
       if (oc == pasta::UnaryOperatorKind::kLNot) {
@@ -1002,7 +1009,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         inst.opcode = mx::ir::OpCode::LOGICAL_NOT;
         inst.source_entity_id = eid;
         inst.operand_indices = {sub_idx};
-        return EmitInstruction(std::move(inst));
+        return emit_typed(std::move(inst));
       }
       if (oc == pasta::UnaryOperatorKind::kNot) {
         uint32_t sub_idx = EmitRValue(sub);
@@ -1010,7 +1017,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         inst.opcode = mx::ir::OpCode::BIT_NOT;
         inst.source_entity_id = eid;
         inst.operand_indices = {sub_idx};
-        return EmitInstruction(std::move(inst));
+        return emit_typed(std::move(inst));
       }
       return EmitRValue(sub);
     }
@@ -1029,7 +1036,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         inst.opcode = mx::ir::OpCode::STORE;
         inst.source_entity_id = eid;
         inst.operand_indices = {addr_idx, val_idx};
-        return EmitInstruction(std::move(inst));
+        return emit_typed(std::move(inst));
       }
 
       // Compound assignment.
@@ -1053,7 +1060,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
           case pasta::BinaryOperatorKind::kShrAssign: inst.compound_op = mx::ir::OpCode::SHR; break;
           default: inst.compound_op = mx::ir::OpCode::ADD; break;
         }
-        return EmitInstruction(std::move(inst));
+        return emit_typed(std::move(inst));
       }
 
       // Comma.
@@ -1075,7 +1082,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
                           : mx::ir::OpCode::LOGICAL_OR;
         inst.source_entity_id = eid;
         inst.operand_indices = {lhs_idx, rhs_idx};
-        return EmitInstruction(std::move(inst));
+        return emit_typed(std::move(inst));
       }
 
       // Comparison.
@@ -1097,7 +1104,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         inst.opcode = cmp_op;
         inst.source_entity_id = eid;
         inst.operand_indices = {lhs_idx, rhs_idx};
-        return EmitInstruction(std::move(inst));
+        return emit_typed(std::move(inst));
       }
 
       // Arithmetic / logic.
@@ -1137,7 +1144,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
           inst.type_entity_id = TypeEntityIdOf(pointee);
           if (auto sz = TypeSizeBytes(pointee)) inst.size_bytes = *sz;
         }
-        return EmitInstruction(std::move(inst));
+        return emit_typed(std::move(inst));
       }
 
       if (arith_op == mx::ir::OpCode::SUB && lhs_ptr && rhs_ptr) {
@@ -1148,7 +1155,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         inst.opcode = mx::ir::OpCode::PTR_DIFF;
         inst.source_entity_id = eid;
         inst.operand_indices = {lhs_idx, rhs_idx};
-        return EmitInstruction(std::move(inst));
+        return emit_typed(std::move(inst));
       }
 
       if (arith_op == mx::ir::OpCode::SUB && lhs_ptr) {
@@ -1167,7 +1174,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
           inst.type_entity_id = TypeEntityIdOf(pointee);
           if (auto sz = TypeSizeBytes(pointee)) inst.size_bytes = *sz;
         }
-        return EmitInstruction(std::move(inst));
+        return emit_typed(std::move(inst));
       }
 
       uint32_t lhs_idx = EmitRValue(bo->LHS());
@@ -1176,7 +1183,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       inst.opcode = arith_op;
       inst.source_entity_id = eid;
       inst.operand_indices = {lhs_idx, rhs_idx};
-      return EmitInstruction(std::move(inst));
+      return emit_typed(std::move(inst));
     }
   }
 
@@ -1195,14 +1202,14 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         inst.opcode = mx::ir::OpCode::VA_START;
         inst.source_entity_id = eid;
         if (!args.empty()) inst.operand_indices.push_back(EmitRValue(args[0]));
-        return EmitInstruction(std::move(inst));
+        return emit_typed(std::move(inst));
       }
       if (callee_name == "__builtin_va_end" || callee_name == "va_end") {
         InstructionIR inst;
         inst.opcode = mx::ir::OpCode::VA_END;
         inst.source_entity_id = eid;
         if (!args.empty()) inst.operand_indices.push_back(EmitRValue(args[0]));
-        return EmitInstruction(std::move(inst));
+        return emit_typed(std::move(inst));
       }
       if (callee_name == "__builtin_va_copy" || callee_name == "va_copy") {
         InstructionIR inst;
@@ -1212,7 +1219,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
           inst.operand_indices.push_back(EmitRValue(args[0]));
           inst.operand_indices.push_back(EmitRValue(args[1]));
         }
-        return EmitInstruction(std::move(inst));
+        return emit_typed(std::move(inst));
       }
     }
 
@@ -1249,7 +1256,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         inst.operand_indices.push_back(EmitRValue(arg));
       }
     }
-    return EmitInstruction(std::move(inst));
+    return emit_typed(std::move(inst));
   }
 
   // Conditional operator (ternary) -- kept as SELECT, not control flow.
@@ -1264,7 +1271,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     inst.opcode = mx::ir::OpCode::SELECT;
     inst.source_entity_id = eid;
     inst.operand_indices = {cond_idx, true_idx, false_idx};
-    return EmitInstruction(std::move(inst));
+    return emit_typed(std::move(inst));
   }
 
   // sizeof / alignof.
@@ -1278,7 +1285,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         inst.type_entity_id = TypeEntityIdOf(arg_type);
         if (auto sz = TypeSizeBytes(arg_type)) inst.size_bytes = *sz;
       }
-      return EmitInstruction(std::move(inst));
+      return emit_typed(std::move(inst));
     }
     // Other traits (alignof, etc.) -- treat as constant if we can evaluate.
     {
@@ -1290,7 +1297,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         inst.int_value = static_cast<int64_t>(*sz);
         inst.uint_value = static_cast<uint64_t>(*sz);
         inst.width = 64;
-        return EmitInstruction(std::move(inst));
+        return emit_typed(std::move(inst));
       }
     }
   }
@@ -1306,7 +1313,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         inst.operand_indices.push_back(EmitRValue(*child_expr));
       }
     }
-    return EmitInstruction(std::move(inst));
+    return emit_typed(std::move(inst));
   }
 
   // CompoundLiteralExpr -- emit the initializer.
@@ -1335,7 +1342,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     inst.source_entity_id = eid;
     inst.int_value = 0;
     inst.width = 32;
-    return EmitInstruction(std::move(inst));
+    return emit_typed(std::move(inst));
   }
 
   // VAArgExpr -- va_arg(ap, type).
@@ -1346,7 +1353,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     inst.source_entity_id = eid;
     if (auto t = e.Type()) inst.type_entity_id = TypeEntityIdOf(*t);
     inst.operand_indices = {sub_idx};
-    return EmitInstruction(std::move(inst));
+    return emit_typed(std::move(inst));
   }
 
 
@@ -1362,7 +1369,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     InstructionIR inst;
     inst.opcode = mx::ir::OpCode::CONST_NULL;
     inst.source_entity_id = eid;
-    return EmitInstruction(std::move(inst));
+    return emit_typed(std::move(inst));
   }
 
   // CXXBoolLiteralExpr -- true/false.
@@ -1374,7 +1381,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     inst.uint_value = bl->Value() ? 1 : 0;
     inst.width = 1;
     if (auto t = e.Type()) inst.type_entity_id = TypeEntityIdOf(*t);
-    return EmitInstruction(std::move(inst));
+    return emit_typed(std::move(inst));
   }
 
   // Emit UNKNOWN for anything we haven't explicitly handled.
@@ -1382,7 +1389,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
   InstructionIR inst;
   inst.opcode = mx::ir::OpCode::UNKNOWN;
   inst.source_entity_id = eid;
-  return EmitInstruction(std::move(inst));
+  return emit_typed(std::move(inst));
 }
 
 uint32_t IRGenerator::EmitLValue(const pasta::Expr &e) {
@@ -1681,6 +1688,61 @@ void IRGenerator::ComputeRPO() {
   };
   dfs(func_.entry_block_index);
   std::reverse(func_.rpo_block_order.begin(), func_.rpo_block_order.end());
+}
+
+void IRGenerator::VerifyBlocks() {
+  auto &blocks = func_.blocks;
+  auto &instructions = func_.instructions;
+
+  // Entry block must exist.
+  DCHECK(func_.entry_block_index < blocks.size())
+      << "Entry block index out of range";
+
+  for (uint32_t bi = 0; bi < blocks.size(); ++bi) {
+    auto &block = blocks[bi];
+
+    // Every block must have at least one instruction.
+    DCHECK(!block.instruction_indices.empty())
+        << "Block " << bi << " has no instructions";
+
+    // The last top-level instruction must be a terminator.
+    if (!block.instruction_indices.empty()) {
+      auto last_idx = block.instruction_indices.back();
+      DCHECK(last_idx < instructions.size())
+          << "Block " << bi << " last instruction index out of range";
+      auto last_op = instructions[last_idx].opcode;
+      DCHECK(mx::ir::IsTerminator(last_op))
+          << "Block " << bi << " last instruction is not a terminator (opcode="
+          << static_cast<int>(last_op) << ")";
+    }
+
+    // Successor/predecessor edges must be symmetric.
+    for (auto succ_idx : block.successor_indices) {
+      DCHECK(succ_idx < blocks.size())
+          << "Block " << bi << " successor " << succ_idx << " out of range";
+      auto &succ = blocks[succ_idx];
+      bool found = false;
+      for (auto pred_idx : succ.predecessor_indices) {
+        if (pred_idx == bi) { found = true; break; }
+      }
+      DCHECK(found)
+          << "Block " << bi << " -> " << succ_idx
+          << " successor edge has no matching predecessor";
+    }
+
+    for (auto pred_idx : block.predecessor_indices) {
+      DCHECK(pred_idx < blocks.size())
+          << "Block " << bi << " predecessor " << pred_idx << " out of range";
+      auto &pred = blocks[pred_idx];
+      bool found = false;
+      for (auto succ_idx : pred.successor_indices) {
+        if (succ_idx == bi) { found = true; break; }
+      }
+      DCHECK(found)
+          << "Block " << bi << " <- " << pred_idx
+          << " predecessor edge has no matching successor";
+    }
+  }
 }
 
 }  // namespace ir

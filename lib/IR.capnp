@@ -14,11 +14,10 @@ struct Object @0xa7625c6bfddc036b {
 struct Instruction @0xc6bb311936d9962b {
   entityOffset @0 :UInt32;   # Start index into fragment's irEntityPool
   constOffset @1 :UInt32;    # Start index into fragment's irIntPool
-  parentOffset @2 :UInt16;   # Distance to parent instruction (0 = root)
-  numOperands @3 :UInt8;     # Number of data-flow operand entity IDs
-  opcode @4 :UInt8;          # OpCode enum
-  constWidth @5 :UInt8;      # Bit width for constants
-  flags @6 :UInt8;           # Bit flags
+  numOperands @2 :UInt8;     # Number of data-flow operand entity IDs
+  opcode @3 :UInt8;          # OpCode enum
+  constWidth @4 :UInt8;      # Bit width for constants
+  flags @5 :UInt8;           # Bit flags
 }
 
 struct Block @0xb1141386bcc94b26 {

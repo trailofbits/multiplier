@@ -55,13 +55,16 @@ gap::generator<IRInstruction> IRBlock::instructions(void) const & {
   auto r = impl->reader();
   auto pool = GetEntityPool(*impl);
   auto all_insts = impl->frag->reader.getIrInstructions();
+  auto full_pool = impl->frag->reader.getIrEntityPool();
   uint32_t base = r.getEntityOffset();
   uint16_t n = r.getNumInstructions();
   for (uint16_t i = 0; i < n; ++i) {
     auto eid = pool[base + i];
     auto vid = EntityId(eid).Unpack();
     if (auto *iid = std::get_if<IRInstructionId>(&vid)) {
-      if (all_insts[iid->offset].getParentOffset() == 0) {
+      // Root instructions have an IRBlockId at their pool position 0.
+      auto parent_eid = full_pool[all_insts[iid->offset].getEntityOffset()];
+      if (std::holds_alternative<IRBlockId>(EntityId(parent_eid).Unpack())) {
         co_yield IRInstruction(std::make_shared<IRInstructionImpl>(
             impl->frag, iid->offset, impl->fragment_id));
       }

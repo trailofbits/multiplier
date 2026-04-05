@@ -50,15 +50,11 @@ struct InstructionIR {
   mx::RawEntityId source_entity_id{mx::kInvalidEntityId};
 
   // Operand instruction indices (into FunctionIR::instructions).
-  // These are the children in the expression tree.
   std::vector<uint32_t> operand_indices;
 
-  // Offset to parent instruction in the flat list. 0 = top-level root.
-  // parent is at (my_index + parent_offset) in the flat instruction list.
-  uint32_t parent_offset{0};
-
-  // Parent block index.
-  uint32_t parent_block_index{0};
+  // Parent instruction index (UINT32_MAX for top-level roots).
+  // Roots have their parent block determined by which BlockIR contains them.
+  uint32_t parent_instruction_index{UINT32_MAX};
 
   // OpCode-specific fields.
   uint32_t object_index{0};
@@ -226,6 +222,7 @@ class IRGenerator {
   // --- Post-processing ---
   void ComputeDominators();
   void ComputeRPO();
+  void VerifyBlocks();
 };
 
 }  // namespace ir
