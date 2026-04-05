@@ -24,12 +24,16 @@ class Type;
 using IRInstructionImplPtr = std::shared_ptr<const IRInstructionImpl>;
 
 class MX_EXPORT IRInstruction {
- private:
+ protected:
   friend class EntityProvider;
   friend class Index;
   friend class IRBlock;
   friend class IRFunction;
   IRInstructionImplPtr impl;
+
+ public:
+  // For derived instruction classes.
+  const IRInstructionImplPtr &impl_ptr(void) const { return impl; }
 
  public:
   IRInstruction(void) = default;
