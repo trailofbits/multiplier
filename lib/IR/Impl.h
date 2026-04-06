@@ -64,6 +64,21 @@ class IRInstructionImpl {
   virtual ~IRInstructionImpl() = default;
 };
 
+class IRSwitchCaseImpl {
+ public:
+  const FragmentImplPtr frag;
+  const unsigned offset;
+  const RawEntityId fragment_id;
+
+  IRSwitchCaseImpl(FragmentImplPtr frag_, unsigned offset_,
+                   RawEntityId fragment_id_)
+      : frag(std::move(frag_)), offset(offset_),
+        fragment_id(fragment_id_) {}
+
+  rpc::ir::SwitchCase::Reader reader() const;
+  virtual ~IRSwitchCaseImpl() = default;
+};
+
 class IRObjectImpl {
  public:
   const FragmentImplPtr frag;

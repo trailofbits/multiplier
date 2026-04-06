@@ -66,7 +66,8 @@ enum class TypeKind : unsigned char;
     ir_(::mx::, IRFunction, ir_function, IR_FUNCTION, 15) \
     ir_(::mx::, IRBlock, ir_block, IR_BLOCK, 16) \
     ir_(::mx::, IRInstruction, ir_instruction, IR_INSTRUCTION, 17) \
-    ir_(::mx::, IRObject, ir_object, IR_OBJECT, 18)
+    ir_(::mx::, IRObject, ir_object, IR_OBJECT, 18) \
+    ir_(::mx::, IRSwitchCase, ir_switch_case, IR_SWITCH_CASE, 19)
 
 #define MX_DECLARE_ENTITY_CLASS(ns_path, type, lower, enum_, val) \
     class type;\
@@ -377,6 +378,7 @@ enum class IREntityKind : uint8_t {
   IR_BLOCK = 1,
   IR_INSTRUCTION = 2,
   IR_OBJECT = 3,
+  IR_SWITCH_CASE = 4,
 };
 
 inline static const char *EnumerationName(IREntityKind) {
@@ -386,7 +388,7 @@ inline static const char *EnumerationName(IREntityKind) {
 MX_EXPORT const char *EnumeratorName(IREntityKind) noexcept;
 
 inline static constexpr unsigned NumEnumerators(IREntityKind) {
-  return 4u;
+  return 5u;
 }
 
 struct MX_EXPORT IRFunctionId final {
@@ -421,6 +423,14 @@ struct MX_EXPORT IRObjectId final {
   static constexpr IREntityKind kind = IREntityKind::IR_OBJECT;
   bool operator==(const IRObjectId &) const noexcept = default;
   auto operator<=>(const IRObjectId &) const noexcept = default;
+};
+
+struct MX_EXPORT IRSwitchCaseId final {
+  RawEntityId fragment_id;
+  EntityOffset offset;
+  static constexpr IREntityKind kind = IREntityKind::IR_SWITCH_CASE;
+  bool operator==(const IRSwitchCaseId &) const noexcept = default;
+  auto operator<=>(const IRSwitchCaseId &) const noexcept = default;
 };
 
 // Translation units represent a compilation. From a translation unit we can
@@ -476,6 +486,8 @@ struct MX_EXPORT FragmentId final {
   inline /* implicit */ FragmentId(const IRInstructionId &id_)
       : fragment_id(id_.fragment_id) {}
   inline /* implicit */ FragmentId(const IRObjectId &id_)
+      : fragment_id(id_.fragment_id) {}
+  inline /* implicit */ FragmentId(const IRSwitchCaseId &id_)
       : fragment_id(id_.fragment_id) {}
 
   static std::optional<FragmentId> from(const EntityId &);
@@ -547,6 +559,7 @@ class MX_EXPORT EntityId final {
   /* implicit */ EntityId(IRBlockId id);
   /* implicit */ EntityId(IRInstructionId id);
   /* implicit */ EntityId(IRObjectId id);
+  /* implicit */ EntityId(IRSwitchCaseId id);
 
   template <typename T>
   /* implicit */ inline EntityId(SpecificEntityId<T>);

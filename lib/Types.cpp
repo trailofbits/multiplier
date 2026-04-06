@@ -61,7 +61,8 @@ static constexpr uint64_t kIRFunctionOffset = 0u;
 static constexpr uint64_t kIRBlockOffset = 1u;
 static constexpr uint64_t kIRInstructionOffset = kIRBlockOffset + kNumBlockKinds;
 static constexpr uint64_t kIRObjectOffset = kIRInstructionOffset + kNumOpCodes;
-static constexpr uint64_t kNumIREntityKinds = kIRObjectOffset + 1u;
+static constexpr uint64_t kIRSwitchCaseOffset = kIRObjectOffset + 1u;
+static constexpr uint64_t kNumIREntityKinds = kIRSwitchCaseOffset + 1u;
 
 static constexpr unsigned kSubKindNumBits = 11u;
 static_assert((kNumDeclKinds + kNumStmtKinds + kNumAttrKinds +
@@ -760,6 +761,12 @@ EntityId::EntityId(IRObjectId id) {
   }
 }
 
+EntityId::EntityId(IRSwitchCaseId id) {
+  if (id.fragment_id) {
+    PackIREntity(opaque, id.fragment_id, kIRSwitchCaseOffset, id.offset);
+  }
+}
+
 EntityId::EntityId(CompilationId id) {
   if (id.compilation_id) {
     PackedEntityId packed = {};
@@ -1115,6 +1122,8 @@ VariantId EntityId::Unpack(void) const noexcept {
                                  static_cast<uint8_t>(sub_kind - kIRInstructionOffset)};
         } else if (sub_kind == kIRObjectOffset) {
           return IRObjectId{fid, off};
+        } else if (sub_kind == kIRSwitchCaseOffset) {
+          return IRSwitchCaseId{fid, off};
         }
       }
 
@@ -1236,6 +1245,8 @@ VariantId EntityId::Unpack(void) const noexcept {
                                  static_cast<uint8_t>(sub_kind - kIRInstructionOffset)};
         } else if (sub_kind == kIRObjectOffset) {
           return IRObjectId{fid, off};
+        } else if (sub_kind == kIRSwitchCaseOffset) {
+          return IRSwitchCaseId{fid, off};
         }
       }
 

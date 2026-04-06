@@ -31,6 +31,15 @@ struct Block @0xb1141386bcc94b26 {
   kind @6 :UInt8;
 }
 
+struct SwitchCase @0x93795f3c8abc1070 {
+  low @0 :Int64;              # Case value lower bound
+  high @1 :Int64;             # Case value upper bound (== low for normal cases)
+  targetBlockId @2 :UInt64;   # IRBlockId of target block
+  sourceEntityId @3 :UInt64;  # CaseStmt/DefaultStmt AST entity ID
+  valueTypeId @4 :UInt64;     # Integral type for interpreting values
+  isDefault @5 :Bool;         # True for the default case
+}
+
 struct Function @0xe6be31a259218610 {
   funcDeclEntityId @0 :UInt64;
   entryBlockId @1 :UInt64;

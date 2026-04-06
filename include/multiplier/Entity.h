@@ -10,6 +10,7 @@
 #include "IR/Block.h"
 #include "IR/Instruction.h"
 #include "IR/Object.h"
+#include "IR/SwitchCase.h"
 
 namespace mx {
 

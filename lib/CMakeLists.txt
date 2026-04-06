@@ -143,6 +143,7 @@ add_library("mx-api" OBJECT
   "IR/Block.cpp"
   "IR/Instruction.cpp"
   "IR/InstructionKinds.cpp"
+  "IR/SwitchCase.cpp"
   "IR/Object.cpp"
   "InvalidEntityProvider.cpp"
   "InvalidEntityProvider.h"
