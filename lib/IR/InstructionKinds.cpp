@@ -12,6 +12,8 @@
 #include "../Fragment.h"
 #include "../EntityProvider.h"
 
+#include <cassert>
+
 namespace mx {
 namespace {
 
@@ -79,7 +81,15 @@ IRObject MakeObj(const IRInstructionImpl &parent, uint64_t eid) {
   return {};
 }
 
-std::optional<Type> ResolveType(const IRInstructionImpl &impl, uint64_t eid) {
+Type ResolveType(const IRInstructionImpl &impl, uint64_t eid) {
+  assert(eid != kInvalidEntityId && "Missing type entity ID");
+  auto ptr = impl.frag->ep->TypeFor(impl.frag->ep, eid);
+  assert(ptr && "Failed to resolve type entity ID");
+  return Type(std::move(ptr));
+}
+
+// Optional version for CallInst result type (void calls).
+std::optional<Type> MaybeResolveType(const IRInstructionImpl &impl, uint64_t eid) {
   if (eid == kInvalidEntityId) return std::nullopt;
   if (auto ptr = impl.frag->ep->TypeFor(impl.frag->ep, eid)) {
     return Type(std::move(ptr));
@@ -95,12 +105,13 @@ std::optional<FunctionDecl> ResolveFunc(const IRInstructionImpl &impl, uint64_t 
   return std::nullopt;
 }
 
-std::optional<FieldDecl> ResolveField(const IRInstructionImpl &impl, uint64_t eid) {
-  if (eid == kInvalidEntityId) return std::nullopt;
-  if (auto ptr = impl.frag->ep->DeclFor(impl.frag->ep, eid)) {
-    return FieldDecl::from(Decl(std::move(ptr)));
-  }
-  return std::nullopt;
+FieldDecl ResolveField(const IRInstructionImpl &impl, uint64_t eid) {
+  assert(eid != kInvalidEntityId && "Missing field entity ID");
+  auto ptr = impl.frag->ep->DeclFor(impl.frag->ep, eid);
+  assert(ptr && "Failed to resolve field entity ID");
+  auto fd = FieldDecl::from(Decl(std::move(ptr)));
+  assert(fd && "Entity is not a FieldDecl");
+  return *fd;
 }
 
 }  // namespace
@@ -138,6 +149,12 @@ IMPL_FROM_SINGLE(CompoundAssignInst, COMPOUND_ASSIGN)
 IMPL_FROM_SINGLE(SelectInst, SELECT)
 IMPL_FROM_SINGLE(CopyInst, COPY)
 IMPL_FROM_SINGLE(InitListInst, INIT_LIST)
+IMPL_FROM_SINGLE(VAStartInst, VA_START)
+IMPL_FROM_SINGLE(VAEndInst, VA_END)
+IMPL_FROM_SINGLE(VACopyInst, VA_COPY)
+IMPL_FROM_SINGLE(VAArgInst, VA_ARG)
+IMPL_FROM_SINGLE(VAPackInst, VA_PACK)
+
 IMPL_FROM_SINGLE(RetInst, RET)
 IMPL_FROM_SINGLE(CondBranchInst, COND_BRANCH)
 IMPL_FROM_SINGLE(SwitchInst, SWITCH)
@@ -175,7 +192,7 @@ uint8_t ConstIntInst::width(void) const {
   return impl->reader().getConstWidth();
 }
 
-std::optional<Type> ConstIntInst::type(void) const {
+Type ConstIntInst::type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 
@@ -192,19 +209,19 @@ uint8_t ConstFloatInst::width(void) const {
   return impl->reader().getConstWidth();
 }
 
-std::optional<Type> ConstFloatInst::type(void) const {
+Type ConstFloatInst::type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 
 // ---- ConstNullInst ----
 
-std::optional<Type> ConstNullInst::type(void) const {
+Type ConstNullInst::type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 
 // ---- AllocaInst ----
 
-std::optional<Type> AllocaInst::allocated_type(void) const {
+Type AllocaInst::allocated_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 
@@ -218,7 +235,7 @@ IRInstruction LoadInst::address(void) const {
   return nth_operand(0);
 }
 
-std::optional<Type> LoadInst::loaded_type(void) const {
+Type LoadInst::loaded_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 
@@ -234,7 +251,7 @@ IRInstruction StoreInst::stored_value(void) const {
 
 // ---- AddressOfInst ----
 
-std::optional<Type> AddressOfInst::type(void) const {
+Type AddressOfInst::type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 
@@ -248,11 +265,11 @@ IRInstruction GEPFieldInst::base(void) const {
   return nth_operand(0);
 }
 
-std::optional<Type> GEPFieldInst::result_type(void) const {
+Type GEPFieldInst::result_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 
-std::optional<FieldDecl> GEPFieldInst::field(void) const {
+FieldDecl GEPFieldInst::field(void) const {
   auto pool = GetPool(*impl);
   return ResolveField(*impl, pool[ExtraBase(impl->reader())]);
 }
@@ -271,11 +288,11 @@ IRInstruction PtrAddInst::index(void) const {
   return nth_operand(1);
 }
 
-std::optional<Type> PtrAddInst::result_type(void) const {
+Type PtrAddInst::result_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 
-std::optional<Type> PtrAddInst::element_type(void) const {
+Type PtrAddInst::element_type(void) const {
   auto pool = GetPool(*impl);
   return ResolveType(*impl, pool[ExtraBase(impl->reader())]);
 }
@@ -288,7 +305,7 @@ int64_t PtrAddInst::element_size(void) const {
 
 IRInstruction BinaryInst::lhs(void) const { return nth_operand(0); }
 IRInstruction BinaryInst::rhs(void) const { return nth_operand(1); }
-std::optional<Type> BinaryInst::result_type(void) const {
+Type BinaryInst::result_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 
@@ -296,31 +313,31 @@ std::optional<Type> BinaryInst::result_type(void) const {
 
 IRInstruction ComparisonInst::lhs(void) const { return nth_operand(0); }
 IRInstruction ComparisonInst::rhs(void) const { return nth_operand(1); }
-std::optional<Type> ComparisonInst::result_type(void) const {
+Type ComparisonInst::result_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 
 // ---- UnaryInst ----
 
 IRInstruction UnaryInst::operand(void) const { return nth_operand(0); }
-std::optional<Type> UnaryInst::result_type(void) const {
+Type UnaryInst::result_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 
 // ---- CastInst ----
 
 IRInstruction CastInst::operand(void) const { return nth_operand(0); }
-std::optional<Type> CastInst::result_type(void) const {
+Type CastInst::result_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 
 // ---- SizeOfInst ----
 
-std::optional<Type> SizeOfInst::result_type(void) const {
+Type SizeOfInst::result_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 
-std::optional<Type> SizeOfInst::measured_type(void) const {
+Type SizeOfInst::measured_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[ExtraBase(impl->reader())]);
 }
 
@@ -333,7 +350,7 @@ int64_t SizeOfInst::static_size(void) const {
 // ---- CallInst ----
 
 std::optional<Type> CallInst::result_type(void) const {
-  return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
+  return MaybeResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 
 std::optional<FunctionDecl> CallInst::target(void) const {
@@ -361,7 +378,7 @@ gap::generator<IRInstruction> CallInst::arguments(void) const & {
 
 IRInstruction IncDecInst::address(void) const { return nth_operand(0); }
 
-std::optional<Type> IncDecInst::result_type(void) const {
+Type IncDecInst::result_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 
@@ -382,7 +399,7 @@ int64_t IncDecInst::pointer_element_size(void) const {
 IRInstruction CompoundAssignInst::address(void) const { return nth_operand(0); }
 IRInstruction CompoundAssignInst::value(void) const { return nth_operand(1); }
 
-std::optional<Type> CompoundAssignInst::result_type(void) const {
+Type CompoundAssignInst::result_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 
@@ -397,14 +414,14 @@ IRInstruction SelectInst::condition(void) const { return nth_operand(0); }
 IRInstruction SelectInst::true_value(void) const { return nth_operand(1); }
 IRInstruction SelectInst::false_value(void) const { return nth_operand(2); }
 
-std::optional<Type> SelectInst::result_type(void) const {
+Type SelectInst::result_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 
 // ---- CopyInst ----
 
 IRInstruction CopyInst::source(void) const { return nth_operand(0); }
-std::optional<Type> CopyInst::result_type(void) const {
+Type CopyInst::result_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 
@@ -416,7 +433,7 @@ gap::generator<IRInstruction> InitListInst::elements(void) const & {
   }
 }
 
-std::optional<Type> InitListInst::result_type(void) const {
+Type InitListInst::result_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 
@@ -455,6 +472,26 @@ IRBlock CondBranchInst::false_block(void) const {
 
 IRInstruction SwitchInst::selector(void) const { return nth_operand(0); }
 
+// ---- VA* instructions ----
+
+IRInstruction VAStartInst::va_list_operand(void) const { return nth_operand(0); }
+IRInstruction VAEndInst::va_list_operand(void) const { return nth_operand(0); }
+IRInstruction VACopyInst::dest(void) const { return nth_operand(0); }
+IRInstruction VACopyInst::src(void) const { return nth_operand(1); }
+IRInstruction VAArgInst::va_list_operand(void) const { return nth_operand(0); }
+
+Type VAArgInst::result_type(void) const {
+  return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
+}
+
+gap::generator<IRInstruction> VAPackInst::arguments(void) const & {
+  for (unsigned i = 0; i < num_operands(); ++i) {
+    co_yield nth_operand(i);
+  }
+}
+
+// ---- SwitchInst ----
+
 unsigned SwitchInst::num_cases(void) const {
   auto pool = GetPool(*impl);
   auto r = impl->reader();
@@ -477,7 +514,7 @@ unsigned SwitchInst::num_cases(void) const {
 
 std::optional<Type> SwitchInst::case_type(void) const {
   auto pool = GetPool(*impl);
-  return ResolveType(*impl, pool[ExtraBase(impl->reader())]);
+  return MaybeResolveType(*impl, pool[ExtraBase(impl->reader())]);
 }
 
 gap::generator<IRSwitchCase> SwitchInst::cases(void) const & {
