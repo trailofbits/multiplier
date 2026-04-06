@@ -71,14 +71,16 @@ struct InstructionIR {
   // Terminator data.
   std::vector<BranchTargetIR> branch_targets;
 
-  // Switch case values: pairs of (low, high) for each case.
-  // Normal case: low == high. Range case (GCC extension): low < high.
-  // The last branch_target has no corresponding switch_case (it's the default).
-  struct SwitchCase {
+  // Switch cases: one per case/default in a switch statement.
+  // Each maps to an IRSwitchCase entity in the serialized output.
+  struct SwitchCaseIR {
     int64_t low{0};
     int64_t high{0};
+    uint32_t block_index{0};
+    mx::RawEntityId source_entity_id{mx::kInvalidEntityId};  // CaseStmt/DefaultStmt
+    bool is_default{false};
   };
-  std::vector<SwitchCase> switch_cases;
+  std::vector<SwitchCaseIR> switch_cases;
 };
 
 struct BlockIR {

@@ -580,6 +580,7 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
     int64_t high{0};
     bool is_default{false};
     uint32_t block_index;
+    mx::RawEntityId source_entity_id{mx::kInvalidEntityId};
   };
   std::vector<CaseInfo> cases;
 
@@ -611,13 +612,13 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
         }
       }
       uint32_t block = NewBlock(mx::ir::BlockKind::SWITCH_CASE);
-      cases.push_back({low, high, false, block});
+      cases.push_back({low, high, false, block, EntityIdOf(stmt)});
       case_blocks_[EntityIdOf(stmt)] = block;
       return;
     }
     if (auto ds = pasta::DefaultStmt::From(stmt)) {
       uint32_t block = NewBlock(mx::ir::BlockKind::SWITCH_DEFAULT);
-      cases.push_back({0, 0, true, block});
+      cases.push_back({0, 0, true, block, EntityIdOf(stmt)});
       case_blocks_[EntityIdOf(stmt)] = block;
       return;
     }
@@ -639,22 +640,15 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
   auto cond_type = sw->Condition().Type();
   if (cond_type) term.type_entity_id = TypeEntityIdOf(*cond_type);
 
-  // Non-default cases first.
+  // Build switch cases with full provenance.
   for (const auto &ci : cases) {
-    if (ci.is_default) continue;
-    BranchTargetIR target;
-    target.block_index = ci.block_index;
-    term.branch_targets.push_back(target);
-    term.switch_cases.push_back({ci.low, ci.high});
-    AddEdge(current_block_index_, ci.block_index);
-  }
-
-  // Default block last.
-  for (const auto &ci : cases) {
-    if (!ci.is_default) continue;
-    BranchTargetIR target;
-    target.block_index = ci.block_index;
-    term.branch_targets.push_back(target);
+    InstructionIR::SwitchCaseIR sc;
+    sc.low = ci.low;
+    sc.high = ci.high;
+    sc.block_index = ci.block_index;
+    sc.source_entity_id = ci.source_entity_id;
+    sc.is_default = ci.is_default;
+    term.switch_cases.push_back(sc);
     AddEdge(current_block_index_, ci.block_index);
   }
 

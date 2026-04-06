@@ -4,6 +4,7 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include <multiplier/IR/InstructionKinds.h>
+#include <multiplier/IR/SwitchCase.h>
 #include <multiplier/AST/FunctionDecl.h>
 #include <multiplier/AST/FieldDecl.h>
 
@@ -455,8 +456,23 @@ IRBlock CondBranchInst::false_block(void) const {
 IRInstruction SwitchInst::selector(void) const { return nth_operand(0); }
 
 unsigned SwitchInst::num_cases(void) const {
-  auto ipool = GetIntPool(*impl);
-  return static_cast<unsigned>(ipool[impl->reader().getConstOffset()]);
+  auto pool = GetPool(*impl);
+  auto r = impl->reader();
+  auto extra_base = ExtraBase(r);
+  // Extras: [caseType, case0_eid, case1_eid, ...]
+  // Count = total extras - 1 (for caseType).
+  // But we don't know total extras directly. Use the switch_cases count
+  // from the SwitchCaseIR data that was serialized.
+  // Actually, we can count by checking how many pool entries after caseType
+  // are IRSwitchCaseId.
+  unsigned count = 0;
+  for (uint32_t i = extra_base + 1; ; ++i) {
+    if (i >= pool.size()) break;
+    auto vid = EntityId(pool[i]).Unpack();
+    if (!std::holds_alternative<IRSwitchCaseId>(vid)) break;
+    ++count;
+  }
+  return count;
 }
 
 std::optional<Type> SwitchInst::case_type(void) const {
@@ -464,33 +480,22 @@ std::optional<Type> SwitchInst::case_type(void) const {
   return ResolveType(*impl, pool[ExtraBase(impl->reader())]);
 }
 
-gap::generator<SwitchCaseValue> SwitchInst::cases(void) const & {
+gap::generator<IRSwitchCase> SwitchInst::cases(void) const & {
   auto pool = GetPool(*impl);
-  auto ipool = GetIntPool(*impl);
   auto r = impl->reader();
   auto extra_base = ExtraBase(r);
-  auto const_base = r.getConstOffset();
-  int64_t nc = ipool[const_base];
 
-  for (int64_t i = 0; i < nc; ++i) {
-    SwitchCaseValue cv;
-    cv.low = ipool[const_base + 1 + i * 2];
-    cv.high = ipool[const_base + 2 + i * 2];
-    cv.block = MakeBlock(*impl, pool[extra_base + 1 + i]);
-    co_yield cv;
+  // Extras: [caseType, case0_eid, case1_eid, ...]
+  for (uint32_t i = extra_base + 1; ; ++i) {
+    if (i >= pool.size()) break;
+    auto vid = EntityId(pool[i]).Unpack();
+    if (auto *scid = std::get_if<IRSwitchCaseId>(&vid)) {
+      co_yield IRSwitchCase(std::make_shared<IRSwitchCaseImpl>(
+          impl->frag, scid->offset, impl->fragment_id));
+    } else {
+      break;
+    }
   }
-}
-
-std::optional<IRBlock> SwitchInst::default_block(void) const {
-  auto pool = GetPool(*impl);
-  auto ipool = GetIntPool(*impl);
-  auto r = impl->reader();
-  int64_t nc = ipool[r.getConstOffset()];
-  auto extra_base = ExtraBase(r);
-  // Default is the last block: skip caseType + nc case blocks.
-  auto b = MakeBlock(*impl, pool[extra_base + 1 + nc]);
-  if (b.id().Pack() != 0) return b;
-  return std::nullopt;
 }
 
 }  // namespace mx

@@ -130,11 +130,11 @@ static void EmitInstructionExtras(
       break;
 
     case OC::SWITCH:
-      // Extras: [caseType, case0_block, case1_block, ..., default_block]
+      // Extras: [caseType, switchCase0_eid, switchCase1_eid, ...]
+      // Placeholders for case entity IDs -- filled in second pass.
       pool.AddEntity(inst.type_entity_id);  // case integral type
-      for (auto &bt : inst.branch_targets) {
-        pool.AddEntity(MakeBlockEid(func, fragment_id, block_base,
-                                     bt.block_index));
+      for (size_t i = 0; i < inst.switch_cases.size(); ++i) {
+        pool.AddEntity(0);  // placeholder
       }
       break;
 
@@ -165,12 +165,7 @@ static uint32_t EmitInstructionConsts(
     }
 
     case OC::SWITCH:
-      // Int pool: [num_cases, case0_low, case0_high, case1_low, case1_high, ...]
-      pool.AddInt(static_cast<int64_t>(inst.switch_cases.size()));
-      for (auto &sc : inst.switch_cases) {
-        pool.AddInt(sc.low);
-        pool.AddInt(sc.high);
-      }
+      // Case values are now in SwitchCase entities, not the int pool.
       break;
 
     case OC::GEP_FIELD:
@@ -434,6 +429,57 @@ void SerializeIR(
     block_offset += static_cast<uint32_t>(func.blocks.size());
     inst_offset += static_cast<uint32_t>(func.instructions.size());
     obj_offset += static_cast<uint32_t>(func.objects.size());
+  }
+
+  // Emit SwitchCase entities and fill in placeholder pool entries.
+  {
+    uint32_t total_switch_cases = 0;
+    for (const auto &func : ir_functions) {
+      for (const auto &inst : func.instructions) {
+        if (inst.opcode == mx::ir::OpCode::SWITCH) {
+          total_switch_cases += static_cast<uint32_t>(inst.switch_cases.size());
+        }
+      }
+    }
+
+    auto frag_cases = fb.initIrSwitchCases(total_switch_cases);
+    uint32_t sc_offset = 0;
+    uint32_t func_block_base = 0;
+    uint32_t func_inst_base = 0;
+
+    for (const auto &func : ir_functions) {
+      for (uint32_t ii = 0; ii < func.instructions.size(); ++ii) {
+        const auto &inst = func.instructions[ii];
+        if (inst.opcode != mx::ir::OpCode::SWITCH) continue;
+
+        // Find the placeholder offset: extras start at
+        // entityOffset + 2(parent+source) + 1(type) + numOperands + 1(caseType)
+        auto r = frag_insts[func_inst_base + ii];
+        uint32_t placeholder_base = r.getEntityOffset() + 2 + 1 +
+            r.getNumOperands() + 1;  // +1 for caseType
+
+        for (size_t sci = 0; sci < inst.switch_cases.size(); ++sci) {
+          const auto &sc = inst.switch_cases[sci];
+          auto cb = frag_cases[sc_offset];
+          cb.setLow(sc.low);
+          cb.setHigh(sc.high);
+          cb.setTargetBlockId(MakeBlockEid(func, fragment_id,
+                                            func_block_base, sc.block_index));
+          cb.setSourceEntityId(sc.source_entity_id);
+          cb.setValueTypeId(inst.type_entity_id);
+          cb.setIsDefault(sc.is_default);
+
+          // Overwrite the placeholder in the pool.
+          mx::IRSwitchCaseId scid{fragment_id, sc_offset};
+          pool.entities[placeholder_base + sci] =
+              mx::EntityId(scid).Pack();
+
+          ++sc_offset;
+        }
+      }
+      func_block_base += static_cast<uint32_t>(func.blocks.size());
+      func_inst_base += static_cast<uint32_t>(func.instructions.size());
+    }
   }
 
   // Compute use-def chains and write per-instruction users lists.
