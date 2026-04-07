@@ -35,6 +35,17 @@
 2. string_bytes() missing on IRObject for string literals
 3. Python bindings are stub only for IRStructure
 4. Global initializer quality depends on EmitRValue handling of all init expressions
+5. **Goto/Duff's device scope compensation**: `goto` that jumps into the middle
+   of a scope bypasses the normal ENTER_SCOPE path. An interpreter following
+   the goto would not see the scope entry for variables in that scope. Similarly,
+   Duff's device-style switch cases can interleave with loop bodies, creating
+   scope entry paths that don't go through ENTER_SCOPE. We need "compensation
+   blocks" — synthetic blocks inserted on goto/case edges that emit the
+   ENTER_SCOPE instructions for any scopes being entered. This is tricky because
+   the label/case might also be reachable from normal control flow (which already
+   has the ENTER_SCOPE), so we can't just add ENTER_SCOPE at the label — we need
+   it on the specific edge. Always using compensation blocks (even for the normal
+   case) would be the simplest correct solution.
 
 ## Decisions Made
 - Phase 3 merged into Phase 2

@@ -600,7 +600,8 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
             break;  // Use first RHS operand.
           }
           Value new_val;
-          switch (rmw->underlying_op()) {
+          auto underlying = rmw->underlying_op();
+          switch (underlying) {
             case mx::ir::OpCode::ADD: new_val = Value::Int(old_val.as_int() + rhs.as_int()); break;
             case mx::ir::OpCode::SUB: new_val = Value::Int(old_val.as_int() - rhs.as_int()); break;
             case mx::ir::OpCode::MUL: new_val = Value::Int(old_val.as_int() * rhs.as_int()); break;
@@ -624,40 +625,8 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
             }
             // Overflow-checked arithmetic: RMW stores the result, returns
             // the overflow flag (bool).
-            case mx::ir::OpCode::ADD_OVERFLOW: {
-              // For overflow RMW, operands are (dest, a, b).
-              // Collect both RHS operands.
-              Value a = Value::Int(0), b = Value::Int(0);
-              int rhs_i = 0;
-              for (auto rhs_op : rmw->rhs_operands()) {
-                if (rhs_i == 0) a = GetValue(rhs_op);
-                else if (rhs_i == 1) b = GetValue(rhs_op);
-                ++rhs_i;
-              }
-              __int128 wide = static_cast<__int128>(a.as_int()) +
-                              static_cast<__int128>(b.as_int());
-              new_val = Value::Int(static_cast<int64_t>(wide));
-              bool overflow = (wide != static_cast<int64_t>(wide));
-              MemWriteValue(addr.ptr, new_val, 8);
-              result = Value::Int(overflow ? 1 : 0);
-              goto rmw_done;
-            }
-            case mx::ir::OpCode::SUB_OVERFLOW: {
-              Value a = Value::Int(0), b = Value::Int(0);
-              int rhs_i = 0;
-              for (auto rhs_op : rmw->rhs_operands()) {
-                if (rhs_i == 0) a = GetValue(rhs_op);
-                else if (rhs_i == 1) b = GetValue(rhs_op);
-                ++rhs_i;
-              }
-              __int128 wide = static_cast<__int128>(a.as_int()) -
-                              static_cast<__int128>(b.as_int());
-              new_val = Value::Int(static_cast<int64_t>(wide));
-              bool overflow = (wide != static_cast<int64_t>(wide));
-              MemWriteValue(addr.ptr, new_val, 8);
-              result = Value::Int(overflow ? 1 : 0);
-              goto rmw_done;
-            }
+            case mx::ir::OpCode::ADD_OVERFLOW:
+            case mx::ir::OpCode::SUB_OVERFLOW:
             case mx::ir::OpCode::MUL_OVERFLOW: {
               Value a = Value::Int(0), b = Value::Int(0);
               int rhs_i = 0;
@@ -666,19 +635,27 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
                 else if (rhs_i == 1) b = GetValue(rhs_op);
                 ++rhs_i;
               }
-              __int128 wide = static_cast<__int128>(a.as_int()) *
-                              static_cast<__int128>(b.as_int());
+              __int128 wide;
+              if (underlying == mx::ir::OpCode::ADD_OVERFLOW)
+                wide = static_cast<__int128>(a.as_int()) + static_cast<__int128>(b.as_int());
+              else if (underlying == mx::ir::OpCode::SUB_OVERFLOW)
+                wide = static_cast<__int128>(a.as_int()) - static_cast<__int128>(b.as_int());
+              else
+                wide = static_cast<__int128>(a.as_int()) * static_cast<__int128>(b.as_int());
               new_val = Value::Int(static_cast<int64_t>(wide));
-              bool overflow = (wide != static_cast<int64_t>(wide));
+              bool overflow = (wide != static_cast<__int128>(static_cast<int64_t>(wide)));
               MemWriteValue(addr.ptr, new_val, 8);
               result = Value::Int(overflow ? 1 : 0);
-              goto rmw_done;
+              break;
             }
             default: new_val = old_val; break;
           }
-          MemWriteValue(addr.ptr, new_val, 8);
-          result = rmw->returns_new_value() ? new_val : old_val;
-          rmw_done:;
+          if (underlying != mx::ir::OpCode::ADD_OVERFLOW &&
+              underlying != mx::ir::OpCode::SUB_OVERFLOW &&
+              underlying != mx::ir::OpCode::MUL_OVERFLOW) {
+            MemWriteValue(addr.ptr, new_val, 8);
+            result = rmw->returns_new_value() ? new_val : old_val;
+          }
         }
       }
       break;

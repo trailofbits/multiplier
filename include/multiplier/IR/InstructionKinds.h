@@ -149,14 +149,6 @@ class MX_EXPORT CastInst : public IRInstruction {
 // Sizeof
 // ---------------------------------------------------------------------------
 
-class MX_EXPORT SizeOfInst : public IRInstruction {
- public:
-  MX_DECLARE_IR_INSTRUCTION(SizeOfInst)
-  Type measured_type(void) const;
-  Type result_type(void) const;
-  int64_t static_size(void) const;
-};
-
 // ---------------------------------------------------------------------------
 // Call
 // ---------------------------------------------------------------------------
@@ -171,26 +163,22 @@ class MX_EXPORT CallInst : public IRInstruction {
 };
 
 // ---------------------------------------------------------------------------
-// Compound operations
+// Read-modify-write
 // ---------------------------------------------------------------------------
 
-class MX_EXPORT IncDecInst : public IRInstruction {
+// RMW(address, rhs_operands...) — reads from address, applies underlying
+// opcode(loaded_value, rhs_operands...), writes back.
+// flags bit 0: 1 = returns new value (pre-increment), 0 = old value (post).
+class MX_EXPORT ReadModifyWriteInst : public IRInstruction {
  public:
-  MX_DECLARE_IR_INSTRUCTION(IncDecInst)
+  MX_DECLARE_IR_INSTRUCTION(ReadModifyWriteInst)
   IRInstruction address(void) const;
-  Type result_type(void) const;
-  bool is_increment(void) const;
-  bool is_prefix(void) const;
-  int64_t pointer_element_size(void) const;
-};
-
-class MX_EXPORT CompoundAssignInst : public IRInstruction {
- public:
-  MX_DECLARE_IR_INSTRUCTION(CompoundAssignInst)
-  IRInstruction address(void) const;
-  IRInstruction value(void) const;
-  Type result_type(void) const;
   ir::OpCode underlying_op(void) const;
+  int64_t element_size(void) const;  // for PTR_ADD, 0 otherwise
+  bool returns_new_value(void) const;
+  Type result_type(void) const;
+  // RHS operands (everything after address).
+  gap::generator<IRInstruction> rhs_operands(void) const &;
 };
 
 // ---------------------------------------------------------------------------
@@ -210,13 +198,6 @@ class MX_EXPORT CopyInst : public IRInstruction {
  public:
   MX_DECLARE_IR_INSTRUCTION(CopyInst)
   IRInstruction source(void) const;
-  Type result_type(void) const;
-};
-
-class MX_EXPORT InitListInst : public IRInstruction {
- public:
-  MX_DECLARE_IR_INSTRUCTION(InitListInst)
-  gap::generator<IRInstruction> elements(void) const &;
   Type result_type(void) const;
 };
 
@@ -266,6 +247,35 @@ class MX_EXPORT MemcpyInst : public IRInstruction {
   IRInstruction dest(void) const;       // op[0]
   IRInstruction src(void) const;        // op[1]
   IRInstruction size(void) const;       // op[2]
+};
+
+class MX_EXPORT MemmoveInst : public IRInstruction {
+ public:
+  MX_DECLARE_IR_INSTRUCTION(MemmoveInst)
+  IRInstruction dest(void) const;       // op[0]
+  IRInstruction src(void) const;        // op[1]
+  IRInstruction size(void) const;       // op[2]
+};
+
+// ---------------------------------------------------------------------------
+// Bitwise/intrinsic operations
+// ---------------------------------------------------------------------------
+
+class MX_EXPORT BitwiseOpInst : public IRInstruction {
+ public:
+  MX_DECLARE_IR_INSTRUCTION(BitwiseOpInst)
+  ir::BitwiseOp sub_opcode(void) const;
+  Type result_type(void) const;
+};
+
+// ---------------------------------------------------------------------------
+// Undefined/poison value
+// ---------------------------------------------------------------------------
+
+class MX_EXPORT UndefinedInst : public IRInstruction {
+ public:
+  MX_DECLARE_IR_INSTRUCTION(UndefinedInst)
+  Type result_type(void) const;
 };
 
 // ---------------------------------------------------------------------------

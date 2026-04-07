@@ -157,6 +157,9 @@ IMPL_FROM_SINGLE(GlobalAddrInst, GLOBAL_ADDR)
 IMPL_FROM_SINGLE(FuncAddrInst, FUNC_ADDR)
 IMPL_FROM_SINGLE(MemsetInst, MEMSET)
 IMPL_FROM_SINGLE(MemcpyInst, MEMCPY)
+IMPL_FROM_SINGLE(MemmoveInst, MEMMOVE)
+IMPL_FROM_SINGLE(BitwiseOpInst, BITWISE_OP)
+IMPL_FROM_SINGLE(UndefinedInst, UNDEFINED)
 
 IMPL_FROM_SINGLE(RetInst, RET)
 IMPL_FROM_SINGLE(CondBranchInst, COND_BRANCH)
@@ -523,6 +526,28 @@ IRInstruction MemsetInst::size(void) const { return nth_operand(2); }
 IRInstruction MemcpyInst::dest(void) const { return nth_operand(0); }
 IRInstruction MemcpyInst::src(void) const { return nth_operand(1); }
 IRInstruction MemcpyInst::size(void) const { return nth_operand(2); }
+
+IRInstruction MemmoveInst::dest(void) const { return nth_operand(0); }
+IRInstruction MemmoveInst::src(void) const { return nth_operand(1); }
+IRInstruction MemmoveInst::size(void) const { return nth_operand(2); }
+
+// ---- BitwiseOpInst ----
+
+ir::BitwiseOp BitwiseOpInst::sub_opcode(void) const {
+  auto int_pool = GetIntPool(*impl);
+  auto r = impl->reader();
+  return static_cast<ir::BitwiseOp>(int_pool[r.getConstOffset()]);
+}
+
+Type BitwiseOpInst::result_type(void) const {
+  return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
+}
+
+// ---- UndefinedInst ----
+
+Type UndefinedInst::result_type(void) const {
+  return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
+}
 
 // ---- SwitchInst ----
 
