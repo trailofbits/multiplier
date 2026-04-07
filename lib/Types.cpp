@@ -55,8 +55,8 @@ static constexpr uint64_t kNumPseudoKinds = 5u;
 //   1..kNumBlockKinds          → IRBlockId (1 per BlockKind)
 //   1+kNumBlockKinds..+kNumOpCodes → IRInstructionId (1 per OpCode)
 //   last                       → IRObjectId
-static constexpr uint64_t kNumBlockKinds = 14u;         // BlockKind enum count
-static constexpr uint64_t kNumOpCodes = 71u;             // OpCode enum count
+static constexpr uint64_t kNumBlockKinds = 15u;         // BlockKind enum count
+static constexpr uint64_t kNumOpCodes = 72u;             // OpCode enum count
 static constexpr uint64_t kNumStructureKinds = 18u;      // StructureKind enum count
 static constexpr uint64_t kIRFunctionOffset = 0u;
 static constexpr uint64_t kIRBlockOffset = 1u;

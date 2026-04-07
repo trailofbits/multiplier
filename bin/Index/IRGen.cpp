@@ -63,7 +63,8 @@ std::optional<FunctionIR> IRGenerator::Generate(
     ScanAddressTaken(*body);
 
     // Create parameters as objects.
-    for (const auto &param : func.Parameters()) {
+    auto params = func.Parameters();
+    for (const auto &param : params) {
       auto eid = EntityIdOf(param);
       bool addr_taken = address_taken_.count(eid);
       auto kind = addr_taken ? mx::ir::ObjectKind::PARAMETER
@@ -84,19 +85,76 @@ std::optional<FunctionIR> IRGenerator::Generate(
       next_obj_index_++;
     }
 
-    // Create entry block and emit the body.
-    uint32_t entry = NewBlock(mx::ir::BlockKind::ENTRY);
-    func_.entry_block_index = entry;
-    SwitchToBlock(entry);
+    // --- Frame block: all ALLOCAs (parameters + locals) ---
+    uint32_t frame = NewBlock(mx::ir::BlockKind::FRAME);
+    func_.entry_block_index = frame;
+    SwitchToBlock(frame);
 
-    // Emit all allocas in the entry block (before any control flow).
+    // Emit parameter ALLOCAs in the frame block.
+    for (const auto &param : params) {
+      uint32_t obj_idx = GetOrMakeObject(param);
+      InstructionIR alloca_inst;
+      alloca_inst.opcode = mx::ir::OpCode::ALLOCA;
+      alloca_inst.source_entity_id = EntityIdOf(param);
+      alloca_inst.object_index = obj_idx;
+      alloca_inst.type_entity_id = TypeEntityIdOf(param.Type());
+      EmitTopLevel(std::move(alloca_inst));
+    }
+
+    // Emit local variable ALLOCAs in the frame block.
     EmitEntryBlockAllocas(*body);
+
+    // --- Entry block: logical start of the function body ---
+    uint32_t entry = NewBlock(mx::ir::BlockKind::ENTRY);
+    EmitBranch(entry);
+    SwitchToBlock(entry);
 
     // Push the function-level scope structure.
     uint32_t func_scope = PushStructure(
         mx::ir::StructureKind::FUNCTION_SCOPE, EntityIdOf(*body));
     func_.body_scope_index = func_scope;
     AssociateBlockWithStructure(entry);
+
+    // ENTER_SCOPE for the function body.
+    {
+      InstructionIR enter;
+      enter.opcode = mx::ir::OpCode::ENTER_SCOPE;
+      enter.source_entity_id = EntityIdOf(*body);
+      enter.structure_index = func_scope;
+      EmitTopLevel(std::move(enter));
+    }
+
+    // Read each parameter into its alloca.
+    for (uint32_t pi = 0; pi < params.size(); ++pi) {
+      const auto &param = params[pi];
+      uint32_t obj_idx = GetOrMakeObject(param);
+
+      // Associate parameter objects with the function scope.
+      func_.structures[func_scope].object_indices.push_back(obj_idx);
+
+      // PARAM_READ: reads the Nth parameter value.
+      InstructionIR pr;
+      pr.opcode = mx::ir::OpCode::PARAM_READ;
+      pr.source_entity_id = EntityIdOf(param);
+      pr.object_index = obj_idx;
+      pr.type_entity_id = TypeEntityIdOf(param.Type());
+      pr.int_value = static_cast<int64_t>(pi);  // parameter index
+      uint32_t pr_idx = EmitInstruction(std::move(pr));
+
+      // ADDRESS_OF the parameter's alloca.
+      InstructionIR addr;
+      addr.opcode = mx::ir::OpCode::ADDRESS_OF;
+      addr.source_entity_id = EntityIdOf(param);
+      addr.object_index = obj_idx;
+      uint32_t addr_idx = EmitInstruction(std::move(addr));
+
+      // STORE the parameter value into its alloca.
+      InstructionIR store;
+      store.opcode = mx::ir::OpCode::STORE;
+      store.source_entity_id = EntityIdOf(param);
+      store.operand_indices = {addr_idx, pr_idx};
+      EmitTopLevel(std::move(store));
+    }
 
     EmitBody(*body);
 
@@ -109,6 +167,13 @@ std::optional<FunctionIR> IRGenerator::Generate(
         needs_ret = !mx::ir::IsTerminator(last_op);
       }
       if (needs_ret) {
+        // EXIT_SCOPE for the function scope before implicit return.
+        InstructionIR exit_inst;
+        exit_inst.opcode = mx::ir::OpCode::EXIT_SCOPE;
+        exit_inst.source_entity_id = EntityIdOf(*body);
+        exit_inst.structure_index = func_scope;
+        EmitTopLevel(std::move(exit_inst));
+
         InstructionIR ret;
         ret.opcode = mx::ir::OpCode::RET;
         EmitTopLevel(std::move(ret));
@@ -1067,8 +1132,15 @@ void IRGenerator::EmitReturnStmt(const pasta::Stmt &s) {
     inst.operand_indices = {val_idx};
   }
 
-  // Exit all scopes up to the function scope.
+  // Exit all scopes up to and including the function scope.
   EmitScopeExits(func_.body_scope_index);
+  {
+    InstructionIR exit_inst;
+    exit_inst.opcode = mx::ir::OpCode::EXIT_SCOPE;
+    exit_inst.source_entity_id = func_.structures[func_.body_scope_index].source_entity_id;
+    exit_inst.structure_index = func_.body_scope_index;
+    EmitTopLevel(std::move(exit_inst));
+  }
 
   EmitTopLevel(std::move(inst));
 }

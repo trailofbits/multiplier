@@ -121,6 +121,10 @@ static void EmitInstructionExtras(
       pool.AddEntity(MakeObjEid(fragment_id, obj_base, inst.object_index));
       break;
 
+    case OC::PARAM_READ:
+      pool.AddEntity(MakeObjEid(fragment_id, obj_base, inst.object_index));
+      break;
+
     case OC::SIZE_OF:
       pool.AddEntity(inst.type_entity_id);
       break;
@@ -208,6 +212,10 @@ static uint32_t EmitInstructionConsts(
 
     case OC::SIZE_OF:
       pool.AddInt(static_cast<int64_t>(inst.size_bytes));  // static size
+      break;
+
+    case OC::PARAM_READ:
+      pool.AddInt(inst.int_value);  // parameter index
       break;
 
     default:

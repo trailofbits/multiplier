@@ -154,6 +154,7 @@ IMPL_FROM_SINGLE(VAEndInst, VA_END)
 IMPL_FROM_SINGLE(VACopyInst, VA_COPY)
 IMPL_FROM_SINGLE(VAArgInst, VA_ARG)
 IMPL_FROM_SINGLE(VAPackInst, VA_PACK)
+IMPL_FROM_SINGLE(ParamReadInst, PARAM_READ)
 IMPL_FROM_SINGLE(MemsetInst, MEMSET)
 IMPL_FROM_SINGLE(MemcpyInst, MEMCPY)
 
@@ -495,6 +496,31 @@ gap::generator<IRInstruction> VAPackInst::arguments(void) const & {
   for (unsigned i = 0; i < num_operands(); ++i) {
     co_yield nth_operand(i);
   }
+}
+
+// ---- ParamReadInst ----
+
+uint32_t ParamReadInst::parameter_index(void) const {
+  auto r = impl->reader();
+  auto int_pool = GetIntPool(*impl);
+  return static_cast<uint32_t>(int_pool[r.getConstOffset()]);
+}
+
+Type ParamReadInst::parameter_type(void) const {
+  return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
+}
+
+IRObject ParamReadInst::object(void) const {
+  auto pool = GetPool(*impl);
+  auto r = impl->reader();
+  auto extra_base = ExtraBase(r);
+  auto eid = pool[extra_base];
+  auto vid = EntityId(eid).Unpack();
+  if (auto *oid = std::get_if<IRObjectId>(&vid)) {
+    return IRObject(std::make_shared<IRObjectImpl>(
+        impl->frag, oid->offset, impl->fragment_id));
+  }
+  return {};
 }
 
 // ---- Memory operations ----

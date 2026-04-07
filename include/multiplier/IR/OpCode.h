@@ -112,8 +112,13 @@ enum class OpCode : uint8_t {
   MEMSET = 68,             // op[0] = dest, op[1] = byte value, op[2] = size
   MEMCPY = 69,             // op[0] = dest, op[1] = src, op[2] = size
 
+  // Parameter read: reads the Nth function parameter.
+  // extra = parameter index (uint32), typeEntityId = parameter type.
+  // Result is the parameter value. Emitted in the entry block.
+  PARAM_READ = 70,
+
   // Unknown / unhandled expression
-  UNKNOWN = 70,
+  UNKNOWN = 71,
 };
 
 // Returns the human-readable name of an opcode.
@@ -124,7 +129,7 @@ inline static const char *EnumerationName(OpCode) {
 const char *EnumeratorName(OpCode op) noexcept;
 
 inline static constexpr unsigned NumEnumerators(OpCode) {
-  return 71u;
+  return 72u;
 }
 
 // Classification helpers.

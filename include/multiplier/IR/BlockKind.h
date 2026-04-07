@@ -11,7 +11,7 @@ namespace mx::ir {
 
 // Structural role of a basic block in the control flow graph.
 enum class BlockKind : uint8_t {
-  // Function entry point.
+  // Function entry point (logical first block of the body).
   ENTRY = 0,
 
   // If-statement related.
@@ -38,6 +38,9 @@ enum class BlockKind : uint8_t {
 
   // Generic / unclassified.
   GENERIC = 13,
+
+  // Frame block: contains all ALLOCAs (parameters + locals). Precedes ENTRY.
+  FRAME = 14,
 };
 
 inline static const char *EnumerationName(BlockKind) {
@@ -47,7 +50,7 @@ inline static const char *EnumerationName(BlockKind) {
 const char *EnumeratorName(BlockKind kind) noexcept;
 
 inline static constexpr unsigned NumEnumerators(BlockKind) {
-  return 14u;
+  return 15u;
 }
 
 }  // namespace mx::ir

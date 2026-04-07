@@ -84,6 +84,7 @@ const char *EnumeratorName(OpCode op) noexcept {
     case OpCode::EXIT_SCOPE: return "EXIT_SCOPE";
     case OpCode::MEMSET: return "MEMSET";
     case OpCode::MEMCPY: return "MEMCPY";
+    case OpCode::PARAM_READ: return "PARAM_READ";
     case OpCode::UNKNOWN: return "UNKNOWN";
   }
   return "UNKNOWN";
@@ -154,6 +155,7 @@ const char *EnumeratorName(BlockKind kind) noexcept {
     case BlockKind::LABEL: return "LABEL";
     case BlockKind::UNREACHABLE: return "UNREACHABLE";
     case BlockKind::GENERIC: return "GENERIC";
+    case BlockKind::FRAME: return "FRAME";
   }
   return "UNKNOWN";
 }

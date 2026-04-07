@@ -221,6 +221,18 @@ class MX_EXPORT InitListInst : public IRInstruction {
 };
 
 // ---------------------------------------------------------------------------
+// Parameter read
+// ---------------------------------------------------------------------------
+
+class MX_EXPORT ParamReadInst : public IRInstruction {
+ public:
+  MX_DECLARE_IR_INSTRUCTION(ParamReadInst)
+  uint32_t parameter_index(void) const;
+  Type parameter_type(void) const;
+  IRObject object(void) const;
+};
+
+// ---------------------------------------------------------------------------
 // Memory operations
 // ---------------------------------------------------------------------------
 
