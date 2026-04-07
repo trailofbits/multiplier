@@ -180,6 +180,7 @@ class IRGenerator {
   uint32_t current_block_index_{0};
   uint32_t next_obj_index_{0};
   std::unordered_map<mx::RawEntityId, uint32_t> entity_to_object_;
+  std::unordered_map<uint32_t, uint32_t> object_to_alloca_;  // obj_idx → alloca inst idx
   std::unordered_set<mx::RawEntityId> address_taken_;
 
   // Break/continue targets: maps source entity ID of the enclosing
