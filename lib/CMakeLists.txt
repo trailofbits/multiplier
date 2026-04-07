@@ -145,6 +145,7 @@ add_library("mx-api" OBJECT
   "IR/InstructionKinds.cpp"
   "IR/SwitchCase.cpp"
   "IR/Structure.cpp"
+  "IR/StructureKinds.cpp"
   "IR/Object.cpp"
   "InvalidEntityProvider.cpp"
   "InvalidEntityProvider.h"

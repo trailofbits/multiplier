@@ -12,6 +12,7 @@
 #include "IR/Object.h"
 #include "IR/SwitchCase.h"
 #include "IR/Structure.h"
+#include "IR/StructureKinds.h"
 
 namespace mx {
 

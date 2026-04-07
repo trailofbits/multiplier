@@ -540,6 +540,13 @@ void SerializeIR(
       sb.setEntityOffset(ent_start);
       sb.setNumChildren(static_cast<uint16_t>(src.children.size()));
       sb.setNumObjects(static_cast<uint16_t>(src.object_indices.size()));
+
+      // SWITCH_CASE data.
+      if (src.kind == mx::ir::StructureKind::SWITCH_CASE) {
+        sb.setCaseLow(src.case_low);
+        sb.setCaseHigh(src.case_high);
+        sb.setIsDefault(src.is_default);
+      }
     }
 
     block_offset += static_cast<uint32_t>(func.blocks.size());

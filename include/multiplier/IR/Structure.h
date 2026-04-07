@@ -22,12 +22,24 @@ class Stmt;
 using IRStructureImplPtr = std::shared_ptr<const IRStructureImpl>;
 
 class MX_EXPORT IRStructure {
- private:
+ protected:
   friend class EntityProvider;
   friend class Index;
   friend class IRBlock;
   friend class IRFunction;
   IRStructureImplPtr impl;
+
+  // For derived structure classes.
+  friend class IRScopeStructure;
+  friend class IRIfStructure;
+  friend class IRIfThenStructure;
+  friend class IRIfElseStructure;
+  friend class IRForStructure;
+  friend class IRWhileStructure;
+  friend class IRDoWhileStructure;
+  friend class IRSwitchStructure;
+  friend class IRSwitchCaseStructure;
+  IRStructureImplPtr impl_ptr(void) const { return impl; }
 
  public:
   IRStructure(void) = default;

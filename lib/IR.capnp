@@ -49,6 +49,9 @@ struct Structure @0xd4a8b7c2e9f31056 {
   entityOffset @3 :UInt32;      # into irEntityPool for children
   numChildren @4 :UInt16;       # child structure/block entity IDs
   numObjects @5 :UInt16;        # ALLOCAs declared in this scope (scopes only)
+  caseLow @6 :Int64;            # SWITCH_CASE: case value lower bound
+  caseHigh @7 :Int64;           # SWITCH_CASE: case value upper bound
+  isDefault @8 :Bool;           # SWITCH_CASE: true for default case
 }
 
 struct Function @0xe6be31a259218610 {
