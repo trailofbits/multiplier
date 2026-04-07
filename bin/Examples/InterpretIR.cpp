@@ -19,6 +19,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstring>
+#include <limits>
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <iomanip>
@@ -612,6 +613,13 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
             case mx::ir::OpCode::BIT_XOR: new_val = Value::Int(old_val.as_int() ^ rhs.as_int()); break;
             case mx::ir::OpCode::SHL: new_val = Value::Int(old_val.as_int() << rhs.as_int()); break;
             case mx::ir::OpCode::SHR: new_val = Value::Int(old_val.as_int() >> rhs.as_int()); break;
+            case mx::ir::OpCode::ATOMIC_ADD: new_val = Value::Int(old_val.as_int() + rhs.as_int()); break;
+            case mx::ir::OpCode::ATOMIC_SUB: new_val = Value::Int(old_val.as_int() - rhs.as_int()); break;
+            case mx::ir::OpCode::ATOMIC_AND: new_val = Value::Int(old_val.as_int() & rhs.as_int()); break;
+            case mx::ir::OpCode::ATOMIC_OR: new_val = Value::Int(old_val.as_int() | rhs.as_int()); break;
+            case mx::ir::OpCode::ATOMIC_XOR: new_val = Value::Int(old_val.as_int() ^ rhs.as_int()); break;
+            case mx::ir::OpCode::ATOMIC_NAND: new_val = Value::Int(~(old_val.as_int() & rhs.as_int())); break;
+            case mx::ir::OpCode::ATOMIC_EXCHANGE: new_val = rhs; break;
             case mx::ir::OpCode::PTR_ADD: {
               int64_t elem_sz = rmw->element_size();
               if (elem_sz <= 0) elem_sz = 1;
@@ -734,56 +742,61 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       break;
     }
 
-    // --- Memory intrinsics ---
-    case mx::ir::OpCode::MEMSET: {
-      if (auto ms = mx::MemsetInst::from(inst)) {
-        Value dest = GetValue(ms->dest());
-        Value byte_val = GetValue(ms->byte_value());
-        Value size = GetValue(ms->size());
-        if (dest.kind == Value::POINTER && size.as_int() > 0) {
-          auto it = memory_.find(dest.ptr.object_id);
-          if (it != memory_.end()) {
-            size_t start = static_cast<size_t>(dest.ptr.offset);
-            size_t len = static_cast<size_t>(size.as_int());
-            size_t end = std::min(start + len, it->second.bytes.size());
-            std::memset(it->second.bytes.data() + start,
-                        static_cast<int>(byte_val.as_int()), end - start);
+    // --- Memory/string intrinsics (MULTIMEM) ---
+    case mx::ir::OpCode::MULTIMEM: {
+      if (auto mm = mx::MultimemInst::from(inst)) {
+        auto sub = mm->sub_opcode();
+        auto ops_gen = inst.operands();
+        std::vector<Value> ops;
+        for (auto op_inst : ops_gen) {
+          ops.push_back(GetValue(op_inst));
+        }
+        using MO = mx::ir::MemoryOp;
+        switch (sub) {
+          case MO::MEMSET: {
+            if (ops.size() >= 3 && ops[0].kind == Value::POINTER && ops[2].as_int() > 0) {
+              auto it = memory_.find(ops[0].ptr.object_id);
+              if (it != memory_.end()) {
+                size_t start = static_cast<size_t>(ops[0].ptr.offset);
+                size_t len = static_cast<size_t>(ops[2].as_int());
+                size_t end = std::min(start + len, it->second.bytes.size());
+                std::memset(it->second.bytes.data() + start,
+                            static_cast<int>(ops[1].as_int()), end - start);
+              }
+            }
+            result = ops.empty() ? Value::Undef() : ops[0];
+            break;
           }
+          case MO::MEMCPY:
+          case MO::MEMMOVE: {
+            if (ops.size() >= 3 && ops[0].kind == Value::POINTER
+                && ops[1].kind == Value::POINTER && ops[2].as_int() > 0) {
+              size_t len = static_cast<size_t>(ops[2].as_int());
+              std::vector<uint8_t> tmp(len);
+              MemRead(ops[1].ptr, tmp.data(), len);
+              MemWrite(ops[0].ptr, tmp.data(), len);
+            }
+            result = ops.empty() ? Value::Undef() : ops[0];
+            break;
+          }
+          case MO::BZERO: {
+            if (ops.size() >= 2 && ops[0].kind == Value::POINTER && ops[1].as_int() > 0) {
+              auto it = memory_.find(ops[0].ptr.object_id);
+              if (it != memory_.end()) {
+                size_t start = static_cast<size_t>(ops[0].ptr.offset);
+                size_t len = static_cast<size_t>(ops[1].as_int());
+                size_t end = std::min(start + len, it->second.bytes.size());
+                std::memset(it->second.bytes.data() + start, 0, end - start);
+              }
+            }
+            result = ops.empty() ? Value::Undef() : ops[0];
+            break;
+          }
+          default:
+            // For unimplemented string ops, return undef.
+            result = Value::Undef();
+            break;
         }
-        result = dest;  // memset returns dest.
-      }
-      break;
-    }
-    case mx::ir::OpCode::MEMCPY: {
-      if (auto mc = mx::MemcpyInst::from(inst)) {
-        Value dest = GetValue(mc->dest());
-        Value src = GetValue(mc->src());
-        Value size = GetValue(mc->size());
-        if (dest.kind == Value::POINTER && src.kind == Value::POINTER
-            && size.as_int() > 0) {
-          size_t len = static_cast<size_t>(size.as_int());
-          std::vector<uint8_t> tmp(len);
-          MemRead(src.ptr, tmp.data(), len);
-          MemWrite(dest.ptr, tmp.data(), len);
-        }
-        result = dest;  // memcpy returns dest.
-      }
-      break;
-    }
-
-    case mx::ir::OpCode::MEMMOVE: {
-      if (auto mm = mx::MemmoveInst::from(inst)) {
-        Value dest = GetValue(mm->dest());
-        Value src = GetValue(mm->src());
-        Value size = GetValue(mm->size());
-        if (dest.kind == Value::POINTER && src.kind == Value::POINTER
-            && size.as_int() > 0) {
-          size_t len = static_cast<size_t>(size.as_int());
-          std::vector<uint8_t> tmp(len);
-          MemRead(src.ptr, tmp.data(), len);
-          MemWrite(dest.ptr, tmp.data(), len);
-        }
-        result = dest;  // memmove returns dest.
       }
       break;
     }
@@ -847,6 +860,118 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       break;
     }
 
+    // --- Floating-point operations ---
+    case mx::ir::OpCode::FLOAT_OP: {
+      if (auto fo = mx::FloatOpInst::from(inst)) {
+        // Collect operands.
+        std::vector<Value> ops;
+        for (auto op_inst : inst.operands()) {
+          ops.push_back(GetValue(op_inst));
+        }
+        using FO = mx::ir::FloatOp;
+        switch (fo->sub_opcode()) {
+          case FO::FABS:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::fabs(ops[0].as_float()));
+            break;
+          case FO::SQRT:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::sqrt(ops[0].as_float()));
+            break;
+          case FO::CEIL:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::ceil(ops[0].as_float()));
+            break;
+          case FO::FLOOR:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::floor(ops[0].as_float()));
+            break;
+          case FO::ROUND:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::round(ops[0].as_float()));
+            break;
+          case FO::TRUNC:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::trunc(ops[0].as_float()));
+            break;
+          case FO::FMIN:
+            result = (ops.size() >= 2)
+                ? Value::Float(std::fmin(ops[0].as_float(), ops[1].as_float()))
+                : Value::Undef();
+            break;
+          case FO::FMAX:
+            result = (ops.size() >= 2)
+                ? Value::Float(std::fmax(ops[0].as_float(), ops[1].as_float()))
+                : Value::Undef();
+            break;
+          case FO::COPYSIGN:
+            result = (ops.size() >= 2)
+                ? Value::Float(std::copysign(ops[0].as_float(), ops[1].as_float()))
+                : Value::Undef();
+            break;
+          case FO::ISNAN:
+            result = ops.empty() ? Value::Undef()
+                : Value::Int(std::isnan(ops[0].as_float()) ? 1 : 0);
+            break;
+          case FO::ISINF:
+            result = ops.empty() ? Value::Undef()
+                : Value::Int(std::isinf(ops[0].as_float()) ? 1 : 0);
+            break;
+          case FO::ISFINITE:
+            result = ops.empty() ? Value::Undef()
+                : Value::Int(std::isfinite(ops[0].as_float()) ? 1 : 0);
+            break;
+          case FO::INF:
+            result = Value::Float(std::numeric_limits<double>::infinity());
+            break;
+          case FO::NAN_VAL:
+            result = Value::Float(std::numeric_limits<double>::quiet_NaN());
+            break;
+          case FO::FLOAT_HUGE:
+            result = Value::Float(std::numeric_limits<double>::infinity());
+            break;
+          default:
+            result = Value::Undef();
+            break;
+        }
+      }
+      break;
+    }
+
+    // --- Dynamic alloca / frame-return address ---
+    case mx::ir::OpCode::DYNAMIC_ALLOCA:
+    case mx::ir::OpCode::FRAME_ADDRESS:
+    case mx::ir::OpCode::RETURN_ADDRESS:
+      // Not meaningfully interpretable; return undef.
+      result = Value::Undef();
+      break;
+
+    // --- Atomic operations ---
+    case mx::ir::OpCode::ATOMIC_LOAD: {
+      // Treat like a regular LOAD for interpretation.
+      if (auto al = mx::AtomicLoadInst::from(inst)) {
+        Value addr = GetValue(al->address());
+        if (addr.kind == Value::POINTER) {
+          result = MemReadValue(addr.ptr, 8, false);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::ATOMIC_STORE: {
+      if (auto as = mx::AtomicStoreInst::from(inst)) {
+        Value addr = GetValue(as->address());
+        Value val = GetValue(as->value());
+        if (addr.kind == Value::POINTER) {
+          MemWriteValue(addr.ptr, val, 8);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::ATOMIC_CMPXCHG:
+      // Simplified: return undef (complex semantics).
+      result = Value::Undef();
+      break;
+
     // --- Undefined/poison value ---
     case mx::ir::OpCode::UNDEFINED:
       result = Value::Undef();
@@ -856,7 +981,14 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
     case mx::ir::OpCode::ADD_OVERFLOW:
     case mx::ir::OpCode::SUB_OVERFLOW:
     case mx::ir::OpCode::MUL_OVERFLOW:
-      LOG(WARNING) << "Overflow opcode used as standalone instruction";
+    case mx::ir::OpCode::ATOMIC_ADD:
+    case mx::ir::OpCode::ATOMIC_SUB:
+    case mx::ir::OpCode::ATOMIC_AND:
+    case mx::ir::OpCode::ATOMIC_OR:
+    case mx::ir::OpCode::ATOMIC_XOR:
+    case mx::ir::OpCode::ATOMIC_NAND:
+    case mx::ir::OpCode::ATOMIC_EXCHANGE:
+      LOG(WARNING) << "RMW-only opcode used as standalone instruction";
       break;
 
     // --- Variadic ---

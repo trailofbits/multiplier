@@ -1323,7 +1323,8 @@ void IRGenerator::EmitInitializer(uint32_t dest_addr_idx,
       uint32_t sz_idx = EmitInstruction(std::move(sz));
 
       InstructionIR memset_inst;
-      memset_inst.opcode = mx::ir::OpCode::MEMSET;
+      memset_inst.opcode = mx::ir::OpCode::MULTIMEM;
+      memset_inst.memory_op = static_cast<uint8_t>(mx::ir::MemoryOp::MEMSET);
       memset_inst.source_entity_id = source_eid;
       memset_inst.operand_indices = {dest_addr_idx, zero_idx, sz_idx};
       EmitTopLevel(std::move(memset_inst));
@@ -1898,44 +1899,73 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         return emit_typed(std::move(inst));
       }
 
-      // Recognize memset/memcpy/memmove and lower to MEMSET/MEMCPY.
-      if (callee_name == "memset" || callee_name == "__builtin_memset" ||
-          callee_name == "__builtin_memset_chk" ||
-          callee_name == "__builtin___memset_chk") {
-        if (args.size() >= 3) {
-          InstructionIR inst;
-          inst.opcode = mx::ir::OpCode::MEMSET;
-          inst.source_entity_id = eid;
-          inst.operand_indices.push_back(EmitRValue(args[0]));
-          inst.operand_indices.push_back(EmitRValue(args[1]));
-          inst.operand_indices.push_back(EmitRValue(args[2]));
-          return emit_typed(std::move(inst));
-        }
-      }
-      if (callee_name == "memcpy" || callee_name == "__builtin_memcpy" ||
-          callee_name == "__builtin_memcpy_chk" ||
-          callee_name == "__builtin___memcpy_chk") {
-        if (args.size() >= 3) {
-          InstructionIR inst;
-          inst.opcode = mx::ir::OpCode::MEMCPY;
-          inst.source_entity_id = eid;
-          inst.operand_indices.push_back(EmitRValue(args[0]));
-          inst.operand_indices.push_back(EmitRValue(args[1]));
-          inst.operand_indices.push_back(EmitRValue(args[2]));
-          return emit_typed(std::move(inst));
-        }
-      }
-      if (callee_name == "memmove" || callee_name == "__builtin_memmove" ||
-          callee_name == "__builtin_memmove_chk" ||
-          callee_name == "__builtin___memmove_chk") {
-        if (args.size() >= 3) {
-          InstructionIR inst;
-          inst.opcode = mx::ir::OpCode::MEMMOVE;
-          inst.source_entity_id = eid;
-          inst.operand_indices.push_back(EmitRValue(args[0]));
-          inst.operand_indices.push_back(EmitRValue(args[1]));
-          inst.operand_indices.push_back(EmitRValue(args[2]));
-          return emit_typed(std::move(inst));
+      // Recognize memory/string operations and lower to MULTIMEM.
+      {
+        using MO = mx::ir::MemoryOp;
+        struct MemBuiltin {
+          const char *name;
+          MO op;
+          unsigned min_args;
+        };
+        static const MemBuiltin mem_builtins[] = {
+          {"memset", MO::MEMSET, 3},
+          {"__builtin_memset", MO::MEMSET, 3},
+          {"__builtin_memset_chk", MO::MEMSET, 3},
+          {"__builtin___memset_chk", MO::MEMSET, 3},
+          {"memcpy", MO::MEMCPY, 3},
+          {"__builtin_memcpy", MO::MEMCPY, 3},
+          {"__builtin_memcpy_chk", MO::MEMCPY, 3},
+          {"__builtin___memcpy_chk", MO::MEMCPY, 3},
+          {"memmove", MO::MEMMOVE, 3},
+          {"__builtin_memmove", MO::MEMMOVE, 3},
+          {"__builtin_memmove_chk", MO::MEMMOVE, 3},
+          {"__builtin___memmove_chk", MO::MEMMOVE, 3},
+          {"memcmp", MO::MEMCMP, 3},
+          {"__builtin_memcmp", MO::MEMCMP, 3},
+          {"memchr", MO::MEMCHR, 3},
+          {"__builtin_memchr", MO::MEMCHR, 3},
+          {"bzero", MO::BZERO, 2},
+          {"__builtin_bzero", MO::BZERO, 2},
+          {"strlen", MO::STRLEN, 1},
+          {"__builtin_strlen", MO::STRLEN, 1},
+          {"strnlen", MO::STRNLEN, 2},
+          {"__builtin_strnlen", MO::STRNLEN, 2},
+          {"strcmp", MO::STRCMP, 2},
+          {"__builtin_strcmp", MO::STRCMP, 2},
+          {"strncmp", MO::STRNCMP, 3},
+          {"__builtin_strncmp", MO::STRNCMP, 3},
+          {"strchr", MO::STRCHR, 2},
+          {"__builtin_strchr", MO::STRCHR, 2},
+          {"strrchr", MO::STRRCHR, 2},
+          {"__builtin_strrchr", MO::STRRCHR, 2},
+          {"strstr", MO::STRSTR, 2},
+          {"__builtin_strstr", MO::STRSTR, 2},
+          {"strcpy", MO::STRCPY, 2},
+          {"__builtin_strcpy", MO::STRCPY, 2},
+          {"__builtin___strcpy_chk", MO::STRCPY, 2},
+          {"strncpy", MO::STRNCPY, 3},
+          {"__builtin_strncpy", MO::STRNCPY, 3},
+          {"__builtin___strncpy_chk", MO::STRNCPY, 3},
+          {"strcat", MO::STRCAT, 2},
+          {"__builtin_strcat", MO::STRCAT, 2},
+          {"__builtin___strcat_chk", MO::STRCAT, 2},
+          {"strncat", MO::STRNCAT, 3},
+          {"__builtin_strncat", MO::STRNCAT, 3},
+          {"__builtin___strncat_chk", MO::STRNCAT, 3},
+          {"stpcpy", MO::STPCPY, 2},
+          {"__builtin_stpcpy", MO::STPCPY, 2},
+        };
+        for (const auto &mb : mem_builtins) {
+          if (callee_name == mb.name && args.size() >= mb.min_args) {
+            InstructionIR inst;
+            inst.opcode = mx::ir::OpCode::MULTIMEM;
+            inst.memory_op = static_cast<uint8_t>(mb.op);
+            inst.source_entity_id = eid;
+            for (unsigned i = 0; i < mb.min_args; ++i) {
+              inst.operand_indices.push_back(EmitRValue(args[i]));
+            }
+            return emit_typed(std::move(inst));
+          }
         }
       }
 
@@ -2079,6 +2109,267 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
             if (auto t = e.Type()) bw_ref.type_entity_id = TypeEntityIdOf(*t);
             return bw_idx;
           }
+        }
+      }
+
+      // Float builtins → FLOAT_OP with sub-opcode.
+      {
+        using FO = mx::ir::FloatOp;
+        struct FloatBuiltin {
+          const char *name;
+          FO op;
+          unsigned num_args;
+        };
+        static const FloatBuiltin float_builtins[] = {
+          {"__builtin_isnan", FO::ISNAN, 1},
+          {"__builtin_isinf", FO::ISINF, 1},
+          {"__builtin_isfinite", FO::ISFINITE, 1},
+          {"__builtin_fabs", FO::FABS, 1},
+          {"__builtin_fabsf", FO::FABS, 1},
+          {"__builtin_fabsl", FO::FABS, 1},
+          {"fabs", FO::FABS, 1},
+          {"fabsf", FO::FABS, 1},
+          {"fabsl", FO::FABS, 1},
+          {"__builtin_copysign", FO::COPYSIGN, 2},
+          {"__builtin_copysignf", FO::COPYSIGN, 2},
+          {"__builtin_copysignl", FO::COPYSIGN, 2},
+          {"copysign", FO::COPYSIGN, 2},
+          {"copysignf", FO::COPYSIGN, 2},
+          {"__builtin_fmin", FO::FMIN, 2},
+          {"__builtin_fminf", FO::FMIN, 2},
+          {"fmin", FO::FMIN, 2},
+          {"fminf", FO::FMIN, 2},
+          {"__builtin_fmax", FO::FMAX, 2},
+          {"__builtin_fmaxf", FO::FMAX, 2},
+          {"fmax", FO::FMAX, 2},
+          {"fmaxf", FO::FMAX, 2},
+          {"__builtin_ceil", FO::CEIL, 1},
+          {"__builtin_ceilf", FO::CEIL, 1},
+          {"ceil", FO::CEIL, 1},
+          {"ceilf", FO::CEIL, 1},
+          {"__builtin_floor", FO::FLOOR, 1},
+          {"__builtin_floorf", FO::FLOOR, 1},
+          {"floor", FO::FLOOR, 1},
+          {"floorf", FO::FLOOR, 1},
+          {"__builtin_round", FO::ROUND, 1},
+          {"__builtin_roundf", FO::ROUND, 1},
+          {"round", FO::ROUND, 1},
+          {"roundf", FO::ROUND, 1},
+          {"__builtin_trunc", FO::TRUNC, 1},
+          {"__builtin_truncf", FO::TRUNC, 1},
+          {"trunc", FO::TRUNC, 1},
+          {"truncf", FO::TRUNC, 1},
+          {"__builtin_sqrt", FO::SQRT, 1},
+          {"__builtin_sqrtf", FO::SQRT, 1},
+          {"sqrt", FO::SQRT, 1},
+          {"sqrtf", FO::SQRT, 1},
+        };
+        for (const auto &fb : float_builtins) {
+          if (callee_name == fb.name && args.size() >= fb.num_args) {
+            InstructionIR inst;
+            inst.opcode = mx::ir::OpCode::FLOAT_OP;
+            inst.float_op = static_cast<uint8_t>(fb.op);
+            inst.source_entity_id = eid;
+            for (unsigned i = 0; i < fb.num_args; ++i) {
+              inst.operand_indices.push_back(EmitRValue(args[i]));
+            }
+            return emit_typed(std::move(inst));
+          }
+        }
+
+        // Zero-argument float constants.
+        if (callee_name == "__builtin_inf" || callee_name == "__builtin_inff" ||
+            callee_name == "__builtin_infl") {
+          InstructionIR inst;
+          inst.opcode = mx::ir::OpCode::FLOAT_OP;
+          inst.float_op = static_cast<uint8_t>(FO::INF);
+          inst.source_entity_id = eid;
+          return emit_typed(std::move(inst));
+        }
+        if (callee_name == "__builtin_nan" || callee_name == "__builtin_nanf" ||
+            callee_name == "__builtin_nanl") {
+          InstructionIR inst;
+          inst.opcode = mx::ir::OpCode::FLOAT_OP;
+          inst.float_op = static_cast<uint8_t>(FO::NAN_VAL);
+          inst.source_entity_id = eid;
+          return emit_typed(std::move(inst));
+        }
+        if (callee_name == "__builtin_huge_val" ||
+            callee_name == "__builtin_huge_valf" ||
+            callee_name == "__builtin_huge_vall") {
+          InstructionIR inst;
+          inst.opcode = mx::ir::OpCode::FLOAT_OP;
+          inst.float_op = static_cast<uint8_t>(FO::FLOAT_HUGE);
+          inst.source_entity_id = eid;
+          return emit_typed(std::move(inst));
+        }
+      }
+
+      // Dynamic alloca → DYNAMIC_ALLOCA.
+      if (callee_name == "__builtin_alloca" || callee_name == "alloca") {
+        if (!args.empty()) {
+          InstructionIR inst;
+          inst.opcode = mx::ir::OpCode::DYNAMIC_ALLOCA;
+          inst.source_entity_id = eid;
+          inst.operand_indices.push_back(EmitRValue(args[0]));
+          return emit_typed(std::move(inst));
+        }
+      }
+
+      // Frame/return address intrinsics.
+      if (callee_name == "__builtin_frame_address") {
+        InstructionIR inst;
+        inst.opcode = mx::ir::OpCode::FRAME_ADDRESS;
+        inst.source_entity_id = eid;
+        if (!args.empty()) {
+          inst.operand_indices.push_back(EmitRValue(args[0]));
+        } else {
+          // Default level 0.
+          InstructionIR zero;
+          zero.opcode = mx::ir::OpCode::CONST_INT;
+          zero.source_entity_id = eid;
+          zero.int_value = 0;
+          zero.uint_value = 0;
+          zero.width = 32;
+          inst.operand_indices.push_back(EmitInstruction(std::move(zero)));
+        }
+        return emit_typed(std::move(inst));
+      }
+      if (callee_name == "__builtin_return_address") {
+        InstructionIR inst;
+        inst.opcode = mx::ir::OpCode::RETURN_ADDRESS;
+        inst.source_entity_id = eid;
+        if (!args.empty()) {
+          inst.operand_indices.push_back(EmitRValue(args[0]));
+        } else {
+          InstructionIR zero;
+          zero.opcode = mx::ir::OpCode::CONST_INT;
+          zero.source_entity_id = eid;
+          zero.int_value = 0;
+          zero.uint_value = 0;
+          zero.width = 32;
+          inst.operand_indices.push_back(EmitInstruction(std::move(zero)));
+        }
+        return emit_typed(std::move(inst));
+      }
+
+      // Atomic load/store/cmpxchg builtins.
+      if (callee_name == "__atomic_load_n" || callee_name == "__c11_atomic_load") {
+        if (!args.empty()) {
+          InstructionIR inst;
+          inst.opcode = mx::ir::OpCode::ATOMIC_LOAD;
+          inst.source_entity_id = eid;
+          inst.operand_indices.push_back(EmitRValue(args[0]));
+          return emit_typed(std::move(inst));
+        }
+      }
+      if (callee_name == "__atomic_store_n" || callee_name == "__c11_atomic_store") {
+        if (args.size() >= 2) {
+          InstructionIR inst;
+          inst.opcode = mx::ir::OpCode::ATOMIC_STORE;
+          inst.source_entity_id = eid;
+          inst.operand_indices.push_back(EmitRValue(args[0]));
+          inst.operand_indices.push_back(EmitRValue(args[1]));
+          return emit_typed(std::move(inst));
+        }
+      }
+      if (callee_name == "__atomic_compare_exchange_n" ||
+          callee_name == "__c11_atomic_compare_exchange_strong" ||
+          callee_name == "__c11_atomic_compare_exchange_weak" ||
+          callee_name == "__sync_bool_compare_and_swap" ||
+          callee_name == "__sync_val_compare_and_swap") {
+        if (args.size() >= 3) {
+          InstructionIR inst;
+          inst.opcode = mx::ir::OpCode::ATOMIC_CMPXCHG;
+          inst.source_entity_id = eid;
+          inst.operand_indices.push_back(EmitRValue(args[0]));
+          inst.operand_indices.push_back(EmitRValue(args[1]));
+          inst.operand_indices.push_back(EmitRValue(args[2]));
+          return emit_typed(std::move(inst));
+        }
+      }
+
+      // Atomic fetch-and-modify → RMW with atomic underlying opcodes.
+      {
+        struct AtomicRMWBuiltin {
+          const char *name;
+          mx::ir::OpCode underlying;
+          bool returns_new;  // true = returns new value, false = returns old
+        };
+        static const AtomicRMWBuiltin atomic_rmw_builtins[] = {
+          {"__atomic_fetch_add", mx::ir::OpCode::ATOMIC_ADD, false},
+          {"__atomic_add_fetch", mx::ir::OpCode::ATOMIC_ADD, true},
+          {"__sync_fetch_and_add", mx::ir::OpCode::ATOMIC_ADD, false},
+          {"__atomic_fetch_sub", mx::ir::OpCode::ATOMIC_SUB, false},
+          {"__atomic_sub_fetch", mx::ir::OpCode::ATOMIC_SUB, true},
+          {"__sync_fetch_and_sub", mx::ir::OpCode::ATOMIC_SUB, false},
+          {"__atomic_fetch_and", mx::ir::OpCode::ATOMIC_AND, false},
+          {"__atomic_and_fetch", mx::ir::OpCode::ATOMIC_AND, true},
+          {"__sync_fetch_and_and", mx::ir::OpCode::ATOMIC_AND, false},
+          {"__atomic_fetch_or", mx::ir::OpCode::ATOMIC_OR, false},
+          {"__atomic_or_fetch", mx::ir::OpCode::ATOMIC_OR, true},
+          {"__sync_fetch_and_or", mx::ir::OpCode::ATOMIC_OR, false},
+          {"__atomic_fetch_xor", mx::ir::OpCode::ATOMIC_XOR, false},
+          {"__atomic_xor_fetch", mx::ir::OpCode::ATOMIC_XOR, true},
+          {"__sync_fetch_and_xor", mx::ir::OpCode::ATOMIC_XOR, false},
+          {"__atomic_fetch_nand", mx::ir::OpCode::ATOMIC_NAND, false},
+          {"__atomic_nand_fetch", mx::ir::OpCode::ATOMIC_NAND, true},
+          {"__sync_fetch_and_nand", mx::ir::OpCode::ATOMIC_NAND, false},
+          {"__atomic_exchange_n", mx::ir::OpCode::ATOMIC_EXCHANGE, false},
+          {"__sync_lock_test_and_set", mx::ir::OpCode::ATOMIC_EXCHANGE, false},
+        };
+        for (const auto &ab : atomic_rmw_builtins) {
+          if (callee_name == ab.name && args.size() >= 2) {
+            InstructionIR rmw;
+            rmw.opcode = mx::ir::OpCode::READ_MODIFY_WRITE;
+            rmw.source_entity_id = eid;
+            rmw.compound_op = ab.underlying;
+            rmw.flags = ab.returns_new ? 1u : 0u;
+            rmw.operand_indices.push_back(EmitRValue(args[0]));
+            rmw.operand_indices.push_back(EmitRValue(args[1]));
+            return emit_typed(std::move(rmw));
+          }
+        }
+      }
+
+      // Type query builtins → CONST_INT.
+      if (callee_name == "__builtin_constant_p") {
+        // In our IR everything is "not a constant" from the optimizer's view.
+        InstructionIR inst;
+        inst.opcode = mx::ir::OpCode::CONST_INT;
+        inst.source_entity_id = eid;
+        inst.int_value = 0;
+        inst.uint_value = 0;
+        inst.width = 32;
+        return emit_typed(std::move(inst));
+      }
+      if (callee_name == "__builtin_types_compatible_p" ||
+          callee_name == "__builtin_classify_type" ||
+          callee_name == "__builtin_object_size") {
+        auto *raw = reinterpret_cast<const clang::Expr *>(e.RawStmt());
+        if (raw) {
+          clang::Expr::EvalResult eval_result;
+          if (raw->EvaluateAsInt(eval_result, ctx_)) {
+            auto ap_val = eval_result.Val.getInt();
+            InstructionIR inst;
+            inst.opcode = mx::ir::OpCode::CONST_INT;
+            inst.source_entity_id = eid;
+            inst.int_value = ap_val.getSExtValue();
+            inst.uint_value = ap_val.getZExtValue();
+            inst.width = static_cast<uint8_t>(
+                std::min<unsigned>(ap_val.getBitWidth(), 64u));
+            return emit_typed(std::move(inst));
+          }
+        }
+        // Fallback for __builtin_object_size: return -1 (unknown).
+        if (callee_name == "__builtin_object_size") {
+          InstructionIR inst;
+          inst.opcode = mx::ir::OpCode::CONST_INT;
+          inst.source_entity_id = eid;
+          inst.int_value = -1;
+          inst.uint_value = static_cast<uint64_t>(-1);
+          inst.width = 64;
+          return emit_typed(std::move(inst));
         }
       }
     }

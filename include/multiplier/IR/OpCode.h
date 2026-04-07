@@ -106,34 +106,58 @@ enum class OpCode : uint8_t {
   ENTER_SCOPE = 63,        // marks scope entry; extra = IRStructureId of scope
   EXIT_SCOPE = 64,         // marks scope exit; extra = IRStructureId of scope
 
-  // Memory operations.
-  MEMSET = 65,             // op[0] = dest, op[1] = byte value, op[2] = size
-  MEMCPY = 66,             // op[0] = dest, op[1] = src, op[2] = size (UB if overlapping)
-  MEMMOVE = 67,            // op[0] = dest, op[1] = src, op[2] = size (safe for overlap)
+  // Unified memory/string operations. Sub-opcode in int_pool[0] selects the
+  // specific operation (see MemoryOp enum).
+  MULTIMEM = 65,
 
   // Parameter read: reads the Nth function parameter.
-  PARAM_READ = 68,
+  PARAM_READ = 66,
 
   // Address-of for globals and functions (external to the current frame).
-  GLOBAL_ADDR = 69,        // pointer to a global or static variable
-  FUNC_ADDR = 70,          // pointer to a function
+  GLOBAL_ADDR = 67,        // pointer to a global or static variable
+  FUNC_ADDR = 68,          // pointer to a function
 
   // Bitwise/intrinsic operations. Sub-opcode in int_pool[0] selects the
   // specific operation (see BitwiseOp enum). op[0] = primary operand.
-  BITWISE_OP = 71,
+  BITWISE_OP = 69,
+
+  // Floating-point operations. Sub-opcode in int_pool[0] selects the
+  // specific operation (see FloatOp enum). op[0] = primary operand.
+  FLOAT_OP = 70,
 
   // Undefined/poison value. Represents a value that is architecturally
   // undefined (e.g., __builtin_clz(0)). An analyzer should flag any use.
-  UNDEFINED = 72,
+  UNDEFINED = 71,
+
+  // Dynamic stack allocation.
+  DYNAMIC_ALLOCA = 72,     // op[0] = size. Returns pointer to stack allocation.
+
+  // Frame/return address intrinsics.
+  FRAME_ADDRESS = 73,      // op[0] = level (CONST_INT, usually 0). Returns frame ptr.
+  RETURN_ADDRESS = 74,     // op[0] = level (CONST_INT, usually 0). Returns return addr.
+
+  // Atomic operations.
+  ATOMIC_LOAD = 75,        // op[0] = address. Loads with atomic semantics.
+  ATOMIC_STORE = 76,       // op[0] = address, op[1] = value.
+  ATOMIC_CMPXCHG = 77,     // op[0] = target, op[1] = expected_ptr, op[2] = desired. Returns bool.
 
   // Overflow-checked arithmetic (only used as RMW underlying opcodes).
   // RMW returns bool (overflow flag), stores the arithmetic result.
-  ADD_OVERFLOW = 74,
-  SUB_OVERFLOW = 75,
-  MUL_OVERFLOW = 76,
+  ADD_OVERFLOW = 78,
+  SUB_OVERFLOW = 79,
+  MUL_OVERFLOW = 80,
+
+  // Atomic RMW underlying opcodes (only valid as RMW underlying ops).
+  ATOMIC_ADD = 81,
+  ATOMIC_SUB = 82,
+  ATOMIC_AND = 83,
+  ATOMIC_OR = 84,
+  ATOMIC_XOR = 85,
+  ATOMIC_NAND = 86,
+  ATOMIC_EXCHANGE = 87,
 
   // Unknown / unhandled expression
-  UNKNOWN = 77,
+  UNKNOWN = 88,
 };
 
 // Returns the human-readable name of an opcode.
@@ -144,7 +168,7 @@ inline static const char *EnumerationName(OpCode) {
 const char *EnumeratorName(OpCode op) noexcept;
 
 inline static constexpr unsigned NumEnumerators(OpCode) {
-  return 78u;
+  return 89u;
 }
 
 // Sub-opcodes for BITWISE_OP. Stored in the int pool.
@@ -180,6 +204,50 @@ enum class BitwiseOp : uint8_t {
 
   // Assume (optimization hint, no-op).
   ASSUME = 12,             // __builtin_assume(x)
+};
+
+// Sub-opcodes for MULTIMEM. Stored in the int pool.
+enum class MemoryOp : uint8_t {
+  // Memory operations.
+  MEMSET = 0,      // op[0]=dest, op[1]=byte, op[2]=size. Returns dest.
+  MEMCPY = 1,      // op[0]=dest, op[1]=src, op[2]=size. UB on overlap. Returns dest.
+  MEMMOVE = 2,     // op[0]=dest, op[1]=src, op[2]=size. Safe for overlap. Returns dest.
+  MEMCMP = 3,      // op[0]=s1, op[1]=s2, op[2]=size. Returns int (<0, 0, >0).
+  MEMCHR = 4,      // op[0]=ptr, op[1]=byte, op[2]=size. Returns ptr or null.
+  BZERO = 5,       // op[0]=dest, op[1]=size. Equivalent to memset(dest,0,size).
+
+  // String operations. All operate on null-terminated strings.
+  STRLEN = 6,      // op[0]=str. Returns length (not including null).
+  STRNLEN = 7,     // op[0]=str, op[1]=maxlen. Returns min(strlen, maxlen).
+  STRCMP = 8,       // op[0]=s1, op[1]=s2. Returns int (<0, 0, >0).
+  STRNCMP = 9,     // op[0]=s1, op[1]=s2, op[2]=n. Compare at most n chars.
+  STRCHR = 10,     // op[0]=str, op[1]=char. Returns ptr to first occurrence or null.
+  STRRCHR = 11,    // op[0]=str, op[1]=char. Returns ptr to last occurrence or null.
+  STRSTR = 12,     // op[0]=haystack, op[1]=needle. Returns ptr or null.
+  STRCPY = 13,     // op[0]=dest, op[1]=src. Returns dest. UB if overlap.
+  STRNCPY = 14,    // op[0]=dest, op[1]=src, op[2]=n. Returns dest.
+  STRCAT = 15,     // op[0]=dest, op[1]=src. Returns dest.
+  STRNCAT = 16,    // op[0]=dest, op[1]=src, op[2]=n. Returns dest.
+  STPCPY = 17,     // op[0]=dest, op[1]=src. Returns pointer to null terminator.
+};
+
+// Sub-opcodes for FLOAT_OP. Stored in the int pool.
+enum class FloatOp : uint8_t {
+  ISNAN = 0,       // op[0]=x. Returns bool.
+  ISINF = 1,       // op[0]=x. Returns bool.
+  ISFINITE = 2,    // op[0]=x. Returns bool.
+  FABS = 3,        // op[0]=x. Returns |x|.
+  COPYSIGN = 4,    // op[0]=x, op[1]=y. Returns x with sign of y.
+  FMIN = 5,        // op[0]=x, op[1]=y. Returns min.
+  FMAX = 6,        // op[0]=x, op[1]=y. Returns max.
+  CEIL = 7,        // op[0]=x. Returns ceil(x).
+  FLOOR = 8,       // op[0]=x. Returns floor(x).
+  ROUND = 9,       // op[0]=x. Returns round(x).
+  TRUNC = 10,      // op[0]=x. Returns trunc(x).
+  SQRT = 11,       // op[0]=x. Returns sqrt(x). UNDEFINED for negative.
+  INF = 12,        // No operands. Returns +infinity.
+  NAN_VAL = 13,    // No operands. Returns NaN.
+  FLOAT_HUGE = 14,  // No operands. Returns HUGE_VAL (+inf).
 };
 
 // Classification helpers.

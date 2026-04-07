@@ -216,6 +216,14 @@ static uint32_t EmitInstructionConsts(
       pool.AddInt(static_cast<int64_t>(inst.bitwise_op));  // BitwiseOp sub-opcode
       break;
 
+    case OC::MULTIMEM:
+      pool.AddInt(static_cast<int64_t>(inst.memory_op));  // MemoryOp sub-opcode
+      break;
+
+    case OC::FLOAT_OP:
+      pool.AddInt(static_cast<int64_t>(inst.float_op));  // FloatOp sub-opcode
+      break;
+
     default:
       return offset;  // no constants
   }
@@ -412,6 +420,7 @@ void SerializeIR(
       // Position 2 (value-producing only): result type.
       if (!mx::ir::IsTerminator(src.opcode) &&
           src.opcode != mx::ir::OpCode::STORE &&
+          src.opcode != mx::ir::OpCode::ATOMIC_STORE &&
           src.opcode != mx::ir::OpCode::VA_START &&
           src.opcode != mx::ir::OpCode::VA_END &&
           src.opcode != mx::ir::OpCode::VA_COPY &&

@@ -32,6 +32,7 @@ IntPool GetIntPool(const IRInstructionImpl &impl) {
 bool HasResultType(ir::OpCode op) {
   return !ir::IsTerminator(op) &&
          op != ir::OpCode::STORE &&
+         op != ir::OpCode::ATOMIC_STORE &&
          op != ir::OpCode::VA_START &&
          op != ir::OpCode::VA_END &&
          op != ir::OpCode::VA_COPY &&
@@ -155,10 +156,15 @@ IMPL_FROM_SINGLE(VAPackInst, VA_PACK)
 IMPL_FROM_SINGLE(ParamReadInst, PARAM_READ)
 IMPL_FROM_SINGLE(GlobalAddrInst, GLOBAL_ADDR)
 IMPL_FROM_SINGLE(FuncAddrInst, FUNC_ADDR)
-IMPL_FROM_SINGLE(MemsetInst, MEMSET)
-IMPL_FROM_SINGLE(MemcpyInst, MEMCPY)
-IMPL_FROM_SINGLE(MemmoveInst, MEMMOVE)
+IMPL_FROM_SINGLE(MultimemInst, MULTIMEM)
 IMPL_FROM_SINGLE(BitwiseOpInst, BITWISE_OP)
+IMPL_FROM_SINGLE(FloatOpInst, FLOAT_OP)
+IMPL_FROM_SINGLE(DynamicAllocaInst, DYNAMIC_ALLOCA)
+IMPL_FROM_SINGLE(FrameAddressInst, FRAME_ADDRESS)
+IMPL_FROM_SINGLE(ReturnAddressInst, RETURN_ADDRESS)
+IMPL_FROM_SINGLE(AtomicLoadInst, ATOMIC_LOAD)
+IMPL_FROM_SINGLE(AtomicStoreInst, ATOMIC_STORE)
+IMPL_FROM_SINGLE(AtomicCmpxchgInst, ATOMIC_CMPXCHG)
 IMPL_FROM_SINGLE(UndefinedInst, UNDEFINED)
 
 IMPL_FROM_SINGLE(RetInst, RET)
@@ -517,19 +523,17 @@ std::optional<FunctionDecl> FuncAddrInst::function(void) const {
   return std::nullopt;
 }
 
-// ---- Memory operations ----
+// ---- MultimemInst ----
 
-IRInstruction MemsetInst::dest(void) const { return nth_operand(0); }
-IRInstruction MemsetInst::byte_value(void) const { return nth_operand(1); }
-IRInstruction MemsetInst::size(void) const { return nth_operand(2); }
+ir::MemoryOp MultimemInst::sub_opcode(void) const {
+  auto int_pool = GetIntPool(*impl);
+  auto r = impl->reader();
+  return static_cast<ir::MemoryOp>(int_pool[r.getConstOffset()]);
+}
 
-IRInstruction MemcpyInst::dest(void) const { return nth_operand(0); }
-IRInstruction MemcpyInst::src(void) const { return nth_operand(1); }
-IRInstruction MemcpyInst::size(void) const { return nth_operand(2); }
-
-IRInstruction MemmoveInst::dest(void) const { return nth_operand(0); }
-IRInstruction MemmoveInst::src(void) const { return nth_operand(1); }
-IRInstruction MemmoveInst::size(void) const { return nth_operand(2); }
+Type MultimemInst::result_type(void) const {
+  return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
+}
 
 // ---- BitwiseOpInst ----
 
@@ -540,6 +544,60 @@ ir::BitwiseOp BitwiseOpInst::sub_opcode(void) const {
 }
 
 Type BitwiseOpInst::result_type(void) const {
+  return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
+}
+
+// ---- FloatOpInst ----
+
+ir::FloatOp FloatOpInst::sub_opcode(void) const {
+  auto int_pool = GetIntPool(*impl);
+  auto r = impl->reader();
+  return static_cast<ir::FloatOp>(int_pool[r.getConstOffset()]);
+}
+
+Type FloatOpInst::result_type(void) const {
+  return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
+}
+
+// ---- DynamicAllocaInst ----
+
+IRInstruction DynamicAllocaInst::size(void) const { return nth_operand(0); }
+Type DynamicAllocaInst::result_type(void) const {
+  return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
+}
+
+// ---- FrameAddressInst ----
+
+IRInstruction FrameAddressInst::level(void) const { return nth_operand(0); }
+Type FrameAddressInst::result_type(void) const {
+  return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
+}
+
+// ---- ReturnAddressInst ----
+
+IRInstruction ReturnAddressInst::level(void) const { return nth_operand(0); }
+Type ReturnAddressInst::result_type(void) const {
+  return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
+}
+
+// ---- AtomicLoadInst ----
+
+IRInstruction AtomicLoadInst::address(void) const { return nth_operand(0); }
+Type AtomicLoadInst::result_type(void) const {
+  return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
+}
+
+// ---- AtomicStoreInst ----
+
+IRInstruction AtomicStoreInst::address(void) const { return nth_operand(0); }
+IRInstruction AtomicStoreInst::value(void) const { return nth_operand(1); }
+
+// ---- AtomicCmpxchgInst ----
+
+IRInstruction AtomicCmpxchgInst::target(void) const { return nth_operand(0); }
+IRInstruction AtomicCmpxchgInst::expected_ptr(void) const { return nth_operand(1); }
+IRInstruction AtomicCmpxchgInst::desired(void) const { return nth_operand(2); }
+Type AtomicCmpxchgInst::result_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 

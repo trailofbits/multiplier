@@ -230,31 +230,14 @@ class MX_EXPORT FuncAddrInst : public IRInstruction {
 };
 
 // ---------------------------------------------------------------------------
-// Memory operations
+// Unified memory/string operations (MULTIMEM)
 // ---------------------------------------------------------------------------
 
-class MX_EXPORT MemsetInst : public IRInstruction {
+class MX_EXPORT MultimemInst : public IRInstruction {
  public:
-  MX_DECLARE_IR_INSTRUCTION(MemsetInst)
-  IRInstruction dest(void) const;       // op[0]
-  IRInstruction byte_value(void) const; // op[1]
-  IRInstruction size(void) const;       // op[2]
-};
-
-class MX_EXPORT MemcpyInst : public IRInstruction {
- public:
-  MX_DECLARE_IR_INSTRUCTION(MemcpyInst)
-  IRInstruction dest(void) const;       // op[0]
-  IRInstruction src(void) const;        // op[1]
-  IRInstruction size(void) const;       // op[2]
-};
-
-class MX_EXPORT MemmoveInst : public IRInstruction {
- public:
-  MX_DECLARE_IR_INSTRUCTION(MemmoveInst)
-  IRInstruction dest(void) const;       // op[0]
-  IRInstruction src(void) const;        // op[1]
-  IRInstruction size(void) const;       // op[2]
+  MX_DECLARE_IR_INSTRUCTION(MultimemInst)
+  ir::MemoryOp sub_opcode(void) const;
+  Type result_type(void) const;
 };
 
 // ---------------------------------------------------------------------------
@@ -265,6 +248,73 @@ class MX_EXPORT BitwiseOpInst : public IRInstruction {
  public:
   MX_DECLARE_IR_INSTRUCTION(BitwiseOpInst)
   ir::BitwiseOp sub_opcode(void) const;
+  Type result_type(void) const;
+};
+
+// ---------------------------------------------------------------------------
+// Floating-point operations (FLOAT_OP)
+// ---------------------------------------------------------------------------
+
+class MX_EXPORT FloatOpInst : public IRInstruction {
+ public:
+  MX_DECLARE_IR_INSTRUCTION(FloatOpInst)
+  ir::FloatOp sub_opcode(void) const;
+  Type result_type(void) const;
+};
+
+// ---------------------------------------------------------------------------
+// Dynamic stack allocation
+// ---------------------------------------------------------------------------
+
+class MX_EXPORT DynamicAllocaInst : public IRInstruction {
+ public:
+  MX_DECLARE_IR_INSTRUCTION(DynamicAllocaInst)
+  IRInstruction size(void) const;        // op[0]
+  Type result_type(void) const;
+};
+
+// ---------------------------------------------------------------------------
+// Frame/return address intrinsics
+// ---------------------------------------------------------------------------
+
+class MX_EXPORT FrameAddressInst : public IRInstruction {
+ public:
+  MX_DECLARE_IR_INSTRUCTION(FrameAddressInst)
+  IRInstruction level(void) const;       // op[0]
+  Type result_type(void) const;
+};
+
+class MX_EXPORT ReturnAddressInst : public IRInstruction {
+ public:
+  MX_DECLARE_IR_INSTRUCTION(ReturnAddressInst)
+  IRInstruction level(void) const;       // op[0]
+  Type result_type(void) const;
+};
+
+// ---------------------------------------------------------------------------
+// Atomic operations
+// ---------------------------------------------------------------------------
+
+class MX_EXPORT AtomicLoadInst : public IRInstruction {
+ public:
+  MX_DECLARE_IR_INSTRUCTION(AtomicLoadInst)
+  IRInstruction address(void) const;     // op[0]
+  Type result_type(void) const;
+};
+
+class MX_EXPORT AtomicStoreInst : public IRInstruction {
+ public:
+  MX_DECLARE_IR_INSTRUCTION(AtomicStoreInst)
+  IRInstruction address(void) const;     // op[0]
+  IRInstruction value(void) const;       // op[1]
+};
+
+class MX_EXPORT AtomicCmpxchgInst : public IRInstruction {
+ public:
+  MX_DECLARE_IR_INSTRUCTION(AtomicCmpxchgInst)
+  IRInstruction target(void) const;       // op[0]
+  IRInstruction expected_ptr(void) const; // op[1]
+  IRInstruction desired(void) const;      // op[2]
   Type result_type(void) const;
 };
 
