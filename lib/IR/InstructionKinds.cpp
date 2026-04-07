@@ -143,13 +143,10 @@ IMPL_FROM_SINGLE(StoreInst, STORE)
 IMPL_FROM_SINGLE(AddressOfInst, ADDRESS_OF)
 IMPL_FROM_SINGLE(GEPFieldInst, GEP_FIELD)
 IMPL_FROM_SINGLE(PtrAddInst, PTR_ADD)
-IMPL_FROM_SINGLE(SizeOfInst, SIZE_OF)
+IMPL_FROM_SINGLE(ReadModifyWriteInst, READ_MODIFY_WRITE)
 IMPL_FROM_SINGLE(CallInst, CALL)
-IMPL_FROM_SINGLE(IncDecInst, INC_DEC)
-IMPL_FROM_SINGLE(CompoundAssignInst, COMPOUND_ASSIGN)
 IMPL_FROM_SINGLE(SelectInst, SELECT)
 IMPL_FROM_SINGLE(CopyInst, COPY)
-IMPL_FROM_SINGLE(InitListInst, INIT_LIST)
 IMPL_FROM_SINGLE(VAStartInst, VA_START)
 IMPL_FROM_SINGLE(VAEndInst, VA_END)
 IMPL_FROM_SINGLE(VACopyInst, VA_COPY)
@@ -342,20 +339,31 @@ Type CastInst::result_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 
-// ---- SizeOfInst ----
+// ---- ReadModifyWriteInst ----
 
-Type SizeOfInst::result_type(void) const {
+IRInstruction ReadModifyWriteInst::address(void) const { return nth_operand(0); }
+
+ir::OpCode ReadModifyWriteInst::underlying_op(void) const {
+  return static_cast<ir::OpCode>(
+      GetIntPool(*impl)[impl->reader().getConstOffset()]);
+}
+
+int64_t ReadModifyWriteInst::element_size(void) const {
+  return GetIntPool(*impl)[impl->reader().getConstOffset() + 1];
+}
+
+bool ReadModifyWriteInst::returns_new_value(void) const {
+  return (impl->reader().getFlags() & 1) != 0;
+}
+
+Type ReadModifyWriteInst::result_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 
-Type SizeOfInst::measured_type(void) const {
-  return ResolveType(*impl, GetPool(*impl)[ExtraBase(impl->reader())]);
-}
-
-int64_t SizeOfInst::static_size(void) const {
-  auto r = impl->reader();
-  auto int_pool = GetIntPool(*impl);
-  return int_pool[r.getConstOffset()];
+gap::generator<IRInstruction> ReadModifyWriteInst::rhs_operands(void) const & {
+  for (unsigned i = 1; i < num_operands(); ++i) {
+    co_yield nth_operand(i);
+  }
 }
 
 // ---- CallInst ----
@@ -385,40 +393,6 @@ gap::generator<IRInstruction> CallInst::arguments(void) const & {
   }
 }
 
-// ---- IncDecInst ----
-
-IRInstruction IncDecInst::address(void) const { return nth_operand(0); }
-
-Type IncDecInst::result_type(void) const {
-  return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
-}
-
-bool IncDecInst::is_increment(void) const {
-  return (impl->reader().getFlags() & 0x1) != 0;
-}
-
-bool IncDecInst::is_prefix(void) const {
-  return (impl->reader().getFlags() & 0x2) != 0;
-}
-
-int64_t IncDecInst::pointer_element_size(void) const {
-  return GetIntPool(*impl)[impl->reader().getConstOffset()];
-}
-
-// ---- CompoundAssignInst ----
-
-IRInstruction CompoundAssignInst::address(void) const { return nth_operand(0); }
-IRInstruction CompoundAssignInst::value(void) const { return nth_operand(1); }
-
-Type CompoundAssignInst::result_type(void) const {
-  return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
-}
-
-ir::OpCode CompoundAssignInst::underlying_op(void) const {
-  return static_cast<ir::OpCode>(
-      GetIntPool(*impl)[impl->reader().getConstOffset()]);
-}
-
 // ---- SelectInst ----
 
 IRInstruction SelectInst::condition(void) const { return nth_operand(0); }
@@ -433,18 +407,6 @@ Type SelectInst::result_type(void) const {
 
 IRInstruction CopyInst::source(void) const { return nth_operand(0); }
 Type CopyInst::result_type(void) const {
-  return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
-}
-
-// ---- InitListInst ----
-
-gap::generator<IRInstruction> InitListInst::elements(void) const & {
-  for (unsigned i = 0; i < num_operands(); ++i) {
-    co_yield nth_operand(i);
-  }
-}
-
-Type InitListInst::result_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 

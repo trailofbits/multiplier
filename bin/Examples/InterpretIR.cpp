@@ -14,9 +14,6 @@
 //   A base-class result_type() would simplify the interpreter significantly.
 // - IRObject doesn't expose string literal bytes, so STRING_LITERAL objects
 //   are initialized to zero. An interpreter needs this data.
-// - COMPOUND_ASSIGN and INC_DEC are compound read-modify-write ops. They're
-//   convenient for the AST mapping but make the interpreter more complex than
-//   if they were decomposed into LOAD+op+STORE sequences.
 
 #include <algorithm>
 #include <cassert>
@@ -590,10 +587,46 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       break;
     }
 
-    // --- Sizeof ---
-    case mx::ir::OpCode::SIZE_OF: {
-      if (auto so = mx::SizeOfInst::from(inst)) {
-        result = Value::Int(so->static_size());
+    // --- Read-modify-write (inc/dec, compound assign) ---
+    case mx::ir::OpCode::READ_MODIFY_WRITE: {
+      if (auto rmw = mx::ReadModifyWriteInst::from(inst)) {
+        Value addr = GetValue(rmw->address());
+        if (addr.kind == Value::POINTER) {
+          Value old_val = MemReadValue(addr.ptr, 8, false);
+          // Collect RHS operands (typically one value).
+          Value rhs = Value::Int(0);
+          for (auto rhs_op : rmw->rhs_operands()) {
+            rhs = GetValue(rhs_op);
+            break;  // Use first RHS operand.
+          }
+          Value new_val;
+          switch (rmw->underlying_op()) {
+            case mx::ir::OpCode::ADD: new_val = Value::Int(old_val.as_int() + rhs.as_int()); break;
+            case mx::ir::OpCode::SUB: new_val = Value::Int(old_val.as_int() - rhs.as_int()); break;
+            case mx::ir::OpCode::MUL: new_val = Value::Int(old_val.as_int() * rhs.as_int()); break;
+            case mx::ir::OpCode::DIV: new_val = Value::Int(rhs.as_int() ? old_val.as_int() / rhs.as_int() : 0); break;
+            case mx::ir::OpCode::REM: new_val = Value::Int(rhs.as_int() ? old_val.as_int() % rhs.as_int() : 0); break;
+            case mx::ir::OpCode::BIT_AND: new_val = Value::Int(old_val.as_int() & rhs.as_int()); break;
+            case mx::ir::OpCode::BIT_OR: new_val = Value::Int(old_val.as_int() | rhs.as_int()); break;
+            case mx::ir::OpCode::BIT_XOR: new_val = Value::Int(old_val.as_int() ^ rhs.as_int()); break;
+            case mx::ir::OpCode::SHL: new_val = Value::Int(old_val.as_int() << rhs.as_int()); break;
+            case mx::ir::OpCode::SHR: new_val = Value::Int(old_val.as_int() >> rhs.as_int()); break;
+            case mx::ir::OpCode::PTR_ADD: {
+              int64_t elem_sz = rmw->element_size();
+              if (elem_sz <= 0) elem_sz = 1;
+              if (old_val.kind == Value::POINTER) {
+                new_val = Value::Ptr(old_val.ptr.object_id,
+                                     old_val.ptr.offset + rhs.as_int() * elem_sz);
+              } else {
+                new_val = Value::Int(old_val.as_int() + rhs.as_int() * elem_sz);
+              }
+              break;
+            }
+            default: new_val = old_val; break;
+          }
+          MemWriteValue(addr.ptr, new_val, 8);
+          result = rmw->returns_new_value() ? new_val : old_val;
+        }
       }
       break;
     }
@@ -656,62 +689,6 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       break;
     }
 
-    // --- Inc/Dec ---
-    // CRITIQUE: This is a compound read-modify-write. The IR could decompose
-    // this into LOAD + ADD/SUB + STORE, which would be simpler for the
-    // interpreter. As-is, we must handle the compound semantics.
-    case mx::ir::OpCode::INC_DEC: {
-      if (auto id = mx::IncDecInst::from(inst)) {
-        Value addr = GetValue(id->address());
-        if (addr.kind == Value::POINTER) {
-          Value old_val = MemReadValue(addr.ptr, 8, false);
-          int64_t delta = id->is_increment() ? 1 : -1;
-          Value new_val = Value::Int(old_val.as_int() + delta);
-          MemWriteValue(addr.ptr, new_val, 8);
-          result = id->is_prefix() ? new_val : old_val;
-        }
-      }
-      break;
-    }
-
-    // --- Compound assign ---
-    // CRITIQUE: Same issue as INC_DEC. A LOAD + op + STORE decomposition
-    // would be cleaner for the interpreter.
-    case mx::ir::OpCode::COMPOUND_ASSIGN: {
-      if (auto ca = mx::CompoundAssignInst::from(inst)) {
-        Value addr = GetValue(ca->address());
-        Value rhs = GetValue(ca->value());
-        if (addr.kind == Value::POINTER) {
-          Value old_val = MemReadValue(addr.ptr, 8, false);
-          Value new_val;
-          switch (ca->underlying_op()) {
-            case mx::ir::OpCode::ADD: new_val = Value::Int(old_val.as_int() + rhs.as_int()); break;
-            case mx::ir::OpCode::SUB: new_val = Value::Int(old_val.as_int() - rhs.as_int()); break;
-            case mx::ir::OpCode::MUL: new_val = Value::Int(old_val.as_int() * rhs.as_int()); break;
-            case mx::ir::OpCode::DIV: new_val = Value::Int(rhs.as_int() ? old_val.as_int() / rhs.as_int() : 0); break;
-            case mx::ir::OpCode::REM: new_val = Value::Int(rhs.as_int() ? old_val.as_int() % rhs.as_int() : 0); break;
-            case mx::ir::OpCode::BIT_AND: new_val = Value::Int(old_val.as_int() & rhs.as_int()); break;
-            case mx::ir::OpCode::BIT_OR: new_val = Value::Int(old_val.as_int() | rhs.as_int()); break;
-            case mx::ir::OpCode::BIT_XOR: new_val = Value::Int(old_val.as_int() ^ rhs.as_int()); break;
-            case mx::ir::OpCode::SHL: new_val = Value::Int(old_val.as_int() << rhs.as_int()); break;
-            case mx::ir::OpCode::SHR: new_val = Value::Int(old_val.as_int() >> rhs.as_int()); break;
-            default: new_val = old_val; break;
-          }
-          MemWriteValue(addr.ptr, new_val, 8);
-          result = new_val;
-        }
-      }
-      break;
-    }
-
-    // --- Init list ---
-    case mx::ir::OpCode::INIT_LIST: {
-      // CRITIQUE: INIT_LIST produces an aggregate value. A concrete interpreter
-      // needs to know the layout (field offsets, array element sizes). Without
-      // decomposition into element stores, this is hard to handle generically.
-      // For now, just pass through as undef.
-      break;
-    }
 
     // --- Param read ---
     case mx::ir::OpCode::PARAM_READ: {

@@ -771,11 +771,29 @@ void IRGenerator::EmitStmt(const pasta::Stmt &s) {
     return;
   }
 
-  // Compound statement (nested block).
+  // Compound statement (nested block) -- push/pop a SCOPE.
   if (auto cs = pasta::CompoundStmt::From(s)) {
+    auto scope_eid = EntityIdOf(s);
+    uint32_t scope_idx = PushStructure(mx::ir::StructureKind::SCOPE, scope_eid);
+    AssociateBlockWithStructure(current_block_index_);
+    {
+      InstructionIR enter;
+      enter.opcode = mx::ir::OpCode::ENTER_SCOPE;
+      enter.source_entity_id = scope_eid;
+      enter.structure_index = scope_idx;
+      EmitTopLevel(std::move(enter));
+    }
     for (const auto &child : cs->Children()) {
       EmitStmt(child);
     }
+    {
+      InstructionIR exit_inst;
+      exit_inst.opcode = mx::ir::OpCode::EXIT_SCOPE;
+      exit_inst.source_entity_id = scope_eid;
+      exit_inst.structure_index = scope_idx;
+      EmitTopLevel(std::move(exit_inst));
+    }
+    PopStructure();
     return;
   }
 
@@ -1611,16 +1629,43 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
           oc == pasta::UnaryOperatorKind::kPostIncrement ||
           oc == pasta::UnaryOperatorKind::kPostDecrement) {
         uint32_t addr_idx = EmitLValue(sub);
+        bool is_inc = (oc == pasta::UnaryOperatorKind::kPreIncrement ||
+                       oc == pasta::UnaryOperatorKind::kPostIncrement);
+        bool is_pre = (oc == pasta::UnaryOperatorKind::kPreIncrement ||
+                       oc == pasta::UnaryOperatorKind::kPreDecrement);
+
+        // Emit CONST_INT(1) as the delta operand.
+        InstructionIR one;
+        one.opcode = mx::ir::OpCode::CONST_INT;
+        one.source_entity_id = eid;
+        one.int_value = 1;
+        one.uint_value = 1;
+        one.width = 64;
+        if (expr_type) one.type_entity_id = TypeEntityIdOf(*expr_type);
+        uint32_t one_idx = EmitInstruction(std::move(one));
+
+        // Determine underlying op and element size for pointers.
+        auto sub_type = sub.Type();
+        bool is_ptr = sub_type && sub_type->IsAnyPointerType();
+        mx::ir::OpCode underlying = is_inc ? mx::ir::OpCode::ADD
+                                           : mx::ir::OpCode::SUB;
+        uint32_t elem_sz = 0;
+        if (is_ptr) {
+          underlying = is_inc ? mx::ir::OpCode::PTR_ADD
+                              : mx::ir::OpCode::PTR_ADD;
+          if (auto pt = sub_type->PointeeType()) {
+            if (auto sz = TypeSizeBytes(*pt)) elem_sz = *sz;
+          }
+        }
+
         InstructionIR inst;
-        inst.opcode = mx::ir::OpCode::INC_DEC;
+        inst.opcode = mx::ir::OpCode::READ_MODIFY_WRITE;
         inst.source_entity_id = eid;
-        inst.operand_indices = {addr_idx};
-        uint8_t f = 0;
-        if (oc == pasta::UnaryOperatorKind::kPreIncrement ||
-            oc == pasta::UnaryOperatorKind::kPostIncrement) f |= 1;
-        if (oc == pasta::UnaryOperatorKind::kPreIncrement ||
-            oc == pasta::UnaryOperatorKind::kPreDecrement) f |= 2;
-        inst.flags = f;
+        inst.operand_indices = {addr_idx, one_idx};
+        inst.compound_op = underlying;
+        inst.size_bytes = elem_sz;
+        // flags bit0 = returns_new_value: pre returns new, post returns old.
+        inst.flags = is_pre ? 1 : 0;
         return emit_typed(std::move(inst));
       }
       if (oc == pasta::UnaryOperatorKind::kMinus) {
@@ -1668,12 +1713,12 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         return emit_typed(std::move(inst));
       }
 
-      // Compound assignment.
+      // Compound assignment -> READ_MODIFY_WRITE.
       if (pasta::CompoundAssignOperator::From(e)) {
         uint32_t addr_idx = EmitLValue(bo->LHS());
         uint32_t val_idx = EmitRValue(bo->RHS());
         InstructionIR inst;
-        inst.opcode = mx::ir::OpCode::COMPOUND_ASSIGN;
+        inst.opcode = mx::ir::OpCode::READ_MODIFY_WRITE;
         inst.source_entity_id = eid;
         inst.operand_indices = {addr_idx, val_idx};
         switch (oc) {
@@ -1689,6 +1734,8 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
           case pasta::BinaryOperatorKind::kShrAssign: inst.compound_op = mx::ir::OpCode::SHR; break;
           default: inst.compound_op = mx::ir::OpCode::ADD; break;
         }
+        // Compound assign always returns the new value.
+        inst.flags = 1;
         return emit_typed(std::move(inst));
       }
 
@@ -1932,51 +1979,97 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     return emit_typed(std::move(inst));
   }
 
-  // sizeof / alignof.
+  // sizeof / alignof / other type traits -- emit as CONST_INT.
   if (auto tte = pasta::UnaryExprOrTypeTraitExpr::From(e)) {
+    auto arg_type = tte->TypeOfArgument();
+    std::optional<uint32_t> val;
     if (tte->KeywordKind() == pasta::UnaryExprOrTypeTrait::kSizeOf) {
+      val = TypeSizeBytes(arg_type);
+    } else if (tte->KeywordKind() == pasta::UnaryExprOrTypeTrait::kAlignOf ||
+               tte->KeywordKind() == pasta::UnaryExprOrTypeTrait::kPreferredAlignOf) {
+      val = TypeAlignBytes(arg_type);
+    } else {
+      val = TypeSizeBytes(arg_type);  // fallback
+    }
+    if (val) {
       InstructionIR inst;
-      inst.opcode = mx::ir::OpCode::SIZE_OF;
+      inst.opcode = mx::ir::OpCode::CONST_INT;
       inst.source_entity_id = eid;
-      {
-        auto arg_type = tte->TypeOfArgument();
-        inst.type_entity_id = TypeEntityIdOf(arg_type);
-        if (auto sz = TypeSizeBytes(arg_type)) inst.size_bytes = *sz;
-      }
+      inst.int_value = static_cast<int64_t>(*val);
+      inst.uint_value = static_cast<uint64_t>(*val);
+      inst.width = 64;
       return emit_typed(std::move(inst));
     }
-    // Other traits (alignof, etc.) -- treat as constant if we can evaluate.
-    {
-      auto arg_type = tte->TypeOfArgument();
-      if (auto sz = TypeSizeBytes(arg_type)) {
-        InstructionIR inst;
-        inst.opcode = mx::ir::OpCode::CONST_INT;
-        inst.source_entity_id = eid;
-        inst.int_value = static_cast<int64_t>(*sz);
-        inst.uint_value = static_cast<uint64_t>(*sz);
-        inst.width = 64;
-        return emit_typed(std::move(inst));
-      }
-    }
   }
 
-  // InitListExpr -- aggregate initialization. Operands are the initializer values.
+  // InitListExpr -- allocate a COMPOUND_LITERAL temp, fill via EmitInitializer,
+  // return ADDRESS_OF. This makes aggregate init consistent with compound literals.
   if (auto ile = pasta::InitListExpr::From(e)) {
-    InstructionIR inst;
-    inst.opcode = mx::ir::OpCode::INIT_LIST;
-    inst.source_entity_id = eid;
-    if (auto t = e.Type()) inst.type_entity_id = TypeEntityIdOf(*t);
-    for (const auto &child : ile->Children()) {
-      if (auto child_expr = pasta::Expr::From(child)) {
-        inst.operand_indices.push_back(EmitRValue(*child_expr));
-      }
+    ObjectIR obj;
+    obj.kind = mx::ir::ObjectKind::COMPOUND_LITERAL;
+    obj.source_decl_id = eid;
+    if (auto t = e.Type()) {
+      obj.type_entity_id = TypeEntityIdOf(*t);
+      if (auto sz = TypeSizeBytes(*t)) obj.size_bytes = *sz;
+      if (auto al = TypeAlignBytes(*t)) obj.align_bytes = *al;
     }
-    return emit_typed(std::move(inst));
+    uint32_t obj_idx = next_obj_index_++;
+    func_.objects.push_back(std::move(obj));
+    AssociateObjectWithScope(obj_idx);
+
+    // ALLOCA for the temp object.
+    InstructionIR alloca_inst;
+    alloca_inst.opcode = mx::ir::OpCode::ALLOCA;
+    alloca_inst.source_entity_id = eid;
+    alloca_inst.object_index = obj_idx;
+    if (auto t = e.Type()) alloca_inst.type_entity_id = TypeEntityIdOf(*t);
+    (void) EmitInstruction(std::move(alloca_inst));
+
+    // ADDRESS_OF the temp.
+    InstructionIR addr;
+    addr.opcode = mx::ir::OpCode::ADDRESS_OF;
+    addr.source_entity_id = eid;
+    addr.object_index = obj_idx;
+    if (auto t = e.Type()) addr.type_entity_id = TypeEntityIdOf(*t);
+    uint32_t addr_idx = EmitInstruction(std::move(addr));
+
+    // Fill the temp via EmitInitializer.
+    EmitInitializer(addr_idx, *ile, eid);
+
+    return addr_idx;
   }
 
-  // CompoundLiteralExpr -- emit the initializer.
+  // CompoundLiteralExpr -- allocate temp, fill via EmitInitializer.
   if (auto cle = pasta::CompoundLiteralExpr::From(e)) {
-    return EmitRValue(cle->Initializer());
+    ObjectIR obj;
+    obj.kind = mx::ir::ObjectKind::COMPOUND_LITERAL;
+    obj.source_decl_id = eid;
+    if (auto t = e.Type()) {
+      obj.type_entity_id = TypeEntityIdOf(*t);
+      if (auto sz = TypeSizeBytes(*t)) obj.size_bytes = *sz;
+      if (auto al = TypeAlignBytes(*t)) obj.align_bytes = *al;
+    }
+    uint32_t obj_idx = next_obj_index_++;
+    func_.objects.push_back(std::move(obj));
+    AssociateObjectWithScope(obj_idx);
+
+    InstructionIR alloca_inst;
+    alloca_inst.opcode = mx::ir::OpCode::ALLOCA;
+    alloca_inst.source_entity_id = eid;
+    alloca_inst.object_index = obj_idx;
+    if (auto t = e.Type()) alloca_inst.type_entity_id = TypeEntityIdOf(*t);
+    uint32_t alloca_idx = EmitInstruction(std::move(alloca_inst));
+
+    InstructionIR addr;
+    addr.opcode = mx::ir::OpCode::ADDRESS_OF;
+    addr.source_entity_id = eid;
+    addr.object_index = obj_idx;
+    if (auto t = e.Type()) addr.type_entity_id = TypeEntityIdOf(*t);
+    uint32_t addr_idx = EmitInstruction(std::move(addr));
+
+    EmitInitializer(addr_idx, cle->Initializer(), eid);
+
+    return addr_idx;
   }
 
   // StmtExpr -- GNU ({ ... }) expression. Emit children, return last expr.

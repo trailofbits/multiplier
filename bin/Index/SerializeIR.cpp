@@ -130,10 +130,6 @@ static void EmitInstructionExtras(
       pool.AddEntity(inst.target_entity_id);
       break;
 
-    case OC::SIZE_OF:
-      pool.AddEntity(inst.type_entity_id);
-      break;
-
     case OC::COND_BRANCH:
       for (auto &bt : inst.branch_targets) {
         pool.AddEntity(MakeBlockEid(func, fragment_id, block_base,
@@ -207,16 +203,9 @@ static uint32_t EmitInstructionConsts(
       pool.AddInt(static_cast<int64_t>(inst.size_bytes));  // element size
       break;
 
-    case OC::COMPOUND_ASSIGN:
-      pool.AddInt(static_cast<int64_t>(inst.compound_op));
-      break;
-
-    case OC::INC_DEC:
-      pool.AddInt(static_cast<int64_t>(inst.size_bytes));  // ptr element size
-      break;
-
-    case OC::SIZE_OF:
-      pool.AddInt(static_cast<int64_t>(inst.size_bytes));  // static size
+    case OC::READ_MODIFY_WRITE:
+      pool.AddInt(static_cast<int64_t>(inst.compound_op));  // underlying opcode
+      pool.AddInt(static_cast<int64_t>(inst.size_bytes));    // element size
       break;
 
     case OC::PARAM_READ:
