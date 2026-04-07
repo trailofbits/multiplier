@@ -57,10 +57,8 @@ const char *EnumeratorName(OpCode op) noexcept {
     case OpCode::CAST_FP_EXT: return "CAST_FP_EXT";
     case OpCode::CAST_INT_CAST: return "CAST_INT_CAST";
     case OpCode::CAST_FP_CAST: return "CAST_FP_CAST";
-    case OpCode::SIZE_OF: return "SIZE_OF";
     case OpCode::CALL: return "CALL";
-    case OpCode::INC_DEC: return "INC_DEC";
-    case OpCode::COMPOUND_ASSIGN: return "COMPOUND_ASSIGN";
+    case OpCode::READ_MODIFY_WRITE: return "READ_MODIFY_WRITE";
     case OpCode::SELECT: return "SELECT";
     case OpCode::COPY: return "COPY";
     case OpCode::COND_BRANCH: return "COND_BRANCH";
@@ -79,14 +77,19 @@ const char *EnumeratorName(OpCode op) noexcept {
     case OpCode::VA_ARG: return "VA_ARG";
     case OpCode::VA_COPY: return "VA_COPY";
     case OpCode::VA_END: return "VA_END";
-    case OpCode::INIT_LIST: return "INIT_LIST";
     case OpCode::ENTER_SCOPE: return "ENTER_SCOPE";
     case OpCode::EXIT_SCOPE: return "EXIT_SCOPE";
     case OpCode::MEMSET: return "MEMSET";
     case OpCode::MEMCPY: return "MEMCPY";
+    case OpCode::MEMMOVE: return "MEMMOVE";
     case OpCode::PARAM_READ: return "PARAM_READ";
     case OpCode::GLOBAL_ADDR: return "GLOBAL_ADDR";
     case OpCode::FUNC_ADDR: return "FUNC_ADDR";
+    case OpCode::BITWISE_OP: return "BITWISE_OP";
+    case OpCode::UNDEFINED: return "UNDEFINED";
+    case OpCode::ADD_OVERFLOW: return "ADD_OVERFLOW";
+    case OpCode::SUB_OVERFLOW: return "SUB_OVERFLOW";
+    case OpCode::MUL_OVERFLOW: return "MUL_OVERFLOW";
     case OpCode::UNKNOWN: return "UNKNOWN";
   }
   return "UNKNOWN";

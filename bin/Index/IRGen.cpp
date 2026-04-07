@@ -1912,10 +1912,9 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
           return emit_typed(std::move(inst));
         }
       }
-      if (callee_name == "memcpy" || callee_name == "memmove" ||
-          callee_name == "__builtin_memcpy" || callee_name == "__builtin_memmove" ||
-          callee_name == "__builtin_memcpy_chk" || callee_name == "__builtin_memmove_chk" ||
-          callee_name == "__builtin___memcpy_chk" || callee_name == "__builtin___memmove_chk") {
+      if (callee_name == "memcpy" || callee_name == "__builtin_memcpy" ||
+          callee_name == "__builtin_memcpy_chk" ||
+          callee_name == "__builtin___memcpy_chk") {
         if (args.size() >= 3) {
           InstructionIR inst;
           inst.opcode = mx::ir::OpCode::MEMCPY;
@@ -1924,6 +1923,162 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
           inst.operand_indices.push_back(EmitRValue(args[1]));
           inst.operand_indices.push_back(EmitRValue(args[2]));
           return emit_typed(std::move(inst));
+        }
+      }
+      if (callee_name == "memmove" || callee_name == "__builtin_memmove" ||
+          callee_name == "__builtin_memmove_chk" ||
+          callee_name == "__builtin___memmove_chk") {
+        if (args.size() >= 3) {
+          InstructionIR inst;
+          inst.opcode = mx::ir::OpCode::MEMMOVE;
+          inst.source_entity_id = eid;
+          inst.operand_indices.push_back(EmitRValue(args[0]));
+          inst.operand_indices.push_back(EmitRValue(args[1]));
+          inst.operand_indices.push_back(EmitRValue(args[2]));
+          return emit_typed(std::move(inst));
+        }
+      }
+
+      // __builtin_unreachable() → UNREACHABLE.
+      if (callee_name == "__builtin_unreachable") {
+        InstructionIR inst;
+        inst.opcode = mx::ir::OpCode::UNREACHABLE;
+        inst.source_entity_id = eid;
+        return emit_typed(std::move(inst));
+      }
+
+      // __builtin_expect(x, v) / __builtin_expect_with_probability → just x.
+      if (callee_name == "__builtin_expect" ||
+          callee_name == "__builtin_expect_with_probability") {
+        if (!args.empty()) return EmitRValue(args[0]);
+      }
+
+      // __builtin_assume(x) → BITWISE_OP(ASSUME, x).
+      if (callee_name == "__builtin_assume") {
+        if (!args.empty()) {
+          InstructionIR inst;
+          inst.opcode = mx::ir::OpCode::BITWISE_OP;
+          inst.source_entity_id = eid;
+          inst.bitwise_op = static_cast<uint8_t>(mx::ir::BitwiseOp::ASSUME);
+          inst.operand_indices.push_back(EmitRValue(args[0]));
+          return emit_typed(std::move(inst));
+        }
+      }
+
+      // Overflow-checked arithmetic builtins →
+      //   STORE &result, UNDEFINED
+      //   overflow = RMW(&result, ADD_OVERFLOW, a, b)
+      if (callee_name == "__builtin_add_overflow" ||
+          callee_name == "__builtin_sub_overflow" ||
+          callee_name == "__builtin_mul_overflow") {
+        if (args.size() >= 3) {
+          mx::ir::OpCode overflow_op = mx::ir::OpCode::ADD_OVERFLOW;
+          if (callee_name == "__builtin_sub_overflow")
+            overflow_op = mx::ir::OpCode::SUB_OVERFLOW;
+          else if (callee_name == "__builtin_mul_overflow")
+            overflow_op = mx::ir::OpCode::MUL_OVERFLOW;
+
+          uint32_t a_idx = EmitRValue(args[0]);
+          uint32_t b_idx = EmitRValue(args[1]);
+          uint32_t dest_idx = EmitRValue(args[2]);
+
+          // Store UNDEFINED to dest to mark it as initialized-but-unknown.
+          InstructionIR undef;
+          undef.opcode = mx::ir::OpCode::UNDEFINED;
+          undef.source_entity_id = eid;
+          uint32_t undef_idx = EmitInstruction(std::move(undef));
+
+          InstructionIR store;
+          store.opcode = mx::ir::OpCode::STORE;
+          store.source_entity_id = eid;
+          store.operand_indices = {dest_idx, undef_idx};
+          EmitTopLevel(std::move(store));
+
+          // RMW(&result, overflow_op, a, b) → returns bool (overflow flag).
+          InstructionIR rmw;
+          rmw.opcode = mx::ir::OpCode::READ_MODIFY_WRITE;
+          rmw.source_entity_id = eid;
+          rmw.compound_op = overflow_op;
+          rmw.flags = 1;  // returns new value (the overflow flag)
+          rmw.operand_indices = {dest_idx, a_idx, b_idx};
+          return emit_typed(std::move(rmw));
+        }
+      }
+
+      // Bitwise/intrinsic builtins → BITWISE_OP with sub-opcode.
+      {
+        using BO = mx::ir::BitwiseOp;
+        struct BitwiseBuiltin {
+          const char *name;
+          BO op;
+          bool undef_for_zero;  // CLZ/CTZ are undefined for input == 0
+        };
+        static const BitwiseBuiltin bitwise_builtins[] = {
+          {"__builtin_bswap16", BO::BSWAP16, false},
+          {"__builtin_bswap32", BO::BSWAP32, false},
+          {"__builtin_bswap64", BO::BSWAP64, false},
+          {"__builtin_popcount", BO::POPCOUNT, false},
+          {"__builtin_popcountl", BO::POPCOUNT, false},
+          {"__builtin_popcountll", BO::POPCOUNT, false},
+          {"__builtin_clz", BO::CLZ, true},
+          {"__builtin_clzl", BO::CLZ, true},
+          {"__builtin_clzll", BO::CLZ, true},
+          {"__builtin_ctz", BO::CTZ, true},
+          {"__builtin_ctzl", BO::CTZ, true},
+          {"__builtin_ctzll", BO::CTZ, true},
+          {"__builtin_ffs", BO::FFS, false},
+          {"__builtin_ffsl", BO::FFS, false},
+          {"__builtin_ffsll", BO::FFS, false},
+          {"__builtin_parity", BO::PARITY, false},
+          {"__builtin_parityl", BO::PARITY, false},
+          {"__builtin_parityll", BO::PARITY, false},
+          {"__builtin_abs", BO::ABS, false},
+        };
+        for (const auto &bb : bitwise_builtins) {
+          if (callee_name == bb.name && !args.empty()) {
+            uint32_t val_idx = EmitRValue(args[0]);
+
+            InstructionIR bw;
+            bw.opcode = mx::ir::OpCode::BITWISE_OP;
+            bw.source_entity_id = eid;
+            bw.bitwise_op = static_cast<uint8_t>(bb.op);
+            bw.operand_indices.push_back(val_idx);
+            uint32_t bw_idx = EmitInstruction(std::move(bw));
+
+            if (bb.undef_for_zero) {
+              // result = SELECT(val == 0, UNDEFINED, bw_result)
+              InstructionIR zero;
+              zero.opcode = mx::ir::OpCode::CONST_INT;
+              zero.source_entity_id = eid;
+              zero.int_value = 0;
+              zero.uint_value = 0;
+              zero.width = 64;
+              uint32_t zero_idx = EmitInstruction(std::move(zero));
+
+              InstructionIR cmp;
+              cmp.opcode = mx::ir::OpCode::CMP_EQ;
+              cmp.source_entity_id = eid;
+              cmp.operand_indices = {val_idx, zero_idx};
+              uint32_t cmp_idx = EmitInstruction(std::move(cmp));
+
+              InstructionIR undef;
+              undef.opcode = mx::ir::OpCode::UNDEFINED;
+              undef.source_entity_id = eid;
+              uint32_t undef_idx = EmitInstruction(std::move(undef));
+
+              InstructionIR sel;
+              sel.opcode = mx::ir::OpCode::SELECT;
+              sel.source_entity_id = eid;
+              sel.operand_indices = {cmp_idx, undef_idx, bw_idx};
+              return emit_typed(std::move(sel));
+            }
+
+            // For defined-for-all-inputs builtins, just return the BITWISE_OP.
+            // Re-wrap as top-level since we already called EmitInstruction.
+            auto &bw_ref = func_.instructions[bw_idx];
+            if (auto t = e.Type()) bw_ref.type_entity_id = TypeEntityIdOf(*t);
+            return bw_idx;
+          }
         }
       }
     }
@@ -2133,6 +2288,36 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     inst.width = 1;
     if (auto t = e.Type()) inst.type_entity_id = TypeEntityIdOf(*t);
     return emit_typed(std::move(inst));
+  }
+
+  // ChooseExpr (__builtin_choose_expr) -- emit the chosen sub-expression.
+  if (auto ce = pasta::ChooseExpr::From(e)) {
+    return EmitRValue(ce->ChosenSubExpression());
+  }
+
+  // GenericSelectionExpr (_Generic) -- emit the result expression.
+  if (auto gse = pasta::GenericSelectionExpr::From(e)) {
+    if (auto re = gse->ResultExpression()) {
+      return EmitRValue(*re);
+    }
+  }
+
+  // OffsetOfExpr (__builtin_offsetof) -- try to evaluate as constant.
+  if (auto ofe = pasta::OffsetOfExpr::From(e)) {
+    auto *raw = reinterpret_cast<const clang::OffsetOfExpr *>(ofe->RawStmt());
+    if (raw) {
+      clang::Expr::EvalResult eval_result;
+      if (raw->EvaluateAsInt(eval_result, ctx_)) {
+        auto ap_val = eval_result.Val.getInt();
+        InstructionIR inst;
+        inst.opcode = mx::ir::OpCode::CONST_INT;
+        inst.source_entity_id = eid;
+        inst.int_value = ap_val.getSExtValue();
+        inst.uint_value = ap_val.getZExtValue();
+        inst.width = 64;
+        return emit_typed(std::move(inst));
+      }
+    }
   }
 
   // Emit UNKNOWN for anything we haven't explicitly handled.

@@ -622,10 +622,63 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
               }
               break;
             }
+            // Overflow-checked arithmetic: RMW stores the result, returns
+            // the overflow flag (bool).
+            case mx::ir::OpCode::ADD_OVERFLOW: {
+              // For overflow RMW, operands are (dest, a, b).
+              // Collect both RHS operands.
+              Value a = Value::Int(0), b = Value::Int(0);
+              int rhs_i = 0;
+              for (auto rhs_op : rmw->rhs_operands()) {
+                if (rhs_i == 0) a = GetValue(rhs_op);
+                else if (rhs_i == 1) b = GetValue(rhs_op);
+                ++rhs_i;
+              }
+              __int128 wide = static_cast<__int128>(a.as_int()) +
+                              static_cast<__int128>(b.as_int());
+              new_val = Value::Int(static_cast<int64_t>(wide));
+              bool overflow = (wide != static_cast<int64_t>(wide));
+              MemWriteValue(addr.ptr, new_val, 8);
+              result = Value::Int(overflow ? 1 : 0);
+              goto rmw_done;
+            }
+            case mx::ir::OpCode::SUB_OVERFLOW: {
+              Value a = Value::Int(0), b = Value::Int(0);
+              int rhs_i = 0;
+              for (auto rhs_op : rmw->rhs_operands()) {
+                if (rhs_i == 0) a = GetValue(rhs_op);
+                else if (rhs_i == 1) b = GetValue(rhs_op);
+                ++rhs_i;
+              }
+              __int128 wide = static_cast<__int128>(a.as_int()) -
+                              static_cast<__int128>(b.as_int());
+              new_val = Value::Int(static_cast<int64_t>(wide));
+              bool overflow = (wide != static_cast<int64_t>(wide));
+              MemWriteValue(addr.ptr, new_val, 8);
+              result = Value::Int(overflow ? 1 : 0);
+              goto rmw_done;
+            }
+            case mx::ir::OpCode::MUL_OVERFLOW: {
+              Value a = Value::Int(0), b = Value::Int(0);
+              int rhs_i = 0;
+              for (auto rhs_op : rmw->rhs_operands()) {
+                if (rhs_i == 0) a = GetValue(rhs_op);
+                else if (rhs_i == 1) b = GetValue(rhs_op);
+                ++rhs_i;
+              }
+              __int128 wide = static_cast<__int128>(a.as_int()) *
+                              static_cast<__int128>(b.as_int());
+              new_val = Value::Int(static_cast<int64_t>(wide));
+              bool overflow = (wide != static_cast<int64_t>(wide));
+              MemWriteValue(addr.ptr, new_val, 8);
+              result = Value::Int(overflow ? 1 : 0);
+              goto rmw_done;
+            }
             default: new_val = old_val; break;
           }
           MemWriteValue(addr.ptr, new_val, 8);
           result = rmw->returns_new_value() ? new_val : old_val;
+          rmw_done:;
         }
       }
       break;
@@ -740,6 +793,94 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       }
       break;
     }
+
+    case mx::ir::OpCode::MEMMOVE: {
+      if (auto mm = mx::MemmoveInst::from(inst)) {
+        Value dest = GetValue(mm->dest());
+        Value src = GetValue(mm->src());
+        Value size = GetValue(mm->size());
+        if (dest.kind == Value::POINTER && src.kind == Value::POINTER
+            && size.as_int() > 0) {
+          size_t len = static_cast<size_t>(size.as_int());
+          std::vector<uint8_t> tmp(len);
+          MemRead(src.ptr, tmp.data(), len);
+          MemWrite(dest.ptr, tmp.data(), len);
+        }
+        result = dest;  // memmove returns dest.
+      }
+      break;
+    }
+
+    // --- Bitwise/intrinsic operations ---
+    case mx::ir::OpCode::BITWISE_OP: {
+      if (auto bw = mx::BitwiseOpInst::from(inst)) {
+        // Get the primary operand (op[0]).
+        Value val = Value::Undef();
+        auto ops = inst.operands();
+        for (auto op_inst : ops) {
+          val = GetValue(op_inst);
+          break;
+        }
+        int64_t v = val.as_int();
+        using BO = mx::ir::BitwiseOp;
+        switch (bw->sub_opcode()) {
+          case BO::BSWAP16:
+            result = Value::Int(static_cast<int64_t>(__builtin_bswap16(
+                static_cast<uint16_t>(v))));
+            break;
+          case BO::BSWAP32:
+            result = Value::Int(static_cast<int64_t>(__builtin_bswap32(
+                static_cast<uint32_t>(v))));
+            break;
+          case BO::BSWAP64:
+            result = Value::Int(static_cast<int64_t>(__builtin_bswap64(
+                static_cast<uint64_t>(v))));
+            break;
+          case BO::POPCOUNT:
+            result = Value::Int(__builtin_popcountll(static_cast<uint64_t>(v)));
+            break;
+          case BO::CLZ:
+            result = v ? Value::Int(__builtin_clzll(static_cast<uint64_t>(v)))
+                       : Value::Undef();
+            break;
+          case BO::CTZ:
+            result = v ? Value::Int(__builtin_ctzll(static_cast<uint64_t>(v)))
+                       : Value::Undef();
+            break;
+          case BO::FFS:
+            result = Value::Int(__builtin_ffsll(v));
+            break;
+          case BO::PARITY:
+            result = Value::Int(__builtin_parityll(static_cast<uint64_t>(v)));
+            break;
+          case BO::ABS:
+            result = Value::Int(v < 0 ? -v : v);
+            break;
+          case BO::EXPECT:
+            result = val;  // identity
+            break;
+          case BO::ASSUME:
+            result = Value::Undef();  // no-op
+            break;
+          default:
+            result = val;
+            break;
+        }
+      }
+      break;
+    }
+
+    // --- Undefined/poison value ---
+    case mx::ir::OpCode::UNDEFINED:
+      result = Value::Undef();
+      break;
+
+    // --- Overflow opcodes (only valid as RMW underlying ops, not standalone) ---
+    case mx::ir::OpCode::ADD_OVERFLOW:
+    case mx::ir::OpCode::SUB_OVERFLOW:
+    case mx::ir::OpCode::MUL_OVERFLOW:
+      LOG(WARNING) << "Overflow opcode used as standalone instruction";
+      break;
 
     // --- Variadic ---
     case mx::ir::OpCode::VA_START:

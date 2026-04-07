@@ -72,6 +72,7 @@ struct InstructionIR {
   uint32_t size_bytes{0};
   uint8_t flags{0};
   mx::ir::OpCode compound_op{mx::ir::OpCode::ADD};
+  uint8_t bitwise_op{0};  // BitwiseOp sub-opcode for BITWISE_OP instructions
 
   // Structure index for ENTER_SCOPE/EXIT_SCOPE (into FunctionIR::structures).
   uint32_t structure_index{UINT32_MAX};

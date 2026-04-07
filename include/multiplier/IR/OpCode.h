@@ -67,63 +67,73 @@ enum class OpCode : uint8_t {
   CAST_INT_CAST = 41,
   CAST_FP_CAST = 42,
 
-  // Sizeof
-  SIZE_OF = 43,
-
   // Call
-  CALL = 44,
+  CALL = 43,
 
-  // Compound
-  INC_DEC = 45,
-  COMPOUND_ASSIGN = 46,
+  // Read-modify-write: atomically reads from address, applies an operation,
+  // and writes back. operands = [address, rhs_operand0, rhs_operand1, ...].
+  // The loaded value is the implicit LHS of the underlying op.
+  // flags: bit 0 = returns new value (1) or old value (0, post-increment).
+  // int_pool[0] = underlying opcode (ADD, SUB, PTR_ADD, SHL, etc.)
+  // int_pool[1] = element size (for PTR_ADD only, 0 otherwise)
+  READ_MODIFY_WRITE = 44,
 
   // Misc
-  SELECT = 47,
-  COPY = 48,
+  SELECT = 45,
+  COPY = 46,
 
   // Terminators
-  COND_BRANCH = 49,
-  SWITCH = 50,
-  RET = 51,
-  UNREACHABLE = 52,
-  BREAK = 53,
-  CONTINUE = 54,
-  GOTO = 55,              // explicit goto label;
-  IMPLICIT_GOTO = 56,     // structural CFG edge (e.g., end of if-then → merge)
-  FALLTHROUGH = 57,       // explicit [[fallthrough]]
-  IMPLICIT_FALLTHROUGH = 58, // implicit (no break at end of case)
-  IMPLICIT_UNREACHABLE = 59, // structurally unreachable (patched empty block)
+  COND_BRANCH = 47,
+  SWITCH = 48,
+  RET = 49,
+  UNREACHABLE = 50,
+  BREAK = 51,
+  CONTINUE = 52,
+  GOTO = 53,              // explicit goto label;
+  IMPLICIT_GOTO = 54,     // structural CFG edge (e.g., end of if-then → merge)
+  FALLTHROUGH = 55,       // explicit [[fallthrough]]
+  IMPLICIT_FALLTHROUGH = 56, // implicit (no break at end of case)
+  IMPLICIT_UNREACHABLE = 57, // structurally unreachable (patched empty block)
 
   // Variadic argument handling
-  VA_PACK = 60,           // groups variadic args at call site; operands = the packed args
-  VA_START = 61,          // binds va_list to function's variadic pack; op[0] = va_list
-  VA_ARG = 62,            // reads next value from va_list; op[0] = va_list; typeEntityId = result type
-  VA_COPY = 63,           // copies va_list; op[0] = dest, op[1] = src
-  VA_END = 64,            // releases va_list; op[0] = va_list
-
-  // Aggregate initialization
-  INIT_LIST = 65,          // {a, b, c} -- operands are the initializer values
+  VA_PACK = 58,           // groups variadic args at call site; operands = the packed args
+  VA_START = 59,          // binds va_list to function's variadic pack; op[0] = va_list
+  VA_ARG = 60,            // reads next value from va_list; op[0] = va_list; typeEntityId = result type
+  VA_COPY = 61,           // copies va_list; op[0] = dest, op[1] = src
+  VA_END = 62,            // releases va_list; op[0] = va_list
 
   // Scope entry/exit markers (not terminators).
-  ENTER_SCOPE = 66,        // marks scope entry; extra = IRStructureId of scope
-  EXIT_SCOPE = 67,         // marks scope exit; extra = IRStructureId of scope
+  ENTER_SCOPE = 63,        // marks scope entry; extra = IRStructureId of scope
+  EXIT_SCOPE = 64,         // marks scope exit; extra = IRStructureId of scope
 
-  // Memory operations (lowered from memset/memcpy/memmove calls).
-  MEMSET = 68,             // op[0] = dest, op[1] = byte value, op[2] = size
-  MEMCPY = 69,             // op[0] = dest, op[1] = src, op[2] = size
+  // Memory operations.
+  MEMSET = 65,             // op[0] = dest, op[1] = byte value, op[2] = size
+  MEMCPY = 66,             // op[0] = dest, op[1] = src, op[2] = size (UB if overlapping)
+  MEMMOVE = 67,            // op[0] = dest, op[1] = src, op[2] = size (safe for overlap)
 
   // Parameter read: reads the Nth function parameter.
-  // extra = parameter index (uint32), typeEntityId = parameter type.
-  // Result is the parameter value. Emitted in the entry block.
-  PARAM_READ = 70,
+  PARAM_READ = 68,
 
   // Address-of for globals and functions (external to the current frame).
-  // targetEntityId = VarDecl or FunctionDecl entity ID.
-  GLOBAL_ADDR = 71,        // pointer to a global or static variable
-  FUNC_ADDR = 72,          // pointer to a function
+  GLOBAL_ADDR = 69,        // pointer to a global or static variable
+  FUNC_ADDR = 70,          // pointer to a function
+
+  // Bitwise/intrinsic operations. Sub-opcode in int_pool[0] selects the
+  // specific operation (see BitwiseOp enum). op[0] = primary operand.
+  BITWISE_OP = 71,
+
+  // Undefined/poison value. Represents a value that is architecturally
+  // undefined (e.g., __builtin_clz(0)). An analyzer should flag any use.
+  UNDEFINED = 72,
+
+  // Overflow-checked arithmetic (only used as RMW underlying opcodes).
+  // RMW returns bool (overflow flag), stores the arithmetic result.
+  ADD_OVERFLOW = 74,
+  SUB_OVERFLOW = 75,
+  MUL_OVERFLOW = 76,
 
   // Unknown / unhandled expression
-  UNKNOWN = 73,
+  UNKNOWN = 77,
 };
 
 // Returns the human-readable name of an opcode.
@@ -134,12 +144,51 @@ inline static const char *EnumerationName(OpCode) {
 const char *EnumeratorName(OpCode op) noexcept;
 
 inline static constexpr unsigned NumEnumerators(OpCode) {
-  return 74u;
+  return 78u;
 }
+
+// Sub-opcodes for BITWISE_OP. Stored in the int pool.
+enum class BitwiseOp : uint8_t {
+  // Byte swap.
+  BSWAP16 = 0,            // Reverse bytes of 16-bit value.
+  BSWAP32 = 1,            // Reverse bytes of 32-bit value.
+  BSWAP64 = 2,            // Reverse bytes of 64-bit value.
+
+  // Population count: number of set bits.
+  POPCOUNT = 3,            // Result is defined for all inputs including 0.
+
+  // Count leading zeros. UNDEFINED for input == 0.
+  CLZ = 4,                 // __builtin_clz (32-bit), __builtin_clzl, __builtin_clzll
+  // Count trailing zeros. UNDEFINED for input == 0.
+  CTZ = 5,                 // __builtin_ctz, __builtin_ctzl, __builtin_ctzll
+
+  // Find first set bit (1-indexed from LSB). Returns 0 for input == 0.
+  FFS = 6,                 // __builtin_ffs, __builtin_ffsl, __builtin_ffsll
+
+  // Parity: 1 if odd number of set bits, 0 if even.
+  PARITY = 7,              // __builtin_parity
+
+  // Bit rotation.
+  ROTL = 8,                // Rotate left. op[0] = value, op[1] = amount.
+  ROTR = 9,                // Rotate right. op[0] = value, op[1] = amount.
+
+  // Absolute value (integer).
+  ABS = 10,                // __builtin_abs. UNDEFINED for INT_MIN (signed overflow).
+
+  // Expect (optimization hint, semantically identity on op[0]).
+  EXPECT = 11,             // __builtin_expect(x, v) → x
+
+  // Assume (optimization hint, no-op).
+  ASSUME = 12,             // __builtin_assume(x)
+};
 
 // Classification helpers.
 inline bool IsTerminator(OpCode op) {
   return op >= OpCode::COND_BRANCH && op <= OpCode::IMPLICIT_UNREACHABLE;
+}
+
+inline bool IsReadModifyWrite(OpCode op) {
+  return op == OpCode::READ_MODIFY_WRITE;
 }
 
 inline bool IsConstant(OpCode op) {
