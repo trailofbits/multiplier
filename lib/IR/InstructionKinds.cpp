@@ -135,9 +135,7 @@ FieldDecl ResolveField(const IRInstructionImpl &impl, uint64_t eid) {
     return std::nullopt; \
   }
 
-IMPL_FROM_SINGLE(ConstIntInst, CONST_INT)
-IMPL_FROM_SINGLE(ConstFloatInst, CONST_FLOAT)
-IMPL_FROM_SINGLE(ConstNullInst, CONST_NULL)
+IMPL_FROM_SINGLE(ConstInst, CONST)
 IMPL_FROM_SINGLE(AllocaInst, ALLOCA)
 IMPL_FROM_SINGLE(LoadInst, LOAD)
 IMPL_FROM_SINGLE(StoreInst, STORE)
@@ -147,7 +145,6 @@ IMPL_FROM_SINGLE(PtrAddInst, PTR_ADD)
 IMPL_FROM_SINGLE(ReadModifyWriteInst, READ_MODIFY_WRITE)
 IMPL_FROM_SINGLE(CallInst, CALL)
 IMPL_FROM_SINGLE(SelectInst, SELECT)
-IMPL_FROM_SINGLE(CopyInst, COPY)
 IMPL_FROM_SINGLE(VAStartInst, VA_START)
 IMPL_FROM_SINGLE(VAEndInst, VA_END)
 IMPL_FROM_SINGLE(VACopyInst, VA_COPY)
@@ -181,7 +178,7 @@ IMPL_FROM_SINGLE(UnknownInst, UNKNOWN)
 IMPL_FROM_RANGE(BinaryInst, ADD, PTR_DIFF)
 IMPL_FROM_RANGE(ComparisonInst, CMP_EQ, CMP_GE)
 IMPL_FROM_RANGE(UnaryInst, NEG, LOGICAL_NOT)
-IMPL_FROM_RANGE(CastInst, CAST_SEXT, CAST_FP_CAST)
+IMPL_FROM_SINGLE(CastInst, CAST)
 
 std::optional<BranchInst> BranchInst::from(const IRInstruction &inst) {
   auto op = inst.opcode();
@@ -195,44 +192,30 @@ std::optional<BranchInst> BranchInst::from(const IRInstruction &inst) {
 #undef IMPL_FROM_SINGLE
 #undef IMPL_FROM_RANGE
 
-// ---- ConstIntInst ----
+// ---- ConstInst ----
 
-int64_t ConstIntInst::signed_value(void) const {
-  return GetIntPool(*impl)[impl->reader().getConstOffset()];
+ir::ConstOp ConstInst::sub_opcode(void) const {
+  auto int_pool = GetIntPool(*impl);
+  auto r = impl->reader();
+  return static_cast<ir::ConstOp>(int_pool[r.getConstOffset()]);
 }
 
-uint64_t ConstIntInst::unsigned_value(void) const {
-  return static_cast<uint64_t>(GetIntPool(*impl)[impl->reader().getConstOffset() + 1]);
+int64_t ConstInst::signed_value(void) const {
+  return GetIntPool(*impl)[impl->reader().getConstOffset() + 1];
 }
 
-uint8_t ConstIntInst::width(void) const {
-  return impl->reader().getConstWidth();
+uint64_t ConstInst::unsigned_value(void) const {
+  return static_cast<uint64_t>(GetIntPool(*impl)[impl->reader().getConstOffset() + 2]);
 }
 
-Type ConstIntInst::type(void) const {
-  return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
-}
-
-// ---- ConstFloatInst ----
-
-double ConstFloatInst::value(void) const {
-  int64_t bits = GetIntPool(*impl)[impl->reader().getConstOffset()];
+double ConstInst::float_value(void) const {
+  int64_t bits = GetIntPool(*impl)[impl->reader().getConstOffset() + 1];
   double result;
   memcpy(&result, &bits, sizeof(result));
   return result;
 }
 
-uint8_t ConstFloatInst::width(void) const {
-  return impl->reader().getConstWidth();
-}
-
-Type ConstFloatInst::type(void) const {
-  return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
-}
-
-// ---- ConstNullInst ----
-
-Type ConstNullInst::type(void) const {
+Type ConstInst::type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 
@@ -343,6 +326,12 @@ Type UnaryInst::result_type(void) const {
 
 // ---- CastInst ----
 
+ir::CastOp CastInst::sub_opcode(void) const {
+  auto int_pool = GetIntPool(*impl);
+  auto r = impl->reader();
+  return static_cast<ir::CastOp>(int_pool[r.getConstOffset()]);
+}
+
 IRInstruction CastInst::operand(void) const { return nth_operand(0); }
 Type CastInst::result_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
@@ -412,12 +401,7 @@ Type SelectInst::result_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 
-// ---- CopyInst ----
-
-IRInstruction CopyInst::source(void) const { return nth_operand(0); }
-Type CopyInst::result_type(void) const {
-  return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
-}
+// CopyInst removed: use CastInst with CastOp::IDENTITY instead.
 
 // ---- RetInst ----
 

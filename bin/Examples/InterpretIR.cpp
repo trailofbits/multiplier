@@ -278,20 +278,19 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
   switch (op) {
 
     // --- Constants ---
-    case mx::ir::OpCode::CONST_INT: {
-      if (auto ci = mx::ConstIntInst::from(inst)) {
-        result = Value::Int(ci->signed_value());
+    case mx::ir::OpCode::CONST: {
+      if (auto ci = mx::ConstInst::from(inst)) {
+        auto sub = ci->sub_opcode();
+        if (sub == mx::ir::ConstOp::NULL_PTR) {
+          result = Value::Ptr(mx::kInvalidEntityId, 0);
+        } else if (sub == mx::ir::ConstOp::FLOAT32 ||
+                   sub == mx::ir::ConstOp::FLOAT64 ||
+                   sub == mx::ir::ConstOp::FLOAT16) {
+          result = Value::Float(ci->float_value());
+        } else {
+          result = Value::Int(ci->signed_value());
+        }
       }
-      break;
-    }
-    case mx::ir::OpCode::CONST_FLOAT: {
-      if (auto cf = mx::ConstFloatInst::from(inst)) {
-        result = Value::Float(cf->value());
-      }
-      break;
-    }
-    case mx::ir::OpCode::CONST_NULL: {
-      result = Value::Ptr(mx::kInvalidEntityId, 0);
       break;
     }
 
@@ -540,51 +539,31 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
     }
 
     // --- Casts ---
-    case mx::ir::OpCode::CAST_SEXT:
-    case mx::ir::OpCode::CAST_ZEXT:
-    case mx::ir::OpCode::CAST_TRUNC:
-    case mx::ir::OpCode::CAST_INT_CAST: {
-      auto c = mx::CastInst::from(inst);
-      if (c) result = Value::Int(GetValue(c->operand()).as_int());
-      break;
-    }
-    case mx::ir::OpCode::CAST_BITCAST: {
-      auto c = mx::CastInst::from(inst);
-      if (c) result = GetValue(c->operand());
-      break;
-    }
-    case mx::ir::OpCode::CAST_PTR_TO_INT: {
+    case mx::ir::OpCode::CAST: {
       auto c = mx::CastInst::from(inst);
       if (c) {
+        auto sub = c->sub_opcode();
         Value v = GetValue(c->operand());
-        // Convert pointer to integer (offset only, object info lost).
-        result = Value::Int(v.kind == Value::POINTER ? v.ptr.offset : v.ival);
+        if (sub == mx::ir::CastOp::BITCAST || sub == mx::ir::CastOp::IDENTITY) {
+          result = v;
+        } else if (sub >= mx::ir::CastOp::PTR_TO_I32 &&
+                   sub <= mx::ir::CastOp::PTR_TO_I64) {
+          result = Value::Int(v.kind == Value::POINTER ? v.ptr.offset : v.ival);
+        } else if (sub >= mx::ir::CastOp::I32_TO_PTR &&
+                   sub <= mx::ir::CastOp::I64_TO_PTR) {
+          result = Value::Ptr(mx::kInvalidEntityId, v.as_int());
+        } else if (mx::ir::IsFloatToInt(sub)) {
+          result = Value::Int(static_cast<int64_t>(v.as_float()));
+        } else if (mx::ir::IsIntToFloat(sub)) {
+          result = Value::Float(static_cast<double>(v.as_int()));
+        } else if (sub == mx::ir::CastOp::F32_TO_F64 ||
+                   sub == mx::ir::CastOp::F64_TO_F32) {
+          result = Value::Float(v.as_float());
+        } else {
+          // Sign/zero extend, truncate -- all int-to-int.
+          result = Value::Int(v.as_int());
+        }
       }
-      break;
-    }
-    case mx::ir::OpCode::CAST_INT_TO_PTR: {
-      auto c = mx::CastInst::from(inst);
-      if (c) {
-        Value v = GetValue(c->operand());
-        result = Value::Ptr(mx::kInvalidEntityId, v.as_int());
-      }
-      break;
-    }
-    case mx::ir::OpCode::CAST_FP_TO_SI: {
-      auto c = mx::CastInst::from(inst);
-      if (c) result = Value::Int(static_cast<int64_t>(GetValue(c->operand()).as_float()));
-      break;
-    }
-    case mx::ir::OpCode::CAST_SI_TO_FP: {
-      auto c = mx::CastInst::from(inst);
-      if (c) result = Value::Float(static_cast<double>(GetValue(c->operand()).as_int()));
-      break;
-    }
-    case mx::ir::OpCode::CAST_FP_TRUNC:
-    case mx::ir::OpCode::CAST_FP_EXT:
-    case mx::ir::OpCode::CAST_FP_CAST: {
-      auto c = mx::CastInst::from(inst);
-      if (c) result = Value::Float(GetValue(c->operand()).as_float());
       break;
     }
 
@@ -719,13 +698,7 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       break;
     }
 
-    // --- Copy ---
-    case mx::ir::OpCode::COPY: {
-      if (auto cp = mx::CopyInst::from(inst)) {
-        result = GetValue(cp->source());
-      }
-      break;
-    }
+    // COPY removed: handled by CAST with IDENTITY sub-opcode above.
 
 
     // --- Param read ---

@@ -32,6 +32,116 @@ using mx::RawEntityId;
 using mx::kInvalidEntityId;
 // PASTA enums for dispatch. These are converted to our unified OpCode.
 
+// Helper: determine ConstOp from width and signedness for integer constants.
+static mx::ir::ConstOp IntConstOp(uint8_t width, bool is_signed = true) {
+  if (width <= 1) return mx::ir::ConstOp::BOOL;
+  if (width <= 8) return is_signed ? mx::ir::ConstOp::INT8 : mx::ir::ConstOp::UINT8;
+  if (width <= 16) return is_signed ? mx::ir::ConstOp::INT16 : mx::ir::ConstOp::UINT16;
+  if (width <= 32) return is_signed ? mx::ir::ConstOp::INT32 : mx::ir::ConstOp::UINT32;
+  return is_signed ? mx::ir::ConstOp::INT64 : mx::ir::ConstOp::UINT64;
+}
+
+// Helper: determine ConstOp for float constants.
+static mx::ir::ConstOp FloatConstOp(uint8_t width) {
+  if (width <= 16) return mx::ir::ConstOp::FLOAT16;
+  if (width <= 32) return mx::ir::ConstOp::FLOAT32;
+  return mx::ir::ConstOp::FLOAT64;
+}
+
+// Helper: determine CastOp from Clang CastKind and type info.
+// src_signed: whether the source integer type is signed.
+// dst_signed: whether the destination integer type is signed.
+static mx::ir::CastOp DetermineCastOp(
+    pasta::CastKind ck, unsigned src_bits, unsigned dst_bits,
+    bool src_signed, bool dst_signed, bool src_float, bool dst_float) {
+  switch (ck) {
+    case pasta::CastKind::kBitCast:
+      return mx::ir::CastOp::BITCAST;
+
+    case pasta::CastKind::kIntegralCast: {
+      if (dst_bits > src_bits) {
+        // Widening.
+        if (src_signed) {
+          // Sign-extend.
+          if (src_bits <= 8 && dst_bits <= 16) return mx::ir::CastOp::SEXT_I8_I16;
+          if (src_bits <= 8 && dst_bits <= 32) return mx::ir::CastOp::SEXT_I8_I32;
+          if (src_bits <= 8) return mx::ir::CastOp::SEXT_I8_I64;
+          if (src_bits <= 16 && dst_bits <= 32) return mx::ir::CastOp::SEXT_I16_I32;
+          if (src_bits <= 16) return mx::ir::CastOp::SEXT_I16_I64;
+          return mx::ir::CastOp::SEXT_I32_I64;
+        } else {
+          // Zero-extend.
+          if (src_bits <= 8 && dst_bits <= 16) return mx::ir::CastOp::ZEXT_I8_I16;
+          if (src_bits <= 8 && dst_bits <= 32) return mx::ir::CastOp::ZEXT_I8_I32;
+          if (src_bits <= 8) return mx::ir::CastOp::ZEXT_I8_I64;
+          if (src_bits <= 16 && dst_bits <= 32) return mx::ir::CastOp::ZEXT_I16_I32;
+          if (src_bits <= 16) return mx::ir::CastOp::ZEXT_I16_I64;
+          return mx::ir::CastOp::ZEXT_I32_I64;
+        }
+      } else if (dst_bits < src_bits) {
+        // Narrowing (truncate).
+        if (dst_bits <= 8 && src_bits <= 16) return mx::ir::CastOp::TRUNC_I16_I8;
+        if (dst_bits <= 8 && src_bits <= 32) return mx::ir::CastOp::TRUNC_I32_I8;
+        if (dst_bits <= 8) return mx::ir::CastOp::TRUNC_I64_I8;
+        if (dst_bits <= 16 && src_bits <= 32) return mx::ir::CastOp::TRUNC_I32_I16;
+        if (dst_bits <= 16) return mx::ir::CastOp::TRUNC_I64_I16;
+        return mx::ir::CastOp::TRUNC_I64_I32;
+      }
+      return mx::ir::CastOp::IDENTITY;
+    }
+
+    case pasta::CastKind::kPointerToIntegral:
+      return dst_bits <= 32 ? mx::ir::CastOp::PTR_TO_I32 : mx::ir::CastOp::PTR_TO_I64;
+
+    case pasta::CastKind::kIntegralToPointer:
+      return src_bits <= 32 ? mx::ir::CastOp::I32_TO_PTR : mx::ir::CastOp::I64_TO_PTR;
+
+    case pasta::CastKind::kIntegralToFloating: {
+      if (src_signed) {
+        if (src_bits <= 8 && dst_bits <= 32) return mx::ir::CastOp::SI8_TO_F32;
+        if (src_bits <= 8) return mx::ir::CastOp::SI8_TO_F64;
+        if (src_bits <= 16 && dst_bits <= 32) return mx::ir::CastOp::SI16_TO_F32;
+        if (src_bits <= 16) return mx::ir::CastOp::SI16_TO_F64;
+        if (src_bits <= 32 && dst_bits <= 32) return mx::ir::CastOp::SI32_TO_F32;
+        if (src_bits <= 32) return mx::ir::CastOp::SI32_TO_F64;
+        if (dst_bits <= 32) return mx::ir::CastOp::SI64_TO_F32;
+        return mx::ir::CastOp::SI64_TO_F64;
+      } else {
+        if (src_bits <= 8 && dst_bits <= 32) return mx::ir::CastOp::UI8_TO_F32;
+        if (src_bits <= 8) return mx::ir::CastOp::UI8_TO_F64;
+        if (src_bits <= 16 && dst_bits <= 32) return mx::ir::CastOp::UI16_TO_F32;
+        if (src_bits <= 16) return mx::ir::CastOp::UI16_TO_F64;
+        if (src_bits <= 32 && dst_bits <= 32) return mx::ir::CastOp::UI32_TO_F32;
+        if (src_bits <= 32) return mx::ir::CastOp::UI32_TO_F64;
+        if (dst_bits <= 32) return mx::ir::CastOp::UI64_TO_F32;
+        return mx::ir::CastOp::UI64_TO_F64;
+      }
+    }
+
+    case pasta::CastKind::kFloatingToIntegral: {
+      if (src_bits <= 32) {
+        if (dst_bits <= 8) return dst_signed ? mx::ir::CastOp::F32_TO_SI8 : mx::ir::CastOp::F32_TO_UI8;
+        if (dst_bits <= 16) return dst_signed ? mx::ir::CastOp::F32_TO_SI16 : mx::ir::CastOp::F32_TO_UI16;
+        if (dst_bits <= 32) return dst_signed ? mx::ir::CastOp::F32_TO_SI32 : mx::ir::CastOp::F32_TO_UI32;
+        return dst_signed ? mx::ir::CastOp::F32_TO_SI64 : mx::ir::CastOp::F32_TO_UI64;
+      } else {
+        if (dst_bits <= 8) return dst_signed ? mx::ir::CastOp::F64_TO_SI8 : mx::ir::CastOp::F64_TO_UI8;
+        if (dst_bits <= 16) return dst_signed ? mx::ir::CastOp::F64_TO_SI16 : mx::ir::CastOp::F64_TO_UI16;
+        if (dst_bits <= 32) return dst_signed ? mx::ir::CastOp::F64_TO_SI32 : mx::ir::CastOp::F64_TO_UI32;
+        return dst_signed ? mx::ir::CastOp::F64_TO_SI64 : mx::ir::CastOp::F64_TO_UI64;
+      }
+    }
+
+    case pasta::CastKind::kFloatingCast:
+      if (src_bits <= 32 && dst_bits > 32) return mx::ir::CastOp::F32_TO_F64;
+      if (src_bits > 32 && dst_bits <= 32) return mx::ir::CastOp::F64_TO_F32;
+      return mx::ir::CastOp::IDENTITY;
+
+    default:
+      return mx::ir::CastOp::BITCAST;
+  }
+}
+
 // ---------------------------------------------------------------------------
 // IRGenerator
 // ---------------------------------------------------------------------------
@@ -1308,7 +1418,8 @@ void IRGenerator::EmitInitializer(uint32_t dest_addr_idx,
     auto total_size = TypeSizeBytes(type);
     if (total_size && *total_size > 0) {
       InstructionIR zero;
-      zero.opcode = mx::ir::OpCode::CONST_INT;
+      zero.opcode = mx::ir::OpCode::CONST;
+      zero.const_op = static_cast<uint8_t>(mx::ir::ConstOp::UINT8);
       zero.source_entity_id = source_eid;
       zero.int_value = 0;
       zero.uint_value = 0;
@@ -1316,7 +1427,8 @@ void IRGenerator::EmitInitializer(uint32_t dest_addr_idx,
       uint32_t zero_idx = EmitInstruction(std::move(zero));
 
       InstructionIR sz;
-      sz.opcode = mx::ir::OpCode::CONST_INT;
+      sz.opcode = mx::ir::OpCode::CONST;
+      sz.const_op = static_cast<uint8_t>(mx::ir::ConstOp::UINT64);
       sz.source_entity_id = source_eid;
       sz.int_value = static_cast<int64_t>(*total_size);
       sz.uint_value = static_cast<uint64_t>(*total_size);
@@ -1347,7 +1459,8 @@ void IRGenerator::EmitInitializer(uint32_t dest_addr_idx,
         } else {
           // PTR_ADD base, i.
           InstructionIR ci;
-          ci.opcode = mx::ir::OpCode::CONST_INT;
+          ci.opcode = mx::ir::OpCode::CONST;
+          ci.const_op = static_cast<uint8_t>(mx::ir::ConstOp::INT64);
           ci.source_entity_id = source_eid;
           ci.int_value = static_cast<int64_t>(i);
           ci.uint_value = static_cast<uint64_t>(i);
@@ -1435,7 +1548,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
   // Integer literal -- use Clang's evaluated value.
   if (auto il = pasta::IntegerLiteral::From(e)) {
     InstructionIR inst;
-    inst.opcode = mx::ir::OpCode::CONST_INT;
+    inst.opcode = mx::ir::OpCode::CONST;
     inst.source_entity_id = eid;
     auto *raw = reinterpret_cast<const clang::IntegerLiteral *>(il->RawStmt());
     if (raw) {
@@ -1443,6 +1556,8 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       inst.int_value = val.getSExtValue();
       inst.uint_value = val.getZExtValue();
       inst.width = static_cast<uint8_t>(val.getBitWidth());
+      bool is_signed = raw->getType()->isSignedIntegerOrEnumerationType();
+      inst.const_op = static_cast<uint8_t>(IntConstOp(inst.width, is_signed));
       {
         auto ty = e.Type();
         if (ty) inst.type_entity_id = TypeEntityIdOf(*ty);
@@ -1454,7 +1569,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
   // Floating literal -- use Clang's evaluated value.
   if (auto fl = pasta::FloatingLiteral::From(e)) {
     InstructionIR inst;
-    inst.opcode = mx::ir::OpCode::CONST_FLOAT;
+    inst.opcode = mx::ir::OpCode::CONST;
     inst.source_entity_id = eid;
     auto *raw = reinterpret_cast<const clang::FloatingLiteral *>(fl->RawStmt());
     if (raw) {
@@ -1465,6 +1580,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       inst.float_value = val.convertToDouble();
       inst.width = static_cast<uint8_t>(
           ctx_.getTypeSize(raw->getType()));
+      inst.const_op = static_cast<uint8_t>(FloatConstOp(inst.width));
     }
     return emit_typed(std::move(inst));
   }
@@ -1472,13 +1588,35 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
   // Character literal -- use Clang's value.
   if (auto cl = pasta::CharacterLiteral::From(e)) {
     InstructionIR inst;
-    inst.opcode = mx::ir::OpCode::CONST_INT;
+    inst.opcode = mx::ir::OpCode::CONST;
     inst.source_entity_id = eid;
     auto *raw = reinterpret_cast<const clang::CharacterLiteral *>(cl->RawStmt());
     if (raw) {
       inst.int_value = raw->getValue();
+      // Determine char width from Clang's CharacterKind.
+      switch (raw->getKind()) {
+        case clang::CharacterLiteralKind::Wide:
+          inst.width = static_cast<uint8_t>(ctx_.getTargetInfo().getWCharWidth());
+          inst.const_op = static_cast<uint8_t>(
+              inst.width <= 16 ? mx::ir::ConstOp::WCHAR16 : mx::ir::ConstOp::WCHAR32);
+          break;
+        case clang::CharacterLiteralKind::UTF16:
+          inst.width = 16;
+          inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::WCHAR16);
+          break;
+        case clang::CharacterLiteralKind::UTF32:
+          inst.width = 32;
+          inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::WCHAR32);
+          break;
+        default:
+          inst.width = 8;
+          inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::UINT8);
+          break;
+      }
+    } else {
+      inst.width = 8;
+      inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::UINT8);
     }
-    inst.width = 8;
     return emit_typed(std::move(inst));
   }
 
@@ -1538,14 +1676,16 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     }
     if (ck == pasta::CastKind::kNullToPointer) {
       InstructionIR inst;
-      inst.opcode = mx::ir::OpCode::CONST_NULL;
+      inst.opcode = mx::ir::OpCode::CONST;
+      inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::NULL_PTR);
       inst.source_entity_id = eid;
       return emit_typed(std::move(inst));
     }
     if (ck == pasta::CastKind::kIntegralToBoolean) {
       uint32_t sub_idx = EmitRValue(sub);
       InstructionIR zero;
-      zero.opcode = mx::ir::OpCode::CONST_INT;
+      zero.opcode = mx::ir::OpCode::CONST;
+      zero.const_op = static_cast<uint8_t>(mx::ir::ConstOp::INT32);
       zero.int_value = 0; zero.width = 32;
       uint32_t zero_idx = EmitInstruction(std::move(zero));
       InstructionIR inst;
@@ -1555,25 +1695,41 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       return emit_typed(std::move(inst));
     }
 
-    // Map cast kinds to IR opcodes.
-    mx::ir::OpCode cast_op = mx::ir::OpCode::CAST_BITCAST;
-    switch (ck) {
-      case pasta::CastKind::kBitCast: cast_op = mx::ir::OpCode::CAST_BITCAST; break;
-      case pasta::CastKind::kIntegralCast: cast_op = mx::ir::OpCode::CAST_INT_CAST; break;
-      case pasta::CastKind::kPointerToIntegral: cast_op = mx::ir::OpCode::CAST_PTR_TO_INT; break;
-      case pasta::CastKind::kIntegralToPointer: cast_op = mx::ir::OpCode::CAST_INT_TO_PTR; break;
-      case pasta::CastKind::kIntegralToFloating: cast_op = mx::ir::OpCode::CAST_SI_TO_FP; break;
-      case pasta::CastKind::kFloatingToIntegral: cast_op = mx::ir::OpCode::CAST_FP_TO_SI; break;
-      case pasta::CastKind::kFloatingCast: cast_op = mx::ir::OpCode::CAST_FP_CAST; break;
-      default: return EmitRValue(sub);
+    // Map cast kinds to unified CAST opcode with CastOp sub-opcode.
+    {
+      // Determine source/dest type info for CastOp selection.
+      auto sub_type = sub.Type();
+      unsigned src_bits = 64, dst_bits = 64;
+      bool src_signed = true, dst_signed = true;
+      bool src_float = false, dst_float = false;
+      if (sub_type) {
+        auto *raw_sub_type = reinterpret_cast<const clang::Expr *>(sub.RawStmt());
+        if (raw_sub_type) {
+          src_bits = static_cast<unsigned>(ctx_.getTypeSize(raw_sub_type->getType()));
+          src_signed = raw_sub_type->getType()->isSignedIntegerOrEnumerationType();
+          src_float = raw_sub_type->getType()->isFloatingType();
+        }
+      }
+      if (maybe_type) {
+        auto *raw_e = reinterpret_cast<const clang::Expr *>(e.RawStmt());
+        if (raw_e) {
+          dst_bits = static_cast<unsigned>(ctx_.getTypeSize(raw_e->getType()));
+          dst_signed = raw_e->getType()->isSignedIntegerOrEnumerationType();
+          dst_float = raw_e->getType()->isFloatingType();
+        }
+      }
+
+      auto cast_sub = DetermineCastOp(ck, src_bits, dst_bits,
+                                       src_signed, dst_signed, src_float, dst_float);
+      uint32_t sub_idx = EmitRValue(sub);
+      InstructionIR inst;
+      inst.opcode = mx::ir::OpCode::CAST;
+      inst.cast_op = static_cast<uint8_t>(cast_sub);
+      inst.source_entity_id = eid;
+      if (maybe_type) inst.type_entity_id = TypeEntityIdOf(*maybe_type);
+      inst.operand_indices = {sub_idx};
+      return emit_typed(std::move(inst));
     }
-    uint32_t sub_idx = EmitRValue(sub);
-    InstructionIR inst;
-    inst.opcode = cast_op;
-    inst.source_entity_id = eid;
-    if (maybe_type) inst.type_entity_id = TypeEntityIdOf(*maybe_type);
-    inst.operand_indices = {sub_idx};
-    return emit_typed(std::move(inst));
   }
 
   // Explicit cast -- use same CastKind dispatch as implicit casts.
@@ -1585,24 +1741,34 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     if (ck == pasta::CastKind::kLValueToRValue) {
       return EmitLoadFromLValue(ece->SubExpression());
     }
-    mx::ir::OpCode cast_op = mx::ir::OpCode::CAST_BITCAST;
-    switch (ck) {
-      case pasta::CastKind::kBitCast: cast_op = mx::ir::OpCode::CAST_BITCAST; break;
-      case pasta::CastKind::kIntegralCast: cast_op = mx::ir::OpCode::CAST_INT_CAST; break;
-      case pasta::CastKind::kPointerToIntegral: cast_op = mx::ir::OpCode::CAST_PTR_TO_INT; break;
-      case pasta::CastKind::kIntegralToPointer: cast_op = mx::ir::OpCode::CAST_INT_TO_PTR; break;
-      case pasta::CastKind::kIntegralToFloating: cast_op = mx::ir::OpCode::CAST_SI_TO_FP; break;
-      case pasta::CastKind::kFloatingToIntegral: cast_op = mx::ir::OpCode::CAST_FP_TO_SI; break;
-      case pasta::CastKind::kFloatingCast: cast_op = mx::ir::OpCode::CAST_FP_CAST; break;
-      default: cast_op = mx::ir::OpCode::CAST_BITCAST; break;
+    {
+      auto sub_expr = ece->SubExpression();
+      unsigned src_bits = 64, dst_bits = 64;
+      bool src_signed = true, dst_signed = true;
+      bool src_float = false, dst_float = false;
+      auto *raw_sub = reinterpret_cast<const clang::Expr *>(sub_expr.RawStmt());
+      if (raw_sub) {
+        src_bits = static_cast<unsigned>(ctx_.getTypeSize(raw_sub->getType()));
+        src_signed = raw_sub->getType()->isSignedIntegerOrEnumerationType();
+        src_float = raw_sub->getType()->isFloatingType();
+      }
+      auto *raw_e = reinterpret_cast<const clang::Expr *>(e.RawStmt());
+      if (raw_e) {
+        dst_bits = static_cast<unsigned>(ctx_.getTypeSize(raw_e->getType()));
+        dst_signed = raw_e->getType()->isSignedIntegerOrEnumerationType();
+        dst_float = raw_e->getType()->isFloatingType();
+      }
+      auto cast_sub = DetermineCastOp(ck, src_bits, dst_bits,
+                                       src_signed, dst_signed, src_float, dst_float);
+      uint32_t sub_idx = EmitRValue(sub_expr);
+      InstructionIR inst;
+      inst.opcode = mx::ir::OpCode::CAST;
+      inst.cast_op = static_cast<uint8_t>(cast_sub);
+      inst.source_entity_id = eid;
+      if (auto t = e.Type()) inst.type_entity_id = TypeEntityIdOf(*t);
+      inst.operand_indices = {sub_idx};
+      return emit_typed(std::move(inst));
     }
-    uint32_t sub_idx = EmitRValue(ece->SubExpression());
-    InstructionIR inst;
-    inst.opcode = cast_op;
-    inst.source_entity_id = eid;
-    if (auto t = e.Type()) inst.type_entity_id = TypeEntityIdOf(*t);
-    inst.operand_indices = {sub_idx};
-    return emit_typed(std::move(inst));
   }
 
   // Other CastExpr -- pass through.
@@ -1636,9 +1802,10 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         bool is_pre = (oc == pasta::UnaryOperatorKind::kPreIncrement ||
                        oc == pasta::UnaryOperatorKind::kPreDecrement);
 
-        // Emit CONST_INT(1) as the delta operand.
+        // Emit CONST(1) as the delta operand.
         InstructionIR one;
-        one.opcode = mx::ir::OpCode::CONST_INT;
+        one.opcode = mx::ir::OpCode::CONST;
+        one.const_op = static_cast<uint8_t>(mx::ir::ConstOp::INT64);
         one.source_entity_id = eid;
         one.int_value = 1;
         one.uint_value = 1;
@@ -2127,7 +2294,8 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
             if (bb.undef_for_zero) {
               // result = SELECT(val == 0, UNDEFINED, bw_result)
               InstructionIR zero;
-              zero.opcode = mx::ir::OpCode::CONST_INT;
+              zero.opcode = mx::ir::OpCode::CONST;
+              zero.const_op = static_cast<uint8_t>(mx::ir::ConstOp::INT64);
               zero.source_entity_id = eid;
               zero.int_value = 0;
               zero.uint_value = 0;
@@ -2275,7 +2443,8 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         } else {
           // Default level 0.
           InstructionIR zero;
-          zero.opcode = mx::ir::OpCode::CONST_INT;
+          zero.opcode = mx::ir::OpCode::CONST;
+          zero.const_op = static_cast<uint8_t>(mx::ir::ConstOp::INT32);
           zero.source_entity_id = eid;
           zero.int_value = 0;
           zero.uint_value = 0;
@@ -2292,7 +2461,8 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
           inst.operand_indices.push_back(EmitRValue(args[0]));
         } else {
           InstructionIR zero;
-          zero.opcode = mx::ir::OpCode::CONST_INT;
+          zero.opcode = mx::ir::OpCode::CONST;
+          zero.const_op = static_cast<uint8_t>(mx::ir::ConstOp::INT32);
           zero.source_entity_id = eid;
           zero.int_value = 0;
           zero.uint_value = 0;
@@ -2381,11 +2551,12 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         }
       }
 
-      // Type query builtins → CONST_INT.
+      // Type query builtins → CONST.
       if (callee_name == "__builtin_constant_p") {
         // In our IR everything is "not a constant" from the optimizer's view.
         InstructionIR inst;
-        inst.opcode = mx::ir::OpCode::CONST_INT;
+        inst.opcode = mx::ir::OpCode::CONST;
+        inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::INT32);
         inst.source_entity_id = eid;
         inst.int_value = 0;
         inst.uint_value = 0;
@@ -2401,7 +2572,10 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
           if (raw->EvaluateAsInt(eval_result, ctx_)) {
             auto ap_val = eval_result.Val.getInt();
             InstructionIR inst;
-            inst.opcode = mx::ir::OpCode::CONST_INT;
+            inst.opcode = mx::ir::OpCode::CONST;
+            inst.const_op = static_cast<uint8_t>(IntConstOp(
+                static_cast<uint8_t>(std::min<unsigned>(ap_val.getBitWidth(), 64u)),
+                true));
             inst.source_entity_id = eid;
             inst.int_value = ap_val.getSExtValue();
             inst.uint_value = ap_val.getZExtValue();
@@ -2413,7 +2587,8 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         // Fallback for __builtin_object_size: return -1 (unknown).
         if (callee_name == "__builtin_object_size") {
           InstructionIR inst;
-          inst.opcode = mx::ir::OpCode::CONST_INT;
+          inst.opcode = mx::ir::OpCode::CONST;
+          inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::INT64);
           inst.source_entity_id = eid;
           inst.int_value = -1;
           inst.uint_value = static_cast<uint64_t>(-1);
@@ -2474,7 +2649,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     return emit_typed(std::move(inst));
   }
 
-  // sizeof / alignof / other type traits -- emit as CONST_INT.
+  // sizeof / alignof / other type traits -- emit as CONST.
   if (auto tte = pasta::UnaryExprOrTypeTraitExpr::From(e)) {
     auto arg_type = tte->TypeOfArgument();
     std::optional<uint32_t> val;
@@ -2488,7 +2663,8 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     }
     if (val) {
       InstructionIR inst;
-      inst.opcode = mx::ir::OpCode::CONST_INT;
+      inst.opcode = mx::ir::OpCode::CONST;
+      inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::UINT64);
       inst.source_entity_id = eid;
       inst.int_value = static_cast<int64_t>(*val);
       inst.uint_value = static_cast<uint64_t>(*val);
@@ -2584,7 +2760,8 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       if (!first) return last_idx;
     }
     InstructionIR inst;
-    inst.opcode = mx::ir::OpCode::CONST_INT;
+    inst.opcode = mx::ir::OpCode::CONST;
+    inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::INT32);
     inst.source_entity_id = eid;
     inst.int_value = 0;
     inst.width = 32;
@@ -2613,7 +2790,8 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
   // CXXNullPtrLiteralExpr -- nullptr.
   if (pasta::CXXNullPtrLiteralExpr::From(e)) {
     InstructionIR inst;
-    inst.opcode = mx::ir::OpCode::CONST_NULL;
+    inst.opcode = mx::ir::OpCode::CONST;
+    inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::NULL_PTR);
     inst.source_entity_id = eid;
     return emit_typed(std::move(inst));
   }
@@ -2621,7 +2799,8 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
   // CXXBoolLiteralExpr -- true/false.
   if (auto bl = pasta::CXXBoolLiteralExpr::From(e)) {
     InstructionIR inst;
-    inst.opcode = mx::ir::OpCode::CONST_INT;
+    inst.opcode = mx::ir::OpCode::CONST;
+    inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::BOOL);
     inst.source_entity_id = eid;
     inst.int_value = bl->Value() ? 1 : 0;
     inst.uint_value = bl->Value() ? 1 : 0;
@@ -2650,7 +2829,8 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       if (raw->EvaluateAsInt(eval_result, ctx_)) {
         auto ap_val = eval_result.Val.getInt();
         InstructionIR inst;
-        inst.opcode = mx::ir::OpCode::CONST_INT;
+        inst.opcode = mx::ir::OpCode::CONST;
+        inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::UINT64);
         inst.source_entity_id = eid;
         inst.int_value = ap_val.getSExtValue();
         inst.uint_value = ap_val.getZExtValue();

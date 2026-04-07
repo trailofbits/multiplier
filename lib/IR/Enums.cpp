@@ -14,9 +14,7 @@ namespace mx::ir {
 
 const char *EnumeratorName(OpCode op) noexcept {
   switch (op) {
-    case OpCode::CONST_INT: return "CONST_INT";
-    case OpCode::CONST_FLOAT: return "CONST_FLOAT";
-    case OpCode::CONST_NULL: return "CONST_NULL";
+    case OpCode::CONST: return "CONST";
     case OpCode::ALLOCA: return "ALLOCA";
     case OpCode::LOAD: return "LOAD";
     case OpCode::STORE: return "STORE";
@@ -45,22 +43,10 @@ const char *EnumeratorName(OpCode op) noexcept {
     case OpCode::NEG: return "NEG";
     case OpCode::BIT_NOT: return "BIT_NOT";
     case OpCode::LOGICAL_NOT: return "LOGICAL_NOT";
-    case OpCode::CAST_SEXT: return "CAST_SEXT";
-    case OpCode::CAST_ZEXT: return "CAST_ZEXT";
-    case OpCode::CAST_TRUNC: return "CAST_TRUNC";
-    case OpCode::CAST_BITCAST: return "CAST_BITCAST";
-    case OpCode::CAST_PTR_TO_INT: return "CAST_PTR_TO_INT";
-    case OpCode::CAST_INT_TO_PTR: return "CAST_INT_TO_PTR";
-    case OpCode::CAST_FP_TO_SI: return "CAST_FP_TO_SI";
-    case OpCode::CAST_SI_TO_FP: return "CAST_SI_TO_FP";
-    case OpCode::CAST_FP_TRUNC: return "CAST_FP_TRUNC";
-    case OpCode::CAST_FP_EXT: return "CAST_FP_EXT";
-    case OpCode::CAST_INT_CAST: return "CAST_INT_CAST";
-    case OpCode::CAST_FP_CAST: return "CAST_FP_CAST";
+    case OpCode::CAST: return "CAST";
     case OpCode::CALL: return "CALL";
     case OpCode::READ_MODIFY_WRITE: return "READ_MODIFY_WRITE";
     case OpCode::SELECT: return "SELECT";
-    case OpCode::COPY: return "COPY";
     case OpCode::COND_BRANCH: return "COND_BRANCH";
     case OpCode::SWITCH: return "SWITCH";
     case OpCode::RET: return "RET";

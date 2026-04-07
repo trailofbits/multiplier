@@ -9,66 +9,181 @@
 
 namespace mx::ir {
 
+// Sub-opcodes for CONST. Stored in the int pool (int_pool[0]).
+// Encodes both the type and width of the constant.
+enum class ConstOp : uint8_t {
+  INT8 = 0,
+  INT16 = 1,
+  INT32 = 2,
+  INT64 = 3,
+  UINT8 = 4,
+  UINT16 = 5,
+  UINT32 = 6,
+  UINT64 = 7,
+  FLOAT32 = 8,
+  FLOAT64 = 9,
+  FLOAT16 = 10,
+  NULL_PTR = 11,
+  INF32 = 12,
+  INF64 = 13,
+  NAN32 = 14,
+  NAN64 = 15,
+  WCHAR16 = 16,
+  WCHAR32 = 17,
+  BOOL = 18,
+};
+
+// Sub-opcodes for CAST. Stored in the int pool (int_pool[0]).
+enum class CastOp : uint8_t {
+  // Sign-extend
+  SEXT_I8_I16 = 0,
+  SEXT_I8_I32,
+  SEXT_I8_I64,
+  SEXT_I16_I32,
+  SEXT_I16_I64,
+  SEXT_I32_I64,
+
+  // Zero-extend
+  ZEXT_I8_I16,
+  ZEXT_I8_I32,
+  ZEXT_I8_I64,
+  ZEXT_I16_I32,
+  ZEXT_I16_I64,
+  ZEXT_I32_I64,
+
+  // Truncate
+  TRUNC_I16_I8,
+  TRUNC_I32_I8,
+  TRUNC_I64_I8,
+  TRUNC_I32_I16,
+  TRUNC_I64_I16,
+  TRUNC_I64_I32,
+
+  // Float widening/narrowing
+  F32_TO_F64,
+  F64_TO_F32,
+
+  // Signed int to float
+  SI8_TO_F32,
+  SI8_TO_F64,
+  SI16_TO_F32,
+  SI16_TO_F64,
+  SI32_TO_F32,
+  SI32_TO_F64,
+  SI64_TO_F32,
+  SI64_TO_F64,
+
+  // Unsigned int to float
+  UI8_TO_F32,
+  UI8_TO_F64,
+  UI16_TO_F32,
+  UI16_TO_F64,
+  UI32_TO_F32,
+  UI32_TO_F64,
+  UI64_TO_F32,
+  UI64_TO_F64,
+
+  // Float to signed int
+  F32_TO_SI8,
+  F32_TO_SI16,
+  F32_TO_SI32,
+  F32_TO_SI64,
+  F64_TO_SI8,
+  F64_TO_SI16,
+  F64_TO_SI32,
+  F64_TO_SI64,
+
+  // Float to unsigned int
+  F32_TO_UI8,
+  F32_TO_UI16,
+  F32_TO_UI32,
+  F32_TO_UI64,
+  F64_TO_UI8,
+  F64_TO_UI16,
+  F64_TO_UI32,
+  F64_TO_UI64,
+
+  // Pointer conversions
+  PTR_TO_I32,
+  PTR_TO_I64,
+  I32_TO_PTR,
+  I64_TO_PTR,
+
+  // Bitcast (reinterpret bits, same size)
+  BITCAST,
+
+  // Identity (no-op, replaces COPY for implicit conversions)
+  IDENTITY,
+};
+
+// CastOp classification helpers.
+inline bool IsSignExtend(CastOp op) {
+  return op >= CastOp::SEXT_I8_I16 && op <= CastOp::SEXT_I32_I64;
+}
+
+inline bool IsZeroExtend(CastOp op) {
+  return op >= CastOp::ZEXT_I8_I16 && op <= CastOp::ZEXT_I32_I64;
+}
+
+inline bool IsTruncate(CastOp op) {
+  return op >= CastOp::TRUNC_I16_I8 && op <= CastOp::TRUNC_I64_I32;
+}
+
+inline bool IsIntToFloat(CastOp op) {
+  return op >= CastOp::SI8_TO_F32 && op <= CastOp::UI64_TO_F64;
+}
+
+inline bool IsFloatToInt(CastOp op) {
+  return op >= CastOp::F32_TO_SI8 && op <= CastOp::F64_TO_UI64;
+}
+
 // Single unified opcode enum for all IR instruction types. The C++ class
 // hierarchy on the read side is derived from this enum.
 enum class OpCode : uint8_t {
-  // Constants
-  CONST_INT = 0,
-  CONST_FLOAT = 1,
-  CONST_NULL = 2,
+  // Constant (sub-opcode in int_pool[0] selects ConstOp).
+  CONST = 0,
 
   // Memory
-  ALLOCA = 3,
-  LOAD = 4,
-  STORE = 5,
-  ADDRESS_OF = 6,
-  GEP_FIELD = 7,
-  PTR_ADD = 8,       // pointer + index; op[0]=base, op[1]=index
+  ALLOCA = 1,
+  LOAD = 2,
+  STORE = 3,
+  ADDRESS_OF = 4,
+  GEP_FIELD = 5,
+  PTR_ADD = 6,       // pointer + index; op[0]=base, op[1]=index
 
   // Binary arithmetic/logic
-  ADD = 9,
-  SUB = 10,
-  MUL = 11,
-  DIV = 12,
-  REM = 13,
-  BIT_AND = 14,
-  BIT_OR = 15,
-  BIT_XOR = 16,
-  SHL = 17,
-  SHR = 18,
-  LOGICAL_AND = 19,
-  LOGICAL_OR = 20,
-  PTR_DIFF = 21,
+  ADD = 7,
+  SUB = 8,
+  MUL = 9,
+  DIV = 10,
+  REM = 11,
+  BIT_AND = 12,
+  BIT_OR = 13,
+  BIT_XOR = 14,
+  SHL = 15,
+  SHR = 16,
+  LOGICAL_AND = 17,
+  LOGICAL_OR = 18,
+  PTR_DIFF = 19,
 
   // Comparison
-  CMP_EQ = 22,
-  CMP_NE = 23,
-  CMP_LT = 24,
-  CMP_LE = 25,
-  CMP_GT = 26,
-  CMP_GE = 27,
+  CMP_EQ = 20,
+  CMP_NE = 21,
+  CMP_LT = 22,
+  CMP_LE = 23,
+  CMP_GT = 24,
+  CMP_GE = 25,
 
   // Unary
-  NEG = 28,
-  BIT_NOT = 29,
-  LOGICAL_NOT = 30,
+  NEG = 26,
+  BIT_NOT = 27,
+  LOGICAL_NOT = 28,
 
-  // Cast
-  CAST_SEXT = 31,
-  CAST_ZEXT = 32,
-  CAST_TRUNC = 33,
-  CAST_BITCAST = 34,
-  CAST_PTR_TO_INT = 35,
-  CAST_INT_TO_PTR = 36,
-  CAST_FP_TO_SI = 37,
-  CAST_SI_TO_FP = 38,
-  CAST_FP_TRUNC = 39,
-  CAST_FP_EXT = 40,
-  CAST_INT_CAST = 41,
-  CAST_FP_CAST = 42,
+  // Cast (sub-opcode in int_pool[0] selects CastOp).
+  CAST = 29,
 
   // Call
-  CALL = 43,
+  CALL = 30,
 
   // Read-modify-write: atomically reads from address, applies an operation,
   // and writes back. operands = [address, rhs_operand0, rhs_operand1, ...].
@@ -76,88 +191,87 @@ enum class OpCode : uint8_t {
   // flags: bit 0 = returns new value (1) or old value (0, post-increment).
   // int_pool[0] = underlying opcode (ADD, SUB, PTR_ADD, SHL, etc.)
   // int_pool[1] = element size (for PTR_ADD only, 0 otherwise)
-  READ_MODIFY_WRITE = 44,
+  READ_MODIFY_WRITE = 31,
 
   // Misc
-  SELECT = 45,
-  COPY = 46,
+  SELECT = 32,
 
   // Terminators
-  COND_BRANCH = 47,
-  SWITCH = 48,
-  RET = 49,
-  UNREACHABLE = 50,
-  BREAK = 51,
-  CONTINUE = 52,
-  GOTO = 53,              // explicit goto label;
-  IMPLICIT_GOTO = 54,     // structural CFG edge (e.g., end of if-then → merge)
-  FALLTHROUGH = 55,       // explicit [[fallthrough]]
-  IMPLICIT_FALLTHROUGH = 56, // implicit (no break at end of case)
-  IMPLICIT_UNREACHABLE = 57, // structurally unreachable (patched empty block)
+  COND_BRANCH = 33,
+  SWITCH = 34,
+  RET = 35,
+  UNREACHABLE = 36,
+  BREAK = 37,
+  CONTINUE = 38,
+  GOTO = 39,              // explicit goto label;
+  IMPLICIT_GOTO = 40,     // structural CFG edge (e.g., end of if-then → merge)
+  FALLTHROUGH = 41,       // explicit [[fallthrough]]
+  IMPLICIT_FALLTHROUGH = 42, // implicit (no break at end of case)
+  IMPLICIT_UNREACHABLE = 43, // structurally unreachable (patched empty block)
 
   // Variadic argument handling
-  VA_PACK = 58,           // groups variadic args at call site; operands = the packed args
-  VA_START = 59,          // binds va_list to function's variadic pack; op[0] = va_list
-  VA_ARG = 60,            // reads next value from va_list; op[0] = va_list; typeEntityId = result type
-  VA_COPY = 61,           // copies va_list; op[0] = dest, op[1] = src
-  VA_END = 62,            // releases va_list; op[0] = va_list
+  VA_PACK = 44,           // groups variadic args at call site; operands = the packed args
+  VA_START = 45,          // binds va_list to function's variadic pack; op[0] = va_list
+  VA_ARG = 46,            // reads next value from va_list; op[0] = va_list; typeEntityId = result type
+  VA_COPY = 47,           // copies va_list; op[0] = dest, op[1] = src
+  VA_END = 48,            // releases va_list; op[0] = va_list
 
   // Scope entry/exit markers (not terminators).
-  ENTER_SCOPE = 63,        // marks scope entry; extra = IRStructureId of scope
-  EXIT_SCOPE = 64,         // marks scope exit; extra = IRStructureId of scope
+  ENTER_SCOPE = 49,        // marks scope entry; extra = IRStructureId of scope
+  EXIT_SCOPE = 50,         // marks scope exit; extra = IRStructureId of scope
 
   // Unified memory/string operations. Sub-opcode in int_pool[0] selects the
   // specific operation (see MemoryOp enum).
-  MULTIMEM = 65,
+  MULTIMEM = 51,
 
   // Parameter read: reads the Nth function parameter.
-  PARAM_READ = 66,
+  PARAM_READ = 52,
 
   // Address-of for globals and functions (external to the current frame).
-  GLOBAL_ADDR = 67,        // pointer to a global or static variable
-  FUNC_ADDR = 68,          // pointer to a function
+  GLOBAL_ADDR = 53,        // pointer to a global or static variable
+  FUNC_ADDR = 54,          // pointer to a function
 
   // Bitwise/intrinsic operations. Sub-opcode in int_pool[0] selects the
   // specific operation (see BitwiseOp enum). op[0] = primary operand.
-  BITWISE = 69,
+  BITWISE = 55,
 
   // Floating-point operations. Sub-opcode in int_pool[0] selects the
   // specific operation (see FloatOp enum). op[0] = primary operand.
-  FLOAT = 70,
+  FLOAT = 56,
 
   // Undefined/poison value. Represents a value that is architecturally
   // undefined (e.g., __builtin_clz(0)). An analyzer should flag any use.
-  UNDEFINED = 71,
+  UNDEFINED = 57,
 
   // Dynamic stack allocation.
-  DYNAMIC_ALLOCA = 72,     // op[0] = size. Returns pointer to stack allocation.
+  DYNAMIC_ALLOCA = 58,     // op[0] = size. Returns pointer to stack allocation.
 
   // Frame/return address intrinsics.
-  FRAME_ADDRESS = 73,      // op[0] = level (CONST_INT, usually 0). Returns frame ptr.
-  RETURN_ADDRESS = 74,     // op[0] = level (CONST_INT, usually 0). Returns return addr.
+  FRAME_ADDRESS = 59,      // op[0] = level (CONST, usually 0). Returns frame ptr.
+  RETURN_ADDRESS = 60,     // op[0] = level (CONST, usually 0). Returns return addr.
 
   // Atomic operations.
-  ATOMIC_LOAD = 75,        // op[0] = address. Loads with atomic semantics.
-  ATOMIC_STORE = 76,       // op[0] = address, op[1] = value.
-  ATOMIC_CMPXCHG = 77,     // op[0] = target, op[1] = expected_ptr, op[2] = desired. Returns bool.
+  ATOMIC_LOAD = 61,        // op[0] = address. Loads with atomic semantics.
+  ATOMIC_STORE = 62,       // op[0] = address, op[1] = value.
+  ATOMIC_CMPXCHG = 63,     // op[0] = target, op[1] = expected_ptr, op[2] = desired. Returns bool.
 
   // Overflow-checked arithmetic (only used as RMW underlying opcodes).
   // RMW returns bool (overflow flag), stores the arithmetic result.
-  ADD_OVERFLOW = 78,
-  SUB_OVERFLOW = 79,
-  MUL_OVERFLOW = 80,
+  ADD_OVERFLOW = 64,
+  SUB_OVERFLOW = 65,
+  MUL_OVERFLOW = 66,
 
   // Atomic RMW underlying opcodes (only valid as RMW underlying ops).
-  ATOMIC_ADD = 81,
-  ATOMIC_SUB = 82,
-  ATOMIC_AND = 83,
-  ATOMIC_OR = 84,
-  ATOMIC_XOR = 85,
-  ATOMIC_NAND = 86,
-  ATOMIC_EXCHANGE = 87,
+  ATOMIC_ADD = 67,
+  ATOMIC_SUB = 68,
+  ATOMIC_AND = 69,
+  ATOMIC_OR = 70,
+  ATOMIC_XOR = 71,
+  ATOMIC_NAND = 72,
+  ATOMIC_EXCHANGE = 73,
 
   // Unknown / unhandled expression
-  UNKNOWN = 88,
+  UNKNOWN = 74,
 };
 
 // Returns the human-readable name of an opcode.
@@ -168,7 +282,7 @@ inline static const char *EnumerationName(OpCode) {
 const char *EnumeratorName(OpCode op) noexcept;
 
 inline static constexpr unsigned NumEnumerators(OpCode) {
-  return 89u;
+  return 75u;
 }
 
 // Sub-opcodes for BITWISE. Stored in the int pool.
@@ -272,7 +386,7 @@ inline bool IsReadModifyWrite(OpCode op) {
 }
 
 inline bool IsConstant(OpCode op) {
-  return op >= OpCode::CONST_INT && op <= OpCode::CONST_NULL;
+  return op == OpCode::CONST;
 }
 
 inline bool IsBinaryOp(OpCode op) {
@@ -288,11 +402,28 @@ inline bool IsUnaryOp(OpCode op) {
 }
 
 inline bool IsCast(OpCode op) {
-  return op >= OpCode::CAST_SEXT && op <= OpCode::CAST_FP_CAST;
+  return op == OpCode::CAST;
 }
 
 inline bool IsMemoryOp(OpCode op) {
   return op >= OpCode::ALLOCA && op <= OpCode::PTR_ADD;
+}
+
+// MemoryOp classification helpers.
+inline bool IsStringToNumber(MemoryOp op) {
+  return op >= MemoryOp::STRTOI32 && op <= MemoryOp::STRTOF64;
+}
+
+inline bool IsMemoryWrite(MemoryOp op) {
+  return op == MemoryOp::MEMSET || op == MemoryOp::MEMCPY ||
+         op == MemoryOp::MEMMOVE || op == MemoryOp::BZERO ||
+         op == MemoryOp::STRCPY || op == MemoryOp::STRNCPY ||
+         op == MemoryOp::STRCAT || op == MemoryOp::STRNCAT ||
+         op == MemoryOp::STPCPY || op == MemoryOp::STPNCPY;
+}
+
+inline bool IsStringOp(MemoryOp op) {
+  return op >= MemoryOp::STRLEN && op <= MemoryOp::STPNCPY;
 }
 
 }  // namespace mx::ir

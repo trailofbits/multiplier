@@ -72,6 +72,8 @@ struct InstructionIR {
   uint32_t size_bytes{0};
   uint8_t flags{0};
   mx::ir::OpCode compound_op{mx::ir::OpCode::ADD};
+  uint8_t const_op{0};    // ConstOp sub-opcode for CONST instructions
+  uint8_t cast_op{0};     // CastOp sub-opcode for CAST instructions
   uint8_t bitwise_op{0};  // BitwiseOp sub-opcode for BITWISE instructions
   uint8_t memory_op{0};   // MemoryOp sub-opcode for MULTIMEM instructions
   uint8_t float_op{0};    // FloatOp sub-opcode for FLOAT instructions

@@ -108,10 +108,7 @@ static void EmitInstructionExtras(
       break;
 
     case OC::LOAD:
-    case OC::CAST_SEXT: case OC::CAST_ZEXT: case OC::CAST_TRUNC:
-    case OC::CAST_BITCAST: case OC::CAST_PTR_TO_INT: case OC::CAST_INT_TO_PTR:
-    case OC::CAST_FP_TO_SI: case OC::CAST_SI_TO_FP: case OC::CAST_FP_TRUNC:
-    case OC::CAST_FP_EXT: case OC::CAST_INT_CAST: case OC::CAST_FP_CAST:
+    case OC::CAST:
     case OC::VA_ARG:
       pool.AddEntity(inst.type_entity_id);
       break;
@@ -178,18 +175,26 @@ static uint32_t EmitInstructionConsts(
   uint32_t offset = pool.IntSize();
 
   switch (inst.opcode) {
-    case OC::CONST_INT:
-      pool.AddInt(inst.int_value);
-      pool.AddInt(static_cast<int64_t>(inst.uint_value));
-      break;
-
-    case OC::CONST_FLOAT: {
-      int64_t bits;
-      static_assert(sizeof(double) == sizeof(int64_t));
-      memcpy(&bits, &inst.float_value, sizeof(bits));
-      pool.AddInt(bits);
+    case OC::CONST: {
+      pool.AddInt(static_cast<int64_t>(inst.const_op));  // ConstOp sub-opcode
+      auto cop = static_cast<mx::ir::ConstOp>(inst.const_op);
+      if (cop == mx::ir::ConstOp::FLOAT32 || cop == mx::ir::ConstOp::FLOAT64 ||
+          cop == mx::ir::ConstOp::FLOAT16) {
+        int64_t bits;
+        static_assert(sizeof(double) == sizeof(int64_t));
+        memcpy(&bits, &inst.float_value, sizeof(bits));
+        pool.AddInt(bits);
+        pool.AddInt(0);  // placeholder for unsigned_value slot
+      } else {
+        pool.AddInt(inst.int_value);
+        pool.AddInt(static_cast<int64_t>(inst.uint_value));
+      }
       break;
     }
+
+    case OC::CAST:
+      pool.AddInt(static_cast<int64_t>(inst.cast_op));  // CastOp sub-opcode
+      break;
 
     case OC::SWITCH:
       // Case values are now in SwitchCase entities, not the int pool.

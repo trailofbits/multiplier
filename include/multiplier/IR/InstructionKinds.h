@@ -26,29 +26,16 @@ class VarDecl;
   static std::optional<ClassName> from(const IRInstruction &inst);
 
 // ---------------------------------------------------------------------------
-// Constants
+// Constants (unified CONST opcode with ConstOp sub-opcode)
 // ---------------------------------------------------------------------------
 
-class MX_EXPORT ConstIntInst : public IRInstruction {
+class MX_EXPORT ConstInst : public IRInstruction {
  public:
-  MX_DECLARE_IR_INSTRUCTION(ConstIntInst)
+  MX_DECLARE_IR_INSTRUCTION(ConstInst)
+  ir::ConstOp sub_opcode(void) const;
   int64_t signed_value(void) const;
   uint64_t unsigned_value(void) const;
-  uint8_t width(void) const;
-  Type type(void) const;
-};
-
-class MX_EXPORT ConstFloatInst : public IRInstruction {
- public:
-  MX_DECLARE_IR_INSTRUCTION(ConstFloatInst)
-  double value(void) const;
-  uint8_t width(void) const;
-  Type type(void) const;
-};
-
-class MX_EXPORT ConstNullInst : public IRInstruction {
- public:
-  MX_DECLARE_IR_INSTRUCTION(ConstNullInst)
+  double float_value(void) const;
   Type type(void) const;
 };
 
@@ -141,6 +128,7 @@ class MX_EXPORT UnaryInst : public IRInstruction {
 class MX_EXPORT CastInst : public IRInstruction {
  public:
   MX_DECLARE_IR_INSTRUCTION(CastInst)
+  ir::CastOp sub_opcode(void) const;
   IRInstruction operand(void) const;
   Type result_type(void) const;
 };
@@ -194,12 +182,7 @@ class MX_EXPORT SelectInst : public IRInstruction {
   Type result_type(void) const;
 };
 
-class MX_EXPORT CopyInst : public IRInstruction {
- public:
-  MX_DECLARE_IR_INSTRUCTION(CopyInst)
-  IRInstruction source(void) const;
-  Type result_type(void) const;
-};
+// CopyInst removed: use CastInst with CastOp::IDENTITY instead.
 
 // ---------------------------------------------------------------------------
 // Parameter read
