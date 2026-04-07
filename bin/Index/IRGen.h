@@ -164,6 +164,7 @@ class IRGenerator {
   IRGenerator(const pasta::AST &ast, const EntityMapper &em);
 
   std::optional<FunctionIR> Generate(const pasta::FunctionDecl &func);
+  std::optional<FunctionIR> GenerateGlobalInit(const pasta::VarDecl &var);
 
  private:
   const pasta::AST &ast_;

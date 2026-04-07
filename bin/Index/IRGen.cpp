@@ -160,6 +160,100 @@ std::optional<FunctionIR> IRGenerator::Generate(
   }
 }
 
+std::optional<FunctionIR> IRGenerator::GenerateGlobalInit(
+    const pasta::VarDecl &var) {
+
+  auto init = var.Initializer();
+  if (!init) return std::nullopt;
+
+  try {
+    func_ = FunctionIR{};
+    func_.func_decl_entity_id = EntityIdOf(var);
+    func_.kind = mx::ir::FunctionKind::GLOBAL_INITIALIZER;
+    current_block_index_ = 0;
+    current_structure_index_ = UINT32_MAX;
+    next_obj_index_ = 0;
+    entity_to_object_.clear();
+    address_taken_.clear();
+    loop_stack_.clear();
+    label_blocks_.clear();
+    case_blocks_.clear();
+    structure_stack_.clear();
+
+    // Create entry block.
+    uint32_t entry = NewBlock(mx::ir::BlockKind::ENTRY);
+    func_.entry_block_index = entry;
+    SwitchToBlock(entry);
+
+    // Push FUNCTION_SCOPE.
+    uint32_t func_scope = PushStructure(
+        mx::ir::StructureKind::FUNCTION_SCOPE, EntityIdOf(var));
+    func_.body_scope_index = func_scope;
+    AssociateBlockWithStructure(entry);
+
+    // Create the global object.
+    uint32_t obj_idx = MakeObject(mx::ir::ObjectKind::GLOBAL, &var);
+
+    // Emit ADDRESS_OF for the global.
+    InstructionIR addr_inst;
+    addr_inst.opcode = mx::ir::OpCode::ADDRESS_OF;
+    addr_inst.source_entity_id = EntityIdOf(var);
+    addr_inst.object_index = obj_idx;
+    uint32_t addr_idx = EmitInstruction(std::move(addr_inst));
+
+    // Emit the initializer expression.
+    uint32_t val_idx = EmitRValue(*init);
+
+    // Emit STORE.
+    InstructionIR store_inst;
+    store_inst.opcode = mx::ir::OpCode::STORE;
+    store_inst.source_entity_id = EntityIdOf(var);
+    store_inst.operand_indices = {addr_idx, val_idx};
+    EmitTopLevel(std::move(store_inst));
+
+    // Emit RET.
+    InstructionIR ret;
+    ret.opcode = mx::ir::OpCode::RET;
+    EmitTopLevel(std::move(ret));
+
+    // Pop FUNCTION_SCOPE.
+    PopStructure();
+
+    // Patch empty blocks.
+    for (uint32_t bi = 0; bi < func_.blocks.size(); ++bi) {
+      auto &block = func_.blocks[bi];
+      if (!block.instruction_indices.empty()) continue;
+      InstructionIR term;
+      term.parent_block_index = bi;
+      if (!block.successor_indices.empty()) {
+        term.opcode = mx::ir::OpCode::IMPLICIT_GOTO;
+        BranchTargetIR target;
+        target.block_index = block.successor_indices.front();
+        term.branch_targets = {target};
+      } else {
+        term.opcode = mx::ir::OpCode::IMPLICIT_UNREACHABLE;
+      }
+      uint32_t idx = static_cast<uint32_t>(func_.instructions.size());
+      func_.instructions.push_back(std::move(term));
+      block.instruction_indices.push_back(idx);
+    }
+
+    ComputeDominators();
+    ComputeRPO();
+    VerifyBlocks();
+
+    LOG(INFO) << "Generated global init IR for var entity "
+              << func_.func_decl_entity_id
+              << ": " << func_.instructions.size() << " instructions";
+
+    return std::move(func_);
+
+  } catch (...) {
+    DCHECK(false) << "Exception during IR generation for global initializer";
+    return std::nullopt;
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Structure management
 // ---------------------------------------------------------------------------

@@ -265,6 +265,44 @@ std::vector<ir::FunctionIR> GenerateIR(
     ir_functions.push_back(std::move(*ir));
   }
 
+  // Generate IR for global variables with initializers.
+  for (const auto &decl : pf.top_level_decls) {
+    auto var = pasta::VarDecl::From(decl);
+    if (!var) continue;
+    if (!var->Initializer()) continue;
+    // Only process file-scope globals (not locals or parameters).
+    if (!var->HasGlobalStorage()) continue;
+
+    ProgressBarWork ir_tracker(progress);
+    ir::IRGenerator gen(ast, em);
+    auto ir = gen.GenerateGlobalInit(*var);
+    if (!ir) continue;
+
+    // Map VarDecl → IRFunction (GLOBAL_INITIALIZER).
+    auto var_eid = em.EntityId(RawEntity(*var));
+    if (var_eid != mx::kInvalidEntityId) {
+      auto ir_func_eid = mx::EntityId(mx::IRFunctionId{
+          fragment_id,
+          static_cast<uint32_t>(ir_functions.size())}).Pack();
+      em.ir_for_entity[var_eid] = ir_func_eid;
+    }
+
+    for (uint32_t i = 0; i < ir->instructions.size(); ++i) {
+      auto &inst = ir->instructions[i];
+      if (inst.source_entity_id != mx::kInvalidEntityId) {
+        auto ir_eid = mx::EntityId(mx::IRInstructionId{
+            fragment_id, inst_offset + i,
+            static_cast<uint8_t>(inst.opcode)}).Pack();
+        // Don't overwrite existing mappings (the VarDecl already maps
+        // to its IRFunction).
+        em.ir_for_entity.emplace(inst.source_entity_id, ir_eid);
+      }
+    }
+
+    inst_offset += static_cast<uint32_t>(ir->instructions.size());
+    ir_functions.push_back(std::move(*ir));
+  }
+
   return ir_functions;
 }
 
