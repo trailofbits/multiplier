@@ -537,6 +537,11 @@ void IRGenerator::EmitEntryBlockAllocas(const pasta::Stmt &body) {
         if (!vd) continue;
         if (pasta::ParmVarDecl::From(decl)) continue;
 
+        // Static/global-storage variables don't get local ALLOCAs.
+        // They're accessed via GLOBAL_ADDR and initialized by
+        // GLOBAL_INITIALIZER functions.
+        if (vd->HasGlobalStorage()) continue;
+
         uint32_t obj_idx = GetOrMakeObject(decl);
 
         InstructionIR alloca_inst;
@@ -1170,12 +1175,17 @@ void IRGenerator::EmitDeclStmt(const pasta::Stmt &s) {
   auto ds = pasta::DeclStmt::From(s);
   if (!ds) return;
 
-  // Allocas were already emitted in the entry block by EmitEntryBlockAllocas.
-  // Here we only emit the initialization store.
+  // Allocas were already emitted in the frame block by EmitEntryBlockAllocas.
+  // Here we only emit the initialization store for non-static locals.
+  // Static locals are initialized by their GLOBAL_INITIALIZER functions.
   for (const auto &decl : ds->Declarations()) {
     auto vd = pasta::VarDecl::From(decl);
     if (!vd) continue;
     if (pasta::ParmVarDecl::From(decl)) continue;
+
+    // Static/global-storage variables: initialization is handled by
+    // GLOBAL_INITIALIZER. Don't emit local init code.
+    if (vd->HasGlobalStorage()) continue;
 
     uint32_t obj_idx = GetOrMakeObject(decl);
     AssociateObjectWithScope(obj_idx);

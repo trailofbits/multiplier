@@ -278,21 +278,45 @@ std::vector<ir::FunctionIR> GenerateIR(
     ir_functions.push_back(std::move(*ir));
   }
 
-  // Generate IR for global variables with initializers.
+  // Generate IR for global variables with initializers, including static locals.
+  // Collect all global-storage VarDecls: top-level globals + static locals.
+  std::vector<pasta::VarDecl> global_vars;
   for (const auto &decl : pf.top_level_decls) {
     auto var = pasta::VarDecl::From(decl);
-    if (!var) continue;
-    if (!var->Initializer()) continue;
-    // Only process file-scope globals (not locals or parameters).
-    if (!var->HasGlobalStorage()) continue;
+    if (var && var->Initializer() && var->HasGlobalStorage()) {
+      global_vars.push_back(*var);
+    }
+    // Scan function bodies for static locals.
+    if (auto func = pasta::FunctionDecl::From(decl)) {
+      if (auto body = func->Body()) {
+        std::function<void(const pasta::Stmt &)> find_statics;
+        find_statics = [&](const pasta::Stmt &s) {
+          if (auto ds = pasta::DeclStmt::From(s)) {
+            for (const auto &d : ds->Declarations()) {
+              auto vd = pasta::VarDecl::From(d);
+              if (vd && vd->Initializer() && vd->HasGlobalStorage()) {
+                global_vars.push_back(*vd);
+              }
+            }
+          }
+          for (const auto &child : s.Children()) {
+            find_statics(child);
+          }
+        };
+        find_statics(*body);
+      }
+    }
+  }
+
+  for (const auto &var : global_vars) {
 
     ProgressBarWork ir_tracker(progress);
     ir::IRGenerator gen(ast, em);
-    auto ir = gen.GenerateGlobalInit(*var);
+    auto ir = gen.GenerateGlobalInit(var);
     if (!ir) continue;
 
     // Map VarDecl → IRFunction (GLOBAL_INITIALIZER).
-    auto var_eid = em.EntityId(RawEntity(*var));
+    auto var_eid = em.EntityId(RawEntity(var));
     if (var_eid != mx::kInvalidEntityId) {
       auto ir_func_eid = mx::EntityId(mx::IRFunctionId{
           fragment_id,
