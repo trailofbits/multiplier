@@ -181,6 +181,7 @@ class IRGenerator {
   struct LoopContext {
     uint32_t break_block;     // where break goes
     uint32_t continue_block;  // where continue goes (loops only)
+    uint32_t structure_index; // structure index of the loop/switch
     bool is_switch;           // true = switch (break goes here, continue goes to enclosing loop)
   };
   std::vector<LoopContext> loop_stack_;
@@ -203,6 +204,10 @@ class IRGenerator {
   void PopStructure();
   void AssociateBlockWithStructure(uint32_t block_idx);
   void AssociateObjectWithScope(uint32_t obj_idx);
+
+  // Emit EXIT_SCOPE for all enclosing scopes up to (but not including)
+  // the scope at stop_structure_index. Used by break/continue/return/goto.
+  void EmitScopeExits(uint32_t stop_structure_index);
 
   // --- Block management ---
   uint32_t NewBlock(mx::ir::BlockKind kind = mx::ir::BlockKind::GENERIC);

@@ -213,6 +213,22 @@ void IRGenerator::AssociateObjectWithScope(uint32_t obj_idx) {
   }
 }
 
+void IRGenerator::EmitScopeExits(uint32_t stop_structure_index) {
+  // Walk from current structure up to (but not including) stop, emitting
+  // EXIT_SCOPE for each SCOPE we pass through.
+  uint32_t si = current_structure_index_;
+  while (si != UINT32_MAX && si != stop_structure_index) {
+    if (mx::ir::IsScope(func_.structures[si].kind)) {
+      InstructionIR exit_inst;
+      exit_inst.opcode = mx::ir::OpCode::EXIT_SCOPE;
+      exit_inst.source_entity_id = func_.structures[si].source_entity_id;
+      exit_inst.structure_index = si;
+      EmitTopLevel(std::move(exit_inst));
+    }
+    si = func_.structures[si].parent_structure_index;
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Block management
 // ---------------------------------------------------------------------------
@@ -650,7 +666,7 @@ void IRGenerator::EmitWhileStmt(const pasta::Stmt &s) {
   EmitCondBranch(cond_idx, body_block, exit_block, EntityIdOf(s));
   PopStructure();  // WHILE_CONDITION
 
-  loop_stack_.push_back({exit_block, cond_block, false});
+  loop_stack_.push_back({exit_block, cond_block, current_structure_index_, false});
   PushStructure(mx::ir::StructureKind::WHILE_BODY, EntityIdOf(ws->Body()));
   SwitchToBlock(body_block);
   AssociateBlockWithStructure(body_block);
@@ -677,7 +693,7 @@ void IRGenerator::EmitDoStmt(const pasta::Stmt &s) {
 
   EmitBranch(body_block);
 
-  loop_stack_.push_back({exit_block, cond_block, false});
+  loop_stack_.push_back({exit_block, cond_block, current_structure_index_, false});
   PushStructure(mx::ir::StructureKind::DO_WHILE_BODY, EntityIdOf(ds->Body()));
   SwitchToBlock(body_block);
   AssociateBlockWithStructure(body_block);
@@ -729,7 +745,7 @@ void IRGenerator::EmitForStmt(const pasta::Stmt &s) {
   }
   PopStructure();  // FOR_CONDITION
 
-  loop_stack_.push_back({exit_block, inc_block, false});
+  loop_stack_.push_back({exit_block, inc_block, current_structure_index_, false});
   PushStructure(mx::ir::StructureKind::FOR_BODY, EntityIdOf(fs->Body()));
   SwitchToBlock(body_block);
   AssociateBlockWithStructure(body_block);
@@ -846,7 +862,7 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
 
   // Push switch context so break statements work.
   // continue_block = 0 is unused (continue skips switch contexts).
-  loop_stack_.push_back({exit_block, 0, true});
+  loop_stack_.push_back({exit_block, 0, current_structure_index_, true});
 
   // Emit case bodies.
   // Emit case bodies. Before switching to each new case block, check if
@@ -923,6 +939,7 @@ void IRGenerator::EmitReturnStmt(const pasta::Stmt &s) {
   auto rs = pasta::ReturnStmt::From(s);
   if (!rs) return;
 
+  // Emit the return value first (before scope exits).
   InstructionIR inst;
   inst.opcode = mx::ir::OpCode::RET;
   inst.source_entity_id = EntityIdOf(s);
@@ -932,6 +949,10 @@ void IRGenerator::EmitReturnStmt(const pasta::Stmt &s) {
     uint32_t val_idx = EmitRValue(*rv);
     inst.operand_indices = {val_idx};
   }
+
+  // Exit all scopes up to the function scope.
+  EmitScopeExits(func_.body_scope_index);
+
   EmitTopLevel(std::move(inst));
 }
 
@@ -969,6 +990,7 @@ void IRGenerator::EmitDeclStmt(const pasta::Stmt &s) {
 
 void IRGenerator::EmitBreakStmt(const pasta::Stmt &s) {
   for (auto it = loop_stack_.rbegin(); it != loop_stack_.rend(); ++it) {
+    EmitScopeExits(it->structure_index);
     EmitBranchWithOpCode(mx::ir::OpCode::BREAK, it->break_block,
                           EntityIdOf(s));
     SwitchToBlock(NewBlock(mx::ir::BlockKind::UNREACHABLE));
@@ -980,6 +1002,7 @@ void IRGenerator::EmitBreakStmt(const pasta::Stmt &s) {
 void IRGenerator::EmitContinueStmt(const pasta::Stmt &s) {
   for (auto it = loop_stack_.rbegin(); it != loop_stack_.rend(); ++it) {
     if (!it->is_switch) {
+      EmitScopeExits(it->structure_index);
       EmitBranchWithOpCode(mx::ir::OpCode::CONTINUE, it->continue_block,
                             EntityIdOf(s));
       SwitchToBlock(NewBlock(mx::ir::BlockKind::UNREACHABLE));
@@ -1004,6 +1027,10 @@ void IRGenerator::EmitGotoStmt(const pasta::Stmt &s) {
     target = NewBlock(mx::ir::BlockKind::LABEL);
     label_blocks_[label_name] = target;
   }
+
+  // Conservatively exit all scopes up to function scope.
+  // A more precise analysis would determine the target label's scope.
+  EmitScopeExits(func_.body_scope_index);
 
   EmitBranchWithOpCode(mx::ir::OpCode::GOTO, target, EntityIdOf(s));
   SwitchToBlock(NewBlock(mx::ir::BlockKind::UNREACHABLE));
