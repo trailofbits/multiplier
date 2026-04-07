@@ -147,43 +147,42 @@ enum class OpCode : uint8_t {
   ALLOCA = 1,
   LOAD = 2,
   STORE = 3,
-  ADDRESS_OF = 4,
-  GEP_FIELD = 5,
-  PTR_ADD = 6,       // pointer + index; op[0]=base, op[1]=index
+  GEP_FIELD = 4,
+  PTR_ADD = 5,       // pointer + index; op[0]=base, op[1]=index
 
   // Binary arithmetic/logic
-  ADD = 7,
-  SUB = 8,
-  MUL = 9,
-  DIV = 10,
-  REM = 11,
-  BIT_AND = 12,
-  BIT_OR = 13,
-  BIT_XOR = 14,
-  SHL = 15,
-  SHR = 16,
-  LOGICAL_AND = 17,
-  LOGICAL_OR = 18,
-  PTR_DIFF = 19,
+  ADD = 6,
+  SUB = 7,
+  MUL = 8,
+  DIV = 9,
+  REM = 10,
+  BIT_AND = 11,
+  BIT_OR = 12,
+  BIT_XOR = 13,
+  SHL = 14,
+  SHR = 15,
+  LOGICAL_AND = 16,
+  LOGICAL_OR = 17,
+  PTR_DIFF = 18,
 
   // Comparison
-  CMP_EQ = 20,
-  CMP_NE = 21,
-  CMP_LT = 22,
-  CMP_LE = 23,
-  CMP_GT = 24,
-  CMP_GE = 25,
+  CMP_EQ = 19,
+  CMP_NE = 20,
+  CMP_LT = 21,
+  CMP_LE = 22,
+  CMP_GT = 23,
+  CMP_GE = 24,
 
   // Unary
-  NEG = 26,
-  BIT_NOT = 27,
-  LOGICAL_NOT = 28,
+  NEG = 25,
+  BIT_NOT = 26,
+  LOGICAL_NOT = 27,
 
   // Cast (sub-opcode in int_pool[0] selects CastOp).
-  CAST = 29,
+  CAST = 28,
 
   // Call
-  CALL = 30,
+  CALL = 29,
 
   // Read-modify-write: atomically reads from address, applies an operation,
   // and writes back. operands = [address, rhs_operand0, rhs_operand1, ...].
@@ -191,87 +190,87 @@ enum class OpCode : uint8_t {
   // flags: bit 0 = returns new value (1) or old value (0, post-increment).
   // int_pool[0] = underlying opcode (ADD, SUB, PTR_ADD, SHL, etc.)
   // int_pool[1] = element size (for PTR_ADD only, 0 otherwise)
-  READ_MODIFY_WRITE = 31,
+  READ_MODIFY_WRITE = 30,
 
   // Misc
-  SELECT = 32,
+  SELECT = 31,
 
   // Terminators
-  COND_BRANCH = 33,
-  SWITCH = 34,
-  RET = 35,
-  UNREACHABLE = 36,
-  BREAK = 37,
-  CONTINUE = 38,
-  GOTO = 39,              // explicit goto label;
-  IMPLICIT_GOTO = 40,     // structural CFG edge (e.g., end of if-then → merge)
-  FALLTHROUGH = 41,       // explicit [[fallthrough]]
-  IMPLICIT_FALLTHROUGH = 42, // implicit (no break at end of case)
-  IMPLICIT_UNREACHABLE = 43, // structurally unreachable (patched empty block)
+  COND_BRANCH = 32,
+  SWITCH = 33,
+  RET = 34,
+  UNREACHABLE = 35,
+  BREAK = 36,
+  CONTINUE = 37,
+  GOTO = 38,              // explicit goto label;
+  IMPLICIT_GOTO = 39,     // structural CFG edge (e.g., end of if-then → merge)
+  FALLTHROUGH = 40,       // explicit [[fallthrough]]
+  IMPLICIT_FALLTHROUGH = 41, // implicit (no break at end of case)
+  IMPLICIT_UNREACHABLE = 42, // structurally unreachable (patched empty block)
 
   // Variadic argument handling
-  VA_PACK = 44,           // groups variadic args at call site; operands = the packed args
-  VA_START = 45,          // binds va_list to function's variadic pack; op[0] = va_list
-  VA_ARG = 46,            // reads next value from va_list; op[0] = va_list; typeEntityId = result type
-  VA_COPY = 47,           // copies va_list; op[0] = dest, op[1] = src
-  VA_END = 48,            // releases va_list; op[0] = va_list
+  VA_PACK = 43,           // groups variadic args at call site; operands = the packed args
+  VA_START = 44,          // binds va_list to function's variadic pack; op[0] = va_list
+  VA_ARG = 45,            // reads next value from va_list; op[0] = va_list; typeEntityId = result type
+  VA_COPY = 46,           // copies va_list; op[0] = dest, op[1] = src
+  VA_END = 47,            // releases va_list; op[0] = va_list
 
   // Scope entry/exit markers (not terminators).
-  ENTER_SCOPE = 49,        // marks scope entry; extra = IRStructureId of scope
-  EXIT_SCOPE = 50,         // marks scope exit; extra = IRStructureId of scope
+  ENTER_SCOPE = 48,        // marks scope entry; extra = IRStructureId of scope
+  EXIT_SCOPE = 49,         // marks scope exit; extra = IRStructureId of scope
 
   // Unified memory/string operations. Sub-opcode in int_pool[0] selects the
   // specific operation (see MemoryOp enum).
-  MULTIMEM = 51,
+  MULTIMEM = 50,
 
   // Parameter read: reads the Nth function parameter.
-  PARAM_READ = 52,
+  PARAM_READ = 51,
 
   // Address-of for globals and functions (external to the current frame).
-  GLOBAL_ADDR = 53,        // pointer to a global or static variable
-  FUNC_ADDR = 54,          // pointer to a function
+  GLOBAL_PTR = 52,        // pointer to a global or static variable
+  FUNC_PTR = 53,          // pointer to a function
 
   // Bitwise/intrinsic operations. Sub-opcode in int_pool[0] selects the
   // specific operation (see BitwiseOp enum). op[0] = primary operand.
-  BITWISE = 55,
+  BITWISE = 54,
 
   // Floating-point operations. Sub-opcode in int_pool[0] selects the
   // specific operation (see FloatOp enum). op[0] = primary operand.
-  FLOAT = 56,
+  FLOAT = 55,
 
   // Undefined/poison value. Represents a value that is architecturally
   // undefined (e.g., __builtin_clz(0)). An analyzer should flag any use.
-  UNDEFINED = 57,
+  UNDEFINED = 56,
 
   // Dynamic stack allocation.
-  DYNAMIC_ALLOCA = 58,     // op[0] = size. Returns pointer to stack allocation.
+  DYNAMIC_ALLOCA = 57,     // op[0] = size. Returns pointer to stack allocation.
 
   // Frame/return address intrinsics.
-  FRAME_ADDRESS = 59,      // op[0] = level (CONST, usually 0). Returns frame ptr.
-  RETURN_ADDRESS = 60,     // op[0] = level (CONST, usually 0). Returns return addr.
+  FRAME_PTR = 58,      // op[0] = level (CONST, usually 0). Returns frame ptr.
+  RETURN_PTR = 59,     // op[0] = level (CONST, usually 0). Returns return addr.
 
   // Atomic operations.
-  ATOMIC_LOAD = 61,        // op[0] = address. Loads with atomic semantics.
-  ATOMIC_STORE = 62,       // op[0] = address, op[1] = value.
-  ATOMIC_CMPXCHG = 63,     // op[0] = target, op[1] = expected_ptr, op[2] = desired. Returns bool.
+  ATOMIC_LOAD = 60,        // op[0] = address. Loads with atomic semantics.
+  ATOMIC_STORE = 61,       // op[0] = address, op[1] = value.
+  ATOMIC_CMPXCHG = 62,     // op[0] = target, op[1] = expected_ptr, op[2] = desired. Returns bool.
 
   // Overflow-checked arithmetic (only used as RMW underlying opcodes).
   // RMW returns bool (overflow flag), stores the arithmetic result.
-  ADD_OVERFLOW = 64,
-  SUB_OVERFLOW = 65,
-  MUL_OVERFLOW = 66,
+  ADD_OVERFLOW = 63,
+  SUB_OVERFLOW = 64,
+  MUL_OVERFLOW = 65,
 
   // Atomic RMW underlying opcodes (only valid as RMW underlying ops).
-  ATOMIC_ADD = 67,
-  ATOMIC_SUB = 68,
-  ATOMIC_AND = 69,
-  ATOMIC_OR = 70,
-  ATOMIC_XOR = 71,
-  ATOMIC_NAND = 72,
-  ATOMIC_EXCHANGE = 73,
+  ATOMIC_ADD = 66,
+  ATOMIC_SUB = 67,
+  ATOMIC_AND = 68,
+  ATOMIC_OR = 69,
+  ATOMIC_XOR = 70,
+  ATOMIC_NAND = 71,
+  ATOMIC_EXCHANGE = 72,
 
   // Unknown / unhandled expression
-  UNKNOWN = 74,
+  UNKNOWN = 73,
 };
 
 // Returns the human-readable name of an opcode.
@@ -282,7 +281,7 @@ inline static const char *EnumerationName(OpCode) {
 const char *EnumeratorName(OpCode op) noexcept;
 
 inline static constexpr unsigned NumEnumerators(OpCode) {
-  return 75u;
+  return 74u;
 }
 
 // Sub-opcodes for BITWISE. Stored in the int pool.

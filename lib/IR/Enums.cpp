@@ -18,7 +18,6 @@ const char *EnumeratorName(OpCode op) noexcept {
     case OpCode::ALLOCA: return "ALLOCA";
     case OpCode::LOAD: return "LOAD";
     case OpCode::STORE: return "STORE";
-    case OpCode::ADDRESS_OF: return "ADDRESS_OF";
     case OpCode::GEP_FIELD: return "GEP_FIELD";
     case OpCode::PTR_ADD: return "PTR_ADD";
     case OpCode::ADD: return "ADD";
@@ -67,14 +66,14 @@ const char *EnumeratorName(OpCode op) noexcept {
     case OpCode::EXIT_SCOPE: return "EXIT_SCOPE";
     case OpCode::MULTIMEM: return "MULTIMEM";
     case OpCode::PARAM_READ: return "PARAM_READ";
-    case OpCode::GLOBAL_ADDR: return "GLOBAL_ADDR";
-    case OpCode::FUNC_ADDR: return "FUNC_ADDR";
+    case OpCode::GLOBAL_PTR: return "GLOBAL_PTR";
+    case OpCode::FUNC_PTR: return "FUNC_PTR";
     case OpCode::BITWISE: return "BITWISE";
     case OpCode::FLOAT: return "FLOAT";
     case OpCode::UNDEFINED: return "UNDEFINED";
     case OpCode::DYNAMIC_ALLOCA: return "DYNAMIC_ALLOCA";
-    case OpCode::FRAME_ADDRESS: return "FRAME_ADDRESS";
-    case OpCode::RETURN_ADDRESS: return "RETURN_ADDRESS";
+    case OpCode::FRAME_PTR: return "FRAME_PTR";
+    case OpCode::RETURN_PTR: return "RETURN_PTR";
     case OpCode::ATOMIC_LOAD: return "ATOMIC_LOAD";
     case OpCode::ATOMIC_STORE: return "ATOMIC_STORE";
     case OpCode::ATOMIC_CMPXCHG: return "ATOMIC_CMPXCHG";

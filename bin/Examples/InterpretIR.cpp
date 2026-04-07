@@ -331,14 +331,6 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       }
       break;
     }
-    case mx::ir::OpCode::ADDRESS_OF: {
-      if (auto ao = mx::AddressOfInst::from(inst)) {
-        auto obj = ao->object();
-        auto obj_eid = mx::EntityId(obj.id()).Pack();
-        result = Value::Ptr(obj_eid, 0);
-      }
-      break;
-    }
     case mx::ir::OpCode::GEP_FIELD: {
       if (auto gep = mx::GEPFieldInst::from(inst)) {
         Value base = GetValue(gep->base());
@@ -913,8 +905,8 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
 
     // --- Dynamic alloca / frame-return address ---
     case mx::ir::OpCode::DYNAMIC_ALLOCA:
-    case mx::ir::OpCode::FRAME_ADDRESS:
-    case mx::ir::OpCode::RETURN_ADDRESS:
+    case mx::ir::OpCode::FRAME_PTR:
+    case mx::ir::OpCode::RETURN_PTR:
       // Not meaningfully interpretable; return undef.
       result = Value::Undef();
       break;
@@ -976,13 +968,13 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
     }
 
     // --- Global/function address ---
-    case mx::ir::OpCode::GLOBAL_ADDR: {
+    case mx::ir::OpCode::GLOBAL_PTR: {
       // In a real interpreter, this would look up the global's storage.
       // For now, create a synthetic pointer using the target entity ID.
       result = Value::Ptr(inst.source_entity_id(), 0);
       break;
     }
-    case mx::ir::OpCode::FUNC_ADDR: {
+    case mx::ir::OpCode::FUNC_PTR: {
       // Function pointer — use the source entity ID as a handle.
       result = Value::Ptr(inst.source_entity_id(), 0);
       break;

@@ -139,7 +139,6 @@ IMPL_FROM_SINGLE(ConstInst, CONST)
 IMPL_FROM_SINGLE(AllocaInst, ALLOCA)
 IMPL_FROM_SINGLE(LoadInst, LOAD)
 IMPL_FROM_SINGLE(StoreInst, STORE)
-IMPL_FROM_SINGLE(AddressOfInst, ADDRESS_OF)
 IMPL_FROM_SINGLE(GEPFieldInst, GEP_FIELD)
 IMPL_FROM_SINGLE(PtrAddInst, PTR_ADD)
 IMPL_FROM_SINGLE(ReadModifyWriteInst, READ_MODIFY_WRITE)
@@ -151,14 +150,14 @@ IMPL_FROM_SINGLE(VACopyInst, VA_COPY)
 IMPL_FROM_SINGLE(VAArgInst, VA_ARG)
 IMPL_FROM_SINGLE(VAPackInst, VA_PACK)
 IMPL_FROM_SINGLE(ParamReadInst, PARAM_READ)
-IMPL_FROM_SINGLE(GlobalAddrInst, GLOBAL_ADDR)
-IMPL_FROM_SINGLE(FuncAddrInst, FUNC_ADDR)
+IMPL_FROM_SINGLE(GlobalPtrInst, GLOBAL_PTR)
+IMPL_FROM_SINGLE(FuncPtrInst, FUNC_PTR)
 IMPL_FROM_SINGLE(MultimemInst, MULTIMEM)
 IMPL_FROM_SINGLE(BitwiseOpInst, BITWISE)
 IMPL_FROM_SINGLE(FloatOpInst, FLOAT)
 IMPL_FROM_SINGLE(DynamicAllocaInst, DYNAMIC_ALLOCA)
-IMPL_FROM_SINGLE(FrameAddressInst, FRAME_ADDRESS)
-IMPL_FROM_SINGLE(ReturnAddressInst, RETURN_ADDRESS)
+IMPL_FROM_SINGLE(FramePtrInst, FRAME_PTR)
+IMPL_FROM_SINGLE(ReturnPtrInst, RETURN_PTR)
 IMPL_FROM_SINGLE(AtomicLoadInst, ATOMIC_LOAD)
 IMPL_FROM_SINGLE(AtomicStoreInst, ATOMIC_STORE)
 IMPL_FROM_SINGLE(AtomicCmpxchgInst, ATOMIC_CMPXCHG)
@@ -247,16 +246,6 @@ IRInstruction StoreInst::address(void) const {
 
 IRInstruction StoreInst::stored_value(void) const {
   return nth_operand(1);
-}
-
-// ---- AddressOfInst ----
-
-Type AddressOfInst::type(void) const {
-  return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
-}
-
-IRObject AddressOfInst::object(void) const {
-  return MakeObj(*impl, GetPool(*impl)[ExtraBase(impl->reader())]);
 }
 
 // ---- GEPFieldInst ----
@@ -481,9 +470,9 @@ IRObject ParamReadInst::object(void) const {
   return {};
 }
 
-// ---- GlobalAddrInst / FuncAddrInst ----
+// ---- GlobalPtrInst / FuncPtrInst ----
 
-std::optional<VarDecl> GlobalAddrInst::variable(void) const {
+std::optional<VarDecl> GlobalPtrInst::variable(void) const {
   auto pool = GetPool(*impl);
   auto r = impl->reader();
   auto extra_base = ExtraBase(r);
@@ -495,7 +484,7 @@ std::optional<VarDecl> GlobalAddrInst::variable(void) const {
   return std::nullopt;
 }
 
-std::optional<FunctionDecl> FuncAddrInst::function(void) const {
+std::optional<FunctionDecl> FuncPtrInst::function(void) const {
   auto pool = GetPool(*impl);
   auto r = impl->reader();
   auto extra_base = ExtraBase(r);
@@ -550,17 +539,17 @@ Type DynamicAllocaInst::result_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 
-// ---- FrameAddressInst ----
+// ---- FramePtrInst ----
 
-IRInstruction FrameAddressInst::level(void) const { return nth_operand(0); }
-Type FrameAddressInst::result_type(void) const {
+IRInstruction FramePtrInst::level(void) const { return nth_operand(0); }
+Type FramePtrInst::result_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 
-// ---- ReturnAddressInst ----
+// ---- ReturnPtrInst ----
 
-IRInstruction ReturnAddressInst::level(void) const { return nth_operand(0); }
-Type ReturnAddressInst::result_type(void) const {
+IRInstruction ReturnPtrInst::level(void) const { return nth_operand(0); }
+Type ReturnPtrInst::result_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 

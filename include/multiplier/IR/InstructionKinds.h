@@ -64,13 +64,6 @@ class MX_EXPORT StoreInst : public IRInstruction {
   IRInstruction stored_value(void) const;
 };
 
-class MX_EXPORT AddressOfInst : public IRInstruction {
- public:
-  MX_DECLARE_IR_INSTRUCTION(AddressOfInst)
-  Type type(void) const;
-  IRObject object(void) const;
-};
-
 // ---------------------------------------------------------------------------
 // Field / Pointer access
 // ---------------------------------------------------------------------------
@@ -200,15 +193,15 @@ class MX_EXPORT ParamReadInst : public IRInstruction {
 // Global/function address
 // ---------------------------------------------------------------------------
 
-class MX_EXPORT GlobalAddrInst : public IRInstruction {
+class MX_EXPORT GlobalPtrInst : public IRInstruction {
  public:
-  MX_DECLARE_IR_INSTRUCTION(GlobalAddrInst)
+  MX_DECLARE_IR_INSTRUCTION(GlobalPtrInst)
   std::optional<VarDecl> variable(void) const;
 };
 
-class MX_EXPORT FuncAddrInst : public IRInstruction {
+class MX_EXPORT FuncPtrInst : public IRInstruction {
  public:
-  MX_DECLARE_IR_INSTRUCTION(FuncAddrInst)
+  MX_DECLARE_IR_INSTRUCTION(FuncPtrInst)
   std::optional<FunctionDecl> function(void) const;
 };
 
@@ -260,16 +253,16 @@ class MX_EXPORT DynamicAllocaInst : public IRInstruction {
 // Frame/return address intrinsics
 // ---------------------------------------------------------------------------
 
-class MX_EXPORT FrameAddressInst : public IRInstruction {
+class MX_EXPORT FramePtrInst : public IRInstruction {
  public:
-  MX_DECLARE_IR_INSTRUCTION(FrameAddressInst)
+  MX_DECLARE_IR_INSTRUCTION(FramePtrInst)
   IRInstruction level(void) const;       // op[0]
   Type result_type(void) const;
 };
 
-class MX_EXPORT ReturnAddressInst : public IRInstruction {
+class MX_EXPORT ReturnPtrInst : public IRInstruction {
  public:
-  MX_DECLARE_IR_INSTRUCTION(ReturnAddressInst)
+  MX_DECLARE_IR_INSTRUCTION(ReturnPtrInst)
   IRInstruction level(void) const;       // op[0]
   Type result_type(void) const;
 };

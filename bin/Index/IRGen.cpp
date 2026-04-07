@@ -164,6 +164,7 @@ std::optional<FunctionIR> IRGenerator::Generate(
     current_structure_index_ = UINT32_MAX;
     next_obj_index_ = 0;
     entity_to_object_.clear();
+    object_to_alloca_.clear();
     address_taken_.clear();
     loop_stack_.clear();
     label_blocks_.clear();
@@ -209,7 +210,8 @@ std::optional<FunctionIR> IRGenerator::Generate(
       alloca_inst.source_entity_id = EntityIdOf(param);
       alloca_inst.object_index = obj_idx;
       alloca_inst.type_entity_id = TypeEntityIdOf(param.Type());
-      EmitTopLevel(std::move(alloca_inst));
+      uint32_t alloca_idx = EmitTopLevel(std::move(alloca_inst));
+      object_to_alloca_[obj_idx] = alloca_idx;
     }
 
     // Emit local variable ALLOCAs in the frame block.
@@ -252,12 +254,8 @@ std::optional<FunctionIR> IRGenerator::Generate(
       pr.int_value = static_cast<int64_t>(pi);  // parameter index
       uint32_t pr_idx = EmitInstruction(std::move(pr));
 
-      // ADDRESS_OF the parameter's alloca.
-      InstructionIR addr;
-      addr.opcode = mx::ir::OpCode::ADDRESS_OF;
-      addr.source_entity_id = EntityIdOf(param);
-      addr.object_index = obj_idx;
-      uint32_t addr_idx = EmitInstruction(std::move(addr));
+      // Reference the parameter's alloca directly.
+      uint32_t addr_idx = object_to_alloca_[obj_idx];
 
       // STORE the parameter value into its alloca.
       InstructionIR store;
@@ -350,6 +348,7 @@ std::optional<FunctionIR> IRGenerator::GenerateGlobalInit(
     current_structure_index_ = UINT32_MAX;
     next_obj_index_ = 0;
     entity_to_object_.clear();
+    object_to_alloca_.clear();
     address_taken_.clear();
     loop_stack_.clear();
     label_blocks_.clear();
@@ -642,7 +641,7 @@ void IRGenerator::EmitEntryBlockAllocas(const pasta::Stmt &body) {
         if (pasta::ParmVarDecl::From(decl)) continue;
 
         // Static/global-storage variables don't get local ALLOCAs.
-        // They're accessed via GLOBAL_ADDR and initialized by
+        // They're accessed via GLOBAL_PTR and initialized by
         // GLOBAL_INITIALIZER functions.
         if (vd->HasGlobalStorage()) continue;
 
@@ -653,7 +652,8 @@ void IRGenerator::EmitEntryBlockAllocas(const pasta::Stmt &body) {
         alloca_inst.source_entity_id = EntityIdOf(decl);
         alloca_inst.object_index = obj_idx;
         alloca_inst.type_entity_id = TypeEntityIdOf(vd->Type());
-        EmitTopLevel(std::move(alloca_inst));
+        uint32_t alloca_idx = EmitTopLevel(std::move(alloca_inst));
+        object_to_alloca_[obj_idx] = alloca_idx;
       }
     }
     for (const auto &child : s.Children()) {
@@ -1314,12 +1314,7 @@ void IRGenerator::EmitDeclStmt(const pasta::Stmt &s) {
     AssociateObjectWithScope(obj_idx);
 
     if (auto init = vd->Initializer()) {
-      InstructionIR addr_inst;
-      addr_inst.opcode = mx::ir::OpCode::ADDRESS_OF;
-      addr_inst.source_entity_id = EntityIdOf(decl);
-      addr_inst.object_index = obj_idx;
-      uint32_t addr_idx = EmitInstruction(std::move(addr_inst));
-
+      uint32_t addr_idx = object_to_alloca_[obj_idx];
       EmitInitializer(addr_idx, *init, EntityIdOf(decl));
     }
   }
@@ -1628,11 +1623,14 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     uint32_t obj_idx = next_obj_index_++;
     func_.objects.push_back(std::move(obj));
 
-    InstructionIR inst;
-    inst.opcode = mx::ir::OpCode::ADDRESS_OF;
-    inst.source_entity_id = eid;
-    inst.object_index = obj_idx;
-    return emit_typed(std::move(inst));
+    InstructionIR alloca_inst;
+    alloca_inst.opcode = mx::ir::OpCode::ALLOCA;
+    alloca_inst.source_entity_id = eid;
+    alloca_inst.object_index = obj_idx;
+    if (auto t = e.Type()) alloca_inst.type_entity_id = TypeEntityIdOf(*t);
+    uint32_t alloca_idx = emit_typed(std::move(alloca_inst));
+    object_to_alloca_[obj_idx] = alloca_idx;
+    return alloca_idx;
   }
 
   // Paren expr -- unwrap.
@@ -2436,7 +2434,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       // Frame/return address intrinsics.
       if (callee_name == "__builtin_frame_address") {
         InstructionIR inst;
-        inst.opcode = mx::ir::OpCode::FRAME_ADDRESS;
+        inst.opcode = mx::ir::OpCode::FRAME_PTR;
         inst.source_entity_id = eid;
         if (!args.empty()) {
           inst.operand_indices.push_back(EmitRValue(args[0]));
@@ -2455,7 +2453,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       }
       if (callee_name == "__builtin_return_address") {
         InstructionIR inst;
-        inst.opcode = mx::ir::OpCode::RETURN_ADDRESS;
+        inst.opcode = mx::ir::OpCode::RETURN_PTR;
         inst.source_entity_id = eid;
         if (!args.empty()) {
           inst.operand_indices.push_back(EmitRValue(args[0]));
@@ -2674,7 +2672,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
   }
 
   // InitListExpr -- allocate a COMPOUND_LITERAL temp, fill via EmitInitializer,
-  // return ADDRESS_OF. This makes aggregate init consistent with compound literals.
+  // return ALLOCA. This makes aggregate init consistent with compound literals.
   if (auto ile = pasta::InitListExpr::From(e)) {
     ObjectIR obj;
     obj.kind = mx::ir::ObjectKind::COMPOUND_LITERAL;
@@ -2694,20 +2692,13 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     alloca_inst.source_entity_id = eid;
     alloca_inst.object_index = obj_idx;
     if (auto t = e.Type()) alloca_inst.type_entity_id = TypeEntityIdOf(*t);
-    (void) EmitInstruction(std::move(alloca_inst));
-
-    // ADDRESS_OF the temp.
-    InstructionIR addr;
-    addr.opcode = mx::ir::OpCode::ADDRESS_OF;
-    addr.source_entity_id = eid;
-    addr.object_index = obj_idx;
-    if (auto t = e.Type()) addr.type_entity_id = TypeEntityIdOf(*t);
-    uint32_t addr_idx = EmitInstruction(std::move(addr));
+    uint32_t alloca_idx = EmitInstruction(std::move(alloca_inst));
+    object_to_alloca_[obj_idx] = alloca_idx;
 
     // Fill the temp via EmitInitializer.
-    EmitInitializer(addr_idx, *ile, eid);
+    EmitInitializer(alloca_idx, *ile, eid);
 
-    return addr_idx;
+    return alloca_idx;
   }
 
   // CompoundLiteralExpr -- allocate temp, fill via EmitInitializer.
@@ -2730,17 +2721,11 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     alloca_inst.object_index = obj_idx;
     if (auto t = e.Type()) alloca_inst.type_entity_id = TypeEntityIdOf(*t);
     uint32_t alloca_idx = EmitInstruction(std::move(alloca_inst));
+    object_to_alloca_[obj_idx] = alloca_idx;
 
-    InstructionIR addr;
-    addr.opcode = mx::ir::OpCode::ADDRESS_OF;
-    addr.source_entity_id = eid;
-    addr.object_index = obj_idx;
-    if (auto t = e.Type()) addr.type_entity_id = TypeEntityIdOf(*t);
-    uint32_t addr_idx = EmitInstruction(std::move(addr));
+    EmitInitializer(alloca_idx, cle->Initializer(), eid);
 
-    EmitInitializer(addr_idx, cle->Initializer(), eid);
-
-    return addr_idx;
+    return alloca_idx;
   }
 
   // StmtExpr -- GNU ({ ... }) expression. Emit children, return last expr.
@@ -2860,33 +2845,29 @@ uint32_t IRGenerator::EmitLValue(const pasta::Expr &e) {
   if (auto dre = pasta::DeclRefExpr::From(e)) {
     auto decl = dre->Declaration();
 
-    // Function reference → FUNC_ADDR.
+    // Function reference → FUNC_PTR.
     if (auto fd = pasta::FunctionDecl::From(decl)) {
       InstructionIR inst;
-      inst.opcode = mx::ir::OpCode::FUNC_ADDR;
+      inst.opcode = mx::ir::OpCode::FUNC_PTR;
       inst.source_entity_id = eid;
       inst.target_entity_id = EntityIdOf(fd->CanonicalDeclaration());
       return EmitInstruction(std::move(inst));
     }
 
-    // Global/static variable → GLOBAL_ADDR.
+    // Global/static variable → GLOBAL_PTR.
     if (auto vd = pasta::VarDecl::From(decl)) {
       if (vd->HasGlobalStorage()) {
         InstructionIR inst;
-        inst.opcode = mx::ir::OpCode::GLOBAL_ADDR;
+        inst.opcode = mx::ir::OpCode::GLOBAL_PTR;
         inst.source_entity_id = eid;
         inst.target_entity_id = EntityIdOf(decl);
         return EmitInstruction(std::move(inst));
       }
     }
 
-    // Local/parameter → ADDRESS_OF with local object.
+    // Local/parameter → reference the ALLOCA directly.
     uint32_t obj_idx = GetOrMakeObject(decl);
-    InstructionIR inst;
-    inst.opcode = mx::ir::OpCode::ADDRESS_OF;
-    inst.source_entity_id = eid;
-    inst.object_index = obj_idx;
-    return EmitInstruction(std::move(inst));
+    return object_to_alloca_[obj_idx];
   }
 
   // MemberExpr.
