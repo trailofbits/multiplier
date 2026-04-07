@@ -41,6 +41,10 @@ enum class BlockKind : uint8_t {
 
   // Frame block: contains all ALLOCAs (parameters + locals). Precedes ENTRY.
   FRAME = 14,
+
+  // Compensation block: inserted on goto edges to emit scope transitions
+  // (EXIT_SCOPE / ENTER_SCOPE) when a goto crosses scope boundaries.
+  COMPENSATION = 15,
 };
 
 inline static const char *EnumerationName(BlockKind) {
@@ -50,7 +54,7 @@ inline static const char *EnumerationName(BlockKind) {
 const char *EnumeratorName(BlockKind kind) noexcept;
 
 inline static constexpr unsigned NumEnumerators(BlockKind) {
-  return 15u;
+  return 16u;
 }
 
 }  // namespace mx::ir

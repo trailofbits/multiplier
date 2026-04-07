@@ -3057,7 +3057,7 @@ void IRGenerator::InsertGotoCompensationBlocks() {
     if (scopes_to_exit.empty() && scopes_to_enter.empty()) continue;
 
     // Create a compensation block.
-    uint32_t comp_block = NewBlock(mx::ir::BlockKind::GENERIC);
+    uint32_t comp_block = NewBlock(mx::ir::BlockKind::COMPENSATION);
 
     // Redirect the goto: goto → comp_block instead of → target.
     auto &goto_inst = func_.instructions[pg.goto_inst_idx];

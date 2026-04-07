@@ -158,6 +158,7 @@ const char *EnumeratorName(BlockKind kind) noexcept {
     case BlockKind::UNREACHABLE: return "UNREACHABLE";
     case BlockKind::GENERIC: return "GENERIC";
     case BlockKind::FRAME: return "FRAME";
+    case BlockKind::COMPENSATION: return "COMPENSATION";
   }
   return "UNKNOWN";
 }
