@@ -170,6 +170,8 @@ std::optional<FunctionIR> IRGenerator::Generate(
     label_blocks_.clear();
     case_blocks_.clear();
     structure_stack_.clear();
+    pending_gotos_.clear();
+    label_structure_.clear();
 
     // Pre-scan for address-taken variables.
     ScanAddressTaken(*body);
@@ -291,6 +293,9 @@ std::optional<FunctionIR> IRGenerator::Generate(
 
     // Pop the function-level scope.
     PopStructure();
+
+    // Insert compensation blocks for gotos that cross scope boundaries.
+    InsertGotoCompensationBlocks();
 
     // Patch empty blocks before computing dominators.
     // Empty blocks arise when all paths into a merge/exit block already
@@ -1360,11 +1365,14 @@ void IRGenerator::EmitGotoStmt(const pasta::Stmt &s) {
     label_blocks_[label_name] = target;
   }
 
-  // Conservatively exit all scopes up to function scope.
-  // A more precise analysis would determine the target label's scope.
-  EmitScopeExits(func_.body_scope_index);
-
-  EmitBranchWithOpCode(mx::ir::OpCode::GOTO, target, EntityIdOf(s));
+  // Don't emit scope exits here — compensation blocks handle it.
+  // Record the goto for post-processing.
+  uint32_t goto_idx = EmitBranchWithOpCode(mx::ir::OpCode::GOTO, target,
+                                            EntityIdOf(s));
+  if (goto_idx != UINT32_MAX) {
+    pending_gotos_.push_back({goto_idx, current_block_index_, target,
+                              current_structure_index_});
+  }
   SwitchToBlock(NewBlock(mx::ir::BlockKind::UNREACHABLE));
 }
 
@@ -1383,10 +1391,14 @@ void IRGenerator::EmitLabelStmt(const pasta::Stmt &s) {
     label_blocks_[label_name] = label_block;
   }
 
+  // Record which structure this label is in (for goto compensation).
+  label_structure_[label_block] = current_structure_index_;
+
   // Reaching a label sequentially is an implicit goto.
   EmitBranchWithOpCode(mx::ir::OpCode::IMPLICIT_GOTO, label_block,
                         EntityIdOf(s));
   SwitchToBlock(label_block);
+  AssociateBlockWithStructure(label_block);
 
   EmitStmt(ls->SubStatement());
 }
@@ -2977,6 +2989,119 @@ std::optional<uint32_t> IRGenerator::TypeAlignBytes(const pasta::Type &t) {
     if (a && *a > 0) return static_cast<uint32_t>((*a + 7) / 8);
   }
   return std::nullopt;
+}
+
+// ---------------------------------------------------------------------------
+// Goto compensation blocks
+// ---------------------------------------------------------------------------
+
+void IRGenerator::InsertGotoCompensationBlocks() {
+  if (pending_gotos_.empty()) return;
+
+  // Helper: get the scope chain from a structure index up to (and including)
+  // FUNCTION_SCOPE. Returns scopes in order from innermost to outermost.
+  auto get_scope_chain = [&](uint32_t si) -> std::vector<uint32_t> {
+    std::vector<uint32_t> chain;
+    while (si != UINT32_MAX) {
+      if (mx::ir::IsScope(func_.structures[si].kind)) {
+        chain.push_back(si);
+      }
+      si = func_.structures[si].parent_structure_index;
+    }
+    return chain;  // innermost first
+  };
+
+  for (auto &pg : pending_gotos_) {
+    // Find the target label's structure.
+    auto label_it = label_structure_.find(pg.target_block_idx);
+    if (label_it == label_structure_.end()) {
+      // Forward reference to label we never saw — leave as-is.
+      continue;
+    }
+    uint32_t target_struct = label_it->second;
+    uint32_t source_struct = pg.source_structure_idx;
+
+    // Get scope chains for source and target.
+    auto source_chain = get_scope_chain(source_struct);
+    auto target_chain = get_scope_chain(target_struct);
+
+    // Find common ancestor scope by converting one chain to a set.
+    std::unordered_set<uint32_t> source_set(source_chain.begin(),
+                                             source_chain.end());
+    uint32_t common_ancestor = UINT32_MAX;
+    // Walk target chain (innermost→outermost) to find first match.
+    for (auto ts : target_chain) {
+      if (source_set.count(ts)) {
+        common_ancestor = ts;
+        break;
+      }
+    }
+
+    // Scopes to exit: source scopes above common ancestor.
+    std::vector<uint32_t> scopes_to_exit;
+    for (auto ss : source_chain) {
+      if (ss == common_ancestor) break;
+      scopes_to_exit.push_back(ss);
+    }
+
+    // Scopes to enter: target scopes below common ancestor (reversed:
+    // we need outermost→innermost order for ENTER_SCOPE).
+    std::vector<uint32_t> scopes_to_enter;
+    for (auto ts : target_chain) {
+      if (ts == common_ancestor) break;
+      scopes_to_enter.push_back(ts);
+    }
+    std::reverse(scopes_to_enter.begin(), scopes_to_enter.end());
+
+    // If no transitions needed, skip.
+    if (scopes_to_exit.empty() && scopes_to_enter.empty()) continue;
+
+    // Create a compensation block.
+    uint32_t comp_block = NewBlock(mx::ir::BlockKind::GENERIC);
+
+    // Redirect the goto: goto → comp_block instead of → target.
+    auto &goto_inst = func_.instructions[pg.goto_inst_idx];
+    if (!goto_inst.branch_targets.empty()) {
+      // Update the CFG edge: remove old edge, add new ones.
+      auto &src_block = func_.blocks[pg.source_block_idx];
+      for (auto &succ : src_block.successor_indices) {
+        if (succ == pg.target_block_idx) {
+          succ = comp_block;
+          break;
+        }
+      }
+      goto_inst.branch_targets[0].block_index = comp_block;
+    }
+
+    // Emit scope transitions in the compensation block.
+    uint32_t saved_block = current_block_index_;
+    SwitchToBlock(comp_block);
+
+    // EXIT_SCOPE for each source scope above common ancestor.
+    for (auto si : scopes_to_exit) {
+      InstructionIR exit_inst;
+      exit_inst.opcode = mx::ir::OpCode::EXIT_SCOPE;
+      exit_inst.source_entity_id = func_.structures[si].source_entity_id;
+      exit_inst.structure_index = si;
+      EmitTopLevel(std::move(exit_inst));
+    }
+
+    // ENTER_SCOPE for each target scope below common ancestor.
+    for (auto si : scopes_to_enter) {
+      InstructionIR enter_inst;
+      enter_inst.opcode = mx::ir::OpCode::ENTER_SCOPE;
+      enter_inst.source_entity_id = func_.structures[si].source_entity_id;
+      enter_inst.structure_index = si;
+      EmitTopLevel(std::move(enter_inst));
+    }
+
+    // Branch from compensation block to the original target.
+    EmitBranch(pg.target_block_idx);
+
+    SwitchToBlock(saved_block);
+  }
+
+  pending_gotos_.clear();
 }
 
 // ---------------------------------------------------------------------------

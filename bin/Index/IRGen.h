@@ -205,6 +205,18 @@ class IRGenerator {
   // so fallthrough can branch to the right block.
   std::unordered_map<mx::RawEntityId, uint32_t> case_blocks_;
 
+  // Goto compensation: records pending gotos that need scope transitions.
+  struct PendingGoto {
+    uint32_t goto_inst_idx;        // index of the GOTO instruction
+    uint32_t source_block_idx;     // block containing the goto
+    uint32_t target_block_idx;     // label block
+    uint32_t source_structure_idx; // structure at goto site
+  };
+  std::vector<PendingGoto> pending_gotos_;
+
+  // Maps label block index to the structure index active when label was emitted.
+  std::unordered_map<uint32_t, uint32_t> label_structure_;
+
   // --- Structure management ---
   uint32_t PushStructure(mx::ir::StructureKind kind,
                          mx::RawEntityId source_eid = mx::kInvalidEntityId);
@@ -292,6 +304,7 @@ class IRGenerator {
   void EmitEntryBlockAllocas(const pasta::Stmt &body);
 
   // --- Post-processing ---
+  void InsertGotoCompensationBlocks();
   void ComputeDominators();
   void ComputeRPO();
   void VerifyBlocks();
