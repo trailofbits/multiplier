@@ -719,9 +719,22 @@ void IRGenerator::EmitForStmt(const pasta::Stmt &s) {
   auto fs = pasta::ForStmt::From(s);
   if (!fs) return;
 
+  // If the for-init declares variables, wrap the entire for loop in an
+  // implicit SCOPE so those variables have correct lifetimes.
+  auto init = fs->Initializer();
+  bool has_init_decl = init && pasta::DeclStmt::From(*init);
+  if (has_init_decl) {
+    PushStructure(mx::ir::StructureKind::SCOPE, EntityIdOf(s));
+    InstructionIR enter;
+    enter.opcode = mx::ir::OpCode::ENTER_SCOPE;
+    enter.source_entity_id = EntityIdOf(s);
+    enter.structure_index = current_structure_index_;
+    EmitTopLevel(std::move(enter));
+  }
+
   PushStructure(mx::ir::StructureKind::FOR, EntityIdOf(s));
 
-  if (auto init = fs->Initializer()) {
+  if (init) {
     PushStructure(mx::ir::StructureKind::FOR_INIT, EntityIdOf(*init));
     EmitStmt(*init);
     PopStructure();  // FOR_INIT
@@ -769,6 +782,16 @@ void IRGenerator::EmitForStmt(const pasta::Stmt &s) {
   SwitchToBlock(exit_block);
 
   PopStructure();  // FOR
+
+  if (has_init_decl) {
+    // current_structure_index_ is now the implicit SCOPE since FOR was popped.
+    InstructionIR exit_inst;
+    exit_inst.opcode = mx::ir::OpCode::EXIT_SCOPE;
+    exit_inst.source_entity_id = EntityIdOf(s);
+    exit_inst.structure_index = current_structure_index_;
+    EmitTopLevel(std::move(exit_inst));
+    PopStructure();  // implicit SCOPE
+  }
 }
 
 void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
