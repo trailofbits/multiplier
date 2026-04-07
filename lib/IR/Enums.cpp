@@ -7,6 +7,7 @@
 #include <multiplier/IR/ObjectKind.h>
 #include <multiplier/IR/BlockKind.h>
 #include <multiplier/IR/FunctionKind.h>
+#include <multiplier/IR/StructureKind.h>
 #include <multiplier/Types.h>
 
 namespace mx::ir {
@@ -109,6 +110,30 @@ const char *EnumeratorName(ObjectKind kind) noexcept {
   return "UNKNOWN";
 }
 
+const char *EnumeratorName(StructureKind kind) noexcept {
+  switch (kind) {
+    case StructureKind::FUNCTION_SCOPE: return "FUNCTION_SCOPE";
+    case StructureKind::SCOPE: return "SCOPE";
+    case StructureKind::IF: return "IF";
+    case StructureKind::IF_THEN: return "IF_THEN";
+    case StructureKind::IF_ELSE: return "IF_ELSE";
+    case StructureKind::FOR: return "FOR";
+    case StructureKind::FOR_INIT: return "FOR_INIT";
+    case StructureKind::FOR_CONDITION: return "FOR_CONDITION";
+    case StructureKind::FOR_BODY: return "FOR_BODY";
+    case StructureKind::FOR_INCREMENT: return "FOR_INCREMENT";
+    case StructureKind::WHILE: return "WHILE";
+    case StructureKind::WHILE_CONDITION: return "WHILE_CONDITION";
+    case StructureKind::WHILE_BODY: return "WHILE_BODY";
+    case StructureKind::DO_WHILE: return "DO_WHILE";
+    case StructureKind::DO_WHILE_BODY: return "DO_WHILE_BODY";
+    case StructureKind::DO_WHILE_CONDITION: return "DO_WHILE_CONDITION";
+    case StructureKind::SWITCH: return "SWITCH";
+    case StructureKind::SWITCH_CASE: return "SWITCH_CASE";
+  }
+  return "UNKNOWN";
+}
+
 const char *EnumeratorName(BlockKind kind) noexcept {
   switch (kind) {
     case BlockKind::ENTRY: return "ENTRY";
@@ -140,6 +165,7 @@ const char *EnumeratorName(IREntityKind kind) noexcept {
     case IREntityKind::IR_INSTRUCTION: return "IR_INSTRUCTION";
     case IREntityKind::IR_OBJECT: return "IR_OBJECT";
     case IREntityKind::IR_SWITCH_CASE: return "IR_SWITCH_CASE";
+    case IREntityKind::IR_STRUCTURE: return "IR_STRUCTURE";
   }
   return "UNKNOWN";
 }

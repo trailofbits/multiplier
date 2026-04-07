@@ -26,6 +26,7 @@
 #include "Frontend/Macro.h"
 #include "Frontend/TokenKind.h"
 #include "Frontend/TokenCategory.h"
+#include "Entity.h"
 #include "Fragment.h"
 #include "Iterator.h"
 #include "Reference.h"

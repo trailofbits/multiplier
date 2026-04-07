@@ -584,6 +584,7 @@ class IRBlock;
 class IRInstruction;
 class IRObject;
 class IRSwitchCase;
+class IRStructure;
 class TokenContext;
 class CXXCtorInitializer;
 class Designator;

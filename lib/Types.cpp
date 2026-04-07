@@ -55,14 +55,16 @@ static constexpr uint64_t kNumPseudoKinds = 5u;
 //   1..kNumBlockKinds          → IRBlockId (1 per BlockKind)
 //   1+kNumBlockKinds..+kNumOpCodes → IRInstructionId (1 per OpCode)
 //   last                       → IRObjectId
-static constexpr uint64_t kNumBlockKinds = 14u;   // BlockKind enum count
-static constexpr uint64_t kNumOpCodes = 67u;       // OpCode enum count
+static constexpr uint64_t kNumBlockKinds = 14u;         // BlockKind enum count
+static constexpr uint64_t kNumOpCodes = 67u;             // OpCode enum count
+static constexpr uint64_t kNumStructureKinds = 18u;      // StructureKind enum count
 static constexpr uint64_t kIRFunctionOffset = 0u;
 static constexpr uint64_t kIRBlockOffset = 1u;
 static constexpr uint64_t kIRInstructionOffset = kIRBlockOffset + kNumBlockKinds;
 static constexpr uint64_t kIRObjectOffset = kIRInstructionOffset + kNumOpCodes;
 static constexpr uint64_t kIRSwitchCaseOffset = kIRObjectOffset + 1u;
-static constexpr uint64_t kNumIREntityKinds = kIRSwitchCaseOffset + 1u;
+static constexpr uint64_t kIRStructureOffset = kIRSwitchCaseOffset + 1u;
+static constexpr uint64_t kNumIREntityKinds = kIRStructureOffset + kNumStructureKinds;
 
 static constexpr unsigned kSubKindNumBits = 11u;
 static_assert((kNumDeclKinds + kNumStmtKinds + kNumAttrKinds +
@@ -767,6 +769,13 @@ EntityId::EntityId(IRSwitchCaseId id) {
   }
 }
 
+EntityId::EntityId(IRStructureId id) {
+  if (id.fragment_id) {
+    PackIREntity(opaque, id.fragment_id,
+                  kIRStructureOffset + id.structure_kind, id.offset);
+  }
+}
+
 EntityId::EntityId(CompilationId id) {
   if (id.compilation_id) {
     PackedEntityId packed = {};
@@ -1124,6 +1133,10 @@ VariantId EntityId::Unpack(void) const noexcept {
           return IRObjectId{fid, off};
         } else if (sub_kind == kIRSwitchCaseOffset) {
           return IRSwitchCaseId{fid, off};
+        } else if (sub_kind >= kIRStructureOffset &&
+                   sub_kind < kIRStructureOffset + kNumStructureKinds) {
+          return IRStructureId{fid, off,
+                               static_cast<uint8_t>(sub_kind - kIRStructureOffset)};
         }
       }
 
@@ -1247,6 +1260,10 @@ VariantId EntityId::Unpack(void) const noexcept {
           return IRObjectId{fid, off};
         } else if (sub_kind == kIRSwitchCaseOffset) {
           return IRSwitchCaseId{fid, off};
+        } else if (sub_kind >= kIRStructureOffset &&
+                   sub_kind < kIRStructureOffset + kNumStructureKinds) {
+          return IRStructureId{fid, off,
+                               static_cast<uint8_t>(sub_kind - kIRStructureOffset)};
         }
       }
 

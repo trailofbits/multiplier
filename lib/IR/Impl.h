@@ -94,4 +94,19 @@ class IRObjectImpl {
   virtual ~IRObjectImpl() = default;
 };
 
+class IRStructureImpl {
+ public:
+  const FragmentImplPtr frag;
+  const unsigned offset;
+  const RawEntityId fragment_id;
+
+  IRStructureImpl(FragmentImplPtr frag_, unsigned offset_,
+                  RawEntityId fragment_id_)
+      : frag(std::move(frag_)), offset(offset_),
+        fragment_id(fragment_id_) {}
+
+  rpc::ir::Structure::Reader reader() const;
+  virtual ~IRStructureImpl() = default;
+};
+
 }  // namespace mx

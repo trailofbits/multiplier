@@ -41,6 +41,15 @@ struct SwitchCase @0x93795f3c8abc1070 {
   switchInstructionId @6 :UInt64;  # IRInstructionId of parent switch
 }
 
+struct Structure @0xd4a8b7c2e9f31056 {
+  sourceEntityId @0 :UInt64;    # AST Stmt/Decl entity ID
+  parentId @1 :UInt64;          # IRStructureId of parent (or IRFunctionId)
+  kind @2 :UInt8;               # StructureKind
+  entityOffset @3 :UInt32;      # into irEntityPool for children
+  numChildren @4 :UInt16;       # child structure/block entity IDs
+  numObjects @5 :UInt16;        # ALLOCAs declared in this scope (scopes only)
+}
+
 struct Function @0xe6be31a259218610 {
   sourceDeclEntityId @0 :UInt64;  # FunctionDecl for NORMAL, VarDecl for GLOBAL_INITIALIZER
   entryBlockId @1 :UInt64;

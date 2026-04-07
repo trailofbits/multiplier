@@ -28,4 +28,8 @@ rpc::ir::Object::Reader IRObjectImpl::reader() const {
   return frag->reader.getIrObjects()[offset];
 }
 
+rpc::ir::Structure::Reader IRStructureImpl::reader() const {
+  return frag->reader.getIrStructures()[offset];
+}
+
 }  // namespace mx

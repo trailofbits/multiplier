@@ -2430,6 +2430,10 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "    if (auto ptr = impl->ep->IRSwitchCaseFor(impl->ep, raw)) {\n"
           << "      return IRSwitchCase(std::move(ptr));\n"
           << "    }\n"
+          << "  } else if (auto *p = std::get_if<IRStructureId>(&vid)) {\n"
+          << "    if (auto ptr = impl->ep->IRStructureFor(impl->ep, raw)) {\n"
+          << "      return IRStructure(std::move(ptr));\n"
+          << "    }\n"
           << "  }\n"
           << "  return std::nullopt;\n"
           << "}\n\n";

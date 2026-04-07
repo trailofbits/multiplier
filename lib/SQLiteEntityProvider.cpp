@@ -1153,6 +1153,16 @@ IRSwitchCaseImplPtr SQLiteEntityProvider::IRSwitchCaseFor(
       std::move(frag), eid->offset, eid->fragment_id);
 }
 
+IRStructureImplPtr SQLiteEntityProvider::IRStructureFor(
+    const Ptr &self, RawEntityId raw_id) {
+  auto eid = EntityId(raw_id).Extract<IRStructureId>();
+  if (!eid) return {};
+  auto frag = self->FragmentFor(self, PackedFragmentId(FragmentId(eid->fragment_id)));
+  if (!frag) return {};
+  return std::make_shared<IRStructureImpl>(
+      std::move(frag), eid->offset, eid->fragment_id);
+}
+
 // Get a list of `Decl`, `Stmt`, `Attr`, `Designator`, etc.
 #define MX_DECLARE_FRAGMENT_OFFSET_LIST_GETTER(ns_path, type_name, lower_name, enum_name, category) \
     gap::generator<type_name ## ImplPtr> SQLiteEntityProvider::type_name ## sFor( \
@@ -1343,6 +1353,7 @@ gap::generator<IRBlockImplPtr> SQLiteEntityProvider::IRBlocksFor(const Ptr &) & 
 gap::generator<IRInstructionImplPtr> SQLiteEntityProvider::IRInstructionsFor(const Ptr &) & { co_return; }
 gap::generator<IRObjectImplPtr> SQLiteEntityProvider::IRObjectsFor(const Ptr &) & { co_return; }
 gap::generator<IRSwitchCaseImplPtr> SQLiteEntityProvider::IRSwitchCasesFor(const Ptr &) & { co_return; }
+gap::generator<IRStructureImplPtr> SQLiteEntityProvider::IRStructuresFor(const Ptr &) & { co_return; }
 
 // Get all types of a specific kind.
 gap::generator<TypeImplPtr> SQLiteEntityProvider::TypesFor(

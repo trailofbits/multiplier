@@ -1807,6 +1807,7 @@ ENTITY_KINDS: Tuple[str] = (
   "IRInstruction",
   "IRObject",
   "IRSwitchCase",
+  "IRStructure",
 )
 
 VariantEntitySchema = make_schema_class("VariantEntity", "Entity", Schema)
