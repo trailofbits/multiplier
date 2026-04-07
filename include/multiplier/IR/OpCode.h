@@ -119,11 +119,11 @@ enum class OpCode : uint8_t {
 
   // Bitwise/intrinsic operations. Sub-opcode in int_pool[0] selects the
   // specific operation (see BitwiseOp enum). op[0] = primary operand.
-  BITWISE_OP = 69,
+  BITWISE = 69,
 
   // Floating-point operations. Sub-opcode in int_pool[0] selects the
   // specific operation (see FloatOp enum). op[0] = primary operand.
-  FLOAT_OP = 70,
+  FLOAT = 70,
 
   // Undefined/poison value. Represents a value that is architecturally
   // undefined (e.g., __builtin_clz(0)). An analyzer should flag any use.
@@ -171,7 +171,7 @@ inline static constexpr unsigned NumEnumerators(OpCode) {
   return 89u;
 }
 
-// Sub-opcodes for BITWISE_OP. Stored in the int pool.
+// Sub-opcodes for BITWISE. Stored in the int pool.
 enum class BitwiseOp : uint8_t {
   // Byte swap.
   BSWAP16 = 0,            // Reverse bytes of 16-bit value.
@@ -229,9 +229,21 @@ enum class MemoryOp : uint8_t {
   STRCAT = 15,     // op[0]=dest, op[1]=src. Returns dest.
   STRNCAT = 16,    // op[0]=dest, op[1]=src, op[2]=n. Returns dest.
   STPCPY = 17,     // op[0]=dest, op[1]=src. Returns pointer to null terminator.
+  STPNCPY = 18,    // op[0]=dest, op[1]=src, op[2]=n. Returns dest+written or dest+n.
+
+  // String-to-number conversions. Size-specific to avoid platform ambiguity.
+  // "Simple" variants: op[0]=str. Returns the number.
+  // "Full" variants: op[0]=str, op[1]=endptr, op[2]=base. Returns the number.
+  STRTOI32 = 19,   // String → signed 32-bit. (atoi, strtol on 32-bit long)
+  STRTOI64 = 20,   // String → signed 64-bit. (atoll, strtol on 64-bit long)
+  STRTOU32 = 21,   // String → unsigned 32-bit. (strtoul on 32-bit long)
+  STRTOU64 = 22,   // String → unsigned 64-bit. (strtoull, strtoul on 64-bit long)
+  STRTOF32 = 23,   // String → float. (strtof)
+  STRTOF64 = 24,   // String → double. (atof, strtod)
+
 };
 
-// Sub-opcodes for FLOAT_OP. Stored in the int pool.
+// Sub-opcodes for FLOAT. Stored in the int pool.
 enum class FloatOp : uint8_t {
   ISNAN = 0,       // op[0]=x. Returns bool.
   ISINF = 1,       // op[0]=x. Returns bool.

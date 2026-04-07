@@ -802,7 +802,7 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
     }
 
     // --- Bitwise/intrinsic operations ---
-    case mx::ir::OpCode::BITWISE_OP: {
+    case mx::ir::OpCode::BITWISE: {
       if (auto bw = mx::BitwiseOpInst::from(inst)) {
         // Get the primary operand (op[0]).
         Value val = Value::Undef();
@@ -861,7 +861,7 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
     }
 
     // --- Floating-point operations ---
-    case mx::ir::OpCode::FLOAT_OP: {
+    case mx::ir::OpCode::FLOAT: {
       if (auto fo = mx::FloatOpInst::from(inst)) {
         // Collect operands.
         std::vector<Value> ops;

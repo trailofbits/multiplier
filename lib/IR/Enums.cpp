@@ -83,8 +83,8 @@ const char *EnumeratorName(OpCode op) noexcept {
     case OpCode::PARAM_READ: return "PARAM_READ";
     case OpCode::GLOBAL_ADDR: return "GLOBAL_ADDR";
     case OpCode::FUNC_ADDR: return "FUNC_ADDR";
-    case OpCode::BITWISE_OP: return "BITWISE_OP";
-    case OpCode::FLOAT_OP: return "FLOAT_OP";
+    case OpCode::BITWISE: return "BITWISE";
+    case OpCode::FLOAT: return "FLOAT";
     case OpCode::UNDEFINED: return "UNDEFINED";
     case OpCode::DYNAMIC_ALLOCA: return "DYNAMIC_ALLOCA";
     case OpCode::FRAME_ADDRESS: return "FRAME_ADDRESS";

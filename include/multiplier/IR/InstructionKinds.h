@@ -252,7 +252,7 @@ class MX_EXPORT BitwiseOpInst : public IRInstruction {
 };
 
 // ---------------------------------------------------------------------------
-// Floating-point operations (FLOAT_OP)
+// Floating-point operations (FLOAT)
 // ---------------------------------------------------------------------------
 
 class MX_EXPORT FloatOpInst : public IRInstruction {

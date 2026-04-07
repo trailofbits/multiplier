@@ -19,6 +19,7 @@
 #include <clang/AST/Expr.h>
 #include <clang/AST/RecordLayout.h>
 #include <clang/AST/Type.h>
+#include <clang/Basic/TargetInfo.h>
 
 #include <cassert>
 #include <functional>
@@ -1954,6 +1955,24 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
           {"__builtin___strncat_chk", MO::STRNCAT, 3},
           {"stpcpy", MO::STPCPY, 2},
           {"__builtin_stpcpy", MO::STPCPY, 2},
+          {"stpncpy", MO::STPNCPY, 3},
+          {"__builtin_stpncpy", MO::STPNCPY, 3},
+          // String-to-number (fixed size).
+          {"atoi", MO::STRTOI32, 1},    // int is always 32-bit
+          {"atoll", MO::STRTOI64, 1},
+          {"atof", MO::STRTOF64, 1},
+          {"strtoll", MO::STRTOI64, 3},
+          {"strtoull", MO::STRTOU64, 3},
+          {"strtod", MO::STRTOF64, 2},
+          {"strtof", MO::STRTOF32, 2},
+          // _chk variants map to the base operation (extra dest_size arg ignored).
+          {"__memcpy_chk", MO::MEMCPY, 3},
+          {"__memset_chk", MO::MEMSET, 3},
+          {"__memmove_chk", MO::MEMMOVE, 3},
+          {"__strcpy_chk", MO::STRCPY, 2},
+          {"__strncpy_chk", MO::STRNCPY, 3},
+          {"__strcat_chk", MO::STRCAT, 2},
+          {"__strncat_chk", MO::STRNCAT, 3},
         };
         for (const auto &mb : mem_builtins) {
           if (callee_name == mb.name && args.size() >= mb.min_args) {
@@ -1966,6 +1985,36 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
             }
             return emit_typed(std::move(inst));
           }
+        }
+      }
+
+      // Size-dependent string-to-number: atol/strtol/strtoul depend on
+      // sizeof(long), which varies by platform.
+      if (callee_name == "atol" || callee_name == "strtol" ||
+          callee_name == "strtoul") {
+        using MO = mx::ir::MemoryOp;
+        bool is_long64 = (ctx_.getTargetInfo().getLongWidth() == 64);
+        MO op;
+        unsigned min_args;
+        if (callee_name == "atol") {
+          op = is_long64 ? MO::STRTOI64 : MO::STRTOI32;
+          min_args = 1;
+        } else if (callee_name == "strtol") {
+          op = is_long64 ? MO::STRTOI64 : MO::STRTOI32;
+          min_args = 3;
+        } else {
+          op = is_long64 ? MO::STRTOU64 : MO::STRTOU32;
+          min_args = 3;
+        }
+        if (args.size() >= min_args) {
+          InstructionIR inst;
+          inst.opcode = mx::ir::OpCode::MULTIMEM;
+          inst.memory_op = static_cast<uint8_t>(op);
+          inst.source_entity_id = eid;
+          for (unsigned i = 0; i < min_args; ++i) {
+            inst.operand_indices.push_back(EmitRValue(args[i]));
+          }
+          return emit_typed(std::move(inst));
         }
       }
 
@@ -1983,11 +2032,11 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         if (!args.empty()) return EmitRValue(args[0]);
       }
 
-      // __builtin_assume(x) → BITWISE_OP(ASSUME, x).
+      // __builtin_assume(x) → BITWISE(ASSUME, x).
       if (callee_name == "__builtin_assume") {
         if (!args.empty()) {
           InstructionIR inst;
-          inst.opcode = mx::ir::OpCode::BITWISE_OP;
+          inst.opcode = mx::ir::OpCode::BITWISE;
           inst.source_entity_id = eid;
           inst.bitwise_op = static_cast<uint8_t>(mx::ir::BitwiseOp::ASSUME);
           inst.operand_indices.push_back(EmitRValue(args[0]));
@@ -2035,7 +2084,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         }
       }
 
-      // Bitwise/intrinsic builtins → BITWISE_OP with sub-opcode.
+      // Bitwise/intrinsic builtins → BITWISE with sub-opcode.
       {
         using BO = mx::ir::BitwiseOp;
         struct BitwiseBuiltin {
@@ -2069,7 +2118,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
             uint32_t val_idx = EmitRValue(args[0]);
 
             InstructionIR bw;
-            bw.opcode = mx::ir::OpCode::BITWISE_OP;
+            bw.opcode = mx::ir::OpCode::BITWISE;
             bw.source_entity_id = eid;
             bw.bitwise_op = static_cast<uint8_t>(bb.op);
             bw.operand_indices.push_back(val_idx);
@@ -2103,7 +2152,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
               return emit_typed(std::move(sel));
             }
 
-            // For defined-for-all-inputs builtins, just return the BITWISE_OP.
+            // For defined-for-all-inputs builtins, just return the BITWISE.
             // Re-wrap as top-level since we already called EmitInstruction.
             auto &bw_ref = func_.instructions[bw_idx];
             if (auto t = e.Type()) bw_ref.type_entity_id = TypeEntityIdOf(*t);
@@ -2112,7 +2161,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         }
       }
 
-      // Float builtins → FLOAT_OP with sub-opcode.
+      // Float builtins → FLOAT with sub-opcode.
       {
         using FO = mx::ir::FloatOp;
         struct FloatBuiltin {
@@ -2167,7 +2216,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         for (const auto &fb : float_builtins) {
           if (callee_name == fb.name && args.size() >= fb.num_args) {
             InstructionIR inst;
-            inst.opcode = mx::ir::OpCode::FLOAT_OP;
+            inst.opcode = mx::ir::OpCode::FLOAT;
             inst.float_op = static_cast<uint8_t>(fb.op);
             inst.source_entity_id = eid;
             for (unsigned i = 0; i < fb.num_args; ++i) {
@@ -2181,7 +2230,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         if (callee_name == "__builtin_inf" || callee_name == "__builtin_inff" ||
             callee_name == "__builtin_infl") {
           InstructionIR inst;
-          inst.opcode = mx::ir::OpCode::FLOAT_OP;
+          inst.opcode = mx::ir::OpCode::FLOAT;
           inst.float_op = static_cast<uint8_t>(FO::INF);
           inst.source_entity_id = eid;
           return emit_typed(std::move(inst));
@@ -2189,7 +2238,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         if (callee_name == "__builtin_nan" || callee_name == "__builtin_nanf" ||
             callee_name == "__builtin_nanl") {
           InstructionIR inst;
-          inst.opcode = mx::ir::OpCode::FLOAT_OP;
+          inst.opcode = mx::ir::OpCode::FLOAT;
           inst.float_op = static_cast<uint8_t>(FO::NAN_VAL);
           inst.source_entity_id = eid;
           return emit_typed(std::move(inst));
@@ -2198,7 +2247,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
             callee_name == "__builtin_huge_valf" ||
             callee_name == "__builtin_huge_vall") {
           InstructionIR inst;
-          inst.opcode = mx::ir::OpCode::FLOAT_OP;
+          inst.opcode = mx::ir::OpCode::FLOAT;
           inst.float_op = static_cast<uint8_t>(FO::FLOAT_HUGE);
           inst.source_entity_id = eid;
           return emit_typed(std::move(inst));
