@@ -91,3 +91,4 @@ define_example("mx-print-type-token-graph" "PrintTypeTokenGraph.cpp")
 define_example("mx-find-linked-structures" "FindLinkedStructures.cpp")
 define_example("mx-list-declarations-overlapping-macro-expansion"
   "ListDeclOverlappingMacroExpansions.cpp")
+define_example("mx-interpret-ir" "InterpretIR.cpp")

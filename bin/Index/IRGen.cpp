@@ -245,9 +245,25 @@ std::optional<FunctionIR> IRGenerator::GenerateGlobalInit(
     case_blocks_.clear();
     structure_stack_.clear();
 
-    // Create entry block.
+    // --- Frame block: ALLOCA for the global variable ---
+    uint32_t frame = NewBlock(mx::ir::BlockKind::FRAME);
+    func_.entry_block_index = frame;
+    SwitchToBlock(frame);
+
+    // Create the global object and emit its ALLOCA.
+    uint32_t obj_idx = MakeObject(mx::ir::ObjectKind::GLOBAL, &var);
+    {
+      InstructionIR alloca_inst;
+      alloca_inst.opcode = mx::ir::OpCode::ALLOCA;
+      alloca_inst.source_entity_id = EntityIdOf(var);
+      alloca_inst.object_index = obj_idx;
+      alloca_inst.type_entity_id = TypeEntityIdOf(var.Type());
+      EmitTopLevel(std::move(alloca_inst));
+    }
+
+    // --- Entry block: scope entry + initialization ---
     uint32_t entry = NewBlock(mx::ir::BlockKind::ENTRY);
-    func_.entry_block_index = entry;
+    EmitBranch(entry);
     SwitchToBlock(entry);
 
     // Push FUNCTION_SCOPE.
@@ -256,8 +272,17 @@ std::optional<FunctionIR> IRGenerator::GenerateGlobalInit(
     func_.body_scope_index = func_scope;
     AssociateBlockWithStructure(entry);
 
-    // Create the global object.
-    uint32_t obj_idx = MakeObject(mx::ir::ObjectKind::GLOBAL, &var);
+    // ENTER_SCOPE for the function body.
+    {
+      InstructionIR enter;
+      enter.opcode = mx::ir::OpCode::ENTER_SCOPE;
+      enter.source_entity_id = EntityIdOf(var);
+      enter.structure_index = func_scope;
+      EmitTopLevel(std::move(enter));
+    }
+
+    // Associate the global object with the function scope.
+    func_.structures[func_scope].object_indices.push_back(obj_idx);
 
     // Emit ADDRESS_OF for the global.
     InstructionIR addr_inst;
@@ -276,10 +301,19 @@ std::optional<FunctionIR> IRGenerator::GenerateGlobalInit(
     store_inst.operand_indices = {addr_idx, val_idx};
     EmitTopLevel(std::move(store_inst));
 
-    // Emit RET.
-    InstructionIR ret;
-    ret.opcode = mx::ir::OpCode::RET;
-    EmitTopLevel(std::move(ret));
+    // EXIT_SCOPE + RET.
+    {
+      InstructionIR exit_inst;
+      exit_inst.opcode = mx::ir::OpCode::EXIT_SCOPE;
+      exit_inst.source_entity_id = EntityIdOf(var);
+      exit_inst.structure_index = func_scope;
+      EmitTopLevel(std::move(exit_inst));
+    }
+    {
+      InstructionIR ret;
+      ret.opcode = mx::ir::OpCode::RET;
+      EmitTopLevel(std::move(ret));
+    }
 
     // Pop FUNCTION_SCOPE.
     PopStructure();
