@@ -3076,7 +3076,7 @@ void IRGenerator::InsertGotoCompensationBlocks() {
     // Redirect the goto: goto → comp_block instead of → target.
     auto &goto_inst = func_.instructions[pg.goto_inst_idx];
     if (!goto_inst.branch_targets.empty()) {
-      // Update the CFG edge: remove old edge, add new ones.
+      // Update successor: source_block → comp_block (was → target).
       auto &src_block = func_.blocks[pg.source_block_idx];
       for (auto &succ : src_block.successor_indices) {
         if (succ == pg.target_block_idx) {
@@ -3085,6 +3085,18 @@ void IRGenerator::InsertGotoCompensationBlocks() {
         }
       }
       goto_inst.branch_targets[0].block_index = comp_block;
+
+      // Remove old predecessor: target no longer has source as predecessor.
+      auto &target_preds = func_.blocks[pg.target_block_idx].predecessor_indices;
+      for (auto it = target_preds.begin(); it != target_preds.end(); ++it) {
+        if (*it == pg.source_block_idx) {
+          target_preds.erase(it);
+          break;
+        }
+      }
+
+      // Add new predecessor: comp_block is predecessor of itself (from source).
+      func_.blocks[comp_block].predecessor_indices.push_back(pg.source_block_idx);
     }
 
     // Emit scope transitions in the compensation block.
