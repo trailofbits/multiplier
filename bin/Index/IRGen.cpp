@@ -50,12 +50,14 @@ std::optional<FunctionIR> IRGenerator::Generate(
     func_ = FunctionIR{};
     func_.func_decl_entity_id = EntityIdOf(func);
     current_block_index_ = 0;
+    current_structure_index_ = UINT32_MAX;
     next_obj_index_ = 0;
     entity_to_object_.clear();
     address_taken_.clear();
     loop_stack_.clear();
     label_blocks_.clear();
     case_blocks_.clear();
+    structure_stack_.clear();
 
     // Pre-scan for address-taken variables.
     ScanAddressTaken(*body);
@@ -90,6 +92,12 @@ std::optional<FunctionIR> IRGenerator::Generate(
     // Emit all allocas in the entry block (before any control flow).
     EmitEntryBlockAllocas(*body);
 
+    // Push the function-level scope structure.
+    uint32_t func_scope = PushStructure(
+        mx::ir::StructureKind::FUNCTION_SCOPE, EntityIdOf(*body));
+    func_.body_scope_index = func_scope;
+    AssociateBlockWithStructure(entry);
+
     EmitBody(*body);
 
     // If the current block has no terminator, add an implicit void return.
@@ -106,6 +114,9 @@ std::optional<FunctionIR> IRGenerator::Generate(
         EmitTopLevel(std::move(ret));
       }
     }
+
+    // Pop the function-level scope.
+    PopStructure();
 
     // Patch empty blocks before computing dominators.
     // Empty blocks arise when all paths into a merge/exit block already
@@ -146,6 +157,58 @@ std::optional<FunctionIR> IRGenerator::Generate(
   } catch (...) {
     DCHECK(false) << "Exception during IR generation for function";
     return std::nullopt;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Structure management
+// ---------------------------------------------------------------------------
+
+uint32_t IRGenerator::PushStructure(mx::ir::StructureKind kind,
+                                     mx::RawEntityId source_eid) {
+  uint32_t idx = static_cast<uint32_t>(func_.structures.size());
+  StructureIR s;
+  s.kind = kind;
+  s.source_entity_id = source_eid;
+  s.parent_structure_index = current_structure_index_;
+  func_.structures.push_back(std::move(s));
+
+  // Register as child of parent.
+  if (current_structure_index_ != UINT32_MAX) {
+    StructureIR::ChildRef ref;
+    ref.index = idx;
+    ref.is_structure = true;
+    func_.structures[current_structure_index_].children.push_back(ref);
+  }
+
+  structure_stack_.push_back(current_structure_index_);
+  current_structure_index_ = idx;
+  return idx;
+}
+
+void IRGenerator::PopStructure() {
+  assert(!structure_stack_.empty());
+  current_structure_index_ = structure_stack_.back();
+  structure_stack_.pop_back();
+}
+
+void IRGenerator::AssociateBlockWithStructure(uint32_t block_idx) {
+  if (current_structure_index_ == UINT32_MAX) return;
+  StructureIR::ChildRef ref;
+  ref.index = block_idx;
+  ref.is_structure = false;
+  func_.structures[current_structure_index_].children.push_back(ref);
+}
+
+void IRGenerator::AssociateObjectWithScope(uint32_t obj_idx) {
+  // Walk up the structure stack to find the nearest scope.
+  uint32_t si = current_structure_index_;
+  while (si != UINT32_MAX) {
+    if (mx::ir::IsScope(func_.structures[si].kind)) {
+      func_.structures[si].object_indices.push_back(obj_idx);
+      return;
+    }
+    si = func_.structures[si].parent_structure_index;
   }
 }
 
@@ -509,6 +572,8 @@ void IRGenerator::EmitIfStmt(const pasta::Stmt &s) {
   auto ifs = pasta::IfStmt::From(s);
   if (!ifs) return;
 
+  PushStructure(mx::ir::StructureKind::IF, EntityIdOf(s));
+
   uint32_t cond_idx = EmitRValue(ifs->Condition());
   uint32_t then_block = NewBlock(mx::ir::BlockKind::IF_THEN);
   uint32_t else_block = NewBlock(mx::ir::BlockKind::IF_ELSE);
@@ -516,22 +581,33 @@ void IRGenerator::EmitIfStmt(const pasta::Stmt &s) {
 
   EmitCondBranch(cond_idx, then_block, else_block, EntityIdOf(s));
 
+  PushStructure(mx::ir::StructureKind::IF_THEN, EntityIdOf(ifs->Then()));
   SwitchToBlock(then_block);
+  AssociateBlockWithStructure(then_block);
   EmitBody(ifs->Then());
   EmitBranch(merge_block);
+  PopStructure();  // IF_THEN
 
+  PushStructure(mx::ir::StructureKind::IF_ELSE);
   SwitchToBlock(else_block);
+  AssociateBlockWithStructure(else_block);
   if (auto else_body = ifs->Else()) {
     EmitBody(*else_body);
   }
   EmitBranch(merge_block);
+  PopStructure();  // IF_ELSE
 
+  AssociateBlockWithStructure(merge_block);
   SwitchToBlock(merge_block);
+
+  PopStructure();  // IF
 }
 
 void IRGenerator::EmitWhileStmt(const pasta::Stmt &s) {
   auto ws = pasta::WhileStmt::From(s);
   if (!ws) return;
+
+  PushStructure(mx::ir::StructureKind::WHILE, EntityIdOf(s));
 
   uint32_t cond_block = NewBlock(mx::ir::BlockKind::LOOP_CONDITION);
   uint32_t body_block = NewBlock(mx::ir::BlockKind::LOOP_BODY);
@@ -539,22 +615,33 @@ void IRGenerator::EmitWhileStmt(const pasta::Stmt &s) {
 
   EmitBranch(cond_block);
 
+  PushStructure(mx::ir::StructureKind::WHILE_CONDITION, EntityIdOf(ws->Condition()));
   SwitchToBlock(cond_block);
+  AssociateBlockWithStructure(cond_block);
   uint32_t cond_idx = EmitRValue(ws->Condition());
   EmitCondBranch(cond_idx, body_block, exit_block, EntityIdOf(s));
+  PopStructure();  // WHILE_CONDITION
 
   loop_stack_.push_back({exit_block, cond_block, false});
+  PushStructure(mx::ir::StructureKind::WHILE_BODY, EntityIdOf(ws->Body()));
   SwitchToBlock(body_block);
+  AssociateBlockWithStructure(body_block);
   EmitBody(ws->Body());
   EmitBranch(cond_block);
+  PopStructure();  // WHILE_BODY
   loop_stack_.pop_back();
 
+  AssociateBlockWithStructure(exit_block);
   SwitchToBlock(exit_block);
+
+  PopStructure();  // WHILE
 }
 
 void IRGenerator::EmitDoStmt(const pasta::Stmt &s) {
   auto ds = pasta::DoStmt::From(s);
   if (!ds) return;
+
+  PushStructure(mx::ir::StructureKind::DO_WHILE, EntityIdOf(s));
 
   uint32_t body_block = NewBlock(mx::ir::BlockKind::LOOP_BODY);
   uint32_t cond_block = NewBlock(mx::ir::BlockKind::LOOP_CONDITION);
@@ -563,23 +650,38 @@ void IRGenerator::EmitDoStmt(const pasta::Stmt &s) {
   EmitBranch(body_block);
 
   loop_stack_.push_back({exit_block, cond_block, false});
+  PushStructure(mx::ir::StructureKind::DO_WHILE_BODY, EntityIdOf(ds->Body()));
   SwitchToBlock(body_block);
+  AssociateBlockWithStructure(body_block);
   EmitBody(ds->Body());
   EmitBranch(cond_block);
+  PopStructure();  // DO_WHILE_BODY
   loop_stack_.pop_back();
 
+  PushStructure(mx::ir::StructureKind::DO_WHILE_CONDITION, EntityIdOf(ds->Condition()));
   SwitchToBlock(cond_block);
+  AssociateBlockWithStructure(cond_block);
   uint32_t cond_idx = EmitRValue(ds->Condition());
   EmitCondBranch(cond_idx, body_block, exit_block, EntityIdOf(s));
+  PopStructure();  // DO_WHILE_CONDITION
 
+  AssociateBlockWithStructure(exit_block);
   SwitchToBlock(exit_block);
+
+  PopStructure();  // DO_WHILE
 }
 
 void IRGenerator::EmitForStmt(const pasta::Stmt &s) {
   auto fs = pasta::ForStmt::From(s);
   if (!fs) return;
 
-  if (auto init = fs->Initializer()) EmitStmt(*init);
+  PushStructure(mx::ir::StructureKind::FOR, EntityIdOf(s));
+
+  if (auto init = fs->Initializer()) {
+    PushStructure(mx::ir::StructureKind::FOR_INIT, EntityIdOf(*init));
+    EmitStmt(*init);
+    PopStructure();  // FOR_INIT
+  }
 
   uint32_t cond_block = NewBlock(mx::ir::BlockKind::LOOP_CONDITION);
   uint32_t body_block = NewBlock(mx::ir::BlockKind::LOOP_BODY);
@@ -588,34 +690,48 @@ void IRGenerator::EmitForStmt(const pasta::Stmt &s) {
 
   EmitBranch(cond_block);
 
+  PushStructure(mx::ir::StructureKind::FOR_CONDITION);
   SwitchToBlock(cond_block);
+  AssociateBlockWithStructure(cond_block);
   if (auto cond = fs->Condition()) {
     uint32_t cond_idx = EmitRValue(*cond);
     EmitCondBranch(cond_idx, body_block, exit_block, EntityIdOf(s));
   } else {
     EmitBranch(body_block);
   }
+  PopStructure();  // FOR_CONDITION
 
   loop_stack_.push_back({exit_block, inc_block, false});
+  PushStructure(mx::ir::StructureKind::FOR_BODY, EntityIdOf(fs->Body()));
   SwitchToBlock(body_block);
+  AssociateBlockWithStructure(body_block);
   EmitBody(fs->Body());
   EmitBranch(inc_block);
+  PopStructure();  // FOR_BODY
   loop_stack_.pop_back();
 
+  PushStructure(mx::ir::StructureKind::FOR_INCREMENT);
   SwitchToBlock(inc_block);
+  AssociateBlockWithStructure(inc_block);
   if (auto inc = fs->Increment()) {
     uint32_t inc_idx = EmitRValue(*inc);
     func_.blocks[current_block_index_].instruction_indices.push_back(inc_idx);
     SetOperandParents(inc_idx);
   }
   EmitBranch(cond_block);
+  PopStructure();  // FOR_INCREMENT
 
+  AssociateBlockWithStructure(exit_block);
   SwitchToBlock(exit_block);
+
+  PopStructure();  // FOR
 }
 
 void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
   auto sw = pasta::SwitchStmt::From(s);
   if (!sw) return;
+
+  PushStructure(mx::ir::StructureKind::SWITCH, EntityIdOf(s));
 
   uint32_t cond_idx = EmitRValue(sw->Condition());
   uint32_t exit_block = NewBlock(mx::ir::BlockKind::SWITCH_EXIT);
@@ -754,7 +870,10 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
   EmitBranch(exit_block);
 
   loop_stack_.pop_back();
+  AssociateBlockWithStructure(exit_block);
   SwitchToBlock(exit_block);
+
+  PopStructure();  // SWITCH
 }
 
 void IRGenerator::EmitReturnStmt(const pasta::Stmt &s) {

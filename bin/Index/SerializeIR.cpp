@@ -48,6 +48,14 @@ static RawEntityId MakeObjEid(RawEntityId fragment_id,
   return mx::EntityId(oid).Pack();
 }
 
+static RawEntityId MakeStructureEid(
+    const ir::FunctionIR &func, RawEntityId fragment_id,
+    uint32_t ir_struct_base_offset, uint32_t local_struct_idx) {
+  auto sk = static_cast<uint8_t>(func.structures[local_struct_idx].kind);
+  mx::IRStructureId sid{fragment_id, ir_struct_base_offset + local_struct_idx, sk};
+  return mx::EntityId(sid).Pack();
+}
+
 // Pool builder: accumulates entity IDs and int values, returns offsets.
 struct PoolBuilder {
   std::vector<uint64_t> entities;
@@ -263,10 +271,12 @@ void SerializeIR(
   uint32_t total_blocks = 0;
   uint32_t total_instructions = 0;
   uint32_t total_objects = 0;
+  uint32_t total_structures = 0;
   for (const auto &func : ir_functions) {
     total_blocks += static_cast<uint32_t>(func.blocks.size());
     total_instructions += static_cast<uint32_t>(func.instructions.size());
     total_objects += static_cast<uint32_t>(func.objects.size());
+    total_structures += static_cast<uint32_t>(func.structures.size());
   }
 
   // Build the pools.
@@ -277,10 +287,12 @@ void SerializeIR(
   auto frag_blocks = fb.initIrBlocks(total_blocks);
   auto frag_insts = fb.initIrInstructions(total_instructions);
   auto frag_objs = fb.initIrObjects(total_objects);
+  auto frag_structs = fb.initIrStructures(total_structures);
 
   uint32_t block_offset = 0;
   uint32_t inst_offset = 0;
   uint32_t obj_offset = 0;
+  uint32_t struct_offset = 0;
 
   for (size_t fi = 0; fi < ir_functions.size(); ++fi) {
     const auto &func = ir_functions[fi];
@@ -430,9 +442,49 @@ void SerializeIR(
       ffb.setNumObjects(static_cast<uint16_t>(func.objects.size()));
     }
 
+    // Serialize structures.
+    for (uint32_t si = 0; si < func.structures.size(); ++si) {
+      const auto &src = func.structures[si];
+      auto sb = frag_structs[struct_offset + si];
+
+      sb.setKind(static_cast<uint8_t>(src.kind));
+      sb.setSourceEntityId(src.source_entity_id);
+
+      // Parent: structure or function.
+      if (src.parent_structure_index != UINT32_MAX) {
+        sb.setParentId(MakeStructureEid(func, fragment_id, struct_offset,
+                                         src.parent_structure_index));
+      } else {
+        // Parent is the function itself.
+        mx::IRFunctionId fid{fragment_id, static_cast<uint32_t>(fi)};
+        sb.setParentId(mx::EntityId(fid).Pack());
+      }
+
+      // Children: structures and blocks interleaved.
+      uint32_t ent_start = pool.EntitySize();
+      for (const auto &child : src.children) {
+        if (child.is_structure) {
+          pool.AddEntity(MakeStructureEid(func, fragment_id, struct_offset,
+                                           child.index));
+        } else {
+          pool.AddEntity(MakeBlockEid(func, fragment_id, block_offset,
+                                       child.index));
+        }
+      }
+      // Objects (for scope kinds).
+      for (auto oi : src.object_indices) {
+        pool.AddEntity(MakeObjEid(fragment_id, obj_offset, oi));
+      }
+
+      sb.setEntityOffset(ent_start);
+      sb.setNumChildren(static_cast<uint16_t>(src.children.size()));
+      sb.setNumObjects(static_cast<uint16_t>(src.object_indices.size()));
+    }
+
     block_offset += static_cast<uint32_t>(func.blocks.size());
     inst_offset += static_cast<uint32_t>(func.instructions.size());
     obj_offset += static_cast<uint32_t>(func.objects.size());
+    struct_offset += static_cast<uint32_t>(func.structures.size());
   }
 
   // Emit SwitchCase entities and fill in placeholder pool entries.

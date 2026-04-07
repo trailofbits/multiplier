@@ -17,6 +17,7 @@
 #include <multiplier/IR/BlockKind.h>
 #include <multiplier/IR/ObjectKind.h>
 #include <multiplier/IR/FunctionKind.h>
+#include <multiplier/IR/StructureKind.h>
 
 namespace clang {
 class ASTContext;
@@ -112,6 +113,28 @@ struct ObjectIR {
   mx::ir::ObjectKind kind{mx::ir::ObjectKind::LOCAL};
 };
 
+struct StructureIR {
+  mx::ir::StructureKind kind{mx::ir::StructureKind::SCOPE};
+  mx::RawEntityId source_entity_id{mx::kInvalidEntityId};
+  uint32_t parent_structure_index{UINT32_MAX};  // index into FunctionIR::structures
+
+  // Children: interleaved structure and block indices (in source order).
+  // Each entry is either a structure index (with is_structure=true) or block index.
+  struct ChildRef {
+    uint32_t index;
+    bool is_structure;
+  };
+  std::vector<ChildRef> children;
+
+  // Object indices for scope kinds (ALLOCAs declared in this scope).
+  std::vector<uint32_t> object_indices;
+
+  // Switch case data (for SWITCH_CASE kind).
+  int64_t case_low{0};
+  int64_t case_high{0};
+  bool is_default{false};
+};
+
 struct FunctionIR {
   mx::RawEntityId func_decl_entity_id{mx::kInvalidEntityId};
   mx::ir::FunctionKind kind{mx::ir::FunctionKind::NORMAL};
@@ -119,8 +142,10 @@ struct FunctionIR {
   std::vector<InstructionIR> instructions;
   std::vector<BlockIR> blocks;
   std::vector<ObjectIR> objects;
+  std::vector<StructureIR> structures;
 
   uint32_t entry_block_index{0};
+  uint32_t body_scope_index{UINT32_MAX};  // FUNCTION_SCOPE structure
   std::vector<uint32_t> rpo_block_order;
 };
 
@@ -156,6 +181,10 @@ class IRGenerator {
   };
   std::vector<LoopContext> loop_stack_;
 
+  // Structure stack for nesting.
+  uint32_t current_structure_index_{UINT32_MAX};
+  std::vector<uint32_t> structure_stack_;
+
   // Goto label targets: maps label name to block index.
   // Forward gotos create the block on first reference.
   std::unordered_map<std::string, uint32_t> label_blocks_;
@@ -163,6 +192,13 @@ class IRGenerator {
   // Maps case/default statement entity IDs to their block indices,
   // so fallthrough can branch to the right block.
   std::unordered_map<mx::RawEntityId, uint32_t> case_blocks_;
+
+  // --- Structure management ---
+  uint32_t PushStructure(mx::ir::StructureKind kind,
+                         mx::RawEntityId source_eid = mx::kInvalidEntityId);
+  void PopStructure();
+  void AssociateBlockWithStructure(uint32_t block_idx);
+  void AssociateObjectWithScope(uint32_t obj_idx);
 
   // --- Block management ---
   uint32_t NewBlock(mx::ir::BlockKind kind = mx::ir::BlockKind::GENERIC);
