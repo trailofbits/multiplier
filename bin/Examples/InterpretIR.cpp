@@ -775,6 +775,19 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       break;
     }
 
+    // --- Global/function address ---
+    case mx::ir::OpCode::GLOBAL_ADDR: {
+      // In a real interpreter, this would look up the global's storage.
+      // For now, create a synthetic pointer using the target entity ID.
+      result = Value::Ptr(inst.source_entity_id(), 0);
+      break;
+    }
+    case mx::ir::OpCode::FUNC_ADDR: {
+      // Function pointer — use the source entity ID as a handle.
+      result = Value::Ptr(inst.source_entity_id(), 0);
+      break;
+    }
+
     // --- Scope markers (no-ops for concrete interpretation) ---
     case mx::ir::OpCode::ENTER_SCOPE:
     case mx::ir::OpCode::EXIT_SCOPE:

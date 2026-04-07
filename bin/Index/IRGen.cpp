@@ -1931,9 +1931,31 @@ uint32_t IRGenerator::EmitLValue(const pasta::Expr &e) {
     return EmitLValue(pe->SubExpression());
   }
 
-  // DeclRefExpr -> addressOf.
+  // DeclRefExpr -> addressOf / globalAddr / funcAddr.
   if (auto dre = pasta::DeclRefExpr::From(e)) {
     auto decl = dre->Declaration();
+
+    // Function reference → FUNC_ADDR.
+    if (auto fd = pasta::FunctionDecl::From(decl)) {
+      InstructionIR inst;
+      inst.opcode = mx::ir::OpCode::FUNC_ADDR;
+      inst.source_entity_id = eid;
+      inst.target_entity_id = EntityIdOf(fd->CanonicalDeclaration());
+      return EmitInstruction(std::move(inst));
+    }
+
+    // Global/static variable → GLOBAL_ADDR.
+    if (auto vd = pasta::VarDecl::From(decl)) {
+      if (vd->HasGlobalStorage()) {
+        InstructionIR inst;
+        inst.opcode = mx::ir::OpCode::GLOBAL_ADDR;
+        inst.source_entity_id = eid;
+        inst.target_entity_id = EntityIdOf(decl);
+        return EmitInstruction(std::move(inst));
+      }
+    }
+
+    // Local/parameter → ADDRESS_OF with local object.
     uint32_t obj_idx = GetOrMakeObject(decl);
     InstructionIR inst;
     inst.opcode = mx::ir::OpCode::ADDRESS_OF;

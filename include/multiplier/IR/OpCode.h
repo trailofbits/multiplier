@@ -117,8 +117,13 @@ enum class OpCode : uint8_t {
   // Result is the parameter value. Emitted in the entry block.
   PARAM_READ = 70,
 
+  // Address-of for globals and functions (external to the current frame).
+  // targetEntityId = VarDecl or FunctionDecl entity ID.
+  GLOBAL_ADDR = 71,        // pointer to a global or static variable
+  FUNC_ADDR = 72,          // pointer to a function
+
   // Unknown / unhandled expression
-  UNKNOWN = 71,
+  UNKNOWN = 73,
 };
 
 // Returns the human-readable name of an opcode.
@@ -129,7 +134,7 @@ inline static const char *EnumerationName(OpCode) {
 const char *EnumeratorName(OpCode op) noexcept;
 
 inline static constexpr unsigned NumEnumerators(OpCode) {
-  return 72u;
+  return 74u;
 }
 
 // Classification helpers.

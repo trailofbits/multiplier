@@ -233,6 +233,22 @@ class MX_EXPORT ParamReadInst : public IRInstruction {
 };
 
 // ---------------------------------------------------------------------------
+// Global/function address
+// ---------------------------------------------------------------------------
+
+class MX_EXPORT GlobalAddrInst : public IRInstruction {
+ public:
+  MX_DECLARE_IR_INSTRUCTION(GlobalAddrInst)
+  std::optional<VarDecl> variable(void) const;
+};
+
+class MX_EXPORT FuncAddrInst : public IRInstruction {
+ public:
+  MX_DECLARE_IR_INSTRUCTION(FuncAddrInst)
+  std::optional<FunctionDecl> function(void) const;
+};
+
+// ---------------------------------------------------------------------------
 // Memory operations
 // ---------------------------------------------------------------------------
 

@@ -125,6 +125,11 @@ static void EmitInstructionExtras(
       pool.AddEntity(MakeObjEid(fragment_id, obj_base, inst.object_index));
       break;
 
+    case OC::GLOBAL_ADDR:
+    case OC::FUNC_ADDR:
+      pool.AddEntity(inst.target_entity_id);
+      break;
+
     case OC::SIZE_OF:
       pool.AddEntity(inst.type_entity_id);
       break;

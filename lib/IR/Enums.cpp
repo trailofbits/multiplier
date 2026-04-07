@@ -85,6 +85,8 @@ const char *EnumeratorName(OpCode op) noexcept {
     case OpCode::MEMSET: return "MEMSET";
     case OpCode::MEMCPY: return "MEMCPY";
     case OpCode::PARAM_READ: return "PARAM_READ";
+    case OpCode::GLOBAL_ADDR: return "GLOBAL_ADDR";
+    case OpCode::FUNC_ADDR: return "FUNC_ADDR";
     case OpCode::UNKNOWN: return "UNKNOWN";
   }
   return "UNKNOWN";

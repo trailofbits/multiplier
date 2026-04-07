@@ -7,6 +7,7 @@
 #include <multiplier/IR/SwitchCase.h>
 #include <multiplier/AST/FunctionDecl.h>
 #include <multiplier/AST/FieldDecl.h>
+#include <multiplier/AST/VarDecl.h>
 
 #include "Impl.h"
 #include "../Fragment.h"
@@ -155,6 +156,8 @@ IMPL_FROM_SINGLE(VACopyInst, VA_COPY)
 IMPL_FROM_SINGLE(VAArgInst, VA_ARG)
 IMPL_FROM_SINGLE(VAPackInst, VA_PACK)
 IMPL_FROM_SINGLE(ParamReadInst, PARAM_READ)
+IMPL_FROM_SINGLE(GlobalAddrInst, GLOBAL_ADDR)
+IMPL_FROM_SINGLE(FuncAddrInst, FUNC_ADDR)
 IMPL_FROM_SINGLE(MemsetInst, MEMSET)
 IMPL_FROM_SINGLE(MemcpyInst, MEMCPY)
 
@@ -521,6 +524,32 @@ IRObject ParamReadInst::object(void) const {
         impl->frag, oid->offset, impl->fragment_id));
   }
   return {};
+}
+
+// ---- GlobalAddrInst / FuncAddrInst ----
+
+std::optional<VarDecl> GlobalAddrInst::variable(void) const {
+  auto pool = GetPool(*impl);
+  auto r = impl->reader();
+  auto extra_base = ExtraBase(r);
+  auto eid = pool[extra_base];
+  if (eid == kInvalidEntityId) return std::nullopt;
+  if (auto ptr = impl->frag->ep->DeclFor(impl->frag->ep, eid)) {
+    return VarDecl::from(Decl(std::move(ptr)));
+  }
+  return std::nullopt;
+}
+
+std::optional<FunctionDecl> FuncAddrInst::function(void) const {
+  auto pool = GetPool(*impl);
+  auto r = impl->reader();
+  auto extra_base = ExtraBase(r);
+  auto eid = pool[extra_base];
+  if (eid == kInvalidEntityId) return std::nullopt;
+  if (auto ptr = impl->frag->ep->DeclFor(impl->frag->ep, eid)) {
+    return FunctionDecl::from(Decl(std::move(ptr)));
+  }
+  return std::nullopt;
 }
 
 // ---- Memory operations ----
