@@ -93,6 +93,7 @@ struct InstructionIR {
 
 struct BlockIR {
   mx::ir::BlockKind kind{mx::ir::BlockKind::GENERIC};
+  uint32_t parent_structure_index{UINT32_MAX};
 
   // Top-level instruction indices (roots of expression trees).
   std::vector<uint32_t> instruction_indices;

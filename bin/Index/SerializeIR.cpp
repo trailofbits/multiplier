@@ -431,6 +431,13 @@ void SerializeIR(
       bb.setNumDominators(num_doms);
       bb.setNumPostDominators(num_pdoms);
       bb.setKind(static_cast<uint8_t>(src.kind));
+
+      // Set parent structure ID.
+      if (src.parent_structure_index != UINT32_MAX) {
+        bb.setParentStructureId(MakeStructureEid(func, fragment_id,
+                                                  struct_offset,
+                                                  src.parent_structure_index));
+      }
     }
 
     // Serialize function.
@@ -440,6 +447,10 @@ void SerializeIR(
       ffb.setKind(static_cast<uint8_t>(func.kind));
       ffb.setEntryBlockId(MakeBlockEid(func, fragment_id, block_offset,
                                         func.entry_block_index));
+      if (func.body_scope_index != UINT32_MAX) {
+        ffb.setBodyScopeId(MakeStructureEid(func, fragment_id, struct_offset,
+                                             func.body_scope_index));
+      }
 
       // Function's block and object lists go into the entity pool.
       uint32_t func_ent_start = pool.EntitySize();

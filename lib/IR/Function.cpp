@@ -6,6 +6,7 @@
 #include <multiplier/IR/Function.h>
 #include <multiplier/IR/Block.h>
 #include <multiplier/IR/Object.h>
+#include <multiplier/IR/Structure.h>
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/FunctionDecl.h>
 #include <multiplier/Fragment.h>
@@ -89,6 +90,18 @@ std::optional<Decl> IRFunction::source_declaration(void) const {
   if (eid == kInvalidEntityId) return std::nullopt;
   if (auto ptr = impl->frag->ep->DeclFor(impl->frag->ep, eid)) {
     return Decl(std::move(ptr));
+  }
+  return std::nullopt;
+}
+
+std::optional<IRStructure> IRFunction::body_scope(void) const {
+  if (!impl) return std::nullopt;
+  auto eid = impl->reader().getBodyScopeId();
+  if (eid == kInvalidEntityId) return std::nullopt;
+  auto vid = EntityId(eid).Unpack();
+  if (auto *sid = std::get_if<IRStructureId>(&vid)) {
+    return IRStructure(std::make_shared<IRStructureImpl>(
+        impl->frag, sid->offset, impl->fragment_id));
   }
   return std::nullopt;
 }

@@ -29,6 +29,7 @@ struct Block @0xb1141386bcc94b26 {
   numDominators @4 :UInt16;
   numPostDominators @5 :UInt16;
   kind @6 :UInt8;
+  parentStructureId @7 :UInt64;   # IRStructureId of enclosing structure
 }
 
 struct SwitchCase @0x93795f3c8abc1070 {
@@ -57,4 +58,5 @@ struct Function @0xe6be31a259218610 {
   numObjects @3 :UInt16;
   entityOffset @4 :UInt32;
   kind @5 :UInt8;             # FunctionKind enum (0 = NORMAL)
+  bodyScopeId @6 :UInt64;    # IRStructureId of FUNCTION_SCOPE (root of structure tree)
 }

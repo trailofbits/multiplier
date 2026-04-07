@@ -15,6 +15,7 @@
 namespace mx {
 
 class IRInstruction;
+class IRStructure;
 class IRBlockImpl;
 using IRBlockImplPtr = std::shared_ptr<const IRBlockImpl>;
 
@@ -33,6 +34,9 @@ class MX_EXPORT IRBlock {
 
   EntityId id(void) const;
   ir::BlockKind kind(void) const;
+
+  // Parent structure in the nesting hierarchy.
+  std::optional<IRStructure> parent_structure(void) const;
 
   // All instructions in post-order (children before parents).
   gap::generator<IRInstruction> all_instructions(void) const &;

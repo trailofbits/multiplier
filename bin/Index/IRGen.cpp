@@ -194,6 +194,7 @@ void IRGenerator::PopStructure() {
 
 void IRGenerator::AssociateBlockWithStructure(uint32_t block_idx) {
   if (current_structure_index_ == UINT32_MAX) return;
+  func_.blocks[block_idx].parent_structure_index = current_structure_index_;
   StructureIR::ChildRef ref;
   ref.index = block_idx;
   ref.is_structure = false;
@@ -931,6 +932,7 @@ void IRGenerator::EmitDeclStmt(const pasta::Stmt &s) {
     if (pasta::ParmVarDecl::From(decl)) continue;
 
     uint32_t obj_idx = GetOrMakeObject(decl);
+    AssociateObjectWithScope(obj_idx);
 
     if (auto init = vd->Initializer()) {
       InstructionIR addr_inst;

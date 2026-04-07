@@ -5,6 +5,7 @@
 
 #include <multiplier/IR/Block.h>
 #include <multiplier/IR/Instruction.h>
+#include <multiplier/IR/Structure.h>
 
 #include "Impl.h"
 #include "../Fragment.h"
@@ -32,6 +33,18 @@ EntityId IRBlock::id(void) const {
 ir::BlockKind IRBlock::kind(void) const {
   if (!impl) return ir::BlockKind::GENERIC;
   return static_cast<ir::BlockKind>(impl->reader().getKind());
+}
+
+std::optional<IRStructure> IRBlock::parent_structure(void) const {
+  if (!impl) return std::nullopt;
+  auto eid = impl->reader().getParentStructureId();
+  if (eid == kInvalidEntityId) return std::nullopt;
+  auto vid = EntityId(eid).Unpack();
+  if (auto *sid = std::get_if<IRStructureId>(&vid)) {
+    return IRStructure(std::make_shared<IRStructureImpl>(
+        impl->frag, sid->offset, impl->fragment_id));
+  }
+  return std::nullopt;
 }
 
 gap::generator<IRInstruction> IRBlock::all_instructions(void) const & {

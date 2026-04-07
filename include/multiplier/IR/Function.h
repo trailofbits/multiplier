@@ -17,6 +17,7 @@ namespace mx {
 class Decl;
 class IRBlock;
 class IRObject;
+class IRStructure;
 class IRFunctionImpl;
 class FunctionDecl;
 using IRFunctionImplPtr = std::shared_ptr<const IRFunctionImpl>;
@@ -51,6 +52,9 @@ class MX_EXPORT IRFunction {
 
   // Memory objects.
   gap::generator<IRObject> objects(void) const &;
+
+  // Root of the structure tree (FUNCTION_SCOPE).
+  std::optional<IRStructure> body_scope(void) const;
 
   // Find the IR for a FunctionDecl.
   static std::optional<IRFunction> from(const FunctionDecl &decl);
