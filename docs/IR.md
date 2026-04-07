@@ -39,8 +39,11 @@ ENTRY block (BlockKind::ENTRY):
 
 scope_entry block:
   ENTER_SCOPE (SCOPE)     // implicit scope for for-init decl
+  IMPLICIT_GOTO → preheader
+
+LOOP_PREHEADER block (BlockKind::LOOP_PREHEADER):
   CONST(INT32) 0
-  STORE %2, ^             // i = 0
+  STORE %2, ^             // i = 0  (for-init lives in preheader)
   IMPLICIT_GOTO → loop_cond
 
 LOOP_CONDITION block:
@@ -100,7 +103,7 @@ Key methods: `kind()`, `declaration()`, `source_declaration()`, `entry_block()`,
 
 Each block ends with exactly one terminator instruction.
 
-**`BlockKind`** (16 kinds):
+**`BlockKind`** (17 kinds):
 
 | Kind | Description |
 |------|-------------|
@@ -109,6 +112,7 @@ Each block ends with exactly one terminator instruction.
 | `IF_THEN` | Then branch of if-statement. |
 | `IF_ELSE` | Else branch. |
 | `IF_MERGE` | Merge point after if. |
+| `LOOP_PREHEADER` | Single-entry block before loop condition. For-init code lives here. |
 | `LOOP_CONDITION` | While/for condition evaluation. |
 | `LOOP_BODY` | Loop body. |
 | `LOOP_EXIT` | Loop exit point. |
@@ -117,9 +121,9 @@ Each block ends with exactly one terminator instruction.
 | `SWITCH_DEFAULT` | Default case body. |
 | `SWITCH_EXIT` | Switch exit point. |
 | `LABEL` | User-defined goto label target. |
+| `COMPENSATION` | Scope transition block inserted on goto edges. |
 | `UNREACHABLE` | Dead code after a terminator. |
 | `GENERIC` | Unclassified. |
-| `COMPENSATION` | Scope transition block inserted on goto edges. |
 
 Key methods: `kind()`, `parent_structure()`, `instructions()` (top-level roots), `all_instructions()` (post-order including sub-expressions), `successors()`, `predecessors()`, `immediate_dominator()`, `dominates()`.
 

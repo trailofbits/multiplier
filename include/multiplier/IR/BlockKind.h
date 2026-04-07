@@ -11,40 +11,34 @@ namespace mx::ir {
 
 // Structural role of a basic block in the control flow graph.
 enum class BlockKind : uint8_t {
-  // Function entry point (logical first block of the body).
-  ENTRY = 0,
+  // Function prologue/entry.
+  FRAME = 0,            // Contains all ALLOCAs (parameters + locals).
+  ENTRY = 1,            // Logical entry: ENTER_SCOPE, PARAM_READs, body start.
 
-  // If-statement related.
-  IF_THEN = 1,
-  IF_ELSE = 2,
-  IF_MERGE = 3,
+  // If-statement.
+  IF_THEN = 2,
+  IF_ELSE = 3,
+  IF_MERGE = 4,
 
-  // Loop condition/body/exit (while, do-while, for).
-  LOOP_CONDITION = 4,
-  LOOP_BODY = 5,
-  LOOP_EXIT = 6,
-  LOOP_INCREMENT = 7,   // for-loop increment
+  // Loops (while, do-while, for).
+  LOOP_PREHEADER = 5,   // Single-entry block before loop condition.
+  LOOP_CONDITION = 6,
+  LOOP_BODY = 7,
+  LOOP_EXIT = 8,
+  LOOP_INCREMENT = 9,   // For-loop increment.
 
-  // Switch-statement related.
-  SWITCH_CASE = 8,
-  SWITCH_DEFAULT = 9,
-  SWITCH_EXIT = 10,
+  // Switch-statement.
+  SWITCH_CASE = 10,
+  SWITCH_DEFAULT = 11,
+  SWITCH_EXIT = 12,
 
-  // User-defined label (goto target).
-  LABEL = 11,
+  // Labels and control flow.
+  LABEL = 13,           // User-defined goto target.
+  COMPENSATION = 14,    // Scope transition block on goto edges.
 
-  // Dead code after a terminator (break/continue/goto/return).
-  UNREACHABLE = 12,
-
-  // Generic / unclassified.
-  GENERIC = 13,
-
-  // Frame block: contains all ALLOCAs (parameters + locals). Precedes ENTRY.
-  FRAME = 14,
-
-  // Compensation block: inserted on goto edges to emit scope transitions
-  // (EXIT_SCOPE / ENTER_SCOPE) when a goto crosses scope boundaries.
-  COMPENSATION = 15,
+  // Other.
+  UNREACHABLE = 15,     // Dead code after a terminator.
+  GENERIC = 16,         // Unclassified.
 };
 
 inline static const char *EnumerationName(BlockKind) {
@@ -54,7 +48,7 @@ inline static const char *EnumerationName(BlockKind) {
 const char *EnumeratorName(BlockKind kind) noexcept;
 
 inline static constexpr unsigned NumEnumerators(BlockKind) {
-  return 16u;
+  return 17u;
 }
 
 }  // namespace mx::ir

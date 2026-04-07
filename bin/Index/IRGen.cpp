@@ -966,10 +966,14 @@ void IRGenerator::EmitWhileStmt(const pasta::Stmt &s) {
 
   PushStructure(mx::ir::StructureKind::WHILE, EntityIdOf(s));
 
+  uint32_t preheader = NewBlock(mx::ir::BlockKind::LOOP_PREHEADER);
   uint32_t cond_block = NewBlock(mx::ir::BlockKind::LOOP_CONDITION);
   uint32_t body_block = NewBlock(mx::ir::BlockKind::LOOP_BODY);
   uint32_t exit_block = NewBlock(mx::ir::BlockKind::LOOP_EXIT);
 
+  EmitBranch(preheader);
+  SwitchToBlock(preheader);
+  AssociateBlockWithStructure(preheader);
   EmitBranch(cond_block);
 
   PushStructure(mx::ir::StructureKind::WHILE_CONDITION, EntityIdOf(ws->Condition()));
@@ -1000,10 +1004,14 @@ void IRGenerator::EmitDoStmt(const pasta::Stmt &s) {
 
   PushStructure(mx::ir::StructureKind::DO_WHILE, EntityIdOf(s));
 
+  uint32_t preheader = NewBlock(mx::ir::BlockKind::LOOP_PREHEADER);
   uint32_t body_block = NewBlock(mx::ir::BlockKind::LOOP_BODY);
   uint32_t cond_block = NewBlock(mx::ir::BlockKind::LOOP_CONDITION);
   uint32_t exit_block = NewBlock(mx::ir::BlockKind::LOOP_EXIT);
 
+  EmitBranch(preheader);
+  SwitchToBlock(preheader);
+  AssociateBlockWithStructure(preheader);
   EmitBranch(body_block);
 
   loop_stack_.push_back({exit_block, cond_block, current_structure_index_, false});
@@ -1047,16 +1055,22 @@ void IRGenerator::EmitForStmt(const pasta::Stmt &s) {
 
   PushStructure(mx::ir::StructureKind::FOR, EntityIdOf(s));
 
+  uint32_t preheader = NewBlock(mx::ir::BlockKind::LOOP_PREHEADER);
+  uint32_t cond_block = NewBlock(mx::ir::BlockKind::LOOP_CONDITION);
+  uint32_t body_block = NewBlock(mx::ir::BlockKind::LOOP_BODY);
+  uint32_t inc_block = NewBlock(mx::ir::BlockKind::LOOP_INCREMENT);
+  uint32_t exit_block = NewBlock(mx::ir::BlockKind::LOOP_EXIT);
+
+  EmitBranch(preheader);
+  SwitchToBlock(preheader);
+  AssociateBlockWithStructure(preheader);
+
+  // For-init lives in the preheader.
   if (init) {
     PushStructure(mx::ir::StructureKind::FOR_INIT, EntityIdOf(*init));
     EmitStmt(*init);
     PopStructure();  // FOR_INIT
   }
-
-  uint32_t cond_block = NewBlock(mx::ir::BlockKind::LOOP_CONDITION);
-  uint32_t body_block = NewBlock(mx::ir::BlockKind::LOOP_BODY);
-  uint32_t inc_block = NewBlock(mx::ir::BlockKind::LOOP_INCREMENT);
-  uint32_t exit_block = NewBlock(mx::ir::BlockKind::LOOP_EXIT);
 
   EmitBranch(cond_block);
 
