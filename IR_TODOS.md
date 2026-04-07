@@ -9,29 +9,26 @@
 - Added `kind` field to capnp Function struct
 
 ### Phase 2: IRStructure entity + scope tracking — IN PROGRESS
-- [ ] Create `StructureKind` enum header
-- [ ] Create `IRStructure` entity class + impl
-- [ ] Add `Structure` to `IR.capnp`, `irStructures` to `RPC.capnp`
-- [ ] Add `StructureIR` to `FunctionIR`, structure stack to `IRGenerator`
-- [ ] Add `PushStructure`/`PopStructure` helpers
-- [ ] Emit `FUNCTION_SCOPE` and `SCOPE` structures
+- [x] Create `StructureKind` enum header (18 kinds)
+- [x] Create `IRStructure` entity class + impl
+- [x] Add `Structure` to `IR.capnp`, `irStructures` to `RPC.capnp`
+- [x] Add `StructureIR` to `FunctionIR`, structure stack to `IRGenerator`
+- [x] Add `PushStructure`/`PopStructure` helpers
+- [x] Emit `FUNCTION_SCOPE` structure (wraps entire function body)
+- [x] Update `Types.h`: `IRStructureId`, `MX_FOR_EACH_ENTITY_CATEGORY` slot 20
+- [x] Update `Types.cpp`: pack/unpack with StructureKind in entity ID
+- [x] Update serialization (`SerializeIR.cpp`)
+- [x] Entity provider implementations (SQLite, Caching, Invalid via macros)
+- [x] Control flow structures (IF, FOR, WHILE, DO_WHILE, SWITCH) — merged Phase 3
+- [ ] Emit nested `SCOPE` structures for CompoundStmt bodies
 - [ ] Add `ENTER_SCOPE`/`EXIT_SCOPE` opcodes
-- [ ] Associate objects with scopes
-- [ ] Add `parentStructureId` to blocks
+- [ ] Associate objects with scopes (`AssociateObjectWithScope` wired in)
+- [ ] Add `parentStructureId` to blocks (in capnp Block struct)
 - [ ] Migrate `IRSwitchCase` → `IRStructure(SWITCH_CASE)`
-- [ ] Update `Types.h`: `IRStructureId`, `MX_FOR_EACH_ENTITY_CATEGORY`
-- [ ] Update `Types.cpp`: pack/unpack
-- [ ] Update serialization (`SerializeIR.cpp`)
-- [ ] Entity provider stubs (SQLite, Caching, Invalid)
-- [ ] Python bindings
+- [ ] Python bindings (stub exists, full binding requires bootstrap regen)
 
-### Phase 3: Control flow region structures — NOT STARTED
-- [ ] Add IF/IF_THEN/IF_ELSE structures
-- [ ] Add FOR/FOR_INIT/FOR_CONDITION/FOR_BODY/FOR_INCREMENT structures
-- [ ] Add WHILE/WHILE_CONDITION/WHILE_BODY structures
-- [ ] Add DO_WHILE/DO_WHILE_BODY/DO_WHILE_CONDITION structures
-- [ ] Add SWITCH structures
-- [ ] Update all Emit* methods to push/pop structures
+### Phase 3: Control flow region structures — MERGED INTO PHASE 2
+All control flow structures are now emitted during codegen.
 
 ### Phase 4: Global initializer functions — NOT STARTED
 - [ ] Generate synthetic init functions for globals
@@ -53,14 +50,17 @@
 - VAR_INIT block kind + structure kind
 
 ## Known Issues / Lies Remaining
-1. No structural nesting — blocks are flat within function
-2. No scope lifetime tracking — ALLOCAs not associated with scopes
-3. IRSwitchCase is separate entity type (should be structural entity)
-4. No global initializer functions
-5. string_bytes() missing on IRObject for string literals
-6. Some instructions may have orphaned sub-expressions
+1. Nested SCOPE structures not yet emitted for CompoundStmt bodies
+2. No ENTER_SCOPE/EXIT_SCOPE instructions yet
+3. Objects not yet associated with scopes during codegen
+4. Block parentStructureId not in capnp schema yet
+5. IRSwitchCase still separate entity type (not yet migrated)
+6. No global initializer functions
+7. string_bytes() missing on IRObject for string literals
+8. Python bindings are stub only — bootstrap regen needed for full support
 
 ## Decisions
-- Phase 1 field rename `funcDeclEntityId` → `sourceDeclEntityId` is binary-compatible (same ordinal)
-- IMPLICIT_UNREACHABLE added as terminator to handle empty blocks cleanly
-- ir() on Decl/Stmt returns VariantEntity to support all IR entity types, not just instructions
+- Phase 3 merged into Phase 2 since control flow structures are naturally emitted alongside scope tracking
+- Python binding uses stub pattern (returns VariantEntity) until bootstrap can be re-run
+- StructureKind embedded in IRStructureId (18 sub_kind offsets) for type discrimination
+- Structure children stored in entity pool as interleaved IRStructureId/IRBlockId entries

@@ -80,6 +80,8 @@ const char *EnumeratorName(OpCode op) noexcept {
     case OpCode::VA_COPY: return "VA_COPY";
     case OpCode::VA_END: return "VA_END";
     case OpCode::INIT_LIST: return "INIT_LIST";
+    case OpCode::ENTER_SCOPE: return "ENTER_SCOPE";
+    case OpCode::EXIT_SCOPE: return "EXIT_SCOPE";
     case OpCode::UNKNOWN: return "UNKNOWN";
   }
   return "UNKNOWN";

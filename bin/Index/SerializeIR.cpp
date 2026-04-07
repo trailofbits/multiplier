@@ -88,7 +88,8 @@ static void EmitInstructionExtras(
     const ir::InstructionIR &inst,
     const ir::FunctionIR &func,
     RawEntityId fragment_id,
-    uint32_t obj_base, uint32_t block_base, uint32_t inst_base) {
+    uint32_t obj_base, uint32_t block_base, uint32_t inst_base,
+    uint32_t struct_base) {
 
   using OC = mx::ir::OpCode;
 
@@ -146,6 +147,16 @@ static void EmitInstructionExtras(
       pool.AddEntity(inst.type_entity_id);  // case integral type
       for (size_t i = 0; i < inst.switch_cases.size(); ++i) {
         pool.AddEntity(0);  // placeholder
+      }
+      break;
+
+    case OC::ENTER_SCOPE:
+    case OC::EXIT_SCOPE:
+      if (inst.structure_index != UINT32_MAX) {
+        pool.AddEntity(MakeStructureEid(func, fragment_id, struct_base,
+                                         inst.structure_index));
+      } else {
+        pool.AddEntity(0);
       }
       break;
 
@@ -348,7 +359,8 @@ void SerializeIR(
 
       // Opcode-specific extras.
       EmitInstructionExtras(pool, src, func, fragment_id,
-                            obj_offset, block_offset, inst_offset);
+                            obj_offset, block_offset, inst_offset,
+                            struct_offset);
 
       // Int pool.
       uint32_t const_start = EmitInstructionConsts(pool, src);

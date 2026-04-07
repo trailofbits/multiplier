@@ -449,8 +449,35 @@ void IRGenerator::SetOperandParents(uint32_t inst_idx) {
 
 void IRGenerator::EmitBody(const pasta::Stmt &body) {
   if (auto cs = pasta::CompoundStmt::From(body)) {
+    // Push a SCOPE structure for compound statements that are NOT the
+    // function body (which already has FUNCTION_SCOPE).
+    bool is_function_body = (current_structure_index_ != UINT32_MAX &&
+        func_.structures[current_structure_index_].kind ==
+            mx::ir::StructureKind::FUNCTION_SCOPE);
+    if (!is_function_body) {
+      PushStructure(mx::ir::StructureKind::SCOPE, EntityIdOf(body));
+
+      // Emit ENTER_SCOPE instruction.
+      InstructionIR enter;
+      enter.opcode = mx::ir::OpCode::ENTER_SCOPE;
+      enter.source_entity_id = EntityIdOf(body);
+      enter.structure_index = current_structure_index_;
+      EmitTopLevel(std::move(enter));
+    }
+
     for (const auto &child : cs->Children()) {
       EmitStmt(child);
+    }
+
+    if (!is_function_body) {
+      // Emit EXIT_SCOPE instruction.
+      InstructionIR exit_inst;
+      exit_inst.opcode = mx::ir::OpCode::EXIT_SCOPE;
+      exit_inst.source_entity_id = EntityIdOf(body);
+      exit_inst.structure_index = current_structure_index_;
+      EmitTopLevel(std::move(exit_inst));
+
+      PopStructure();
     }
   } else {
     EmitStmt(body);

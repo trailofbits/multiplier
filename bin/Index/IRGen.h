@@ -73,6 +73,9 @@ struct InstructionIR {
   uint8_t flags{0};
   mx::ir::OpCode compound_op{mx::ir::OpCode::ADD};
 
+  // Structure index for ENTER_SCOPE/EXIT_SCOPE (into FunctionIR::structures).
+  uint32_t structure_index{UINT32_MAX};
+
   // Terminator data.
   std::vector<BranchTargetIR> branch_targets;
 

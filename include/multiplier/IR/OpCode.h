@@ -104,8 +104,12 @@ enum class OpCode : uint8_t {
   // Aggregate initialization
   INIT_LIST = 65,          // {a, b, c} -- operands are the initializer values
 
+  // Scope entry/exit markers (not terminators).
+  ENTER_SCOPE = 66,        // marks scope entry; extra = IRStructureId of scope
+  EXIT_SCOPE = 67,         // marks scope exit; extra = IRStructureId of scope
+
   // Unknown / unhandled expression
-  UNKNOWN = 66,
+  UNKNOWN = 68,
 };
 
 // Returns the human-readable name of an opcode.
@@ -116,7 +120,7 @@ inline static const char *EnumerationName(OpCode) {
 const char *EnumeratorName(OpCode op) noexcept;
 
 inline static constexpr unsigned NumEnumerators(OpCode) {
-  return 67u;
+  return 69u;
 }
 
 // Classification helpers.
