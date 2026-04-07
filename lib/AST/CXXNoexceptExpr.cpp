@@ -183,12 +183,12 @@ std::optional<CXXNoexceptExpr> CXXNoexceptExpr::from(const TokenContext &t) {
 }
 
 Expr CXXNoexceptExpr::operand(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal39();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 bool CXXNoexceptExpr::value(void) const {
-  return impl->reader.getVal84();
+  return impl->reader.getVal85();
 }
 
 #pragma GCC diagnostic pop

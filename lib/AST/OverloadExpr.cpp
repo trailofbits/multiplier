@@ -189,11 +189,11 @@ std::optional<OverloadExpr> OverloadExpr::from(const TokenContext &t) {
 }
 
 unsigned OverloadExpr::num_declarations(void) const {
-  return impl->reader.getVal15().size();
+  return impl->reader.getVal16().size();
 }
 
 std::optional<NamedDecl> OverloadExpr::nth_declaration(unsigned n) const {
-  auto list = impl->reader.getVal15();
+  auto list = impl->reader.getVal16();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -207,12 +207,12 @@ std::optional<NamedDecl> OverloadExpr::nth_declaration(unsigned n) const {
 }
 
 gap::generator<NamedDecl> OverloadExpr::declarations(void) const & {
-  auto list = impl->reader.getVal15();
+  auto list = impl->reader.getVal16();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d15 = ep->DeclFor(ep, v)) {
-      if (auto e = NamedDecl::from_base(std::move(d15))) {
+    if (auto d16 = ep->DeclFor(ep, v)) {
+      if (auto e = NamedDecl::from_base(std::move(d16))) {
         co_yield std::move(*e);
       }
     }
@@ -221,16 +221,16 @@ gap::generator<NamedDecl> OverloadExpr::declarations(void) const & {
 }
 
 Token OverloadExpr::l_angle_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 Token OverloadExpr::name_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 std::optional<CXXRecordDecl> OverloadExpr::naming_class(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal40();
+    RawEntityId eid = impl->reader.getVal41();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -242,19 +242,19 @@ std::optional<CXXRecordDecl> OverloadExpr::naming_class(void) const {
 }
 
 Token OverloadExpr::r_angle_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
-}
-
-Token OverloadExpr::template_keyword_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
+Token OverloadExpr::template_keyword_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
+}
+
 bool OverloadExpr::has_explicit_template_arguments(void) const {
-  return impl->reader.getVal84();
+  return impl->reader.getVal85();
 }
 
 bool OverloadExpr::has_template_keyword(void) const {
-  return impl->reader.getVal85();
+  return impl->reader.getVal86();
 }
 
 #pragma GCC diagnostic pop

@@ -185,7 +185,7 @@ std::optional<UserDefinedLiteral> UserDefinedLiteral::from(const TokenContext &t
 
 std::optional<Expr> UserDefinedLiteral::cooked_literal(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal43();
+    RawEntityId eid = impl->reader.getVal44();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -197,11 +197,11 @@ std::optional<Expr> UserDefinedLiteral::cooked_literal(void) const {
 }
 
 UserDefinedLiteralLiteralOperatorKind UserDefinedLiteral::literal_operator_kind(void) const {
-  return static_cast<UserDefinedLiteralLiteralOperatorKind>(impl->reader.getVal91());
+  return static_cast<UserDefinedLiteralLiteralOperatorKind>(impl->reader.getVal92());
 }
 
 Token UserDefinedLiteral::ud_suffix_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
 }
 
 #pragma GCC diagnostic pop

@@ -183,12 +183,12 @@ std::optional<CXXCatchStmt> CXXCatchStmt::from(const TokenContext &t) {
 }
 
 Token CXXCatchStmt::catch_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
 }
 
 std::optional<Type> CXXCatchStmt::caught_type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal10();
+    RawEntityId eid = impl->reader.getVal11();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -201,7 +201,7 @@ std::optional<Type> CXXCatchStmt::caught_type(void) const {
 
 std::optional<VarDecl> CXXCatchStmt::exception_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal11();
+    RawEntityId eid = impl->reader.getVal12();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -213,7 +213,7 @@ std::optional<VarDecl> CXXCatchStmt::exception_declaration(void) const {
 }
 
 Stmt CXXCatchStmt::handler_block(void) const {
-  RawEntityId eid = impl->reader.getVal13();
+  RawEntityId eid = impl->reader.getVal14();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 

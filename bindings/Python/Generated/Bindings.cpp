@@ -284,8 +284,8 @@ from_python<mx::ObjCReturnsInnerPointerAttrSpelling>(BorrowedPyObject *obj) noex
 template MX_EXPORT std::optional<FromPythonReturnType<mx::AcquireHandleAttr>::Type>
 from_python<mx::AcquireHandleAttr>(BorrowedPyObject *obj) noexcept;
 
-template MX_EXPORT std::optional<FromPythonReturnType<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::CXXCtorInitializer, mx::Compilation, mx::IRFunction, mx::IRBlock, mx::IRInstruction, mx::IRObject>>::Type>
-from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::CXXCtorInitializer, mx::Compilation, mx::IRFunction, mx::IRBlock, mx::IRInstruction, mx::IRObject>>(BorrowedPyObject *obj) noexcept;
+template MX_EXPORT std::optional<FromPythonReturnType<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::CXXCtorInitializer, mx::Compilation, mx::IRFunction, mx::IRBlock, mx::IRInstruction, mx::IRObject, mx::IRSwitchCase>>::Type>
+from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::CXXCtorInitializer, mx::Compilation, mx::IRFunction, mx::IRBlock, mx::IRInstruction, mx::IRObject, mx::IRSwitchCase>>(BorrowedPyObject *obj) noexcept;
 
 template MX_EXPORT std::optional<FromPythonReturnType<mx::FunctionTypeAArch64SMETypeAttributes>::Type>
 from_python<mx::FunctionTypeAArch64SMETypeAttributes>(BorrowedPyObject *obj) noexcept;

@@ -5,6 +5,7 @@
 
 #include <multiplier/IR/SwitchCase.h>
 #include <multiplier/IR/Block.h>
+#include <multiplier/IR/Instruction.h>
 
 #include "Impl.h"
 #include "../Fragment.h"
@@ -68,6 +69,17 @@ std::optional<Stmt> IRSwitchCase::source_statement(void) const {
     return Stmt(std::move(ptr));
   }
   return std::nullopt;
+}
+
+IRInstruction IRSwitchCase::parent_switch(void) const {
+  if (!impl) return {};
+  auto eid = impl->reader().getSwitchInstructionId();
+  auto vid = EntityId(eid).Unpack();
+  if (auto *iid = std::get_if<IRInstructionId>(&vid)) {
+    return IRInstruction(std::make_shared<IRInstructionImpl>(
+        impl->frag, iid->offset, impl->fragment_id));
+  }
+  return {};
 }
 
 }  // namespace mx

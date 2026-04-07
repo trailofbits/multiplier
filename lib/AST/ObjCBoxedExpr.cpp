@@ -184,21 +184,21 @@ std::optional<ObjCBoxedExpr> ObjCBoxedExpr::from(const TokenContext &t) {
 }
 
 Token ObjCBoxedExpr::at_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 ObjCMethodDecl ObjCBoxedExpr::boxing_method(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal40();
   return ObjCMethodDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Expr ObjCBoxedExpr::sub_expression(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal41();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 bool ObjCBoxedExpr::is_expressible_as_constant_initializer(void) const {
-  return impl->reader.getVal84();
+  return impl->reader.getVal85();
 }
 
 #pragma GCC diagnostic pop

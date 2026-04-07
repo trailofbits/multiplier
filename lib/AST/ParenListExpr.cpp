@@ -183,19 +183,19 @@ std::optional<ParenListExpr> ParenListExpr::from(const TokenContext &t) {
 }
 
 Token ParenListExpr::l_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
-}
-
-Token ParenListExpr::r_paren_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
+Token ParenListExpr::r_paren_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+}
+
 unsigned ParenListExpr::num_expressions(void) const {
-  return impl->reader.getVal15().size();
+  return impl->reader.getVal16().size();
 }
 
 std::optional<Expr> ParenListExpr::nth_expression(unsigned n) const {
-  auto list = impl->reader.getVal15();
+  auto list = impl->reader.getVal16();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -209,12 +209,12 @@ std::optional<Expr> ParenListExpr::nth_expression(unsigned n) const {
 }
 
 gap::generator<Expr> ParenListExpr::expressions(void) const & {
-  auto list = impl->reader.getVal15();
+  auto list = impl->reader.getVal16();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d15 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from_base(std::move(d15))) {
+    if (auto d16 = ep->StmtFor(ep, v)) {
+      if (auto e = Expr::from_base(std::move(d16))) {
         co_yield std::move(*e);
       }
     }

@@ -50,7 +50,7 @@ mx::RawEntityId EntityMapper::ParentStmtId(const void *entity) const {
   }
 }
 
-mx::RawEntityId EntityMapper::IRInstructionId(const void *entity) const {
+mx::RawEntityId EntityMapper::IREntityId(const void *entity) const {
   auto ast_eid = EntityId(entity);
   if (ast_eid == mx::kInvalidEntityId) {
     return mx::kInvalidEntityId;

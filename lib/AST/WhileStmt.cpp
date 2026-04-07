@@ -184,18 +184,18 @@ std::optional<WhileStmt> WhileStmt::from(const TokenContext &t) {
 }
 
 Stmt WhileStmt::body(void) const {
-  RawEntityId eid = impl->reader.getVal9();
+  RawEntityId eid = impl->reader.getVal10();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Expr WhileStmt::condition(void) const {
-  RawEntityId eid = impl->reader.getVal10();
+  RawEntityId eid = impl->reader.getVal11();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 std::optional<VarDecl> WhileStmt::condition_variable(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal11();
+    RawEntityId eid = impl->reader.getVal12();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -208,7 +208,7 @@ std::optional<VarDecl> WhileStmt::condition_variable(void) const {
 
 std::optional<DeclStmt> WhileStmt::condition_variable_declaration_statement(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal13();
+    RawEntityId eid = impl->reader.getVal14();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -220,19 +220,19 @@ std::optional<DeclStmt> WhileStmt::condition_variable_declaration_statement(void
 }
 
 Token WhileStmt::l_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal15());
 }
 
 Token WhileStmt::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal17());
-}
-
-Token WhileStmt::while_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal18());
 }
 
+Token WhileStmt::while_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal19());
+}
+
 bool WhileStmt::has_variable_storage(void) const {
-  return impl->reader.getVal12();
+  return impl->reader.getVal13();
 }
 
 #pragma GCC diagnostic pop

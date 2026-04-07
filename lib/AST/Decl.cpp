@@ -43,8 +43,36 @@ std::optional<Stmt> Decl::parent_statement(void) const {
   return std::nullopt;
 }
 
+std::optional<VariantEntity> Decl::ir(void) const {
+  auto raw = impl->reader.getVal2();
+  if (raw == kInvalidEntityId) return std::nullopt;
+  auto vid = EntityId(raw).Unpack();
+  if (auto *p = std::get_if<IRFunctionId>(&vid)) {
+    if (auto ptr = impl->ep->IRFunctionFor(impl->ep, raw)) {
+      return IRFunction(std::move(ptr));
+    }
+  } else if (auto *p = std::get_if<IRBlockId>(&vid)) {
+    if (auto ptr = impl->ep->IRBlockFor(impl->ep, raw)) {
+      return IRBlock(std::move(ptr));
+    }
+  } else if (auto *p = std::get_if<IRInstructionId>(&vid)) {
+    if (auto ptr = impl->ep->IRInstructionFor(impl->ep, raw)) {
+      return IRInstruction(std::move(ptr));
+    }
+  } else if (auto *p = std::get_if<IRObjectId>(&vid)) {
+    if (auto ptr = impl->ep->IRObjectFor(impl->ep, raw)) {
+      return IRObject(std::move(ptr));
+    }
+  } else if (auto *p = std::get_if<IRSwitchCaseId>(&vid)) {
+    if (auto ptr = impl->ep->IRSwitchCaseFor(impl->ep, raw)) {
+      return IRSwitchCase(std::move(ptr));
+    }
+  }
+  return std::nullopt;
+}
+
 bool Decl::is_definition(void) const {
-  return impl->reader.getVal2();
+  return impl->reader.getVal3();
 }
 
 std::shared_ptr<EntityProvider> Decl::entity_provider_of(const Index &index_) {
@@ -205,11 +233,11 @@ std::optional<Decl> Decl::from(const TokenContext &t) {
 }
 
 unsigned Decl::num_attributes(void) const {
-  return impl->reader.getVal3().size();
+  return impl->reader.getVal4().size();
 }
 
 std::optional<Attr> Decl::nth_attribute(unsigned n) const {
-  auto list = impl->reader.getVal3();
+  auto list = impl->reader.getVal4();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -223,24 +251,24 @@ std::optional<Attr> Decl::nth_attribute(unsigned n) const {
 }
 
 gap::generator<Attr> Decl::attributes(void) const & {
-  auto list = impl->reader.getVal3();
+  auto list = impl->reader.getVal4();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d3 = ep->AttrFor(ep, v)) {
-      co_yield Attr(std::move(d3));
+    if (auto d4 = ep->AttrFor(ep, v)) {
+      co_yield Attr(std::move(d4));
     }
   }
   co_return;
 }
 
 AvailabilityResult Decl::availability(void) const {
-  return static_cast<AvailabilityResult>(impl->reader.getVal4());
+  return static_cast<AvailabilityResult>(impl->reader.getVal5());
 }
 
 std::optional<Attr> Decl::defining_attribute(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal5();
+    RawEntityId eid = impl->reader.getVal6();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -253,7 +281,7 @@ std::optional<Attr> Decl::defining_attribute(void) const {
 
 std::optional<ExternalSourceSymbolAttr> Decl::external_source_symbol_attribute(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal6();
+    RawEntityId eid = impl->reader.getVal7();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -265,25 +293,25 @@ std::optional<ExternalSourceSymbolAttr> Decl::external_source_symbol_attribute(v
 }
 
 DeclFriendObjectKind Decl::friend_object_kind(void) const {
-  return static_cast<DeclFriendObjectKind>(impl->reader.getVal7());
+  return static_cast<DeclFriendObjectKind>(impl->reader.getVal8());
 }
 
 std::optional<uint32_t> Decl::max_alignment(void) const {
-  if (!impl->reader.getVal9()) {
+  if (!impl->reader.getVal10()) {
     return std::nullopt;
   } else {
-    return static_cast<uint32_t>(impl->reader.getVal8());
+    return static_cast<uint32_t>(impl->reader.getVal9());
   }
   return std::nullopt;
 }
 
 DeclModuleOwnershipKind Decl::module_ownership_kind(void) const {
-  return static_cast<DeclModuleOwnershipKind>(impl->reader.getVal10());
+  return static_cast<DeclModuleOwnershipKind>(impl->reader.getVal11());
 }
 
 std::optional<Decl> Decl::non_closure_context(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal11();
+    RawEntityId eid = impl->reader.getVal12();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -295,111 +323,111 @@ std::optional<Decl> Decl::non_closure_context(void) const {
 }
 
 uint32_t Decl::owning_module_id(void) const {
-  return impl->reader.getVal12();
-}
-
-uint32_t Decl::template_depth(void) const {
   return impl->reader.getVal13();
 }
 
-bool Decl::is_deprecated(void) const {
+uint32_t Decl::template_depth(void) const {
   return impl->reader.getVal14();
 }
 
-bool Decl::is_file_context_declaration(void) const {
+bool Decl::is_deprecated(void) const {
   return impl->reader.getVal15();
 }
 
-bool Decl::is_function_or_function_template(void) const {
+bool Decl::is_file_context_declaration(void) const {
   return impl->reader.getVal16();
 }
 
-bool Decl::is_implicit(void) const {
+bool Decl::is_function_or_function_template(void) const {
   return impl->reader.getVal17();
 }
 
-bool Decl::is_in_anonymous_namespace(void) const {
+bool Decl::is_implicit(void) const {
   return impl->reader.getVal18();
 }
 
-bool Decl::is_in_another_module_unit(void) const {
+bool Decl::is_in_anonymous_namespace(void) const {
   return impl->reader.getVal19();
 }
 
-bool Decl::is_in_export_declaration_context(void) const {
+bool Decl::is_in_another_module_unit(void) const {
   return impl->reader.getVal20();
 }
 
-bool Decl::is_in_std_namespace(void) const {
+bool Decl::is_in_export_declaration_context(void) const {
   return impl->reader.getVal21();
 }
 
-bool Decl::is_invisible_outside_the_owning_module(void) const {
+bool Decl::is_in_std_namespace(void) const {
   return impl->reader.getVal22();
 }
 
-bool Decl::is_local_extern_declaration(void) const {
+bool Decl::is_invisible_outside_the_owning_module(void) const {
   return impl->reader.getVal23();
 }
 
-bool Decl::is_module_private(void) const {
+bool Decl::is_local_extern_declaration(void) const {
   return impl->reader.getVal24();
 }
 
-bool Decl::is_out_of_line(void) const {
+bool Decl::is_module_private(void) const {
   return impl->reader.getVal25();
 }
 
-bool Decl::is_parameter_pack(void) const {
+bool Decl::is_out_of_line(void) const {
   return impl->reader.getVal26();
 }
 
-bool Decl::is_template_declaration(void) const {
+bool Decl::is_parameter_pack(void) const {
   return impl->reader.getVal27();
 }
 
-bool Decl::is_template_parameter(void) const {
+bool Decl::is_template_declaration(void) const {
   return impl->reader.getVal28();
 }
 
-bool Decl::is_template_parameter_pack(void) const {
+bool Decl::is_template_parameter(void) const {
   return impl->reader.getVal29();
 }
 
-bool Decl::is_templated(void) const {
+bool Decl::is_template_parameter_pack(void) const {
   return impl->reader.getVal30();
 }
 
-bool Decl::is_top_level_declaration_in_obj_c_container(void) const {
+bool Decl::is_templated(void) const {
   return impl->reader.getVal31();
 }
 
-bool Decl::is_unavailable(void) const {
+bool Decl::is_top_level_declaration_in_obj_c_container(void) const {
   return impl->reader.getVal32();
 }
 
-bool Decl::is_unconditionally_visible(void) const {
+bool Decl::is_unavailable(void) const {
   return impl->reader.getVal33();
 }
 
-bool Decl::is_weak_imported(void) const {
+bool Decl::is_unconditionally_visible(void) const {
   return impl->reader.getVal34();
 }
 
+bool Decl::is_weak_imported(void) const {
+  return impl->reader.getVal35();
+}
+
 DeclKind Decl::kind(void) const {
-  return static_cast<DeclKind>(impl->reader.getVal35());
+  return static_cast<DeclKind>(impl->reader.getVal36());
 }
 
 DeclCategory Decl::category(void) const {
-  return static_cast<DeclCategory>(impl->reader.getVal36());
+  return static_cast<DeclCategory>(impl->reader.getVal37());
 }
 
 Token Decl::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal37());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 TokenRange Decl::tokens(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal38(), impl->reader.getVal39());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal39(), impl->reader.getVal40());
 }
 
 #pragma GCC diagnostic pop

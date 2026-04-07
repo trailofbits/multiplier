@@ -2388,27 +2388,47 @@ MethodListPtr CodeGenerator::RunOnClass(
       make_parent("parent_statement", "MX_VISIT_STMT_LINK", "Stmt");
     }
 
-    // `*::ir_instruction()` -- the IR instruction corresponding to this entity.
+    // `*::ir()` -- the IR entity corresponding to this AST entity.
+    // For FunctionDecl, returns IRFunction. For Stmt/Expr, returns IRInstruction.
+    // For CaseStmt/DefaultStmt, returns IRSwitchCase. Etc.
     if (class_name == "Decl" || class_name == "Stmt") {
-      auto sd = storage.AddMethod("UInt64");  // IR instruction entity ID.
+      auto sd = storage.AddMethod("UInt64");  // IR entity ID (any IR kind).
       auto [cd_getter_name, cd_setter_name, cd_init_name] = NamesFor(sd);
 
       class_os
-          << "  std::optional<IRInstruction> ir_instruction(void) const;\n";
+          << "  std::optional<VariantEntity> ir(void) const;\n";
 
       serialize_inc_os
           << "  MX_VISIT_ENTITY_ID(" << class_name
-          << ", ir_instruction, " << sd << ")\n";
+          << ", ir, " << sd << ")\n";
 
       serialize_cpp_os
-          << "  b." << cd_setter_name << "(es.IRInstructionId(e));\n";
+          << "  b." << cd_setter_name << "(es.IREntityId(e));\n";
 
       lib_cpp_os
-          << "std::optional<IRInstruction> " << class_name << "::ir_instruction(void) const {\n"
-          << "  if (auto id = impl->reader." << cd_getter_name << "(); "
-          << "id != kInvalidEntityId) {\n"
-          << "    if (auto eptr = impl->ep->IRInstructionFor(impl->ep, id)) {\n"
-          << "      return IRInstruction(std::move(eptr));\n"
+          << "std::optional<VariantEntity> " << class_name << "::ir(void) const {\n"
+          << "  auto raw = impl->reader." << cd_getter_name << "();\n"
+          << "  if (raw == kInvalidEntityId) return std::nullopt;\n"
+          << "  auto vid = EntityId(raw).Unpack();\n"
+          << "  if (auto *p = std::get_if<IRFunctionId>(&vid)) {\n"
+          << "    if (auto ptr = impl->ep->IRFunctionFor(impl->ep, raw)) {\n"
+          << "      return IRFunction(std::move(ptr));\n"
+          << "    }\n"
+          << "  } else if (auto *p = std::get_if<IRBlockId>(&vid)) {\n"
+          << "    if (auto ptr = impl->ep->IRBlockFor(impl->ep, raw)) {\n"
+          << "      return IRBlock(std::move(ptr));\n"
+          << "    }\n"
+          << "  } else if (auto *p = std::get_if<IRInstructionId>(&vid)) {\n"
+          << "    if (auto ptr = impl->ep->IRInstructionFor(impl->ep, raw)) {\n"
+          << "      return IRInstruction(std::move(ptr));\n"
+          << "    }\n"
+          << "  } else if (auto *p = std::get_if<IRObjectId>(&vid)) {\n"
+          << "    if (auto ptr = impl->ep->IRObjectFor(impl->ep, raw)) {\n"
+          << "      return IRObject(std::move(ptr));\n"
+          << "    }\n"
+          << "  } else if (auto *p = std::get_if<IRSwitchCaseId>(&vid)) {\n"
+          << "    if (auto ptr = impl->ep->IRSwitchCaseFor(impl->ep, raw)) {\n"
+          << "      return IRSwitchCase(std::move(ptr));\n"
           << "    }\n"
           << "  }\n"
           << "  return std::nullopt;\n"
@@ -4115,6 +4135,9 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "#endif\n"
       << "#ifndef MX_VISIT_BASE\n"
       << "#  define MX_VISIT_BASE(...)\n"
+      << "#endif\n"
+      << "#ifndef MX_VISIT_ENTITY_ID\n"
+      << "#  define MX_VISIT_ENTITY_ID(...)\n"
       << "#endif\n"
       << "#ifndef MX_VISIT_DECL_LINK\n"
       << "#  define MX_VISIT_DECL_LINK(...)\n"

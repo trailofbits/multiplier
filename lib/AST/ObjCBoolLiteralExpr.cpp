@@ -183,11 +183,11 @@ std::optional<ObjCBoolLiteralExpr> ObjCBoolLiteralExpr::from(const TokenContext 
 }
 
 Token ObjCBoolLiteralExpr::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 bool ObjCBoolLiteralExpr::value(void) const {
-  return impl->reader.getVal84();
+  return impl->reader.getVal85();
 }
 
 #pragma GCC diagnostic pop

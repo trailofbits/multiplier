@@ -38,12 +38,14 @@ struct SwitchCase @0x93795f3c8abc1070 {
   sourceEntityId @3 :UInt64;  # CaseStmt/DefaultStmt AST entity ID
   valueTypeId @4 :UInt64;     # Integral type for interpreting values
   isDefault @5 :Bool;         # True for the default case
+  switchInstructionId @6 :UInt64;  # IRInstructionId of parent switch
 }
 
 struct Function @0xe6be31a259218610 {
-  funcDeclEntityId @0 :UInt64;
+  sourceDeclEntityId @0 :UInt64;  # FunctionDecl for NORMAL, VarDecl for GLOBAL_INITIALIZER
   entryBlockId @1 :UInt64;
-  numBlocks @2 :UInt16;      # Number of block IDs in this function's entityPool run
-  numObjects @3 :UInt16;     # Number of object IDs in this function's entityPool run
-  entityOffset @4 :UInt32;   # Start index into fragment's irEntityPool for block/object lists
+  numBlocks @2 :UInt16;
+  numObjects @3 :UInt16;
+  entityOffset @4 :UInt32;
+  kind @5 :UInt8;             # FunctionKind enum (0 = NORMAL)
 }

@@ -92,6 +92,42 @@ std::optional<FunctionIR> IRGenerator::Generate(
 
     EmitBody(*body);
 
+    // If the current block has no terminator, add an implicit void return.
+    {
+      auto &blk = func_.blocks[current_block_index_];
+      bool needs_ret = blk.instruction_indices.empty();
+      if (!needs_ret) {
+        auto last_op = func_.instructions[blk.instruction_indices.back()].opcode;
+        needs_ret = !mx::ir::IsTerminator(last_op);
+      }
+      if (needs_ret) {
+        InstructionIR ret;
+        ret.opcode = mx::ir::OpCode::RET;
+        EmitTopLevel(std::move(ret));
+      }
+    }
+
+    // Patch empty blocks before computing dominators.
+    // Empty blocks arise when all paths into a merge/exit block already
+    // terminated (e.g., both if-branches return), or from empty switch cases.
+    for (uint32_t bi = 0; bi < func_.blocks.size(); ++bi) {
+      auto &block = func_.blocks[bi];
+      if (!block.instruction_indices.empty()) continue;
+      InstructionIR term;
+      term.parent_block_index = bi;
+      if (!block.successor_indices.empty()) {
+        term.opcode = mx::ir::OpCode::IMPLICIT_GOTO;
+        BranchTargetIR target;
+        target.block_index = block.successor_indices.front();
+        term.branch_targets = {target};
+      } else {
+        term.opcode = mx::ir::OpCode::IMPLICIT_UNREACHABLE;
+      }
+      uint32_t idx = static_cast<uint32_t>(func_.instructions.size());
+      func_.instructions.push_back(std::move(term));
+      block.instruction_indices.push_back(idx);
+    }
+
     // Compute dominators and RPO.
     ComputeDominators();
     ComputeRPO();
@@ -144,6 +180,15 @@ uint32_t IRGenerator::EmitBranch(uint32_t target_block,
 uint32_t IRGenerator::EmitBranchWithOpCode(mx::ir::OpCode opcode,
                                             uint32_t target_block,
                                             mx::RawEntityId source_eid) {
+  // Don't emit a branch if the current block is already terminated.
+  auto &blk = func_.blocks[current_block_index_];
+  if (!blk.instruction_indices.empty()) {
+    auto last_op = func_.instructions[blk.instruction_indices.back()].opcode;
+    if (mx::ir::IsTerminator(last_op)) {
+      return UINT32_MAX;
+    }
+  }
+
   InstructionIR br;
   br.opcode = opcode;
   br.source_entity_id = source_eid;
@@ -313,6 +358,7 @@ uint32_t IRGenerator::GetOrMakeObject(const pasta::Decl &decl) {
 // ---------------------------------------------------------------------------
 
 uint32_t IRGenerator::EmitInstruction(InstructionIR inst) {
+  inst.parent_block_index = current_block_index_;
   uint32_t idx = static_cast<uint32_t>(func_.instructions.size());
   func_.instructions.push_back(std::move(inst));
   return idx;
@@ -1757,12 +1803,12 @@ void IRGenerator::VerifyBlocks() {
   for (uint32_t bi = 0; bi < blocks.size(); ++bi) {
     auto &block = blocks[bi];
 
-    // Every block must have at least one instruction.
+    // All blocks should have been patched before ComputeDominators.
     DCHECK(!block.instruction_indices.empty())
         << "Block " << bi << " has no instructions";
 
     // The last top-level instruction must be a terminator.
-    if (!block.instruction_indices.empty()) {
+    {
       auto last_idx = block.instruction_indices.back();
       DCHECK(last_idx < instructions.size())
           << "Block " << bi << " last instruction index out of range";

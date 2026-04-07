@@ -219,24 +219,24 @@ std::optional<VarTemplateSpecializationDecl> VarTemplateSpecializationDecl::from
 }
 
 Token VarTemplateSpecializationDecl::extern_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal113());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal114());
 }
 
 TemplateSpecializationKind VarTemplateSpecializationDecl::specialization_kind(void) const {
-  return static_cast<TemplateSpecializationKind>(impl->reader.getVal118());
+  return static_cast<TemplateSpecializationKind>(impl->reader.getVal119());
 }
 
 VarTemplateDecl VarTemplateSpecializationDecl::specialized_template(void) const {
-  RawEntityId eid = impl->reader.getVal114();
+  RawEntityId eid = impl->reader.getVal115();
   return VarTemplateDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 unsigned VarTemplateSpecializationDecl::num_template_arguments(void) const {
-  return impl->reader.getVal44().size();
+  return impl->reader.getVal45().size();
 }
 
 std::optional<TemplateArgument> VarTemplateSpecializationDecl::nth_template_argument(unsigned n) const {
-  auto list = impl->reader.getVal44();
+  auto list = impl->reader.getVal45();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -250,31 +250,31 @@ std::optional<TemplateArgument> VarTemplateSpecializationDecl::nth_template_argu
 }
 
 gap::generator<TemplateArgument> VarTemplateSpecializationDecl::template_arguments(void) const & {
-  auto list = impl->reader.getVal44();
+  auto list = impl->reader.getVal45();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d44 = ep->TemplateArgumentFor(ep, v)) {
-      co_yield TemplateArgument(std::move(d44));
+    if (auto d45 = ep->TemplateArgumentFor(ep, v)) {
+      co_yield TemplateArgument(std::move(d45));
     }
   }
   co_return;
 }
 
 Token VarTemplateSpecializationDecl::template_keyword_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal115());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal116());
 }
 
 bool VarTemplateSpecializationDecl::is_class_scope_explicit_specialization(void) const {
-  return impl->reader.getVal121();
-}
-
-bool VarTemplateSpecializationDecl::is_explicit_instantiation_or_specialization(void) const {
   return impl->reader.getVal122();
 }
 
-bool VarTemplateSpecializationDecl::is_explicit_specialization(void) const {
+bool VarTemplateSpecializationDecl::is_explicit_instantiation_or_specialization(void) const {
   return impl->reader.getVal123();
+}
+
+bool VarTemplateSpecializationDecl::is_explicit_specialization(void) const {
+  return impl->reader.getVal124();
 }
 
 #pragma GCC diagnostic pop

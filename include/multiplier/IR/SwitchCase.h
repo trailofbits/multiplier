@@ -13,6 +13,7 @@
 namespace mx {
 
 class IRBlock;
+class IRInstruction;
 class IRSwitchCaseImpl;
 class Stmt;
 class Type;
@@ -47,6 +48,9 @@ class MX_EXPORT IRSwitchCase {
 
   // AST provenance: the CaseStmt or DefaultStmt.
   std::optional<Stmt> source_statement(void) const;
+
+  // The parent switch instruction.
+  IRInstruction parent_switch(void) const;
 };
 
 }  // namespace mx

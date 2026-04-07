@@ -91,13 +91,25 @@ class EntityMapper final {
     return ParentStmtId(RawEntity(entity));
   }
 
-  // Look up the IR instruction entity ID for a given AST entity.
-  // Returns kInvalidEntityId if no IR instruction maps to this entity.
-  mx::RawEntityId IRInstructionId(const void *entity) const;
+  // Look up the IR entity ID for a given AST entity.
+  // Returns kInvalidEntityId if no IR entity maps to this entity.
+  // The returned ID may be an IRInstructionId, IRFunctionId, etc.
+  mx::RawEntityId IREntityId(const void *entity) const;
 
   template <typename Entity>
+  inline mx::RawEntityId IREntityId(const Entity &entity) const {
+    return IREntityId(RawEntity(entity));
+  }
+
+  // Convenience aliases.
+  template <typename Entity>
   inline mx::RawEntityId IRInstructionId(const Entity &entity) const {
-    return IRInstructionId(RawEntity(entity));
+    return IREntityId(entity);
+  }
+
+  template <typename Entity>
+  inline mx::RawEntityId IRFunctionId(const Entity &entity) const {
+    return IREntityId(entity);
   }
 
   inline mx::RawEntityId EntityId(std::nullptr_t entity) const noexcept {

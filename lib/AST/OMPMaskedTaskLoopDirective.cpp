@@ -184,7 +184,7 @@ std::optional<OMPMaskedTaskLoopDirective> OMPMaskedTaskLoopDirective::from(const
 }
 
 bool OMPMaskedTaskLoopDirective::has_cancel(void) const {
-  return impl->reader.getVal23();
+  return impl->reader.getVal24();
 }
 
 #pragma GCC diagnostic pop

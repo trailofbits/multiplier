@@ -185,7 +185,7 @@ std::optional<CXXFoldExpr> CXXFoldExpr::from(const TokenContext &t) {
 
 std::optional<UnresolvedLookupExpr> CXXFoldExpr::callee(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal38();
+    RawEntityId eid = impl->reader.getVal39();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -197,23 +197,10 @@ std::optional<UnresolvedLookupExpr> CXXFoldExpr::callee(void) const {
 }
 
 Token CXXFoldExpr::ellipsis_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 std::optional<Expr> CXXFoldExpr::initializer(void) const {
-  if (true) {
-    RawEntityId eid = impl->reader.getVal40();
-    if (eid == kInvalidEntityId) {
-      return std::nullopt;
-    }
-    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from_base(std::move(eptr));
-    }
-  }
-  return std::nullopt;
-}
-
-std::optional<Expr> CXXFoldExpr::lhs(void) const {
   if (true) {
     RawEntityId eid = impl->reader.getVal41();
     if (eid == kInvalidEntityId) {
@@ -226,22 +213,35 @@ std::optional<Expr> CXXFoldExpr::lhs(void) const {
   return std::nullopt;
 }
 
+std::optional<Expr> CXXFoldExpr::lhs(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal42();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from_base(std::move(eptr));
+    }
+  }
+  return std::nullopt;
+}
+
 Token CXXFoldExpr::l_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }
 
 BinaryOperatorKind CXXFoldExpr::operator_(void) const {
-  return static_cast<BinaryOperatorKind>(impl->reader.getVal89());
+  return static_cast<BinaryOperatorKind>(impl->reader.getVal90());
 }
 
 Expr CXXFoldExpr::pattern(void) const {
-  RawEntityId eid = impl->reader.getVal43();
+  RawEntityId eid = impl->reader.getVal44();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 std::optional<Expr> CXXFoldExpr::rhs(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal44();
+    RawEntityId eid = impl->reader.getVal45();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -253,15 +253,15 @@ std::optional<Expr> CXXFoldExpr::rhs(void) const {
 }
 
 Token CXXFoldExpr::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal46());
 }
 
 bool CXXFoldExpr::is_left_fold(void) const {
-  return impl->reader.getVal84();
+  return impl->reader.getVal85();
 }
 
 bool CXXFoldExpr::is_right_fold(void) const {
-  return impl->reader.getVal85();
+  return impl->reader.getVal86();
 }
 
 #pragma GCC diagnostic pop

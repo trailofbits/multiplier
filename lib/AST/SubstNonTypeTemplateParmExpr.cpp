@@ -185,44 +185,44 @@ std::optional<SubstNonTypeTemplateParmExpr> SubstNonTypeTemplateParmExpr::from(c
 }
 
 Decl SubstNonTypeTemplateParmExpr::associated_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal39();
   return Decl(impl->ep->DeclFor(impl->ep, eid));
 }
 
 uint32_t SubstNonTypeTemplateParmExpr::index(void) const {
-  return impl->reader.getVal26();
+  return impl->reader.getVal27();
 }
 
 Token SubstNonTypeTemplateParmExpr::name_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 std::optional<uint32_t> SubstNonTypeTemplateParmExpr::pack_index(void) const {
-  if (!impl->reader.getVal84()) {
+  if (!impl->reader.getVal85()) {
     return std::nullopt;
   } else {
-    return static_cast<uint32_t>(impl->reader.getVal100());
+    return static_cast<uint32_t>(impl->reader.getVal101());
   }
   return std::nullopt;
 }
 
 NonTypeTemplateParmDecl SubstNonTypeTemplateParmExpr::parameter(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal41();
   return NonTypeTemplateParmDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Type SubstNonTypeTemplateParmExpr::parameter_type(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal42();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Expr SubstNonTypeTemplateParmExpr::replacement(void) const {
-  RawEntityId eid = impl->reader.getVal42();
+  RawEntityId eid = impl->reader.getVal43();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 bool SubstNonTypeTemplateParmExpr::is_reference_parameter(void) const {
-  return impl->reader.getVal85();
+  return impl->reader.getVal86();
 }
 
 #pragma GCC diagnostic pop

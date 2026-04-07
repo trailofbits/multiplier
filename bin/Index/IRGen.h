@@ -16,6 +16,7 @@
 #include <multiplier/IR/OpCode.h>
 #include <multiplier/IR/BlockKind.h>
 #include <multiplier/IR/ObjectKind.h>
+#include <multiplier/IR/FunctionKind.h>
 
 namespace clang {
 class ASTContext;
@@ -55,6 +56,9 @@ struct InstructionIR {
   // Parent instruction index (UINT32_MAX for top-level roots).
   // Roots have their parent block determined by which BlockIR contains them.
   uint32_t parent_instruction_index{UINT32_MAX};
+
+  // Block this instruction was emitted into (set by EmitInstruction).
+  uint32_t parent_block_index{UINT32_MAX};
 
   // OpCode-specific fields.
   uint32_t object_index{0};
@@ -110,6 +114,7 @@ struct ObjectIR {
 
 struct FunctionIR {
   mx::RawEntityId func_decl_entity_id{mx::kInvalidEntityId};
+  mx::ir::FunctionKind kind{mx::ir::FunctionKind::NORMAL};
 
   std::vector<InstructionIR> instructions;
   std::vector<BlockIR> blocks;

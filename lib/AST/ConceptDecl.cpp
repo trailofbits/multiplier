@@ -213,12 +213,12 @@ std::optional<ConceptDecl> ConceptDecl::from(const TokenContext &t) {
 }
 
 Expr ConceptDecl::constraint_expression(void) const {
-  RawEntityId eid = impl->reader.getVal50();
+  RawEntityId eid = impl->reader.getVal51();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 bool ConceptDecl::is_type_concept(void) const {
-  return impl->reader.getVal68();
+  return impl->reader.getVal69();
 }
 
 #pragma GCC diagnostic pop

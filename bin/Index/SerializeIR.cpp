@@ -25,6 +25,9 @@ using mx::kInvalidEntityId;
 static RawEntityId MakeBlockEid(
     const ir::FunctionIR &func, RawEntityId fragment_id,
     uint32_t ir_block_base_offset, uint32_t local_block_idx) {
+  CHECK(local_block_idx < func.blocks.size())
+      << "MakeBlockEid: local_block_idx=" << local_block_idx
+      << " >= blocks.size()=" << func.blocks.size();
   auto bk = static_cast<uint8_t>(func.blocks[local_block_idx].kind);
   mx::IRBlockId bid{fragment_id, ir_block_base_offset + local_block_idx, bk};
   return mx::EntityId(bid).Pack();
@@ -184,6 +187,10 @@ static uint32_t EmitInstructionConsts(
       pool.AddInt(static_cast<int64_t>(inst.size_bytes));  // ptr element size
       break;
 
+    case OC::SIZE_OF:
+      pool.AddInt(static_cast<int64_t>(inst.size_bytes));  // static size
+      break;
+
     default:
       return offset;  // no constants
   }
@@ -216,6 +223,15 @@ std::vector<ir::FunctionIR> GenerateIR(
       continue;
     }
 
+    // Map FunctionDecl → IRFunction.
+    auto func_eid = em.EntityId(RawEntity(*func));
+    if (func_eid != mx::kInvalidEntityId) {
+      auto ir_func_eid = mx::EntityId(mx::IRFunctionId{
+          fragment_id,
+          static_cast<uint32_t>(ir_functions.size())}).Pack();
+      em.ir_for_entity[func_eid] = ir_func_eid;
+    }
+
     for (uint32_t i = 0; i < ir->instructions.size(); ++i) {
       auto &inst = ir->instructions[i];
       if (inst.source_entity_id != mx::kInvalidEntityId) {
@@ -236,6 +252,7 @@ std::vector<ir::FunctionIR> GenerateIR(
 void SerializeIR(
     const std::vector<ir::FunctionIR> &ir_functions,
     const PendingFragment &pf,
+    EntityMapper &em,
     mx::rpc::Fragment::Builder &fb) {
 
   if (ir_functions.empty()) return;
@@ -279,21 +296,7 @@ void SerializeIR(
       ob.setKind(static_cast<uint8_t>(src.kind));
     }
 
-    // Build reverse map: instruction index → block index.
-    std::vector<uint32_t> inst_to_block(func.instructions.size(), UINT32_MAX);
-    for (uint32_t bi = 0; bi < func.blocks.size(); ++bi) {
-      for (auto idx : func.blocks[bi].instruction_indices) {
-        inst_to_block[idx] = bi;
-        // Also mark all sub-expression instructions (walk operands).
-        std::function<void(uint32_t)> mark = [&](uint32_t i) {
-          inst_to_block[i] = bi;
-          for (auto op : func.instructions[i].operand_indices) {
-            mark(op);
-          }
-        };
-        mark(idx);
-      }
-    }
+    // No reverse map needed: each instruction stores parent_block_index.
 
     // Serialize instructions.
     for (size_t ii = 0; ii < func.instructions.size(); ++ii) {
@@ -306,7 +309,7 @@ void SerializeIR(
       // Position 0: parent (block for roots, instruction for sub-exprs).
       if (src.parent_instruction_index == UINT32_MAX) {
         pool.AddEntity(MakeBlockEid(func, fragment_id, block_offset,
-                                     inst_to_block[ii]));
+                                     src.parent_block_index));
       } else {
         pool.AddEntity(MakeInstEid(func, fragment_id, inst_offset,
                                     src.parent_instruction_index));
@@ -409,7 +412,8 @@ void SerializeIR(
     // Serialize function.
     {
       auto ffb = frag_funcs[fi];
-      ffb.setFuncDeclEntityId(func.func_decl_entity_id);
+      ffb.setSourceDeclEntityId(func.func_decl_entity_id);
+      ffb.setKind(static_cast<uint8_t>(func.kind));
       ffb.setEntryBlockId(MakeBlockEid(func, fragment_id, block_offset,
                                         func.entry_block_index));
 
@@ -469,10 +473,21 @@ void SerializeIR(
           cb.setValueTypeId(inst.type_entity_id);
           cb.setIsDefault(sc.is_default);
 
+          // Store the parent switch instruction ID.
+          auto switch_eid = mx::EntityId(mx::IRInstructionId{
+              fragment_id, func_inst_base + ii,
+              static_cast<uint8_t>(mx::ir::OpCode::SWITCH)}).Pack();
+          cb.setSwitchInstructionId(switch_eid);
+
           // Overwrite the placeholder in the pool.
           mx::IRSwitchCaseId scid{fragment_id, sc_offset};
-          pool.entities[placeholder_base + sci] =
-              mx::EntityId(scid).Pack();
+          auto sc_eid = mx::EntityId(scid).Pack();
+          pool.entities[placeholder_base + sci] = sc_eid;
+
+          // Map CaseStmt/DefaultStmt → IRSwitchCase.
+          if (sc.source_entity_id != mx::kInvalidEntityId) {
+            em.ir_for_entity[sc.source_entity_id] = sc_eid;
+          }
 
           ++sc_offset;
         }

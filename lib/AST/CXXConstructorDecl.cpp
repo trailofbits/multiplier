@@ -218,7 +218,7 @@ std::optional<CXXConstructorDecl> CXXConstructorDecl::from(const TokenContext &t
 
 std::optional<CXXConstructorDecl> CXXConstructorDecl::target_constructor(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal170();
+    RawEntityId eid = impl->reader.getVal171();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -230,11 +230,11 @@ std::optional<CXXConstructorDecl> CXXConstructorDecl::target_constructor(void) c
 }
 
 unsigned CXXConstructorDecl::num_initializers(void) const {
-  return impl->reader.getVal174().size();
+  return impl->reader.getVal175().size();
 }
 
 std::optional<CXXCtorInitializer> CXXConstructorDecl::nth_initializer(unsigned n) const {
-  auto list = impl->reader.getVal174();
+  auto list = impl->reader.getVal175();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -248,35 +248,35 @@ std::optional<CXXCtorInitializer> CXXConstructorDecl::nth_initializer(unsigned n
 }
 
 gap::generator<CXXCtorInitializer> CXXConstructorDecl::initializers(void) const & {
-  auto list = impl->reader.getVal174();
+  auto list = impl->reader.getVal175();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d174 = ep->CXXCtorInitializerFor(ep, v)) {
-      co_yield CXXCtorInitializer(std::move(d174));
+    if (auto d175 = ep->CXXCtorInitializerFor(ep, v)) {
+      co_yield CXXCtorInitializer(std::move(d175));
     }
   }
   co_return;
 }
 
 bool CXXConstructorDecl::is_default_constructor(void) const {
-  return impl->reader.getVal172();
-}
-
-bool CXXConstructorDecl::is_delegating_constructor(void) const {
   return impl->reader.getVal173();
 }
 
-bool CXXConstructorDecl::is_explicit(void) const {
-  return impl->reader.getVal175();
+bool CXXConstructorDecl::is_delegating_constructor(void) const {
+  return impl->reader.getVal174();
 }
 
-bool CXXConstructorDecl::is_inheriting_constructor(void) const {
+bool CXXConstructorDecl::is_explicit(void) const {
   return impl->reader.getVal176();
 }
 
-bool CXXConstructorDecl::is_specialization_copying_object(void) const {
+bool CXXConstructorDecl::is_inheriting_constructor(void) const {
   return impl->reader.getVal177();
+}
+
+bool CXXConstructorDecl::is_specialization_copying_object(void) const {
+  return impl->reader.getVal178();
 }
 
 #pragma GCC diagnostic pop

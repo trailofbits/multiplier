@@ -182,12 +182,12 @@ std::optional<CoreturnStmt> CoreturnStmt::from(const TokenContext &t) {
 }
 
 Token CoreturnStmt::keyword_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
 }
 
 std::optional<Expr> CoreturnStmt::operand(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal10();
+    RawEntityId eid = impl->reader.getVal11();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -199,12 +199,12 @@ std::optional<Expr> CoreturnStmt::operand(void) const {
 }
 
 Expr CoreturnStmt::promise_call(void) const {
-  RawEntityId eid = impl->reader.getVal11();
+  RawEntityId eid = impl->reader.getVal12();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 bool CoreturnStmt::is_implicit(void) const {
-  return impl->reader.getVal12();
+  return impl->reader.getVal13();
 }
 
 #pragma GCC diagnostic pop

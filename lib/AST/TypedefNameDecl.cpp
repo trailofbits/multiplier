@@ -222,7 +222,7 @@ std::optional<TypedefNameDecl> TypedefNameDecl::from(const TokenContext &t) {
 
 std::optional<TagDecl> TypedefNameDecl::anonymous_declaration_with_typedef_name(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal49();
+    RawEntityId eid = impl->reader.getVal50();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -234,16 +234,16 @@ std::optional<TagDecl> TypedefNameDecl::anonymous_declaration_with_typedef_name(
 }
 
 Type TypedefNameDecl::underlying_type(void) const {
-  RawEntityId eid = impl->reader.getVal50();
+  RawEntityId eid = impl->reader.getVal51();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool TypedefNameDecl::is_moded(void) const {
-  return impl->reader.getVal66();
+  return impl->reader.getVal67();
 }
 
 bool TypedefNameDecl::is_transparent_tag(void) const {
-  return impl->reader.getVal67();
+  return impl->reader.getVal68();
 }
 
 #pragma GCC diagnostic pop

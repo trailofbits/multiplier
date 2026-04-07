@@ -183,7 +183,7 @@ std::optional<MSAsmStmt> MSAsmStmt::from(const TokenContext &t) {
 }
 
 gap::generator<std::string_view> MSAsmStmt::all_constraints(void) const & {
-  auto list = impl->reader.getVal65();
+  auto list = impl->reader.getVal66();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
 co_yield std::string_view(v.cStr(), v.size());
@@ -192,11 +192,11 @@ co_yield std::string_view(v.cStr(), v.size());
 }
 
 unsigned MSAsmStmt::num_all_expressions(void) const {
-  return impl->reader.getVal30().size();
+  return impl->reader.getVal31().size();
 }
 
 std::optional<Expr> MSAsmStmt::nth_all_expression(unsigned n) const {
-  auto list = impl->reader.getVal30();
+  auto list = impl->reader.getVal31();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -210,12 +210,12 @@ std::optional<Expr> MSAsmStmt::nth_all_expression(unsigned n) const {
 }
 
 gap::generator<Expr> MSAsmStmt::all_expressions(void) const & {
-  auto list = impl->reader.getVal30();
+  auto list = impl->reader.getVal31();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d30 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from_base(std::move(d30))) {
+    if (auto d31 = ep->StmtFor(ep, v)) {
+      if (auto e = Expr::from_base(std::move(d31))) {
         co_yield std::move(*e);
       }
     }
@@ -224,16 +224,16 @@ gap::generator<Expr> MSAsmStmt::all_expressions(void) const & {
 }
 
 std::string_view MSAsmStmt::assembly_string(void) const {
-  capnp::Text::Reader data = impl->reader.getVal66();
+  capnp::Text::Reader data = impl->reader.getVal67();
   return std::string_view(data.cStr(), data.size());
 }
 
 Token MSAsmStmt::l_brace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal11());
 }
 
 bool MSAsmStmt::has_braces(void) const {
-  return impl->reader.getVal23();
+  return impl->reader.getVal24();
 }
 
 #pragma GCC diagnostic pop

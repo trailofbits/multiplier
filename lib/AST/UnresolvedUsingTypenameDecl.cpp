@@ -212,19 +212,19 @@ std::optional<UnresolvedUsingTypenameDecl> UnresolvedUsingTypenameDecl::from(con
 }
 
 Token UnresolvedUsingTypenameDecl::ellipsis_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal49());
-}
-
-Token UnresolvedUsingTypenameDecl::typename_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal50());
 }
 
+Token UnresolvedUsingTypenameDecl::typename_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal51());
+}
+
 Token UnresolvedUsingTypenameDecl::using_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal58());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal59());
 }
 
 bool UnresolvedUsingTypenameDecl::is_pack_expansion(void) const {
-  return impl->reader.getVal66();
+  return impl->reader.getVal67();
 }
 
 #pragma GCC diagnostic pop

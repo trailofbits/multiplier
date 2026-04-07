@@ -158,7 +158,12 @@ IMPL_FROM_SINGLE(VAPackInst, VA_PACK)
 IMPL_FROM_SINGLE(RetInst, RET)
 IMPL_FROM_SINGLE(CondBranchInst, COND_BRANCH)
 IMPL_FROM_SINGLE(SwitchInst, SWITCH)
-IMPL_FROM_SINGLE(UnreachableInst, UNREACHABLE)
+std::optional<UnreachableInst> UnreachableInst::from(const IRInstruction &inst) {
+  auto op = inst.opcode();
+  if (op == ir::OpCode::UNREACHABLE || op == ir::OpCode::IMPLICIT_UNREACHABLE)
+    return UnreachableInst(inst.impl_ptr());
+  return std::nullopt;
+}
 IMPL_FROM_SINGLE(UnknownInst, UNKNOWN)
 
 IMPL_FROM_RANGE(BinaryInst, ADD, PTR_DIFF)
@@ -342,9 +347,9 @@ Type SizeOfInst::measured_type(void) const {
 }
 
 int64_t SizeOfInst::static_size(void) const {
-  // sizeOf stores the static size in the int pool via EmitInstructionConsts
-  // but only if it was computed. Check if constOffset is valid.
-  return 0;  // TODO: store in int pool
+  auto r = impl->reader();
+  auto int_pool = GetIntPool(*impl);
+  return int_pool[r.getConstOffset()];
 }
 
 // ---- CallInst ----

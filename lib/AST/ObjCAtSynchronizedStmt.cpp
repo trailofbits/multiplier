@@ -183,16 +183,16 @@ std::optional<ObjCAtSynchronizedStmt> ObjCAtSynchronizedStmt::from(const TokenCo
 }
 
 Token ObjCAtSynchronizedStmt::at_synchronized_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
 }
 
 CompoundStmt ObjCAtSynchronizedStmt::synch_body(void) const {
-  RawEntityId eid = impl->reader.getVal10();
+  RawEntityId eid = impl->reader.getVal11();
   return CompoundStmt::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr ObjCAtSynchronizedStmt::synch_expression(void) const {
-  RawEntityId eid = impl->reader.getVal11();
+  RawEntityId eid = impl->reader.getVal12();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 

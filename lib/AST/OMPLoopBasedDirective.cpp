@@ -291,7 +291,7 @@ std::optional<OMPLoopBasedDirective> OMPLoopBasedDirective::from(const TokenCont
 }
 
 uint32_t OMPLoopBasedDirective::loops_number(void) const {
-  return impl->reader.getVal26();
+  return impl->reader.getVal27();
 }
 
 #pragma GCC diagnostic pop

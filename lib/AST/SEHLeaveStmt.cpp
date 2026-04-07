@@ -181,7 +181,7 @@ std::optional<SEHLeaveStmt> SEHLeaveStmt::from(const TokenContext &t) {
 }
 
 Token SEHLeaveStmt::leave_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
 }
 
 #pragma GCC diagnostic pop

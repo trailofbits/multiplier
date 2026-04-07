@@ -183,47 +183,47 @@ std::optional<CXXRewrittenBinaryOperator> CXXRewrittenBinaryOperator::from(const
 }
 
 Expr CXXRewrittenBinaryOperator::lhs(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal39();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 BinaryOperatorKind CXXRewrittenBinaryOperator::opcode(void) const {
-  return static_cast<BinaryOperatorKind>(impl->reader.getVal89());
+  return static_cast<BinaryOperatorKind>(impl->reader.getVal90());
 }
 
 std::string_view CXXRewrittenBinaryOperator::opcode_string(void) const {
-  capnp::Text::Reader data = impl->reader.getVal61();
+  capnp::Text::Reader data = impl->reader.getVal62();
   return std::string_view(data.cStr(), data.size());
 }
 
 BinaryOperatorKind CXXRewrittenBinaryOperator::operator_(void) const {
-  return static_cast<BinaryOperatorKind>(impl->reader.getVal91());
+  return static_cast<BinaryOperatorKind>(impl->reader.getVal92());
 }
 
 Token CXXRewrittenBinaryOperator::operator_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 Expr CXXRewrittenBinaryOperator::rhs(void) const {
-  RawEntityId eid = impl->reader.getVal40();
-  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
-}
-
-Expr CXXRewrittenBinaryOperator::semantic_form(void) const {
   RawEntityId eid = impl->reader.getVal41();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
-bool CXXRewrittenBinaryOperator::is_assignment_operation(void) const {
-  return impl->reader.getVal84();
+Expr CXXRewrittenBinaryOperator::semantic_form(void) const {
+  RawEntityId eid = impl->reader.getVal42();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
-bool CXXRewrittenBinaryOperator::is_comparison_operation(void) const {
+bool CXXRewrittenBinaryOperator::is_assignment_operation(void) const {
   return impl->reader.getVal85();
 }
 
-bool CXXRewrittenBinaryOperator::is_reversed(void) const {
+bool CXXRewrittenBinaryOperator::is_comparison_operation(void) const {
   return impl->reader.getVal86();
+}
+
+bool CXXRewrittenBinaryOperator::is_reversed(void) const {
+  return impl->reader.getVal87();
 }
 
 #pragma GCC diagnostic pop

@@ -184,20 +184,20 @@ std::optional<StmtExpr> StmtExpr::from(const TokenContext &t) {
 }
 
 Token StmtExpr::l_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
-}
-
-Token StmtExpr::r_paren_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
+Token StmtExpr::r_paren_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+}
+
 CompoundStmt StmtExpr::sub_statement(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal41();
   return CompoundStmt::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 uint32_t StmtExpr::template_depth(void) const {
-  return impl->reader.getVal26();
+  return impl->reader.getVal27();
 }
 
 #pragma GCC diagnostic pop

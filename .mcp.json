@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "clangaroo": {
+      "command": "clangaroo",
+      "args": [
+        "--project", "/Users/orangesloth/Code/multiplier/multiplier"
+      ]
+    }
+  }
+}

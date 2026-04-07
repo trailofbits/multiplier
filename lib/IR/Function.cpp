@@ -67,13 +67,28 @@ gap::generator<IRObject> IRFunction::objects(void) const & {
   }
 }
 
+ir::FunctionKind IRFunction::kind(void) const {
+  if (!impl) return ir::FunctionKind::NORMAL;
+  return static_cast<ir::FunctionKind>(impl->reader().getKind());
+}
+
 std::optional<FunctionDecl> IRFunction::declaration(void) const {
   if (!impl) return std::nullopt;
-  auto eid = impl->reader().getFuncDeclEntityId();
+  if (kind() != ir::FunctionKind::NORMAL) return std::nullopt;
+  auto eid = impl->reader().getSourceDeclEntityId();
   if (eid == kInvalidEntityId) return std::nullopt;
   if (auto ptr = impl->frag->ep->DeclFor(impl->frag->ep, eid)) {
-    auto decl = Decl(std::move(ptr));
-    return FunctionDecl::from(decl);
+    return FunctionDecl::from(Decl(std::move(ptr)));
+  }
+  return std::nullopt;
+}
+
+std::optional<Decl> IRFunction::source_declaration(void) const {
+  if (!impl) return std::nullopt;
+  auto eid = impl->reader().getSourceDeclEntityId();
+  if (eid == kInvalidEntityId) return std::nullopt;
+  if (auto ptr = impl->frag->ep->DeclFor(impl->frag->ep, eid)) {
+    return Decl(std::move(ptr));
   }
   return std::nullopt;
 }
@@ -87,7 +102,7 @@ std::optional<IRFunction> IRFunction::from(const FunctionDecl &decl) {
   auto frag_id = frag.impl->fragment_id;
 
   for (unsigned i = 0; i < ir_funcs.size(); ++i) {
-    if (ir_funcs[i].getFuncDeclEntityId() == decl_eid) {
+    if (ir_funcs[i].getSourceDeclEntityId() == decl_eid) {
       return IRFunction(std::make_shared<IRFunctionImpl>(
           frag.impl, i, frag_id));
     }

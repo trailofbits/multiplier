@@ -184,16 +184,16 @@ std::optional<DependentCoawaitExpr> DependentCoawaitExpr::from(const TokenContex
 }
 
 Token DependentCoawaitExpr::keyword_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 Expr DependentCoawaitExpr::operand(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal40();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 UnresolvedLookupExpr DependentCoawaitExpr::operator_coawait_lookup(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal41();
   return UnresolvedLookupExpr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 

@@ -182,12 +182,12 @@ std::optional<ObjCAtThrowStmt> ObjCAtThrowStmt::from(const TokenContext &t) {
 }
 
 Expr ObjCAtThrowStmt::throw_expression(void) const {
-  RawEntityId eid = impl->reader.getVal9();
+  RawEntityId eid = impl->reader.getVal10();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Token ObjCAtThrowStmt::throw_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal11());
 }
 
 #pragma GCC diagnostic pop

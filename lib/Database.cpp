@@ -624,7 +624,7 @@ void DatabaseWriterImpl::InitMetadata(void) {
 
   // Generate and store a unique index ID if not already present.
   auto check = db.Prepare("SELECT COUNT(*) FROM index_id");
-  check.Execute();
+  check.ExecuteStep();
   int64_t count = 0;
   check.Row().Columns(count);
   if (count == 0) {
@@ -794,20 +794,24 @@ std::filesystem::path CreateDatabase(const std::filesystem::path &db_path_) {
 }  // namespace
 
 DatabaseWriterImpl::~DatabaseWriterImpl(void) {
+  // Join the bulk insertion thread FIRST so its database connection is closed
+  // before we run any cleanup SQL on the main connection. Otherwise SQLite
+  // can return "database is locked" due to concurrent writers.
+  try {
+    insertion_queue.enqueue(ExitSignal{});
+    bulk_insertion_thread.join();
+  } catch (...) {}
 
-  ExitDictionaries();
+  try {
+    ExitDictionaries();
+  } catch (...) {}
 
-  insertion_queue.enqueue(ExitSignal{});
-  bulk_insertion_thread.join();
-
-//  for (const char *stmt : DatabaseWriter::kExitStatments) {
-//    db.Execute(stmt);
-//  }
-
-  ExitRecords();
-  ExitMetadata();
-  db.Execute("PRAGMA wal_checkpoint(FULL)");
-  db.Optimize();
+  try {
+    ExitRecords();
+    ExitMetadata();
+    db.Execute("PRAGMA wal_checkpoint(FULL)");
+    db.Optimize();
+  } catch (...) {}
 }
 
 DatabaseWriterImpl::DatabaseWriterImpl(const std::filesystem::path &db_path_,

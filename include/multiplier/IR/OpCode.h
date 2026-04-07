@@ -92,19 +92,20 @@ enum class OpCode : uint8_t {
   IMPLICIT_GOTO = 56,     // structural CFG edge (e.g., end of if-then → merge)
   FALLTHROUGH = 57,       // explicit [[fallthrough]]
   IMPLICIT_FALLTHROUGH = 58, // implicit (no break at end of case)
+  IMPLICIT_UNREACHABLE = 59, // structurally unreachable (patched empty block)
 
   // Variadic argument handling
-  VA_PACK = 59,           // groups variadic args at call site; operands = the packed args
-  VA_START = 60,          // binds va_list to function's variadic pack; op[0] = va_list
-  VA_ARG = 61,            // reads next value from va_list; op[0] = va_list; typeEntityId = result type
-  VA_COPY = 62,           // copies va_list; op[0] = dest, op[1] = src
-  VA_END = 63,            // releases va_list; op[0] = va_list
+  VA_PACK = 60,           // groups variadic args at call site; operands = the packed args
+  VA_START = 61,          // binds va_list to function's variadic pack; op[0] = va_list
+  VA_ARG = 62,            // reads next value from va_list; op[0] = va_list; typeEntityId = result type
+  VA_COPY = 63,           // copies va_list; op[0] = dest, op[1] = src
+  VA_END = 64,            // releases va_list; op[0] = va_list
 
   // Aggregate initialization
-  INIT_LIST = 64,          // {a, b, c} -- operands are the initializer values
+  INIT_LIST = 65,          // {a, b, c} -- operands are the initializer values
 
   // Unknown / unhandled expression
-  UNKNOWN = 65,
+  UNKNOWN = 66,
 };
 
 // Returns the human-readable name of an opcode.
@@ -115,12 +116,12 @@ inline static const char *EnumerationName(OpCode) {
 const char *EnumeratorName(OpCode op) noexcept;
 
 inline static constexpr unsigned NumEnumerators(OpCode) {
-  return 66u;
+  return 67u;
 }
 
 // Classification helpers.
 inline bool IsTerminator(OpCode op) {
-  return op >= OpCode::COND_BRANCH && op <= OpCode::IMPLICIT_FALLTHROUGH;
+  return op >= OpCode::COND_BRANCH && op <= OpCode::IMPLICIT_UNREACHABLE;
 }
 
 inline bool IsConstant(OpCode op) {

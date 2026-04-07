@@ -215,12 +215,12 @@ std::optional<ObjCCategoryImplDecl> ObjCCategoryImplDecl::from(const TokenContex
 }
 
 ObjCCategoryDecl ObjCCategoryImplDecl::category_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal59();
+  RawEntityId eid = impl->reader.getVal60();
   return ObjCCategoryDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Token ObjCCategoryImplDecl::category_name_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal60());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal61());
 }
 
 #pragma GCC diagnostic pop

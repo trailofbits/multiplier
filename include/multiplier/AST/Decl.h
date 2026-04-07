@@ -45,6 +45,7 @@ class MX_EXPORT Decl {
  public:
   std::optional<Decl> parent_declaration(void) const;
   std::optional<Stmt> parent_statement(void) const;
+  std::optional<VariantEntity> ir(void) const;
  protected:
   friend class Attr;
   friend class File;

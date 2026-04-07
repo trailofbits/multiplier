@@ -214,37 +214,37 @@ std::optional<OMPDeclareReductionDecl> OMPDeclareReductionDecl::from(const Token
 }
 
 Expr OMPDeclareReductionDecl::combiner(void) const {
-  RawEntityId eid = impl->reader.getVal50();
+  RawEntityId eid = impl->reader.getVal51();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr OMPDeclareReductionDecl::combiner_in(void) const {
-  RawEntityId eid = impl->reader.getVal58();
-  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
-}
-
-Expr OMPDeclareReductionDecl::combiner_out(void) const {
   RawEntityId eid = impl->reader.getVal59();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
-Expr OMPDeclareReductionDecl::initializer_original(void) const {
+Expr OMPDeclareReductionDecl::combiner_out(void) const {
   RawEntityId eid = impl->reader.getVal60();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
-Expr OMPDeclareReductionDecl::initializer_private(void) const {
-  RawEntityId eid = impl->reader.getVal70();
+Expr OMPDeclareReductionDecl::initializer_original(void) const {
+  RawEntityId eid = impl->reader.getVal61();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
-Expr OMPDeclareReductionDecl::initializer(void) const {
+Expr OMPDeclareReductionDecl::initializer_private(void) const {
   RawEntityId eid = impl->reader.getVal71();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
+Expr OMPDeclareReductionDecl::initializer(void) const {
+  RawEntityId eid = impl->reader.getVal72();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
+}
+
 OMPDeclareReductionInitKind OMPDeclareReductionDecl::initializer_kind(void) const {
-  return static_cast<OMPDeclareReductionInitKind>(impl->reader.getVal72());
+  return static_cast<OMPDeclareReductionInitKind>(impl->reader.getVal73());
 }
 
 gap::generator<Decl> OMPDeclareReductionDecl::contained_declarations(void) const & {

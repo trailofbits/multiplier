@@ -41,6 +41,34 @@ std::optional<Stmt> Stmt::parent_statement(void) const {
   return std::nullopt;
 }
 
+std::optional<VariantEntity> Stmt::ir(void) const {
+  auto raw = impl->reader.getVal2();
+  if (raw == kInvalidEntityId) return std::nullopt;
+  auto vid = EntityId(raw).Unpack();
+  if (auto *p = std::get_if<IRFunctionId>(&vid)) {
+    if (auto ptr = impl->ep->IRFunctionFor(impl->ep, raw)) {
+      return IRFunction(std::move(ptr));
+    }
+  } else if (auto *p = std::get_if<IRBlockId>(&vid)) {
+    if (auto ptr = impl->ep->IRBlockFor(impl->ep, raw)) {
+      return IRBlock(std::move(ptr));
+    }
+  } else if (auto *p = std::get_if<IRInstructionId>(&vid)) {
+    if (auto ptr = impl->ep->IRInstructionFor(impl->ep, raw)) {
+      return IRInstruction(std::move(ptr));
+    }
+  } else if (auto *p = std::get_if<IRObjectId>(&vid)) {
+    if (auto ptr = impl->ep->IRObjectFor(impl->ep, raw)) {
+      return IRObject(std::move(ptr));
+    }
+  } else if (auto *p = std::get_if<IRSwitchCaseId>(&vid)) {
+    if (auto ptr = impl->ep->IRSwitchCaseFor(impl->ep, raw)) {
+      return IRSwitchCase(std::move(ptr));
+    }
+  }
+  return std::nullopt;
+}
+
 std::shared_ptr<EntityProvider> Stmt::entity_provider_of(const Index &index_) {
   return index_.impl;
 }
@@ -54,7 +82,7 @@ std::shared_ptr<EntityProvider> Stmt::entity_provider_of(const File &file_) {
 }
 
 std::optional<PackedDeclId> Stmt::referenced_declaration_id(void) const {
-  if (auto id = impl->reader.getVal2();
+  if (auto id = impl->reader.getVal3();
       id != kInvalidEntityId) {
     VariantId vid = EntityId(id).Unpack();
     if (std::holds_alternative<DeclId>(vid)) {
@@ -66,7 +94,7 @@ std::optional<PackedDeclId> Stmt::referenced_declaration_id(void) const {
 }
 
 std::optional<Decl> Stmt::referenced_declaration(void) const {
-  if (auto id = impl->reader.getVal2();
+  if (auto id = impl->reader.getVal3();
       id != kInvalidEntityId) {
     if (auto eptr = impl->ep->DeclFor(impl->ep, id)) {
       return Decl(std::move(eptr));
@@ -222,32 +250,32 @@ std::optional<Stmt> Stmt::from(const TokenContext &t) {
 }
 
 Stmt Stmt::ignore_containers(void) const {
-  RawEntityId eid = impl->reader.getVal3();
+  RawEntityId eid = impl->reader.getVal4();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 gap::generator<Stmt> Stmt::children(void) const & {
-  auto list = impl->reader.getVal4();
+  auto list = impl->reader.getVal5();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d4 = ep->StmtFor(ep, v)) {
-      co_yield Stmt(std::move(d4));
+    if (auto d5 = ep->StmtFor(ep, v)) {
+      co_yield Stmt(std::move(d5));
     }
   }
   co_return;
 }
 
 TokenRange Stmt::tokens(void) const {
-  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal5(), impl->reader.getVal6());
+  return impl->ep->TokenRangeFor(impl->ep, impl->reader.getVal6(), impl->reader.getVal7());
 }
 
 StmtKind Stmt::kind(void) const {
-  return static_cast<StmtKind>(impl->reader.getVal7());
+  return static_cast<StmtKind>(impl->reader.getVal8());
 }
 
 Stmt Stmt::strip_label_like_statements(void) const {
-  RawEntityId eid = impl->reader.getVal8();
+  RawEntityId eid = impl->reader.getVal9();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 

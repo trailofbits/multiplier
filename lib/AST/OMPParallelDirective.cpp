@@ -183,12 +183,12 @@ std::optional<OMPParallelDirective> OMPParallelDirective::from(const TokenContex
 }
 
 Expr OMPParallelDirective::task_reduction_reference_expression(void) const {
-  RawEntityId eid = impl->reader.getVal14();
+  RawEntityId eid = impl->reader.getVal15();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 bool OMPParallelDirective::has_cancel(void) const {
-  return impl->reader.getVal23();
+  return impl->reader.getVal24();
 }
 
 #pragma GCC diagnostic pop

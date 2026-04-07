@@ -186,7 +186,7 @@ std::optional<MaterializeTemporaryExpr> MaterializeTemporaryExpr::from(const Tok
 
 std::optional<ValueDecl> MaterializeTemporaryExpr::extending_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal38();
+    RawEntityId eid = impl->reader.getVal39();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -199,7 +199,7 @@ std::optional<ValueDecl> MaterializeTemporaryExpr::extending_declaration(void) c
 
 std::optional<LifetimeExtendedTemporaryDecl> MaterializeTemporaryExpr::lifetime_extended_temporary_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal39();
+    RawEntityId eid = impl->reader.getVal40();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -211,24 +211,24 @@ std::optional<LifetimeExtendedTemporaryDecl> MaterializeTemporaryExpr::lifetime_
 }
 
 uint32_t MaterializeTemporaryExpr::mangling_number(void) const {
-  return impl->reader.getVal26();
+  return impl->reader.getVal27();
 }
 
 StorageDuration MaterializeTemporaryExpr::storage_duration(void) const {
-  return static_cast<StorageDuration>(impl->reader.getVal89());
+  return static_cast<StorageDuration>(impl->reader.getVal90());
 }
 
 Expr MaterializeTemporaryExpr::sub_expression(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal41();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 bool MaterializeTemporaryExpr::is_bound_to_lvalue_reference(void) const {
-  return impl->reader.getVal84();
+  return impl->reader.getVal85();
 }
 
 bool MaterializeTemporaryExpr::is_usable_in_constant_expressions(void) const {
-  return impl->reader.getVal85();
+  return impl->reader.getVal86();
 }
 
 #pragma GCC diagnostic pop

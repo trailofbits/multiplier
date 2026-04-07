@@ -185,12 +185,12 @@ std::optional<OMPDistributeParallelForDirective> OMPDistributeParallelForDirecti
 }
 
 Expr OMPDistributeParallelForDirective::task_reduction_reference_expression(void) const {
-  RawEntityId eid = impl->reader.getVal56();
+  RawEntityId eid = impl->reader.getVal57();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 bool OMPDistributeParallelForDirective::has_cancel(void) const {
-  return impl->reader.getVal23();
+  return impl->reader.getVal24();
 }
 
 #pragma GCC diagnostic pop

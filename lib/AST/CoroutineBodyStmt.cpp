@@ -184,58 +184,58 @@ std::optional<CoroutineBodyStmt> CoroutineBodyStmt::from(const TokenContext &t) 
 }
 
 gap::generator<Stmt> CoroutineBodyStmt::children_excl_body(void) const & {
-  auto list = impl->reader.getVal15();
+  auto list = impl->reader.getVal16();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d15 = ep->StmtFor(ep, v)) {
-      co_yield Stmt(std::move(d15));
+    if (auto d16 = ep->StmtFor(ep, v)) {
+      co_yield Stmt(std::move(d16));
     }
   }
   co_return;
 }
 
 Expr CoroutineBodyStmt::allocate(void) const {
-  RawEntityId eid = impl->reader.getVal9();
+  RawEntityId eid = impl->reader.getVal10();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 CompoundStmt CoroutineBodyStmt::body(void) const {
-  RawEntityId eid = impl->reader.getVal10();
+  RawEntityId eid = impl->reader.getVal11();
   return CompoundStmt::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr CoroutineBodyStmt::deallocate(void) const {
-  RawEntityId eid = impl->reader.getVal11();
+  RawEntityId eid = impl->reader.getVal12();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Stmt CoroutineBodyStmt::exception_handler(void) const {
-  RawEntityId eid = impl->reader.getVal13();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid));
-}
-
-Stmt CoroutineBodyStmt::fallthrough_handler(void) const {
   RawEntityId eid = impl->reader.getVal14();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
-Stmt CoroutineBodyStmt::final_suspend_statement(void) const {
-  RawEntityId eid = impl->reader.getVal17();
+Stmt CoroutineBodyStmt::fallthrough_handler(void) const {
+  RawEntityId eid = impl->reader.getVal15();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
-Stmt CoroutineBodyStmt::initializer_suspend_statement(void) const {
+Stmt CoroutineBodyStmt::final_suspend_statement(void) const {
   RawEntityId eid = impl->reader.getVal18();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
+Stmt CoroutineBodyStmt::initializer_suspend_statement(void) const {
+  RawEntityId eid = impl->reader.getVal19();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
+}
+
 unsigned CoroutineBodyStmt::num_parameter_moves(void) const {
-  return impl->reader.getVal27().size();
+  return impl->reader.getVal28().size();
 }
 
 std::optional<Stmt> CoroutineBodyStmt::nth_parameter_move(unsigned n) const {
-  auto list = impl->reader.getVal27();
+  auto list = impl->reader.getVal28();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -249,30 +249,30 @@ std::optional<Stmt> CoroutineBodyStmt::nth_parameter_move(unsigned n) const {
 }
 
 gap::generator<Stmt> CoroutineBodyStmt::parameter_moves(void) const & {
-  auto list = impl->reader.getVal27();
+  auto list = impl->reader.getVal28();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d27 = ep->StmtFor(ep, v)) {
-      co_yield Stmt(std::move(d27));
+    if (auto d28 = ep->StmtFor(ep, v)) {
+      co_yield Stmt(std::move(d28));
     }
   }
   co_return;
 }
 
 VarDecl CoroutineBodyStmt::promise_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal19();
+  RawEntityId eid = impl->reader.getVal20();
   return VarDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Stmt CoroutineBodyStmt::promise_declaration_statement(void) const {
-  RawEntityId eid = impl->reader.getVal20();
+  RawEntityId eid = impl->reader.getVal21();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 std::optional<Stmt> CoroutineBodyStmt::result_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal21();
+    RawEntityId eid = impl->reader.getVal22();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -284,13 +284,13 @@ std::optional<Stmt> CoroutineBodyStmt::result_declaration(void) const {
 }
 
 Stmt CoroutineBodyStmt::return_statement(void) const {
-  RawEntityId eid = impl->reader.getVal22();
+  RawEntityId eid = impl->reader.getVal23();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 std::optional<Stmt> CoroutineBodyStmt::return_statement_on_alloc_failure(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal31();
+    RawEntityId eid = impl->reader.getVal32();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -302,17 +302,17 @@ std::optional<Stmt> CoroutineBodyStmt::return_statement_on_alloc_failure(void) c
 }
 
 Expr CoroutineBodyStmt::return_value(void) const {
-  RawEntityId eid = impl->reader.getVal32();
-  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
-}
-
-Expr CoroutineBodyStmt::return_value_initializer(void) const {
   RawEntityId eid = impl->reader.getVal33();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
+Expr CoroutineBodyStmt::return_value_initializer(void) const {
+  RawEntityId eid = impl->reader.getVal34();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
+}
+
 bool CoroutineBodyStmt::has_dependent_promise_type(void) const {
-  return impl->reader.getVal12();
+  return impl->reader.getVal13();
 }
 
 #pragma GCC diagnostic pop

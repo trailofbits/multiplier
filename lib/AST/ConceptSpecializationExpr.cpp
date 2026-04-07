@@ -187,30 +187,30 @@ std::optional<ConceptSpecializationExpr> ConceptSpecializationExpr::from(const T
 }
 
 Token ConceptSpecializationExpr::concept_name_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 NamedDecl ConceptSpecializationExpr::found_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal40();
   return NamedDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 ConceptDecl ConceptSpecializationExpr::named_concept(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal41();
   return ConceptDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 ImplicitConceptSpecializationDecl ConceptSpecializationExpr::specialization_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal42();
   return ImplicitConceptSpecializationDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 unsigned ConceptSpecializationExpr::num_template_arguments(void) const {
-  return impl->reader.getVal15().size();
+  return impl->reader.getVal16().size();
 }
 
 std::optional<TemplateArgument> ConceptSpecializationExpr::nth_template_argument(unsigned n) const {
-  auto list = impl->reader.getVal15();
+  auto list = impl->reader.getVal16();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -224,23 +224,23 @@ std::optional<TemplateArgument> ConceptSpecializationExpr::nth_template_argument
 }
 
 gap::generator<TemplateArgument> ConceptSpecializationExpr::template_arguments(void) const & {
-  auto list = impl->reader.getVal15();
+  auto list = impl->reader.getVal16();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d15 = ep->TemplateArgumentFor(ep, v)) {
-      co_yield TemplateArgument(std::move(d15));
+    if (auto d16 = ep->TemplateArgumentFor(ep, v)) {
+      co_yield TemplateArgument(std::move(d16));
     }
   }
   co_return;
 }
 
 Token ConceptSpecializationExpr::template_keyword_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }
 
 bool ConceptSpecializationExpr::has_explicit_template_arguments(void) const {
-  return impl->reader.getVal84();
+  return impl->reader.getVal85();
 }
 
 #pragma GCC diagnostic pop

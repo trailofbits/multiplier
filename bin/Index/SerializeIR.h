@@ -32,9 +32,11 @@ std::vector<ir::FunctionIR> GenerateIR(
     const std::unique_ptr<ProgressBar> &progress);
 
 // Step 2: Serialize previously-generated IR into the fragment proto.
+// Also populates remaining reverse mappings (e.g. CaseStmt → IRSwitchCase).
 void SerializeIR(
     const std::vector<ir::FunctionIR> &ir_functions,
     const PendingFragment &pf,
+    EntityMapper &em,
     mx::rpc::Fragment::Builder &fb);
 
 }  // namespace indexer

@@ -222,7 +222,7 @@ std::optional<RedeclarableTemplateDecl> RedeclarableTemplateDecl::from(const Tok
 }
 
 bool RedeclarableTemplateDecl::is_member_specialization(void) const {
-  return impl->reader.getVal68();
+  return impl->reader.getVal69();
 }
 
 #pragma GCC diagnostic pop

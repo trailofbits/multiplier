@@ -214,45 +214,45 @@ std::optional<ObjCPropertyImplDecl> ObjCPropertyImplDecl::from(const TokenContex
 }
 
 Expr ObjCPropertyImplDecl::getter_cxx_constructor(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal41();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 ObjCMethodDecl ObjCPropertyImplDecl::getter_method_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal48();
+  RawEntityId eid = impl->reader.getVal49();
   return ObjCMethodDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 ObjCPropertyDecl ObjCPropertyImplDecl::property_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal49();
+  RawEntityId eid = impl->reader.getVal50();
   return ObjCPropertyDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 ObjCPropertyImplDeclKind ObjCPropertyImplDecl::property_implementation(void) const {
-  return static_cast<ObjCPropertyImplDeclKind>(impl->reader.getVal57());
+  return static_cast<ObjCPropertyImplDeclKind>(impl->reader.getVal58());
 }
 
 ObjCIvarDecl ObjCPropertyImplDecl::property_instance_variable_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal50();
+  RawEntityId eid = impl->reader.getVal51();
   return ObjCIvarDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Token ObjCPropertyImplDecl::property_instance_variable_declaration_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal58());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal59());
 }
 
 Expr ObjCPropertyImplDecl::setter_cxx_assignment(void) const {
-  RawEntityId eid = impl->reader.getVal59();
+  RawEntityId eid = impl->reader.getVal60();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 ObjCMethodDecl ObjCPropertyImplDecl::setter_method_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal60();
+  RawEntityId eid = impl->reader.getVal61();
   return ObjCMethodDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 bool ObjCPropertyImplDecl::is_instance_variable_name_specified(void) const {
-  return impl->reader.getVal42();
+  return impl->reader.getVal43();
 }
 
 #pragma GCC diagnostic pop

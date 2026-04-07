@@ -212,19 +212,19 @@ std::optional<NamespaceDecl> NamespaceDecl::from(const TokenContext &t) {
 }
 
 Token NamespaceDecl::r_brace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal48());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal49());
 }
 
 bool NamespaceDecl::is_anonymous_namespace(void) const {
-  return impl->reader.getVal66();
-}
-
-bool NamespaceDecl::is_inline(void) const {
   return impl->reader.getVal67();
 }
 
-bool NamespaceDecl::is_nested(void) const {
+bool NamespaceDecl::is_inline(void) const {
   return impl->reader.getVal68();
+}
+
+bool NamespaceDecl::is_nested(void) const {
+  return impl->reader.getVal69();
 }
 
 gap::generator<Decl> NamespaceDecl::contained_declarations(void) const & {

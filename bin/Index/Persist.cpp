@@ -974,7 +974,7 @@ void GlobalIndexingState::PersistFragment(
   SerializePendingFragment(fb, database, pf);
 
   // Serialize the IR into the fragment.
-  SerializeIR(ir_functions, pf, fb);
+  SerializeIR(ir_functions, pf, em, fb);
 
   PersistTokenContexts(pf, fb);
   LinkEntitiesAcrossFragments(database, pf, mangler);

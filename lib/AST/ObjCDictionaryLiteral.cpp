@@ -184,7 +184,7 @@ std::optional<ObjCDictionaryLiteral> ObjCDictionaryLiteral::from(const TokenCont
 }
 
 ObjCMethodDecl ObjCDictionaryLiteral::dictionary_with_objects_method(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal39();
   return ObjCMethodDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 

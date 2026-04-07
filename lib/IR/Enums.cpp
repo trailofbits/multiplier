@@ -6,6 +6,7 @@
 #include <multiplier/IR/OpCode.h>
 #include <multiplier/IR/ObjectKind.h>
 #include <multiplier/IR/BlockKind.h>
+#include <multiplier/IR/FunctionKind.h>
 #include <multiplier/Types.h>
 
 namespace mx::ir {
@@ -71,6 +72,7 @@ const char *EnumeratorName(OpCode op) noexcept {
     case OpCode::IMPLICIT_GOTO: return "IMPLICIT_GOTO";
     case OpCode::FALLTHROUGH: return "FALLTHROUGH";
     case OpCode::IMPLICIT_FALLTHROUGH: return "IMPLICIT_FALLTHROUGH";
+    case OpCode::IMPLICIT_UNREACHABLE: return "IMPLICIT_UNREACHABLE";
     case OpCode::VA_PACK: return "VA_PACK";
     case OpCode::VA_START: return "VA_START";
     case OpCode::VA_ARG: return "VA_ARG";
@@ -78,6 +80,14 @@ const char *EnumeratorName(OpCode op) noexcept {
     case OpCode::VA_END: return "VA_END";
     case OpCode::INIT_LIST: return "INIT_LIST";
     case OpCode::UNKNOWN: return "UNKNOWN";
+  }
+  return "UNKNOWN";
+}
+
+const char *EnumeratorName(FunctionKind kind) noexcept {
+  switch (kind) {
+    case FunctionKind::NORMAL: return "NORMAL";
+    case FunctionKind::GLOBAL_INITIALIZER: return "GLOBAL_INITIALIZER";
   }
   return "UNKNOWN";
 }
