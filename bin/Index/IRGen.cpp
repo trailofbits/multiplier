@@ -872,18 +872,33 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
     if (auto cs = pasta::CaseStmt::From(stmt)) {
       if (ci < cases.size()) {
         maybe_emit_implicit_fallthrough(cases[ci].block_index);
+        PushStructure(mx::ir::StructureKind::SWITCH_CASE,
+                      cases[ci].source_entity_id);
+        // Store case value data in the structure.
+        auto &sc_struct = func_.structures[current_structure_index_];
+        sc_struct.case_low = cases[ci].low;
+        sc_struct.case_high = cases[ci].high;
+        sc_struct.is_default = false;
         SwitchToBlock(cases[ci].block_index);
+        AssociateBlockWithStructure(cases[ci].block_index);
         ci++;
         EmitBody(cs->SubStatement());
+        PopStructure();  // SWITCH_CASE
       }
       return;
     }
     if (auto ds = pasta::DefaultStmt::From(stmt)) {
       if (ci < cases.size()) {
         maybe_emit_implicit_fallthrough(cases[ci].block_index);
+        PushStructure(mx::ir::StructureKind::SWITCH_CASE,
+                      cases[ci].source_entity_id);
+        auto &sc_struct = func_.structures[current_structure_index_];
+        sc_struct.is_default = true;
         SwitchToBlock(cases[ci].block_index);
+        AssociateBlockWithStructure(cases[ci].block_index);
         ci++;
         EmitBody(ds->SubStatement());
+        PopStructure();  // SWITCH_CASE (default)
       }
       return;
     }
