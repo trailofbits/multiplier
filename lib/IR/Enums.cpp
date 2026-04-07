@@ -82,6 +82,8 @@ const char *EnumeratorName(OpCode op) noexcept {
     case OpCode::INIT_LIST: return "INIT_LIST";
     case OpCode::ENTER_SCOPE: return "ENTER_SCOPE";
     case OpCode::EXIT_SCOPE: return "EXIT_SCOPE";
+    case OpCode::MEMSET: return "MEMSET";
+    case OpCode::MEMCPY: return "MEMCPY";
     case OpCode::UNKNOWN: return "UNKNOWN";
   }
   return "UNKNOWN";

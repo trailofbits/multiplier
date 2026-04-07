@@ -154,6 +154,8 @@ IMPL_FROM_SINGLE(VAEndInst, VA_END)
 IMPL_FROM_SINGLE(VACopyInst, VA_COPY)
 IMPL_FROM_SINGLE(VAArgInst, VA_ARG)
 IMPL_FROM_SINGLE(VAPackInst, VA_PACK)
+IMPL_FROM_SINGLE(MemsetInst, MEMSET)
+IMPL_FROM_SINGLE(MemcpyInst, MEMCPY)
 
 IMPL_FROM_SINGLE(RetInst, RET)
 IMPL_FROM_SINGLE(CondBranchInst, COND_BRANCH)
@@ -494,6 +496,16 @@ gap::generator<IRInstruction> VAPackInst::arguments(void) const & {
     co_yield nth_operand(i);
   }
 }
+
+// ---- Memory operations ----
+
+IRInstruction MemsetInst::dest(void) const { return nth_operand(0); }
+IRInstruction MemsetInst::byte_value(void) const { return nth_operand(1); }
+IRInstruction MemsetInst::size(void) const { return nth_operand(2); }
+
+IRInstruction MemcpyInst::dest(void) const { return nth_operand(0); }
+IRInstruction MemcpyInst::src(void) const { return nth_operand(1); }
+IRInstruction MemcpyInst::size(void) const { return nth_operand(2); }
 
 // ---- SwitchInst ----
 

@@ -221,6 +221,26 @@ class MX_EXPORT InitListInst : public IRInstruction {
 };
 
 // ---------------------------------------------------------------------------
+// Memory operations
+// ---------------------------------------------------------------------------
+
+class MX_EXPORT MemsetInst : public IRInstruction {
+ public:
+  MX_DECLARE_IR_INSTRUCTION(MemsetInst)
+  IRInstruction dest(void) const;       // op[0]
+  IRInstruction byte_value(void) const; // op[1]
+  IRInstruction size(void) const;       // op[2]
+};
+
+class MX_EXPORT MemcpyInst : public IRInstruction {
+ public:
+  MX_DECLARE_IR_INSTRUCTION(MemcpyInst)
+  IRInstruction dest(void) const;       // op[0]
+  IRInstruction src(void) const;        // op[1]
+  IRInstruction size(void) const;       // op[2]
+};
+
+// ---------------------------------------------------------------------------
 // Variadic
 // ---------------------------------------------------------------------------
 

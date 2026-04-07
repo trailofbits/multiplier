@@ -1536,6 +1536,35 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         }
         return emit_typed(std::move(inst));
       }
+
+      // Recognize memset/memcpy/memmove and lower to MEMSET/MEMCPY.
+      if (callee_name == "memset" || callee_name == "__builtin_memset" ||
+          callee_name == "__builtin_memset_chk" ||
+          callee_name == "__builtin___memset_chk") {
+        if (args.size() >= 3) {
+          InstructionIR inst;
+          inst.opcode = mx::ir::OpCode::MEMSET;
+          inst.source_entity_id = eid;
+          inst.operand_indices.push_back(EmitRValue(args[0]));
+          inst.operand_indices.push_back(EmitRValue(args[1]));
+          inst.operand_indices.push_back(EmitRValue(args[2]));
+          return emit_typed(std::move(inst));
+        }
+      }
+      if (callee_name == "memcpy" || callee_name == "memmove" ||
+          callee_name == "__builtin_memcpy" || callee_name == "__builtin_memmove" ||
+          callee_name == "__builtin_memcpy_chk" || callee_name == "__builtin_memmove_chk" ||
+          callee_name == "__builtin___memcpy_chk" || callee_name == "__builtin___memmove_chk") {
+        if (args.size() >= 3) {
+          InstructionIR inst;
+          inst.opcode = mx::ir::OpCode::MEMCPY;
+          inst.source_entity_id = eid;
+          inst.operand_indices.push_back(EmitRValue(args[0]));
+          inst.operand_indices.push_back(EmitRValue(args[1]));
+          inst.operand_indices.push_back(EmitRValue(args[2]));
+          return emit_typed(std::move(inst));
+        }
+      }
     }
 
     InstructionIR inst;

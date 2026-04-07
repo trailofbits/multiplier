@@ -108,8 +108,12 @@ enum class OpCode : uint8_t {
   ENTER_SCOPE = 66,        // marks scope entry; extra = IRStructureId of scope
   EXIT_SCOPE = 67,         // marks scope exit; extra = IRStructureId of scope
 
+  // Memory operations (lowered from memset/memcpy/memmove calls).
+  MEMSET = 68,             // op[0] = dest, op[1] = byte value, op[2] = size
+  MEMCPY = 69,             // op[0] = dest, op[1] = src, op[2] = size
+
   // Unknown / unhandled expression
-  UNKNOWN = 68,
+  UNKNOWN = 70,
 };
 
 // Returns the human-readable name of an opcode.
@@ -120,7 +124,7 @@ inline static const char *EnumerationName(OpCode) {
 const char *EnumeratorName(OpCode op) noexcept;
 
 inline static constexpr unsigned NumEnumerators(OpCode) {
-  return 69u;
+  return 71u;
 }
 
 // Classification helpers.
