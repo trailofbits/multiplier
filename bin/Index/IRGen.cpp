@@ -245,21 +245,10 @@ std::optional<FunctionIR> IRGenerator::GenerateGlobalInit(
     case_blocks_.clear();
     structure_stack_.clear();
 
-    // --- Frame block: ALLOCA for the global variable ---
+    // --- Frame block (empty: address comes via parameter) ---
     uint32_t frame = NewBlock(mx::ir::BlockKind::FRAME);
     func_.entry_block_index = frame;
     SwitchToBlock(frame);
-
-    // Create the global object and emit its ALLOCA.
-    uint32_t obj_idx = MakeObject(mx::ir::ObjectKind::GLOBAL, &var);
-    {
-      InstructionIR alloca_inst;
-      alloca_inst.opcode = mx::ir::OpCode::ALLOCA;
-      alloca_inst.source_entity_id = EntityIdOf(var);
-      alloca_inst.object_index = obj_idx;
-      alloca_inst.type_entity_id = TypeEntityIdOf(var.Type());
-      EmitTopLevel(std::move(alloca_inst));
-    }
 
     // --- Entry block: scope entry + initialization ---
     uint32_t entry = NewBlock(mx::ir::BlockKind::ENTRY);
@@ -281,15 +270,13 @@ std::optional<FunctionIR> IRGenerator::GenerateGlobalInit(
       EmitTopLevel(std::move(enter));
     }
 
-    // Associate the global object with the function scope.
-    func_.structures[func_scope].object_indices.push_back(obj_idx);
-
-    // Emit ADDRESS_OF for the global.
-    InstructionIR addr_inst;
-    addr_inst.opcode = mx::ir::OpCode::ADDRESS_OF;
-    addr_inst.source_entity_id = EntityIdOf(var);
-    addr_inst.object_index = obj_idx;
-    uint32_t addr_idx = EmitInstruction(std::move(addr_inst));
+    // PARAM_READ 0: the pointer to the global (passed by the caller).
+    InstructionIR pr;
+    pr.opcode = mx::ir::OpCode::PARAM_READ;
+    pr.source_entity_id = EntityIdOf(var);
+    pr.type_entity_id = TypeEntityIdOf(var.Type());
+    pr.int_value = 0;  // parameter index 0
+    uint32_t addr_idx = EmitInstruction(std::move(pr));
 
     // Emit the initializer expression.
     uint32_t val_idx = EmitRValue(*init);
