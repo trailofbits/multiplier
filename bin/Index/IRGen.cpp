@@ -635,6 +635,7 @@ void IRGenerator::SetOperandParents(uint32_t inst_idx) {
   auto &inst = func_.instructions[inst_idx];
   for (auto op_idx : inst.operand_indices) {
     func_.instructions[op_idx].parent_instruction_index = inst_idx;
+    SetOperandParents(op_idx);
   }
 }
 
@@ -1281,6 +1282,35 @@ void IRGenerator::EmitInitializer(uint32_t dest_addr_idx,
 
     auto type = *maybe_type;
 
+    // Zero-initialize the whole object before element-wise stores.
+    // The compiler emits a memset for aggregate initialization.
+    // ENTER_SCOPE only marks memory as allocated-but-uninitialized;
+    // this MEMSET is what actually makes the memory defined.
+    auto total_size = TypeSizeBytes(type);
+    if (total_size && *total_size > 0) {
+      InstructionIR zero;
+      zero.opcode = mx::ir::OpCode::CONST_INT;
+      zero.source_entity_id = source_eid;
+      zero.int_value = 0;
+      zero.uint_value = 0;
+      zero.width = 8;
+      uint32_t zero_idx = EmitInstruction(std::move(zero));
+
+      InstructionIR sz;
+      sz.opcode = mx::ir::OpCode::CONST_INT;
+      sz.source_entity_id = source_eid;
+      sz.int_value = static_cast<int64_t>(*total_size);
+      sz.uint_value = static_cast<uint64_t>(*total_size);
+      sz.width = 64;
+      uint32_t sz_idx = EmitInstruction(std::move(sz));
+
+      InstructionIR memset_inst;
+      memset_inst.opcode = mx::ir::OpCode::MEMSET;
+      memset_inst.source_entity_id = source_eid;
+      memset_inst.operand_indices = {dest_addr_idx, zero_idx, sz_idx};
+      EmitTopLevel(std::move(memset_inst));
+    }
+
     // Strip qualifiers/sugar to get the underlying type.
     auto canon = type.CanonicalType();
 
@@ -1316,30 +1346,6 @@ void IRGenerator::EmitInitializer(uint32_t dest_addr_idx,
         EmitInitializer(elem_addr, inits[i], source_eid);
       }
 
-      // Zero-fill remaining elements if there's an array filler.
-      if (auto filler = ile->ArrayFiller()) {
-        auto arr_size = arr_type->Size().isStrictlyPositive()
-            ? arr_type->Size().getZExtValue() : 0u;
-        for (uint64_t i = inits.size(); i < arr_size; ++i) {
-          InstructionIR ci;
-          ci.opcode = mx::ir::OpCode::CONST_INT;
-          ci.source_entity_id = source_eid;
-          ci.int_value = static_cast<int64_t>(i);
-          ci.uint_value = i;
-          ci.width = 64;
-          uint32_t idx_val = EmitInstruction(std::move(ci));
-
-          InstructionIR pa;
-          pa.opcode = mx::ir::OpCode::PTR_ADD;
-          pa.source_entity_id = source_eid;
-          pa.operand_indices = {dest_addr_idx, idx_val};
-          pa.type_entity_id = TypeEntityIdOf(elem_type);
-          pa.size_bytes = *elem_size;
-          uint32_t elem_addr = EmitInstruction(std::move(pa));
-
-          EmitInitializer(elem_addr, *filler, source_eid);
-        }
-      }
       return;
     }
 
