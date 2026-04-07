@@ -278,15 +278,8 @@ std::optional<FunctionIR> IRGenerator::GenerateGlobalInit(
     pr.int_value = 0;  // parameter index 0
     uint32_t addr_idx = EmitInstruction(std::move(pr));
 
-    // Emit the initializer expression.
-    uint32_t val_idx = EmitRValue(*init);
-
-    // Emit STORE.
-    InstructionIR store_inst;
-    store_inst.opcode = mx::ir::OpCode::STORE;
-    store_inst.source_entity_id = EntityIdOf(var);
-    store_inst.operand_indices = {addr_idx, val_idx};
-    EmitTopLevel(std::move(store_inst));
+    // Emit initialization (decomposes aggregates into element stores).
+    EmitInitializer(addr_idx, *init, EntityIdOf(var));
 
     // EXIT_SCOPE + RET.
     {
@@ -1197,13 +1190,7 @@ void IRGenerator::EmitDeclStmt(const pasta::Stmt &s) {
       addr_inst.object_index = obj_idx;
       uint32_t addr_idx = EmitInstruction(std::move(addr_inst));
 
-      uint32_t val_idx = EmitRValue(*init);
-
-      InstructionIR store_inst;
-      store_inst.opcode = mx::ir::OpCode::STORE;
-      store_inst.source_entity_id = EntityIdOf(decl);
-      store_inst.operand_indices = {addr_idx, val_idx};
-      EmitTopLevel(std::move(store_inst));
+      EmitInitializer(addr_idx, *init, EntityIdOf(decl));
     }
   }
 }
@@ -1277,6 +1264,130 @@ void IRGenerator::EmitLabelStmt(const pasta::Stmt &s) {
   SwitchToBlock(label_block);
 
   EmitStmt(ls->SubStatement());
+}
+
+// ---------------------------------------------------------------------------
+// Initializer emission (decomposes aggregates into element stores)
+// ---------------------------------------------------------------------------
+
+void IRGenerator::EmitInitializer(uint32_t dest_addr_idx,
+                                   const pasta::Expr &init,
+                                   mx::RawEntityId source_eid) {
+  // If the initializer is an InitListExpr, decompose it into element stores.
+  if (auto ile = pasta::InitListExpr::From(init)) {
+    auto inits = ile->Initializers();
+    auto maybe_type = init.Type();
+    if (!maybe_type) goto scalar_fallback;
+
+    auto type = *maybe_type;
+
+    // Strip qualifiers/sugar to get the underlying type.
+    auto canon = type.CanonicalType();
+
+    // Array initialization: PTR_ADD for each element.
+    if (auto arr_type = pasta::ConstantArrayType::From(canon)) {
+      auto elem_type = arr_type->ElementType();
+      auto elem_size = TypeSizeBytes(elem_type);
+      if (!elem_size || *elem_size == 0) goto scalar_fallback;
+
+      for (uint32_t i = 0; i < inits.size(); ++i) {
+        uint32_t elem_addr;
+        if (i == 0) {
+          elem_addr = dest_addr_idx;
+        } else {
+          // PTR_ADD base, i.
+          InstructionIR ci;
+          ci.opcode = mx::ir::OpCode::CONST_INT;
+          ci.source_entity_id = source_eid;
+          ci.int_value = static_cast<int64_t>(i);
+          ci.uint_value = static_cast<uint64_t>(i);
+          ci.width = 64;
+          uint32_t idx_val = EmitInstruction(std::move(ci));
+
+          InstructionIR pa;
+          pa.opcode = mx::ir::OpCode::PTR_ADD;
+          pa.source_entity_id = source_eid;
+          pa.operand_indices = {dest_addr_idx, idx_val};
+          pa.type_entity_id = TypeEntityIdOf(elem_type);
+          pa.size_bytes = *elem_size;
+          elem_addr = EmitInstruction(std::move(pa));
+        }
+        // Recurse for nested aggregates.
+        EmitInitializer(elem_addr, inits[i], source_eid);
+      }
+
+      // Zero-fill remaining elements if there's an array filler.
+      if (auto filler = ile->ArrayFiller()) {
+        auto arr_size = arr_type->Size().isStrictlyPositive()
+            ? arr_type->Size().getZExtValue() : 0u;
+        for (uint64_t i = inits.size(); i < arr_size; ++i) {
+          InstructionIR ci;
+          ci.opcode = mx::ir::OpCode::CONST_INT;
+          ci.source_entity_id = source_eid;
+          ci.int_value = static_cast<int64_t>(i);
+          ci.uint_value = i;
+          ci.width = 64;
+          uint32_t idx_val = EmitInstruction(std::move(ci));
+
+          InstructionIR pa;
+          pa.opcode = mx::ir::OpCode::PTR_ADD;
+          pa.source_entity_id = source_eid;
+          pa.operand_indices = {dest_addr_idx, idx_val};
+          pa.type_entity_id = TypeEntityIdOf(elem_type);
+          pa.size_bytes = *elem_size;
+          uint32_t elem_addr = EmitInstruction(std::move(pa));
+
+          EmitInitializer(elem_addr, *filler, source_eid);
+        }
+      }
+      return;
+    }
+
+    // Struct/union initialization: GEP_FIELD for each field.
+    if (auto rec_type = pasta::RecordType::From(canon)) {
+      auto rec_decl = rec_type->Declaration();
+      auto fields = rec_decl.Fields();
+
+      uint32_t init_idx = 0;
+      for (const auto &field : fields) {
+        if (init_idx >= inits.size()) break;
+
+        auto offset_bits = field.OffsetInBits();
+        if (!offset_bits) continue;
+        uint32_t byte_offset = static_cast<uint32_t>(*offset_bits / 8);
+
+        InstructionIR gep;
+        gep.opcode = mx::ir::OpCode::GEP_FIELD;
+        gep.source_entity_id = source_eid;
+        gep.operand_indices = {dest_addr_idx};
+        gep.target_entity_id = EntityIdOf(field);
+        gep.size_bytes = byte_offset;
+        gep.type_entity_id = TypeEntityIdOf(field.Type());
+        uint32_t field_addr = EmitInstruction(std::move(gep));
+
+        EmitInitializer(field_addr, inits[init_idx], source_eid);
+        ++init_idx;
+      }
+      return;
+    }
+
+    // Single-element init list for scalars: { expr }.
+    if (inits.size() == 1) {
+      EmitInitializer(dest_addr_idx, inits[0], source_eid);
+      return;
+    }
+  }
+
+scalar_fallback:
+  // Scalar initialization: just emit the value and store it.
+  {
+    uint32_t val_idx = EmitRValue(init);
+    InstructionIR store;
+    store.opcode = mx::ir::OpCode::STORE;
+    store.source_entity_id = source_eid;
+    store.operand_indices = {dest_addr_idx, val_idx};
+    EmitTopLevel(std::move(store));
+  }
 }
 
 // ---------------------------------------------------------------------------

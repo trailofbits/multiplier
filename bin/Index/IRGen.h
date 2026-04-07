@@ -261,6 +261,10 @@ class IRGenerator {
   void EmitGotoStmt(const pasta::Stmt &s);
   void EmitLabelStmt(const pasta::Stmt &s);
 
+  // --- Initializer emission (decomposes aggregates into element stores) ---
+  void EmitInitializer(uint32_t dest_addr_idx, const pasta::Expr &init,
+                       mx::RawEntityId source_eid);
+
   // --- Expression emission (builds nested instruction trees) ---
   uint32_t EmitRValue(const pasta::Expr &e);
   uint32_t EmitLValue(const pasta::Expr &e);
