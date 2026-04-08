@@ -245,7 +245,7 @@ Used for: `++i` (ADD), `i += 5` (ADD), `++ptr` (PTR_ADD), `--ptr` (PTR_ADD with 
 
 | Opcode | Description |
 |--------|-------------|
-| `ATOMIC_CMPXCHG` | Compare-and-exchange. `target()`, `expected_ptr()`, `desired()`. Returns bool. |
+| Atomic cmpxchg | Use `MEMORY` with `CMPXCHG_LE_*` / `CMPXCHG_BE_*` sub-opcodes. `op[0]=target`, `op[1]=expected_ptr`, `op[2]=desired`. Returns bool. |
 | Atomic load/store | Use `MEMORY` with `ATOMIC_LOAD_*` / `ATOMIC_STORE_*` sub-opcodes. |
 | Atomic fetch ops | Use `READ_MODIFY_WRITE` with `ATOMIC_ADD`..`ATOMIC_EXCHANGE` underlying. |
 | Overflow ops | Use `READ_MODIFY_WRITE` with `ADD_OVERFLOW`/`SUB_OVERFLOW`/`MUL_OVERFLOW`. Returns bool (overflow flag), stores arithmetic result. |

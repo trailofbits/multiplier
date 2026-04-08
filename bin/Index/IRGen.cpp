@@ -1936,6 +1936,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         inst.operand_indices = {addr_idx, delta_idx};
         inst.compound_op = underlying;
         inst.size_bytes = elem_sz;
+        inst.is_big_endian = ctx_.getTargetInfo().isBigEndian();
         // flags bit0 = returns_new_value: pre returns new, post returns old.
         inst.flags = is_pre ? 1 : 0;
         return emit_typed(std::move(inst));
@@ -2048,6 +2049,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         }
         // Compound assign always returns the new value.
         inst.flags = 1;
+        inst.is_big_endian = ctx_.getTargetInfo().isBigEndian();
         return emit_typed(std::move(inst));
       }
 
@@ -2401,6 +2403,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
           rmw.source_entity_id = eid;
           rmw.compound_op = overflow_op;
           rmw.flags = 1;  // returns new value (the overflow flag)
+          rmw.is_big_endian = ctx_.getTargetInfo().isBigEndian();
           rmw.operand_indices = {dest_idx, a_idx, b_idx};
           return emit_typed(std::move(rmw));
         }
@@ -2737,11 +2740,28 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
           callee_name == "__sync_val_compare_and_swap") {
         if (args.size() >= 3) {
           InstructionIR inst;
-          inst.opcode = mx::ir::OpCode::ATOMIC_CMPXCHG;
+          inst.opcode = mx::ir::OpCode::MEMORY;
           inst.source_entity_id = eid;
           inst.operand_indices.push_back(EmitRValue(args[0]));
           inst.operand_indices.push_back(EmitRValue(args[1]));
           inst.operand_indices.push_back(EmitRValue(args[2]));
+          {
+            unsigned sz = 8;
+            if (auto t = args[2].Type()) {
+              if (auto s = TypeSizeBytes(*t)) sz = *s;
+            }
+            bool big = ctx_.getTargetInfo().isBigEndian();
+            unsigned size_idx;
+            switch (sz) {
+              case 1: size_idx = 0; break;
+              case 2: size_idx = 1; break;
+              case 4: size_idx = 2; break;
+              case 8: default: size_idx = 3; break;
+            }
+            unsigned base = big ? static_cast<unsigned>(mx::ir::MemOp::CMPXCHG_BE_8)
+                                : static_cast<unsigned>(mx::ir::MemOp::CMPXCHG_LE_8);
+            inst.mem_op = static_cast<uint8_t>(base + size_idx);
+          }
           return emit_typed(std::move(inst));
         }
       }
@@ -2784,6 +2804,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
             rmw.flags = ab.returns_new ? 1u : 0u;
             rmw.operand_indices.push_back(EmitRValue(args[0]));
             rmw.operand_indices.push_back(EmitRValue(args[1]));
+            rmw.is_big_endian = ctx_.getTargetInfo().isBigEndian();
             // Set element size from the pointee type (args[0] is a pointer).
             if (auto arg_type = args[0].Type()) {
               if (auto pt = arg_type->PointeeType()) {

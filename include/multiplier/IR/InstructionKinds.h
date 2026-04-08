@@ -157,6 +157,7 @@ class MX_EXPORT ReadModifyWriteInst : public IRInstruction {
   IRInstruction address(void) const;
   ir::OpCode underlying_op(void) const;
   int64_t element_size(void) const;  // for PTR_ADD, 0 otherwise
+  bool is_big_endian(void) const;    // int_pool[2]: target endianness
   bool returns_new_value(void) const;
   Type result_type(void) const;
   // RHS operands (everything after address).
@@ -272,19 +273,6 @@ class MX_EXPORT ReturnPtrInst : public IRInstruction {
  public:
   MX_DECLARE_IR_INSTRUCTION(ReturnPtrInst)
   IRInstruction level(void) const;       // op[0]
-  Type result_type(void) const;
-};
-
-// ---------------------------------------------------------------------------
-// Atomic operations
-// ---------------------------------------------------------------------------
-
-class MX_EXPORT AtomicCmpxchgInst : public IRInstruction {
- public:
-  MX_DECLARE_IR_INSTRUCTION(AtomicCmpxchgInst)
-  IRInstruction target(void) const;       // op[0]
-  IRInstruction expected_ptr(void) const; // op[1]
-  IRInstruction desired(void) const;      // op[2]
   Type result_type(void) const;
 };
 

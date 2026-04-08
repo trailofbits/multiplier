@@ -211,6 +211,7 @@ static uint32_t EmitInstructionConsts(
     case OC::READ_MODIFY_WRITE:
       pool.AddInt(static_cast<int64_t>(inst.compound_op));  // underlying opcode
       pool.AddInt(static_cast<int64_t>(inst.size_bytes));    // element size
+      pool.AddInt(static_cast<int64_t>(inst.is_big_endian ? 1 : 0));  // endianness
       break;
 
     case OC::PARAM_READ:

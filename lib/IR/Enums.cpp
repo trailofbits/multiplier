@@ -74,7 +74,6 @@ const char *EnumeratorName(OpCode op) noexcept {
     case OpCode::DYNAMIC_ALLOCA: return "DYNAMIC_ALLOCA";
     case OpCode::FRAME_PTR: return "FRAME_PTR";
     case OpCode::RETURN_PTR: return "RETURN_PTR";
-    case OpCode::ATOMIC_CMPXCHG: return "ATOMIC_CMPXCHG";
     case OpCode::ADD_OVERFLOW: return "ADD_OVERFLOW";
     case OpCode::SUB_OVERFLOW: return "SUB_OVERFLOW";
     case OpCode::MUL_OVERFLOW: return "MUL_OVERFLOW";

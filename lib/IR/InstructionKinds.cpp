@@ -185,7 +185,6 @@ IMPL_FROM_SINGLE(FloatOpInst, FLOAT)
 IMPL_FROM_SINGLE(DynamicAllocaInst, DYNAMIC_ALLOCA)
 IMPL_FROM_SINGLE(FramePtrInst, FRAME_PTR)
 IMPL_FROM_SINGLE(ReturnPtrInst, RETURN_PTR)
-IMPL_FROM_SINGLE(AtomicCmpxchgInst, ATOMIC_CMPXCHG)
 IMPL_FROM_SINGLE(EnterScopeInst, ENTER_SCOPE)
 IMPL_FROM_SINGLE(ExitScopeInst, EXIT_SCOPE)
 IMPL_FROM_SINGLE(UndefinedInst, UNDEFINED)
@@ -385,6 +384,10 @@ ir::OpCode ReadModifyWriteInst::underlying_op(void) const {
 
 int64_t ReadModifyWriteInst::element_size(void) const {
   return GetIntPool(*impl)[impl->reader().getConstOffset() + 1];
+}
+
+bool ReadModifyWriteInst::is_big_endian(void) const {
+  return GetIntPool(*impl)[impl->reader().getConstOffset() + 2] != 0;
 }
 
 bool ReadModifyWriteInst::returns_new_value(void) const {
@@ -617,15 +620,6 @@ Type FramePtrInst::result_type(void) const {
 
 IRInstruction ReturnPtrInst::level(void) const { return nth_operand(0); }
 Type ReturnPtrInst::result_type(void) const {
-  return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
-}
-
-// ---- AtomicCmpxchgInst ----
-
-IRInstruction AtomicCmpxchgInst::target(void) const { return nth_operand(0); }
-IRInstruction AtomicCmpxchgInst::expected_ptr(void) const { return nth_operand(1); }
-IRInstruction AtomicCmpxchgInst::desired(void) const { return nth_operand(2); }
-Type AtomicCmpxchgInst::result_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 

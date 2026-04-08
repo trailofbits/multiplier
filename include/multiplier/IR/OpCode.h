@@ -183,12 +183,13 @@ enum class OpCode : uint8_t {
   // Call
   CALL = 28,
 
-  // Read-modify-write: atomically reads from address, applies an operation,
-  // and writes back. operands = [address, rhs_operand0, rhs_operand1, ...].
+  // Read-modify-write: reads from address, applies an operation, writes back.
+  // operands = [address, rhs_operand0, rhs_operand1, ...].
   // The loaded value is the implicit LHS of the underlying op.
   // flags: bit 0 = returns new value (1) or old value (0, post-increment).
-  // int_pool[0] = underlying opcode (ADD, SUB, PTR_ADD, SHL, etc.)
+  // int_pool[0] = underlying opcode (ADD, SUB, PTR_ADD, ATOMIC_ADD, etc.)
   // int_pool[1] = element size (for PTR_ADD only, 0 otherwise)
+  // int_pool[2] = is_big_endian (0 = little-endian, 1 = big-endian)
   READ_MODIFY_WRITE = 29,
 
   // Misc
@@ -245,29 +246,26 @@ enum class OpCode : uint8_t {
   FRAME_PTR = 57,      // op[0] = level (CONST, usually 0). Returns frame ptr.
   RETURN_PTR = 58,     // op[0] = level (CONST, usually 0). Returns return addr.
 
-  // Atomic operations.
-  ATOMIC_CMPXCHG = 59,     // op[0] = target, op[1] = expected_ptr, op[2] = desired. Returns bool.
-
   // Overflow-checked arithmetic (only used as RMW underlying opcodes).
   // RMW returns bool (overflow flag), stores the arithmetic result.
-  ADD_OVERFLOW = 60,
-  SUB_OVERFLOW = 61,
-  MUL_OVERFLOW = 62,
+  ADD_OVERFLOW = 59,
+  SUB_OVERFLOW = 60,
+  MUL_OVERFLOW = 61,
 
   // Atomic RMW underlying opcodes (only valid as RMW underlying ops).
-  ATOMIC_ADD = 63,
-  ATOMIC_SUB = 64,
-  ATOMIC_AND = 65,
-  ATOMIC_OR = 66,
-  ATOMIC_XOR = 67,
-  ATOMIC_NAND = 68,
-  ATOMIC_EXCHANGE = 69,
+  ATOMIC_ADD = 62,
+  ATOMIC_SUB = 63,
+  ATOMIC_AND = 64,
+  ATOMIC_OR = 65,
+  ATOMIC_XOR = 66,
+  ATOMIC_NAND = 67,
+  ATOMIC_EXCHANGE = 68,
 
   // Evaluate all operands, return the last one's value.
-  LAST_VALUE = 70,
+  LAST_VALUE = 69,
 
   // Unknown / unhandled expression
-  UNKNOWN = 71,
+  UNKNOWN = 70,
 };
 
 // Returns the human-readable name of an opcode.
@@ -278,7 +276,7 @@ inline static const char *EnumerationName(OpCode) {
 const char *EnumeratorName(OpCode op) noexcept;
 
 inline static constexpr unsigned NumEnumerators(OpCode) {
-  return 72u;
+  return 71u;
 }
 
 // Sub-opcodes for MEMORY. Stored in the int pool (int_pool[0]).
@@ -327,12 +325,14 @@ enum class MemOp : uint8_t {
   // int_pool layout: [MemOp sub-opcode, bit_offset, bit_width]
   // bit_offset and bit_width are compile-time constants (not operands).
   //
-  // Little-endian: bit 0 = LSB of byte 0.
-  BIT_READ_LE = 57,   // op[0]=address. Returns zero-extended integer.
-  BIT_WRITE_LE = 58,  // op[0]=address, op[1]=value. Read-modify-write.
-  // Big-endian: bit 0 = MSB of byte 0.
-  BIT_READ_BE = 59,
-  BIT_WRITE_BE = 60,
+  // Bit-field access (see documentation above).
+  BIT_READ_LE = 57, BIT_WRITE_LE = 58,
+  BIT_READ_BE = 59, BIT_WRITE_BE = 60,
+
+  // Atomic compare-and-exchange (sized, endian-aware).
+  // op[0]=target, op[1]=expected_ptr, op[2]=desired. Returns bool.
+  CMPXCHG_LE_8 = 61, CMPXCHG_LE_16 = 62, CMPXCHG_LE_32 = 63, CMPXCHG_LE_64 = 64,
+  CMPXCHG_BE_8 = 65, CMPXCHG_BE_16 = 66, CMPXCHG_BE_32 = 67, CMPXCHG_BE_64 = 68,
 };
 
 // MemOp classification helpers.
@@ -354,6 +354,7 @@ inline bool IsStringToNumber(MemOp op) { return op >= MemOp::STRTOI32 && op <= M
 inline bool IsMemoryBulk(MemOp op) { return op >= MemOp::MEMSET && op <= MemOp::BZERO; }
 inline bool IsStringOp(MemOp op) { return op >= MemOp::STRLEN && op <= MemOp::STPNCPY; }
 inline bool IsBitAccess(MemOp op) { return op >= MemOp::BIT_READ_LE && op <= MemOp::BIT_WRITE_BE; }
+inline bool IsCmpxchg(MemOp op) { return op >= MemOp::CMPXCHG_LE_8 && op <= MemOp::CMPXCHG_BE_64; }
 inline bool IsBitRead(MemOp op) { return op == MemOp::BIT_READ_LE || op == MemOp::BIT_READ_BE; }
 inline bool IsBitWrite(MemOp op) { return op == MemOp::BIT_WRITE_LE || op == MemOp::BIT_WRITE_BE; }
 

@@ -438,6 +438,10 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
               break;
             }
             default:
+              if (mx::ir::IsCmpxchg(sub)) {
+                // Simplified: return undef (complex semantics).
+                result = Value::Undef();
+              }
               break;
           }
         }
@@ -971,12 +975,6 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
     case mx::ir::OpCode::FRAME_PTR:
     case mx::ir::OpCode::RETURN_PTR:
       // Not meaningfully interpretable; return undef.
-      result = Value::Undef();
-      break;
-
-    // --- Atomic operations ---
-    case mx::ir::OpCode::ATOMIC_CMPXCHG:
-      // Simplified: return undef (complex semantics).
       result = Value::Undef();
       break;
 
