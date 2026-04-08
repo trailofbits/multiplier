@@ -116,7 +116,7 @@ Every block ends with exactly one terminator.
 | `LOOP_INCREMENT` | For-loop increment. |
 | `SWITCH_CASE`, `SWITCH_DEFAULT`, `SWITCH_EXIT` | Switch parts. |
 | `LABEL` | Goto target. |
-| `COMPENSATION` | Scope transitions on goto edges. |
+| `COMPENSATION` | Scope transitions on goto/switch-case edges. |
 | `UNREACHABLE` | Dead code after terminator. |
 | `GENERIC` | Unclassified. |
 
@@ -163,9 +163,15 @@ Helpers: `IsLoad()`, `IsStore()`, `IsAtomic()`, `IsBigEndian()`, `AccessSize()`.
 
 **String-to-number** (sub-opcodes 51-56): `STRTOI32`, `STRTOI64`, `STRTOU32`, `STRTOU64`, `STRTOF32`, `STRTOF64` — size-specific to avoid platform ambiguity.
 
-Both library calls and `__builtin_` variants are recognized.
+**Bit-field access** (sub-opcodes 57-60): `BIT_READ_LE`, `BIT_WRITE_LE`, `BIT_READ_BE`, `BIT_WRITE_BE`. Bit offset and width stored in int pool (not as operands). Endianness determines bit numbering: LE bit 0 = LSB of byte 0; BE bit 0 = MSB of byte 0. Used for struct bit-field reads and writes.
 
-`MemoryInst` class: `sub_opcode()`, `address()`, `stored_value()`, `result_type()`.
+**Atomic compare-and-exchange** (sub-opcodes 61-68): `CMPXCHG_{LE,BE}_{8,16,32,64}`. `op[0]=target`, `op[1]=expected_ptr`, `op[2]=desired`. Returns bool.
+
+Helpers: `IsLoad()`, `IsStore()`, `IsAtomic()`, `IsBigEndian()`, `AccessSize()`, `IsBitAccess()`, `IsBitRead()`, `IsBitWrite()`, `IsCmpxchg()`.
+
+Both library calls and `__builtin_` variants are recognized. `_Atomic` types automatically use atomic load/store/RMW variants.
+
+`MemoryInst` class: `sub_opcode()`, `address()`, `stored_value()`, `result_type()`, `bit_offset()`, `bit_width()`.
 
 ### Constants (CONST opcode)
 
@@ -201,9 +207,11 @@ Helpers: `IsSignExtend()`, `IsZeroExtend()`, `IsTruncate()`, `IsIntToFloat()`, `
 
 ### Read-Modify-Write
 
-`READ_MODIFY_WRITE` — reads from address, applies an operation, writes back. `ReadModifyWriteInst`: `address()`, `underlying_op()`, `element_size()`, `returns_new_value()`, `rhs_operands()`.
+`READ_MODIFY_WRITE` — reads from address, applies an operation, writes back. `ReadModifyWriteInst`: `address()`, `underlying_op()`, `element_size()`, `is_big_endian()`, `is_atomic()`, `returns_new_value()`, `rhs_operands()`.
 
-Used for: `++i` (ADD), `i += 5` (ADD), `++ptr` (PTR_ADD), `--ptr` (PTR_ADD with -1), `ptr += n` (PTR_ADD), `__builtin_add_overflow` (ADD_OVERFLOW, returns bool), `__atomic_fetch_add` (ATOMIC_ADD).
+int_pool layout: `[underlying_opcode, element_size, is_big_endian]`.
+
+Used for: `++i` (ADD), `i += 5` (ADD), `++ptr` (PTR_ADD), `--ptr` (PTR_ADD with -1), `ptr += n` (PTR_ADD), `_Atomic int a; a += 1` (ATOMIC_ADD), `__builtin_add_overflow` (ADD_OVERFLOW, returns bool), `__atomic_fetch_add` (ATOMIC_ADD).
 
 ### Misc
 
@@ -283,9 +291,9 @@ Key methods: `kind()`, `source_declaration()`, `type()`, `size_bytes()`, `align_
 - For-loops with init-declarations get an implicit `SCOPE`.
 - Dynamic allocations (`DYNAMIC_ALLOCA`) create scope-tracked objects freed on scope exit.
 
-### Goto Compensation
+### Scope Compensation Blocks
 
-When `goto` crosses scope boundaries, a `COMPENSATION` block is inserted with the necessary `EXIT_SCOPE` / `ENTER_SCOPE` transitions.
+When control flow crosses scope boundaries — via `goto` or switch-case edges (Duff's device) — a `COMPENSATION` block is inserted with the necessary `EXIT_SCOPE` / `ENTER_SCOPE` transitions. Each goto and each switch→case edge gets its own compensation block. Same-scope jumps need no compensation.
 
 ### GNU Block Expressions
 
