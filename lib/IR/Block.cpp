@@ -4,6 +4,7 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include <multiplier/IR/Block.h>
+#include <multiplier/IR/Function.h>
 #include <multiplier/IR/Instruction.h>
 #include <multiplier/IR/Structure.h>
 
@@ -43,6 +44,15 @@ std::optional<IRStructure> IRBlock::parent_structure(void) const {
   if (auto *sid = std::get_if<IRStructureId>(&vid)) {
     return IRStructure(std::make_shared<IRStructureImpl>(
         impl->frag, sid->offset, impl->fragment_id));
+  }
+  return std::nullopt;
+}
+
+std::optional<IRFunction> IRBlock::parent_function(void) const {
+  auto s = parent_structure();
+  while (s) {
+    if (auto f = s->parent_function()) return f;
+    s = s->parent_structure();
   }
   return std::nullopt;
 }

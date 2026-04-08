@@ -14,6 +14,7 @@
 
 namespace mx {
 
+class IRFunction;
 class IRInstruction;
 class IRStructure;
 class IRBlockImpl;
@@ -37,6 +38,9 @@ class MX_EXPORT IRBlock {
 
   // Parent structure in the nesting hierarchy.
   std::optional<IRStructure> parent_structure(void) const;
+
+  // Parent function (walks structure chain to root).
+  std::optional<IRFunction> parent_function(void) const;
 
   // All instructions in post-order (children before parents).
   gap::generator<IRInstruction> all_instructions(void) const &;

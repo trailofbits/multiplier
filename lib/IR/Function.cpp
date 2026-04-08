@@ -5,6 +5,7 @@
 
 #include <multiplier/IR/Function.h>
 #include <multiplier/IR/Block.h>
+#include <multiplier/IR/Instruction.h>
 #include <multiplier/IR/Object.h>
 #include <multiplier/IR/Structure.h>
 #include <multiplier/AST/Decl.h>
@@ -171,6 +172,14 @@ std::optional<IRFunction> IRFunction::containing(const Stmt &stmt) {
     return containing(*parent_stmt);
   }
   return std::nullopt;
+}
+
+std::optional<IRFunction> IRFunction::containing(const IRBlock &block) {
+  return block.parent_function();
+}
+
+std::optional<IRFunction> IRFunction::containing(const IRInstruction &inst) {
+  return containing(inst.parent_block());
 }
 
 }  // namespace mx
