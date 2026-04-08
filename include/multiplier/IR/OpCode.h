@@ -410,7 +410,43 @@ enum class FloatOp : uint8_t {
   SQRT = 11,       // op[0]=x. Returns sqrt(x). UNDEFINED for negative.
   INF = 12,        // No operands. Returns +infinity.
   NAN_VAL = 13,    // No operands. Returns NaN.
-  FLOAT_HUGE = 14,  // No operands. Returns HUGE_VAL (+inf).
+  FLOAT_HUGE = 14, // No operands. Returns HUGE_VAL (+inf).
+
+  // Trigonometric.
+  SIN = 15,        // op[0]=x. Returns sin(x).
+  COS = 16,        // op[0]=x. Returns cos(x).
+  TAN = 17,        // op[0]=x. Returns tan(x).
+  ASIN = 18,       // op[0]=x. Returns asin(x). UNDEFINED for |x|>1.
+  ACOS = 19,       // op[0]=x. Returns acos(x). UNDEFINED for |x|>1.
+  ATAN = 20,       // op[0]=x. Returns atan(x).
+  ATAN2 = 21,      // op[0]=y, op[1]=x. Returns atan2(y,x).
+
+  // Exponential/logarithmic.
+  EXP = 22,        // op[0]=x. Returns e^x.
+  EXP2 = 23,       // op[0]=x. Returns 2^x.
+  LOG = 24,        // op[0]=x. Returns ln(x). UNDEFINED for x<=0.
+  LOG2 = 25,       // op[0]=x. Returns log2(x). UNDEFINED for x<=0.
+  LOG10 = 26,      // op[0]=x. Returns log10(x). UNDEFINED for x<=0.
+
+  // Power/modular.
+  POW = 27,        // op[0]=base, op[1]=exp. Returns base^exp.
+  FMOD = 28,       // op[0]=x, op[1]=y. Returns fmod(x,y).
+  REMAINDER = 29,  // op[0]=x, op[1]=y. Returns IEEE remainder.
+  FMA = 30,        // op[0]=x, op[1]=y, op[2]=z. Returns x*y+z (fused).
+
+  // Hyperbolic.
+  SINH = 31,       // op[0]=x.
+  COSH = 32,       // op[0]=x.
+  TANH = 33,       // op[0]=x.
+
+  // Other.
+  HYPOT = 34,      // op[0]=x, op[1]=y. Returns sqrt(x^2+y^2).
+  ERF = 35,        // op[0]=x. Error function.
+  ERFC = 36,       // op[0]=x. Complementary error function.
+  TGAMMA = 37,     // op[0]=x. Gamma function.
+  LGAMMA = 38,     // op[0]=x. Log-gamma function.
+  FDIM = 39,       // op[0]=x, op[1]=y. Returns max(x-y, 0).
+  SIGNBIT = 40,    // op[0]=x. Returns bool (sign bit set).
 };
 
 // Classification helpers.
