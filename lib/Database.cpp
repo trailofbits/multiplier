@@ -806,12 +806,10 @@ DatabaseWriterImpl::~DatabaseWriterImpl(void) {
     ExitDictionaries();
   } catch (...) {}
 
-  try {
-    ExitRecords();
-    ExitMetadata();
-    db.Execute("PRAGMA wal_checkpoint(FULL)");
-    db.Optimize();
-  } catch (...) {}
+  try { ExitRecords(); } catch (...) {}
+  try { ExitMetadata(); } catch (...) {}
+  try { db.Execute("PRAGMA wal_checkpoint(FULL)"); } catch (...) {}
+  try { db.Optimize(); } catch (...) {}
 }
 
 DatabaseWriterImpl::DatabaseWriterImpl(const std::filesystem::path &db_path_,
@@ -1031,7 +1029,12 @@ void DatabaseWriterImpl::ExitRecords(void) {
 #define MX_EXEC_TEARDOWNS(record) \
   for (const char *stmt : record::kExitStatements) { \
     if (stmt) { \
-      db.Execute(stmt); \
+      try { \
+        db.Execute(stmt); \
+      } catch (...) { \
+        /* FTS optimize and other teardown statements may fail; */ \
+        /* don't let them prevent WAL checkpoint. */ \
+      } \
     } \
   }
 

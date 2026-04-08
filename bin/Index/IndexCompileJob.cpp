@@ -3212,6 +3212,21 @@ void FragmentCollector::PersistParsedFragments(void) {
       fragment_ids.push_back(pf->fragment_id);
 
     // NOTE(pag): To debug these, you should set a breakpoint on `__cxa_throw`.
+    } catch (const std::exception &ex) {
+      pf->has_error = true;
+
+      if (!pf->top_level_decls.empty()) {
+        const pasta::Decl &leader_decl = pf->top_level_decls.front();
+        LOG(ERROR)
+            << "Persisting fragment"
+            << PrefixedLocation(leader_decl, " at or near ")
+            << " on main job file " << main_file_path
+            << " triggered exception: " << ex.what();
+      } else {
+        LOG(ERROR)
+            << "Persisting fragment on main job file " << main_file_path
+            << " triggered exception: " << ex.what();
+      }
     } catch (...) {
       pf->has_error = true;
 
@@ -3221,11 +3236,11 @@ void FragmentCollector::PersistParsedFragments(void) {
             << "Persisting fragment"
             << PrefixedLocation(leader_decl, " at or near ")
             << " on main job file " << main_file_path
-            << " triggered exception";
+            << " triggered unknown exception";
       } else {
         LOG(ERROR)
             << "Persisting fragment on main job file " << main_file_path
-            << " triggered exception";
+            << " triggered unknown exception";
       }
       continue;
     }
