@@ -310,11 +310,29 @@ enum class MemOp : uint8_t {
   // String-to-number.
   STRTOI32 = 51, STRTOI64 = 52, STRTOU32 = 53, STRTOU64 = 54, STRTOF32 = 55, STRTOF64 = 56,
 
-  // Bit-field access. For reading/writing individual bit ranges within bytes.
-  // op[0]=address, op[1]=bit_offset (CONST), op[2]=bit_width (CONST).
-  BIT_READ = 57,     // Read bit_width bits starting at bit_offset. Returns integer.
-  // op[0]=address, op[1]=bit_offset (CONST), op[2]=bit_width (CONST), op[3]=value.
-  BIT_WRITE = 58,    // Write value into bit_width bits at bit_offset (read-modify-write).
+  // Bit-field access. Reads/writes individual bit ranges within memory.
+  //
+  // Addressing model:
+  //   The address operand (op[0]) points to the base of the containing
+  //   object (e.g., the struct). bit_offset is measured from the LSB of
+  //   the first byte at that address, in the target's bit numbering:
+  //
+  //   Little-endian: bit 0 is the LSB of byte 0. bit_offset=10, width=5
+  //   means bits [10..14] spanning bytes 1-2:
+  //     byte 0: [7:0]   byte 1: [15:8]   byte 2: [23:16]
+  //     field occupies byte1[2:0] and byte2[1:0]
+  //
+  //   Big-endian: bit 0 is the MSB of byte 0. Layout is reversed.
+  //
+  // int_pool layout: [MemOp sub-opcode, bit_offset, bit_width]
+  // bit_offset and bit_width are compile-time constants (not operands).
+  //
+  // Little-endian: bit 0 = LSB of byte 0.
+  BIT_READ_LE = 57,   // op[0]=address. Returns zero-extended integer.
+  BIT_WRITE_LE = 58,  // op[0]=address, op[1]=value. Read-modify-write.
+  // Big-endian: bit 0 = MSB of byte 0.
+  BIT_READ_BE = 59,
+  BIT_WRITE_BE = 60,
 };
 
 // MemOp classification helpers.
@@ -335,6 +353,9 @@ inline bool IsDirectLoadStore(MemOp op) { return static_cast<uint8_t>(op) < 32; 
 inline bool IsStringToNumber(MemOp op) { return op >= MemOp::STRTOI32 && op <= MemOp::STRTOF64; }
 inline bool IsMemoryBulk(MemOp op) { return op >= MemOp::MEMSET && op <= MemOp::BZERO; }
 inline bool IsStringOp(MemOp op) { return op >= MemOp::STRLEN && op <= MemOp::STPNCPY; }
+inline bool IsBitAccess(MemOp op) { return op >= MemOp::BIT_READ_LE && op <= MemOp::BIT_WRITE_BE; }
+inline bool IsBitRead(MemOp op) { return op == MemOp::BIT_READ_LE || op == MemOp::BIT_READ_BE; }
+inline bool IsBitWrite(MemOp op) { return op == MemOp::BIT_WRITE_LE || op == MemOp::BIT_WRITE_BE; }
 
 // Sub-opcodes for BITWISE. Stored in the int pool.
 enum class BitwiseOp : uint8_t {

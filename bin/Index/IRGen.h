@@ -77,6 +77,8 @@ struct InstructionIR {
   uint8_t bitwise_op{0};  // BitwiseOp sub-opcode for BITWISE instructions
   uint8_t mem_op{0};      // MemOp sub-opcode for MEMORY instructions
   uint8_t float_op{0};    // FloatOp sub-opcode for FLOAT instructions
+  uint32_t bit_offset{0}; // BIT_READ/BIT_WRITE: bit offset into the object
+  uint32_t bit_width{0};  // BIT_READ/BIT_WRITE: number of bits
 
   // Structure index for ENTER_SCOPE/EXIT_SCOPE (into FunctionIR::structures).
   uint32_t structure_index{UINT32_MAX};

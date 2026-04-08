@@ -1543,32 +1543,20 @@ void IRGenerator::EmitInitializer(uint32_t dest_addr_idx,
                   eval_result.Val.getInt().getZExtValue());
             }
             if (bit_width > 0) {
-              // MEMORY(BIT_WRITE, addr, bit_offset, bit_width, value)
-              InstructionIR off_inst;
-              off_inst.opcode = mx::ir::OpCode::CONST;
-              off_inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::UINT32);
-              off_inst.source_entity_id = source_eid;
-              off_inst.uint_value = *offset_bits;
-              off_inst.int_value = static_cast<int64_t>(*offset_bits);
-              off_inst.width = 32;
-              uint32_t off_idx = EmitInstruction(std::move(off_inst));
-
-              InstructionIR width_inst;
-              width_inst.opcode = mx::ir::OpCode::CONST;
-              width_inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::UINT32);
-              width_inst.source_entity_id = source_eid;
-              width_inst.uint_value = bit_width;
-              width_inst.int_value = static_cast<int64_t>(bit_width);
-              width_inst.width = 32;
-              uint32_t width_idx = EmitInstruction(std::move(width_inst));
-
+              // MEMORY(BIT_WRITE): op[0]=addr, op[1]=value.
+              // bit_offset and bit_width stored in int pool (not as operands).
               uint32_t val_idx = EmitRValue(inits[init_idx]);
 
               InstructionIR bw_inst;
               bw_inst.opcode = mx::ir::OpCode::MEMORY;
-              bw_inst.mem_op = static_cast<uint8_t>(mx::ir::MemOp::BIT_WRITE);
+              bw_inst.mem_op = static_cast<uint8_t>(
+                  ctx_.getTargetInfo().isBigEndian()
+                      ? mx::ir::MemOp::BIT_WRITE_BE
+                      : mx::ir::MemOp::BIT_WRITE_LE);
               bw_inst.source_entity_id = source_eid;
-              bw_inst.operand_indices = {dest_addr_idx, off_idx, width_idx, val_idx};
+              bw_inst.bit_offset = static_cast<uint32_t>(*offset_bits);
+              bw_inst.bit_width = bit_width;
+              bw_inst.operand_indices = {dest_addr_idx, val_idx};
               EmitTopLevel(std::move(bw_inst));
             }
           }

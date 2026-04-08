@@ -283,6 +283,19 @@ Type MemoryInst::result_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 
+uint32_t MemoryInst::bit_offset(void) const {
+  auto int_pool = GetIntPool(*impl);
+  auto r = impl->reader();
+  // int_pool layout for MEMORY: [sub_opcode, bit_offset, bit_width]
+  return static_cast<uint32_t>(int_pool[r.getConstOffset() + 1]);
+}
+
+uint32_t MemoryInst::bit_width(void) const {
+  auto int_pool = GetIntPool(*impl);
+  auto r = impl->reader();
+  return static_cast<uint32_t>(int_pool[r.getConstOffset() + 2]);
+}
+
 // ---- GEPFieldInst ----
 
 IRInstruction GEPFieldInst::base(void) const {

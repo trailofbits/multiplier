@@ -223,6 +223,14 @@ static uint32_t EmitInstructionConsts(
 
     case OC::MEMORY:
       pool.AddInt(static_cast<int64_t>(inst.mem_op));  // MemOp sub-opcode
+      // BIT_READ/BIT_WRITE store bit_offset and bit_width in int pool.
+      if (inst.mem_op == static_cast<uint8_t>(mx::ir::MemOp::BIT_READ_LE) ||
+          inst.mem_op == static_cast<uint8_t>(mx::ir::MemOp::BIT_READ_BE) ||
+          inst.mem_op == static_cast<uint8_t>(mx::ir::MemOp::BIT_WRITE_LE) ||
+          inst.mem_op == static_cast<uint8_t>(mx::ir::MemOp::BIT_WRITE_BE)) {
+        pool.AddInt(static_cast<int64_t>(inst.bit_offset));
+        pool.AddInt(static_cast<int64_t>(inst.bit_width));
+      }
       break;
 
     case OC::FLOAT:

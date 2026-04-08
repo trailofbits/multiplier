@@ -58,8 +58,11 @@ class MX_EXPORT MemoryInst : public IRInstruction {
   MX_DECLARE_IR_INSTRUCTION(MemoryInst)
   ir::MemOp sub_opcode(void) const;
   IRInstruction address(void) const;        // op[0] for all
-  IRInstruction stored_value(void) const;   // op[1] for stores
-  Type result_type(void) const;             // for loads
+  IRInstruction stored_value(void) const;   // op[1] for stores / BIT_WRITE value
+  Type result_type(void) const;             // for loads / BIT_READ
+  // BIT_READ/BIT_WRITE: bit-level access parameters (from int pool).
+  uint32_t bit_offset(void) const;          // bit offset from address
+  uint32_t bit_width(void) const;           // number of bits
 };
 
 // ---------------------------------------------------------------------------
