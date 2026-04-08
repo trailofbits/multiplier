@@ -2,7 +2,10 @@
 // return values, recursive calls, indirect calls via function pointers
 // (FUNC_PTR), and variadic functions (VA_PACK, VA_START, VA_ARG, VA_END).
 
-#include <stdarg.h>
+typedef __builtin_va_list va_list;
+#define va_start(ap, param) __builtin_va_start(ap, param)
+#define va_arg(ap, type)    __builtin_va_arg(ap, type)
+#define va_end(ap)          __builtin_va_end(ap)
 
 static int add(int a, int b) {
     return a + b;

@@ -1,7 +1,7 @@
 // Tests: sizeof and alignof lowered to CONST, offsetof lowered via
 // EvaluateAsInt, and various type size queries.
 
-#include <stddef.h>
+#define offsetof(type, member) __builtin_offsetof(type, member)
 
 struct Packed {
     char a;
@@ -16,7 +16,7 @@ int test_sizeof_alignof(void) {
     if (sizeof(long long) < 8) return 3;
 
     // sizeof struct.
-    if (sizeof(struct Packed) < 6) return 4;  // at least sum of fields
+    if (sizeof(struct Packed) < 6) return 4;
 
     // sizeof array.
     int arr[10];
