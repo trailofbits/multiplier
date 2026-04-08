@@ -5,9 +5,12 @@
 
 #include <multiplier/IR/Object.h>
 #include <multiplier/IR/ObjectKind.h>
+#include <multiplier/AST/VarDecl.h>
+#include <multiplier/AST/Type.h>
 
 #include "Impl.h"
 #include "../Fragment.h"
+#include "../EntityProvider.h"
 
 namespace mx {
 
@@ -32,6 +35,26 @@ uint32_t IRObject::size_bytes(void) const {
 uint32_t IRObject::align_bytes(void) const {
   if (!impl) return 0;
   return impl->reader().getAlignBytes();
+}
+
+std::optional<VarDecl> IRObject::source_declaration(void) const {
+  if (!impl) return std::nullopt;
+  auto eid = impl->reader().getSourceDeclId();
+  if (eid == kInvalidEntityId) return std::nullopt;
+  if (auto ptr = impl->frag->ep->DeclFor(impl->frag->ep, eid)) {
+    return VarDecl::from(Decl(std::move(ptr)));
+  }
+  return std::nullopt;
+}
+
+std::optional<Type> IRObject::type(void) const {
+  if (!impl) return std::nullopt;
+  auto eid = impl->reader().getTypeEntityId();
+  if (eid == kInvalidEntityId) return std::nullopt;
+  if (auto ptr = impl->frag->ep->TypeFor(impl->frag->ep, eid)) {
+    return Type(std::move(ptr));
+  }
+  return std::nullopt;
 }
 
 bool IRObject::needs_memory(void) const {
