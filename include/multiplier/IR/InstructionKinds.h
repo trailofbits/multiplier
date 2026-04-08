@@ -158,6 +158,7 @@ class MX_EXPORT ReadModifyWriteInst : public IRInstruction {
   ir::OpCode underlying_op(void) const;
   int64_t element_size(void) const;  // for PTR_ADD, 0 otherwise
   bool is_big_endian(void) const;    // int_pool[2]: target endianness
+  bool is_atomic(void) const;        // true if underlying op is ATOMIC_*
   bool returns_new_value(void) const;
   Type result_type(void) const;
   // RHS operands (everything after address).

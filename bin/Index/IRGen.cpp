@@ -2004,8 +2004,10 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         inst.operand_indices = {addr_idx, val_idx};
 
         // Check if LHS is a pointer type for += and -=.
+        // Check if LHS is _Atomic for atomic compound assignment.
         auto lhs_type = bo->LHS().Type();
         bool lhs_is_ptr = lhs_type && lhs_type->IsAnyPointerType();
+        bool lhs_is_atomic = lhs_type && lhs_type->IsAtomicType();
 
         switch (oc) {
           case pasta::BinaryOperatorKind::kAddAssign:
@@ -2015,14 +2017,12 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
                 if (auto sz = TypeSizeBytes(*pt)) inst.size_bytes = *sz;
               }
             } else {
-              inst.compound_op = mx::ir::OpCode::ADD;
+              inst.compound_op = lhs_is_atomic ? mx::ir::OpCode::ATOMIC_ADD
+                                               : mx::ir::OpCode::ADD;
             }
             break;
           case pasta::BinaryOperatorKind::kSubAssign:
             if (lhs_is_ptr) {
-              // ptr -= n is PTR_ADD with negated index.
-              // The RMW will do: old_ptr + (-n) * elem_size.
-              // We negate the RHS value here.
               InstructionIR neg;
               neg.opcode = mx::ir::OpCode::NEG;
               neg.source_entity_id = eid;
@@ -2034,15 +2034,25 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
                 if (auto sz = TypeSizeBytes(*pt)) inst.size_bytes = *sz;
               }
             } else {
-              inst.compound_op = mx::ir::OpCode::SUB;
+              inst.compound_op = lhs_is_atomic ? mx::ir::OpCode::ATOMIC_SUB
+                                               : mx::ir::OpCode::SUB;
             }
             break;
           case pasta::BinaryOperatorKind::kMulAssign: inst.compound_op = mx::ir::OpCode::MUL; break;
           case pasta::BinaryOperatorKind::kDivAssign: inst.compound_op = mx::ir::OpCode::DIV; break;
           case pasta::BinaryOperatorKind::kRemAssign: inst.compound_op = mx::ir::OpCode::REM; break;
-          case pasta::BinaryOperatorKind::kAndAssign: inst.compound_op = mx::ir::OpCode::BIT_AND; break;
-          case pasta::BinaryOperatorKind::kOrAssign: inst.compound_op = mx::ir::OpCode::BIT_OR; break;
-          case pasta::BinaryOperatorKind::kXorAssign: inst.compound_op = mx::ir::OpCode::BIT_XOR; break;
+          case pasta::BinaryOperatorKind::kAndAssign:
+            inst.compound_op = lhs_is_atomic ? mx::ir::OpCode::ATOMIC_AND
+                                             : mx::ir::OpCode::BIT_AND;
+            break;
+          case pasta::BinaryOperatorKind::kOrAssign:
+            inst.compound_op = lhs_is_atomic ? mx::ir::OpCode::ATOMIC_OR
+                                             : mx::ir::OpCode::BIT_OR;
+            break;
+          case pasta::BinaryOperatorKind::kXorAssign:
+            inst.compound_op = lhs_is_atomic ? mx::ir::OpCode::ATOMIC_XOR
+                                             : mx::ir::OpCode::BIT_XOR;
+            break;
           case pasta::BinaryOperatorKind::kShlAssign: inst.compound_op = mx::ir::OpCode::SHL; break;
           case pasta::BinaryOperatorKind::kShrAssign: inst.compound_op = mx::ir::OpCode::SHR; break;
           default: inst.compound_op = mx::ir::OpCode::ADD; break;

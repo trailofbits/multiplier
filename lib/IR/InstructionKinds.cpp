@@ -390,6 +390,11 @@ bool ReadModifyWriteInst::is_big_endian(void) const {
   return GetIntPool(*impl)[impl->reader().getConstOffset() + 2] != 0;
 }
 
+bool ReadModifyWriteInst::is_atomic(void) const {
+  auto op = underlying_op();
+  return op >= ir::OpCode::ATOMIC_ADD && op <= ir::OpCode::ATOMIC_EXCHANGE;
+}
+
 bool ReadModifyWriteInst::returns_new_value(void) const {
   return (impl->reader().getFlags() & 1) != 0;
 }
