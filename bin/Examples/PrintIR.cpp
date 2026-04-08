@@ -240,14 +240,39 @@ void PrintFunction(std::ostream &os, const mx::IRFunction &func) {
 
 int main(int argc, char *argv[]) {
   std::stringstream ss;
-  ss << "Usage: " << argv[0] << " --db DATABASE [--entity_name NAME | --all]";
+  ss << "Usage: " << argv[0]
+     << " --db DATABASE [--entity_name NAME | --entity_id ID | --all]";
   google::SetUsageMessage(ss.str());
   google::ParseCommandLineFlags(&argc, &argv, false);
   google::InitGoogleLogging(argv[0]);
 
   mx::Index index = InitExample(false);
 
-  if (FLAGS_all) {
+  if (FLAGS_entity_id != mx::kInvalidEntityId) {
+    auto entity = index.entity(FLAGS_entity_id);
+
+    // If it's directly an IRFunction, print it.
+    if (auto *ir = std::get_if<mx::IRFunction>(&entity)) {
+      PrintFunction(std::cout, *ir);
+    }
+    // If it's a Decl, find its IR.
+    else if (auto *decl = std::get_if<mx::Decl>(&entity)) {
+      if (auto ir_var = decl->ir()) {
+        if (auto *ir = std::get_if<mx::IRFunction>(&*ir_var)) {
+          PrintFunction(std::cout, *ir);
+        } else {
+          LOG(ERROR) << "Entity " << FLAGS_entity_id << " has IR but not an IRFunction";
+          return 1;
+        }
+      } else {
+        LOG(ERROR) << "No IR for entity " << FLAGS_entity_id;
+        return 1;
+      }
+    } else {
+      LOG(ERROR) << "Entity " << FLAGS_entity_id << " is not a Decl or IRFunction";
+      return 1;
+    }
+  } else if (FLAGS_all) {
     // Print IR for every function.
     for (auto frag : mx::Fragment::in(index)) {
       for (auto decl : mx::Decl::in(frag)) {
