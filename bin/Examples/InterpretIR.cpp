@@ -761,8 +761,91 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
             result = ops.empty() ? Value::Undef() : ops[0];
             break;
           }
+          case MO::STRLEN: {
+            // Read bytes until null terminator.
+            if (ops.size() >= 1 && ops[0].kind == Value::POINTER) {
+              auto it = memory_.find(ops[0].ptr.object_id);
+              if (it != memory_.end()) {
+                size_t start = static_cast<size_t>(ops[0].ptr.offset);
+                size_t len = 0;
+                while (start + len < it->second.bytes.size() &&
+                       it->second.bytes[start + len] != 0) ++len;
+                result = Value::Int(static_cast<int64_t>(len));
+              }
+            }
+            break;
+          }
+          case MO::STRCMP: {
+            if (ops.size() >= 2 && ops[0].kind == Value::POINTER
+                && ops[1].kind == Value::POINTER) {
+              auto it0 = memory_.find(ops[0].ptr.object_id);
+              auto it1 = memory_.find(ops[1].ptr.object_id);
+              if (it0 != memory_.end() && it1 != memory_.end()) {
+                size_t s0 = static_cast<size_t>(ops[0].ptr.offset);
+                size_t s1 = static_cast<size_t>(ops[1].ptr.offset);
+                int cmp = 0;
+                while (true) {
+                  uint8_t c0 = (s0 < it0->second.bytes.size()) ? it0->second.bytes[s0] : 0;
+                  uint8_t c1 = (s1 < it1->second.bytes.size()) ? it1->second.bytes[s1] : 0;
+                  if (c0 != c1) { cmp = (c0 < c1) ? -1 : 1; break; }
+                  if (c0 == 0) break;
+                  ++s0; ++s1;
+                }
+                result = Value::Int(cmp);
+              }
+            }
+            break;
+          }
+          case MO::MEMCMP: {
+            if (ops.size() >= 3 && ops[0].kind == Value::POINTER
+                && ops[1].kind == Value::POINTER) {
+              size_t len = static_cast<size_t>(ops[2].as_int());
+              std::vector<uint8_t> buf0(len, 0), buf1(len, 0);
+              MemRead(ops[0].ptr, buf0.data(), len);
+              MemRead(ops[1].ptr, buf1.data(), len);
+              result = Value::Int(std::memcmp(buf0.data(), buf1.data(), len));
+            }
+            break;
+          }
+          case MO::MEMCHR: {
+            if (ops.size() >= 3 && ops[0].kind == Value::POINTER) {
+              size_t len = static_cast<size_t>(ops[2].as_int());
+              uint8_t needle = static_cast<uint8_t>(ops[1].as_int());
+              auto it = memory_.find(ops[0].ptr.object_id);
+              if (it != memory_.end()) {
+                size_t start = static_cast<size_t>(ops[0].ptr.offset);
+                for (size_t i = 0; i < len && start + i < it->second.bytes.size(); ++i) {
+                  if (it->second.bytes[start + i] == needle) {
+                    result = Value::Ptr(ops[0].ptr.object_id,
+                                        ops[0].ptr.offset + static_cast<int64_t>(i));
+                    break;
+                  }
+                }
+                // If not found, result stays as Undef (null).
+              }
+            }
+            break;
+          }
+          case MO::STRCHR: {
+            if (ops.size() >= 2 && ops[0].kind == Value::POINTER) {
+              uint8_t needle = static_cast<uint8_t>(ops[1].as_int());
+              auto it = memory_.find(ops[0].ptr.object_id);
+              if (it != memory_.end()) {
+                size_t start = static_cast<size_t>(ops[0].ptr.offset);
+                for (size_t i = start; i < it->second.bytes.size(); ++i) {
+                  if (it->second.bytes[i] == needle) {
+                    result = Value::Ptr(ops[0].ptr.object_id,
+                                        static_cast<int64_t>(i));
+                    break;
+                  }
+                  if (it->second.bytes[i] == 0) break;  // null terminator
+                }
+              }
+            }
+            break;
+          }
           default:
-            // For unimplemented string ops, return undef.
+            // For unimplemented string/number ops, return undef.
             result = Value::Undef();
             break;
         }
@@ -964,10 +1047,33 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       break;
     }
 
-    // --- Scope markers (no-ops for concrete interpretation) ---
-    case mx::ir::OpCode::ENTER_SCOPE:
-    case mx::ir::OpCode::EXIT_SCOPE:
+    // --- Scope markers: track object lifetimes ---
+    case mx::ir::OpCode::ENTER_SCOPE: {
+      if (auto esi = mx::EnterScopeInst::from(inst)) {
+        auto scope = esi->scope();
+        for (auto obj : scope.objects()) {
+          auto oid = mx::EntityId(obj.id()).Pack();
+          auto it = memory_.find(oid);
+          if (it != memory_.end()) {
+            it->second.poisoned = false;  // Re-entering scope (loop iteration).
+          }
+        }
+      }
       break;
+    }
+    case mx::ir::OpCode::EXIT_SCOPE: {
+      if (auto esi = mx::ExitScopeInst::from(inst)) {
+        auto scope = esi->scope();
+        for (auto obj : scope.objects()) {
+          auto oid = mx::EntityId(obj.id()).Pack();
+          auto it = memory_.find(oid);
+          if (it != memory_.end()) {
+            it->second.poisoned = true;  // Object lifetime ended.
+          }
+        }
+      }
+      break;
+    }
 
     // --- Terminators are handled by the CFG walker, not here ---
     case mx::ir::OpCode::COND_BRANCH:
