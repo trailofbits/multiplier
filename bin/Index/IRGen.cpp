@@ -2116,13 +2116,18 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       }
 
       if (arith_op == mx::ir::OpCode::SUB && lhs_ptr && rhs_ptr) {
-        // ptr - ptr → PTR_DIFF
+        // ptr - ptr → PTR_DIFF (result in elements, not bytes)
         uint32_t lhs_idx = EmitRValue(bo->LHS());
         uint32_t rhs_idx = EmitRValue(bo->RHS());
         InstructionIR inst;
         inst.opcode = mx::ir::OpCode::PTR_DIFF;
         inst.source_entity_id = eid;
         inst.operand_indices = {lhs_idx, rhs_idx};
+        // Element size needed to convert byte difference to element count.
+        if (auto pt = pasta::PointerType::From(*lhs_type)) {
+          auto pointee = pt->PointeeType();
+          if (auto sz = TypeSizeBytes(pointee)) inst.size_bytes = *sz;
+        }
         return emit_typed(std::move(inst));
       }
 
@@ -3238,14 +3243,18 @@ std::optional<uint32_t> IRGenerator::TypeAlignBytes(const pasta::Type &t) {
 
 mx::ir::MemOp IRGenerator::DetermineMemOp(
     bool is_store, bool is_atomic, unsigned size_bytes) {
-  bool big_endian = ctx_.getTargetInfo().isBigEndian();
+  // For non-standard sizes (not 1/2/4/8), use MEMCPY/MEMMOVE.
   unsigned size_idx;
   switch (size_bytes) {
     case 1: size_idx = 0; break;
     case 2: size_idx = 1; break;
     case 4: size_idx = 2; break;
-    default: size_idx = 3; break; // 8 or unknown
+    case 8: size_idx = 3; break;
+    default:
+      // Non-standard size: fall back to bulk memory copy.
+      return mx::ir::MemOp::MEMCPY;
   }
+  bool big_endian = ctx_.getTargetInfo().isBigEndian();
   unsigned base = 0;
   if (is_store && !is_atomic) base = 8;
   else if (!is_store && is_atomic) base = 16;
