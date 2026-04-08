@@ -28,7 +28,7 @@ EntityId IRStructure::id(void) const {
   IRStructureId sid;
   sid.fragment_id = impl->fragment_id;
   sid.offset = impl->offset;
-  sid.structure_kind = static_cast<uint8_t>(kind());
+  sid.structure_kind = kind();
   return EntityId(sid);
 }
 

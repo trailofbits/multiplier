@@ -28,7 +28,7 @@ static RawEntityId MakeBlockEid(
   CHECK(local_block_idx < func.blocks.size())
       << "MakeBlockEid: local_block_idx=" << local_block_idx
       << " >= blocks.size()=" << func.blocks.size();
-  auto bk = static_cast<uint8_t>(func.blocks[local_block_idx].kind);
+  auto bk = func.blocks[local_block_idx].kind;
   mx::IRBlockId bid{fragment_id, ir_block_base_offset + local_block_idx, bk};
   return mx::EntityId(bid).Pack();
 }
@@ -36,7 +36,7 @@ static RawEntityId MakeBlockEid(
 static RawEntityId MakeInstEid(
     const ir::FunctionIR &func, RawEntityId fragment_id,
     uint32_t ir_inst_base_offset, uint32_t local_inst_idx) {
-  auto op = static_cast<uint8_t>(func.instructions[local_inst_idx].opcode);
+  auto op = func.instructions[local_inst_idx].opcode;
   mx::IRInstructionId iid{fragment_id, ir_inst_base_offset + local_inst_idx, op};
   return mx::EntityId(iid).Pack();
 }
@@ -51,7 +51,7 @@ static RawEntityId MakeObjEid(RawEntityId fragment_id,
 static RawEntityId MakeStructureEid(
     const ir::FunctionIR &func, RawEntityId fragment_id,
     uint32_t ir_struct_base_offset, uint32_t local_struct_idx) {
-  auto sk = static_cast<uint8_t>(func.structures[local_struct_idx].kind);
+  auto sk = func.structures[local_struct_idx].kind;
   mx::IRStructureId sid{fragment_id, ir_struct_base_offset + local_struct_idx, sk};
   return mx::EntityId(sid).Pack();
 }
@@ -284,7 +284,7 @@ std::vector<ir::FunctionIR> GenerateIR(
       if (inst.source_entity_id != mx::kInvalidEntityId) {
         auto ir_eid = mx::EntityId(mx::IRInstructionId{
             fragment_id, inst_offset + i,
-            static_cast<uint8_t>(inst.opcode)}).Pack();
+            inst.opcode}).Pack();
         em.ir_for_entity[inst.source_entity_id] = ir_eid;
       }
     }
@@ -344,7 +344,7 @@ std::vector<ir::FunctionIR> GenerateIR(
       if (inst.source_entity_id != mx::kInvalidEntityId) {
         auto ir_eid = mx::EntityId(mx::IRInstructionId{
             fragment_id, inst_offset + i,
-            static_cast<uint8_t>(inst.opcode)}).Pack();
+            inst.opcode}).Pack();
         // Don't overwrite existing mappings (the VarDecl already maps
         // to its IRFunction).
         em.ir_for_entity.emplace(inst.source_entity_id, ir_eid);
@@ -654,7 +654,7 @@ void SerializeIR(
           // Store the parent switch instruction ID.
           auto switch_eid = mx::EntityId(mx::IRInstructionId{
               fragment_id, func_inst_base + ii,
-              static_cast<uint8_t>(mx::ir::OpCode::SWITCH)}).Pack();
+              mx::ir::OpCode::SWITCH}).Pack();
           cb.setSwitchInstructionId(switch_eid);
 
           // Overwrite the placeholder in the pool.
@@ -696,7 +696,7 @@ void SerializeIR(
       auto &u = users[gi];
       auto user_list = frag_insts[gi].initUsers(u.size());
       for (size_t j = 0; j < u.size(); ++j) {
-        mx::IRInstructionId iid{fragment_id, u[j], opcodes[u[j]]};
+        mx::IRInstructionId iid{fragment_id, u[j], static_cast<mx::ir::OpCode>(opcodes[u[j]])};
         user_list.set(j, mx::EntityId(iid).Pack());
       }
     }

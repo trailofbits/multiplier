@@ -27,7 +27,7 @@ EntityId IRBlock::id(void) const {
   IRBlockId bid;
   bid.fragment_id = impl->fragment_id;
   bid.offset = impl->offset;
-  bid.block_kind = static_cast<uint8_t>(kind());
+  bid.block_kind = kind();
   return EntityId(bid);
 }
 

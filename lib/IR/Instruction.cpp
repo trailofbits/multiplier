@@ -57,7 +57,7 @@ EntityId IRInstruction::id(void) const {
   IRInstructionId iid;
   iid.fragment_id = impl->fragment_id;
   iid.offset = impl->offset;
-  iid.opcode = static_cast<uint8_t>(opcode());
+  iid.opcode = opcode();
   return EntityId(iid);
 }
 
