@@ -2893,6 +2893,23 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     return emit_typed(std::move(inst));
   }
 
+  // DesignatedInitExpr -- unwrap to the actual initializer value.
+  if (auto die = pasta::DesignatedInitExpr::From(e)) {
+    return EmitRValue(die->Initializer());
+  }
+
+  // ImplicitValueInitExpr -- zero-initialization of a value.
+  if (pasta::ImplicitValueInitExpr::From(e)) {
+    InstructionIR inst;
+    inst.opcode = mx::ir::OpCode::CONST;
+    inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::INT64);
+    inst.source_entity_id = eid;
+    inst.int_value = 0;
+    inst.uint_value = 0;
+    inst.width = 64;
+    return emit_typed(std::move(inst));
+  }
+
   // ChooseExpr (__builtin_choose_expr) -- emit the chosen sub-expression.
   if (auto ce = pasta::ChooseExpr::From(e)) {
     return EmitRValue(ce->ChosenSubExpression());
