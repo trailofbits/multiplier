@@ -49,6 +49,8 @@ class MX_EXPORT AllocaInst : public IRInstruction {
   MX_DECLARE_IR_INSTRUCTION(AllocaInst)
   Type allocated_type(void) const;
   IRObject object(void) const;
+  uint32_t size_bytes(void) const;   // from the object
+  uint32_t align_bytes(void) const;  // from the object
 };
 
 class MX_EXPORT MemoryInst : public IRInstruction {
@@ -247,7 +249,8 @@ class MX_EXPORT FloatOpInst : public IRInstruction {
 class MX_EXPORT DynamicAllocaInst : public IRInstruction {
  public:
   MX_DECLARE_IR_INSTRUCTION(DynamicAllocaInst)
-  IRInstruction size(void) const;        // op[0]
+  IRInstruction size(void) const;        // op[0] = size in bytes (runtime value)
+  IRObject object(void) const;           // scope-tracked object
   Type result_type(void) const;
 };
 

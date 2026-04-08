@@ -117,6 +117,7 @@ static void EmitInstructionExtras(
       break;
 
     case OC::PARAM_READ:
+    case OC::DYNAMIC_ALLOCA:
       pool.AddEntity(MakeObjEid(fragment_id, obj_base, inst.object_index));
       break;
 

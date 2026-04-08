@@ -255,6 +255,14 @@ IRObject AllocaInst::object(void) const {
   return MakeObj(*impl, GetPool(*impl)[ExtraBase(impl->reader(), GetIntPool(*impl))]);
 }
 
+uint32_t AllocaInst::size_bytes(void) const {
+  return object().size_bytes();
+}
+
+uint32_t AllocaInst::align_bytes(void) const {
+  return object().align_bytes();
+}
+
 // ---- MemoryInst ----
 
 ir::MemOp MemoryInst::sub_opcode(void) const {
@@ -576,6 +584,11 @@ Type FloatOpInst::result_type(void) const {
 // ---- DynamicAllocaInst ----
 
 IRInstruction DynamicAllocaInst::size(void) const { return nth_operand(0); }
+
+IRObject DynamicAllocaInst::object(void) const {
+  return MakeObj(*impl, GetPool(*impl)[ExtraBase(impl->reader(), GetIntPool(*impl))]);
+}
+
 Type DynamicAllocaInst::result_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
