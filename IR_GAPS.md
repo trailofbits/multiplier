@@ -8,6 +8,9 @@
 - **EnterScopeInst/ExitScopeInst (Phase E)** — New instruction classes with scope() accessor.
 - **Convenience methods (Phase F)** — IRBlock::parent_function(), IRFunction::containing(IRBlock/IRInstruction).
 - **DesignatedInitExpr (Phase G)** — Unwrap to Initializer(). Also handle ImplicitValueInitExpr as zero.
+- **Float builtins (Phase H)** — 27 new FloatOp sub-opcodes (sin, cos, exp, log, pow, fmod, fma, etc.)
+- **Bit-field init fix (Phase I)** — Skip bit-fields in EmitInitializer (zeroed by MEMSET).
+- **Interpreter improvements (Phase J)** — Scope tracking (poison on EXIT_SCOPE), STRLEN/STRCMP/MEMCMP/MEMCHR/STRCHR.
 
 ## Critical Bugs
 
