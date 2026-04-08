@@ -261,14 +261,14 @@ std::optional<FunctionIR> IRGenerator::Generate(
 
       // STORE the parameter value into its alloca.
       InstructionIR store;
-      store.opcode = mx::ir::OpCode::MEM;
+      store.opcode = mx::ir::OpCode::MEMORY;
       store.source_entity_id = EntityIdOf(param);
       store.operand_indices = {addr_idx, pr_idx};
       {
         unsigned sz = 8;
         if (auto s = TypeSizeBytes(param.Type())) sz = *s;
-        store.mem_access_op = static_cast<uint8_t>(
-            DetermineMemAccessOp(true, false, sz));
+        store.mem_op = static_cast<uint8_t>(
+            DetermineMemOp(true, false, sz));
       }
       EmitTopLevel(std::move(store));
     }
@@ -595,17 +595,17 @@ uint32_t IRGenerator::EmitLoadFromLValue(const pasta::Expr &e) {
   auto eid = EntityIdOf(e);
   uint32_t addr_idx = EmitLValue(e);
   InstructionIR inst;
-  inst.opcode = mx::ir::OpCode::MEM;
+  inst.opcode = mx::ir::OpCode::MEMORY;
   inst.source_entity_id = eid;
   if (auto t = e.Type()) {
     inst.type_entity_id = TypeEntityIdOf(*t);
     unsigned sz = 8;
     if (auto s = TypeSizeBytes(*t)) sz = *s;
-    inst.mem_access_op = static_cast<uint8_t>(
-        DetermineMemAccessOp(false, false, sz));
+    inst.mem_op = static_cast<uint8_t>(
+        DetermineMemOp(false, false, sz));
   } else {
-    inst.mem_access_op = static_cast<uint8_t>(
-        DetermineMemAccessOp(false, false, 8));
+    inst.mem_op = static_cast<uint8_t>(
+        DetermineMemOp(false, false, 8));
   }
   inst.operand_indices = {addr_idx};
   return EmitInstruction(std::move(inst));
@@ -1472,8 +1472,8 @@ void IRGenerator::EmitInitializer(uint32_t dest_addr_idx,
       uint32_t sz_idx = EmitInstruction(std::move(sz));
 
       InstructionIR memset_inst;
-      memset_inst.opcode = mx::ir::OpCode::MULTIMEM;
-      memset_inst.memory_op = static_cast<uint8_t>(mx::ir::MemoryOp::MEMSET);
+      memset_inst.opcode = mx::ir::OpCode::MEMORY;
+      memset_inst.mem_op = static_cast<uint8_t>(mx::ir::MemOp::MEMSET);
       memset_inst.source_entity_id = source_eid;
       memset_inst.operand_indices = {dest_addr_idx, zero_idx, sz_idx};
       EmitTopLevel(std::move(memset_inst));
@@ -1568,7 +1568,7 @@ scalar_fallback:
   {
     uint32_t val_idx = EmitRValue(init);
     InstructionIR store;
-    store.opcode = mx::ir::OpCode::MEM;
+    store.opcode = mx::ir::OpCode::MEMORY;
     store.source_entity_id = source_eid;
     store.operand_indices = {dest_addr_idx, val_idx};
     {
@@ -1576,8 +1576,8 @@ scalar_fallback:
       if (auto t = init.Type()) {
         if (auto s = TypeSizeBytes(*t)) sz = *s;
       }
-      store.mem_access_op = static_cast<uint8_t>(
-          DetermineMemAccessOp(true, false, sz));
+      store.mem_op = static_cast<uint8_t>(
+          DetermineMemOp(true, false, sz));
     }
     EmitTopLevel(std::move(store));
   }
@@ -1718,17 +1718,17 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     if (ck == pasta::CastKind::kLValueToRValue) {
       uint32_t addr_idx = EmitLValue(sub);
       InstructionIR inst;
-      inst.opcode = mx::ir::OpCode::MEM;
+      inst.opcode = mx::ir::OpCode::MEMORY;
       inst.source_entity_id = eid;
       if (maybe_type) {
         inst.type_entity_id = TypeEntityIdOf(*maybe_type);
         unsigned sz = 8;
         if (auto s = TypeSizeBytes(*maybe_type)) sz = *s;
-        inst.mem_access_op = static_cast<uint8_t>(
-            DetermineMemAccessOp(false, false, sz));
+        inst.mem_op = static_cast<uint8_t>(
+            DetermineMemOp(false, false, sz));
       } else {
-        inst.mem_access_op = static_cast<uint8_t>(
-            DetermineMemAccessOp(false, false, 8));
+        inst.mem_op = static_cast<uint8_t>(
+            DetermineMemOp(false, false, 8));
       }
       inst.operand_indices = {addr_idx};
       return emit_typed(std::move(inst));
@@ -1852,17 +1852,17 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       if (oc == pasta::UnaryOperatorKind::kDeref) {
         uint32_t ptr_idx = EmitRValue(sub);
         InstructionIR inst;
-        inst.opcode = mx::ir::OpCode::MEM;
+        inst.opcode = mx::ir::OpCode::MEMORY;
         inst.source_entity_id = eid;
         if (auto t__ = e.Type()) {
           inst.type_entity_id = TypeEntityIdOf(*t__);
           unsigned sz = 8;
           if (auto s = TypeSizeBytes(*t__)) sz = *s;
-          inst.mem_access_op = static_cast<uint8_t>(
-              DetermineMemAccessOp(false, false, sz));
+          inst.mem_op = static_cast<uint8_t>(
+              DetermineMemOp(false, false, sz));
         } else {
-          inst.mem_access_op = static_cast<uint8_t>(
-              DetermineMemAccessOp(false, false, 8));
+          inst.mem_op = static_cast<uint8_t>(
+              DetermineMemOp(false, false, 8));
         }
         inst.operand_indices = {ptr_idx};
         return emit_typed(std::move(inst));
@@ -1952,7 +1952,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         uint32_t addr_idx = EmitLValue(bo->LHS());
         uint32_t val_idx = EmitRValue(bo->RHS());
         InstructionIR inst;
-        inst.opcode = mx::ir::OpCode::MEM;
+        inst.opcode = mx::ir::OpCode::MEMORY;
         inst.source_entity_id = eid;
         inst.operand_indices = {addr_idx, val_idx};
         {
@@ -1960,8 +1960,8 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
           if (auto t = bo->RHS().Type()) {
             if (auto s = TypeSizeBytes(*t)) sz = *s;
           }
-          inst.mem_access_op = static_cast<uint8_t>(
-              DetermineMemAccessOp(true, false, sz));
+          inst.mem_op = static_cast<uint8_t>(
+              DetermineMemOp(true, false, sz));
         }
         return emit_typed(std::move(inst));
       }
@@ -2156,9 +2156,9 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         return emit_typed(std::move(inst));
       }
 
-      // Recognize memory/string operations and lower to MULTIMEM.
+      // Recognize memory/string operations and lower to MEMORY.
       {
-        using MO = mx::ir::MemoryOp;
+        using MO = mx::ir::MemOp;
         struct MemBuiltin {
           const char *name;
           MO op;
@@ -2233,8 +2233,8 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         for (const auto &mb : mem_builtins) {
           if (callee_name == mb.name && args.size() >= mb.min_args) {
             InstructionIR inst;
-            inst.opcode = mx::ir::OpCode::MULTIMEM;
-            inst.memory_op = static_cast<uint8_t>(mb.op);
+            inst.opcode = mx::ir::OpCode::MEMORY;
+            inst.mem_op = static_cast<uint8_t>(mb.op);
             inst.source_entity_id = eid;
             for (unsigned i = 0; i < mb.min_args; ++i) {
               inst.operand_indices.push_back(EmitRValue(args[i]));
@@ -2248,7 +2248,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       // sizeof(long), which varies by platform.
       if (callee_name == "atol" || callee_name == "strtol" ||
           callee_name == "strtoul") {
-        using MO = mx::ir::MemoryOp;
+        using MO = mx::ir::MemOp;
         bool is_long64 = (ctx_.getTargetInfo().getLongWidth() == 64);
         MO op;
         unsigned min_args;
@@ -2264,8 +2264,8 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         }
         if (args.size() >= min_args) {
           InstructionIR inst;
-          inst.opcode = mx::ir::OpCode::MULTIMEM;
-          inst.memory_op = static_cast<uint8_t>(op);
+          inst.opcode = mx::ir::OpCode::MEMORY;
+          inst.mem_op = static_cast<uint8_t>(op);
           inst.source_entity_id = eid;
           for (unsigned i = 0; i < min_args; ++i) {
             inst.operand_indices.push_back(EmitRValue(args[i]));
@@ -2324,11 +2324,11 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
           uint32_t undef_idx = EmitInstruction(std::move(undef));
 
           InstructionIR store;
-          store.opcode = mx::ir::OpCode::MEM;
+          store.opcode = mx::ir::OpCode::MEMORY;
           store.source_entity_id = eid;
           store.operand_indices = {dest_idx, undef_idx};
-          store.mem_access_op = static_cast<uint8_t>(
-              DetermineMemAccessOp(true, false, 8));
+          store.mem_op = static_cast<uint8_t>(
+              DetermineMemOp(true, false, 8));
           EmitTopLevel(std::move(store));
 
           // RMW(&result, overflow_op, a, b) → returns bool (overflow flag).
@@ -2624,7 +2624,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       if (callee_name == "__atomic_load_n" || callee_name == "__c11_atomic_load") {
         if (!args.empty()) {
           InstructionIR inst;
-          inst.opcode = mx::ir::OpCode::MEM;
+          inst.opcode = mx::ir::OpCode::MEMORY;
           inst.source_entity_id = eid;
           inst.operand_indices.push_back(EmitRValue(args[0]));
           {
@@ -2632,8 +2632,8 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
             if (auto t = e.Type()) {
               if (auto s = TypeSizeBytes(*t)) sz = *s;
             }
-            inst.mem_access_op = static_cast<uint8_t>(
-                DetermineMemAccessOp(false, true, sz));
+            inst.mem_op = static_cast<uint8_t>(
+                DetermineMemOp(false, true, sz));
           }
           return emit_typed(std::move(inst));
         }
@@ -2641,7 +2641,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       if (callee_name == "__atomic_store_n" || callee_name == "__c11_atomic_store") {
         if (args.size() >= 2) {
           InstructionIR inst;
-          inst.opcode = mx::ir::OpCode::MEM;
+          inst.opcode = mx::ir::OpCode::MEMORY;
           inst.source_entity_id = eid;
           inst.operand_indices.push_back(EmitRValue(args[0]));
           inst.operand_indices.push_back(EmitRValue(args[1]));
@@ -2650,8 +2650,8 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
             if (auto t = args[1].Type()) {
               if (auto s = TypeSizeBytes(*t)) sz = *s;
             }
-            inst.mem_access_op = static_cast<uint8_t>(
-                DetermineMemAccessOp(true, true, sz));
+            inst.mem_op = static_cast<uint8_t>(
+                DetermineMemOp(true, true, sz));
           }
           return emit_typed(std::move(inst));
         }
@@ -3162,7 +3162,7 @@ std::optional<uint32_t> IRGenerator::TypeAlignBytes(const pasta::Type &t) {
   return std::nullopt;
 }
 
-mx::ir::MemAccessOp IRGenerator::DetermineMemAccessOp(
+mx::ir::MemOp IRGenerator::DetermineMemOp(
     bool is_store, bool is_atomic, unsigned size_bytes) {
   bool big_endian = ctx_.getTargetInfo().isBigEndian();
   unsigned size_idx;
@@ -3177,7 +3177,7 @@ mx::ir::MemAccessOp IRGenerator::DetermineMemAccessOp(
   else if (!is_store && is_atomic) base = 16;
   else if (is_store && is_atomic) base = 24;
   if (big_endian) base += 4;
-  return static_cast<mx::ir::MemAccessOp>(base + size_idx);
+  return static_cast<mx::ir::MemOp>(base + size_idx);
 }
 
 // ---------------------------------------------------------------------------

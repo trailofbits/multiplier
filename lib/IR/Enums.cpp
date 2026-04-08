@@ -16,7 +16,7 @@ const char *EnumeratorName(OpCode op) noexcept {
   switch (op) {
     case OpCode::CONST: return "CONST";
     case OpCode::ALLOCA: return "ALLOCA";
-    case OpCode::MEM: return "MEM";
+    case OpCode::MEMORY: return "MEMORY";
     case OpCode::GEP_FIELD: return "GEP_FIELD";
     case OpCode::PTR_ADD: return "PTR_ADD";
     case OpCode::ADD: return "ADD";
@@ -63,7 +63,7 @@ const char *EnumeratorName(OpCode op) noexcept {
     case OpCode::VA_END: return "VA_END";
     case OpCode::ENTER_SCOPE: return "ENTER_SCOPE";
     case OpCode::EXIT_SCOPE: return "EXIT_SCOPE";
-    case OpCode::MULTIMEM: return "MULTIMEM";
+    // MULTIMEM removed: merged into MEMORY.
     case OpCode::PARAM_READ: return "PARAM_READ";
     case OpCode::GLOBAL_PTR: return "GLOBAL_PTR";
     case OpCode::FUNC_PTR: return "FUNC_PTR";

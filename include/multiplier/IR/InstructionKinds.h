@@ -51,13 +51,13 @@ class MX_EXPORT AllocaInst : public IRInstruction {
   IRObject object(void) const;
 };
 
-class MX_EXPORT MemInst : public IRInstruction {
+class MX_EXPORT MemoryInst : public IRInstruction {
  public:
-  MX_DECLARE_IR_INSTRUCTION(MemInst)
-  ir::MemAccessOp sub_opcode(void) const;
+  MX_DECLARE_IR_INSTRUCTION(MemoryInst)
+  ir::MemOp sub_opcode(void) const;
   IRInstruction address(void) const;        // op[0] for all
-  IRInstruction stored_value(void) const;   // op[1] for stores only
-  Type result_type(void) const;             // for loads only
+  IRInstruction stored_value(void) const;   // op[1] for stores
+  Type result_type(void) const;             // for loads
 };
 
 // ---------------------------------------------------------------------------
@@ -210,16 +210,7 @@ class MX_EXPORT FuncPtrInst : public IRInstruction {
   std::optional<FunctionDecl> function(void) const;
 };
 
-// ---------------------------------------------------------------------------
-// Unified memory/string operations (MULTIMEM)
-// ---------------------------------------------------------------------------
-
-class MX_EXPORT MultimemInst : public IRInstruction {
- public:
-  MX_DECLARE_IR_INSTRUCTION(MultimemInst)
-  ir::MemoryOp sub_opcode(void) const;
-  Type result_type(void) const;
-};
+// MultimemInst removed: merged into MemoryInst.
 
 // ---------------------------------------------------------------------------
 // Bitwise/intrinsic operations

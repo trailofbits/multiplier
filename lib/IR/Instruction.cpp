@@ -44,10 +44,10 @@ static uint32_t OperandBase(const IRInstructionImpl &impl) {
   auto r = impl.reader();
   auto op = static_cast<ir::OpCode>(r.getOpcode());
   bool has_type = HasResultType(op);
-  if (has_type && op == ir::OpCode::MEM) {
+  if (has_type && op == ir::OpCode::MEMORY) {
     auto int_pool = GetIntPool(impl);
-    auto mop = static_cast<ir::MemAccessOp>(int_pool[r.getConstOffset()]);
-    if (ir::IsAnyStore(mop)) has_type = false;
+    auto mop = static_cast<ir::MemOp>(int_pool[r.getConstOffset()]);
+    if (ir::IsDirectLoadStore(mop) && ir::IsAnyStore(mop)) has_type = false;
   }
   return r.getEntityOffset() + 2 + (has_type ? 1 : 0);
 }

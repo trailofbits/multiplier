@@ -304,25 +304,141 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       }
       break;
     }
-    case mx::ir::OpCode::MEM: {
-      if (auto mi = mx::MemInst::from(inst)) {
+    case mx::ir::OpCode::MEMORY: {
+      if (auto mi = mx::MemoryInst::from(inst)) {
         auto sub = mi->sub_opcode();
-        unsigned sz = mx::ir::AccessSize(sub);
-        if (mx::ir::IsAnyLoad(sub)) {
-          Value addr = GetValue(mi->address());
-          if (addr.kind == Value::POINTER) {
-            result = MemReadValue(addr.ptr, sz, false);
+        if (mx::ir::IsDirectLoadStore(sub)) {
+          unsigned sz = mx::ir::AccessSize(sub);
+          if (mx::ir::IsAnyLoad(sub)) {
+            Value addr = GetValue(mi->address());
+            if (addr.kind == Value::POINTER) {
+              result = MemReadValue(addr.ptr, sz, false);
+            } else {
+              LOG(WARNING) << "MEMORY load from non-pointer value";
+            }
           } else {
-            LOG(WARNING) << "MEM load from non-pointer value";
+            // Store.
+            Value addr = GetValue(mi->address());
+            Value val = GetValue(mi->stored_value());
+            if (addr.kind == Value::POINTER) {
+              MemWriteValue(addr.ptr, val, sz);
+            } else {
+              LOG(WARNING) << "MEMORY store to non-pointer value";
+            }
           }
         } else {
-          // Store.
-          Value addr = GetValue(mi->address());
-          Value val = GetValue(mi->stored_value());
-          if (addr.kind == Value::POINTER) {
-            MemWriteValue(addr.ptr, val, sz);
-          } else {
-            LOG(WARNING) << "MEM store to non-pointer value";
+          // Bulk memory/string operations.
+          auto ops_gen = inst.operands();
+          std::vector<Value> ops;
+          for (auto op_inst : ops_gen) {
+            ops.push_back(GetValue(op_inst));
+          }
+          using MO = mx::ir::MemOp;
+          switch (sub) {
+            case MO::MEMSET: {
+              if (ops.size() >= 3 && ops[0].kind == Value::POINTER && ops[2].as_int() > 0) {
+                auto it = memory_.find(ops[0].ptr.object_id);
+                if (it != memory_.end()) {
+                  size_t start = static_cast<size_t>(ops[0].ptr.offset);
+                  size_t len = static_cast<size_t>(ops[2].as_int());
+                  size_t end = std::min(start + len, it->second.bytes.size());
+                  std::memset(it->second.bytes.data() + start,
+                              static_cast<int>(ops[1].as_int()), end - start);
+                }
+              }
+              result = ops.empty() ? Value::Undef() : ops[0];
+              break;
+            }
+            case MO::MEMCPY:
+            case MO::MEMMOVE: {
+              if (ops.size() >= 3 && ops[0].kind == Value::POINTER
+                  && ops[1].kind == Value::POINTER && ops[2].as_int() > 0) {
+                size_t len = static_cast<size_t>(ops[2].as_int());
+                std::vector<uint8_t> tmp(len);
+                MemRead(ops[1].ptr, tmp.data(), len);
+                MemWrite(ops[0].ptr, tmp.data(), len);
+              }
+              result = ops.empty() ? Value::Undef() : ops[0];
+              break;
+            }
+            case MO::BZERO: {
+              if (ops.size() >= 2 && ops[0].kind == Value::POINTER && ops[1].as_int() > 0) {
+                auto it = memory_.find(ops[0].ptr.object_id);
+                if (it != memory_.end()) {
+                  size_t start = static_cast<size_t>(ops[0].ptr.offset);
+                  size_t len = static_cast<size_t>(ops[1].as_int());
+                  size_t end = std::min(start + len, it->second.bytes.size());
+                  std::memset(it->second.bytes.data() + start, 0, end - start);
+                }
+              }
+              result = ops.empty() ? Value::Undef() : ops[0];
+              break;
+            }
+            case MO::STRLEN: {
+              if (ops.size() >= 1 && ops[0].kind == Value::POINTER) {
+                auto it = memory_.find(ops[0].ptr.object_id);
+                if (it != memory_.end()) {
+                  size_t start = static_cast<size_t>(ops[0].ptr.offset);
+                  size_t len = 0;
+                  while (start + len < it->second.bytes.size() &&
+                         it->second.bytes[start + len] != 0) ++len;
+                  result = Value::Int(static_cast<int64_t>(len));
+                }
+              }
+              break;
+            }
+            case MO::STRCMP: {
+              if (ops.size() >= 2 && ops[0].kind == Value::POINTER
+                  && ops[1].kind == Value::POINTER) {
+                auto it0 = memory_.find(ops[0].ptr.object_id);
+                auto it1 = memory_.find(ops[1].ptr.object_id);
+                if (it0 != memory_.end() && it1 != memory_.end()) {
+                  size_t s0 = static_cast<size_t>(ops[0].ptr.offset);
+                  size_t s1 = static_cast<size_t>(ops[1].ptr.offset);
+                  int cmp = 0;
+                  while (true) {
+                    uint8_t c0 = (s0 < it0->second.bytes.size()) ? it0->second.bytes[s0] : 0;
+                    uint8_t c1 = (s1 < it1->second.bytes.size()) ? it1->second.bytes[s1] : 0;
+                    if (c0 != c1) { cmp = (c0 < c1) ? -1 : 1; break; }
+                    if (c0 == 0) break;
+                    ++s0; ++s1;
+                  }
+                  result = Value::Int(cmp);
+                }
+              }
+              break;
+            }
+            case MO::MEMCMP: {
+              if (ops.size() >= 3 && ops[0].kind == Value::POINTER
+                  && ops[1].kind == Value::POINTER) {
+                size_t len = static_cast<size_t>(ops[2].as_int());
+                std::vector<uint8_t> buf0(len, 0), buf1(len, 0);
+                MemRead(ops[0].ptr, buf0.data(), len);
+                MemRead(ops[1].ptr, buf1.data(), len);
+                result = Value::Int(std::memcmp(buf0.data(), buf1.data(), len));
+              }
+              break;
+            }
+            case MO::MEMCHR: {
+              if (ops.size() >= 3 && ops[0].kind == Value::POINTER) {
+                size_t len = static_cast<size_t>(ops[2].as_int());
+                uint8_t needle = static_cast<uint8_t>(ops[1].as_int());
+                auto it = memory_.find(ops[0].ptr.object_id);
+                if (it != memory_.end()) {
+                  size_t start = static_cast<size_t>(ops[0].ptr.offset);
+                  for (size_t i = 0; i < len && start + i < it->second.bytes.size(); ++i) {
+                    if (it->second.bytes[start + i] == needle) {
+                      result = Value::Ptr(ops[0].ptr.object_id,
+                                          ops[0].ptr.offset + static_cast<int64_t>(i));
+                      break;
+                    }
+                  }
+                }
+              }
+              break;
+            }
+            default:
+              break;
           }
         }
       }
@@ -711,147 +827,7 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       break;
     }
 
-    // --- Memory/string intrinsics (MULTIMEM) ---
-    case mx::ir::OpCode::MULTIMEM: {
-      if (auto mm = mx::MultimemInst::from(inst)) {
-        auto sub = mm->sub_opcode();
-        auto ops_gen = inst.operands();
-        std::vector<Value> ops;
-        for (auto op_inst : ops_gen) {
-          ops.push_back(GetValue(op_inst));
-        }
-        using MO = mx::ir::MemoryOp;
-        switch (sub) {
-          case MO::MEMSET: {
-            if (ops.size() >= 3 && ops[0].kind == Value::POINTER && ops[2].as_int() > 0) {
-              auto it = memory_.find(ops[0].ptr.object_id);
-              if (it != memory_.end()) {
-                size_t start = static_cast<size_t>(ops[0].ptr.offset);
-                size_t len = static_cast<size_t>(ops[2].as_int());
-                size_t end = std::min(start + len, it->second.bytes.size());
-                std::memset(it->second.bytes.data() + start,
-                            static_cast<int>(ops[1].as_int()), end - start);
-              }
-            }
-            result = ops.empty() ? Value::Undef() : ops[0];
-            break;
-          }
-          case MO::MEMCPY:
-          case MO::MEMMOVE: {
-            if (ops.size() >= 3 && ops[0].kind == Value::POINTER
-                && ops[1].kind == Value::POINTER && ops[2].as_int() > 0) {
-              size_t len = static_cast<size_t>(ops[2].as_int());
-              std::vector<uint8_t> tmp(len);
-              MemRead(ops[1].ptr, tmp.data(), len);
-              MemWrite(ops[0].ptr, tmp.data(), len);
-            }
-            result = ops.empty() ? Value::Undef() : ops[0];
-            break;
-          }
-          case MO::BZERO: {
-            if (ops.size() >= 2 && ops[0].kind == Value::POINTER && ops[1].as_int() > 0) {
-              auto it = memory_.find(ops[0].ptr.object_id);
-              if (it != memory_.end()) {
-                size_t start = static_cast<size_t>(ops[0].ptr.offset);
-                size_t len = static_cast<size_t>(ops[1].as_int());
-                size_t end = std::min(start + len, it->second.bytes.size());
-                std::memset(it->second.bytes.data() + start, 0, end - start);
-              }
-            }
-            result = ops.empty() ? Value::Undef() : ops[0];
-            break;
-          }
-          case MO::STRLEN: {
-            // Read bytes until null terminator.
-            if (ops.size() >= 1 && ops[0].kind == Value::POINTER) {
-              auto it = memory_.find(ops[0].ptr.object_id);
-              if (it != memory_.end()) {
-                size_t start = static_cast<size_t>(ops[0].ptr.offset);
-                size_t len = 0;
-                while (start + len < it->second.bytes.size() &&
-                       it->second.bytes[start + len] != 0) ++len;
-                result = Value::Int(static_cast<int64_t>(len));
-              }
-            }
-            break;
-          }
-          case MO::STRCMP: {
-            if (ops.size() >= 2 && ops[0].kind == Value::POINTER
-                && ops[1].kind == Value::POINTER) {
-              auto it0 = memory_.find(ops[0].ptr.object_id);
-              auto it1 = memory_.find(ops[1].ptr.object_id);
-              if (it0 != memory_.end() && it1 != memory_.end()) {
-                size_t s0 = static_cast<size_t>(ops[0].ptr.offset);
-                size_t s1 = static_cast<size_t>(ops[1].ptr.offset);
-                int cmp = 0;
-                while (true) {
-                  uint8_t c0 = (s0 < it0->second.bytes.size()) ? it0->second.bytes[s0] : 0;
-                  uint8_t c1 = (s1 < it1->second.bytes.size()) ? it1->second.bytes[s1] : 0;
-                  if (c0 != c1) { cmp = (c0 < c1) ? -1 : 1; break; }
-                  if (c0 == 0) break;
-                  ++s0; ++s1;
-                }
-                result = Value::Int(cmp);
-              }
-            }
-            break;
-          }
-          case MO::MEMCMP: {
-            if (ops.size() >= 3 && ops[0].kind == Value::POINTER
-                && ops[1].kind == Value::POINTER) {
-              size_t len = static_cast<size_t>(ops[2].as_int());
-              std::vector<uint8_t> buf0(len, 0), buf1(len, 0);
-              MemRead(ops[0].ptr, buf0.data(), len);
-              MemRead(ops[1].ptr, buf1.data(), len);
-              result = Value::Int(std::memcmp(buf0.data(), buf1.data(), len));
-            }
-            break;
-          }
-          case MO::MEMCHR: {
-            if (ops.size() >= 3 && ops[0].kind == Value::POINTER) {
-              size_t len = static_cast<size_t>(ops[2].as_int());
-              uint8_t needle = static_cast<uint8_t>(ops[1].as_int());
-              auto it = memory_.find(ops[0].ptr.object_id);
-              if (it != memory_.end()) {
-                size_t start = static_cast<size_t>(ops[0].ptr.offset);
-                for (size_t i = 0; i < len && start + i < it->second.bytes.size(); ++i) {
-                  if (it->second.bytes[start + i] == needle) {
-                    result = Value::Ptr(ops[0].ptr.object_id,
-                                        ops[0].ptr.offset + static_cast<int64_t>(i));
-                    break;
-                  }
-                }
-                // If not found, result stays as Undef (null).
-              }
-            }
-            break;
-          }
-          case MO::STRCHR: {
-            if (ops.size() >= 2 && ops[0].kind == Value::POINTER) {
-              uint8_t needle = static_cast<uint8_t>(ops[1].as_int());
-              auto it = memory_.find(ops[0].ptr.object_id);
-              if (it != memory_.end()) {
-                size_t start = static_cast<size_t>(ops[0].ptr.offset);
-                for (size_t i = start; i < it->second.bytes.size(); ++i) {
-                  if (it->second.bytes[i] == needle) {
-                    result = Value::Ptr(ops[0].ptr.object_id,
-                                        static_cast<int64_t>(i));
-                    break;
-                  }
-                  if (it->second.bytes[i] == 0) break;  // null terminator
-                }
-              }
-            }
-            break;
-          }
-          default:
-            // For unimplemented string/number ops, return undef.
-            result = Value::Undef();
-            break;
-        }
-      }
-      break;
-    }
+    // MULTIMEM removed: merged into MEMORY case above.
 
     // --- Bitwise/intrinsic operations ---
     case mx::ir::OpCode::BITWISE: {

@@ -75,9 +75,8 @@ struct InstructionIR {
   uint8_t const_op{0};    // ConstOp sub-opcode for CONST instructions
   uint8_t cast_op{0};     // CastOp sub-opcode for CAST instructions
   uint8_t bitwise_op{0};  // BitwiseOp sub-opcode for BITWISE instructions
-  uint8_t memory_op{0};   // MemoryOp sub-opcode for MULTIMEM instructions
+  uint8_t mem_op{0};      // MemOp sub-opcode for MEMORY instructions
   uint8_t float_op{0};    // FloatOp sub-opcode for FLOAT instructions
-  uint8_t mem_access_op{0}; // MemAccessOp sub-opcode for MEM instructions
 
   // Structure index for ENTER_SCOPE/EXIT_SCOPE (into FunctionIR::structures).
   uint32_t structure_index{UINT32_MAX};
@@ -299,8 +298,8 @@ class IRGenerator {
   // --- Type helpers ---
   std::optional<uint32_t> TypeSizeBytes(const pasta::Type &t);
   std::optional<uint32_t> TypeAlignBytes(const pasta::Type &t);
-  mx::ir::MemAccessOp DetermineMemAccessOp(bool is_store, bool is_atomic,
-                                            unsigned size_bytes);
+  mx::ir::MemOp DetermineMemOp(bool is_store, bool is_atomic,
+                                unsigned size_bytes);
 
   // --- Pre-scan ---
   void ScanAddressTaken(const pasta::Stmt &s);

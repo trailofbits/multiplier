@@ -145,7 +145,7 @@ enum class OpCode : uint8_t {
 
   // Memory
   ALLOCA = 1,
-  MEM = 2,             // Unified load/store (sub-opcode in int_pool[0] selects MemAccessOp).
+  MEMORY = 2,          // Unified load/store/bulk/string (sub-opcode in int_pool[0] selects MemOp).
   GEP_FIELD = 3,
   PTR_ADD = 4,         // pointer + index; op[0]=base, op[1]=index
 
@@ -202,7 +202,7 @@ enum class OpCode : uint8_t {
   BREAK = 35,
   CONTINUE = 36,
   GOTO = 37,              // explicit goto label;
-  IMPLICIT_GOTO = 38,     // structural CFG edge (e.g., end of if-then → merge)
+  IMPLICIT_GOTO = 38,     // structural CFG edge (e.g., end of if-then -> merge)
   FALLTHROUGH = 39,       // explicit [[fallthrough]]
   IMPLICIT_FALLTHROUGH = 40, // implicit (no break at end of case)
   IMPLICIT_UNREACHABLE = 41, // structurally unreachable (patched empty block)
@@ -218,60 +218,56 @@ enum class OpCode : uint8_t {
   ENTER_SCOPE = 47,        // marks scope entry; extra = IRStructureId of scope
   EXIT_SCOPE = 48,         // marks scope exit; extra = IRStructureId of scope
 
-  // Unified memory/string operations. Sub-opcode in int_pool[0] selects the
-  // specific operation (see MemoryOp enum).
-  MULTIMEM = 49,
-
   // Parameter read: reads the Nth function parameter.
-  PARAM_READ = 50,
+  PARAM_READ = 49,
 
   // Address-of for globals and functions (external to the current frame).
-  GLOBAL_PTR = 51,        // pointer to a global or static variable
-  FUNC_PTR = 52,          // pointer to a function
+  GLOBAL_PTR = 50,        // pointer to a global or static variable
+  FUNC_PTR = 51,          // pointer to a function
 
   // Bitwise/intrinsic operations. Sub-opcode in int_pool[0] selects the
   // specific operation (see BitwiseOp enum). op[0] = primary operand.
-  BITWISE = 53,
+  BITWISE = 52,
 
   // Floating-point operations. Sub-opcode in int_pool[0] selects the
   // specific operation (see FloatOp enum). op[0] = primary operand.
-  FLOAT = 54,
+  FLOAT = 53,
 
   // Undefined/poison value. Represents a value that is architecturally
   // undefined (e.g., __builtin_clz(0)). An analyzer should flag any use.
-  UNDEFINED = 55,
+  UNDEFINED = 54,
 
   // Dynamic stack allocation.
-  DYNAMIC_ALLOCA = 56,     // op[0] = size. Returns pointer to stack allocation.
+  DYNAMIC_ALLOCA = 55,     // op[0] = size. Returns pointer to stack allocation.
 
   // Frame/return address intrinsics.
-  FRAME_PTR = 57,      // op[0] = level (CONST, usually 0). Returns frame ptr.
-  RETURN_PTR = 58,     // op[0] = level (CONST, usually 0). Returns return addr.
+  FRAME_PTR = 56,      // op[0] = level (CONST, usually 0). Returns frame ptr.
+  RETURN_PTR = 57,     // op[0] = level (CONST, usually 0). Returns return addr.
 
   // Atomic operations.
-  ATOMIC_CMPXCHG = 59,     // op[0] = target, op[1] = expected_ptr, op[2] = desired. Returns bool.
+  ATOMIC_CMPXCHG = 58,     // op[0] = target, op[1] = expected_ptr, op[2] = desired. Returns bool.
 
   // Overflow-checked arithmetic (only used as RMW underlying opcodes).
   // RMW returns bool (overflow flag), stores the arithmetic result.
-  ADD_OVERFLOW = 60,
-  SUB_OVERFLOW = 61,
-  MUL_OVERFLOW = 62,
+  ADD_OVERFLOW = 59,
+  SUB_OVERFLOW = 60,
+  MUL_OVERFLOW = 61,
 
   // Atomic RMW underlying opcodes (only valid as RMW underlying ops).
-  ATOMIC_ADD = 63,
-  ATOMIC_SUB = 64,
-  ATOMIC_AND = 65,
-  ATOMIC_OR = 66,
-  ATOMIC_XOR = 67,
-  ATOMIC_NAND = 68,
-  ATOMIC_EXCHANGE = 69,
+  ATOMIC_ADD = 62,
+  ATOMIC_SUB = 63,
+  ATOMIC_AND = 64,
+  ATOMIC_OR = 65,
+  ATOMIC_XOR = 66,
+  ATOMIC_NAND = 67,
+  ATOMIC_EXCHANGE = 68,
 
   // Evaluate all operands, return the last one's value.
   // Used for comma operator (a, b) and similar "sequence point" patterns.
-  LAST_VALUE = 70,
+  LAST_VALUE = 69,
 
   // Unknown / unhandled expression
-  UNKNOWN = 71,
+  UNKNOWN = 70,
 };
 
 // Returns the human-readable name of an opcode.
@@ -282,19 +278,20 @@ inline static const char *EnumerationName(OpCode) {
 const char *EnumeratorName(OpCode op) noexcept;
 
 inline static constexpr unsigned NumEnumerators(OpCode) {
-  return 72u;
+  return 71u;
 }
 
-// Sub-opcodes for MEM. Stored in the int pool (int_pool[0]).
-// Encodes direction (load/store), atomicity, endianness, and access width.
-enum class MemAccessOp : uint8_t {
-  // Non-atomic loads (little-endian)
-  LOAD_LE_8 = 0,   LOAD_LE_16 = 1,  LOAD_LE_32 = 2,  LOAD_LE_64 = 3,
-  // Non-atomic loads (big-endian)
-  LOAD_BE_8 = 4,   LOAD_BE_16 = 5,  LOAD_BE_32 = 6,  LOAD_BE_64 = 7,
-  // Non-atomic stores (little-endian)
-  STORE_LE_8 = 8,  STORE_LE_16 = 9, STORE_LE_32 = 10, STORE_LE_64 = 11,
-  // Non-atomic stores (big-endian)
+// Sub-opcodes for MEMORY. Stored in the int pool (int_pool[0]).
+// Encodes direction (load/store), atomicity, endianness, access width,
+// plus bulk memory and string operations.
+enum class MemOp : uint8_t {
+  // Loads (non-atomic, little-endian)
+  LOAD_LE_8 = 0, LOAD_LE_16 = 1, LOAD_LE_32 = 2, LOAD_LE_64 = 3,
+  // Loads (non-atomic, big-endian)
+  LOAD_BE_8 = 4, LOAD_BE_16 = 5, LOAD_BE_32 = 6, LOAD_BE_64 = 7,
+  // Stores (non-atomic, little-endian)
+  STORE_LE_8 = 8, STORE_LE_16 = 9, STORE_LE_32 = 10, STORE_LE_64 = 11,
+  // Stores (non-atomic, big-endian)
   STORE_BE_8 = 12, STORE_BE_16 = 13, STORE_BE_32 = 14, STORE_BE_64 = 15,
   // Atomic loads (little-endian)
   ATOMIC_LOAD_LE_8 = 16, ATOMIC_LOAD_LE_16 = 17, ATOMIC_LOAD_LE_32 = 18, ATOMIC_LOAD_LE_64 = 19,
@@ -304,23 +301,34 @@ enum class MemAccessOp : uint8_t {
   ATOMIC_STORE_LE_8 = 24, ATOMIC_STORE_LE_16 = 25, ATOMIC_STORE_LE_32 = 26, ATOMIC_STORE_LE_64 = 27,
   // Atomic stores (big-endian)
   ATOMIC_STORE_BE_8 = 28, ATOMIC_STORE_BE_16 = 29, ATOMIC_STORE_BE_32 = 30, ATOMIC_STORE_BE_64 = 31,
+
+  // Memory operations.
+  MEMSET = 32, MEMCPY = 33, MEMMOVE = 34, MEMCMP = 35, MEMCHR = 36, BZERO = 37,
+  // String operations.
+  STRLEN = 38, STRNLEN = 39, STRCMP = 40, STRNCMP = 41, STRCHR = 42, STRRCHR = 43,
+  STRSTR = 44, STRCPY = 45, STRNCPY = 46, STRCAT = 47, STRNCAT = 48, STPCPY = 49, STPNCPY = 50,
+  // String-to-number.
+  STRTOI32 = 51, STRTOI64 = 52, STRTOU32 = 53, STRTOU64 = 54, STRTOF32 = 55, STRTOF64 = 56,
 };
 
-// MemAccessOp classification helpers.
-inline bool IsLoad(MemAccessOp op) { return static_cast<uint8_t>(op) < 8; }
-inline bool IsStore(MemAccessOp op) { auto v = static_cast<uint8_t>(op); return v >= 8 && v < 16; }
-inline bool IsAtomicLoad(MemAccessOp op) { auto v = static_cast<uint8_t>(op); return v >= 16 && v < 24; }
-inline bool IsAtomicStore(MemAccessOp op) { auto v = static_cast<uint8_t>(op); return v >= 24; }
-inline bool IsAnyLoad(MemAccessOp op) { return IsLoad(op) || IsAtomicLoad(op); }
-inline bool IsAnyStore(MemAccessOp op) { return IsStore(op) || IsAtomicStore(op); }
-inline bool IsAtomic(MemAccessOp op) { return static_cast<uint8_t>(op) >= 16; }
-inline bool IsBigEndian(MemAccessOp op) { return (static_cast<uint8_t>(op) % 8) >= 4; }
-inline unsigned AccessSize(MemAccessOp op) {
-  switch (static_cast<uint8_t>(op) % 4) {
-    case 0: return 1; case 1: return 2; case 2: return 4; case 3: return 8;
-  }
+// MemOp classification helpers.
+inline bool IsLoad(MemOp op) { return static_cast<uint8_t>(op) < 8; }
+inline bool IsStore(MemOp op) { auto v = static_cast<uint8_t>(op); return v >= 8 && v < 16; }
+inline bool IsAtomicLoad(MemOp op) { auto v = static_cast<uint8_t>(op); return v >= 16 && v < 24; }
+inline bool IsAtomicStore(MemOp op) { auto v = static_cast<uint8_t>(op); return v >= 24 && v < 32; }
+inline bool IsAnyLoad(MemOp op) { return IsLoad(op) || IsAtomicLoad(op); }
+inline bool IsAnyStore(MemOp op) { return IsStore(op) || IsAtomicStore(op); }
+inline bool IsAtomic(MemOp op) { return static_cast<uint8_t>(op) >= 16 && static_cast<uint8_t>(op) < 32; }
+inline bool IsBigEndian(MemOp op) { return static_cast<uint8_t>(op) < 32 && (static_cast<uint8_t>(op) % 8) >= 4; }
+inline unsigned AccessSize(MemOp op) {
+  if (static_cast<uint8_t>(op) >= 32) return 0; // not a load/store
+  switch (static_cast<uint8_t>(op) % 4) { case 0: return 1; case 1: return 2; case 2: return 4; case 3: return 8; }
   return 0;
 }
+inline bool IsDirectLoadStore(MemOp op) { return static_cast<uint8_t>(op) < 32; }
+inline bool IsStringToNumber(MemOp op) { return op >= MemOp::STRTOI32 && op <= MemOp::STRTOF64; }
+inline bool IsMemoryBulk(MemOp op) { return op >= MemOp::MEMSET && op <= MemOp::BZERO; }
+inline bool IsStringOp(MemOp op) { return op >= MemOp::STRLEN && op <= MemOp::STPNCPY; }
 
 // Sub-opcodes for BITWISE. Stored in the int pool.
 enum class BitwiseOp : uint8_t {
@@ -351,47 +359,10 @@ enum class BitwiseOp : uint8_t {
   ABS = 10,                // __builtin_abs. UNDEFINED for INT_MIN (signed overflow).
 
   // Expect (optimization hint, semantically identity on op[0]).
-  EXPECT = 11,             // __builtin_expect(x, v) → x
+  EXPECT = 11,             // __builtin_expect(x, v) -> x
 
   // Assume (optimization hint, no-op).
   ASSUME = 12,             // __builtin_assume(x)
-};
-
-// Sub-opcodes for MULTIMEM. Stored in the int pool.
-enum class MemoryOp : uint8_t {
-  // Memory operations.
-  MEMSET = 0,      // op[0]=dest, op[1]=byte, op[2]=size. Returns dest.
-  MEMCPY = 1,      // op[0]=dest, op[1]=src, op[2]=size. UB on overlap. Returns dest.
-  MEMMOVE = 2,     // op[0]=dest, op[1]=src, op[2]=size. Safe for overlap. Returns dest.
-  MEMCMP = 3,      // op[0]=s1, op[1]=s2, op[2]=size. Returns int (<0, 0, >0).
-  MEMCHR = 4,      // op[0]=ptr, op[1]=byte, op[2]=size. Returns ptr or null.
-  BZERO = 5,       // op[0]=dest, op[1]=size. Equivalent to memset(dest,0,size).
-
-  // String operations. All operate on null-terminated strings.
-  STRLEN = 6,      // op[0]=str. Returns length (not including null).
-  STRNLEN = 7,     // op[0]=str, op[1]=maxlen. Returns min(strlen, maxlen).
-  STRCMP = 8,       // op[0]=s1, op[1]=s2. Returns int (<0, 0, >0).
-  STRNCMP = 9,     // op[0]=s1, op[1]=s2, op[2]=n. Compare at most n chars.
-  STRCHR = 10,     // op[0]=str, op[1]=char. Returns ptr to first occurrence or null.
-  STRRCHR = 11,    // op[0]=str, op[1]=char. Returns ptr to last occurrence or null.
-  STRSTR = 12,     // op[0]=haystack, op[1]=needle. Returns ptr or null.
-  STRCPY = 13,     // op[0]=dest, op[1]=src. Returns dest. UB if overlap.
-  STRNCPY = 14,    // op[0]=dest, op[1]=src, op[2]=n. Returns dest.
-  STRCAT = 15,     // op[0]=dest, op[1]=src. Returns dest.
-  STRNCAT = 16,    // op[0]=dest, op[1]=src, op[2]=n. Returns dest.
-  STPCPY = 17,     // op[0]=dest, op[1]=src. Returns pointer to null terminator.
-  STPNCPY = 18,    // op[0]=dest, op[1]=src, op[2]=n. Returns dest+written or dest+n.
-
-  // String-to-number conversions. Size-specific to avoid platform ambiguity.
-  // "Simple" variants: op[0]=str. Returns the number.
-  // "Full" variants: op[0]=str, op[1]=endptr, op[2]=base. Returns the number.
-  STRTOI32 = 19,   // String → signed 32-bit. (atoi, strtol on 32-bit long)
-  STRTOI64 = 20,   // String → signed 64-bit. (atoll, strtol on 64-bit long)
-  STRTOU32 = 21,   // String → unsigned 32-bit. (strtoul on 32-bit long)
-  STRTOU64 = 22,   // String → unsigned 64-bit. (strtoull, strtoul on 64-bit long)
-  STRTOF32 = 23,   // String → float. (strtof)
-  STRTOF64 = 24,   // String → double. (atof, strtod)
-
 };
 
 // Sub-opcodes for FLOAT. Stored in the int pool.
@@ -479,25 +450,18 @@ inline bool IsCast(OpCode op) {
 }
 
 inline bool IsMemoryOp(OpCode op) {
-  return op == OpCode::MEM || op == OpCode::ALLOCA ||
+  return op == OpCode::MEMORY || op == OpCode::ALLOCA ||
          op == OpCode::GEP_FIELD || op == OpCode::PTR_ADD;
 }
 
-// MemoryOp classification helpers.
-inline bool IsStringToNumber(MemoryOp op) {
-  return op >= MemoryOp::STRTOI32 && op <= MemoryOp::STRTOF64;
-}
-
-inline bool IsMemoryWrite(MemoryOp op) {
-  return op == MemoryOp::MEMSET || op == MemoryOp::MEMCPY ||
-         op == MemoryOp::MEMMOVE || op == MemoryOp::BZERO ||
-         op == MemoryOp::STRCPY || op == MemoryOp::STRNCPY ||
-         op == MemoryOp::STRCAT || op == MemoryOp::STRNCAT ||
-         op == MemoryOp::STPCPY || op == MemoryOp::STPNCPY;
-}
-
-inline bool IsStringOp(MemoryOp op) {
-  return op >= MemoryOp::STRLEN && op <= MemoryOp::STPNCPY;
+// MemOp write classification (bulk ops that write to memory).
+inline bool IsMemoryWrite(MemOp op) {
+  return IsAnyStore(op) ||
+         op == MemOp::MEMSET || op == MemOp::MEMCPY ||
+         op == MemOp::MEMMOVE || op == MemOp::BZERO ||
+         op == MemOp::STRCPY || op == MemOp::STRNCPY ||
+         op == MemOp::STRCAT || op == MemOp::STRNCAT ||
+         op == MemOp::STPCPY || op == MemOp::STPNCPY;
 }
 
 }  // namespace mx::ir

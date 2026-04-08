@@ -30,11 +30,9 @@ IntPool GetIntPool(const IRInstructionImpl &impl) {
   return impl.frag->reader.getIrIntPool();
 }
 
-// NOTE: For MEM instructions, this returns true. Loads have a result type
-// at position 2; stores do not (the serializer omits it for stores).
-// The MemInst read-side code handles this via the sub-opcode.
-// At the deserialization level, we need to check the sub-opcode to know
-// whether position 2 is a type or the first operand.
+// NOTE: For MEMORY instructions, this returns true. Loads have a result type
+// at position 2; stores/bulk ops do not (the serializer omits it).
+// The MemoryInst read-side code handles this via the sub-opcode.
 bool HasResultType(ir::OpCode op) {
   return !ir::IsTerminator(op) &&
          op != ir::OpCode::VA_START &&
@@ -46,15 +44,17 @@ bool HasResultType(ir::OpCode op) {
          op != ir::OpCode::UNKNOWN;
 }
 
-// For MEM instructions, check the sub-opcode to determine if there's a
-// result type. This is needed because MEM stores don't have a result type.
+// For MEMORY instructions, check the sub-opcode to determine if there's a
+// result type. Stores don't have a result type; bulk/string ops do.
 bool HasResultTypeForInst(const rpc::ir::Instruction::Reader &r,
                           const IntPool &int_pool) {
   auto op = static_cast<ir::OpCode>(r.getOpcode());
   if (!HasResultType(op)) return false;
-  if (op == ir::OpCode::MEM) {
-    auto mop = static_cast<ir::MemAccessOp>(int_pool[r.getConstOffset()]);
-    return ir::IsAnyLoad(mop);
+  if (op == ir::OpCode::MEMORY) {
+    auto mop = static_cast<ir::MemOp>(int_pool[r.getConstOffset()]);
+    // Direct stores have no result type; everything else does.
+    if (ir::IsDirectLoadStore(mop)) return ir::IsAnyLoad(mop);
+    return true;  // bulk/string ops always have a result type
   }
   return true;
 }
@@ -69,9 +69,9 @@ uint32_t OpBase(const rpc::ir::Instruction::Reader &r,
                 const IntPool &int_pool) {
   auto op = static_cast<ir::OpCode>(r.getOpcode());
   bool has_type = HasResultType(op);
-  if (has_type && op == ir::OpCode::MEM) {
-    auto mop = static_cast<ir::MemAccessOp>(int_pool[r.getConstOffset()]);
-    if (ir::IsAnyStore(mop)) has_type = false;
+  if (has_type && op == ir::OpCode::MEMORY) {
+    auto mop = static_cast<ir::MemOp>(int_pool[r.getConstOffset()]);
+    if (ir::IsDirectLoadStore(mop) && ir::IsAnyStore(mop)) has_type = false;
   }
   return r.getEntityOffset() + 2 + (has_type ? 1 : 0);
 }
@@ -163,7 +163,7 @@ FieldDecl ResolveField(const IRInstructionImpl &impl, uint64_t eid) {
 
 IMPL_FROM_SINGLE(ConstInst, CONST)
 IMPL_FROM_SINGLE(AllocaInst, ALLOCA)
-IMPL_FROM_SINGLE(MemInst, MEM)
+IMPL_FROM_SINGLE(MemoryInst, MEMORY)
 IMPL_FROM_SINGLE(GEPFieldInst, GEP_FIELD)
 IMPL_FROM_SINGLE(PtrAddInst, PTR_ADD)
 IMPL_FROM_SINGLE(ReadModifyWriteInst, READ_MODIFY_WRITE)
@@ -178,7 +178,7 @@ IMPL_FROM_SINGLE(VAPackInst, VA_PACK)
 IMPL_FROM_SINGLE(ParamReadInst, PARAM_READ)
 IMPL_FROM_SINGLE(GlobalPtrInst, GLOBAL_PTR)
 IMPL_FROM_SINGLE(FuncPtrInst, FUNC_PTR)
-IMPL_FROM_SINGLE(MultimemInst, MULTIMEM)
+// MultimemInst removed: merged into MemoryInst.
 IMPL_FROM_SINGLE(BitwiseOpInst, BITWISE)
 IMPL_FROM_SINGLE(FloatOpInst, FLOAT)
 IMPL_FROM_SINGLE(DynamicAllocaInst, DYNAMIC_ALLOCA)
@@ -254,23 +254,23 @@ IRObject AllocaInst::object(void) const {
   return MakeObj(*impl, GetPool(*impl)[ExtraBase(impl->reader(), GetIntPool(*impl))]);
 }
 
-// ---- MemInst ----
+// ---- MemoryInst ----
 
-ir::MemAccessOp MemInst::sub_opcode(void) const {
+ir::MemOp MemoryInst::sub_opcode(void) const {
   auto int_pool = GetIntPool(*impl);
   auto r = impl->reader();
-  return static_cast<ir::MemAccessOp>(int_pool[r.getConstOffset()]);
+  return static_cast<ir::MemOp>(int_pool[r.getConstOffset()]);
 }
 
-IRInstruction MemInst::address(void) const {
+IRInstruction MemoryInst::address(void) const {
   return nth_operand(0);
 }
 
-IRInstruction MemInst::stored_value(void) const {
+IRInstruction MemoryInst::stored_value(void) const {
   return nth_operand(1);
 }
 
-Type MemInst::result_type(void) const {
+Type MemoryInst::result_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 
@@ -534,17 +534,7 @@ std::optional<FunctionDecl> FuncPtrInst::function(void) const {
   return std::nullopt;
 }
 
-// ---- MultimemInst ----
-
-ir::MemoryOp MultimemInst::sub_opcode(void) const {
-  auto int_pool = GetIntPool(*impl);
-  auto r = impl->reader();
-  return static_cast<ir::MemoryOp>(int_pool[r.getConstOffset()]);
-}
-
-Type MultimemInst::result_type(void) const {
-  return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
-}
+// MultimemInst removed: merged into MemoryInst.
 
 // ---- BitwiseOpInst ----
 

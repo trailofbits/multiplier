@@ -219,12 +219,8 @@ static uint32_t EmitInstructionConsts(
       pool.AddInt(static_cast<int64_t>(inst.bitwise_op));  // BitwiseOp sub-opcode
       break;
 
-    case OC::MULTIMEM:
-      pool.AddInt(static_cast<int64_t>(inst.memory_op));  // MemoryOp sub-opcode
-      break;
-
-    case OC::MEM:
-      pool.AddInt(static_cast<int64_t>(inst.mem_access_op));  // MemAccessOp sub-opcode
+    case OC::MEMORY:
+      pool.AddInt(static_cast<int64_t>(inst.mem_op));  // MemOp sub-opcode
       break;
 
     case OC::FLOAT:
@@ -432,10 +428,11 @@ void SerializeIR(
             src.opcode != mx::ir::OpCode::VA_COPY &&
             src.opcode != mx::ir::OpCode::VA_PACK &&
             src.opcode != mx::ir::OpCode::UNKNOWN;
-        // MEM stores don't produce a value.
-        if (has_type && src.opcode == mx::ir::OpCode::MEM) {
-          auto mop = static_cast<mx::ir::MemAccessOp>(src.mem_access_op);
-          if (mx::ir::IsAnyStore(mop)) has_type = false;
+        // MEMORY direct stores don't produce a value.
+        if (has_type && src.opcode == mx::ir::OpCode::MEMORY) {
+          auto mop = static_cast<mx::ir::MemOp>(src.mem_op);
+          if (mx::ir::IsDirectLoadStore(mop) && mx::ir::IsAnyStore(mop))
+            has_type = false;
         }
         if (has_type) pool.AddEntity(src.type_entity_id);
       }
