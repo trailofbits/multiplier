@@ -50,18 +50,13 @@ class MX_EXPORT AllocaInst : public IRInstruction {
   IRObject object(void) const;
 };
 
-class MX_EXPORT LoadInst : public IRInstruction {
+class MX_EXPORT MemInst : public IRInstruction {
  public:
-  MX_DECLARE_IR_INSTRUCTION(LoadInst)
-  IRInstruction address(void) const;
-  Type loaded_type(void) const;
-};
-
-class MX_EXPORT StoreInst : public IRInstruction {
- public:
-  MX_DECLARE_IR_INSTRUCTION(StoreInst)
-  IRInstruction address(void) const;
-  IRInstruction stored_value(void) const;
+  MX_DECLARE_IR_INSTRUCTION(MemInst)
+  ir::MemAccessOp sub_opcode(void) const;
+  IRInstruction address(void) const;        // op[0] for all
+  IRInstruction stored_value(void) const;   // op[1] for stores only
+  Type result_type(void) const;             // for loads only
 };
 
 // ---------------------------------------------------------------------------
@@ -270,20 +265,6 @@ class MX_EXPORT ReturnPtrInst : public IRInstruction {
 // ---------------------------------------------------------------------------
 // Atomic operations
 // ---------------------------------------------------------------------------
-
-class MX_EXPORT AtomicLoadInst : public IRInstruction {
- public:
-  MX_DECLARE_IR_INSTRUCTION(AtomicLoadInst)
-  IRInstruction address(void) const;     // op[0]
-  Type result_type(void) const;
-};
-
-class MX_EXPORT AtomicStoreInst : public IRInstruction {
- public:
-  MX_DECLARE_IR_INSTRUCTION(AtomicStoreInst)
-  IRInstruction address(void) const;     // op[0]
-  IRInstruction value(void) const;       // op[1]
-};
 
 class MX_EXPORT AtomicCmpxchgInst : public IRInstruction {
  public:

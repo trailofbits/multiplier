@@ -29,15 +29,31 @@ IntPool GetIntPool(const IRInstructionImpl &impl) {
   return impl.frag->reader.getIrIntPool();
 }
 
+// NOTE: For MEM instructions, this returns true. Loads have a result type
+// at position 2; stores do not (the serializer omits it for stores).
+// The MemInst read-side code handles this via the sub-opcode.
+// At the deserialization level, we need to check the sub-opcode to know
+// whether position 2 is a type or the first operand.
 bool HasResultType(ir::OpCode op) {
   return !ir::IsTerminator(op) &&
-         op != ir::OpCode::STORE &&
-         op != ir::OpCode::ATOMIC_STORE &&
          op != ir::OpCode::VA_START &&
          op != ir::OpCode::VA_END &&
          op != ir::OpCode::VA_COPY &&
          op != ir::OpCode::VA_PACK &&
          op != ir::OpCode::UNKNOWN;
+}
+
+// For MEM instructions, check the sub-opcode to determine if there's a
+// result type. This is needed because MEM stores don't have a result type.
+bool HasResultTypeForInst(const rpc::ir::Instruction::Reader &r,
+                          const IntPool &int_pool) {
+  auto op = static_cast<ir::OpCode>(r.getOpcode());
+  if (!HasResultType(op)) return false;
+  if (op == ir::OpCode::MEM) {
+    auto mop = static_cast<ir::MemAccessOp>(int_pool[r.getConstOffset()]);
+    return ir::IsAnyLoad(mop);
+  }
+  return true;
 }
 
 // Pool position of result type (only valid if HasResultType).
@@ -46,14 +62,21 @@ uint32_t TypePos(const rpc::ir::Instruction::Reader &r) {
 }
 
 // Pool position of first operand.
-uint32_t OpBase(const rpc::ir::Instruction::Reader &r) {
+uint32_t OpBase(const rpc::ir::Instruction::Reader &r,
+                const IntPool &int_pool) {
   auto op = static_cast<ir::OpCode>(r.getOpcode());
-  return r.getEntityOffset() + 2 + (HasResultType(op) ? 1 : 0);
+  bool has_type = HasResultType(op);
+  if (has_type && op == ir::OpCode::MEM) {
+    auto mop = static_cast<ir::MemAccessOp>(int_pool[r.getConstOffset()]);
+    if (ir::IsAnyStore(mop)) has_type = false;
+  }
+  return r.getEntityOffset() + 2 + (has_type ? 1 : 0);
 }
 
 // Pool position of first extra (after operands).
-uint32_t ExtraBase(const rpc::ir::Instruction::Reader &r) {
-  return OpBase(r) + r.getNumOperands();
+uint32_t ExtraBase(const rpc::ir::Instruction::Reader &r,
+                   const IntPool &int_pool) {
+  return OpBase(r, int_pool) + r.getNumOperands();
 }
 
 IRInstruction MakeInst(const IRInstructionImpl &parent, uint64_t eid) {
@@ -137,8 +160,7 @@ FieldDecl ResolveField(const IRInstructionImpl &impl, uint64_t eid) {
 
 IMPL_FROM_SINGLE(ConstInst, CONST)
 IMPL_FROM_SINGLE(AllocaInst, ALLOCA)
-IMPL_FROM_SINGLE(LoadInst, LOAD)
-IMPL_FROM_SINGLE(StoreInst, STORE)
+IMPL_FROM_SINGLE(MemInst, MEM)
 IMPL_FROM_SINGLE(GEPFieldInst, GEP_FIELD)
 IMPL_FROM_SINGLE(PtrAddInst, PTR_ADD)
 IMPL_FROM_SINGLE(ReadModifyWriteInst, READ_MODIFY_WRITE)
@@ -158,8 +180,6 @@ IMPL_FROM_SINGLE(FloatOpInst, FLOAT)
 IMPL_FROM_SINGLE(DynamicAllocaInst, DYNAMIC_ALLOCA)
 IMPL_FROM_SINGLE(FramePtrInst, FRAME_PTR)
 IMPL_FROM_SINGLE(ReturnPtrInst, RETURN_PTR)
-IMPL_FROM_SINGLE(AtomicLoadInst, ATOMIC_LOAD)
-IMPL_FROM_SINGLE(AtomicStoreInst, ATOMIC_STORE)
 IMPL_FROM_SINGLE(AtomicCmpxchgInst, ATOMIC_CMPXCHG)
 IMPL_FROM_SINGLE(UndefinedInst, UNDEFINED)
 
@@ -225,27 +245,27 @@ Type AllocaInst::allocated_type(void) const {
 }
 
 IRObject AllocaInst::object(void) const {
-  return MakeObj(*impl, GetPool(*impl)[ExtraBase(impl->reader())]);
+  return MakeObj(*impl, GetPool(*impl)[ExtraBase(impl->reader(), GetIntPool(*impl))]);
 }
 
-// ---- LoadInst ----
+// ---- MemInst ----
 
-IRInstruction LoadInst::address(void) const {
+ir::MemAccessOp MemInst::sub_opcode(void) const {
+  auto int_pool = GetIntPool(*impl);
+  auto r = impl->reader();
+  return static_cast<ir::MemAccessOp>(int_pool[r.getConstOffset()]);
+}
+
+IRInstruction MemInst::address(void) const {
   return nth_operand(0);
 }
 
-Type LoadInst::loaded_type(void) const {
-  return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
-}
-
-// ---- StoreInst ----
-
-IRInstruction StoreInst::address(void) const {
-  return nth_operand(0);
-}
-
-IRInstruction StoreInst::stored_value(void) const {
+IRInstruction MemInst::stored_value(void) const {
   return nth_operand(1);
+}
+
+Type MemInst::result_type(void) const {
+  return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 
 // ---- GEPFieldInst ----
@@ -260,7 +280,7 @@ Type GEPFieldInst::result_type(void) const {
 
 FieldDecl GEPFieldInst::field(void) const {
   auto pool = GetPool(*impl);
-  return ResolveField(*impl, pool[ExtraBase(impl->reader())]);
+  return ResolveField(*impl, pool[ExtraBase(impl->reader(), GetIntPool(*impl))]);
 }
 
 int64_t GEPFieldInst::byte_offset(void) const {
@@ -283,7 +303,7 @@ Type PtrAddInst::result_type(void) const {
 
 Type PtrAddInst::element_type(void) const {
   auto pool = GetPool(*impl);
-  return ResolveType(*impl, pool[ExtraBase(impl->reader())]);
+  return ResolveType(*impl, pool[ExtraBase(impl->reader(), GetIntPool(*impl))]);
 }
 
 int64_t PtrAddInst::element_size(void) const {
@@ -361,12 +381,12 @@ std::optional<Type> CallInst::result_type(void) const {
 
 std::optional<FunctionDecl> CallInst::target(void) const {
   auto pool = GetPool(*impl);
-  return ResolveFunc(*impl, pool[ExtraBase(impl->reader())]);
+  return ResolveFunc(*impl, pool[ExtraBase(impl->reader(), GetIntPool(*impl))]);
 }
 
 bool CallInst::is_indirect(void) const {
   auto pool = GetPool(*impl);
-  auto eid = pool[ExtraBase(impl->reader())];
+  auto eid = pool[ExtraBase(impl->reader(), GetIntPool(*impl))];
   return eid == kInvalidEntityId;
 }
 
@@ -404,7 +424,7 @@ std::optional<IRInstruction> RetInst::return_value(void) const {
 IRBlock BranchInst::target_block(void) const {
   auto pool = GetPool(*impl);
   // For branch terminators, the target block is the first extra.
-  return MakeBlock(*impl, pool[ExtraBase(impl->reader())]);
+  return MakeBlock(*impl, pool[ExtraBase(impl->reader(), GetIntPool(*impl))]);
 }
 
 // ---- CondBranchInst ----
@@ -413,13 +433,13 @@ IRInstruction CondBranchInst::condition(void) const { return nth_operand(0); }
 
 IRBlock CondBranchInst::true_block(void) const {
   auto pool = GetPool(*impl);
-  auto base = ExtraBase(impl->reader());
+  auto base = ExtraBase(impl->reader(), GetIntPool(*impl));
   return MakeBlock(*impl, pool[base]);
 }
 
 IRBlock CondBranchInst::false_block(void) const {
   auto pool = GetPool(*impl);
-  auto base = ExtraBase(impl->reader());
+  auto base = ExtraBase(impl->reader(), GetIntPool(*impl));
   return MakeBlock(*impl, pool[base + 1]);
 }
 
@@ -460,7 +480,7 @@ Type ParamReadInst::parameter_type(void) const {
 IRObject ParamReadInst::object(void) const {
   auto pool = GetPool(*impl);
   auto r = impl->reader();
-  auto extra_base = ExtraBase(r);
+  auto extra_base = ExtraBase(r, GetIntPool(*impl));
   auto eid = pool[extra_base];
   auto vid = EntityId(eid).Unpack();
   if (auto *oid = std::get_if<IRObjectId>(&vid)) {
@@ -475,7 +495,7 @@ IRObject ParamReadInst::object(void) const {
 std::optional<VarDecl> GlobalPtrInst::variable(void) const {
   auto pool = GetPool(*impl);
   auto r = impl->reader();
-  auto extra_base = ExtraBase(r);
+  auto extra_base = ExtraBase(r, GetIntPool(*impl));
   auto eid = pool[extra_base];
   if (eid == kInvalidEntityId) return std::nullopt;
   if (auto ptr = impl->frag->ep->DeclFor(impl->frag->ep, eid)) {
@@ -487,7 +507,7 @@ std::optional<VarDecl> GlobalPtrInst::variable(void) const {
 std::optional<FunctionDecl> FuncPtrInst::function(void) const {
   auto pool = GetPool(*impl);
   auto r = impl->reader();
-  auto extra_base = ExtraBase(r);
+  auto extra_base = ExtraBase(r, GetIntPool(*impl));
   auto eid = pool[extra_base];
   if (eid == kInvalidEntityId) return std::nullopt;
   if (auto ptr = impl->frag->ep->DeclFor(impl->frag->ep, eid)) {
@@ -553,18 +573,6 @@ Type ReturnPtrInst::result_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 
-// ---- AtomicLoadInst ----
-
-IRInstruction AtomicLoadInst::address(void) const { return nth_operand(0); }
-Type AtomicLoadInst::result_type(void) const {
-  return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
-}
-
-// ---- AtomicStoreInst ----
-
-IRInstruction AtomicStoreInst::address(void) const { return nth_operand(0); }
-IRInstruction AtomicStoreInst::value(void) const { return nth_operand(1); }
-
 // ---- AtomicCmpxchgInst ----
 
 IRInstruction AtomicCmpxchgInst::target(void) const { return nth_operand(0); }
@@ -585,7 +593,7 @@ Type UndefinedInst::result_type(void) const {
 unsigned SwitchInst::num_cases(void) const {
   auto pool = GetPool(*impl);
   auto r = impl->reader();
-  auto extra_base = ExtraBase(r);
+  auto extra_base = ExtraBase(r, GetIntPool(*impl));
   // Extras: [caseType, case0_eid, case1_eid, ...]
   // Count = total extras - 1 (for caseType).
   // But we don't know total extras directly. Use the switch_cases count
@@ -604,13 +612,13 @@ unsigned SwitchInst::num_cases(void) const {
 
 std::optional<Type> SwitchInst::case_type(void) const {
   auto pool = GetPool(*impl);
-  return MaybeResolveType(*impl, pool[ExtraBase(impl->reader())]);
+  return MaybeResolveType(*impl, pool[ExtraBase(impl->reader(), GetIntPool(*impl))]);
 }
 
 gap::generator<IRSwitchCase> SwitchInst::cases(void) const & {
   auto pool = GetPool(*impl);
   auto r = impl->reader();
-  auto extra_base = ExtraBase(r);
+  auto extra_base = ExtraBase(r, GetIntPool(*impl));
 
   // Extras: [caseType, case0_eid, case1_eid, ...]
   for (uint32_t i = extra_base + 1; ; ++i) {

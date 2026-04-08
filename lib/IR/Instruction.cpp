@@ -24,10 +24,14 @@ GetEntityPool(const IRInstructionImpl &impl) {
   return impl.frag->reader.getIrEntityPool();
 }
 
+static capnp::List<int64_t, capnp::Kind::PRIMITIVE>::Reader
+GetIntPool(const IRInstructionImpl &impl) {
+  return impl.frag->reader.getIrIntPool();
+}
+
 // Does this opcode produce a typed value (has result type at position 2)?
 static bool HasResultType(ir::OpCode op) {
   return !ir::IsTerminator(op) &&
-         op != ir::OpCode::STORE &&
          op != ir::OpCode::VA_START &&
          op != ir::OpCode::VA_END &&
          op != ir::OpCode::VA_COPY &&
@@ -36,9 +40,16 @@ static bool HasResultType(ir::OpCode op) {
 }
 
 // Starting pool offset of operands for this instruction.
-static uint32_t OperandBase(const rpc::ir::Instruction::Reader &r) {
+static uint32_t OperandBase(const IRInstructionImpl &impl) {
+  auto r = impl.reader();
   auto op = static_cast<ir::OpCode>(r.getOpcode());
-  return r.getEntityOffset() + 2 + (HasResultType(op) ? 1 : 0);
+  bool has_type = HasResultType(op);
+  if (has_type && op == ir::OpCode::MEM) {
+    auto int_pool = GetIntPool(impl);
+    auto mop = static_cast<ir::MemAccessOp>(int_pool[r.getConstOffset()]);
+    if (ir::IsAnyStore(mop)) has_type = false;
+  }
+  return r.getEntityOffset() + 2 + (has_type ? 1 : 0);
 }
 
 EntityId IRInstruction::id(void) const {
@@ -59,7 +70,7 @@ gap::generator<IRInstruction> IRInstruction::operands(void) const & {
   if (!impl) co_return;
   auto r = impl->reader();
   auto pool = GetEntityPool(*impl);
-  uint32_t base = OperandBase(r);
+  uint32_t base = OperandBase(*impl);
   uint8_t n = r.getNumOperands();
   for (uint8_t i = 0; i < n; ++i) {
     auto eid = pool[base + i];
@@ -81,7 +92,7 @@ IRInstruction IRInstruction::nth_operand(unsigned n) const {
   auto r = impl->reader();
   if (n >= r.getNumOperands()) return {};
   auto pool = GetEntityPool(*impl);
-  auto eid = pool[OperandBase(r) + n];
+  auto eid = pool[OperandBase(*impl) + n];
   auto vid = EntityId(eid).Unpack();
   if (auto *iid = std::get_if<IRInstructionId>(&vid)) {
     return IRInstruction(std::make_shared<IRInstructionImpl>(

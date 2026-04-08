@@ -145,44 +145,43 @@ enum class OpCode : uint8_t {
 
   // Memory
   ALLOCA = 1,
-  LOAD = 2,
-  STORE = 3,
-  GEP_FIELD = 4,
-  PTR_ADD = 5,       // pointer + index; op[0]=base, op[1]=index
+  MEM = 2,             // Unified load/store (sub-opcode in int_pool[0] selects MemAccessOp).
+  GEP_FIELD = 3,
+  PTR_ADD = 4,         // pointer + index; op[0]=base, op[1]=index
 
   // Binary arithmetic/logic
-  ADD = 6,
-  SUB = 7,
-  MUL = 8,
-  DIV = 9,
-  REM = 10,
-  BIT_AND = 11,
-  BIT_OR = 12,
-  BIT_XOR = 13,
-  SHL = 14,
-  SHR = 15,
-  LOGICAL_AND = 16,
-  LOGICAL_OR = 17,
-  PTR_DIFF = 18,
+  ADD = 5,
+  SUB = 6,
+  MUL = 7,
+  DIV = 8,
+  REM = 9,
+  BIT_AND = 10,
+  BIT_OR = 11,
+  BIT_XOR = 12,
+  SHL = 13,
+  SHR = 14,
+  LOGICAL_AND = 15,
+  LOGICAL_OR = 16,
+  PTR_DIFF = 17,
 
   // Comparison
-  CMP_EQ = 19,
-  CMP_NE = 20,
-  CMP_LT = 21,
-  CMP_LE = 22,
-  CMP_GT = 23,
-  CMP_GE = 24,
+  CMP_EQ = 18,
+  CMP_NE = 19,
+  CMP_LT = 20,
+  CMP_LE = 21,
+  CMP_GT = 22,
+  CMP_GE = 23,
 
   // Unary
-  NEG = 25,
-  BIT_NOT = 26,
-  LOGICAL_NOT = 27,
+  NEG = 24,
+  BIT_NOT = 25,
+  LOGICAL_NOT = 26,
 
   // Cast (sub-opcode in int_pool[0] selects CastOp).
-  CAST = 28,
+  CAST = 27,
 
   // Call
-  CALL = 29,
+  CALL = 28,
 
   // Read-modify-write: atomically reads from address, applies an operation,
   // and writes back. operands = [address, rhs_operand0, rhs_operand1, ...].
@@ -190,87 +189,85 @@ enum class OpCode : uint8_t {
   // flags: bit 0 = returns new value (1) or old value (0, post-increment).
   // int_pool[0] = underlying opcode (ADD, SUB, PTR_ADD, SHL, etc.)
   // int_pool[1] = element size (for PTR_ADD only, 0 otherwise)
-  READ_MODIFY_WRITE = 30,
+  READ_MODIFY_WRITE = 29,
 
   // Misc
-  SELECT = 31,
+  SELECT = 30,
 
   // Terminators
-  COND_BRANCH = 32,
-  SWITCH = 33,
-  RET = 34,
-  UNREACHABLE = 35,
-  BREAK = 36,
-  CONTINUE = 37,
-  GOTO = 38,              // explicit goto label;
-  IMPLICIT_GOTO = 39,     // structural CFG edge (e.g., end of if-then → merge)
-  FALLTHROUGH = 40,       // explicit [[fallthrough]]
-  IMPLICIT_FALLTHROUGH = 41, // implicit (no break at end of case)
-  IMPLICIT_UNREACHABLE = 42, // structurally unreachable (patched empty block)
+  COND_BRANCH = 31,
+  SWITCH = 32,
+  RET = 33,
+  UNREACHABLE = 34,
+  BREAK = 35,
+  CONTINUE = 36,
+  GOTO = 37,              // explicit goto label;
+  IMPLICIT_GOTO = 38,     // structural CFG edge (e.g., end of if-then → merge)
+  FALLTHROUGH = 39,       // explicit [[fallthrough]]
+  IMPLICIT_FALLTHROUGH = 40, // implicit (no break at end of case)
+  IMPLICIT_UNREACHABLE = 41, // structurally unreachable (patched empty block)
 
   // Variadic argument handling
-  VA_PACK = 43,           // groups variadic args at call site; operands = the packed args
-  VA_START = 44,          // binds va_list to function's variadic pack; op[0] = va_list
-  VA_ARG = 45,            // reads next value from va_list; op[0] = va_list; typeEntityId = result type
-  VA_COPY = 46,           // copies va_list; op[0] = dest, op[1] = src
-  VA_END = 47,            // releases va_list; op[0] = va_list
+  VA_PACK = 42,           // groups variadic args at call site; operands = the packed args
+  VA_START = 43,          // binds va_list to function's variadic pack; op[0] = va_list
+  VA_ARG = 44,            // reads next value from va_list; op[0] = va_list; typeEntityId = result type
+  VA_COPY = 45,           // copies va_list; op[0] = dest, op[1] = src
+  VA_END = 46,            // releases va_list; op[0] = va_list
 
   // Scope entry/exit markers (not terminators).
-  ENTER_SCOPE = 48,        // marks scope entry; extra = IRStructureId of scope
-  EXIT_SCOPE = 49,         // marks scope exit; extra = IRStructureId of scope
+  ENTER_SCOPE = 47,        // marks scope entry; extra = IRStructureId of scope
+  EXIT_SCOPE = 48,         // marks scope exit; extra = IRStructureId of scope
 
   // Unified memory/string operations. Sub-opcode in int_pool[0] selects the
   // specific operation (see MemoryOp enum).
-  MULTIMEM = 50,
+  MULTIMEM = 49,
 
   // Parameter read: reads the Nth function parameter.
-  PARAM_READ = 51,
+  PARAM_READ = 50,
 
   // Address-of for globals and functions (external to the current frame).
-  GLOBAL_PTR = 52,        // pointer to a global or static variable
-  FUNC_PTR = 53,          // pointer to a function
+  GLOBAL_PTR = 51,        // pointer to a global or static variable
+  FUNC_PTR = 52,          // pointer to a function
 
   // Bitwise/intrinsic operations. Sub-opcode in int_pool[0] selects the
   // specific operation (see BitwiseOp enum). op[0] = primary operand.
-  BITWISE = 54,
+  BITWISE = 53,
 
   // Floating-point operations. Sub-opcode in int_pool[0] selects the
   // specific operation (see FloatOp enum). op[0] = primary operand.
-  FLOAT = 55,
+  FLOAT = 54,
 
   // Undefined/poison value. Represents a value that is architecturally
   // undefined (e.g., __builtin_clz(0)). An analyzer should flag any use.
-  UNDEFINED = 56,
+  UNDEFINED = 55,
 
   // Dynamic stack allocation.
-  DYNAMIC_ALLOCA = 57,     // op[0] = size. Returns pointer to stack allocation.
+  DYNAMIC_ALLOCA = 56,     // op[0] = size. Returns pointer to stack allocation.
 
   // Frame/return address intrinsics.
-  FRAME_PTR = 58,      // op[0] = level (CONST, usually 0). Returns frame ptr.
-  RETURN_PTR = 59,     // op[0] = level (CONST, usually 0). Returns return addr.
+  FRAME_PTR = 57,      // op[0] = level (CONST, usually 0). Returns frame ptr.
+  RETURN_PTR = 58,     // op[0] = level (CONST, usually 0). Returns return addr.
 
   // Atomic operations.
-  ATOMIC_LOAD = 60,        // op[0] = address. Loads with atomic semantics.
-  ATOMIC_STORE = 61,       // op[0] = address, op[1] = value.
-  ATOMIC_CMPXCHG = 62,     // op[0] = target, op[1] = expected_ptr, op[2] = desired. Returns bool.
+  ATOMIC_CMPXCHG = 59,     // op[0] = target, op[1] = expected_ptr, op[2] = desired. Returns bool.
 
   // Overflow-checked arithmetic (only used as RMW underlying opcodes).
   // RMW returns bool (overflow flag), stores the arithmetic result.
-  ADD_OVERFLOW = 63,
-  SUB_OVERFLOW = 64,
-  MUL_OVERFLOW = 65,
+  ADD_OVERFLOW = 60,
+  SUB_OVERFLOW = 61,
+  MUL_OVERFLOW = 62,
 
   // Atomic RMW underlying opcodes (only valid as RMW underlying ops).
-  ATOMIC_ADD = 66,
-  ATOMIC_SUB = 67,
-  ATOMIC_AND = 68,
-  ATOMIC_OR = 69,
-  ATOMIC_XOR = 70,
-  ATOMIC_NAND = 71,
-  ATOMIC_EXCHANGE = 72,
+  ATOMIC_ADD = 63,
+  ATOMIC_SUB = 64,
+  ATOMIC_AND = 65,
+  ATOMIC_OR = 66,
+  ATOMIC_XOR = 67,
+  ATOMIC_NAND = 68,
+  ATOMIC_EXCHANGE = 69,
 
   // Unknown / unhandled expression
-  UNKNOWN = 73,
+  UNKNOWN = 70,
 };
 
 // Returns the human-readable name of an opcode.
@@ -281,7 +278,44 @@ inline static const char *EnumerationName(OpCode) {
 const char *EnumeratorName(OpCode op) noexcept;
 
 inline static constexpr unsigned NumEnumerators(OpCode) {
-  return 74u;
+  return 71u;
+}
+
+// Sub-opcodes for MEM. Stored in the int pool (int_pool[0]).
+// Encodes direction (load/store), atomicity, endianness, and access width.
+enum class MemAccessOp : uint8_t {
+  // Non-atomic loads (little-endian)
+  LOAD_LE_8 = 0,   LOAD_LE_16 = 1,  LOAD_LE_32 = 2,  LOAD_LE_64 = 3,
+  // Non-atomic loads (big-endian)
+  LOAD_BE_8 = 4,   LOAD_BE_16 = 5,  LOAD_BE_32 = 6,  LOAD_BE_64 = 7,
+  // Non-atomic stores (little-endian)
+  STORE_LE_8 = 8,  STORE_LE_16 = 9, STORE_LE_32 = 10, STORE_LE_64 = 11,
+  // Non-atomic stores (big-endian)
+  STORE_BE_8 = 12, STORE_BE_16 = 13, STORE_BE_32 = 14, STORE_BE_64 = 15,
+  // Atomic loads (little-endian)
+  ATOMIC_LOAD_LE_8 = 16, ATOMIC_LOAD_LE_16 = 17, ATOMIC_LOAD_LE_32 = 18, ATOMIC_LOAD_LE_64 = 19,
+  // Atomic loads (big-endian)
+  ATOMIC_LOAD_BE_8 = 20, ATOMIC_LOAD_BE_16 = 21, ATOMIC_LOAD_BE_32 = 22, ATOMIC_LOAD_BE_64 = 23,
+  // Atomic stores (little-endian)
+  ATOMIC_STORE_LE_8 = 24, ATOMIC_STORE_LE_16 = 25, ATOMIC_STORE_LE_32 = 26, ATOMIC_STORE_LE_64 = 27,
+  // Atomic stores (big-endian)
+  ATOMIC_STORE_BE_8 = 28, ATOMIC_STORE_BE_16 = 29, ATOMIC_STORE_BE_32 = 30, ATOMIC_STORE_BE_64 = 31,
+};
+
+// MemAccessOp classification helpers.
+inline bool IsLoad(MemAccessOp op) { return static_cast<uint8_t>(op) < 8; }
+inline bool IsStore(MemAccessOp op) { auto v = static_cast<uint8_t>(op); return v >= 8 && v < 16; }
+inline bool IsAtomicLoad(MemAccessOp op) { auto v = static_cast<uint8_t>(op); return v >= 16 && v < 24; }
+inline bool IsAtomicStore(MemAccessOp op) { auto v = static_cast<uint8_t>(op); return v >= 24; }
+inline bool IsAnyLoad(MemAccessOp op) { return IsLoad(op) || IsAtomicLoad(op); }
+inline bool IsAnyStore(MemAccessOp op) { return IsStore(op) || IsAtomicStore(op); }
+inline bool IsAtomic(MemAccessOp op) { return static_cast<uint8_t>(op) >= 16; }
+inline bool IsBigEndian(MemAccessOp op) { return (static_cast<uint8_t>(op) % 8) >= 4; }
+inline unsigned AccessSize(MemAccessOp op) {
+  switch (static_cast<uint8_t>(op) % 4) {
+    case 0: return 1; case 1: return 2; case 2: return 4; case 3: return 8;
+  }
+  return 0;
 }
 
 // Sub-opcodes for BITWISE. Stored in the int pool.
@@ -405,7 +439,8 @@ inline bool IsCast(OpCode op) {
 }
 
 inline bool IsMemoryOp(OpCode op) {
-  return op >= OpCode::ALLOCA && op <= OpCode::PTR_ADD;
+  return op == OpCode::MEM || op == OpCode::ALLOCA ||
+         op == OpCode::GEP_FIELD || op == OpCode::PTR_ADD;
 }
 
 // MemoryOp classification helpers.

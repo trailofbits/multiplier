@@ -107,7 +107,6 @@ static void EmitInstructionExtras(
       pool.AddEntity(inst.type_entity_id);
       break;
 
-    case OC::LOAD:
     case OC::CAST:
     case OC::VA_ARG:
       pool.AddEntity(inst.type_entity_id);
@@ -222,6 +221,10 @@ static uint32_t EmitInstructionConsts(
 
     case OC::MULTIMEM:
       pool.AddInt(static_cast<int64_t>(inst.memory_op));  // MemoryOp sub-opcode
+      break;
+
+    case OC::MEM:
+      pool.AddInt(static_cast<int64_t>(inst.mem_access_op));  // MemAccessOp sub-opcode
       break;
 
     case OC::FLOAT:
@@ -422,15 +425,19 @@ void SerializeIR(
       pool.AddEntity(src.source_entity_id);
 
       // Position 2 (value-producing only): result type.
-      if (!mx::ir::IsTerminator(src.opcode) &&
-          src.opcode != mx::ir::OpCode::STORE &&
-          src.opcode != mx::ir::OpCode::ATOMIC_STORE &&
-          src.opcode != mx::ir::OpCode::VA_START &&
-          src.opcode != mx::ir::OpCode::VA_END &&
-          src.opcode != mx::ir::OpCode::VA_COPY &&
-          src.opcode != mx::ir::OpCode::VA_PACK &&
-          src.opcode != mx::ir::OpCode::UNKNOWN) {
-        pool.AddEntity(src.type_entity_id);
+      {
+        bool has_type = !mx::ir::IsTerminator(src.opcode) &&
+            src.opcode != mx::ir::OpCode::VA_START &&
+            src.opcode != mx::ir::OpCode::VA_END &&
+            src.opcode != mx::ir::OpCode::VA_COPY &&
+            src.opcode != mx::ir::OpCode::VA_PACK &&
+            src.opcode != mx::ir::OpCode::UNKNOWN;
+        // MEM stores don't produce a value.
+        if (has_type && src.opcode == mx::ir::OpCode::MEM) {
+          auto mop = static_cast<mx::ir::MemAccessOp>(src.mem_access_op);
+          if (mx::ir::IsAnyStore(mop)) has_type = false;
+        }
+        if (has_type) pool.AddEntity(src.type_entity_id);
       }
 
       // Operands.

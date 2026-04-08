@@ -304,29 +304,26 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       }
       break;
     }
-    case mx::ir::OpCode::LOAD: {
-      if (auto li = mx::LoadInst::from(inst)) {
-        Value addr = GetValue(li->address());
-        if (addr.kind == Value::POINTER) {
-          // Determine size from loaded_type.
-          // CRITIQUE: We need the type system to know the size. For now,
-          // default to 8 bytes (pointer-sized). A real interpreter would
-          // query the type's size.
-          result = MemReadValue(addr.ptr, 8, false);
+    case mx::ir::OpCode::MEM: {
+      if (auto mi = mx::MemInst::from(inst)) {
+        auto sub = mi->sub_opcode();
+        unsigned sz = mx::ir::AccessSize(sub);
+        if (mx::ir::IsAnyLoad(sub)) {
+          Value addr = GetValue(mi->address());
+          if (addr.kind == Value::POINTER) {
+            result = MemReadValue(addr.ptr, sz, false);
+          } else {
+            LOG(WARNING) << "MEM load from non-pointer value";
+          }
         } else {
-          LOG(WARNING) << "LOAD from non-pointer value";
-        }
-      }
-      break;
-    }
-    case mx::ir::OpCode::STORE: {
-      if (auto si = mx::StoreInst::from(inst)) {
-        Value addr = GetValue(si->address());
-        Value val = GetValue(si->stored_value());
-        if (addr.kind == Value::POINTER) {
-          MemWriteValue(addr.ptr, val, 8);
-        } else {
-          LOG(WARNING) << "STORE to non-pointer value";
+          // Store.
+          Value addr = GetValue(mi->address());
+          Value val = GetValue(mi->stored_value());
+          if (addr.kind == Value::POINTER) {
+            MemWriteValue(addr.ptr, val, sz);
+          } else {
+            LOG(WARNING) << "MEM store to non-pointer value";
+          }
         }
       }
       break;
@@ -912,26 +909,6 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       break;
 
     // --- Atomic operations ---
-    case mx::ir::OpCode::ATOMIC_LOAD: {
-      // Treat like a regular LOAD for interpretation.
-      if (auto al = mx::AtomicLoadInst::from(inst)) {
-        Value addr = GetValue(al->address());
-        if (addr.kind == Value::POINTER) {
-          result = MemReadValue(addr.ptr, 8, false);
-        }
-      }
-      break;
-    }
-    case mx::ir::OpCode::ATOMIC_STORE: {
-      if (auto as = mx::AtomicStoreInst::from(inst)) {
-        Value addr = GetValue(as->address());
-        Value val = GetValue(as->value());
-        if (addr.kind == Value::POINTER) {
-          MemWriteValue(addr.ptr, val, 8);
-        }
-      }
-      break;
-    }
     case mx::ir::OpCode::ATOMIC_CMPXCHG:
       // Simplified: return undef (complex semantics).
       result = Value::Undef();

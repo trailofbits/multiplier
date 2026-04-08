@@ -16,8 +16,7 @@ const char *EnumeratorName(OpCode op) noexcept {
   switch (op) {
     case OpCode::CONST: return "CONST";
     case OpCode::ALLOCA: return "ALLOCA";
-    case OpCode::LOAD: return "LOAD";
-    case OpCode::STORE: return "STORE";
+    case OpCode::MEM: return "MEM";
     case OpCode::GEP_FIELD: return "GEP_FIELD";
     case OpCode::PTR_ADD: return "PTR_ADD";
     case OpCode::ADD: return "ADD";
@@ -74,8 +73,6 @@ const char *EnumeratorName(OpCode op) noexcept {
     case OpCode::DYNAMIC_ALLOCA: return "DYNAMIC_ALLOCA";
     case OpCode::FRAME_PTR: return "FRAME_PTR";
     case OpCode::RETURN_PTR: return "RETURN_PTR";
-    case OpCode::ATOMIC_LOAD: return "ATOMIC_LOAD";
-    case OpCode::ATOMIC_STORE: return "ATOMIC_STORE";
     case OpCode::ATOMIC_CMPXCHG: return "ATOMIC_CMPXCHG";
     case OpCode::ADD_OVERFLOW: return "ADD_OVERFLOW";
     case OpCode::SUB_OVERFLOW: return "SUB_OVERFLOW";
