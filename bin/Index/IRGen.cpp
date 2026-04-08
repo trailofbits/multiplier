@@ -354,7 +354,9 @@ std::optional<FunctionIR> IRGenerator::GenerateGlobalInit(
   try {
     func_ = FunctionIR{};
     func_.func_decl_entity_id = EntityIdOf(var);
-    func_.kind = mx::ir::FunctionKind::GLOBAL_INITIALIZER;
+    func_.kind = (var.TLSKind() != pasta::VarDeclTLSKind::kNone)
+        ? mx::ir::FunctionKind::THREAD_LOCAL_INITIALIZER
+        : mx::ir::FunctionKind::GLOBAL_INITIALIZER;
     current_block_index_ = 0;
     current_structure_index_ = UINT32_MAX;
     next_obj_index_ = 0;
@@ -2936,28 +2938,53 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     return alloca_idx;
   }
 
-  // StmtExpr -- GNU ({ ... }) expression. Emit children, return last expr.
+  // StmtExpr -- GNU ({ ... }) expression. Emit all statements in a scope,
+  // return the value of the last expression.
   if (auto se = pasta::StmtExpr::From(e)) {
     auto sub = se->SubStatement();
     if (auto cs = pasta::CompoundStmt::From(sub)) {
-      uint32_t last_idx = 0;
-      bool first = true;
-      for (const auto &child : cs->Children()) {
-        if (auto child_expr = pasta::Expr::From(child)) {
+      // Push a scope for the block expression's locals.
+      PushStructure(mx::ir::StructureKind::SCOPE, EntityIdOf(sub));
+      {
+        InstructionIR enter;
+        enter.opcode = mx::ir::OpCode::ENTER_SCOPE;
+        enter.source_entity_id = EntityIdOf(sub);
+        enter.structure_index = current_structure_index_;
+        EmitTopLevel(std::move(enter));
+      }
+
+      // Emit all children. The last expression child is the value.
+      auto children = cs->Children();
+      std::vector<pasta::Stmt> child_vec(children.begin(), children.end());
+      uint32_t last_idx = UINT32_MAX;
+
+      for (size_t i = 0; i < child_vec.size(); ++i) {
+        bool is_last = (i == child_vec.size() - 1);
+        auto child_expr = pasta::Expr::From(child_vec[i]);
+        if (is_last && child_expr) {
+          // Last child is an expression — its value is the block result.
           last_idx = EmitRValue(*child_expr);
-          first = false;
         } else {
-          EmitStmt(child);
+          // Non-last children: emit as statements (side effects only).
+          EmitStmt(child_vec[i]);
         }
       }
-      if (!first) return last_idx;
+
+      {
+        InstructionIR exit_inst;
+        exit_inst.opcode = mx::ir::OpCode::EXIT_SCOPE;
+        exit_inst.source_entity_id = EntityIdOf(sub);
+        exit_inst.structure_index = current_structure_index_;
+        EmitTopLevel(std::move(exit_inst));
+      }
+      PopStructure();
+
+      if (last_idx != UINT32_MAX) return last_idx;
     }
+    // No expression result — return undefined.
     InstructionIR inst;
-    inst.opcode = mx::ir::OpCode::CONST;
-    inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::INT32);
+    inst.opcode = mx::ir::OpCode::UNDEFINED;
     inst.source_entity_id = eid;
-    inst.int_value = 0;
-    inst.width = 32;
     return emit_typed(std::move(inst));
   }
 

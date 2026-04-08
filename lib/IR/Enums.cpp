@@ -95,6 +95,7 @@ const char *EnumeratorName(FunctionKind kind) noexcept {
   switch (kind) {
     case FunctionKind::NORMAL: return "NORMAL";
     case FunctionKind::GLOBAL_INITIALIZER: return "GLOBAL_INITIALIZER";
+    case FunctionKind::THREAD_LOCAL_INITIALIZER: return "THREAD_LOCAL_INITIALIZER";
   }
   return "UNKNOWN";
 }

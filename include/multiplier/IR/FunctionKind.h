@@ -12,6 +12,7 @@ namespace mx::ir {
 enum class FunctionKind : uint8_t {
   NORMAL = 0,
   GLOBAL_INITIALIZER = 1,
+  THREAD_LOCAL_INITIALIZER = 2,
 };
 
 inline static const char *EnumerationName(FunctionKind) {
@@ -21,7 +22,7 @@ inline static const char *EnumerationName(FunctionKind) {
 const char *EnumeratorName(FunctionKind kind) noexcept;
 
 inline static constexpr unsigned NumEnumerators(FunctionKind) {
-  return 2u;
+  return 3u;
 }
 
 }  // namespace mx::ir
