@@ -1011,8 +1011,9 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
     }
 
     // --- Global/function address ---
-    case mx::ir::OpCode::GLOBAL_PTR: {
-      // In a real interpreter, this would look up the global's storage.
+    case mx::ir::OpCode::GLOBAL_PTR:
+    case mx::ir::OpCode::THREAD_LOCAL_PTR: {
+      // In a real interpreter, this would look up the global/TLS storage.
       // For now, create a synthetic pointer using the target entity ID.
       result = Value::Ptr(inst.source_entity_id(), 0);
       break;

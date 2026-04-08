@@ -1974,9 +1974,41 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         inst.opcode = mx::ir::OpCode::READ_MODIFY_WRITE;
         inst.source_entity_id = eid;
         inst.operand_indices = {addr_idx, val_idx};
+
+        // Check if LHS is a pointer type for += and -=.
+        auto lhs_type = bo->LHS().Type();
+        bool lhs_is_ptr = lhs_type && lhs_type->IsAnyPointerType();
+
         switch (oc) {
-          case pasta::BinaryOperatorKind::kAddAssign: inst.compound_op = mx::ir::OpCode::ADD; break;
-          case pasta::BinaryOperatorKind::kSubAssign: inst.compound_op = mx::ir::OpCode::SUB; break;
+          case pasta::BinaryOperatorKind::kAddAssign:
+            if (lhs_is_ptr) {
+              inst.compound_op = mx::ir::OpCode::PTR_ADD;
+              if (auto pt = lhs_type->PointeeType()) {
+                if (auto sz = TypeSizeBytes(*pt)) inst.size_bytes = *sz;
+              }
+            } else {
+              inst.compound_op = mx::ir::OpCode::ADD;
+            }
+            break;
+          case pasta::BinaryOperatorKind::kSubAssign:
+            if (lhs_is_ptr) {
+              // ptr -= n is PTR_ADD with negated index.
+              // The RMW will do: old_ptr + (-n) * elem_size.
+              // We negate the RHS value here.
+              InstructionIR neg;
+              neg.opcode = mx::ir::OpCode::NEG;
+              neg.source_entity_id = eid;
+              neg.operand_indices = {val_idx};
+              val_idx = EmitInstruction(std::move(neg));
+              inst.operand_indices = {addr_idx, val_idx};
+              inst.compound_op = mx::ir::OpCode::PTR_ADD;
+              if (auto pt = lhs_type->PointeeType()) {
+                if (auto sz = TypeSizeBytes(*pt)) inst.size_bytes = *sz;
+              }
+            } else {
+              inst.compound_op = mx::ir::OpCode::SUB;
+            }
+            break;
           case pasta::BinaryOperatorKind::kMulAssign: inst.compound_op = mx::ir::OpCode::MUL; break;
           case pasta::BinaryOperatorKind::kDivAssign: inst.compound_op = mx::ir::OpCode::DIV; break;
           case pasta::BinaryOperatorKind::kRemAssign: inst.compound_op = mx::ir::OpCode::REM; break;
@@ -2570,12 +2602,22 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         }
       }
 
-      // Dynamic alloca → DYNAMIC_ALLOCA.
+      // Dynamic alloca → DYNAMIC_ALLOCA with scope-tracked object.
       if (callee_name == "__builtin_alloca" || callee_name == "alloca") {
         if (!args.empty()) {
+          // Create an ALLOCA object so the scope can track this allocation.
+          // On scope exit, the interpreter frees objects of kind ALLOCA.
+          ObjectIR obj;
+          obj.kind = mx::ir::ObjectKind::ALLOCA;
+          obj.source_decl_id = eid;
+          uint32_t obj_idx = next_obj_index_++;
+          func_.objects.push_back(std::move(obj));
+          AssociateObjectWithScope(obj_idx);
+
           InstructionIR inst;
           inst.opcode = mx::ir::OpCode::DYNAMIC_ALLOCA;
           inst.source_entity_id = eid;
+          inst.object_index = obj_idx;
           inst.operand_indices.push_back(EmitRValue(args[0]));
           return emit_typed(std::move(inst));
         }
@@ -3037,13 +3079,18 @@ uint32_t IRGenerator::EmitLValue(const pasta::Expr &e) {
       return EmitInstruction(std::move(inst));
     }
 
-    // Global/static variable → GLOBAL_PTR.
+    // Global/static/thread-local variable → GLOBAL_PTR or THREAD_LOCAL_PTR.
     if (auto vd = pasta::VarDecl::From(decl)) {
       if (vd->HasGlobalStorage()) {
         InstructionIR inst;
-        inst.opcode = mx::ir::OpCode::GLOBAL_PTR;
         inst.source_entity_id = eid;
         inst.target_entity_id = EntityIdOf(decl);
+        // Distinguish thread-local from regular global.
+        if (vd->TLSKind() != pasta::VarDeclTLSKind::kNone) {
+          inst.opcode = mx::ir::OpCode::THREAD_LOCAL_PTR;
+        } else {
+          inst.opcode = mx::ir::OpCode::GLOBAL_PTR;
+        }
         return EmitInstruction(std::move(inst));
       }
     }

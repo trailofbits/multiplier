@@ -121,6 +121,7 @@ static void EmitInstructionExtras(
       break;
 
     case OC::GLOBAL_PTR:
+    case OC::THREAD_LOCAL_PTR:
     case OC::FUNC_PTR:
       pool.AddEntity(inst.target_entity_id);
       break;

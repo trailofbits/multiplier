@@ -204,6 +204,12 @@ class MX_EXPORT GlobalPtrInst : public IRInstruction {
   std::optional<VarDecl> variable(void) const;
 };
 
+class MX_EXPORT ThreadLocalPtrInst : public IRInstruction {
+ public:
+  MX_DECLARE_IR_INSTRUCTION(ThreadLocalPtrInst)
+  std::optional<VarDecl> variable(void) const;
+};
+
 class MX_EXPORT FuncPtrInst : public IRInstruction {
  public:
   MX_DECLARE_IR_INSTRUCTION(FuncPtrInst)

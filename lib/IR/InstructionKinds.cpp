@@ -177,6 +177,7 @@ IMPL_FROM_SINGLE(VAArgInst, VA_ARG)
 IMPL_FROM_SINGLE(VAPackInst, VA_PACK)
 IMPL_FROM_SINGLE(ParamReadInst, PARAM_READ)
 IMPL_FROM_SINGLE(GlobalPtrInst, GLOBAL_PTR)
+IMPL_FROM_SINGLE(ThreadLocalPtrInst, THREAD_LOCAL_PTR)
 IMPL_FROM_SINGLE(FuncPtrInst, FUNC_PTR)
 // MultimemInst removed: merged into MemoryInst.
 IMPL_FROM_SINGLE(BitwiseOpInst, BITWISE)
@@ -508,9 +509,21 @@ IRObject ParamReadInst::object(void) const {
   return {};
 }
 
-// ---- GlobalPtrInst / FuncPtrInst ----
+// ---- GlobalPtrInst / ThreadLocalPtrInst / FuncPtrInst ----
 
 std::optional<VarDecl> GlobalPtrInst::variable(void) const {
+  auto pool = GetPool(*impl);
+  auto r = impl->reader();
+  auto extra_base = ExtraBase(r, GetIntPool(*impl));
+  auto eid = pool[extra_base];
+  if (eid == kInvalidEntityId) return std::nullopt;
+  if (auto ptr = impl->frag->ep->DeclFor(impl->frag->ep, eid)) {
+    return VarDecl::from(Decl(std::move(ptr)));
+  }
+  return std::nullopt;
+}
+
+std::optional<VarDecl> ThreadLocalPtrInst::variable(void) const {
   auto pool = GetPool(*impl);
   auto r = impl->reader();
   auto extra_base = ExtraBase(r, GetIntPool(*impl));

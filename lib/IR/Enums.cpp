@@ -66,6 +66,7 @@ const char *EnumeratorName(OpCode op) noexcept {
     // MULTIMEM removed: merged into MEMORY.
     case OpCode::PARAM_READ: return "PARAM_READ";
     case OpCode::GLOBAL_PTR: return "GLOBAL_PTR";
+    case OpCode::THREAD_LOCAL_PTR: return "THREAD_LOCAL_PTR";
     case OpCode::FUNC_PTR: return "FUNC_PTR";
     case OpCode::BITWISE: return "BITWISE";
     case OpCode::FLOAT: return "FLOAT";

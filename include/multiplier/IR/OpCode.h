@@ -221,53 +221,53 @@ enum class OpCode : uint8_t {
   // Parameter read: reads the Nth function parameter.
   PARAM_READ = 49,
 
-  // Address-of for globals and functions (external to the current frame).
+  // Address-of for globals, thread-locals, and functions (external to frame).
   GLOBAL_PTR = 50,        // pointer to a global or static variable
-  FUNC_PTR = 51,          // pointer to a function
+  THREAD_LOCAL_PTR = 51,  // pointer to a thread-local variable
+  FUNC_PTR = 52,          // pointer to a function
 
   // Bitwise/intrinsic operations. Sub-opcode in int_pool[0] selects the
   // specific operation (see BitwiseOp enum). op[0] = primary operand.
-  BITWISE = 52,
+  BITWISE = 53,
 
   // Floating-point operations. Sub-opcode in int_pool[0] selects the
   // specific operation (see FloatOp enum). op[0] = primary operand.
-  FLOAT = 53,
+  FLOAT = 54,
 
   // Undefined/poison value. Represents a value that is architecturally
   // undefined (e.g., __builtin_clz(0)). An analyzer should flag any use.
-  UNDEFINED = 54,
+  UNDEFINED = 55,
 
   // Dynamic stack allocation.
-  DYNAMIC_ALLOCA = 55,     // op[0] = size. Returns pointer to stack allocation.
+  DYNAMIC_ALLOCA = 56,     // op[0] = size. Returns pointer to stack allocation.
 
   // Frame/return address intrinsics.
-  FRAME_PTR = 56,      // op[0] = level (CONST, usually 0). Returns frame ptr.
-  RETURN_PTR = 57,     // op[0] = level (CONST, usually 0). Returns return addr.
+  FRAME_PTR = 57,      // op[0] = level (CONST, usually 0). Returns frame ptr.
+  RETURN_PTR = 58,     // op[0] = level (CONST, usually 0). Returns return addr.
 
   // Atomic operations.
-  ATOMIC_CMPXCHG = 58,     // op[0] = target, op[1] = expected_ptr, op[2] = desired. Returns bool.
+  ATOMIC_CMPXCHG = 59,     // op[0] = target, op[1] = expected_ptr, op[2] = desired. Returns bool.
 
   // Overflow-checked arithmetic (only used as RMW underlying opcodes).
   // RMW returns bool (overflow flag), stores the arithmetic result.
-  ADD_OVERFLOW = 59,
-  SUB_OVERFLOW = 60,
-  MUL_OVERFLOW = 61,
+  ADD_OVERFLOW = 60,
+  SUB_OVERFLOW = 61,
+  MUL_OVERFLOW = 62,
 
   // Atomic RMW underlying opcodes (only valid as RMW underlying ops).
-  ATOMIC_ADD = 62,
-  ATOMIC_SUB = 63,
-  ATOMIC_AND = 64,
-  ATOMIC_OR = 65,
-  ATOMIC_XOR = 66,
-  ATOMIC_NAND = 67,
-  ATOMIC_EXCHANGE = 68,
+  ATOMIC_ADD = 63,
+  ATOMIC_SUB = 64,
+  ATOMIC_AND = 65,
+  ATOMIC_OR = 66,
+  ATOMIC_XOR = 67,
+  ATOMIC_NAND = 68,
+  ATOMIC_EXCHANGE = 69,
 
   // Evaluate all operands, return the last one's value.
-  // Used for comma operator (a, b) and similar "sequence point" patterns.
-  LAST_VALUE = 69,
+  LAST_VALUE = 70,
 
   // Unknown / unhandled expression
-  UNKNOWN = 70,
+  UNKNOWN = 71,
 };
 
 // Returns the human-readable name of an opcode.
@@ -278,7 +278,7 @@ inline static const char *EnumerationName(OpCode) {
 const char *EnumeratorName(OpCode op) noexcept;
 
 inline static constexpr unsigned NumEnumerators(OpCode) {
-  return 71u;
+  return 72u;
 }
 
 // Sub-opcodes for MEMORY. Stored in the int pool (int_pool[0]).
