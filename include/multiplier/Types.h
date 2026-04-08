@@ -47,6 +47,12 @@ enum class StmtKind : unsigned char;
 enum class TokenKind : unsigned short;
 enum class TypeKind : unsigned char;
 
+namespace ir {
+enum class BlockKind : uint8_t;
+enum class OpCode : uint8_t;
+enum class StructureKind : uint8_t;
+}  // namespace ir
+
 #define MX_IGNORE_ENTITY_CATEGORY(ns_path, type_name, lower_name, enum_name, category)
 #define MX_FOR_EACH_ENTITY_CATEGORY(file_, token_, type_, frag_, frag_offset_, pseudo_, tu_, ir_) \
     frag_(::mx::, Fragment, fragment, FRAGMENT, 1) \
@@ -405,7 +411,7 @@ struct MX_EXPORT IRFunctionId final {
 struct MX_EXPORT IRBlockId final {
   RawEntityId fragment_id;
   EntityOffset offset;
-  uint8_t block_kind;  // BlockKind enum value
+  ir::BlockKind block_kind;
   static constexpr IREntityKind kind = IREntityKind::IR_BLOCK;
   bool operator==(const IRBlockId &) const noexcept = default;
   auto operator<=>(const IRBlockId &) const noexcept = default;
@@ -414,7 +420,7 @@ struct MX_EXPORT IRBlockId final {
 struct MX_EXPORT IRInstructionId final {
   RawEntityId fragment_id;
   EntityOffset offset;
-  uint8_t opcode;  // OpCode enum value
+  ir::OpCode opcode;
   static constexpr IREntityKind kind = IREntityKind::IR_INSTRUCTION;
   bool operator==(const IRInstructionId &) const noexcept = default;
   auto operator<=>(const IRInstructionId &) const noexcept = default;
@@ -439,7 +445,7 @@ struct MX_EXPORT IRSwitchCaseId final {
 struct MX_EXPORT IRStructureId final {
   RawEntityId fragment_id;
   EntityOffset offset;
-  uint8_t structure_kind;  // StructureKind enum value
+  ir::StructureKind structure_kind;
   static constexpr IREntityKind kind = IREntityKind::IR_STRUCTURE;
   bool operator==(const IRStructureId &) const noexcept = default;
   auto operator<=>(const IRStructureId &) const noexcept = default;
