@@ -1,7 +1,10 @@
 # IR Gaps and Issues
 
 ## DONE
-- **MEM opcode** — Replaced LOAD/STORE/ATOMIC_LOAD/ATOMIC_STORE with unified MEM opcode. 32 sub-opcodes (MemAccessOp) encode load/store x atomic x LE/BE x 8/16/32/64.
+- **MEM opcode (Phase A)** — Replaced LOAD/STORE/ATOMIC_LOAD/ATOMIC_STORE with unified MEM opcode. 32 sub-opcodes encode load/store x atomic x LE/BE x 8/16/32/64.
+- **LAST_VALUE (Phase B)** — New opcode for comma operator. Both sides are operands, no more orphaned instructions.
+- **Pointer decrement fix (Phase C)** — `--ptr` now correctly emits CONST(-1) with PTR_ADD, not CONST(+1).
+- **IRObject methods (Phase D)** — Implemented source_declaration() and type() which were declared but missing.
 
 ## Critical Bugs
 
