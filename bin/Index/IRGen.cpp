@@ -1867,16 +1867,17 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         bool is_pre = (oc == pasta::UnaryOperatorKind::kPreIncrement ||
                        oc == pasta::UnaryOperatorKind::kPreDecrement);
 
-        // Emit CONST(1) as the delta operand.
-        InstructionIR one;
-        one.opcode = mx::ir::OpCode::CONST;
-        one.const_op = static_cast<uint8_t>(mx::ir::ConstOp::INT64);
-        one.source_entity_id = eid;
-        one.int_value = 1;
-        one.uint_value = 1;
-        one.width = 64;
-        if (expr_type) one.type_entity_id = TypeEntityIdOf(*expr_type);
-        uint32_t one_idx = EmitInstruction(std::move(one));
+        // Emit CONST(+1 or -1) as the delta operand.
+        int64_t delta = is_inc ? 1 : -1;
+        InstructionIR delta_inst;
+        delta_inst.opcode = mx::ir::OpCode::CONST;
+        delta_inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::INT64);
+        delta_inst.source_entity_id = eid;
+        delta_inst.int_value = delta;
+        delta_inst.uint_value = static_cast<uint64_t>(delta);
+        delta_inst.width = 64;
+        if (expr_type) delta_inst.type_entity_id = TypeEntityIdOf(*expr_type);
+        uint32_t delta_idx = EmitInstruction(std::move(delta_inst));
 
         // Determine underlying op and element size for pointers.
         auto sub_type = sub.Type();
@@ -1885,8 +1886,8 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
                                            : mx::ir::OpCode::SUB;
         uint32_t elem_sz = 0;
         if (is_ptr) {
-          underlying = is_inc ? mx::ir::OpCode::PTR_ADD
-                              : mx::ir::OpCode::PTR_ADD;
+          // PTR_ADD with +1/-1 handles both increment and decrement.
+          underlying = mx::ir::OpCode::PTR_ADD;
           if (auto pt = sub_type->PointeeType()) {
             if (auto sz = TypeSizeBytes(*pt)) elem_sz = *sz;
           }
@@ -1895,7 +1896,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         InstructionIR inst;
         inst.opcode = mx::ir::OpCode::READ_MODIFY_WRITE;
         inst.source_entity_id = eid;
-        inst.operand_indices = {addr_idx, one_idx};
+        inst.operand_indices = {addr_idx, delta_idx};
         inst.compound_op = underlying;
         inst.size_bytes = elem_sz;
         // flags bit0 = returns_new_value: pre returns new, post returns old.
