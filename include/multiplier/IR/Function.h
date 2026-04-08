@@ -15,6 +15,7 @@
 namespace mx {
 
 class Decl;
+class Stmt;
 class IRBlock;
 class IRObject;
 class IRStructure;
@@ -56,8 +57,13 @@ class MX_EXPORT IRFunction {
   // Root of the structure tree (FUNCTION_SCOPE).
   std::optional<IRStructure> body_scope(void) const;
 
-  // Find the IR for a FunctionDecl.
+  // Find the IR for a FunctionDecl (follows redeclarations).
   static std::optional<IRFunction> from(const FunctionDecl &decl);
+
+  // Find the containing IR function for any Decl or Stmt.
+  // Walks up the parent chain to find the enclosing FunctionDecl.
+  static std::optional<IRFunction> containing(const Decl &decl);
+  static std::optional<IRFunction> containing(const Stmt &stmt);
 
 };
 

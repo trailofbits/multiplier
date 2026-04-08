@@ -8,6 +8,7 @@
 #include <multiplier/IR/Object.h>
 #include <multiplier/IR/Structure.h>
 #include <multiplier/AST/Decl.h>
+#include <multiplier/AST/Stmt.h>
 #include <multiplier/AST/FunctionDecl.h>
 #include <multiplier/Fragment.h>
 
@@ -140,6 +141,35 @@ std::optional<IRFunction> IRFunction::from(const FunctionDecl &decl) {
     }
   }
 
+  return std::nullopt;
+}
+
+std::optional<IRFunction> IRFunction::containing(const Decl &decl) {
+  // If this IS a FunctionDecl, use from() directly.
+  if (auto fd = FunctionDecl::from(decl)) {
+    return from(*fd);
+  }
+
+  // Walk up the parent chain: Decl → parent Decl or parent Stmt.
+  // A local variable's parent is the DeclStmt, whose parent is the
+  // CompoundStmt, whose parent is the FunctionDecl's body, etc.
+  if (auto parent_decl = decl.parent_declaration()) {
+    return containing(*parent_decl);
+  }
+  if (auto parent_stmt = decl.parent_statement()) {
+    return containing(*parent_stmt);
+  }
+  return std::nullopt;
+}
+
+std::optional<IRFunction> IRFunction::containing(const Stmt &stmt) {
+  // Walk up: Stmt → parent Stmt or parent Decl.
+  if (auto parent_decl = stmt.parent_declaration()) {
+    return containing(*parent_decl);
+  }
+  if (auto parent_stmt = stmt.parent_statement()) {
+    return containing(*parent_stmt);
+  }
   return std::nullopt;
 }
 
