@@ -1529,12 +1529,49 @@ void IRGenerator::EmitInitializer(uint32_t dest_addr_idx,
       for (const auto &field : fields) {
         if (init_idx >= inits.size()) break;
 
-        // Skip bit-fields — they're already zeroed by the MEMSET above.
-        // A correct implementation would need a read-modify-write to set
-        // individual bit-field values, but the zero-fill is sufficient
-        // for zero-initialized fields, and non-zero bit-field inits are
-        // rare enough to defer.
+        // Bit-fields: use BIT_WRITE to set individual bit ranges.
         if (field.IsBitField()) {
+          auto offset_bits = field.OffsetInBits();
+          auto bw = field.BitWidth();
+          if (offset_bits && bw) {
+            // Get bit width from the BitWidth expression.
+            auto *raw_bw = reinterpret_cast<const clang::Expr *>(bw->RawStmt());
+            clang::Expr::EvalResult eval_result;
+            unsigned bit_width = 0;
+            if (raw_bw && raw_bw->EvaluateAsInt(eval_result, ctx_)) {
+              bit_width = static_cast<unsigned>(
+                  eval_result.Val.getInt().getZExtValue());
+            }
+            if (bit_width > 0) {
+              // MEMORY(BIT_WRITE, addr, bit_offset, bit_width, value)
+              InstructionIR off_inst;
+              off_inst.opcode = mx::ir::OpCode::CONST;
+              off_inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::UINT32);
+              off_inst.source_entity_id = source_eid;
+              off_inst.uint_value = *offset_bits;
+              off_inst.int_value = static_cast<int64_t>(*offset_bits);
+              off_inst.width = 32;
+              uint32_t off_idx = EmitInstruction(std::move(off_inst));
+
+              InstructionIR width_inst;
+              width_inst.opcode = mx::ir::OpCode::CONST;
+              width_inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::UINT32);
+              width_inst.source_entity_id = source_eid;
+              width_inst.uint_value = bit_width;
+              width_inst.int_value = static_cast<int64_t>(bit_width);
+              width_inst.width = 32;
+              uint32_t width_idx = EmitInstruction(std::move(width_inst));
+
+              uint32_t val_idx = EmitRValue(inits[init_idx]);
+
+              InstructionIR bw_inst;
+              bw_inst.opcode = mx::ir::OpCode::MEMORY;
+              bw_inst.mem_op = static_cast<uint8_t>(mx::ir::MemOp::BIT_WRITE);
+              bw_inst.source_entity_id = source_eid;
+              bw_inst.operand_indices = {dest_addr_idx, off_idx, width_idx, val_idx};
+              EmitTopLevel(std::move(bw_inst));
+            }
+          }
           ++init_idx;
           continue;
         }
@@ -2759,6 +2796,12 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
             rmw.flags = ab.returns_new ? 1u : 0u;
             rmw.operand_indices.push_back(EmitRValue(args[0]));
             rmw.operand_indices.push_back(EmitRValue(args[1]));
+            // Set element size from the pointee type (args[0] is a pointer).
+            if (auto arg_type = args[0].Type()) {
+              if (auto pt = arg_type->PointeeType()) {
+                if (auto sz = TypeSizeBytes(*pt)) rmw.size_bytes = *sz;
+              }
+            }
             return emit_typed(std::move(rmw));
           }
         }

@@ -309,6 +309,12 @@ enum class MemOp : uint8_t {
   STRSTR = 44, STRCPY = 45, STRNCPY = 46, STRCAT = 47, STRNCAT = 48, STPCPY = 49, STPNCPY = 50,
   // String-to-number.
   STRTOI32 = 51, STRTOI64 = 52, STRTOU32 = 53, STRTOU64 = 54, STRTOF32 = 55, STRTOF64 = 56,
+
+  // Bit-field access. For reading/writing individual bit ranges within bytes.
+  // op[0]=address, op[1]=bit_offset (CONST), op[2]=bit_width (CONST).
+  BIT_READ = 57,     // Read bit_width bits starting at bit_offset. Returns integer.
+  // op[0]=address, op[1]=bit_offset (CONST), op[2]=bit_width (CONST), op[3]=value.
+  BIT_WRITE = 58,    // Write value into bit_width bits at bit_offset (read-modify-write).
 };
 
 // MemOp classification helpers.
