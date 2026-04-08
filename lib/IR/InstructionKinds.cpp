@@ -5,6 +5,7 @@
 
 #include <multiplier/IR/InstructionKinds.h>
 #include <multiplier/IR/SwitchCase.h>
+#include <multiplier/IR/Structure.h>
 #include <multiplier/AST/FunctionDecl.h>
 #include <multiplier/AST/FieldDecl.h>
 #include <multiplier/AST/VarDecl.h>
@@ -40,6 +41,8 @@ bool HasResultType(ir::OpCode op) {
          op != ir::OpCode::VA_END &&
          op != ir::OpCode::VA_COPY &&
          op != ir::OpCode::VA_PACK &&
+         op != ir::OpCode::ENTER_SCOPE &&
+         op != ir::OpCode::EXIT_SCOPE &&
          op != ir::OpCode::UNKNOWN;
 }
 
@@ -182,6 +185,8 @@ IMPL_FROM_SINGLE(DynamicAllocaInst, DYNAMIC_ALLOCA)
 IMPL_FROM_SINGLE(FramePtrInst, FRAME_PTR)
 IMPL_FROM_SINGLE(ReturnPtrInst, RETURN_PTR)
 IMPL_FROM_SINGLE(AtomicCmpxchgInst, ATOMIC_CMPXCHG)
+IMPL_FROM_SINGLE(EnterScopeInst, ENTER_SCOPE)
+IMPL_FROM_SINGLE(ExitScopeInst, EXIT_SCOPE)
 IMPL_FROM_SINGLE(UndefinedInst, UNDEFINED)
 
 IMPL_FROM_SINGLE(RetInst, RET)
@@ -593,6 +598,36 @@ IRInstruction AtomicCmpxchgInst::expected_ptr(void) const { return nth_operand(1
 IRInstruction AtomicCmpxchgInst::desired(void) const { return nth_operand(2); }
 Type AtomicCmpxchgInst::result_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
+}
+
+// ---- EnterScopeInst / ExitScopeInst ----
+
+IRStructure EnterScopeInst::scope(void) const {
+  auto pool = GetPool(*impl);
+  auto int_pool = GetIntPool(*impl);
+  auto r = impl->reader();
+  auto extra_base = ExtraBase(r, int_pool);
+  auto eid = pool[extra_base];
+  auto vid = EntityId(eid).Unpack();
+  if (auto *sid = std::get_if<IRStructureId>(&vid)) {
+    return IRStructure(std::make_shared<IRStructureImpl>(
+        impl->frag, sid->offset, impl->fragment_id));
+  }
+  return {};
+}
+
+IRStructure ExitScopeInst::scope(void) const {
+  auto pool = GetPool(*impl);
+  auto int_pool = GetIntPool(*impl);
+  auto r = impl->reader();
+  auto extra_base = ExtraBase(r, int_pool);
+  auto eid = pool[extra_base];
+  auto vid = EntityId(eid).Unpack();
+  if (auto *sid = std::get_if<IRStructureId>(&vid)) {
+    return IRStructure(std::make_shared<IRStructureImpl>(
+        impl->frag, sid->offset, impl->fragment_id));
+  }
+  return {};
 }
 
 // ---- UndefinedInst ----

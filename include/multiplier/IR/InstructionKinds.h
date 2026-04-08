@@ -18,6 +18,7 @@ namespace mx {
 class FunctionDecl;
 class FieldDecl;
 class VarDecl;
+class IRStructure;
 
 // Helper macro for derived instruction classes.
 #define MX_DECLARE_IR_INSTRUCTION(ClassName) \
@@ -292,6 +293,22 @@ class MX_EXPORT UndefinedInst : public IRInstruction {
  public:
   MX_DECLARE_IR_INSTRUCTION(UndefinedInst)
   Type result_type(void) const;
+};
+
+// ---------------------------------------------------------------------------
+// Scope entry/exit
+// ---------------------------------------------------------------------------
+
+class MX_EXPORT EnterScopeInst : public IRInstruction {
+ public:
+  MX_DECLARE_IR_INSTRUCTION(EnterScopeInst)
+  IRStructure scope(void) const;
+};
+
+class MX_EXPORT ExitScopeInst : public IRInstruction {
+ public:
+  MX_DECLARE_IR_INSTRUCTION(ExitScopeInst)
+  IRStructure scope(void) const;
 };
 
 // ---------------------------------------------------------------------------
