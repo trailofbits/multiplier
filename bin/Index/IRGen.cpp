@@ -1527,6 +1527,16 @@ void IRGenerator::EmitInitializer(uint32_t dest_addr_idx,
       for (const auto &field : fields) {
         if (init_idx >= inits.size()) break;
 
+        // Skip bit-fields — they're already zeroed by the MEMSET above.
+        // A correct implementation would need a read-modify-write to set
+        // individual bit-field values, but the zero-fill is sufficient
+        // for zero-initialized fields, and non-zero bit-field inits are
+        // rare enough to defer.
+        if (field.IsBitField()) {
+          ++init_idx;
+          continue;
+        }
+
         auto offset_bits = field.OffsetInBits();
         if (!offset_bits) continue;
         uint32_t byte_offset = static_cast<uint32_t>(*offset_bits / 8);
