@@ -595,6 +595,53 @@ uint32_t IRGenerator::EmitCondBranch(uint32_t cond_idx, uint32_t true_block,
 
 uint32_t IRGenerator::EmitLoadFromLValue(const pasta::Expr &e) {
   auto eid = EntityIdOf(e);
+
+  // Bit-field read: emit BIT_READ instead of GEP_FIELD + LOAD.
+  if (auto me = pasta::MemberExpr::From(e)) {
+    auto member = me->MemberDeclaration();
+    if (auto fd = pasta::FieldDecl::From(member)) {
+      if (fd->IsBitField()) {
+        // Emit base address (not through the MemberExpr itself).
+        uint32_t base_idx;
+        if (me->IsArrow()) {
+          base_idx = EmitRValue(me->Base());
+        } else {
+          base_idx = EmitLValue(me->Base());
+        }
+
+        InstructionIR inst;
+        inst.opcode = mx::ir::OpCode::MEMORY;
+        inst.source_entity_id = eid;
+        if (auto t = e.Type()) {
+          inst.type_entity_id = TypeEntityIdOf(*t);
+        }
+        inst.operand_indices = {base_idx};
+        inst.target_entity_id = EntityIdOf(member);
+
+        // Determine bit offset and width.
+        if (auto bits = fd->OffsetInBits()) {
+          inst.bit_offset = static_cast<uint32_t>(*bits);
+        }
+        if (auto bw = fd->BitWidth()) {
+          auto *raw_bw = reinterpret_cast<const clang::Expr *>(bw->RawStmt());
+          if (raw_bw) {
+            clang::Expr::EvalResult result;
+            if (raw_bw->EvaluateAsInt(result, ctx_)) {
+              inst.bit_width = static_cast<uint32_t>(
+                  result.Val.getInt().getZExtValue());
+            }
+          }
+        }
+
+        bool big_endian = ctx_.getTargetInfo().isBigEndian();
+        inst.mem_op = static_cast<uint8_t>(
+            big_endian ? mx::ir::MemOp::BIT_READ_BE
+                       : mx::ir::MemOp::BIT_READ_LE);
+        return EmitInstruction(std::move(inst));
+      }
+    }
+  }
+
   uint32_t addr_idx = EmitLValue(e);
   InstructionIR inst;
   inst.opcode = mx::ir::OpCode::MEMORY;
@@ -603,8 +650,9 @@ uint32_t IRGenerator::EmitLoadFromLValue(const pasta::Expr &e) {
     inst.type_entity_id = TypeEntityIdOf(*t);
     unsigned sz = 8;
     if (auto s = TypeSizeBytes(*t)) sz = *s;
+    bool is_atomic = t->IsAtomicType();
     inst.mem_op = static_cast<uint8_t>(
-        DetermineMemOp(false, false, sz));
+        DetermineMemOp(false, is_atomic, sz));
   } else {
     inst.mem_op = static_cast<uint8_t>(
         DetermineMemOp(false, false, 8));
@@ -1225,7 +1273,9 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
     AddEdge(current_block_index_, ci.block_index);
   }
 
-  EmitTopLevel(std::move(term));
+  uint32_t switch_block_idx = current_block_index_;
+  uint32_t switch_structure_idx = current_structure_index_;
+  uint32_t term_idx = EmitTopLevel(std::move(term));
 
   // Push switch context so break statements work.
   // continue_block = 0 is unused (continue skips switch contexts).
@@ -1264,6 +1314,11 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
         sc_struct.is_default = false;
         SwitchToBlock(cases[ci].block_index);
         AssociateBlockWithStructure(cases[ci].block_index);
+        // Record case block structure for Duff's device compensation.
+        label_structure_[cases[ci].block_index] = current_structure_index_;
+        pending_gotos_.push_back({term_idx, switch_block_idx,
+                                  cases[ci].block_index,
+                                  switch_structure_idx});
         ci++;
         EmitBody(cs->SubStatement());
         PopStructure();  // SWITCH_CASE
@@ -1279,6 +1334,11 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
         sc_struct.is_default = true;
         SwitchToBlock(cases[ci].block_index);
         AssociateBlockWithStructure(cases[ci].block_index);
+        // Record default block structure for Duff's device compensation.
+        label_structure_[cases[ci].block_index] = current_structure_index_;
+        pending_gotos_.push_back({term_idx, switch_block_idx,
+                                  cases[ci].block_index,
+                                  switch_structure_idx});
         ci++;
         EmitBody(ds->SubStatement());
         PopStructure();  // SWITCH_CASE (default)
@@ -1743,6 +1803,51 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     auto maybe_type = e.Type();
 
     if (ck == pasta::CastKind::kLValueToRValue) {
+      // Bit-field read: emit BIT_READ instead of normal LOAD.
+      if (auto me = pasta::MemberExpr::From(sub)) {
+        auto member = me->MemberDeclaration();
+        if (auto fd = pasta::FieldDecl::From(member)) {
+          if (fd->IsBitField()) {
+            uint32_t base_idx;
+            if (me->IsArrow()) {
+              base_idx = EmitRValue(me->Base());
+            } else {
+              base_idx = EmitLValue(me->Base());
+            }
+
+            InstructionIR inst;
+            inst.opcode = mx::ir::OpCode::MEMORY;
+            inst.source_entity_id = eid;
+            if (maybe_type) {
+              inst.type_entity_id = TypeEntityIdOf(*maybe_type);
+            }
+            inst.operand_indices = {base_idx};
+            inst.target_entity_id = EntityIdOf(member);
+
+            if (auto bits = fd->OffsetInBits()) {
+              inst.bit_offset = static_cast<uint32_t>(*bits);
+            }
+            if (auto bw = fd->BitWidth()) {
+              auto *raw_bw = reinterpret_cast<const clang::Expr *>(
+                  bw->RawStmt());
+              if (raw_bw) {
+                clang::Expr::EvalResult result;
+                if (raw_bw->EvaluateAsInt(result, ctx_)) {
+                  inst.bit_width = static_cast<uint32_t>(
+                      result.Val.getInt().getZExtValue());
+                }
+              }
+            }
+
+            bool big_endian = ctx_.getTargetInfo().isBigEndian();
+            inst.mem_op = static_cast<uint8_t>(
+                big_endian ? mx::ir::MemOp::BIT_READ_BE
+                           : mx::ir::MemOp::BIT_READ_LE);
+            return emit_typed(std::move(inst));
+          }
+        }
+      }
+
       uint32_t addr_idx = EmitLValue(sub);
       InstructionIR inst;
       inst.opcode = mx::ir::OpCode::MEMORY;
@@ -1751,8 +1856,9 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         inst.type_entity_id = TypeEntityIdOf(*maybe_type);
         unsigned sz = 8;
         if (auto s = TypeSizeBytes(*maybe_type)) sz = *s;
+        bool is_atomic = maybe_type->IsAtomicType();
         inst.mem_op = static_cast<uint8_t>(
-            DetermineMemOp(false, false, sz));
+            DetermineMemOp(false, is_atomic, sz));
       } else {
         inst.mem_op = static_cast<uint8_t>(
             DetermineMemOp(false, false, 8));
@@ -1988,8 +2094,10 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
           if (auto t = bo->RHS().Type()) {
             if (auto s = TypeSizeBytes(*t)) sz = *s;
           }
+          auto lhs_type = bo->LHS().Type();
+          bool is_atomic = lhs_type && lhs_type->IsAtomicType();
           inst.mem_op = static_cast<uint8_t>(
-              DetermineMemOp(true, false, sz));
+              DetermineMemOp(true, is_atomic, sz));
         }
         return emit_typed(std::move(inst));
       }
@@ -3393,31 +3501,48 @@ void IRGenerator::InsertGotoCompensationBlocks() {
     // Create a compensation block.
     uint32_t comp_block = NewBlock(mx::ir::BlockKind::COMPENSATION);
 
-    // Redirect the goto: goto → comp_block instead of → target.
+    // Redirect the source instruction → comp_block instead of → target.
     auto &goto_inst = func_.instructions[pg.goto_inst_idx];
-    if (!goto_inst.branch_targets.empty()) {
-      // Update successor: source_block → comp_block (was → target).
-      auto &src_block = func_.blocks[pg.source_block_idx];
-      for (auto &succ : src_block.successor_indices) {
-        if (succ == pg.target_block_idx) {
-          succ = comp_block;
-          break;
-        }
-      }
-      goto_inst.branch_targets[0].block_index = comp_block;
 
-      // Remove old predecessor: target no longer has source as predecessor.
-      auto &target_preds = func_.blocks[pg.target_block_idx].predecessor_indices;
-      for (auto it = target_preds.begin(); it != target_preds.end(); ++it) {
-        if (*it == pg.source_block_idx) {
-          target_preds.erase(it);
-          break;
-        }
+    // Update successor: source_block → comp_block (was → target).
+    auto &src_block = func_.blocks[pg.source_block_idx];
+    for (auto &succ : src_block.successor_indices) {
+      if (succ == pg.target_block_idx) {
+        succ = comp_block;
+        break;
       }
-
-      // Add new predecessor: comp_block is predecessor of itself (from source).
-      func_.blocks[comp_block].predecessor_indices.push_back(pg.source_block_idx);
     }
+
+    // Redirect the branch target in the instruction itself.
+    // For SWITCH instructions, update the matching switch_cases entry.
+    // For gotos/branches, update branch_targets[0].
+    if (goto_inst.opcode == mx::ir::OpCode::SWITCH) {
+      for (auto &sc : goto_inst.switch_cases) {
+        if (sc.block_index == pg.target_block_idx) {
+          sc.block_index = comp_block;
+          break;
+        }
+      }
+    } else if (!goto_inst.branch_targets.empty()) {
+      for (auto &bt : goto_inst.branch_targets) {
+        if (bt.block_index == pg.target_block_idx) {
+          bt.block_index = comp_block;
+          break;
+        }
+      }
+    }
+
+    // Remove old predecessor: target no longer has source as predecessor.
+    auto &target_preds = func_.blocks[pg.target_block_idx].predecessor_indices;
+    for (auto it = target_preds.begin(); it != target_preds.end(); ++it) {
+      if (*it == pg.source_block_idx) {
+        target_preds.erase(it);
+        break;
+      }
+    }
+
+    // Add new predecessor: comp_block has source as predecessor.
+    func_.blocks[comp_block].predecessor_indices.push_back(pg.source_block_idx);
 
     // Emit scope transitions in the compensation block.
     uint32_t saved_block = current_block_index_;
