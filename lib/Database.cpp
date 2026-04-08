@@ -797,19 +797,16 @@ DatabaseWriterImpl::~DatabaseWriterImpl(void) {
   // Join the bulk insertion thread FIRST so its database connection is closed
   // before we run any cleanup SQL on the main connection. Otherwise SQLite
   // can return "database is locked" due to concurrent writers.
-  try {
-    insertion_queue.enqueue(ExitSignal{});
-    bulk_insertion_thread.join();
-  } catch (...) {}
+  // Join the async writer thread. This MUST complete before any teardown
+  // SQL, otherwise SQLite returns "database is locked".
+  insertion_queue.enqueue(ExitSignal{});
+  bulk_insertion_thread.join();
 
-  try {
-    ExitDictionaries();
-  } catch (...) {}
-
-  try { ExitRecords(); } catch (...) {}
-  try { ExitMetadata(); } catch (...) {}
-  try { db.Execute("PRAGMA wal_checkpoint(FULL)"); } catch (...) {}
-  try { db.Optimize(); } catch (...) {}
+  ExitDictionaries();
+  ExitRecords();
+  ExitMetadata();
+  db.Execute("PRAGMA wal_checkpoint(FULL)");
+  db.Optimize();
 }
 
 DatabaseWriterImpl::DatabaseWriterImpl(const std::filesystem::path &db_path_,
