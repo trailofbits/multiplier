@@ -5,6 +5,9 @@
 - **LAST_VALUE (Phase B)** — New opcode for comma operator. Both sides are operands, no more orphaned instructions.
 - **Pointer decrement fix (Phase C)** — `--ptr` now correctly emits CONST(-1) with PTR_ADD, not CONST(+1).
 - **IRObject methods (Phase D)** — Implemented source_declaration() and type() which were declared but missing.
+- **EnterScopeInst/ExitScopeInst (Phase E)** — New instruction classes with scope() accessor.
+- **Convenience methods (Phase F)** — IRBlock::parent_function(), IRFunction::containing(IRBlock/IRInstruction).
+- **DesignatedInitExpr (Phase G)** — Unwrap to Initializer(). Also handle ImplicitValueInitExpr as zero.
 
 ## Critical Bugs
 
