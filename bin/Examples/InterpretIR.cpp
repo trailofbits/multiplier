@@ -437,6 +437,414 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
               }
               break;
             }
+            case MO::STRCHR: {
+              if (ops.size() >= 2 && ops[0].kind == Value::POINTER) {
+                uint8_t needle = static_cast<uint8_t>(ops[1].as_int());
+                auto it = memory_.find(ops[0].ptr.object_id);
+                if (it != memory_.end()) {
+                  size_t start = static_cast<size_t>(ops[0].ptr.offset);
+                  bool found = false;
+                  for (size_t i = start; i < it->second.bytes.size(); ++i) {
+                    if (it->second.bytes[i] == needle) {
+                      result = Value::Ptr(ops[0].ptr.object_id,
+                                          static_cast<int64_t>(i));
+                      found = true;
+                      break;
+                    }
+                    if (it->second.bytes[i] == 0) break;
+                  }
+                  if (!found) {
+                    // If searching for null terminator, point to it.
+                    if (needle == 0) {
+                      for (size_t i = start; i < it->second.bytes.size(); ++i) {
+                        if (it->second.bytes[i] == 0) {
+                          result = Value::Ptr(ops[0].ptr.object_id,
+                                              static_cast<int64_t>(i));
+                          found = true;
+                          break;
+                        }
+                      }
+                    }
+                    if (!found) {
+                      result = Value::Ptr(mx::kInvalidEntityId, 0);  // NULL
+                    }
+                  }
+                }
+              }
+              break;
+            }
+            case MO::STRNLEN: {
+              if (ops.size() >= 2 && ops[0].kind == Value::POINTER) {
+                int64_t maxlen = ops[1].as_int();
+                auto it = memory_.find(ops[0].ptr.object_id);
+                if (it != memory_.end()) {
+                  size_t start = static_cast<size_t>(ops[0].ptr.offset);
+                  size_t len = 0;
+                  while (len < static_cast<size_t>(maxlen) &&
+                         start + len < it->second.bytes.size() &&
+                         it->second.bytes[start + len] != 0) ++len;
+                  result = Value::Int(static_cast<int64_t>(len));
+                }
+              }
+              break;
+            }
+            case MO::STRNCMP: {
+              if (ops.size() >= 3 && ops[0].kind == Value::POINTER
+                  && ops[1].kind == Value::POINTER) {
+                size_t n = static_cast<size_t>(ops[2].as_int());
+                auto it0 = memory_.find(ops[0].ptr.object_id);
+                auto it1 = memory_.find(ops[1].ptr.object_id);
+                if (it0 != memory_.end() && it1 != memory_.end()) {
+                  size_t s0 = static_cast<size_t>(ops[0].ptr.offset);
+                  size_t s1 = static_cast<size_t>(ops[1].ptr.offset);
+                  int cmp = 0;
+                  for (size_t i = 0; i < n; ++i) {
+                    uint8_t c0 = (s0 + i < it0->second.bytes.size()) ? it0->second.bytes[s0 + i] : 0;
+                    uint8_t c1 = (s1 + i < it1->second.bytes.size()) ? it1->second.bytes[s1 + i] : 0;
+                    if (c0 != c1) { cmp = (c0 < c1) ? -1 : 1; break; }
+                    if (c0 == 0) break;
+                  }
+                  result = Value::Int(cmp);
+                }
+              }
+              break;
+            }
+            case MO::STRRCHR: {
+              if (ops.size() >= 2 && ops[0].kind == Value::POINTER) {
+                uint8_t needle = static_cast<uint8_t>(ops[1].as_int());
+                auto it = memory_.find(ops[0].ptr.object_id);
+                if (it != memory_.end()) {
+                  size_t start = static_cast<size_t>(ops[0].ptr.offset);
+                  int64_t last_pos = -1;
+                  for (size_t i = start; i < it->second.bytes.size(); ++i) {
+                    if (it->second.bytes[i] == needle) {
+                      last_pos = static_cast<int64_t>(i);
+                    }
+                    if (it->second.bytes[i] == 0) break;
+                  }
+                  if (last_pos >= 0) {
+                    result = Value::Ptr(ops[0].ptr.object_id, last_pos);
+                  } else {
+                    result = Value::Ptr(mx::kInvalidEntityId, 0);  // NULL
+                  }
+                }
+              }
+              break;
+            }
+            case MO::STRSTR: {
+              if (ops.size() >= 2 && ops[0].kind == Value::POINTER
+                  && ops[1].kind == Value::POINTER) {
+                auto it0 = memory_.find(ops[0].ptr.object_id);
+                auto it1 = memory_.find(ops[1].ptr.object_id);
+                if (it0 != memory_.end() && it1 != memory_.end()) {
+                  // Read haystack string.
+                  size_t hs = static_cast<size_t>(ops[0].ptr.offset);
+                  size_t hlen = 0;
+                  while (hs + hlen < it0->second.bytes.size() &&
+                         it0->second.bytes[hs + hlen] != 0) ++hlen;
+                  // Read needle string.
+                  size_t ns = static_cast<size_t>(ops[1].ptr.offset);
+                  size_t nlen = 0;
+                  while (ns + nlen < it1->second.bytes.size() &&
+                         it1->second.bytes[ns + nlen] != 0) ++nlen;
+                  if (nlen == 0) {
+                    result = ops[0];  // Empty needle: return haystack.
+                  } else {
+                    bool found = false;
+                    for (size_t i = 0; i + nlen <= hlen; ++i) {
+                      if (std::memcmp(it0->second.bytes.data() + hs + i,
+                                      it1->second.bytes.data() + ns, nlen) == 0) {
+                        result = Value::Ptr(ops[0].ptr.object_id,
+                                            ops[0].ptr.offset + static_cast<int64_t>(i));
+                        found = true;
+                        break;
+                      }
+                    }
+                    if (!found) {
+                      result = Value::Ptr(mx::kInvalidEntityId, 0);  // NULL
+                    }
+                  }
+                }
+              }
+              break;
+            }
+            case MO::STRCPY: {
+              if (ops.size() >= 2 && ops[0].kind == Value::POINTER
+                  && ops[1].kind == Value::POINTER) {
+                auto it_src = memory_.find(ops[1].ptr.object_id);
+                if (it_src != memory_.end()) {
+                  size_t ss = static_cast<size_t>(ops[1].ptr.offset);
+                  size_t ds = static_cast<size_t>(ops[0].ptr.offset);
+                  Pointer dp = ops[0].ptr;
+                  for (size_t i = 0; ; ++i) {
+                    uint8_t c = (ss + i < it_src->second.bytes.size()) ? it_src->second.bytes[ss + i] : 0;
+                    dp.offset = ops[0].ptr.offset + static_cast<int64_t>(i);
+                    MemWrite(dp, &c, 1);
+                    if (c == 0) break;
+                  }
+                }
+                result = ops[0];  // Return dest.
+              }
+              break;
+            }
+            case MO::STRNCPY: {
+              if (ops.size() >= 3 && ops[0].kind == Value::POINTER
+                  && ops[1].kind == Value::POINTER) {
+                size_t n = static_cast<size_t>(ops[2].as_int());
+                auto it_src = memory_.find(ops[1].ptr.object_id);
+                if (it_src != memory_.end()) {
+                  size_t ss = static_cast<size_t>(ops[1].ptr.offset);
+                  Pointer dp = ops[0].ptr;
+                  bool hit_null = false;
+                  for (size_t i = 0; i < n; ++i) {
+                    uint8_t c = 0;
+                    if (!hit_null && ss + i < it_src->second.bytes.size()) {
+                      c = it_src->second.bytes[ss + i];
+                      if (c == 0) hit_null = true;
+                    }
+                    dp.offset = ops[0].ptr.offset + static_cast<int64_t>(i);
+                    MemWrite(dp, &c, 1);
+                  }
+                }
+                result = ops[0];  // Return dest.
+              }
+              break;
+            }
+            case MO::STRCAT: {
+              if (ops.size() >= 2 && ops[0].kind == Value::POINTER
+                  && ops[1].kind == Value::POINTER) {
+                // Find end of dest string.
+                auto it_dst = memory_.find(ops[0].ptr.object_id);
+                auto it_src = memory_.find(ops[1].ptr.object_id);
+                if (it_dst != memory_.end() && it_src != memory_.end()) {
+                  size_t ds = static_cast<size_t>(ops[0].ptr.offset);
+                  size_t dlen = 0;
+                  while (ds + dlen < it_dst->second.bytes.size() &&
+                         it_dst->second.bytes[ds + dlen] != 0) ++dlen;
+                  // Copy src after dest's null.
+                  size_t ss = static_cast<size_t>(ops[1].ptr.offset);
+                  Pointer dp = {ops[0].ptr.object_id,
+                                ops[0].ptr.offset + static_cast<int64_t>(dlen)};
+                  for (size_t i = 0; ; ++i) {
+                    uint8_t c = (ss + i < it_src->second.bytes.size()) ? it_src->second.bytes[ss + i] : 0;
+                    dp.offset = ops[0].ptr.offset + static_cast<int64_t>(dlen + i);
+                    MemWrite(dp, &c, 1);
+                    if (c == 0) break;
+                  }
+                }
+                result = ops[0];  // Return dest.
+              }
+              break;
+            }
+            case MO::STRNCAT: {
+              if (ops.size() >= 3 && ops[0].kind == Value::POINTER
+                  && ops[1].kind == Value::POINTER) {
+                size_t n = static_cast<size_t>(ops[2].as_int());
+                auto it_dst = memory_.find(ops[0].ptr.object_id);
+                auto it_src = memory_.find(ops[1].ptr.object_id);
+                if (it_dst != memory_.end() && it_src != memory_.end()) {
+                  size_t ds = static_cast<size_t>(ops[0].ptr.offset);
+                  size_t dlen = 0;
+                  while (ds + dlen < it_dst->second.bytes.size() &&
+                         it_dst->second.bytes[ds + dlen] != 0) ++dlen;
+                  size_t ss = static_cast<size_t>(ops[1].ptr.offset);
+                  Pointer dp = {ops[0].ptr.object_id, 0};
+                  size_t i = 0;
+                  for (; i < n; ++i) {
+                    uint8_t c = (ss + i < it_src->second.bytes.size()) ? it_src->second.bytes[ss + i] : 0;
+                    if (c == 0) break;
+                    dp.offset = ops[0].ptr.offset + static_cast<int64_t>(dlen + i);
+                    MemWrite(dp, &c, 1);
+                  }
+                  // Write null terminator.
+                  uint8_t nul = 0;
+                  dp.offset = ops[0].ptr.offset + static_cast<int64_t>(dlen + i);
+                  MemWrite(dp, &nul, 1);
+                }
+                result = ops[0];  // Return dest.
+              }
+              break;
+            }
+            case MO::STPCPY: {
+              if (ops.size() >= 2 && ops[0].kind == Value::POINTER
+                  && ops[1].kind == Value::POINTER) {
+                auto it_src = memory_.find(ops[1].ptr.object_id);
+                if (it_src != memory_.end()) {
+                  size_t ss = static_cast<size_t>(ops[1].ptr.offset);
+                  Pointer dp = ops[0].ptr;
+                  size_t i = 0;
+                  for (; ; ++i) {
+                    uint8_t c = (ss + i < it_src->second.bytes.size()) ? it_src->second.bytes[ss + i] : 0;
+                    dp.offset = ops[0].ptr.offset + static_cast<int64_t>(i);
+                    MemWrite(dp, &c, 1);
+                    if (c == 0) break;
+                  }
+                  // Return pointer to the null terminator in dest.
+                  result = Value::Ptr(ops[0].ptr.object_id,
+                                      ops[0].ptr.offset + static_cast<int64_t>(i));
+                }
+              }
+              break;
+            }
+            case MO::STPNCPY: {
+              if (ops.size() >= 3 && ops[0].kind == Value::POINTER
+                  && ops[1].kind == Value::POINTER) {
+                size_t n = static_cast<size_t>(ops[2].as_int());
+                auto it_src = memory_.find(ops[1].ptr.object_id);
+                if (it_src != memory_.end()) {
+                  size_t ss = static_cast<size_t>(ops[1].ptr.offset);
+                  Pointer dp = ops[0].ptr;
+                  bool hit_null = false;
+                  size_t null_pos = n;  // default: dest+n
+                  for (size_t i = 0; i < n; ++i) {
+                    uint8_t c = 0;
+                    if (!hit_null && ss + i < it_src->second.bytes.size()) {
+                      c = it_src->second.bytes[ss + i];
+                      if (c == 0) { hit_null = true; null_pos = i; }
+                    } else if (!hit_null) {
+                      hit_null = true;
+                      null_pos = i;
+                    }
+                    dp.offset = ops[0].ptr.offset + static_cast<int64_t>(i);
+                    MemWrite(dp, &c, 1);
+                  }
+                  // Return pointer to null terminator or dest+n.
+                  result = Value::Ptr(ops[0].ptr.object_id,
+                                      ops[0].ptr.offset + static_cast<int64_t>(null_pos));
+                }
+              }
+              break;
+            }
+            case MO::STRTOI32: case MO::STRTOI64:
+            case MO::STRTOU32: case MO::STRTOU64:
+            case MO::STRTOF32: case MO::STRTOF64: {
+              if (ops.size() >= 1 && ops[0].kind == Value::POINTER) {
+                auto it = memory_.find(ops[0].ptr.object_id);
+                if (it != memory_.end()) {
+                  // Read string bytes into a null-terminated buffer.
+                  size_t start = static_cast<size_t>(ops[0].ptr.offset);
+                  std::string str;
+                  for (size_t i = start; i < it->second.bytes.size(); ++i) {
+                    if (it->second.bytes[i] == 0) break;
+                    str.push_back(static_cast<char>(it->second.bytes[i]));
+                  }
+                  switch (sub) {
+                    case MO::STRTOI32:
+                      result = Value::Int(static_cast<int64_t>(
+                          std::strtol(str.c_str(), nullptr, 10)));
+                      break;
+                    case MO::STRTOI64:
+                      result = Value::Int(static_cast<int64_t>(
+                          std::strtoll(str.c_str(), nullptr, 10)));
+                      break;
+                    case MO::STRTOU32:
+                      result = Value::Int(static_cast<int64_t>(
+                          std::strtoul(str.c_str(), nullptr, 10)));
+                      break;
+                    case MO::STRTOU64:
+                      result = Value::Int(static_cast<int64_t>(
+                          std::strtoull(str.c_str(), nullptr, 10)));
+                      break;
+                    case MO::STRTOF32:
+                      result = Value::Float(static_cast<double>(
+                          std::strtof(str.c_str(), nullptr)));
+                      break;
+                    case MO::STRTOF64:
+                      result = Value::Float(
+                          std::strtod(str.c_str(), nullptr));
+                      break;
+                    default:
+                      break;
+                  }
+                }
+              }
+              break;
+            }
+            case MO::BIT_READ_LE: case MO::BIT_READ_BE: {
+              if (ops.size() >= 1 && ops[0].kind == Value::POINTER) {
+                uint32_t bo = mi->bit_offset();
+                uint32_t bw = mi->bit_width();
+                // Compute which bytes to read.
+                uint32_t first_byte = bo / 8;
+                uint32_t last_byte = (bo + bw - 1) / 8;
+                uint32_t num_bytes = last_byte - first_byte + 1;
+                std::vector<uint8_t> buf(num_bytes, 0);
+                Pointer rp = ops[0].ptr;
+                rp.offset += first_byte;
+                MemRead(rp, buf.data(), num_bytes);
+                uint64_t raw = 0;
+                if (sub == MO::BIT_READ_LE) {
+                  // LE: bit 0 = LSB of byte 0.
+                  for (uint32_t i = 0; i < num_bytes; ++i) {
+                    raw |= static_cast<uint64_t>(buf[i]) << (i * 8);
+                  }
+                  // Shift right to remove bits below bit_offset within the
+                  // fetched bytes.
+                  raw >>= (bo % 8);
+                } else {
+                  // BE: bit 0 = MSB of byte 0. Read bytes MSB-first.
+                  for (uint32_t i = 0; i < num_bytes; ++i) {
+                    raw = (raw << 8) | buf[i];
+                  }
+                  // Bits are numbered from MSB. The field starts at
+                  // bit bo within the full object. Within the fetched
+                  // window, the field starts at (bo % 8) from the MSB
+                  // of the first byte.
+                  uint32_t top_bits = num_bytes * 8;
+                  uint32_t shift = top_bits - (bo % 8) - bw;
+                  raw >>= shift;
+                }
+                // Mask to bit_width.
+                uint64_t mask = (bw >= 64) ? ~uint64_t{0} : ((uint64_t{1} << bw) - 1);
+                raw &= mask;
+                result = Value::Int(static_cast<int64_t>(raw));
+              }
+              break;
+            }
+            case MO::BIT_WRITE_LE: case MO::BIT_WRITE_BE: {
+              if (ops.size() >= 2 && ops[0].kind == Value::POINTER) {
+                uint32_t bo = mi->bit_offset();
+                uint32_t bw = mi->bit_width();
+                uint64_t val = static_cast<uint64_t>(ops[1].as_int());
+                uint64_t mask = (bw >= 64) ? ~uint64_t{0} : ((uint64_t{1} << bw) - 1);
+                val &= mask;
+                uint32_t first_byte = bo / 8;
+                uint32_t last_byte = (bo + bw - 1) / 8;
+                uint32_t num_bytes = last_byte - first_byte + 1;
+                std::vector<uint8_t> buf(num_bytes, 0);
+                Pointer rp = ops[0].ptr;
+                rp.offset += first_byte;
+                MemRead(rp, buf.data(), num_bytes);
+                if (sub == MO::BIT_WRITE_LE) {
+                  // LE: assemble bytes as little-endian integer.
+                  uint64_t raw = 0;
+                  for (uint32_t i = 0; i < num_bytes; ++i) {
+                    raw |= static_cast<uint64_t>(buf[i]) << (i * 8);
+                  }
+                  uint32_t shift = bo % 8;
+                  raw &= ~(mask << shift);
+                  raw |= (val << shift);
+                  for (uint32_t i = 0; i < num_bytes; ++i) {
+                    buf[i] = static_cast<uint8_t>(raw >> (i * 8));
+                  }
+                } else {
+                  // BE: assemble bytes as big-endian integer.
+                  uint64_t raw = 0;
+                  for (uint32_t i = 0; i < num_bytes; ++i) {
+                    raw = (raw << 8) | buf[i];
+                  }
+                  uint32_t top_bits = num_bytes * 8;
+                  uint32_t shift = top_bits - (bo % 8) - bw;
+                  raw &= ~(mask << shift);
+                  raw |= (val << shift);
+                  for (uint32_t i = 0; i < num_bytes; ++i) {
+                    buf[num_bytes - 1 - i] = static_cast<uint8_t>(raw >> (i * 8));
+                  }
+                }
+                MemWrite(rp, buf.data(), num_bytes);
+              }
+              break;
+            }
             default:
               if (mx::ir::IsCmpxchg(sub)) {
                 // Simplified: return undef (complex semantics).
@@ -962,8 +1370,116 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
           case FO::FLOAT_HUGE:
             result = Value::Float(std::numeric_limits<double>::infinity());
             break;
-          default:
-            result = Value::Undef();
+          case FO::SIN:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::sin(ops[0].as_float()));
+            break;
+          case FO::COS:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::cos(ops[0].as_float()));
+            break;
+          case FO::TAN:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::tan(ops[0].as_float()));
+            break;
+          case FO::ASIN:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::asin(ops[0].as_float()));
+            break;
+          case FO::ACOS:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::acos(ops[0].as_float()));
+            break;
+          case FO::ATAN:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::atan(ops[0].as_float()));
+            break;
+          case FO::ATAN2:
+            result = (ops.size() >= 2)
+                ? Value::Float(std::atan2(ops[0].as_float(), ops[1].as_float()))
+                : Value::Undef();
+            break;
+          case FO::EXP:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::exp(ops[0].as_float()));
+            break;
+          case FO::EXP2:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::exp2(ops[0].as_float()));
+            break;
+          case FO::LOG:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::log(ops[0].as_float()));
+            break;
+          case FO::LOG2:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::log2(ops[0].as_float()));
+            break;
+          case FO::LOG10:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::log10(ops[0].as_float()));
+            break;
+          case FO::POW:
+            result = (ops.size() >= 2)
+                ? Value::Float(std::pow(ops[0].as_float(), ops[1].as_float()))
+                : Value::Undef();
+            break;
+          case FO::FMOD:
+            result = (ops.size() >= 2)
+                ? Value::Float(std::fmod(ops[0].as_float(), ops[1].as_float()))
+                : Value::Undef();
+            break;
+          case FO::REMAINDER:
+            result = (ops.size() >= 2)
+                ? Value::Float(std::remainder(ops[0].as_float(), ops[1].as_float()))
+                : Value::Undef();
+            break;
+          case FO::FMA:
+            result = (ops.size() >= 3)
+                ? Value::Float(std::fma(ops[0].as_float(), ops[1].as_float(), ops[2].as_float()))
+                : Value::Undef();
+            break;
+          case FO::SINH:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::sinh(ops[0].as_float()));
+            break;
+          case FO::COSH:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::cosh(ops[0].as_float()));
+            break;
+          case FO::TANH:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::tanh(ops[0].as_float()));
+            break;
+          case FO::HYPOT:
+            result = (ops.size() >= 2)
+                ? Value::Float(std::hypot(ops[0].as_float(), ops[1].as_float()))
+                : Value::Undef();
+            break;
+          case FO::ERF:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::erf(ops[0].as_float()));
+            break;
+          case FO::ERFC:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::erfc(ops[0].as_float()));
+            break;
+          case FO::TGAMMA:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::tgamma(ops[0].as_float()));
+            break;
+          case FO::LGAMMA:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::lgamma(ops[0].as_float()));
+            break;
+          case FO::FDIM:
+            result = (ops.size() >= 2)
+                ? Value::Float(std::fdim(ops[0].as_float(), ops[1].as_float()))
+                : Value::Undef();
+            break;
+          case FO::SIGNBIT:
+            result = ops.empty() ? Value::Undef()
+                : Value::Int(std::signbit(ops[0].as_float()) ? 1 : 0);
             break;
         }
       }
