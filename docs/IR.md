@@ -2,13 +2,11 @@
 
 ## Overview
 
-Multiplier generates a per-function intermediate representation (IR) at index time. The IR is a statement-level control flow graph where expressions are nested instruction trees within basic blocks. Every function with a body gets an IR, and every global variable with an initializer gets a synthetic initializer function.
+Multiplier generates a per-function intermediate representation (IR) at index time. The IR is a statement-level control flow graph where expressions are nested instruction trees within basic blocks. Every function with a body gets an IR. Global variables and thread-local variables with initializers get synthetic initializer functions.
 
-The IR is designed for concrete and symbolic interpretation. Every piece of data an interpreter needs is immediately accessible: types are explicit in opcodes (no need to query the type system), control flow is well-formed (every block ends with a terminator), and the structural nesting of scopes and control flow is fully represented.
+The IR is designed for concrete and symbolic interpretation. Types are explicit in opcodes (no need to query the type system), control flow is well-formed (every block ends with a terminator), and the structural nesting of scopes and control flow is fully represented.
 
 ## Worked Example
-
-Given this C function:
 
 ```c
 int sum(int n) {
@@ -20,378 +18,300 @@ int sum(int n) {
 }
 ```
 
-The IR looks like:
-
 ```
-FRAME block (BlockKind::FRAME):
-  ALLOCA %0 : int        // parameter 'n'
-  ALLOCA %1 : int        // local 'total'
-  ALLOCA %2 : int        // local 'i'
+FRAME block:
+  ALLOCA %0 : int          // 'n'
+  ALLOCA %1 : int          // 'total'
+  ALLOCA %2 : int          // 'i'
   IMPLICIT_GOTO → entry
 
-ENTRY block (BlockKind::ENTRY):
+ENTRY block:
   ENTER_SCOPE (FUNCTION_SCOPE)
-  PARAM_READ 0            // read parameter 'n'
-  STORE %0, ^             // store into n's alloca
+  PARAM_READ 0
+  MEMORY(STORE_LE_32) %0, ^    // n = param0
   CONST(INT32) 0
-  STORE %1, ^             // total = 0
+  MEMORY(STORE_LE_32) %1, ^    // total = 0
   IMPLICIT_GOTO → scope_entry
 
 scope_entry block:
-  ENTER_SCOPE (SCOPE)     // implicit scope for for-init decl
+  ENTER_SCOPE (SCOPE)           // implicit scope for 'int i'
   IMPLICIT_GOTO → preheader
 
-LOOP_PREHEADER block (BlockKind::LOOP_PREHEADER):
+LOOP_PREHEADER block:
   CONST(INT32) 0
-  STORE %2, ^             // i = 0  (for-init lives in preheader)
+  MEMORY(STORE_LE_32) %2, ^    // i = 0
   IMPLICIT_GOTO → loop_cond
 
 LOOP_CONDITION block:
-  LOAD %2                 // i
-  LOAD %0                 // n
+  MEMORY(LOAD_LE_32) %2        // i
+  MEMORY(LOAD_LE_32) %0        // n
   CMP_LT ^, ^
   COND_BRANCH ^, loop_body, loop_exit
 
 LOOP_BODY block:
-  ENTER_SCOPE (SCOPE)     // for-body scope
-  RMW %1, ADD, LOAD(%2)   // total += i
+  ENTER_SCOPE (SCOPE)
+  RMW(ADD) %1, MEMORY(LOAD_LE_32 %2)   // total += i
   EXIT_SCOPE
   IMPLICIT_GOTO → loop_inc
 
 LOOP_INCREMENT block:
-  RMW %2, ADD, CONST(INT32) 1   // i++
+  RMW(ADD) %2, CONST(INT32) 1          // i++
   IMPLICIT_GOTO → loop_cond
 
 LOOP_EXIT block:
-  EXIT_SCOPE              // for-init scope
-  LOAD %1                 // total
+  EXIT_SCOPE                    // for-init scope
+  MEMORY(LOAD_LE_32) %1        // total
   EXIT_SCOPE (FUNCTION_SCOPE)
   RET ^
 ```
 
-Key observations:
-- All ALLOCAs are in the FRAME block. The ALLOCA instruction IS the pointer to that variable — there is no separate ADDRESS_OF instruction.
-- `PARAM_READ` explicitly reads the Nth parameter value and `STORE`s it into the parameter's alloca.
-- `ENTER_SCOPE` / `EXIT_SCOPE` bracket the lifetimes of objects. The for-loop's init-declaration (`int i`) gets an implicit scope wrapping the entire loop.
-- `RMW` (read-modify-write) handles `+=` and `++` — it reads from the address, applies the operation, writes back.
-- Expressions are nested trees under their root instruction. `LOAD`, `CONST`, and other sub-expressions are operands of their parent.
+Key points:
+- ALLOCAs in the FRAME block are the pointers to local storage. No separate "address-of" instruction — `&x` IS the ALLOCA result.
+- MEMORY instructions carry exact size and endianness in their sub-opcode (e.g., `STORE_LE_32` = little-endian 32-bit store).
+- `PARAM_READ` reads function parameters explicitly. The value is stored into the parameter's ALLOCA.
+- `RMW(ADD)` is a read-modify-write: reads from address, adds the operand, writes back.
+- `ENTER_SCOPE` / `EXIT_SCOPE` bracket object lifetimes. The for-init `int i` gets an implicit wrapping scope.
 
 ## Functions
 
-**`FunctionKind`**: `NORMAL`, `GLOBAL_INITIALIZER`
+**`FunctionKind`**: `NORMAL`, `GLOBAL_INITIALIZER`, `THREAD_LOCAL_INITIALIZER`
 
 - **`NORMAL`**: Generated from a `FunctionDecl` with a body.
-- **`GLOBAL_INITIALIZER`**: Synthetic function for a global or static local variable's initialization. Receives a pointer to the global as its single parameter (`PARAM_READ 0`). The body stores the initial value through that pointer.
+- **`GLOBAL_INITIALIZER`**: Synthetic function for a global or static local variable's initialization. Receives a pointer to the variable as parameter 0.
+- **`THREAD_LOCAL_INITIALIZER`**: Same as GLOBAL_INITIALIZER but for `_Thread_local` variables. An interpreter knows the init runs per-thread.
 
 ```
 // Global: int g = 42;
-FRAME block:
-  (empty — address comes via parameter)
-
+FRAME block: (empty)
 ENTRY block:
   ENTER_SCOPE (FUNCTION_SCOPE)
-  PARAM_READ 0             // pointer to g
+  PARAM_READ 0                         // pointer to g
+  MEMORY(MEMSET) ^, CONST(INT8) 0, CONST(INT64) 4   // zero-fill
+  PARAM_READ 0
   CONST(INT32) 42
-  STORE ^, ^               // *g_ptr = 42
+  MEMORY(STORE_LE_32) ^, ^             // *g_ptr = 42
   EXIT_SCOPE
   RET
 ```
 
-Key methods: `kind()`, `declaration()`, `source_declaration()`, `entry_block()`, `blocks()` (RPO order), `objects()`, `body_scope()`.
+Key methods: `kind()`, `declaration()`, `source_declaration()`, `entry_block()`, `blocks()` (RPO), `objects()`, `body_scope()`.
+
+Navigation: `IRFunction::from(FunctionDecl)` (follows redeclarations), `IRFunction::containing(Decl|Stmt|IRBlock|IRInstruction)`.
 
 ## Blocks
 
-Each block ends with exactly one terminator instruction.
+Every block ends with exactly one terminator.
 
 **`BlockKind`** (17 kinds):
 
 | Kind | Description |
 |------|-------------|
-| `FRAME` | Contains all ALLOCAs (parameters + locals). Physical entry point. |
-| `ENTRY` | Logical entry: ENTER_SCOPE, PARAM_READs, then function body. |
-| `IF_THEN` | Then branch of if-statement. |
-| `IF_ELSE` | Else branch. |
-| `IF_MERGE` | Merge point after if. |
-| `LOOP_PREHEADER` | Single-entry block before loop condition. For-init code lives here. |
-| `LOOP_CONDITION` | While/for condition evaluation. |
+| `FRAME` | All ALLOCAs. Physical entry point. |
+| `ENTRY` | Logical entry: ENTER_SCOPE, PARAM_READs, body start. |
+| `IF_THEN`, `IF_ELSE`, `IF_MERGE` | If-statement parts. |
+| `LOOP_PREHEADER` | Single-entry before loop condition. For-init code lives here. |
+| `LOOP_CONDITION` | Condition evaluation. |
 | `LOOP_BODY` | Loop body. |
-| `LOOP_EXIT` | Loop exit point. |
+| `LOOP_EXIT` | Exit point. |
 | `LOOP_INCREMENT` | For-loop increment. |
-| `SWITCH_CASE` | Case body in switch. |
-| `SWITCH_DEFAULT` | Default case body. |
-| `SWITCH_EXIT` | Switch exit point. |
-| `LABEL` | User-defined goto label target. |
-| `COMPENSATION` | Scope transition block inserted on goto edges. |
-| `UNREACHABLE` | Dead code after a terminator. |
+| `SWITCH_CASE`, `SWITCH_DEFAULT`, `SWITCH_EXIT` | Switch parts. |
+| `LABEL` | Goto target. |
+| `COMPENSATION` | Scope transitions on goto edges. |
+| `UNREACHABLE` | Dead code after terminator. |
 | `GENERIC` | Unclassified. |
 
-Key methods: `kind()`, `parent_structure()`, `instructions()` (top-level roots), `all_instructions()` (post-order including sub-expressions), `successors()`, `predecessors()`, `immediate_dominator()`, `dominates()`.
+Key methods: `kind()`, `parent_structure()`, `parent_function()`, `instructions()`, `all_instructions()`, `successors()`, `predecessors()`, `dominates()`.
 
 ## Instructions
 
-Instructions use a unified `OpCode` enum (74 values). Grouped opcodes carry a sub-opcode in the int pool for the specific operation.
+72 opcodes. Grouped opcodes use a sub-opcode enum in the int pool.
 
-### Layout Within Blocks
+Instructions are stored in post-order (children before parents). `block.instructions()` yields top-level roots; `block.all_instructions()` yields everything in evaluation order.
 
-Instructions are stored in post-order (children before parents). Each instruction has a parent: either another instruction (sub-expression) or the block (top-level root). `block.instructions()` yields roots only; `block.all_instructions()` yields everything in evaluation order.
-
-### Opcode Reference
-
-**`CONST`** — Constant value. Sub-opcode (`ConstOp`) specifies exact type and width.
-
-| Sub-opcode | Description |
-|-----------|-------------|
-| `INT8`, `INT16`, `INT32`, `INT64` | Signed integer constant. |
-| `UINT8`, `UINT16`, `UINT32`, `UINT64` | Unsigned integer constant. |
-| `FLOAT16`, `FLOAT32`, `FLOAT64` | Floating-point constant. |
-| `NULL_PTR` | Null pointer. |
-| `INF32`, `INF64` | Positive infinity. |
-| `NAN32`, `NAN64` | NaN. |
-| `WCHAR16`, `WCHAR32` | Wide character constant. |
-| `BOOL` | Boolean constant. |
-
-**`ALLOCA`** — Allocates stack memory for a variable. The instruction's value IS the pointer to the allocation. There is no separate "address-of" instruction — references to `&local_var` or `&param` use the ALLOCA result directly.
-
-**`LOAD`** — Reads a value from a pointer. `op[0]` = address.
-
-**`STORE`** — Writes a value to a pointer. `op[0]` = address, `op[1]` = value. No result.
-
-**`GEP_FIELD`** — Struct field pointer. `op[0]` = base struct pointer. Carries the `FieldDecl` entity ID and byte offset.
-
-**`PTR_ADD`** — Pointer arithmetic. `op[0]` = base pointer, `op[1]` = index. Carries element type and element size.
-
-**`ADD`, `SUB`, `MUL`, `DIV`, `REM`** — Binary arithmetic. `op[0]` = lhs, `op[1]` = rhs.
-
-**`BIT_AND`, `BIT_OR`, `BIT_XOR`, `SHL`, `SHR`** — Bitwise operations.
-
-**`LOGICAL_AND`, `LOGICAL_OR`** — Short-circuit logical operators. Both operands are evaluated (the RHS is marked `is_conditionally_executed`). Not split into control flow.
-
-**`PTR_DIFF`** — Pointer subtraction. Returns the difference in elements.
-
-**`CMP_EQ`, `CMP_NE`, `CMP_LT`, `CMP_LE`, `CMP_GT`, `CMP_GE`** — Comparisons. Return integer 0 or 1.
-
-**`NEG`, `BIT_NOT`, `LOGICAL_NOT`** — Unary operators.
-
-**`CAST`** — Type conversion. Sub-opcode (`CastOp`) specifies exact source and destination types.
-
-| Category | Examples |
-|----------|---------|
-| Sign-extend | `SEXT_I8_I16`, `SEXT_I16_I32`, `SEXT_I32_I64` |
-| Zero-extend | `ZEXT_I8_I16`, `ZEXT_I16_I32`, `ZEXT_I32_I64` |
-| Truncate | `TRUNC_I32_I16`, `TRUNC_I64_I32` |
-| Int↔Float | `SI32_TO_F64`, `F64_TO_SI32`, `UI32_TO_F32`, ... |
-| Float↔Float | `F32_TO_F64`, `F64_TO_F32` |
-| Pointer | `PTR_TO_I64`, `I64_TO_PTR` |
-| Other | `BITCAST`, `IDENTITY` |
-
-Helpers: `IsSignExtend(CastOp)`, `IsZeroExtend(CastOp)`, `IsTruncate(CastOp)`, `IsIntToFloat(CastOp)`, `IsFloatToInt(CastOp)`.
-
-**`CALL`** — Function call. For direct calls, carries the target `FunctionDecl` entity ID. For indirect calls (function pointers), `op[0]` is the callee expression. Variadic arguments are grouped under a `VA_PACK` sub-instruction.
-
-**`READ_MODIFY_WRITE`** — Atomic read-modify-write pattern. `op[0]` = address, remaining operands are RHS values. Reads the value at the address, applies the underlying operation (stored in int pool as an `OpCode`), writes back. Flags bit 0: 1 = returns new value, 0 = returns old value.
-
-Used for: `++i` (underlying=ADD), `i += 5` (underlying=ADD), `++ptr` (underlying=PTR_ADD with element size), `__builtin_add_overflow(a, b, &result)` (underlying=ADD_OVERFLOW, returns overflow flag).
-
-**`SELECT`** — Ternary operator (`a ? b : c`). `op[0]` = condition, `op[1]` = true value, `op[2]` = false value. Both branches are marked `is_conditionally_executed`.
-
-**Terminators**:
+### Pointer Acquisition
 
 | Opcode | Description |
 |--------|-------------|
-| `COND_BRANCH` | `op[0]` = condition, branches to true/false blocks. |
-| `SWITCH` | `op[0]` = selector. Cases are `IRSwitchCase` entities. |
-| `RET` | `op[0]` = return value (optional for void). |
+| `ALLOCA` | Pointer to a static local allocation. `allocated_type()`, `object()`, `size_bytes()`, `align_bytes()`. |
+| `DYNAMIC_ALLOCA` | Pointer to runtime stack allocation. `size()` (operand), `object()` (scope-tracked). |
+| `GLOBAL_PTR` | Pointer to a global/static variable. `variable()` → VarDecl. |
+| `THREAD_LOCAL_PTR` | Pointer to a thread-local variable. `variable()` → VarDecl. |
+| `FUNC_PTR` | Pointer to a function. `function()` → FunctionDecl. |
+| `GEP_FIELD` | Struct field pointer. `base()`, `field()` → FieldDecl, `byte_offset()`. |
+| `PTR_ADD` | Pointer arithmetic. `base()`, `index()`, `element_type()`, `element_size()`. |
+
+### Memory Access (MEMORY opcode)
+
+Single `MEMORY` opcode with `MemOp` sub-opcode encoding direction, endianness, size, atomicity, and bulk/string operations.
+
+**Direct loads/stores** (sub-opcodes 0-31):
+
+| Pattern | Variants |
+|---------|----------|
+| `LOAD_{LE,BE}_{8,16,32,64}` | Non-atomic loads |
+| `STORE_{LE,BE}_{8,16,32,64}` | Non-atomic stores |
+| `ATOMIC_LOAD_{LE,BE}_{8,16,32,64}` | Atomic loads |
+| `ATOMIC_STORE_{LE,BE}_{8,16,32,64}` | Atomic stores |
+
+For non-power-of-2 or >8 byte accesses, `MEMORY(MEMCPY)` is used instead.
+
+Helpers: `IsLoad()`, `IsStore()`, `IsAtomic()`, `IsBigEndian()`, `AccessSize()`.
+
+**Bulk memory** (sub-opcodes 32-37): `MEMSET`, `MEMCPY`, `MEMMOVE`, `MEMCMP`, `MEMCHR`, `BZERO`
+
+**String operations** (sub-opcodes 38-50): `STRLEN`, `STRNLEN`, `STRCMP`, `STRNCMP`, `STRCHR`, `STRRCHR`, `STRSTR`, `STRCPY`, `STRNCPY`, `STRCAT`, `STRNCAT`, `STPCPY`, `STPNCPY`
+
+**String-to-number** (sub-opcodes 51-56): `STRTOI32`, `STRTOI64`, `STRTOU32`, `STRTOU64`, `STRTOF32`, `STRTOF64` — size-specific to avoid platform ambiguity.
+
+Both library calls and `__builtin_` variants are recognized.
+
+`MemoryInst` class: `sub_opcode()`, `address()`, `stored_value()`, `result_type()`.
+
+### Constants (CONST opcode)
+
+`ConstOp` sub-opcode encodes exact type: `INT8`-`INT64`, `UINT8`-`UINT64`, `FLOAT16`/`FLOAT32`/`FLOAT64`, `NULL_PTR`, `INF32`/`INF64`, `NAN32`/`NAN64`, `WCHAR16`/`WCHAR32`, `BOOL`.
+
+`ConstInst` class: `sub_opcode()`, `signed_value()`, `unsigned_value()`, `float_value()`, `type()`.
+
+### Casts (CAST opcode)
+
+`CastOp` sub-opcode encodes explicit source/destination sizes (~60 variants):
+
+- Sign-extend: `SEXT_I8_I16`, ..., `SEXT_I32_I64`
+- Zero-extend: `ZEXT_I8_I16`, ..., `ZEXT_I32_I64`
+- Truncate: `TRUNC_I64_I32`, ..., `TRUNC_I16_I8`
+- Int↔Float: `SI32_TO_F64`, `F64_TO_SI32`, `UI32_TO_F32`, ...
+- Float↔Float: `F32_TO_F64`, `F64_TO_F32`
+- Pointer: `PTR_TO_I64`, `I64_TO_PTR`
+- `BITCAST`, `IDENTITY`
+
+Helpers: `IsSignExtend()`, `IsZeroExtend()`, `IsTruncate()`, `IsIntToFloat()`, `IsFloatToInt()`.
+
+### Arithmetic and Logic
+
+| Opcodes | Class |
+|---------|-------|
+| `ADD`, `SUB`, `MUL`, `DIV`, `REM`, `BIT_AND`, `BIT_OR`, `BIT_XOR`, `SHL`, `SHR`, `LOGICAL_AND`, `LOGICAL_OR`, `PTR_DIFF` | `BinaryInst` |
+| `CMP_EQ`, `CMP_NE`, `CMP_LT`, `CMP_LE`, `CMP_GT`, `CMP_GE` | `ComparisonInst` |
+| `NEG`, `BIT_NOT`, `LOGICAL_NOT` | `UnaryInst` |
+
+### Calls
+
+`CALL` — `CallInst`: `target()` (FunctionDecl for direct), `is_indirect()`, `arguments()`, `result_type()`. Variadic args grouped under `VA_PACK`.
+
+### Read-Modify-Write
+
+`READ_MODIFY_WRITE` — reads from address, applies an operation, writes back. `ReadModifyWriteInst`: `address()`, `underlying_op()`, `element_size()`, `returns_new_value()`, `rhs_operands()`.
+
+Used for: `++i` (ADD), `i += 5` (ADD), `++ptr` (PTR_ADD), `--ptr` (PTR_ADD with -1), `ptr += n` (PTR_ADD), `__builtin_add_overflow` (ADD_OVERFLOW, returns bool), `__atomic_fetch_add` (ATOMIC_ADD).
+
+### Misc
+
+| Opcode | Description |
+|--------|-------------|
+| `SELECT` | Ternary `a ? b : c`. Both branches marked conditionally executed. |
+| `LAST_VALUE` | Comma operator `a, b`. Evaluates all operands, returns last. |
+| `PARAM_READ` | Reads Nth function parameter. `parameter_index()`, `parameter_type()`, `object()`. |
+| `UNDEFINED` | Poison value. Any use is UB. |
+
+### Terminators
+
+| Opcode | Description |
+|--------|-------------|
+| `COND_BRANCH` | Conditional branch. `condition()`, `true_block()`, `false_block()`. |
+| `SWITCH` | Switch statement. `selector()`, `cases()`, `num_cases()`. |
+| `RET` | Return. `return_value()` (optional). |
 | `UNREACHABLE` | Explicit `__builtin_unreachable()`. |
-| `BREAK`, `CONTINUE` | Loop/switch control flow with source provenance. |
-| `GOTO` | Explicit `goto label`. May go through a COMPENSATION block. |
-| `IMPLICIT_GOTO` | Structural CFG edge (e.g., end of if-then → merge). |
-| `FALLTHROUGH` | Explicit `[[fallthrough]]` attribute. |
-| `IMPLICIT_FALLTHROUGH` | Missing `break` at end of switch case. |
-| `IMPLICIT_UNREACHABLE` | Patched empty block (structurally unreachable). |
+| `BREAK`, `CONTINUE` | Loop/switch control with source provenance. |
+| `GOTO` | Explicit goto. May route through COMPENSATION block. |
+| `IMPLICIT_GOTO` | Structural CFG edge. |
+| `FALLTHROUGH`, `IMPLICIT_FALLTHROUGH` | Switch case fallthrough (explicit vs missing break). |
+| `IMPLICIT_UNREACHABLE` | Patched empty block. |
 
-**Scope markers** (non-terminators):
+### Scope Markers
 
-| Opcode | Description |
-|--------|-------------|
-| `ENTER_SCOPE` | Marks scope entry. Objects in the scope become live (but uninitialized). |
-| `EXIT_SCOPE` | Marks scope exit. Objects become invalid (use-after-scope = UB). |
+| Opcode | Class | Description |
+|--------|-------|-------------|
+| `ENTER_SCOPE` | `EnterScopeInst` | Scope entry. Objects become allocated but uninitialized. `scope()` → IRStructure. |
+| `EXIT_SCOPE` | `ExitScopeInst` | Scope exit. Objects become invalid. `scope()` → IRStructure. |
 
-Both carry the `IRStructureId` of the scope in the entity pool.
+### Intrinsics
 
-**`MULTIMEM`** — Unified memory and string operations. Sub-opcode (`MemoryOp`) selects the operation.
+**`BITWISE`** — `BitwiseOpInst` with sub-opcodes: `BSWAP16`/`32`/`64`, `POPCOUNT`, `CLZ` (undefined for 0), `CTZ` (undefined for 0), `FFS`, `PARITY`, `ABS`, `EXPECT`, `ASSUME`, `ROTL`, `ROTR`.
 
-| Category | Sub-opcodes |
-|----------|-------------|
-| Memory | `MEMSET`, `MEMCPY` (UB on overlap), `MEMMOVE` (safe), `MEMCMP`, `MEMCHR`, `BZERO` |
-| String | `STRLEN`, `STRNLEN`, `STRCMP`, `STRNCMP`, `STRCHR`, `STRRCHR`, `STRSTR`, `STRCPY`, `STRNCPY`, `STRCAT`, `STRNCAT`, `STPCPY`, `STPNCPY` |
-| String→Number | `STRTOI32`, `STRTOI64`, `STRTOU32`, `STRTOU64`, `STRTOF32`, `STRTOF64` |
+**`FLOAT`** — `FloatOpInst` with 41 sub-opcodes: `SIN`, `COS`, `TAN`, `ASIN`, `ACOS`, `ATAN`, `ATAN2`, `EXP`, `EXP2`, `LOG`, `LOG2`, `LOG10`, `POW`, `FMOD`, `REMAINDER`, `FMA`, `SINH`, `COSH`, `TANH`, `HYPOT`, `ERF`, `ERFC`, `TGAMMA`, `LGAMMA`, `FDIM`, `SIGNBIT`, `ISNAN`, `ISINF`, `ISFINITE`, `FABS`, `COPYSIGN`, `FMIN`, `FMAX`, `CEIL`, `FLOOR`, `ROUND`, `TRUNC`, `SQRT`, `INF`, `NAN_VAL`, `FLOAT_HUGE`.
 
-String-to-number sub-opcodes are size-specific to avoid platform ambiguity. `atoi` → `STRTOI32`, `atol` → `STRTOI32` or `STRTOI64` depending on `sizeof(long)`.
-
-Helpers: `IsStringToNumber(MemoryOp)`, `IsMemoryWrite(MemoryOp)`, `IsStringOp(MemoryOp)`.
-
-Both library calls (`memcpy`, `strlen`, `atoi`) and `__builtin_` variants are recognized and lowered.
-
-**`BITWISE`** — Bit manipulation intrinsics. Sub-opcode (`BitwiseOp`):
-
-| Sub-opcode | Builtin | Defined for zero? |
-|-----------|---------|-------------------|
-| `BSWAP16`, `BSWAP32`, `BSWAP64` | `__builtin_bswap*` | Yes |
-| `POPCOUNT` | `__builtin_popcount` | Yes |
-| `CLZ` | `__builtin_clz` | **No** (undefined) |
-| `CTZ` | `__builtin_ctz` | **No** (undefined) |
-| `FFS` | `__builtin_ffs` | Yes (returns 0) |
-| `PARITY` | `__builtin_parity` | Yes |
-| `ABS` | `__builtin_abs` | **Undefined for INT_MIN** |
-| `EXPECT` | `__builtin_expect` | Identity (hint) |
-| `ASSUME` | `__builtin_assume` | No-op |
-
-For CLZ/CTZ, the codegen emits `SELECT(x == 0, UNDEFINED, BITWISE(CLZ, x))`.
-
-**`FLOAT`** — Floating-point intrinsics. Sub-opcode (`FloatOp`): `ISNAN`, `ISINF`, `ISFINITE`, `FABS`, `COPYSIGN`, `FMIN`, `FMAX`, `CEIL`, `FLOOR`, `ROUND`, `TRUNC`, `SQRT`, `INF`, `NAN_VAL`, `FLOAT_HUGE`.
-
-**`PARAM_READ`** — Reads the Nth function parameter. Emitted in the ENTRY block. The parameter index is in the int pool. Result is the parameter value, which is then `STORE`d into the parameter's ALLOCA.
-
-**`GLOBAL_PTR`** — Pointer to a global or static variable. Carries the `VarDecl` entity ID. No local alloca is involved.
-
-**`FUNC_PTR`** — Pointer to a function. Carries the `FunctionDecl` entity ID.
-
-**`UNDEFINED`** — Poison value. Represents architecturally undefined data. Any use should be flagged by an analyzer.
-
-**`DYNAMIC_ALLOCA`** — Runtime stack allocation (`alloca(n)`). `op[0]` = size.
-
-**`FRAME_PTR`** — `__builtin_frame_address(level)`. `op[0]` = level.
-
-**`RETURN_PTR`** — `__builtin_return_address(level)`. `op[0]` = level.
-
-**Atomics**:
+### Atomics
 
 | Opcode | Description |
 |--------|-------------|
-| `ATOMIC_LOAD` | `op[0]` = address. Atomic read. |
-| `ATOMIC_STORE` | `op[0]` = address, `op[1]` = value. Atomic write. |
-| `ATOMIC_CMPXCHG` | `op[0]` = target, `op[1]` = expected_ptr, `op[2]` = desired. Returns bool. |
-
-Atomic fetch-and-modify operations use `READ_MODIFY_WRITE` with underlying opcodes: `ATOMIC_ADD`, `ATOMIC_SUB`, `ATOMIC_AND`, `ATOMIC_OR`, `ATOMIC_XOR`, `ATOMIC_NAND`, `ATOMIC_EXCHANGE`.
-
-Overflow-checked arithmetic uses `READ_MODIFY_WRITE` with underlying opcodes: `ADD_OVERFLOW`, `SUB_OVERFLOW`, `MUL_OVERFLOW`. The RMW stores the arithmetic result and returns the overflow flag (bool).
-
-**`UNKNOWN`** — Unhandled expression. Carries `source_entity_id` for AST inspection.
+| `ATOMIC_CMPXCHG` | Compare-and-exchange. `target()`, `expected_ptr()`, `desired()`. Returns bool. |
+| Atomic load/store | Use `MEMORY` with `ATOMIC_LOAD_*` / `ATOMIC_STORE_*` sub-opcodes. |
+| Atomic fetch ops | Use `READ_MODIFY_WRITE` with `ATOMIC_ADD`..`ATOMIC_EXCHANGE` underlying. |
+| Overflow ops | Use `READ_MODIFY_WRITE` with `ADD_OVERFLOW`/`SUB_OVERFLOW`/`MUL_OVERFLOW`. Returns bool (overflow flag), stores arithmetic result. |
 
 ## Objects
 
-`IRObject` represents a memory location. All locals use alloca/load/store.
+`IRObject` represents a memory location.
 
-**`ObjectKind`** (11 kinds):
-
-| Kind | Description |
-|------|-------------|
-| `LOCAL` | Address-taken local variable. |
-| `LOCAL_VALUE` | Non-address-taken local (candidate for SSA promotion). |
-| `PARAMETER` | Address-taken parameter. |
-| `PARAMETER_VALUE` | Non-address-taken parameter. |
-| `GLOBAL` | Global variable. |
-| `THREAD_LOCAL` | Thread-local variable. |
-| `STRING_LITERAL` | String literal storage. |
-| `COMPOUND_LITERAL` | Compound literal or aggregate temporary. |
-| `RETURN_SLOT` | Implicit return value storage. |
-| `ALLOCA` | Dynamic alloca (VLA). |
-| `HEAP` | Heap-allocated (malloc). |
+**`ObjectKind`**: `LOCAL`, `LOCAL_VALUE`, `PARAMETER`, `PARAMETER_VALUE`, `GLOBAL`, `THREAD_LOCAL`, `STRING_LITERAL`, `COMPOUND_LITERAL`, `RETURN_SLOT`, `ALLOCA` (dynamic), `HEAP`.
 
 Key methods: `kind()`, `source_declaration()`, `type()`, `size_bytes()`, `align_bytes()`, `needs_memory()`.
 
 ## Structural Hierarchy
 
-`IRStructure` represents the nesting structure of the program. Every block has a parent structure. Structures form a tree rooted at `FUNCTION_SCOPE`.
+`IRStructure` forms a tree rooted at `FUNCTION_SCOPE`. Every block has a `parent_structure()`.
 
 **`StructureKind`** (18 kinds):
 
-| Kind | Derived Class | Description |
+| Kind | Derived Class | Key Methods |
 |------|--------------|-------------|
-| `FUNCTION_SCOPE` | `IRScopeStructure` | Function body. Objects = parameters + top-level locals. |
-| `SCOPE` | `IRScopeStructure` | Nested `{ }` block. Objects = locals declared in this block. |
-| `IF` | `IRIfStructure` | Entire if-statement. `then_branch()`, `else_branch()`. |
-| `IF_THEN` | `IRIfThenStructure` | Then branch. |
-| `IF_ELSE` | `IRIfElseStructure` | Else branch. |
-| `FOR` | `IRForStructure` | Entire for-loop. `init()`, `condition()`, `body()`, `increment()`. |
-| `FOR_INIT` | — | For-init statement. |
-| `FOR_CONDITION` | — | For condition. |
-| `FOR_BODY` | — | For body. |
-| `FOR_INCREMENT` | — | For increment. |
-| `WHILE` | `IRWhileStructure` | Entire while-loop. `condition()`, `body()`. |
-| `WHILE_CONDITION` | — | While condition. |
-| `WHILE_BODY` | — | While body. |
-| `DO_WHILE` | `IRDoWhileStructure` | Entire do-while. `body()`, `condition()`. |
-| `DO_WHILE_BODY` | — | Do-while body. |
-| `DO_WHILE_CONDITION` | — | Do-while condition. |
-| `SWITCH` | `IRSwitchStructure` | Entire switch. `cases()`, `default_case()`. |
-| `SWITCH_CASE` | `IRSwitchCaseStructure` | Individual case/default. `low()`, `high()`, `is_default()`. |
+| `FUNCTION_SCOPE`, `SCOPE` | `IRScopeStructure` | `objects()` — locals in this scope |
+| `IF` | `IRIfStructure` | `then_branch()`, `else_branch()` |
+| `FOR` | `IRForStructure` | `init()`, `condition()`, `body()`, `increment()` |
+| `WHILE` | `IRWhileStructure` | `condition()`, `body()` |
+| `DO_WHILE` | `IRDoWhileStructure` | `body()`, `condition()` |
+| `SWITCH` | `IRSwitchStructure` | `cases()`, `default_case()` |
+| `SWITCH_CASE` | `IRSwitchCaseStructure` | `low()`, `high()`, `is_default()` |
+| Sub-parts | — | `IF_THEN`, `IF_ELSE`, `FOR_INIT`, `FOR_CONDITION`, `FOR_BODY`, `FOR_INCREMENT`, `WHILE_CONDITION`, `WHILE_BODY`, `DO_WHILE_BODY`, `DO_WHILE_CONDITION` |
 
 ### Scope Lifetime Model
 
-- **`ENTER_SCOPE`**: Objects in the scope become live but **uninitialized**. Reading them before a store is undefined behavior.
-- **`EXIT_SCOPE`**: Objects become **invalid**. Reading them after exit is use-after-scope.
-- Aggregate initialization emits `MULTIMEM(MEMSET, dest, 0, size)` to zero-fill before element-wise stores. This is what the compiler would emit.
-- For-loops with init-declarations (`for (int i = 0; ...)`) get an implicit `SCOPE` wrapping the entire loop, so `i`'s lifetime is correct.
+- **`ENTER_SCOPE`**: Objects become allocated but **uninitialized**. Reading before a store is undefined.
+- **`EXIT_SCOPE`**: Objects become **invalid**. Reading after is use-after-scope.
+- Aggregate initialization emits `MEMORY(MEMSET)` to zero-fill, then element-wise stores.
+- For-loops with init-declarations get an implicit `SCOPE`.
+- Dynamic allocations (`DYNAMIC_ALLOCA`) create scope-tracked objects freed on scope exit.
 
 ### Goto Compensation
 
-When a `goto` jumps across scope boundaries, the IR inserts a **compensation block** (`BlockKind::COMPENSATION`) on the goto edge. The compensation block emits:
-1. `EXIT_SCOPE` for each scope being left (innermost first)
-2. `ENTER_SCOPE` for each scope being entered (outermost first)
+When `goto` crosses scope boundaries, a `COMPENSATION` block is inserted with the necessary `EXIT_SCOPE` / `ENTER_SCOPE` transitions.
 
-This ensures the interpreter sees correct scope transitions regardless of control flow path.
+### GNU Block Expressions
 
-```
-// goto middle; { int x; middle: use(x); }
-
-block_a:
-  GOTO → compensation
-
-compensation (COMPENSATION):
-  ENTER_SCOPE (x's scope)
-  IMPLICIT_GOTO → label_block
-
-label_block (LABEL):
-  ... use(x) ...
-```
+`({ int x = 1; x + 1; })` emits a scoped block with `ENTER_SCOPE`/`EXIT_SCOPE`. The last expression's value is the result.
 
 ## Entity IDs
 
-All IR entities embed their kind in the entity ID's sub_kind field:
-- `IRBlockId` embeds `BlockKind`
-- `IRInstructionId` embeds `OpCode`
-- `IRStructureId` embeds `StructureKind`
-
-This enables type discrimination without loading the entity.
+Entity IDs embed kind in the sub_kind field: `IRBlockId` embeds `BlockKind`, `IRInstructionId` embeds `OpCode`, `IRStructureId` embeds `StructureKind`.
 
 ## Serialization
 
-IR is stored in each fragment's Cap'n Proto message as flat lists:
-
 ```
 Fragment {
-  irFunctions:    List(Function)
-  irBlocks:       List(Block)
-  irInstructions: List(Instruction)
-  irObjects:      List(Object)
-  irSwitchCases:  List(SwitchCase)
-  irStructures:   List(Structure)
-  irEntityPool:   List(UInt64)   // shared entity ID pool
-  irIntPool:      List(Int64)    // shared constant pool
+  irFunctions, irBlocks, irInstructions, irObjects,
+  irSwitchCases, irStructures, irEntityPool, irIntPool
 }
 ```
 
-Instructions reference the pools via `entityOffset` and `constOffset`. The entity pool stores: `[parent, sourceEntityId, resultType, operand0..N, extras...]`. The int pool stores constants, sub-opcodes, and widths.
-
 ## Design Rationale
 
-**Statement-level CFG**: Unlike Clang's CFG, which splits short-circuit operators into separate blocks, our IR keeps expressions as nested trees. `if ((x + y) && z)` stays as one block with a nested `LOGICAL_AND(ADD(LOAD(x), LOAD(y)), LOAD(z))` tree.
+**Statement-level CFG**: Expressions stay as nested trees. `if ((x+y) && z)` is one block with `LOGICAL_AND(ADD(LOAD(x), LOAD(y)), LOAD(z))`.
 
-**No SSA**: All locals go through alloca/load/store. `LOCAL_VALUE`/`PARAMETER_VALUE` kinds mark variables that could be promoted to SSA by a future `mem2reg` pass.
+**No SSA**: All locals go through alloca/load/store. `LOCAL_VALUE`/`PARAMETER_VALUE` mark SSA-promotable variables.
 
-**Explicit widths**: Constants carry exact width in `ConstOp` (INT32, FLOAT64, etc.). Casts carry explicit source/destination sizes in `CastOp` (SEXT_I32_I64, F64_TO_SI32, etc.). An interpreter never needs to query the type system.
+**Explicit widths**: Constants (`INT32`, `FLOAT64`), casts (`SEXT_I32_I64`), and loads/stores (`LOAD_LE_32`) carry exact sizes. No type system queries needed.
 
-**Grouped opcodes**: Memory/string ops (`MULTIMEM`), bitwise intrinsics (`BITWISE`), float intrinsics (`FLOAT`), constants (`CONST`), and casts (`CAST`) each use a single opcode with a sub-opcode enum. This keeps the main opcode count manageable while supporting many operations.
+**Grouped opcodes**: `MEMORY` (57 sub-ops), `CONST` (19), `CAST` (~60), `BITWISE` (13), `FLOAT` (41) keep the main opcode count at 72.
 
-**Provenance**: Every instruction carries `sourceEntityId` linking to the AST node. Calls carry target `FunctionDecl` IDs. GEP fields carry `FieldDecl` IDs. An analyzer navigates to the AST for names, source locations, and detailed type information.
+**Provenance**: Every instruction has `source_entity_id`. Calls have `target()`. GEP fields have `field()`. Navigate to AST for names and source locations.
