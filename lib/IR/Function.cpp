@@ -107,19 +107,39 @@ std::optional<IRStructure> IRFunction::body_scope(void) const {
 }
 
 std::optional<IRFunction> IRFunction::from(const FunctionDecl &decl) {
-  auto frag = Fragment::containing(decl);
-  if (!frag.impl) return std::nullopt;
+  // Try this specific declaration first.
+  auto try_decl = [](const FunctionDecl &d) -> std::optional<IRFunction> {
+    auto frag = Fragment::containing(d);
+    if (!frag.impl) return std::nullopt;
 
-  auto decl_eid = decl.id().Pack();
-  auto ir_funcs = frag.impl->reader.getIrFunctions();
-  auto frag_id = frag.impl->fragment_id;
+    auto decl_eid = d.id().Pack();
+    auto ir_funcs = frag.impl->reader.getIrFunctions();
+    auto frag_id = frag.impl->fragment_id;
 
-  for (unsigned i = 0; i < ir_funcs.size(); ++i) {
-    if (ir_funcs[i].getSourceDeclEntityId() == decl_eid) {
-      return IRFunction(std::make_shared<IRFunctionImpl>(
-          frag.impl, i, frag_id));
+    for (unsigned i = 0; i < ir_funcs.size(); ++i) {
+      if (ir_funcs[i].getSourceDeclEntityId() == decl_eid) {
+        return IRFunction(std::make_shared<IRFunctionImpl>(
+            frag.impl, i, frag_id));
+      }
+    }
+    return std::nullopt;
+  };
+
+  if (auto ir = try_decl(decl)) return ir;
+
+  // If this declaration has no IR, try the definition.
+  // IR is generated from the definition, so a forward declaration
+  // won't have IR mapped directly.
+  if (!decl.is_definition()) {
+    for (auto redecl : decl.redeclarations()) {
+      if (auto fd = FunctionDecl::from(redecl)) {
+        if (fd->is_definition()) {
+          if (auto ir = try_decl(*fd)) return ir;
+        }
+      }
     }
   }
+
   return std::nullopt;
 }
 
