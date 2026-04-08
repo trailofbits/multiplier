@@ -1,5 +1,8 @@
 # IR Gaps and Issues
 
+## DONE
+- **MEM opcode** — Replaced LOAD/STORE/ATOMIC_LOAD/ATOMIC_STORE with unified MEM opcode. 32 sub-opcodes (MemAccessOp) encode load/store x atomic x LE/BE x 8/16/32/64.
+
 ## Critical Bugs
 
 1. **Pointer decrement bug** — `--ptr` emits PTR_ADD same as `++ptr`. Should negate index.

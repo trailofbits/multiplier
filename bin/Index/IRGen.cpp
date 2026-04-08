@@ -1981,10 +1981,15 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         return emit_typed(std::move(inst));
       }
 
-      // Comma.
+      // Comma operator: evaluate both sides, return the last value.
       if (oc == pasta::BinaryOperatorKind::kComma) {
-        EmitRValue(bo->LHS());
-        return EmitRValue(bo->RHS());
+        uint32_t lhs_idx = EmitRValue(bo->LHS());
+        uint32_t rhs_idx = EmitRValue(bo->RHS());
+        InstructionIR inst;
+        inst.opcode = mx::ir::OpCode::LAST_VALUE;
+        inst.source_entity_id = eid;
+        inst.operand_indices = {lhs_idx, rhs_idx};
+        return emit_typed(std::move(inst));
       }
 
       // Logical AND/OR -- kept as instructions, NOT control flow splits.

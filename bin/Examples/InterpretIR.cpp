@@ -687,7 +687,14 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       break;
     }
 
-    // COPY removed: handled by CAST with IDENTITY sub-opcode above.
+    // --- Last value (comma operator) ---
+    case mx::ir::OpCode::LAST_VALUE: {
+      // All operands already evaluated (post-order). Return the last.
+      if (auto lv = mx::LastValueInst::from(inst)) {
+        result = GetValue(lv->last());
+      }
+      break;
+    }
 
 
     // --- Param read ---

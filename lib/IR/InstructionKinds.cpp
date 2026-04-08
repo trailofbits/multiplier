@@ -165,6 +165,7 @@ IMPL_FROM_SINGLE(GEPFieldInst, GEP_FIELD)
 IMPL_FROM_SINGLE(PtrAddInst, PTR_ADD)
 IMPL_FROM_SINGLE(ReadModifyWriteInst, READ_MODIFY_WRITE)
 IMPL_FROM_SINGLE(CallInst, CALL)
+IMPL_FROM_SINGLE(LastValueInst, LAST_VALUE)
 IMPL_FROM_SINGLE(SelectInst, SELECT)
 IMPL_FROM_SINGLE(VAStartInst, VA_START)
 IMPL_FROM_SINGLE(VAEndInst, VA_END)
@@ -398,6 +399,18 @@ gap::generator<IRInstruction> CallInst::arguments(void) const & {
   for (unsigned i = start; i < num_operands(); ++i) {
     co_yield nth_operand(i);
   }
+}
+
+// ---- SelectInst ----
+
+// ---- LastValueInst ----
+
+IRInstruction LastValueInst::last(void) const {
+  return nth_operand(num_operands() - 1);
+}
+
+Type LastValueInst::result_type(void) const {
+  return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 
 // ---- SelectInst ----

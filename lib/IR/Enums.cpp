@@ -84,6 +84,7 @@ const char *EnumeratorName(OpCode op) noexcept {
     case OpCode::ATOMIC_XOR: return "ATOMIC_XOR";
     case OpCode::ATOMIC_NAND: return "ATOMIC_NAND";
     case OpCode::ATOMIC_EXCHANGE: return "ATOMIC_EXCHANGE";
+    case OpCode::LAST_VALUE: return "LAST_VALUE";
     case OpCode::UNKNOWN: return "UNKNOWN";
   }
   return "UNKNOWN";

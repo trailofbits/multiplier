@@ -266,8 +266,12 @@ enum class OpCode : uint8_t {
   ATOMIC_NAND = 68,
   ATOMIC_EXCHANGE = 69,
 
+  // Evaluate all operands, return the last one's value.
+  // Used for comma operator (a, b) and similar "sequence point" patterns.
+  LAST_VALUE = 70,
+
   // Unknown / unhandled expression
-  UNKNOWN = 70,
+  UNKNOWN = 71,
 };
 
 // Returns the human-readable name of an opcode.
@@ -278,7 +282,7 @@ inline static const char *EnumerationName(OpCode) {
 const char *EnumeratorName(OpCode op) noexcept;
 
 inline static constexpr unsigned NumEnumerators(OpCode) {
-  return 71u;
+  return 72u;
 }
 
 // Sub-opcodes for MEM. Stored in the int pool (int_pool[0]).

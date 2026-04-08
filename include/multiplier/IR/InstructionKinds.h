@@ -161,6 +161,15 @@ class MX_EXPORT ReadModifyWriteInst : public IRInstruction {
 // Misc
 // ---------------------------------------------------------------------------
 
+// Evaluates all operands in order, returns the last one's value.
+// Used for comma operator (a, b) and other sequence-point patterns.
+class MX_EXPORT LastValueInst : public IRInstruction {
+ public:
+  MX_DECLARE_IR_INSTRUCTION(LastValueInst)
+  IRInstruction last(void) const;  // The last operand (the value returned).
+  Type result_type(void) const;
+};
+
 class MX_EXPORT SelectInst : public IRInstruction {
  public:
   MX_DECLARE_IR_INSTRUCTION(SelectInst)
