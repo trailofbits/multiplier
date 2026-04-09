@@ -213,6 +213,7 @@ static uint32_t EmitInstructionConsts(
       break;
 
     case OC::PTR_ADD:
+    case OC::PTR_DIFF:
       pool.AddInt(static_cast<int64_t>(inst.size_bytes));  // element size
       break;
 
