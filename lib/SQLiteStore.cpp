@@ -147,9 +147,7 @@ ConnectionImpl::~ConnectionImpl(void) {
 
   stmts.clear();
 
-  int rc = sqlite3_close_v2(db);
-  (void) rc;
-  assert(rc == SQLITE_OK && "sqlite3_close_v2 failed");
+  sqlite3_close(db);
 }
 
 Error::Error(const std::string &msg, sqlite3 *db)
