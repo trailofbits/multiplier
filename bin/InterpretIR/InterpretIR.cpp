@@ -1169,12 +1169,29 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
                    sub <= mx::ir::CastOp::I64_TO_PTR) {
           result = Value::Ptr(mx::kInvalidEntityId, v.as_int());
         } else if (mx::ir::IsFloatToInt(sub)) {
-          result = Value::Int(static_cast<int64_t>(v.as_float()));
+          // If input is INTEGER (raw double bits from a LOAD), reinterpret.
+          double fv;
+          if (v.kind == Value::FLOATING) {
+            fv = v.fval;
+          } else {
+            // Raw bits → double.
+            uint64_t bits = static_cast<uint64_t>(v.ival);
+            std::memcpy(&fv, &bits, sizeof(fv));
+          }
+          result = Value::Int(static_cast<int64_t>(fv));
         } else if (mx::ir::IsIntToFloat(sub)) {
           result = Value::Float(static_cast<double>(v.as_int()));
         } else if (sub == mx::ir::CastOp::F32_TO_F64 ||
                    sub == mx::ir::CastOp::F64_TO_F32) {
-          result = Value::Float(v.as_float());
+          if (v.kind == Value::FLOATING) {
+            result = Value::Float(v.fval);
+          } else {
+            // Raw bits → float.
+            double fv;
+            uint64_t bits = static_cast<uint64_t>(v.ival);
+            std::memcpy(&fv, &bits, sizeof(fv));
+            result = Value::Float(fv);
+          }
         } else if (mx::ir::IsSignExtend(sub)) {
           // Sign-extend: LOADs already sign-extend to int64, so SEXT is
           // a no-op (the value is already correctly sign-extended).
