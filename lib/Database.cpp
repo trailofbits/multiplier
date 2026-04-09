@@ -802,7 +802,10 @@ DatabaseWriterImpl::~DatabaseWriterImpl(void) {
   insertion_queue.enqueue(ExitSignal{});
   bulk_insertion_thread.join();
 
-  ExitRecords();
+  // ExitRecords may fail (e.g., FTS optimize on "database is locked").
+  // Don't let it prevent the checkpoint.
+  try { ExitRecords(); } catch (...) {}
+
   ExitMetadata();
   db.Execute("PRAGMA wal_checkpoint(FULL)");
   db.Optimize();
