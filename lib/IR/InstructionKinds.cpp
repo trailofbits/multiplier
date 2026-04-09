@@ -37,7 +37,6 @@ bool HasResultType(ir::OpCode op) {
          op != ir::OpCode::VA_START &&
          op != ir::OpCode::VA_END &&
          op != ir::OpCode::VA_COPY &&
-         op != ir::OpCode::VA_PACK &&
          op != ir::OpCode::ENTER_SCOPE &&
          op != ir::OpCode::EXIT_SCOPE &&
          op != ir::OpCode::UNKNOWN;
@@ -172,21 +171,31 @@ IMPL_FROM_SINGLE(SelectInst, SELECT)
 IMPL_FROM_SINGLE(VAStartInst, VA_START)
 IMPL_FROM_SINGLE(VAEndInst, VA_END)
 IMPL_FROM_SINGLE(VACopyInst, VA_COPY)
-IMPL_FROM_SINGLE(VAArgInst, VA_ARG)
-IMPL_FROM_SINGLE(VAPackInst, VA_PACK)
-IMPL_FROM_SINGLE(ParamReadInst, PARAM_READ)
+IMPL_FROM_SINGLE(ParamPtrInst, PARAM_PTR)
 IMPL_FROM_SINGLE(GlobalPtrInst, GLOBAL_PTR)
 IMPL_FROM_SINGLE(ThreadLocalPtrInst, THREAD_LOCAL_PTR)
 IMPL_FROM_SINGLE(FuncPtrInst, FUNC_PTR)
 // MultimemInst removed: merged into MemoryInst.
 IMPL_FROM_SINGLE(BitwiseOpInst, BITWISE)
 IMPL_FROM_SINGLE(FloatOpInst, FLOAT)
-IMPL_FROM_SINGLE(DynamicAllocaInst, DYNAMIC_ALLOCA)
 IMPL_FROM_SINGLE(FramePtrInst, FRAME_PTR)
-IMPL_FROM_SINGLE(ReturnPtrInst, RETURN_PTR)
+IMPL_FROM_SINGLE(ReturnAddressInst, RETURN_ADDRESS)
 IMPL_FROM_SINGLE(EnterScopeInst, ENTER_SCOPE)
 IMPL_FROM_SINGLE(ExitScopeInst, EXIT_SCOPE)
 IMPL_FROM_SINGLE(UndefinedInst, UNDEFINED)
+IMPL_FROM_SINGLE(ReturnPtrInst, RETURN_PTR)
+
+// ConsumeVAParamInst: matches MEMORY with CONSUME_VA_PARAM sub-opcode.
+std::optional<ConsumeVAParamInst> ConsumeVAParamInst::from(const IRInstruction &inst) {
+  if (inst.opcode() != ir::OpCode::MEMORY) return std::nullopt;
+  // Check sub-opcode from int pool.
+  auto &i = *inst.impl_ptr();
+  auto int_pool = GetIntPool(i);
+  auto r = i.reader();
+  auto mop = static_cast<ir::MemOp>(int_pool[r.getConstOffset()]);
+  if (mop != ir::MemOp::CONSUME_VA_PARAM) return std::nullopt;
+  return ConsumeVAParamInst(inst.impl_ptr());
+}
 
 IMPL_FROM_SINGLE(RetInst, RET)
 IMPL_FROM_SINGLE(CondBranchInst, COND_BRANCH)
@@ -243,7 +252,47 @@ Type ConstInst::type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 
-// ---- AllocaInst ----
+// ---- AllocaInst and derived kinds ----
+
+ir::AllocaKind AllocaInst::alloca_kind(void) const {
+  auto int_pool = GetIntPool(*impl);
+  auto r = impl->reader();
+  return static_cast<ir::AllocaKind>(int_pool[r.getConstOffset()]);
+}
+
+// Alloca sub-kind from() implementations.
+static ir::AllocaKind GetAllocaKind(const IRInstruction &inst) {
+  if (inst.opcode() != ir::OpCode::ALLOCA)
+    return static_cast<ir::AllocaKind>(255);  // invalid sentinel
+  auto &i = *inst.impl_ptr();
+  auto int_pool = GetIntPool(i);
+  auto r = i.reader();
+  return static_cast<ir::AllocaKind>(int_pool[r.getConstOffset()]);
+}
+
+std::optional<LocalAllocaInst> LocalAllocaInst::from(const IRInstruction &inst) {
+  if (GetAllocaKind(inst) == ir::AllocaKind::LOCAL)
+    return LocalAllocaInst(inst.impl_ptr());
+  return std::nullopt;
+}
+
+std::optional<ArgAllocaInst> ArgAllocaInst::from(const IRInstruction &inst) {
+  if (GetAllocaKind(inst) == ir::AllocaKind::ARG)
+    return ArgAllocaInst(inst.impl_ptr());
+  return std::nullopt;
+}
+
+std::optional<ReturnAllocaInst> ReturnAllocaInst::from(const IRInstruction &inst) {
+  if (GetAllocaKind(inst) == ir::AllocaKind::RETURN)
+    return ReturnAllocaInst(inst.impl_ptr());
+  return std::nullopt;
+}
+
+std::optional<DynamicAllocaInst> DynamicAllocaInst::from(const IRInstruction &inst) {
+  if (GetAllocaKind(inst) == ir::AllocaKind::DYNAMIC)
+    return DynamicAllocaInst(inst.impl_ptr());
+  return std::nullopt;
+}
 
 Type AllocaInst::allocated_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
@@ -425,9 +474,25 @@ bool CallInst::is_indirect(void) const {
   return eid == kInvalidEntityId;
 }
 
+bool CallInst::has_return_value(void) const {
+  auto pool = GetPool(*impl);
+  auto base = ExtraBase(impl->reader(), GetIntPool(*impl));
+  auto eid = pool[base + 1];  // extras[1] = return alloca entity ID
+  return eid != kInvalidEntityId;
+}
+
+std::optional<AllocaInst> CallInst::return_alloca(void) const {
+  auto pool = GetPool(*impl);
+  auto base = ExtraBase(impl->reader(), GetIntPool(*impl));
+  auto eid = pool[base + 1];  // extras[1] = return alloca entity ID
+  if (eid == kInvalidEntityId) return std::nullopt;
+  auto inst = MakeInst(*impl, eid);
+  return AllocaInst::from(inst);
+}
+
 gap::generator<IRInstruction> CallInst::arguments(void) const & {
-  // For direct calls: all operands are arguments.
-  // For indirect calls: operand 0 is the callee pointer, rest are args.
+  // For direct calls: all operands are ARG allocas.
+  // For indirect calls: operand 0 is the callee pointer, rest are ARG allocas.
   bool indirect = is_indirect();
   unsigned start = indirect ? 1 : 0;
   for (unsigned i = start; i < num_operands(); ++i) {
@@ -500,41 +565,24 @@ IRInstruction VAStartInst::va_list_operand(void) const { return nth_operand(0); 
 IRInstruction VAEndInst::va_list_operand(void) const { return nth_operand(0); }
 IRInstruction VACopyInst::dest(void) const { return nth_operand(0); }
 IRInstruction VACopyInst::src(void) const { return nth_operand(1); }
-IRInstruction VAArgInst::va_list_operand(void) const { return nth_operand(0); }
+// ---- ConsumeVAParamInst ----
 
-Type VAArgInst::result_type(void) const {
+IRInstruction ConsumeVAParamInst::va_list_operand(void) const { return nth_operand(0); }
+
+Type ConsumeVAParamInst::result_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 
-gap::generator<IRInstruction> VAPackInst::arguments(void) const & {
-  for (unsigned i = 0; i < num_operands(); ++i) {
-    co_yield nth_operand(i);
-  }
-}
+// ---- ParamPtrInst ----
 
-// ---- ParamReadInst ----
-
-uint32_t ParamReadInst::parameter_index(void) const {
+uint32_t ParamPtrInst::parameter_index(void) const {
   auto r = impl->reader();
   auto int_pool = GetIntPool(*impl);
   return static_cast<uint32_t>(int_pool[r.getConstOffset()]);
 }
 
-Type ParamReadInst::parameter_type(void) const {
+Type ParamPtrInst::parameter_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
-}
-
-IRObject ParamReadInst::object(void) const {
-  auto pool = GetPool(*impl);
-  auto r = impl->reader();
-  auto extra_base = ExtraBase(r, GetIntPool(*impl));
-  auto eid = pool[extra_base];
-  auto vid = EntityId(eid).Unpack();
-  if (auto *oid = std::get_if<IRObjectId>(&vid)) {
-    return IRObject(std::make_shared<IRObjectImpl>(
-        impl->frag, oid->offset, impl->fragment_id));
-  }
-  return {};
 }
 
 // ---- GlobalPtrInst / ThreadLocalPtrInst / FuncPtrInst ----
@@ -603,15 +651,9 @@ Type FloatOpInst::result_type(void) const {
 
 // ---- DynamicAllocaInst ----
 
+// ---- DynamicAllocaInst ----
+
 IRInstruction DynamicAllocaInst::size(void) const { return nth_operand(0); }
-
-IRObject DynamicAllocaInst::object(void) const {
-  return MakeObj(*impl, GetPool(*impl)[ExtraBase(impl->reader(), GetIntPool(*impl))]);
-}
-
-Type DynamicAllocaInst::result_type(void) const {
-  return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
-}
 
 // ---- FramePtrInst ----
 
@@ -620,10 +662,16 @@ Type FramePtrInst::result_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 
+// ---- ReturnAddressInst ----
+
+IRInstruction ReturnAddressInst::level(void) const { return nth_operand(0); }
+Type ReturnAddressInst::result_type(void) const {
+  return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
+}
+
 // ---- ReturnPtrInst ----
 
-IRInstruction ReturnPtrInst::level(void) const { return nth_operand(0); }
-Type ReturnPtrInst::result_type(void) const {
+Type ReturnPtrInst::return_type(void) const {
   return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
 }
 

@@ -20,31 +20,31 @@ int sum(int n) {
 
 ```
 FRAME block:
-  ALLOCA %0 : int          // 'n'
-  ALLOCA %1 : int          // 'total'
-  ALLOCA %2 : int          // 'i'
+  ALLOCA/LOCAL %0 : int      // 'n'
+  ALLOCA/LOCAL %1 : int      // 'total'
+  ALLOCA/LOCAL %2 : int      // 'i'
   IMPLICIT_GOTO → entry
 
 ENTRY block:
   ENTER_SCOPE (FUNCTION_SCOPE)
-  PARAM_READ 0
-  MEMORY(STORE_LE_32) %0, ^    // n = param0
+  PARAM_PTR 0
+  MEMORY(STORE_LE_32) %0, ^  // n = param0
   CONST(INT32) 0
-  MEMORY(STORE_LE_32) %1, ^    // total = 0
+  MEMORY(STORE_LE_32) %1, ^  // total = 0
   IMPLICIT_GOTO → scope_entry
 
 scope_entry block:
-  ENTER_SCOPE (SCOPE)           // implicit scope for 'int i'
+  ENTER_SCOPE (SCOPE)         // implicit scope for 'int i'
   IMPLICIT_GOTO → preheader
 
 LOOP_PREHEADER block:
   CONST(INT32) 0
-  MEMORY(STORE_LE_32) %2, ^    // i = 0
+  MEMORY(STORE_LE_32) %2, ^  // i = 0
   IMPLICIT_GOTO → loop_cond
 
 LOOP_CONDITION block:
-  MEMORY(LOAD_LE_32) %2        // i
-  MEMORY(LOAD_LE_32) %0        // n
+  MEMORY(LOAD_LE_32) %2      // i
+  MEMORY(LOAD_LE_32) %0      // n
   CMP_LT ^, ^
   COND_BRANCH ^, loop_body, loop_exit
 
@@ -59,18 +59,19 @@ LOOP_INCREMENT block:
   IMPLICIT_GOTO → loop_cond
 
 LOOP_EXIT block:
-  EXIT_SCOPE                    // for-init scope
-  MEMORY(LOAD_LE_32) %1        // total
+  EXIT_SCOPE                  // for-init scope
+  MEMORY(LOAD_LE_32) %1      // total
   EXIT_SCOPE (FUNCTION_SCOPE)
   RET ^
 ```
 
 Key points:
-- ALLOCAs in the FRAME block are the pointers to local storage. No separate "address-of" instruction — `&x` IS the ALLOCA result.
+- ALLOCAs in the FRAME block are pointers to local storage. No separate "address-of" instruction — `&x` IS the ALLOCA result. Sub-opcode `AllocaKind` distinguishes `LOCAL`, `ARG`, `RETURN`, and `DYNAMIC`.
 - MEMORY instructions carry exact size and endianness in their sub-opcode (e.g., `STORE_LE_32` = little-endian 32-bit store).
-- `PARAM_READ` reads function parameters explicitly. The value is stored into the parameter's ALLOCA.
+- `PARAM_PTR` returns a pointer to the Nth function parameter. Storage lives in the caller's EXPRESSION_SCOPE.
 - `RMW(ADD)` is a read-modify-write: reads from address, adds the operand, writes back.
 - `ENTER_SCOPE` / `EXIT_SCOPE` bracket object lifetimes. The for-init `int i` gets an implicit wrapping scope.
+- Direct assignment `a = b` uses `MEMCPY(dest, src, size)` — no load/store pair. Scalar LOAD/STORE only for feeding values into arithmetic.
 
 ## Functions
 
@@ -85,11 +86,11 @@ Key points:
 FRAME block: (empty)
 ENTRY block:
   ENTER_SCOPE (FUNCTION_SCOPE)
-  PARAM_READ 0                         // pointer to g
+  PARAM_PTR 0                            // pointer to g
   MEMORY(MEMSET) ^, CONST(INT8) 0, CONST(INT64) 4   // zero-fill
-  PARAM_READ 0
+  PARAM_PTR 0
   CONST(INT32) 42
-  MEMORY(STORE_LE_32) ^, ^             // *g_ptr = 42
+  MEMORY(STORE_LE_32) ^, ^              // *g_ptr = 42
   EXIT_SCOPE
   RET
 ```
@@ -107,7 +108,7 @@ Every block ends with exactly one terminator.
 | Kind | Description |
 |------|-------------|
 | `FRAME` | All ALLOCAs. Physical entry point. |
-| `ENTRY` | Logical entry: ENTER_SCOPE, PARAM_READs, body start. |
+| `ENTRY` | Logical entry: ENTER_SCOPE, PARAM_PTRs, body start. |
 | `IF_THEN`, `IF_ELSE`, `IF_MERGE` | If-statement parts. |
 | `LOOP_PREHEADER` | Single-entry before loop condition. For-init code lives here. |
 | `LOOP_CONDITION` | Condition evaluation. |
@@ -124,7 +125,7 @@ Key methods: `kind()`, `parent_structure()`, `parent_function()`, `instructions(
 
 ## Instructions
 
-72 opcodes. Grouped opcodes use a sub-opcode enum in the int pool.
+71 opcodes. Grouped opcodes use a sub-opcode enum in the int pool.
 
 Instructions are stored in post-order (children before parents). `block.instructions()` yields top-level roots; `block.all_instructions()` yields everything in evaluation order.
 
@@ -132,8 +133,7 @@ Instructions are stored in post-order (children before parents). `block.instruct
 
 | Opcode | Description |
 |--------|-------------|
-| `ALLOCA` | Pointer to a static local allocation. `allocated_type()`, `object()`, `size_bytes()`, `align_bytes()`. |
-| `DYNAMIC_ALLOCA` | Pointer to runtime stack allocation. `size()` (operand), `object()` (scope-tracked). |
+| `ALLOCA` | Pointer to an allocation. Sub-opcode `AllocaKind` in int_pool[0]: `LOCAL` (regular local), `ARG` (call argument in EXPRESSION_SCOPE), `RETURN` (return value in EXPRESSION_SCOPE), `DYNAMIC` (VLA/alloca()). `allocated_type()`, `object()`, `size_bytes()`, `align_bytes()`. Derived classes: `LocalAllocaInst`, `ArgAllocaInst`, `ReturnAllocaInst`, `DynamicAllocaInst`. |
 | `GLOBAL_PTR` | Pointer to a global/static variable. `variable()` → VarDecl. |
 | `THREAD_LOCAL_PTR` | Pointer to a thread-local variable. `variable()` → VarDecl. |
 | `FUNC_PTR` | Pointer to a function. `function()` → FunctionDecl. |
@@ -144,6 +144,8 @@ Instructions are stored in post-order (children before parents). `block.instruct
 
 Single `MEMORY` opcode with `MemOp` sub-opcode encoding direction, endianness, size, atomicity, and bulk/string operations.
 
+**Size rules**: Only 1/2/4/8 byte scalar LOAD/STORE is allowed. For non-power-of-2 sizes or objects > 8 bytes, `MEMCPY` is used. Direct assignment `a = b` always uses `MEMCPY` when the RHS is an lvalue — no redundant LOAD+STORE pair.
+
 **Direct loads/stores** (sub-opcodes 0-31):
 
 | Pattern | Variants |
@@ -152,8 +154,6 @@ Single `MEMORY` opcode with `MemOp` sub-opcode encoding direction, endianness, s
 | `STORE_{LE,BE}_{8,16,32,64}` | Non-atomic stores |
 | `ATOMIC_LOAD_{LE,BE}_{8,16,32,64}` | Atomic loads |
 | `ATOMIC_STORE_{LE,BE}_{8,16,32,64}` | Atomic stores |
-
-For non-power-of-2 or >8 byte accesses, `MEMORY(MEMCPY)` is used instead.
 
 Helpers: `IsLoad()`, `IsStore()`, `IsAtomic()`, `IsBigEndian()`, `AccessSize()`.
 
@@ -167,11 +167,15 @@ Helpers: `IsLoad()`, `IsStore()`, `IsAtomic()`, `IsBigEndian()`, `AccessSize()`.
 
 **Atomic compare-and-exchange** (sub-opcodes 61-68): `CMPXCHG_{LE,BE}_{8,16,32,64}`. `op[0]=target`, `op[1]=expected_ptr`, `op[2]=desired`. Returns bool.
 
+**Variadic argument consumption** (sub-opcode 69): `CONSUME_VA_PARAM`. `op[0]=va_list_ptr`. Reads the current va_list index, copies from the caller's variadic argument alloca, increments the index. `type_entity_id` specifies the consumed type.
+
 Helpers: `IsLoad()`, `IsStore()`, `IsAtomic()`, `IsBigEndian()`, `AccessSize()`, `IsBitAccess()`, `IsBitRead()`, `IsBitWrite()`, `IsCmpxchg()`.
 
 Both library calls and `__builtin_` variants are recognized. `_Atomic` types automatically use atomic load/store/RMW variants.
 
 `MemoryInst` class: `sub_opcode()`, `address()`, `stored_value()`, `result_type()`, `bit_offset()`, `bit_width()`.
+
+`ConsumeVAParamInst` class: `va_list_operand()`, `result_type()`.
 
 ### Constants (CONST opcode)
 
@@ -203,7 +207,9 @@ Helpers: `IsSignExtend()`, `IsZeroExtend()`, `IsTruncate()`, `IsIntToFloat()`, `
 
 ### Calls
 
-`CALL` — `CallInst`: `target()` (FunctionDecl for direct), `is_indirect()`, `arguments()`, `result_type()`. Variadic args grouped under `VA_PACK`.
+`CALL` — `CallInst`: `target()` (FunctionDecl for direct), `is_indirect()`, `arguments()`, `result_type()`.
+
+With the EXPRESSION_SCOPE model, function calls are wrapped in an `EXPRESSION_SCOPE` that holds `ALLOCA/ARG` for each argument and `ALLOCA/RETURN` for the return value. On the callee side, `PARAM_PTR(n)` gives a pointer to the caller's Nth argument alloca.
 
 ### Read-Modify-Write
 
@@ -219,8 +225,19 @@ Used for: `++i` (ADD), `i += 5` (ADD), `++ptr` (PTR_ADD), `--ptr` (PTR_ADD with 
 |--------|-------------|
 | `SELECT` | Ternary `a ? b : c`. Both branches marked conditionally executed. |
 | `LAST_VALUE` | Comma operator `a, b`. Evaluates all operands, returns last. |
-| `PARAM_READ` | Reads Nth function parameter. `parameter_index()`, `parameter_type()`, `object()`. |
+| `PARAM_PTR` | Pointer to Nth function parameter. Storage lives in caller's EXPRESSION_SCOPE. `parameter_index()`, `parameter_type()`. |
+| `FRAME_PTR` | `__builtin_frame_address(level)`. `level()`, `result_type()`. |
+| `RETURN_ADDRESS` | `__builtin_return_address(level)`. `level()`, `result_type()`. |
 | `UNDEFINED` | Poison value. Any use is UB. |
+
+### Variadic Argument Handling
+
+| Opcode | Description |
+|--------|-------------|
+| `VA_START` | Binds va_list to function's variadic arguments. `va_list_operand()`. |
+| `VA_COPY` | Copies va_list. `dest()`, `src()`. |
+| `VA_END` | Releases va_list. `va_list_operand()`. |
+| `MEMORY/CONSUME_VA_PARAM` | Reads next variadic arg from va_list, copies from caller's EXPRESSION_SCOPE, increments index. `va_list_operand()`, `result_type()`. |
 
 ### Terminators
 
@@ -270,18 +287,32 @@ Key methods: `kind()`, `source_declaration()`, `type()`, `size_bytes()`, `align_
 
 `IRStructure` forms a tree rooted at `FUNCTION_SCOPE`. Every block has a `parent_structure()`.
 
-**`StructureKind`** (18 kinds):
+**`StructureKind`** (19 kinds):
 
 | Kind | Derived Class | Key Methods |
 |------|--------------|-------------|
 | `FUNCTION_SCOPE`, `SCOPE` | `IRScopeStructure` | `objects()` — locals in this scope |
+| `EXPRESSION_SCOPE` | `IRExpressionScopeStructure` | `objects()` — arg/return allocas for calls in a full-expression |
 | `IF` | `IRIfStructure` | `then_branch()`, `else_branch()` |
 | `FOR` | `IRForStructure` | `init()`, `condition()`, `body()`, `increment()` |
 | `WHILE` | `IRWhileStructure` | `condition()`, `body()` |
 | `DO_WHILE` | `IRDoWhileStructure` | `body()`, `condition()` |
 | `SWITCH` | `IRSwitchStructure` | `cases()`, `default_case()` |
-| `SWITCH_CASE` | `IRSwitchCaseStructure` | `low()`, `high()`, `is_default()` |
+| `SWITCH_CASE` | `IRSwitchCaseStructure` | `low()`, `high()`, `is_default()`, `target_block()` |
 | Sub-parts | — | `IF_THEN`, `IF_ELSE`, `FOR_INIT`, `FOR_CONDITION`, `FOR_BODY`, `FOR_INCREMENT`, `WHILE_CONDITION`, `WHILE_BODY`, `DO_WHILE_BODY`, `DO_WHILE_CONDITION` |
+
+### EXPRESSION_SCOPE and Calling Convention
+
+Function calls are wrapped in an `EXPRESSION_SCOPE` that extends to the full-expression boundary (the `;`). The scope holds:
+- One `ALLOCA/ARG` per argument (caller copies values into these)
+- One `ALLOCA/RETURN` for the return value (callee writes result here)
+
+On the callee side:
+- `PARAM_PTR(n)` returns a pointer to the caller's Nth argument alloca
+- The callee reads parameters by loading from `PARAM_PTR` pointers
+- Parameters have no callee-side scope — their lifetime is the caller's EXPRESSION_SCOPE
+
+For nested calls like `foo(bar(x), baz(y))`, all argument and return allocas for all calls in the expression share one EXPRESSION_SCOPE.
 
 ### Scope Lifetime Model
 
@@ -289,11 +320,15 @@ Key methods: `kind()`, `source_declaration()`, `type()`, `size_bytes()`, `align_
 - **`EXIT_SCOPE`**: Objects become **invalid**. Reading after is use-after-scope.
 - Aggregate initialization emits `MEMORY(MEMSET)` to zero-fill, then element-wise stores.
 - For-loops with init-declarations get an implicit `SCOPE`.
-- Dynamic allocations (`DYNAMIC_ALLOCA`) create scope-tracked objects freed on scope exit.
+- Dynamic allocations (`ALLOCA/DYNAMIC`) create scope-tracked objects freed on scope exit.
 
 ### Scope Compensation Blocks
 
 When control flow crosses scope boundaries — via `goto` or switch-case edges (Duff's device) — a `COMPENSATION` block is inserted with the necessary `EXIT_SCOPE` / `ENTER_SCOPE` transitions. Each goto and each switch→case edge gets its own compensation block. Same-scope jumps need no compensation.
+
+### Array-to-Pointer Decay
+
+When an array is passed to a function, it decays to a pointer. The ALLOCA for the array IS the decayed pointer — no load is emitted. On the callee side, Clang adjusts `int arr[10]` parameters to `int *`, so the parameter type and size are correct (pointer-sized).
 
 ### GNU Block Expressions
 
@@ -308,7 +343,7 @@ Entity IDs embed kind in the sub_kind field: `IRBlockId` embeds `BlockKind`, `IR
 ```
 Fragment {
   irFunctions, irBlocks, irInstructions, irObjects,
-  irSwitchCases, irStructures, irEntityPool, irIntPool
+  irStructures, irEntityPool, irIntPool
 }
 ```
 
@@ -320,6 +355,8 @@ Fragment {
 
 **Explicit widths**: Constants (`INT32`, `FLOAT64`), casts (`SEXT_I32_I64`), and loads/stores (`LOAD_LE_32`) carry exact sizes. No type system queries needed.
 
-**Grouped opcodes**: `MEMORY` (57 sub-ops), `CONST` (19), `CAST` (~60), `BITWISE` (13), `FLOAT` (41) keep the main opcode count at 72.
+**Grouped opcodes**: `MEMORY` (70 sub-ops), `CONST` (19), `CAST` (~60), `ALLOCA` (4), `BITWISE` (13), `FLOAT` (41) keep the main opcode count at 71.
+
+**Assignment model**: Direct assignment `a = b` always uses `MEMCPY(dest, src, size)`. Scalar `LOAD`/`STORE` only for feeding values into arithmetic and writing computed results back. This avoids endianness issues for direct copies and naturally handles all sizes.
 
 **Provenance**: Every instruction has `source_entity_id`. Calls have `target()`. GEP fields have `field()`. Navigate to AST for names and source locations.

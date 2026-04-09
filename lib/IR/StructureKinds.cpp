@@ -80,6 +80,13 @@ std::optional<IRSwitchCaseStructure> IRSwitchCaseStructure::from(
   return std::nullopt;
 }
 
+std::optional<IRExpressionScopeStructure> IRExpressionScopeStructure::from(
+    const IRStructure &s) {
+  if (s.kind() == ir::StructureKind::EXPRESSION_SCOPE)
+    return IRExpressionScopeStructure(s.impl_ptr());
+  return std::nullopt;
+}
+
 // ---------------------------------------------------------------------------
 // IRIfStructure
 // ---------------------------------------------------------------------------

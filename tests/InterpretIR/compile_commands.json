@@ -1,0 +1,127 @@
+[
+  {
+    "directory": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR",
+    "command": "/Users/orangesloth/Install/multiplier/Release/bin/clang -c -std=c11 /Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_arithmetic.c",
+    "file": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_arithmetic.c"
+  }
+,
+  {
+    "directory": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR",
+    "command": "/Users/orangesloth/Install/multiplier/Release/bin/clang -c -std=c11 /Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_bitfields.c",
+    "file": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_bitfields.c"
+  }
+,
+  {
+    "directory": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR",
+    "command": "/Users/orangesloth/Install/multiplier/Release/bin/clang -c -std=c11 /Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_casts.c",
+    "file": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_casts.c"
+  }
+,
+  {
+    "directory": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR",
+    "command": "/Users/orangesloth/Install/multiplier/Release/bin/clang -c -std=c11 /Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_compound_assign.c",
+    "file": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_compound_assign.c"
+  }
+,
+  {
+    "directory": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR",
+    "command": "/Users/orangesloth/Install/multiplier/Release/bin/clang -c -std=c11 /Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_control_flow.c",
+    "file": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_control_flow.c"
+  }
+,
+  {
+    "directory": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR",
+    "command": "/Users/orangesloth/Install/multiplier/Release/bin/clang -c -std=c11 /Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_function_calls.c",
+    "file": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_function_calls.c"
+  }
+,
+  {
+    "directory": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR",
+    "command": "/Users/orangesloth/Install/multiplier/Release/bin/clang -c -std=c11 /Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_globals.c",
+    "file": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_globals.c"
+  }
+,
+  {
+    "directory": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR",
+    "command": "/Users/orangesloth/Install/multiplier/Release/bin/clang -c -std=c11 /Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_goto.c",
+    "file": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_goto.c"
+  }
+,
+  {
+    "directory": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR",
+    "command": "/Users/orangesloth/Install/multiplier/Release/bin/clang -c -std=c11 /Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_init_lists.c",
+    "file": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_init_lists.c"
+  }
+,
+  {
+    "directory": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR",
+    "command": "/Users/orangesloth/Install/multiplier/Release/bin/clang -c -std=c11 /Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_memory_ops.c",
+    "file": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_memory_ops.c"
+  }
+,
+  {
+    "directory": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR",
+    "command": "/Users/orangesloth/Install/multiplier/Release/bin/clang -c -std=c11 /Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_pointers.c",
+    "file": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_pointers.c"
+  }
+,
+  {
+    "directory": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR",
+    "command": "/Users/orangesloth/Install/multiplier/Release/bin/clang -c -std=c11 /Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_scopes.c",
+    "file": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_scopes.c"
+  }
+,
+  {
+    "directory": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR",
+    "command": "/Users/orangesloth/Install/multiplier/Release/bin/clang -c -std=c11 /Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_sizeof_alignof.c",
+    "file": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_sizeof_alignof.c"
+  }
+,
+  {
+    "directory": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR",
+    "command": "/Users/orangesloth/Install/multiplier/Release/bin/clang -c -std=c11 /Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_switch.c",
+    "file": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_switch.c"
+  }
+,
+  {
+    "directory": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR",
+    "command": "/Users/orangesloth/Install/multiplier/Release/bin/clang -c -std=c11 /Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_array_decay.c",
+    "file": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_array_decay.c"
+  }
+,
+  {
+    "directory": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR",
+    "command": "/Users/orangesloth/Install/multiplier/Release/bin/clang -c -std=c11 /Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_struct_assign.c",
+    "file": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_struct_assign.c"
+  }
+,
+  {
+    "directory": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR",
+    "command": "/Users/orangesloth/Install/multiplier/Release/bin/clang -c -std=c11 /Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_string_literals.c",
+    "file": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_string_literals.c"
+  }
+,
+  {
+    "directory": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR",
+    "command": "/Users/orangesloth/Install/multiplier/Release/bin/clang -c -std=c11 /Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_variadics.c",
+    "file": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_variadics.c"
+  }
+,
+  {
+    "directory": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR",
+    "command": "/Users/orangesloth/Install/multiplier/Release/bin/clang -c -std=c11 /Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_dynamic_alloca.c",
+    "file": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_dynamic_alloca.c"
+  }
+,
+  {
+    "directory": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR",
+    "command": "/Users/orangesloth/Install/multiplier/Release/bin/clang -c -std=c11 /Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_byvalue.c",
+    "file": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_byvalue.c"
+  }
+,
+  {
+    "directory": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR",
+    "command": "/Users/orangesloth/Install/multiplier/Release/bin/clang -c -std=c11 /Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_evil_goto.c",
+    "file": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_evil_goto.c"
+  }
+]

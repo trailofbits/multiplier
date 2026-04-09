@@ -6,6 +6,7 @@
 #pragma once
 
 #include <cstdint>
+#include "../Compiler.h"
 
 namespace mx::ir {
 
@@ -31,6 +32,14 @@ enum class ConstOp : uint8_t {
   WCHAR16 = 16,
   WCHAR32 = 17,
   BOOL = 18,
+};
+
+// Sub-opcodes for ALLOCA. Stored in the int pool (int_pool[0]).
+enum class AllocaKind : uint8_t {
+  LOCAL = 0,       // regular local variable
+  ARG = 1,         // argument passing alloca in EXPRESSION_SCOPE
+  RETURN = 2,      // return value storage in EXPRESSION_SCOPE
+  DYNAMIC = 3,     // runtime-sized (VLA, alloca())
 };
 
 // Sub-opcodes for CAST. Stored in the int pool (int_pool[0]).
@@ -143,7 +152,7 @@ enum class OpCode : uint8_t {
   // Constant (sub-opcode in int_pool[0] selects ConstOp).
   CONST = 0,
 
-  // Memory
+  // Memory (ALLOCA sub-opcode in int_pool[0] selects AllocaKind).
   ALLOCA = 1,
   MEMORY = 2,          // Unified load/store/bulk/string (sub-opcode in int_pool[0] selects MemOp).
   GEP_FIELD = 3,
@@ -209,9 +218,7 @@ enum class OpCode : uint8_t {
   IMPLICIT_UNREACHABLE = 41, // structurally unreachable (patched empty block)
 
   // Variadic argument handling
-  VA_PACK = 42,           // groups variadic args at call site; operands = the packed args
   VA_START = 43,          // binds va_list to function's variadic pack; op[0] = va_list
-  VA_ARG = 44,            // reads next value from va_list; op[0] = va_list; typeEntityId = result type
   VA_COPY = 45,           // copies va_list; op[0] = dest, op[1] = src
   VA_END = 46,            // releases va_list; op[0] = va_list
 
@@ -219,8 +226,10 @@ enum class OpCode : uint8_t {
   ENTER_SCOPE = 47,        // marks scope entry; extra = IRStructureId of scope
   EXIT_SCOPE = 48,         // marks scope exit; extra = IRStructureId of scope
 
-  // Parameter read: reads the Nth function parameter.
-  PARAM_READ = 49,
+  // Parameter pointer: returns a pointer to the Nth function parameter.
+  // The storage lives in the caller's EXPRESSION_SCOPE.
+  // int_pool[0] = parameter index.
+  PARAM_PTR = 49,
 
   // Address-of for globals, thread-locals, and functions (external to frame).
   GLOBAL_PTR = 50,        // pointer to a global or static variable
@@ -239,12 +248,9 @@ enum class OpCode : uint8_t {
   // undefined (e.g., __builtin_clz(0)). An analyzer should flag any use.
   UNDEFINED = 55,
 
-  // Dynamic stack allocation.
-  DYNAMIC_ALLOCA = 56,     // op[0] = size. Returns pointer to stack allocation.
-
   // Frame/return address intrinsics.
   FRAME_PTR = 57,      // op[0] = level (CONST, usually 0). Returns frame ptr.
-  RETURN_PTR = 58,     // op[0] = level (CONST, usually 0). Returns return addr.
+  RETURN_ADDRESS = 58, // op[0] = level (CONST, usually 0). Returns return addr.
 
   // Overflow-checked arithmetic (only used as RMW underlying opcodes).
   // RMW returns bool (overflow flag), stores the arithmetic result.
@@ -266,6 +272,11 @@ enum class OpCode : uint8_t {
 
   // Unknown / unhandled expression
   UNKNOWN = 70,
+
+  // Return value pointer: callee-side pointer to the caller's ALLOCA/RETURN
+  // storage. No operands. The caller's CALL instruction references the
+  // return alloca; RETURN_PTR in the callee resolves to the same storage.
+  RETURN_PTR = 71,
 };
 
 // Returns the human-readable name of an opcode.
@@ -273,10 +284,13 @@ inline static const char *EnumerationName(OpCode) {
   return "OpCode";
 }
 
-const char *EnumeratorName(OpCode op) noexcept;
+MX_EXPORT const char *EnumeratorName(OpCode op) noexcept;
+MX_EXPORT const char *EnumeratorName(ConstOp op) noexcept;
+MX_EXPORT const char *EnumeratorName(AllocaKind op) noexcept;
+MX_EXPORT const char *EnumeratorName(CastOp op) noexcept;
 
 inline static constexpr unsigned NumEnumerators(OpCode) {
-  return 71u;
+  return 72u;
 }
 
 // Sub-opcodes for MEMORY. Stored in the int pool (int_pool[0]).
@@ -333,6 +347,12 @@ enum class MemOp : uint8_t {
   // op[0]=target, op[1]=expected_ptr, op[2]=desired. Returns bool.
   CMPXCHG_LE_8 = 61, CMPXCHG_LE_16 = 62, CMPXCHG_LE_32 = 63, CMPXCHG_LE_64 = 64,
   CMPXCHG_BE_8 = 65, CMPXCHG_BE_16 = 66, CMPXCHG_BE_32 = 67, CMPXCHG_BE_64 = 68,
+
+  // Variadic argument consumption. op[0]=va_list_ptr. Reads the current
+  // va_list index, memcpys from the corresponding variadic argument alloca
+  // in the caller's EXPRESSION_SCOPE, then increments the va_list index.
+  // type_entity_id specifies the type/size being consumed.
+  CONSUME_VA_PARAM = 69,
 };
 
 // MemOp classification helpers.
@@ -491,5 +511,9 @@ inline bool IsMemoryWrite(MemOp op) {
          op == MemOp::STRCAT || op == MemOp::STRNCAT ||
          op == MemOp::STPCPY || op == MemOp::STPNCPY;
 }
+
+MX_EXPORT const char *EnumeratorName(MemOp op) noexcept;
+MX_EXPORT const char *EnumeratorName(BitwiseOp op) noexcept;
+MX_EXPORT const char *EnumeratorName(FloatOp op) noexcept;
 
 }  // namespace mx::ir

@@ -119,10 +119,20 @@ class Interpreter {
   // Parameter values passed to the function.
   std::vector<Value> params_;
 
+  // Pointers to parameter storage (allocated during setup, populated from params_).
+  // PARAM_PTR(n) returns param_ptrs_[n].
+  std::vector<Value> param_ptrs_;
+
+  // Pointer to return value storage. RETURN_PTR returns this.
+  Value return_ptr_ = Value::Undef();
+
   uint64_t steps_{0};
 
   // Evaluate a single instruction, storing result in values_.
   void Eval(const mx::IRInstruction &inst);
+
+  // Recursively evaluate all sub-expressions of an instruction.
+  void EvalSubExpressions(const mx::IRInstruction &inst);
 
   // Get the value of an instruction (must have been evaluated already).
   Value GetValue(const mx::IRInstruction &inst);
@@ -299,7 +309,12 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       if (auto ai = mx::AllocaInst::from(inst)) {
         auto obj = ai->object();
         auto obj_eid = mx::EntityId(obj.id()).Pack();
-        AllocateObject(obj);
+        // Only allocate on first encounter; subsequent references to the
+        // same ALLOCA (as sub-expressions in other blocks) should not
+        // re-allocate and zero the storage.
+        if (memory_.find(obj_eid) == memory_.end()) {
+          AllocateObject(obj);
+        }
         result = Value::Ptr(obj_eid, 0);
       }
       break;
@@ -1089,7 +1104,13 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       if (auto rmw = mx::ReadModifyWriteInst::from(inst)) {
         Value addr = GetValue(rmw->address());
         if (addr.kind == Value::POINTER) {
-          Value old_val = MemReadValue(addr.ptr, 8, false);
+          // Determine access size from the object.
+          size_t access_sz = 8;
+          auto it = memory_.find(addr.ptr.object_id);
+          if (it != memory_.end() && it->second.bytes.size() <= 8) {
+            access_sz = it->second.bytes.size();
+          }
+          Value old_val = MemReadValue(addr.ptr, access_sz, false);
           // Collect RHS operands (typically one value).
           Value rhs = Value::Int(0);
           for (auto rhs_op : rmw->rhs_operands()) {
@@ -1157,7 +1178,7 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
           if (underlying != mx::ir::OpCode::ADD_OVERFLOW &&
               underlying != mx::ir::OpCode::SUB_OVERFLOW &&
               underlying != mx::ir::OpCode::MUL_OVERFLOW) {
-            MemWriteValue(addr.ptr, new_val, 8);
+            MemWriteValue(addr.ptr, new_val, access_sz);
             result = rmw->returns_new_value() ? new_val : old_val;
           }
         }
@@ -1171,14 +1192,7 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
         // Collect argument values.
         std::vector<Value> call_args;
         for (auto arg : ci->arguments()) {
-          // VA_PACK groups variadic args — flatten them.
-          if (arg.opcode() == mx::ir::OpCode::VA_PACK) {
-            for (auto va_arg : arg.operands()) {
-              call_args.push_back(GetValue(va_arg));
-            }
-          } else {
-            call_args.push_back(GetValue(arg));
-          }
+          call_args.push_back(GetValue(arg));
         }
 
         auto target = ci->target();
@@ -1225,15 +1239,16 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
     }
 
 
-    // --- Param read ---
-    case mx::ir::OpCode::PARAM_READ: {
-      if (auto pr = mx::ParamReadInst::from(inst)) {
+    // --- Param pointer ---
+    case mx::ir::OpCode::PARAM_PTR: {
+      if (auto pr = mx::ParamPtrInst::from(inst)) {
         uint32_t idx = pr->parameter_index();
-        if (idx < params_.size()) {
-          result = params_[idx];
+        if (idx < param_ptrs_.size()) {
+          result = param_ptrs_[idx];
         } else {
-          LOG(WARNING) << "PARAM_READ index " << idx
-                       << " out of range (have " << params_.size() << " args)";
+          LOG(WARNING) << "PARAM_PTR index " << idx
+                       << " out of range (have " << param_ptrs_.size()
+                       << " param pointers)";
         }
       }
       break;
@@ -1486,12 +1501,16 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       break;
     }
 
-    // --- Dynamic alloca / frame-return address ---
-    case mx::ir::OpCode::DYNAMIC_ALLOCA:
+    // --- Frame/return address intrinsics ---
     case mx::ir::OpCode::FRAME_PTR:
-    case mx::ir::OpCode::RETURN_PTR:
+    case mx::ir::OpCode::RETURN_ADDRESS:
       // Not meaningfully interpretable; return undef.
       result = Value::Undef();
+      break;
+
+    // --- Return value pointer (callee side) ---
+    case mx::ir::OpCode::RETURN_PTR:
+      result = return_ptr_;
       break;
 
     // --- Undefined/poison value ---
@@ -1516,11 +1535,9 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
     // --- Variadic ---
     case mx::ir::OpCode::VA_START:
     case mx::ir::OpCode::VA_END:
-    case mx::ir::OpCode::VA_COPY:
-    case mx::ir::OpCode::VA_ARG:
-    case mx::ir::OpCode::VA_PACK: {
+    case mx::ir::OpCode::VA_COPY: {
       // CRITIQUE: Variadic args need a runtime va_list model. Not implemented
-      // in this simple interpreter. VA_ARG returns undef.
+      // in this simple interpreter. va_arg is handled via MEMORY/CONSUME_VA_PARAM.
       break;
     }
 
@@ -1589,16 +1606,55 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
   Trace(inst, result);
 }
 
+void Interpreter::EvalSubExpressions(const mx::IRInstruction &inst) {
+  for (auto operand : inst.operands()) {
+    EvalSubExpressions(operand);  // depth-first
+    auto sub_op = operand.opcode();
+    if (!mx::ir::IsTerminator(sub_op)) {
+      Eval(operand);
+    }
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Main interpreter loop
 // ---------------------------------------------------------------------------
 
 Value Interpreter::Run(const std::vector<Value> &args) {
   params_ = args;
+  param_ptrs_.clear();
   values_.clear();
   memory_.clear();
   block_map_.clear();
   steps_ = 0;
+
+  // Pre-allocate parameter and return storage.
+  // PARAM_PTR(n) returns a pointer to the nth parameter's storage.
+  // RETURN_PTR returns a pointer to the return value storage.
+  return_ptr_ = Value::Undef();
+  {
+    uint32_t param_idx = 0;
+    for (auto obj : func_.objects()) {
+      auto k = obj.kind();
+      if (k == mx::ir::ObjectKind::PARAMETER ||
+          k == mx::ir::ObjectKind::PARAMETER_VALUE) {
+        auto eid = mx::EntityId(obj.id()).Pack();
+        AllocateObject(obj);
+        Pointer ptr{eid, 0};
+        if (param_idx < args.size()) {
+          uint32_t sz = obj.size_bytes();
+          if (sz == 0) sz = 8;
+          MemWriteValue(ptr, args[param_idx], sz);
+        }
+        param_ptrs_.push_back(Value::Ptr(eid, 0));
+        ++param_idx;
+      } else if (k == mx::ir::ObjectKind::RETURN_SLOT) {
+        auto eid = mx::EntityId(obj.id()).Pack();
+        AllocateObject(obj);
+        return_ptr_ = Value::Ptr(eid, 0);
+      }
+    }
+  }
 
   // Build block map for CFG navigation.
   for (auto block : func_.blocks()) {
@@ -1621,12 +1677,13 @@ Value Interpreter::Run(const std::vector<Value> &args) {
     }
 
     if (trace_) {
-      std::cerr << "Block " << static_cast<unsigned>(current.kind())
+      std::cerr << "Block " << mx::ir::EnumeratorName(current.kind())
                 << " (" << mx::EntityId(current.id()).Pack() << ")\n";
     }
 
-    // Evaluate all instructions in the block (post-order: children before
-    // parents). This means sub-expressions are evaluated before their roots.
+
+    // Evaluate all instructions in the block. all_instructions() yields
+    // only root instructions; sub-expressions are lazy-evaluated via GetValue.
     for (auto inst : current.all_instructions()) {
       ++steps_;
       auto op = inst.opcode();
@@ -1638,12 +1695,18 @@ Value Interpreter::Run(const std::vector<Value> &args) {
       }
 
       // --- Terminator handling ---
+
       if (op == mx::ir::OpCode::RET) {
         auto ri = mx::RetInst::from(inst);
         if (ri) {
           if (auto rv = ri->return_value()) {
             return_value = GetValue(*rv);
           }
+        }
+        // Fallback: read from RETURN_PTR storage if direct operand is undef.
+        if (return_value.kind == Value::UNDEFINED &&
+            return_ptr_.kind == Value::POINTER) {
+          return_value = MemReadValue(return_ptr_.ptr, 4, false);  // TODO: size from return type
         }
         goto done;
       }

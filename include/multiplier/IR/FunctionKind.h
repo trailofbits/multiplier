@@ -6,6 +6,7 @@
 #pragma once
 
 #include <cstdint>
+#include "../Compiler.h"
 
 namespace mx::ir {
 
@@ -19,7 +20,7 @@ inline static const char *EnumerationName(FunctionKind) {
   return "FunctionKind";
 }
 
-const char *EnumeratorName(FunctionKind kind) noexcept;
+MX_EXPORT const char *EnumeratorName(FunctionKind kind) noexcept;
 
 inline static constexpr unsigned NumEnumerators(FunctionKind) {
   return 3u;

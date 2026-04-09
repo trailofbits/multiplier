@@ -72,6 +72,7 @@ struct InstructionIR {
   uint32_t size_bytes{0};
   uint8_t flags{0};
   mx::ir::OpCode compound_op{mx::ir::OpCode::ADD};
+  uint8_t alloca_kind{0}; // AllocaKind sub-opcode for ALLOCA instructions
   uint8_t const_op{0};    // ConstOp sub-opcode for CONST instructions
   uint8_t cast_op{0};     // CastOp sub-opcode for CAST instructions
   uint8_t bitwise_op{0};  // BitwiseOp sub-opcode for BITWISE instructions
@@ -83,6 +84,9 @@ struct InstructionIR {
 
   // Structure index for ENTER_SCOPE/EXIT_SCOPE (into FunctionIR::structures).
   uint32_t structure_index{UINT32_MAX};
+
+  // Return alloca instruction index for CALL (UINT32_MAX if void).
+  uint32_t return_alloca_index{UINT32_MAX};
 
   // Terminator data.
   std::vector<BranchTargetIR> branch_targets;
@@ -221,6 +225,10 @@ class IRGenerator {
   // Maps label block index to the structure index active when label was emitted.
   std::unordered_map<uint32_t, uint32_t> label_structure_;
 
+  // Expression scope for call argument/return allocas.
+  // UINT32_MAX means no active expression scope.
+  uint32_t expression_scope_index_{UINT32_MAX};
+
   // --- Structure management ---
   uint32_t PushStructure(mx::ir::StructureKind kind,
                          mx::RawEntityId source_eid = mx::kInvalidEntityId);
@@ -282,6 +290,15 @@ class IRGenerator {
   void EmitContinueStmt(const pasta::Stmt &s);
   void EmitGotoStmt(const pasta::Stmt &s);
   void EmitLabelStmt(const pasta::Stmt &s);
+
+  // --- Expression scope for calls ---
+  // Ensures an EXPRESSION_SCOPE exists for the current full-expression.
+  // Returns the structure index. Pushes one if not already active.
+  uint32_t EnsureExpressionScope(mx::RawEntityId source_eid);
+  // Pop the expression scope (called at top-level expression boundaries).
+  void PopExpressionScope();
+  // Check if an expression contains any function calls.
+  bool ContainsCall(const pasta::Expr &e);
 
   // --- Initializer emission (decomposes aggregates into element stores) ---
   void EmitInitializer(uint32_t dest_addr_idx, const pasta::Expr &init,

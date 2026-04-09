@@ -35,7 +35,6 @@ static bool HasResultType(ir::OpCode op) {
          op != ir::OpCode::VA_START &&
          op != ir::OpCode::VA_END &&
          op != ir::OpCode::VA_COPY &&
-         op != ir::OpCode::VA_PACK &&
          op != ir::OpCode::UNKNOWN;
 }
 
@@ -128,6 +127,10 @@ std::optional<Stmt> IRInstruction::source_statement(void) const {
   auto pool = GetEntityPool(*impl);
   auto eid = pool[impl->reader().getEntityOffset() + 1];  // position 1
   if (eid == kInvalidEntityId) return std::nullopt;
+  // source_entity_id can be a DeclId, StmtId, or other entity kind.
+  // Only try StmtFor if it's actually a Stmt entity.
+  auto vid = EntityId(eid).Unpack();
+  if (!std::holds_alternative<StmtId>(vid)) return std::nullopt;
   if (auto ptr = impl->frag->ep->StmtFor(impl->frag->ep, eid)) {
     return Stmt(std::move(ptr));
   }

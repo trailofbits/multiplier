@@ -41,6 +41,8 @@ std::optional<VarDecl> IRObject::source_declaration(void) const {
   if (!impl) return std::nullopt;
   auto eid = impl->reader().getSourceDeclId();
   if (eid == kInvalidEntityId) return std::nullopt;
+  auto vid = EntityId(eid).Unpack();
+  if (!std::holds_alternative<DeclId>(vid)) return std::nullopt;
   if (auto ptr = impl->frag->ep->DeclFor(impl->frag->ep, eid)) {
     return VarDecl::from(Decl(std::move(ptr)));
   }

@@ -111,4 +111,14 @@ class MX_EXPORT IRSwitchCaseStructure : public IRStructure {
   IRBlock target_block(void) const;
 };
 
+// ---------------------------------------------------------------------------
+// Expression scope (argument/return allocas for calls in a full-expression)
+// ---------------------------------------------------------------------------
+
+class MX_EXPORT IRExpressionScopeStructure : public IRStructure {
+ public:
+  MX_DECLARE_IR_STRUCTURE(IRExpressionScopeStructure)
+  // objects() inherited — yields argument/return allocas for all calls.
+};
+
 }  // namespace mx

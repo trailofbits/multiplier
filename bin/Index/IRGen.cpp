@@ -32,6 +32,12 @@ using mx::RawEntityId;
 using mx::kInvalidEntityId;
 // PASTA enums for dispatch. These are converted to our unified OpCode.
 
+// Returns true if size_bytes is a valid scalar access size (1, 2, 4, or 8).
+static bool IsScalarSize(unsigned size_bytes) {
+  return size_bytes == 1 || size_bytes == 2 ||
+         size_bytes == 4 || size_bytes == 8;
+}
+
 // Helper: determine ConstOp from width and signedness for integer constants.
 static mx::ir::ConstOp IntConstOp(uint8_t width, bool is_signed = true) {
   if (width <= 1) return mx::ir::ConstOp::BOOL;
@@ -239,38 +245,23 @@ std::optional<FunctionIR> IRGenerator::Generate(
       EmitTopLevel(std::move(enter));
     }
 
-    // Read each parameter into its alloca.
+    // Emit PARAM_PTR for each parameter. PARAM_PTR gives a direct pointer
+    // to the caller's ARG alloca — no local copy. The parameter's "alloca"
+    // in DeclRefExpr resolution maps to this PARAM_PTR instruction.
     for (uint32_t pi = 0; pi < params.size(); ++pi) {
       const auto &param = params[pi];
       uint32_t obj_idx = GetOrMakeObject(param);
 
-      // Associate parameter objects with the function scope.
-      func_.structures[func_scope].object_indices.push_back(obj_idx);
-
-      // PARAM_READ: reads the Nth parameter value.
       InstructionIR pr;
-      pr.opcode = mx::ir::OpCode::PARAM_READ;
+      pr.opcode = mx::ir::OpCode::PARAM_PTR;
       pr.source_entity_id = EntityIdOf(param);
-      pr.object_index = obj_idx;
       pr.type_entity_id = TypeEntityIdOf(param.Type());
       pr.int_value = static_cast<int64_t>(pi);  // parameter index
       uint32_t pr_idx = EmitInstruction(std::move(pr));
 
-      // Reference the parameter's alloca directly.
-      uint32_t addr_idx = object_to_alloca_[obj_idx];
-
-      // STORE the parameter value into its alloca.
-      InstructionIR store;
-      store.opcode = mx::ir::OpCode::MEMORY;
-      store.source_entity_id = EntityIdOf(param);
-      store.operand_indices = {addr_idx, pr_idx};
-      {
-        unsigned sz = 8;
-        if (auto s = TypeSizeBytes(param.Type())) sz = *s;
-        store.mem_op = static_cast<uint8_t>(
-            DetermineMemOp(true, false, sz));
-      }
-      EmitTopLevel(std::move(store));
+      // Map the parameter object's alloca to the PARAM_PTR instruction,
+      // so DeclRefExpr for the param resolves to this pointer.
+      object_to_alloca_[obj_idx] = pr_idx;
     }
 
     EmitBody(*body);
@@ -393,9 +384,9 @@ std::optional<FunctionIR> IRGenerator::GenerateGlobalInit(
       EmitTopLevel(std::move(enter));
     }
 
-    // PARAM_READ 0: the pointer to the global (passed by the caller).
+    // PARAM_PTR 0: the pointer to the global (passed by the caller).
     InstructionIR pr;
-    pr.opcode = mx::ir::OpCode::PARAM_READ;
+    pr.opcode = mx::ir::OpCode::PARAM_PTR;
     pr.source_entity_id = EntityIdOf(var);
     pr.type_entity_id = TypeEntityIdOf(var.Type());
     pr.int_value = 0;  // parameter index 0
@@ -643,6 +634,19 @@ uint32_t IRGenerator::EmitLoadFromLValue(const pasta::Expr &e) {
   }
 
   uint32_t addr_idx = EmitLValue(e);
+
+  // Check if this is a large object that can't be scalar-loaded.
+  // For types > 8 bytes (structs, arrays, etc.), return the address directly —
+  // the "value" of a large object is its pointer. Callers that need to copy
+  // the object should use MEMCPY explicitly.
+  if (auto t = e.Type()) {
+    if (auto sz = TypeSizeBytes(*t)) {
+      if (!IsScalarSize(*sz)) {
+        return addr_idx;
+      }
+    }
+  }
+
   InstructionIR inst;
   inst.opcode = mx::ir::OpCode::MEMORY;
   inst.source_entity_id = eid;
@@ -821,6 +825,44 @@ void IRGenerator::SetOperandParents(uint32_t inst_idx) {
 }
 
 // ---------------------------------------------------------------------------
+// Expression scope for calls
+// ---------------------------------------------------------------------------
+
+bool IRGenerator::ContainsCall(const pasta::Expr &e) {
+  if (pasta::CallExpr::From(e)) return true;
+  for (auto child : e.Children()) {
+    if (auto child_expr = pasta::Expr::From(child)) {
+      if (ContainsCall(*child_expr)) return true;
+    }
+  }
+  return false;
+}
+
+uint32_t IRGenerator::EnsureExpressionScope(mx::RawEntityId source_eid) {
+  if (expression_scope_index_ != UINT32_MAX) {
+    return expression_scope_index_;
+  }
+  expression_scope_index_ = PushStructure(
+      mx::ir::StructureKind::EXPRESSION_SCOPE, source_eid);
+  InstructionIR enter;
+  enter.opcode = mx::ir::OpCode::ENTER_SCOPE;
+  enter.source_entity_id = source_eid;
+  enter.structure_index = expression_scope_index_;
+  EmitTopLevel(std::move(enter));
+  return expression_scope_index_;
+}
+
+void IRGenerator::PopExpressionScope() {
+  if (expression_scope_index_ == UINT32_MAX) return;
+  InstructionIR exit_inst;
+  exit_inst.opcode = mx::ir::OpCode::EXIT_SCOPE;
+  exit_inst.structure_index = expression_scope_index_;
+  EmitTopLevel(std::move(exit_inst));
+  PopStructure();
+  expression_scope_index_ = UINT32_MAX;
+}
+
+// ---------------------------------------------------------------------------
 // Statement emission (builds the CFG)
 // ---------------------------------------------------------------------------
 
@@ -983,6 +1025,8 @@ void IRGenerator::EmitStmt(const pasta::Stmt &s) {
     uint32_t val_idx = EmitRValue(*expr);
     func_.blocks[current_block_index_].instruction_indices.push_back(val_idx);
     SetOperandParents(val_idx);
+    // Pop expression scope at the full-expression boundary (the `;`).
+    PopExpressionScope();
     return;
   }
 
@@ -997,6 +1041,7 @@ void IRGenerator::EmitIfStmt(const pasta::Stmt &s) {
   PushStructure(mx::ir::StructureKind::IF, EntityIdOf(s));
 
   uint32_t cond_idx = EmitRValue(ifs->Condition());
+  PopExpressionScope();
   uint32_t then_block = NewBlock(mx::ir::BlockKind::IF_THEN);
   uint32_t else_block = NewBlock(mx::ir::BlockKind::IF_ELSE);
   uint32_t merge_block = NewBlock(mx::ir::BlockKind::IF_MERGE);
@@ -1045,6 +1090,7 @@ void IRGenerator::EmitWhileStmt(const pasta::Stmt &s) {
   SwitchToBlock(cond_block);
   AssociateBlockWithStructure(cond_block);
   uint32_t cond_idx = EmitRValue(ws->Condition());
+  PopExpressionScope();
   EmitCondBranch(cond_idx, body_block, exit_block, EntityIdOf(s));
   PopStructure();  // WHILE_CONDITION
 
@@ -1092,6 +1138,7 @@ void IRGenerator::EmitDoStmt(const pasta::Stmt &s) {
   SwitchToBlock(cond_block);
   AssociateBlockWithStructure(cond_block);
   uint32_t cond_idx = EmitRValue(ds->Condition());
+  PopExpressionScope();
   EmitCondBranch(cond_idx, body_block, exit_block, EntityIdOf(s));
   PopStructure();  // DO_WHILE_CONDITION
 
@@ -1144,6 +1191,7 @@ void IRGenerator::EmitForStmt(const pasta::Stmt &s) {
   AssociateBlockWithStructure(cond_block);
   if (auto cond = fs->Condition()) {
     uint32_t cond_idx = EmitRValue(*cond);
+    PopExpressionScope();
     EmitCondBranch(cond_idx, body_block, exit_block, EntityIdOf(s));
   } else {
     EmitBranch(body_block);
@@ -1164,6 +1212,7 @@ void IRGenerator::EmitForStmt(const pasta::Stmt &s) {
   AssociateBlockWithStructure(inc_block);
   if (auto inc = fs->Increment()) {
     uint32_t inc_idx = EmitRValue(*inc);
+    PopExpressionScope();
     func_.blocks[current_block_index_].instruction_indices.push_back(inc_idx);
     SetOperandParents(inc_idx);
   }
@@ -1193,6 +1242,7 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
   PushStructure(mx::ir::StructureKind::SWITCH, EntityIdOf(s));
 
   uint32_t cond_idx = EmitRValue(sw->Condition());
+  PopExpressionScope();
   uint32_t exit_block = NewBlock(mx::ir::BlockKind::SWITCH_EXIT);
 
   // Collect case/default statements and create a block for each.
@@ -1380,7 +1430,44 @@ void IRGenerator::EmitReturnStmt(const pasta::Stmt &s) {
   auto rv = rs->ReturnValue();
   if (rv) {
     uint32_t val_idx = EmitRValue(*rv);
+    PopExpressionScope();
+
+    // RET carries the value as operand for backward compat
+    // (RetInst::return_value() reads it).
     inst.operand_indices = {val_idx};
+
+    // Emit RETURN_PTR to get pointer to caller's return storage.
+    InstructionIR ret_ptr;
+    ret_ptr.opcode = mx::ir::OpCode::RETURN_PTR;
+    ret_ptr.source_entity_id = EntityIdOf(s);
+    if (auto t = rv->Type()) ret_ptr.type_entity_id = TypeEntityIdOf(*t);
+    uint32_t ret_ptr_idx = EmitInstruction(std::move(ret_ptr));
+
+    // Store the return value into RETURN_PTR.
+    unsigned sz = 8;
+    if (auto t = rv->Type()) {
+      if (auto s = TypeSizeBytes(*t)) sz = *s;
+    }
+    InstructionIR store;
+    store.opcode = mx::ir::OpCode::MEMORY;
+    store.source_entity_id = EntityIdOf(s);
+    if (!IsScalarSize(sz) || rv->IsLValue()) {
+      // Large or lvalue: MEMCPY.
+      InstructionIR size_inst;
+      size_inst.opcode = mx::ir::OpCode::CONST;
+      size_inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::UINT64);
+      size_inst.uint_value = sz;
+      size_inst.width = 64;
+      uint32_t size_idx = EmitInstruction(std::move(size_inst));
+      uint32_t src_idx = rv->IsLValue() ? EmitLValue(*rv) : val_idx;
+      store.operand_indices = {ret_ptr_idx, src_idx, size_idx};
+      store.mem_op = static_cast<uint8_t>(mx::ir::MemOp::MEMCPY);
+    } else {
+      store.operand_indices = {ret_ptr_idx, val_idx};
+      store.mem_op = static_cast<uint8_t>(
+          DetermineMemOp(true, false, sz));
+    }
+    EmitTopLevel(std::move(store));
   }
 
   // Exit all scopes up to and including the function scope.
@@ -1657,18 +1744,31 @@ void IRGenerator::EmitInitializer(uint32_t dest_addr_idx,
   }
 
 scalar_fallback:
-  // Scalar initialization: just emit the value and store it.
+  // Emit the value and store/copy it into the destination.
   {
+    unsigned sz = 8;
+    if (auto t = init.Type()) {
+      if (auto s = TypeSizeBytes(*t)) sz = *s;
+    }
+
     uint32_t val_idx = EmitRValue(init);
     InstructionIR store;
     store.opcode = mx::ir::OpCode::MEMORY;
     store.source_entity_id = source_eid;
-    store.operand_indices = {dest_addr_idx, val_idx};
-    {
-      unsigned sz = 8;
-      if (auto t = init.Type()) {
-        if (auto s = TypeSizeBytes(*t)) sz = *s;
-      }
+
+    if (!IsScalarSize(sz)) {
+      // Non-scalar size (e.g., string literal char[6]): MEMCPY.
+      // val_idx is a pointer for non-scalar types.
+      InstructionIR size_inst;
+      size_inst.opcode = mx::ir::OpCode::CONST;
+      size_inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::UINT64);
+      size_inst.uint_value = sz;
+      size_inst.width = 64;
+      uint32_t size_idx = EmitInstruction(std::move(size_inst));
+      store.operand_indices = {dest_addr_idx, val_idx, size_idx};
+      store.mem_op = static_cast<uint8_t>(mx::ir::MemOp::MEMCPY);
+    } else {
+      store.operand_indices = {dest_addr_idx, val_idx};
       store.mem_op = static_cast<uint8_t>(
           DetermineMemOp(true, false, sz));
     }
@@ -1855,6 +1955,17 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       }
 
       uint32_t addr_idx = EmitLValue(sub);
+
+      // For large objects, LValueToRValue returns the address —
+      // the "value" is the pointer to the object.
+      if (maybe_type) {
+        if (auto sz = TypeSizeBytes(*maybe_type)) {
+          if (!IsScalarSize(*sz)) {
+            return addr_idx;
+          }
+        }
+      }
+
       InstructionIR inst;
       inst.opcode = mx::ir::OpCode::MEMORY;
       inst.source_entity_id = eid;
@@ -1872,8 +1983,11 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       inst.operand_indices = {addr_idx};
       return emit_typed(std::move(inst));
     }
-    if (ck == pasta::CastKind::kArrayToPointerDecay ||
-        ck == pasta::CastKind::kNoOperation) {
+    if (ck == pasta::CastKind::kArrayToPointerDecay) {
+      // Array decays to pointer: the address of the array IS the pointer.
+      return EmitLValue(sub);
+    }
+    if (ck == pasta::CastKind::kNoOperation) {
       return EmitRValue(sub);
     }
     if (ck == pasta::CastKind::kFunctionToPointerDecay) {
@@ -2087,24 +2201,46 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     {
       auto oc = bo->Opcode();
 
-      // Assignment.
+      // Assignment: always MEMCPY when RHS is an lvalue (has an address).
+      // For computed scalars (arithmetic results), use STORE.
       if (oc == pasta::BinaryOperatorKind::kAssign) {
         uint32_t addr_idx = EmitLValue(bo->LHS());
-        uint32_t val_idx = EmitRValue(bo->RHS());
+        auto rhs = bo->RHS();
+        unsigned sz = 8;
+        if (auto t = rhs.Type()) {
+          if (auto s = TypeSizeBytes(*t)) sz = *s;
+        }
+
+        // If RHS is an lvalue or the type is large, use MEMCPY.
+        bool rhs_is_lvalue = rhs.IsLValue();
+        bool is_large = (!IsScalarSize(sz));
+        if (rhs_is_lvalue || is_large) {
+          // Get the address of the RHS.
+          uint32_t src_idx = rhs_is_lvalue ? EmitLValue(rhs) : EmitRValue(rhs);
+          InstructionIR size_inst;
+          size_inst.opcode = mx::ir::OpCode::CONST;
+          size_inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::UINT64);
+          size_inst.uint_value = sz;
+          size_inst.width = 64;
+          uint32_t size_idx = EmitInstruction(std::move(size_inst));
+          InstructionIR inst;
+          inst.opcode = mx::ir::OpCode::MEMORY;
+          inst.source_entity_id = eid;
+          inst.operand_indices = {addr_idx, src_idx, size_idx};
+          inst.mem_op = static_cast<uint8_t>(mx::ir::MemOp::MEMCPY);
+          return emit_typed(std::move(inst));
+        }
+
+        // RHS is a computed scalar value — use STORE.
+        uint32_t val_idx = EmitRValue(rhs);
         InstructionIR inst;
         inst.opcode = mx::ir::OpCode::MEMORY;
         inst.source_entity_id = eid;
         inst.operand_indices = {addr_idx, val_idx};
-        {
-          unsigned sz = 8;
-          if (auto t = bo->RHS().Type()) {
-            if (auto s = TypeSizeBytes(*t)) sz = *s;
-          }
-          auto lhs_type = bo->LHS().Type();
-          bool is_atomic = lhs_type && lhs_type->IsAtomicType();
-          inst.mem_op = static_cast<uint8_t>(
-              DetermineMemOp(true, is_atomic, sz));
-        }
+        auto lhs_type = bo->LHS().Type();
+        bool is_atomic = lhs_type && lhs_type->IsAtomicType();
+        inst.mem_op = static_cast<uint8_t>(
+            DetermineMemOp(true, is_atomic, sz));
         return emit_typed(std::move(inst));
       }
 
@@ -2761,7 +2897,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         }
       }
 
-      // Dynamic alloca → DYNAMIC_ALLOCA with scope-tracked object.
+      // Dynamic alloca → ALLOCA/DYNAMIC with scope-tracked object.
       if (callee_name == "__builtin_alloca" || callee_name == "alloca") {
         if (!args.empty()) {
           // Create an ALLOCA object so the scope can track this allocation.
@@ -2774,7 +2910,8 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
           AssociateObjectWithScope(obj_idx);
 
           InstructionIR inst;
-          inst.opcode = mx::ir::OpCode::DYNAMIC_ALLOCA;
+          inst.opcode = mx::ir::OpCode::ALLOCA;
+          inst.alloca_kind = static_cast<uint8_t>(mx::ir::AllocaKind::DYNAMIC);
           inst.source_entity_id = eid;
           inst.object_index = obj_idx;
           inst.operand_indices.push_back(EmitRValue(args[0]));
@@ -2804,7 +2941,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       }
       if (callee_name == "__builtin_return_address") {
         InstructionIR inst;
-        inst.opcode = mx::ir::OpCode::RETURN_PTR;
+        inst.opcode = mx::ir::OpCode::RETURN_ADDRESS;
         inst.source_entity_id = eid;
         if (!args.empty()) {
           inst.operand_indices.push_back(EmitRValue(args[0]));
@@ -2987,39 +3124,120 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       }
     }
 
+    // Ensure we have an EXPRESSION_SCOPE for the argument allocas.
+    EnsureExpressionScope(eid);
+
     InstructionIR inst;
     inst.source_entity_id = eid;
-
     inst.opcode = mx::ir::OpCode::CALL;
+
+    auto args = ce->Arguments();
 
     if (direct_callee) {
       auto canon = direct_callee->CanonicalDeclaration();
       inst.target_entity_id = EntityIdOf(canon);
-
-      auto args = ce->Arguments();
-      uint32_t num_params = direct_callee->NumParameters();
-      bool is_variadic = direct_callee->IsVariadic();
-
-      for (uint32_t i = 0; i < args.size(); ++i) {
-        if (is_variadic && i >= num_params) {
-          InstructionIR pack;
-          pack.opcode = mx::ir::OpCode::VA_PACK;
-          pack.source_entity_id = eid;
-          for (uint32_t j = i; j < args.size(); ++j) {
-            pack.operand_indices.push_back(EmitRValue(args[j]));
-          }
-          inst.operand_indices.push_back(EmitInstruction(std::move(pack)));
-          break;
-        }
-        inst.operand_indices.push_back(EmitRValue(args[i]));
-      }
     } else {
       inst.target_entity_id = kInvalidEntityId;
+      // For indirect calls, first operand is the callee pointer.
       inst.operand_indices.push_back(EmitRValue(ce->Callee()));
-      for (const auto &arg : ce->Arguments()) {
-        inst.operand_indices.push_back(EmitRValue(arg));
-      }
     }
+
+    // Create ARG allocas for each argument.
+    for (uint32_t i = 0; i < args.size(); ++i) {
+      auto arg_expr = args[i];
+      uint32_t val_idx = EmitRValue(arg_expr);
+
+      // Create ALLOCA/ARG for this argument.
+      ObjectIR obj;
+      obj.kind = mx::ir::ObjectKind::PARAMETER;
+      obj.source_decl_id = EntityIdOf(arg_expr);
+      if (auto t = arg_expr.Type()) {
+        obj.type_entity_id = TypeEntityIdOf(*t);
+        if (auto sz = TypeSizeBytes(*t)) obj.size_bytes = *sz;
+        if (auto al = TypeAlignBytes(*t)) obj.align_bytes = *al;
+      }
+      uint32_t obj_idx = next_obj_index_++;
+      func_.objects.push_back(std::move(obj));
+      AssociateObjectWithScope(obj_idx);
+
+      InstructionIR alloca_inst;
+      alloca_inst.opcode = mx::ir::OpCode::ALLOCA;
+      alloca_inst.alloca_kind = static_cast<uint8_t>(mx::ir::AllocaKind::ARG);
+      alloca_inst.source_entity_id = EntityIdOf(arg_expr);
+      alloca_inst.object_index = obj_idx;
+      if (auto t = arg_expr.Type()) {
+        alloca_inst.type_entity_id = TypeEntityIdOf(*t);
+      }
+      uint32_t alloca_idx = EmitInstruction(std::move(alloca_inst));
+
+      // Copy value into the ARG alloca.
+      unsigned sz = 8;
+      if (auto t = arg_expr.Type()) {
+        if (auto s = TypeSizeBytes(*t)) sz = *s;
+      }
+
+      InstructionIR store;
+      store.opcode = mx::ir::OpCode::MEMORY;
+      store.source_entity_id = EntityIdOf(arg_expr);
+      if (!IsScalarSize(sz)) {
+        // Large argument: MEMCPY.
+        InstructionIR size_inst;
+        size_inst.opcode = mx::ir::OpCode::CONST;
+        size_inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::UINT64);
+        size_inst.uint_value = sz;
+        size_inst.width = 64;
+        uint32_t size_idx = EmitInstruction(std::move(size_inst));
+        store.operand_indices = {alloca_idx, val_idx, size_idx};
+        store.mem_op = static_cast<uint8_t>(mx::ir::MemOp::MEMCPY);
+      } else if (arg_expr.IsLValue()) {
+        // Lvalue arg: MEMCPY from source address.
+        uint32_t src_idx = EmitLValue(arg_expr);
+        InstructionIR size_inst;
+        size_inst.opcode = mx::ir::OpCode::CONST;
+        size_inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::UINT64);
+        size_inst.uint_value = sz;
+        size_inst.width = 64;
+        uint32_t size_idx = EmitInstruction(std::move(size_inst));
+        store.operand_indices = {alloca_idx, src_idx, size_idx};
+        store.mem_op = static_cast<uint8_t>(mx::ir::MemOp::MEMCPY);
+      } else {
+        // Scalar rvalue: STORE.
+        store.operand_indices = {alloca_idx, val_idx};
+        store.mem_op = static_cast<uint8_t>(
+            DetermineMemOp(true, false, sz));
+      }
+      EmitTopLevel(std::move(store));
+
+      // CALL operand is the ARG alloca (pointer to argument storage).
+      inst.operand_indices.push_back(alloca_idx);
+    }
+
+    // Create ALLOCA/RETURN for the return value (if non-void).
+    auto ret_type = ce->Type();
+    bool has_return = ret_type && !ret_type->IsVoidType();
+    uint32_t return_alloca_idx = UINT32_MAX;
+    if (has_return) {
+      ObjectIR ret_obj;
+      ret_obj.kind = mx::ir::ObjectKind::RETURN_SLOT;
+      if (ret_type) {
+        ret_obj.type_entity_id = TypeEntityIdOf(*ret_type);
+        if (auto sz = TypeSizeBytes(*ret_type)) ret_obj.size_bytes = *sz;
+        if (auto al = TypeAlignBytes(*ret_type)) ret_obj.align_bytes = *al;
+      }
+      uint32_t ret_obj_idx = next_obj_index_++;
+      func_.objects.push_back(std::move(ret_obj));
+      AssociateObjectWithScope(ret_obj_idx);
+
+      InstructionIR ret_alloca;
+      ret_alloca.opcode = mx::ir::OpCode::ALLOCA;
+      ret_alloca.alloca_kind = static_cast<uint8_t>(mx::ir::AllocaKind::RETURN);
+      ret_alloca.source_entity_id = eid;
+      ret_alloca.object_index = ret_obj_idx;
+      if (ret_type) ret_alloca.type_entity_id = TypeEntityIdOf(*ret_type);
+      return_alloca_idx = EmitInstruction(std::move(ret_alloca));
+    }
+
+    inst.return_alloca_index = return_alloca_idx;
     return emit_typed(std::move(inst));
   }
 
@@ -3173,7 +3391,8 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
   if (auto va = pasta::VAArgExpr::From(e)) {
     uint32_t sub_idx = EmitRValue(va->SubExpression());
     InstructionIR inst;
-    inst.opcode = mx::ir::OpCode::VA_ARG;
+    inst.opcode = mx::ir::OpCode::MEMORY;
+    inst.mem_op = static_cast<uint8_t>(mx::ir::MemOp::CONSUME_VA_PARAM);
     inst.source_entity_id = eid;
     if (auto t = e.Type()) inst.type_entity_id = TypeEntityIdOf(*t);
     inst.operand_indices = {sub_idx};
@@ -3419,16 +3638,15 @@ std::optional<uint32_t> IRGenerator::TypeAlignBytes(const pasta::Type &t) {
 
 mx::ir::MemOp IRGenerator::DetermineMemOp(
     bool is_store, bool is_atomic, unsigned size_bytes) {
-  // For non-standard sizes (not 1/2/4/8), use MEMCPY/MEMMOVE.
+  assert(IsScalarSize(size_bytes) &&
+         "DetermineMemOp called with non-scalar size; use MEMCPY instead");
   unsigned size_idx;
   switch (size_bytes) {
     case 1: size_idx = 0; break;
     case 2: size_idx = 1; break;
     case 4: size_idx = 2; break;
     case 8: size_idx = 3; break;
-    default:
-      // Non-standard size: fall back to bulk memory copy.
-      return mx::ir::MemOp::MEMCPY;
+    default: __builtin_unreachable();
   }
   bool big_endian = ctx_.getTargetInfo().isBigEndian();
   unsigned base = 0;
@@ -3503,6 +3721,8 @@ void IRGenerator::InsertGotoCompensationBlocks() {
 
     // If no transitions needed, skip.
     if (scopes_to_exit.empty() && scopes_to_enter.empty()) continue;
+
+    // Compensation block needed.
 
     // Create a compensation block.
     uint32_t comp_block = NewBlock(mx::ir::BlockKind::COMPENSATION);

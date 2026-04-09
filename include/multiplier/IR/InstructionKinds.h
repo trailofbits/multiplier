@@ -47,10 +47,44 @@ class MX_EXPORT ConstInst : public IRInstruction {
 class MX_EXPORT AllocaInst : public IRInstruction {
  public:
   MX_DECLARE_IR_INSTRUCTION(AllocaInst)
+  ir::AllocaKind alloca_kind(void) const;
   Type allocated_type(void) const;
   IRObject object(void) const;
   uint32_t size_bytes(void) const;   // from the object
   uint32_t align_bytes(void) const;  // from the object
+};
+
+// LOCAL alloca: regular local variable.
+class MX_EXPORT LocalAllocaInst : public AllocaInst {
+ public:
+  explicit LocalAllocaInst(IRInstructionImplPtr impl_)
+      : AllocaInst(std::move(impl_)) {}
+  static std::optional<LocalAllocaInst> from(const IRInstruction &inst);
+};
+
+// ARG alloca: argument passing storage in EXPRESSION_SCOPE.
+class MX_EXPORT ArgAllocaInst : public AllocaInst {
+ public:
+  explicit ArgAllocaInst(IRInstructionImplPtr impl_)
+      : AllocaInst(std::move(impl_)) {}
+  static std::optional<ArgAllocaInst> from(const IRInstruction &inst);
+};
+
+// RETURN alloca: return value storage in EXPRESSION_SCOPE.
+class MX_EXPORT ReturnAllocaInst : public AllocaInst {
+ public:
+  explicit ReturnAllocaInst(IRInstructionImplPtr impl_)
+      : AllocaInst(std::move(impl_)) {}
+  static std::optional<ReturnAllocaInst> from(const IRInstruction &inst);
+};
+
+// DYNAMIC alloca: runtime-sized (VLA, alloca()).
+class MX_EXPORT DynamicAllocaInst : public AllocaInst {
+ public:
+  explicit DynamicAllocaInst(IRInstructionImplPtr impl_)
+      : AllocaInst(std::move(impl_)) {}
+  static std::optional<DynamicAllocaInst> from(const IRInstruction &inst);
+  IRInstruction size(void) const;        // op[0] = size in bytes (runtime value)
 };
 
 class MX_EXPORT MemoryInst : public IRInstruction {
@@ -141,6 +175,8 @@ class MX_EXPORT CallInst : public IRInstruction {
   std::optional<Type> result_type(void) const;  // nullopt for void calls
   std::optional<FunctionDecl> target(void) const;
   bool is_indirect(void) const;
+  bool has_return_value(void) const;
+  std::optional<AllocaInst> return_alloca(void) const;  // ALLOCA/RETURN in caller's EXPRESSION_SCOPE
   gap::generator<IRInstruction> arguments(void) const &;
 };
 
@@ -190,15 +226,16 @@ class MX_EXPORT SelectInst : public IRInstruction {
 // CopyInst removed: use CastInst with CastOp::IDENTITY instead.
 
 // ---------------------------------------------------------------------------
-// Parameter read
+// Parameter pointer
 // ---------------------------------------------------------------------------
 
-class MX_EXPORT ParamReadInst : public IRInstruction {
+// Returns a pointer to the Nth function parameter. The storage lives
+// in the caller's EXPRESSION_SCOPE.
+class MX_EXPORT ParamPtrInst : public IRInstruction {
  public:
-  MX_DECLARE_IR_INSTRUCTION(ParamReadInst)
+  MX_DECLARE_IR_INSTRUCTION(ParamPtrInst)
   uint32_t parameter_index(void) const;
   Type parameter_type(void) const;
-  IRObject object(void) const;
 };
 
 // ---------------------------------------------------------------------------
@@ -223,7 +260,17 @@ class MX_EXPORT FuncPtrInst : public IRInstruction {
   std::optional<FunctionDecl> function(void) const;
 };
 
-// MultimemInst removed: merged into MemoryInst.
+// ---------------------------------------------------------------------------
+// Return value pointer (callee-side)
+// ---------------------------------------------------------------------------
+
+// Pointer to the caller's ALLOCA/RETURN storage. No operands.
+// Used inside the callee to write the return value before RET.
+class MX_EXPORT ReturnPtrInst : public IRInstruction {
+ public:
+  MX_DECLARE_IR_INSTRUCTION(ReturnPtrInst)
+  Type return_type(void) const;
+};
 
 // ---------------------------------------------------------------------------
 // Bitwise/intrinsic operations
@@ -248,18 +295,6 @@ class MX_EXPORT FloatOpInst : public IRInstruction {
 };
 
 // ---------------------------------------------------------------------------
-// Dynamic stack allocation
-// ---------------------------------------------------------------------------
-
-class MX_EXPORT DynamicAllocaInst : public IRInstruction {
- public:
-  MX_DECLARE_IR_INSTRUCTION(DynamicAllocaInst)
-  IRInstruction size(void) const;        // op[0] = size in bytes (runtime value)
-  IRObject object(void) const;           // scope-tracked object
-  Type result_type(void) const;
-};
-
-// ---------------------------------------------------------------------------
 // Frame/return address intrinsics
 // ---------------------------------------------------------------------------
 
@@ -270,9 +305,9 @@ class MX_EXPORT FramePtrInst : public IRInstruction {
   Type result_type(void) const;
 };
 
-class MX_EXPORT ReturnPtrInst : public IRInstruction {
+class MX_EXPORT ReturnAddressInst : public IRInstruction {
  public:
-  MX_DECLARE_IR_INSTRUCTION(ReturnPtrInst)
+  MX_DECLARE_IR_INSTRUCTION(ReturnAddressInst)
   IRInstruction level(void) const;       // op[0]
   Type result_type(void) const;
 };
@@ -326,17 +361,15 @@ class MX_EXPORT VACopyInst : public IRInstruction {
   IRInstruction src(void) const;
 };
 
-class MX_EXPORT VAArgInst : public IRInstruction {
+// ConsumeVAParam: reads the next variadic argument from va_list, memcpys
+// it from the caller's EXPRESSION_SCOPE, increments the va_list index.
+// This is a MemOp sub-opcode (CONSUME_VA_PARAM) but gets a dedicated class
+// for ergonomic access.
+class MX_EXPORT ConsumeVAParamInst : public IRInstruction {
  public:
-  MX_DECLARE_IR_INSTRUCTION(VAArgInst)
+  MX_DECLARE_IR_INSTRUCTION(ConsumeVAParamInst)
   IRInstruction va_list_operand(void) const;
   Type result_type(void) const;
-};
-
-class MX_EXPORT VAPackInst : public IRInstruction {
- public:
-  MX_DECLARE_IR_INSTRUCTION(VAPackInst)
-  gap::generator<IRInstruction> arguments(void) const &;
 };
 
 // ---------------------------------------------------------------------------

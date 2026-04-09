@@ -96,6 +96,13 @@ static void EmitInstructionExtras(
   switch (inst.opcode) {
     case OC::CALL:
       pool.AddEntity(inst.target_entity_id);
+      // Return alloca instruction ID (kInvalidEntityId for void calls).
+      if (inst.return_alloca_index != UINT32_MAX) {
+        pool.AddEntity(MakeInstEid(func, fragment_id, inst_base,
+                                    inst.return_alloca_index));
+      } else {
+        pool.AddEntity(mx::kInvalidEntityId);
+      }
       break;
 
     case OC::GEP_FIELD:
@@ -108,7 +115,6 @@ static void EmitInstructionExtras(
       break;
 
     case OC::CAST:
-    case OC::VA_ARG:
       pool.AddEntity(inst.type_entity_id);
       break;
 
@@ -116,9 +122,7 @@ static void EmitInstructionExtras(
       pool.AddEntity(MakeObjEid(fragment_id, obj_base, inst.object_index));
       break;
 
-    case OC::PARAM_READ:
-    case OC::DYNAMIC_ALLOCA:
-      pool.AddEntity(MakeObjEid(fragment_id, obj_base, inst.object_index));
+    case OC::PARAM_PTR:
       break;
 
     case OC::GLOBAL_PTR:
@@ -192,6 +196,10 @@ static uint32_t EmitInstructionConsts(
       break;
     }
 
+    case OC::ALLOCA:
+      pool.AddInt(static_cast<int64_t>(inst.alloca_kind));  // AllocaKind sub-opcode
+      break;
+
     case OC::CAST:
       pool.AddInt(static_cast<int64_t>(inst.cast_op));  // CastOp sub-opcode
       break;
@@ -214,7 +222,7 @@ static uint32_t EmitInstructionConsts(
       pool.AddInt(static_cast<int64_t>(inst.is_big_endian ? 1 : 0));  // endianness
       break;
 
-    case OC::PARAM_READ:
+    case OC::PARAM_PTR:
       pool.AddInt(inst.int_value);  // parameter index
       break;
 
@@ -437,7 +445,6 @@ void SerializeIR(
             src.opcode != mx::ir::OpCode::VA_START &&
             src.opcode != mx::ir::OpCode::VA_END &&
             src.opcode != mx::ir::OpCode::VA_COPY &&
-            src.opcode != mx::ir::OpCode::VA_PACK &&
             src.opcode != mx::ir::OpCode::UNKNOWN;
         // MEMORY direct stores don't produce a value.
         if (has_type && src.opcode == mx::ir::OpCode::MEMORY) {
@@ -625,10 +632,12 @@ void SerializeIR(
         if (inst.opcode != mx::ir::OpCode::SWITCH) continue;
 
         // Find the placeholder offset: extras start at
-        // entityOffset + 2(parent+source) + 1(type) + numOperands + 1(caseType)
+        // entityOffset + 2(parent+source) + numOperands
+        // SWITCH is a terminator so has no type slot.
+        // extras[0] = caseType, extras[1..] = case entity IDs.
         auto r = frag_insts[func_inst_base + ii];
-        uint32_t placeholder_base = r.getEntityOffset() + 2 + 1 +
-            r.getNumOperands() + 1;  // +1 for caseType
+        uint32_t placeholder_base = r.getEntityOffset() + 2 +
+            r.getNumOperands() + 1;  // +1 for caseType at extras[0]
 
         for (size_t sci = 0; sci < inst.switch_cases.size(); ++sci) {
           const auto &sc = inst.switch_cases[sci];

@@ -39,6 +39,7 @@ class MX_EXPORT IRStructure {
   friend class IRDoWhileStructure;
   friend class IRSwitchStructure;
   friend class IRSwitchCaseStructure;
+  friend class IRExpressionScopeStructure;
   IRStructureImplPtr impl_ptr(void) const { return impl; }
 
  public:

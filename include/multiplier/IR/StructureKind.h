@@ -6,6 +6,7 @@
 #pragma once
 
 #include <cstdint>
+#include "../Compiler.h"  // MX_EXPORT
 
 namespace mx::ir {
 
@@ -43,22 +44,27 @@ enum class StructureKind : uint8_t {
   // Switch statement parts.
   SWITCH = 16,           // the whole switch
   SWITCH_CASE = 17,      // individual case/default
+
+  // Expression scope: holds argument/return allocas for all calls
+  // within a full-expression. Extends to the enclosing `;`.
+  EXPRESSION_SCOPE = 18,
 };
 
 inline static const char *EnumerationName(StructureKind) {
   return "StructureKind";
 }
 
-const char *EnumeratorName(StructureKind kind) noexcept;
+MX_EXPORT const char *EnumeratorName(StructureKind kind) noexcept;
 
 inline static constexpr unsigned NumEnumerators(StructureKind) {
-  return 18u;
+  return 19u;
 }
 
 // Classification helpers.
 inline bool IsScope(StructureKind kind) {
   return kind == StructureKind::FUNCTION_SCOPE ||
-         kind == StructureKind::SCOPE;
+         kind == StructureKind::SCOPE ||
+         kind == StructureKind::EXPRESSION_SCOPE;
 }
 
 }  // namespace mx::ir
