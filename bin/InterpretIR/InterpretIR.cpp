@@ -79,6 +79,18 @@ struct Value {
 
   int64_t as_int() const { return ival; }
   double as_float() const { return fval; }
+  // Reinterpret int64 bits as double (for LOADed float values).
+  double as_float_bits() const {
+    if (kind == FLOATING) return fval;
+    double d;
+    uint64_t bits = static_cast<uint64_t>(ival);
+    std::memcpy(&d, &bits, sizeof(d));
+    return d;
+  }
+  // Coerce to float: use fval if FLOATING, else reinterpret bits.
+  double coerce_float() const {
+    return kind == FLOATING ? fval : as_float_bits();
+  }
 };
 
 // ---------------------------------------------------------------------------
@@ -961,7 +973,7 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       if (bin) {
         Value l = GetValue(bin->lhs()), r = GetValue(bin->rhs());
         if (l.kind == Value::FLOATING || r.kind == Value::FLOATING)
-          result = Value::Float(l.as_float() + r.as_float());
+          result = Value::Float(l.coerce_float() + r.coerce_float());
         else
           result = Value::Int(l.as_int() + r.as_int());
       }
@@ -972,7 +984,7 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       if (bin) {
         Value l = GetValue(bin->lhs()), r = GetValue(bin->rhs());
         if (l.kind == Value::FLOATING || r.kind == Value::FLOATING)
-          result = Value::Float(l.as_float() - r.as_float());
+          result = Value::Float(l.coerce_float() - r.coerce_float());
         else
           result = Value::Int(l.as_int() - r.as_int());
       }
@@ -983,7 +995,7 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       if (bin) {
         Value l = GetValue(bin->lhs()), r = GetValue(bin->rhs());
         if (l.kind == Value::FLOATING || r.kind == Value::FLOATING)
-          result = Value::Float(l.as_float() * r.as_float());
+          result = Value::Float(l.coerce_float() * r.coerce_float());
         else
           result = Value::Int(l.as_int() * r.as_int());
       }
@@ -994,7 +1006,7 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       if (bin) {
         Value l = GetValue(bin->lhs()), r = GetValue(bin->rhs());
         if (l.kind == Value::FLOATING || r.kind == Value::FLOATING)
-          result = Value::Float(r.as_float() != 0 ? l.as_float() / r.as_float() : 0.0);
+          result = Value::Float(r.coerce_float() != 0 ? l.coerce_float() / r.coerce_float() : 0.0);
         else
           result = Value::Int(r.as_int() != 0 ? l.as_int() / r.as_int() : 0);
       }
@@ -1005,7 +1017,7 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       if (bin) {
         Value l = GetValue(bin->lhs()), r = GetValue(bin->rhs());
         if (l.kind == Value::FLOATING || r.kind == Value::FLOATING)
-          result = Value::Float(std::fmod(l.as_float(), r.as_float()));
+          result = Value::Float(std::fmod(l.coerce_float(), r.coerce_float()));
         else
           result = Value::Int(r.as_int() != 0 ? l.as_int() % r.as_int() : 0);
       }
@@ -1106,7 +1118,7 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
         bool use_float = (l.kind == Value::FLOATING || r.kind == Value::FLOATING);
         bool res = false;
         if (use_float) {
-          double lv = l.as_float(), rv = r.as_float();
+          double lv = l.coerce_float(), rv = r.coerce_float();
           switch (op) {
             case mx::ir::OpCode::CMP_EQ: res = lv == rv; break;
             case mx::ir::OpCode::CMP_NE: res = lv != rv; break;
