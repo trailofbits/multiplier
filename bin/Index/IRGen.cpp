@@ -1033,6 +1033,22 @@ void IRGenerator::EmitStmt(const pasta::Stmt &s) {
     SetOperandParents(val_idx);
     // Pop expression scope at the full-expression boundary (the `;`).
     PopExpressionScope();
+
+    // If the expression is a call to a noreturn function, emit UNREACHABLE
+    // and switch to a dead block.
+    if (auto ce = pasta::CallExpr::From(*expr)) {
+      bool is_noreturn = false;
+      if (auto callee = ce->DirectCallee()) {
+        is_noreturn = callee->IsNoReturn();
+      }
+      if (is_noreturn) {
+        InstructionIR unreach;
+        unreach.opcode = mx::ir::OpCode::UNREACHABLE;
+        unreach.source_entity_id = EntityIdOf(s);
+        EmitTopLevel(std::move(unreach));
+        SwitchToBlock(NewBlock(mx::ir::BlockKind::UNREACHABLE));
+      }
+    }
     return;
   }
 
@@ -2698,10 +2714,12 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         }
       }
 
-      // __builtin_unreachable() → UNREACHABLE.
+      // __builtin_unreachable() → handled as noreturn at expression statement
+      // level (emits UNREACHABLE terminator after the call expression scope).
+      // Just return UNDEFINED as the expression value.
       if (callee_name == "__builtin_unreachable") {
         InstructionIR inst;
-        inst.opcode = mx::ir::OpCode::UNREACHABLE;
+        inst.opcode = mx::ir::OpCode::UNDEFINED;
         inst.source_entity_id = eid;
         return emit_typed(std::move(inst));
       }
