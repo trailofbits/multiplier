@@ -181,9 +181,8 @@ void Interpreter::MemWrite(const Pointer &ptr, const void *data, size_t len) {
   }
   size_t start = static_cast<size_t>(ptr.offset);
   if (start + len > mem.bytes.size()) {
-    LOG(WARNING) << "Write out of bounds: offset=" << start
-                 << " len=" << len << " size=" << mem.bytes.size();
-    return;
+    // Auto-grow for VLA-like objects (compile-time size unknown).
+    mem.bytes.resize(start + len, 0);
   }
   std::memcpy(mem.bytes.data() + start, data, len);
 }
@@ -201,10 +200,8 @@ void Interpreter::MemRead(const Pointer &ptr, void *data, size_t len) {
   }
   size_t start = static_cast<size_t>(ptr.offset);
   if (start + len > mem.bytes.size()) {
-    LOG(WARNING) << "Read out of bounds: offset=" << start
-                 << " len=" << len << " size=" << mem.bytes.size();
-    std::memset(data, 0, len);
-    return;
+    // Auto-grow for VLA-like objects.
+    mem.bytes.resize(start + len, 0);
   }
   std::memcpy(data, mem.bytes.data() + start, len);
 }
@@ -362,11 +359,22 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       if (auto ai = mx::AllocaInst::from(inst)) {
         auto obj = ai->object();
         auto obj_eid = mx::EntityId(obj.id()).Pack();
-        // Only allocate on first encounter; subsequent references to the
-        // same ALLOCA (as sub-expressions in other blocks) should not
-        // re-allocate and zero the storage.
         if (memory_.find(obj_eid) == memory_.end()) {
-          AllocateObject(obj);
+          // For DYNAMIC allocas (VLAs), use the runtime size operand.
+          if (auto da = mx::DynamicAllocaInst::from(inst)) {
+            Value sz_val = GetValue(da->size());
+            uint32_t runtime_sz = static_cast<uint32_t>(sz_val.as_int());
+            if (runtime_sz > 0) {
+              auto &mem = memory_[obj_eid];
+              mem.bytes.resize(runtime_sz, 0);
+              mem.allocated = true;
+              mem.poisoned = false;
+            } else {
+              AllocateObject(obj);
+            }
+          } else {
+            AllocateObject(obj);
+          }
         }
         result = Value::Ptr(obj_eid, 0);
       }
@@ -1795,9 +1803,9 @@ Value Interpreter::Run(const std::vector<Value> &args) {
       break;
     }
 
-    // Clear cached instruction values at block boundaries. This ensures
-    // LOADs re-read from memory on each block visit (critical for loops).
-    // Lazy evaluation in GetValue will recompute sub-expressions on demand.
+
+
+    // Clear cached values at block boundaries for fresh LOAD evaluation.
     values_.clear();
 
     if (trace_) {
