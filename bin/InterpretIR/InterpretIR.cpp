@@ -337,6 +337,19 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
                    sub == mx::ir::ConstOp::FLOAT64 ||
                    sub == mx::ir::ConstOp::FLOAT16) {
           result = Value::Float(ci->float_value());
+        } else if (sub == mx::ir::ConstOp::UINT64) {
+          // UINT64: use unsigned value directly (no sign extension needed).
+          result = Value::Int(static_cast<int64_t>(ci->unsigned_value()));
+        } else if (sub == mx::ir::ConstOp::UINT32) {
+          // UINT32: sign-extend to match LOAD_LE_32 sign-extension.
+          result = Value::Int(static_cast<int64_t>(
+              static_cast<int32_t>(static_cast<uint32_t>(ci->unsigned_value()))));
+        } else if (sub == mx::ir::ConstOp::UINT16) {
+          result = Value::Int(static_cast<int64_t>(
+              static_cast<int16_t>(static_cast<uint16_t>(ci->unsigned_value()))));
+        } else if (sub == mx::ir::ConstOp::UINT8) {
+          result = Value::Int(static_cast<int64_t>(
+              static_cast<int8_t>(static_cast<uint8_t>(ci->unsigned_value()))));
         } else {
           result = Value::Int(ci->signed_value());
         }
