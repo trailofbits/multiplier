@@ -1291,12 +1291,21 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
       uint32_t block = NewBlock(mx::ir::BlockKind::SWITCH_CASE);
       cases.push_back({low, high, false, block, EntityIdOf(stmt)});
       case_blocks_[EntityIdOf(stmt)] = block;
+      // Recurse into SubStatement to find nested cases (case 1: case 2: ...).
+      auto sub = cs->SubStatement();
+      if (pasta::CaseStmt::From(sub) || pasta::DefaultStmt::From(sub)) {
+        collect_cases(sub);
+      }
       return;
     }
     if (auto ds = pasta::DefaultStmt::From(stmt)) {
       uint32_t block = NewBlock(mx::ir::BlockKind::SWITCH_DEFAULT);
       cases.push_back({0, 0, true, block, EntityIdOf(stmt)});
       case_blocks_[EntityIdOf(stmt)] = block;
+      auto sub = ds->SubStatement();
+      if (pasta::CaseStmt::From(sub) || pasta::DefaultStmt::From(sub)) {
+        collect_cases(sub);
+      }
       return;
     }
     for (const auto &child : stmt.Children()) {
@@ -1343,9 +1352,11 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
   size_t ci = 0;
   auto maybe_emit_implicit_fallthrough = [&](uint32_t next_block) {
     auto &blk = func_.blocks[current_block_index_];
-    if (blk.instruction_indices.empty()) return;
-    auto &last = func_.instructions[blk.instruction_indices.back()];
-    if (mx::ir::IsTerminator(last.opcode)) return;
+    // If the block already has a terminator, skip.
+    if (!blk.instruction_indices.empty()) {
+      auto &last = func_.instructions[blk.instruction_indices.back()];
+      if (mx::ir::IsTerminator(last.opcode)) return;
+    }
     // Current block has no terminator -- implicit fallthrough.
     InstructionIR inst;
     inst.opcode = mx::ir::OpCode::IMPLICIT_FALLTHROUGH;
@@ -1379,7 +1390,14 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
                                   cases[ci].block_index,
                                   switch_structure_idx});
         ci++;
-        EmitBody(cs->SubStatement());
+        // If SubStatement is another case/default, handle it via recursion
+        // (empty case fallthrough: case 1: case 2: case 3: body).
+        auto sub = cs->SubStatement();
+        if (pasta::CaseStmt::From(sub) || pasta::DefaultStmt::From(sub)) {
+          emit_case_bodies(sub);
+        } else {
+          EmitBody(sub);
+        }
         PopStructure();  // SWITCH_CASE
       }
       return;
@@ -1391,18 +1409,21 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
                       cases[ci].source_entity_id);
         auto &sc_struct = func_.structures[current_structure_index_];
         sc_struct.is_default = true;
-        // Record structure index back into the switch instruction.
         func_.instructions[term_idx].switch_cases[ci].structure_index =
             current_structure_index_;
         SwitchToBlock(cases[ci].block_index);
         AssociateBlockWithStructure(cases[ci].block_index);
-        // Record default block structure for Duff's device compensation.
         label_structure_[cases[ci].block_index] = current_structure_index_;
         pending_gotos_.push_back({term_idx, switch_block_idx,
                                   cases[ci].block_index,
                                   switch_structure_idx});
         ci++;
-        EmitBody(ds->SubStatement());
+        auto sub = ds->SubStatement();
+        if (pasta::CaseStmt::From(sub) || pasta::DefaultStmt::From(sub)) {
+          emit_case_bodies(sub);
+        } else {
+          EmitBody(sub);
+        }
         PopStructure();  // SWITCH_CASE (default)
       }
       return;
