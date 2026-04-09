@@ -1291,16 +1291,12 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
       uint32_t block = NewBlock(mx::ir::BlockKind::SWITCH_CASE);
       cases.push_back({low, high, false, block, EntityIdOf(stmt)});
       case_blocks_[EntityIdOf(stmt)] = block;
-      // Recurse into SubStatement to find nested cases (case 1: case 2: ...).
-      collect_cases(cs->SubStatement());
       return;
     }
     if (auto ds = pasta::DefaultStmt::From(stmt)) {
       uint32_t block = NewBlock(mx::ir::BlockKind::SWITCH_DEFAULT);
       cases.push_back({0, 0, true, block, EntityIdOf(stmt)});
       case_blocks_[EntityIdOf(stmt)] = block;
-      // Recurse into SubStatement for nested cases.
-      collect_cases(ds->SubStatement());
       return;
     }
     for (const auto &child : stmt.Children()) {
@@ -1383,12 +1379,7 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
                                   cases[ci].block_index,
                                   switch_structure_idx});
         ci++;
-        // If the SubStatement is another case/default, don't emit it here —
-        // it will be handled by the emit_case_bodies recursion.
-        auto sub = cs->SubStatement();
-        if (!pasta::CaseStmt::From(sub) && !pasta::DefaultStmt::From(sub)) {
-          EmitBody(sub);
-        }
+        EmitBody(cs->SubStatement());
         PopStructure();  // SWITCH_CASE
       }
       return;
