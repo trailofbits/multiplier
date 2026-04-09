@@ -79,18 +79,6 @@ struct Value {
 
   int64_t as_int() const { return ival; }
   double as_float() const { return fval; }
-  // Reinterpret int64 bits as double (for LOADed float values).
-  double as_float_bits() const {
-    if (kind == FLOATING) return fval;
-    double d;
-    uint64_t bits = static_cast<uint64_t>(ival);
-    std::memcpy(&d, &bits, sizeof(d));
-    return d;
-  }
-  // Coerce to float: use fval if FLOATING, else reinterpret bits.
-  double coerce_float() const {
-    return kind == FLOATING ? fval : as_float_bits();
-  }
 };
 
 // ---------------------------------------------------------------------------
@@ -974,7 +962,7 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       if (bin) {
         Value l = GetValue(bin->lhs()), r = GetValue(bin->rhs());
         if (l.kind == Value::FLOATING || r.kind == Value::FLOATING)
-          result = Value::Float(l.coerce_float() + r.coerce_float());
+          result = Value::Float(l.as_float() + r.as_float());
         else
           result = Value::Int(l.as_int() + r.as_int());
       }
@@ -985,7 +973,7 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       if (bin) {
         Value l = GetValue(bin->lhs()), r = GetValue(bin->rhs());
         if (l.kind == Value::FLOATING || r.kind == Value::FLOATING)
-          result = Value::Float(l.coerce_float() - r.coerce_float());
+          result = Value::Float(l.as_float() - r.as_float());
         else
           result = Value::Int(l.as_int() - r.as_int());
       }
@@ -996,7 +984,7 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       if (bin) {
         Value l = GetValue(bin->lhs()), r = GetValue(bin->rhs());
         if (l.kind == Value::FLOATING || r.kind == Value::FLOATING)
-          result = Value::Float(l.coerce_float() * r.coerce_float());
+          result = Value::Float(l.as_float() * r.as_float());
         else
           result = Value::Int(l.as_int() * r.as_int());
       }
@@ -1007,7 +995,7 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       if (bin) {
         Value l = GetValue(bin->lhs()), r = GetValue(bin->rhs());
         if (l.kind == Value::FLOATING || r.kind == Value::FLOATING)
-          result = Value::Float(r.coerce_float() != 0 ? l.coerce_float() / r.coerce_float() : 0.0);
+          result = Value::Float(r.as_float() != 0 ? l.as_float() / r.as_float() : 0.0);
         else
           result = Value::Int(r.as_int() != 0 ? l.as_int() / r.as_int() : 0);
       }
@@ -1018,7 +1006,7 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       if (bin) {
         Value l = GetValue(bin->lhs()), r = GetValue(bin->rhs());
         if (l.kind == Value::FLOATING || r.kind == Value::FLOATING)
-          result = Value::Float(std::fmod(l.coerce_float(), r.coerce_float()));
+          result = Value::Float(std::fmod(l.as_float(), r.as_float()));
         else
           result = Value::Int(r.as_int() != 0 ? l.as_int() % r.as_int() : 0);
       }
@@ -1101,34 +1089,14 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       break;
     }
     case mx::ir::OpCode::PTR_DIFF: {
-      auto bin = mx::BinaryInst::from(inst);
-      if (bin) {
-        Value l = GetValue(bin->lhs()), r = GetValue(bin->rhs());
+      auto pd = mx::PtrDiffInst::from(inst);
+      if (pd) {
+        Value l = GetValue(pd->lhs()), r = GetValue(pd->rhs());
         if (l.kind == Value::POINTER && r.kind == Value::POINTER) {
           int64_t byte_diff = l.ptr.offset - r.ptr.offset;
-          // Element size is in int_pool[0]. We need to read it but
-          // BinaryInst doesn't expose it. Use the num_operands trick:
-          // PTR_DIFF has 2 operands and element_size at int_pool[const_offset].
-          // For now, use PtrAddInst which has the same pool layout.
-          // PtrAddInst::from will fail (wrong opcode), so read element_size
-          // from the instruction's extra data. The codegen stores it in
-          // size_bytes which maps to int_pool[0].
-          // TODO: Add PtrDiffInst class with element_size() accessor.
-          int64_t elem_size = 1;
-          // Heuristic: check num_operands. If the instruction has extra
-          // int pool entries, the first one is element_size.
-          auto nops = inst.num_operands();
-          (void)nops;
-          // For now, we can try to use the object's total size / array count.
-          // Simpler: the codegen always stores element_size in the int pool.
-          // Read it by trying to interpret as PtrAddInst (same layout).
-          // Actually just divide: the serializer now stores element_size for
-          // PTR_DIFF. We need a read API. Hardcode 4 for int* for now.
-          // TODO: expose int_pool via PtrDiffInst class.
-          elem_size = 4;  // sizeof(int) — most common case
-          if (elem_size > 0) {
-            result = Value::Int(byte_diff / elem_size);
-          }
+          int64_t elem_size = pd->element_size();
+          if (elem_size <= 0) elem_size = 1;
+          result = Value::Int(byte_diff / elem_size);
         }
       }
       break;
@@ -1147,7 +1115,7 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
         bool use_float = (l.kind == Value::FLOATING || r.kind == Value::FLOATING);
         bool res = false;
         if (use_float) {
-          double lv = l.coerce_float(), rv = r.coerce_float();
+          double lv = l.as_float(), rv = r.as_float();
           switch (op) {
             case mx::ir::OpCode::CMP_EQ: res = lv == rv; break;
             case mx::ir::OpCode::CMP_NE: res = lv != rv; break;

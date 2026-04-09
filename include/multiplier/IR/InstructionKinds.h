@@ -122,6 +122,15 @@ class MX_EXPORT PtrAddInst : public IRInstruction {
   int64_t element_size(void) const;
 };
 
+class MX_EXPORT PtrDiffInst : public IRInstruction {
+ public:
+  MX_DECLARE_IR_INSTRUCTION(PtrDiffInst)
+  IRInstruction lhs(void) const;
+  IRInstruction rhs(void) const;
+  Type result_type(void) const;
+  int64_t element_size(void) const;
+};
+
 // ---------------------------------------------------------------------------
 // Binary / Comparison / Unary
 // ---------------------------------------------------------------------------

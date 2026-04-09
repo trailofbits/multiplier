@@ -727,6 +727,11 @@ void IRGenerator::EmitEntryBlockAllocas(const pasta::Stmt &body) {
         alloca_inst.source_entity_id = EntityIdOf(decl);
         alloca_inst.object_index = obj_idx;
         alloca_inst.type_entity_id = TypeEntityIdOf(vd->Type());
+        // Detect VLAs: VariableArrayType has runtime size.
+        if (pasta::VariableArrayType::From(vd->Type())) {
+          alloca_inst.alloca_kind = static_cast<uint8_t>(
+              mx::ir::AllocaKind::DYNAMIC);
+        }
         uint32_t alloca_idx = EmitTopLevel(std::move(alloca_inst));
         object_to_alloca_[obj_idx] = alloca_idx;
       }

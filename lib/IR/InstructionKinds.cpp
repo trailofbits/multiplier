@@ -210,6 +210,7 @@ IMPL_FROM_SINGLE(UnknownInst, UNKNOWN)
 
 IMPL_FROM_RANGE(BinaryInst, ADD, PTR_DIFF)
 IMPL_FROM_RANGE(ComparisonInst, CMP_EQ, CMP_GE)
+IMPL_FROM_SINGLE(PtrDiffInst, PTR_DIFF)
 IMPL_FROM_RANGE(UnaryInst, NEG, LOGICAL_NOT)
 IMPL_FROM_SINGLE(CastInst, CAST)
 
@@ -382,6 +383,19 @@ Type PtrAddInst::element_type(void) const {
 }
 
 int64_t PtrAddInst::element_size(void) const {
+  return GetIntPool(*impl)[impl->reader().getConstOffset()];
+}
+
+// ---- PtrDiffInst ----
+
+IRInstruction PtrDiffInst::lhs(void) const { return nth_operand(0); }
+IRInstruction PtrDiffInst::rhs(void) const { return nth_operand(1); }
+
+Type PtrDiffInst::result_type(void) const {
+  return ResolveType(*impl, GetPool(*impl)[TypePos(impl->reader())]);
+}
+
+int64_t PtrDiffInst::element_size(void) const {
   return GetIntPool(*impl)[impl->reader().getConstOffset()];
 }
 
