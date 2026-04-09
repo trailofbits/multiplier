@@ -208,7 +208,13 @@ std::optional<UnreachableInst> UnreachableInst::from(const IRInstruction &inst) 
 }
 IMPL_FROM_SINGLE(UnknownInst, UNKNOWN)
 
-IMPL_FROM_RANGE(BinaryInst, ADD, PTR_DIFF)
+// BinaryInst matches ADD..PTR_DIFF and UDIV..USHR.
+std::optional<BinaryInst> BinaryInst::from(const IRInstruction &inst) {
+  auto op = inst.opcode();
+  if (ir::IsBinaryOp(op))
+    return BinaryInst(inst.impl_ptr());
+  return std::nullopt;
+}
 IMPL_FROM_RANGE(ComparisonInst, CMP_EQ, CMP_GE)
 IMPL_FROM_SINGLE(PtrDiffInst, PTR_DIFF)
 IMPL_FROM_RANGE(UnaryInst, NEG, LOGICAL_NOT)

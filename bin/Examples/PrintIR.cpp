@@ -134,7 +134,8 @@ void PrintInstruction(std::ostream &os, const mx::IRInstruction &inst,
     os << " [";
     for (unsigned i = 0; i < n; ++i) {
       if (i) os << ", ";
-      inst.nth_operand(i).format_ref(os);
+      auto operand = inst.nth_operand(i);
+      operand.format_ref(os);
     }
     os << "]";
   }

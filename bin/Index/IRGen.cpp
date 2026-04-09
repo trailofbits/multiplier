@@ -2512,7 +2512,8 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       inst.opcode = arith_op;
       inst.source_entity_id = eid;
       inst.operand_indices = {lhs_idx, rhs_idx};
-      return emit_typed(std::move(inst));
+      auto result = emit_typed(std::move(inst));
+      return result;
     }
   }
 
@@ -3547,7 +3548,6 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
   }
 
   // Emit UNKNOWN for anything we haven't explicitly handled.
-  // The source_entity_id lets the user inspect the original AST node.
   InstructionIR inst;
   inst.opcode = mx::ir::OpCode::UNKNOWN;
   inst.source_entity_id = eid;
