@@ -4,8 +4,14 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include <multiplier/IR/Instruction.h>
+#include <multiplier/IR/InstructionKinds.h>
 #include <multiplier/IR/Block.h>
 #include <multiplier/IR/OpCode.h>
+#include <multiplier/AST/NamedDecl.h>
+#include <multiplier/AST/VarDecl.h>
+#include <multiplier/AST/FunctionDecl.h>
+#include <multiplier/AST/Decl.h>
+#include <sstream>
 
 #include "Impl.h"
 #include "../Fragment.h"
@@ -185,6 +191,98 @@ bool IRInstruction::is_terminator(void) const {
 bool IRInstruction::is_conditionally_executed(void) const {
   if (!impl) return false;
   return (impl->reader().getFlags() & 0x4) != 0;
+}
+
+// Derive a name from the source entity for this instruction.
+// ALLOCAs → VarDecl name. GLOBAL_PTR/THREAD_LOCAL_PTR → VarDecl name.
+// FUNC_PTR → FunctionDecl name. CALL → target name. Others → empty.
+std::string_view IRInstruction::name(void) const {
+  if (!impl) return {};
+  auto eid = source_entity_id();
+  if (eid == kInvalidEntityId) return {};
+  auto vid = EntityId(eid).Unpack();
+  if (std::holds_alternative<DeclId>(vid)) {
+    if (auto ptr = impl->frag->ep->DeclFor(impl->frag->ep, eid)) {
+      if (auto nd = NamedDecl::from(Decl(std::move(ptr)))) {
+        return nd->name();
+      }
+    }
+  }
+  return {};
+}
+
+static uint32_t InstructionOffset(const IRInstruction &inst) {
+  auto vid = EntityId(inst.id()).Unpack();
+  if (auto *iid = std::get_if<IRInstructionId>(&vid)) {
+    return iid->offset;
+  }
+  return 0;
+}
+
+void IRInstruction::format_ref(std::ostream &os) const {
+  auto n = name();
+  auto off = InstructionOffset(*this);
+  if (!n.empty()) {
+    os << "%" << n << "." << off;
+  } else {
+    os << "%" << off;
+  }
+}
+
+std::string IRInstruction::ref_string(void) const {
+  std::ostringstream ss;
+  format_ref(ss);
+  return ss.str();
+}
+
+void IRInstruction::format(std::ostream &os) const {
+  if (!impl) { os << "%? = UNKNOWN"; return; }
+
+  // Instruction reference.
+  format_ref(os);
+  os << " = ";
+
+  // Opcode.
+  auto op = opcode();
+  os << ir::EnumeratorName(op);
+
+  // Sub-opcode for grouped instructions.
+  if (auto ai = AllocaInst::from(*this)) {
+    os << "/" << ir::EnumeratorName(ai->alloca_kind());
+  } else if (auto mi = MemoryInst::from(*this)) {
+    os << "/" << ir::EnumeratorName(mi->sub_opcode());
+  } else if (auto ci = ConstInst::from(*this)) {
+    os << "/" << ir::EnumeratorName(ci->sub_opcode());
+    auto sub = ci->sub_opcode();
+    if (sub >= ir::ConstOp::FLOAT32 && sub <= ir::ConstOp::FLOAT64) {
+      os << " " << ci->float_value();
+    } else if (sub != ir::ConstOp::NULL_PTR) {
+      os << " " << ci->signed_value();
+    }
+  } else if (auto ci = CastInst::from(*this)) {
+    os << "/" << ir::EnumeratorName(ci->sub_opcode());
+  } else if (auto bi = BitwiseOpInst::from(*this)) {
+    os << "/" << ir::EnumeratorName(bi->sub_opcode());
+  } else if (auto fi = FloatOpInst::from(*this)) {
+    os << "/" << ir::EnumeratorName(fi->sub_opcode());
+  }
+
+  // Operands.
+  unsigned n = num_operands();
+  if (n > 0) {
+    os << " [";
+    for (unsigned i = 0; i < n; ++i) {
+      if (i) os << ", ";
+      nth_operand(i).format_ref(os);
+    }
+    os << "]";
+  }
+}
+
+std::string IRInstruction::to_string(void) const {
+  std::ostringstream ss;
+  format(ss);
+  return ss.str();
 }
 
 }  // namespace mx

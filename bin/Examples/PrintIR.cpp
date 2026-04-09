@@ -54,7 +54,8 @@ void PrintInstruction(std::ostream &os, const mx::IRInstruction &inst,
   if (is_root) os << ">> ";
   else os << "   ";
 
-  os << "%" << OffsetOf(inst.id()) << " = ";
+  inst.format_ref(os);
+  os << " = ";
 
   // Opcode name.
   os << mx::ir::EnumeratorName(op);
@@ -133,8 +134,7 @@ void PrintInstruction(std::ostream &os, const mx::IRInstruction &inst,
     os << " [";
     for (unsigned i = 0; i < n; ++i) {
       if (i) os << ", ";
-      auto operand = inst.nth_operand(i);
-      os << "%" << OffsetOf(operand.id());
+      inst.nth_operand(i).format_ref(os);
     }
     os << "]";
   }

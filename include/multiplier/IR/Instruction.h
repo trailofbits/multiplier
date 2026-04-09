@@ -10,6 +10,8 @@
 #include "OpCode.h"
 #include <memory>
 #include <optional>
+#include <ostream>
+#include <string>
 #include <gap/coro/generator.hpp>
 
 namespace mx {
@@ -70,6 +72,20 @@ class MX_EXPORT IRInstruction {
   // Conditional execution.
   bool is_conditionally_executed(void) const;
 
+  // Name: a human-readable label like "total.5" or "arr.3".
+  // Derived from the source AST (ALLOCA → VarDecl name, GLOBAL_PTR → name,
+  // FUNC_PTR → name, etc.) plus the instruction offset for uniqueness.
+  // Returns empty string if no meaningful name can be derived.
+  std::string_view name(void) const;
+
+  // Format: write a human-readable representation of this instruction
+  // reference to a stream (e.g., "%total.5" or "%12").
+  void format_ref(std::ostream &os) const;
+  std::string ref_string(void) const;
+
+  // Format: write a full instruction representation to a stream.
+  void format(std::ostream &os) const;
+  std::string to_string(void) const;
 };
 
 }  // namespace mx
