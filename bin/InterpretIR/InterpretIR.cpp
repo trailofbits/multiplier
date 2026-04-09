@@ -143,6 +143,11 @@ class Interpreter {
   void MemWriteValue(const Pointer &ptr, const Value &val, size_t size);
   Value MemReadValue(const Pointer &ptr, size_t size, bool is_float);
 
+  // Pointer shadow map: tracks which memory locations hold pointer values.
+  // Key = (object_id << 32) | offset. When a pointer is written, it's
+  // recorded here. When loading pointer-sized values, check here first.
+  std::unordered_map<uint64_t, Pointer> pointer_shadow_;
+
   // Allocate memory for an object.
   void AllocateObject(const mx::IRObject &obj);
 
@@ -206,10 +211,19 @@ void Interpreter::MemRead(const Pointer &ptr, void *data, size_t len) {
 
 void Interpreter::MemWriteValue(const Pointer &ptr, const Value &val,
                                  size_t size) {
+  uint64_t shadow_key = (static_cast<uint64_t>(ptr.object_id) << 32) |
+                         (static_cast<uint32_t>(ptr.offset) & 0xFFFFFFFF);
   if (val.kind == Value::POINTER) {
-    // Store pointer as raw bytes (object_id + offset).
-    MemWrite(ptr, &val.ptr, sizeof(val.ptr));
-  } else if (val.kind == Value::FLOATING) {
+    // Record pointer in shadow map for later loads.
+    pointer_shadow_[shadow_key] = val.ptr;
+    // Also write a sentinel to memory bytes (not meaningful, just fills space).
+    int64_t sentinel = 0;
+    MemWrite(ptr, &sentinel, std::min(size, sizeof(sentinel)));
+    return;
+  }
+  // Non-pointer write: clear pointer shadow at this location.
+  pointer_shadow_.erase(shadow_key);
+  if (val.kind == Value::FLOATING) {
     if (size == 4) {
       float f = static_cast<float>(val.fval);
       MemWrite(ptr, &f, 4);
@@ -224,6 +238,13 @@ void Interpreter::MemWriteValue(const Pointer &ptr, const Value &val,
 
 Value Interpreter::MemReadValue(const Pointer &ptr, size_t size,
                                  bool is_float) {
+  // Check pointer shadow map first.
+  uint64_t shadow_key = (static_cast<uint64_t>(ptr.object_id) << 32) |
+                         (static_cast<uint32_t>(ptr.offset) & 0xFFFFFFFF);
+  auto pit = pointer_shadow_.find(shadow_key);
+  if (pit != pointer_shadow_.end()) {
+    return Value::Ptr(pit->second.object_id, pit->second.offset);
+  }
   if (is_float) {
     if (size == 4) {
       float f = 0;
@@ -1643,6 +1664,7 @@ Value Interpreter::Run(const std::vector<Value> &args) {
   param_ptrs_.clear();
   values_.clear();
   memory_.clear();
+  pointer_shadow_.clear();
   block_map_.clear();
   steps_ = 0;
 
