@@ -234,8 +234,16 @@ Value Interpreter::MemReadValue(const Pointer &ptr, size_t size,
     MemRead(ptr, &d, 8);
     return Value::Float(d);
   }
+  // Read integer and sign-extend to int64 to match CONST representation.
+  // The IR uses CAST/ZEXT explicitly for unsigned extension.
   int64_t v = 0;
   MemRead(ptr, &v, std::min(size, sizeof(v)));
+  switch (size) {
+    case 1: v = static_cast<int64_t>(static_cast<int8_t>(v)); break;
+    case 2: v = static_cast<int64_t>(static_cast<int16_t>(v)); break;
+    case 4: v = static_cast<int64_t>(static_cast<int32_t>(v)); break;
+    default: break;
+  }
   return Value::Int(v);
 }
 
@@ -244,9 +252,19 @@ Value Interpreter::MemReadValue(const Pointer &ptr, size_t size,
 // ---------------------------------------------------------------------------
 
 Value Interpreter::GetValue(const mx::IRInstruction &inst) {
+  auto op = inst.opcode();
   auto eid = mx::EntityId(inst.id()).Pack();
+
+  // Use cached result if available.
   auto it = values_.find(eid);
   if (it != values_.end()) return it->second;
+
+  // Lazy evaluation for sub-expressions not yet computed.
+  if (!mx::ir::IsTerminator(op)) {
+    Eval(inst);
+    it = values_.find(eid);
+    if (it != values_.end()) return it->second;
+  }
   return Value::Undef();
 }
 
@@ -1675,6 +1693,11 @@ Value Interpreter::Run(const std::vector<Value> &args) {
       LOG(ERROR) << "Interpreter exceeded max steps (" << FLAGS_max_steps << ")";
       break;
     }
+
+    // Clear cached instruction values at block boundaries. This ensures
+    // LOADs re-read from memory on each block visit (critical for loops).
+    // Lazy evaluation in GetValue will recompute sub-expressions on demand.
+    values_.clear();
 
     if (trace_) {
       std::cerr << "Block " << mx::ir::EnumeratorName(current.kind())
