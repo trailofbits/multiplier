@@ -124,4 +124,16 @@
     "command": "/Users/orangesloth/Install/multiplier/Release/bin/clang -c -std=c11 /Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_evil_goto.c",
     "file": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_evil_goto.c"
   }
+,
+  {
+    "directory": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR",
+    "command": "/Users/orangesloth/Install/multiplier/Release/bin/clang -c -std=c11 /Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_conditional_exec.c",
+    "file": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_conditional_exec.c"
+  }
+,
+  {
+    "directory": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR",
+    "command": "/Users/orangesloth/Install/multiplier/Release/bin/clang -c -std=c11 /Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_unsigned.c",
+    "file": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_unsigned.c"
+  }
 ]
