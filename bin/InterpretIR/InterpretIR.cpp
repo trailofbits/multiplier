@@ -256,7 +256,8 @@ Value Interpreter::MemReadValue(const Pointer &ptr, size_t size,
     return Value::Float(d);
   }
   // Read integer and sign-extend to int64 to match CONST representation.
-  // The IR uses CAST/ZEXT explicitly for unsigned extension.
+  // Everything is int64 internally. Sign extension ensures -10 stored in
+  // 4 bytes reads back as int64(-10), matching CONST(INT32, -10).
   int64_t v = 0;
   MemRead(ptr, &v, std::min(size, sizeof(v)));
   switch (size) {
@@ -1130,8 +1131,50 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
         } else if (sub == mx::ir::CastOp::F32_TO_F64 ||
                    sub == mx::ir::CastOp::F64_TO_F32) {
           result = Value::Float(v.as_float());
+        } else if (mx::ir::IsSignExtend(sub)) {
+          // Sign-extend: LOADs already sign-extend to int64, so SEXT is
+          // a no-op (the value is already correctly sign-extended).
+          result = Value::Int(v.as_int());
+        } else if (mx::ir::IsZeroExtend(sub)) {
+          // Zero-extend: mask to source width (undoing sign-extension from LOAD).
+          int64_t iv = v.as_int();
+          switch (sub) {
+            case mx::ir::CastOp::ZEXT_I8_I16:
+            case mx::ir::CastOp::ZEXT_I8_I32:
+            case mx::ir::CastOp::ZEXT_I8_I64:
+              iv = iv & 0xFF;
+              break;
+            case mx::ir::CastOp::ZEXT_I16_I32:
+            case mx::ir::CastOp::ZEXT_I16_I64:
+              iv = iv & 0xFFFF;
+              break;
+            case mx::ir::CastOp::ZEXT_I32_I64:
+              iv = iv & 0xFFFFFFFF;
+              break;
+            default: break;
+          }
+          result = Value::Int(iv);
+        } else if (mx::ir::IsTruncate(sub)) {
+          // Truncate: mask to target width.
+          int64_t iv = v.as_int();
+          switch (sub) {
+            case mx::ir::CastOp::TRUNC_I16_I8:
+            case mx::ir::CastOp::TRUNC_I32_I8:
+            case mx::ir::CastOp::TRUNC_I64_I8:
+              iv = iv & 0xFF;
+              break;
+            case mx::ir::CastOp::TRUNC_I32_I16:
+            case mx::ir::CastOp::TRUNC_I64_I16:
+              iv = iv & 0xFFFF;
+              break;
+            case mx::ir::CastOp::TRUNC_I64_I32:
+              iv = iv & 0xFFFFFFFF;
+              break;
+            default: break;
+          }
+          result = Value::Int(iv);
         } else {
-          // Sign/zero extend, truncate -- all int-to-int.
+          // Other int-to-int casts.
           result = Value::Int(v.as_int());
         }
       }
