@@ -1401,8 +1401,16 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
       }
       return;
     }
-    for (const auto &child : stmt.Children()) {
-      emit_case_bodies(child);
+    // For CompoundStmt or other container, process children.
+    // Non-case/default statements (like break, assignments between cases)
+    // are emitted directly.
+    if (pasta::CompoundStmt::From(stmt)) {
+      for (const auto &child : stmt.Children()) {
+        emit_case_bodies(child);
+      }
+    } else {
+      // Regular statement between cases (e.g., break, goto, assignment).
+      EmitStmt(stmt);
     }
   };
   emit_case_bodies(body);
