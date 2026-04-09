@@ -2390,7 +2390,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     // `*::ir()` -- the IR entity corresponding to this AST entity.
     // For FunctionDecl, returns IRFunction. For Stmt/Expr, returns IRInstruction.
-    // For CaseStmt/DefaultStmt, returns IRSwitchCase. Etc.
+    // For CaseStmt/DefaultStmt, returns IRStructure (SWITCH_CASE). Etc.
     if (class_name == "Decl" || class_name == "Stmt") {
       auto sd = storage.AddMethod("UInt64");  // IR entity ID (any IR kind).
       auto [cd_getter_name, cd_setter_name, cd_init_name] = NamesFor(sd);
@@ -2425,10 +2425,6 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  } else if (auto *p = std::get_if<IRObjectId>(&vid)) {\n"
           << "    if (auto ptr = impl->ep->IRObjectFor(impl->ep, raw)) {\n"
           << "      return IRObject(std::move(ptr));\n"
-          << "    }\n"
-          << "  } else if (auto *p = std::get_if<IRSwitchCaseId>(&vid)) {\n"
-          << "    if (auto ptr = impl->ep->IRSwitchCaseFor(impl->ep, raw)) {\n"
-          << "      return IRSwitchCase(std::move(ptr));\n"
           << "    }\n"
           << "  } else if (auto *p = std::get_if<IRStructureId>(&vid)) {\n"
           << "    if (auto ptr = impl->ep->IRStructureFor(impl->ep, raw)) {\n"

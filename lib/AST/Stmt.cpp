@@ -61,10 +61,6 @@ std::optional<VariantEntity> Stmt::ir(void) const {
     if (auto ptr = impl->ep->IRObjectFor(impl->ep, raw)) {
       return IRObject(std::move(ptr));
     }
-  } else if (auto *p = std::get_if<IRSwitchCaseId>(&vid)) {
-    if (auto ptr = impl->ep->IRSwitchCaseFor(impl->ep, raw)) {
-      return IRSwitchCase(std::move(ptr));
-    }
   } else if (auto *p = std::get_if<IRStructureId>(&vid)) {
     if (auto ptr = impl->ep->IRStructureFor(impl->ep, raw)) {
       return IRStructure(std::move(ptr));

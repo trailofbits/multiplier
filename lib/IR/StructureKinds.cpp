@@ -183,4 +183,12 @@ bool IRSwitchCaseStructure::is_default(void) const {
   return impl_ptr()->reader().getIsDefault();
 }
 
+IRBlock IRSwitchCaseStructure::target_block(void) const {
+  // The target block is the first child block of this SWITCH_CASE structure.
+  for (auto child : child_blocks()) {
+    return child;
+  }
+  return {};
+}
+
 }  // namespace mx

@@ -88,11 +88,12 @@ struct InstructionIR {
   std::vector<BranchTargetIR> branch_targets;
 
   // Switch cases: one per case/default in a switch statement.
-  // Each maps to an IRSwitchCase entity in the serialized output.
+  // Each maps to an IRStructure entity (kind SWITCH_CASE) in the serialized output.
   struct SwitchCaseIR {
     int64_t low{0};
     int64_t high{0};
     uint32_t block_index{0};
+    uint32_t structure_index{UINT32_MAX};  // Index into func.structures
     mx::RawEntityId source_entity_id{mx::kInvalidEntityId};  // CaseStmt/DefaultStmt
     bool is_default{false};
   };

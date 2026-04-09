@@ -62,8 +62,7 @@ static constexpr uint64_t kIRFunctionOffset = 0u;
 static constexpr uint64_t kIRBlockOffset = 1u;
 static constexpr uint64_t kIRInstructionOffset = kIRBlockOffset + kNumBlockKinds;
 static constexpr uint64_t kIRObjectOffset = kIRInstructionOffset + kNumOpCodes;
-static constexpr uint64_t kIRSwitchCaseOffset = kIRObjectOffset + 1u;
-static constexpr uint64_t kIRStructureOffset = kIRSwitchCaseOffset + 1u;
+static constexpr uint64_t kIRStructureOffset = kIRObjectOffset + 1u;
 static constexpr uint64_t kNumIREntityKinds = kIRStructureOffset + kNumStructureKinds;
 
 static constexpr unsigned kSubKindNumBits = 11u;
@@ -763,12 +762,6 @@ EntityId::EntityId(IRObjectId id) {
   }
 }
 
-EntityId::EntityId(IRSwitchCaseId id) {
-  if (id.fragment_id) {
-    PackIREntity(opaque, id.fragment_id, kIRSwitchCaseOffset, id.offset);
-  }
-}
-
 EntityId::EntityId(IRStructureId id) {
   if (id.fragment_id) {
     PackIREntity(opaque, id.fragment_id,
@@ -1131,8 +1124,6 @@ VariantId EntityId::Unpack(void) const noexcept {
                                  static_cast<ir::OpCode>(sub_kind - kIRInstructionOffset)};
         } else if (sub_kind == kIRObjectOffset) {
           return IRObjectId{fid, off};
-        } else if (sub_kind == kIRSwitchCaseOffset) {
-          return IRSwitchCaseId{fid, off};
         } else if (sub_kind >= kIRStructureOffset &&
                    sub_kind < kIRStructureOffset + kNumStructureKinds) {
           return IRStructureId{fid, off,
@@ -1258,8 +1249,6 @@ VariantId EntityId::Unpack(void) const noexcept {
                                  static_cast<ir::OpCode>(sub_kind - kIRInstructionOffset)};
         } else if (sub_kind == kIRObjectOffset) {
           return IRObjectId{fid, off};
-        } else if (sub_kind == kIRSwitchCaseOffset) {
-          return IRSwitchCaseId{fid, off};
         } else if (sub_kind >= kIRStructureOffset &&
                    sub_kind < kIRStructureOffset + kNumStructureKinds) {
           return IRStructureId{fid, off,

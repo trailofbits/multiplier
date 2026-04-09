@@ -20,10 +20,6 @@ rpc::ir::Instruction::Reader IRInstructionImpl::reader() const {
   return frag->reader.getIrInstructions()[offset];
 }
 
-rpc::ir::SwitchCase::Reader IRSwitchCaseImpl::reader() const {
-  return frag->reader.getIrSwitchCases()[offset];
-}
-
 rpc::ir::Object::Reader IRObjectImpl::reader() const {
   return frag->reader.getIrObjects()[offset];
 }

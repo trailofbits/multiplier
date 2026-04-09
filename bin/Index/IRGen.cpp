@@ -1312,6 +1312,9 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
         sc_struct.case_low = cases[ci].low;
         sc_struct.case_high = cases[ci].high;
         sc_struct.is_default = false;
+        // Record structure index back into the switch instruction.
+        func_.instructions[term_idx].switch_cases[ci].structure_index =
+            current_structure_index_;
         SwitchToBlock(cases[ci].block_index);
         AssociateBlockWithStructure(cases[ci].block_index);
         // Record case block structure for Duff's device compensation.
@@ -1332,6 +1335,9 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
                       cases[ci].source_entity_id);
         auto &sc_struct = func_.structures[current_structure_index_];
         sc_struct.is_default = true;
+        // Record structure index back into the switch instruction.
+        func_.instructions[term_idx].switch_cases[ci].structure_index =
+            current_structure_index_;
         SwitchToBlock(cases[ci].block_index);
         AssociateBlockWithStructure(cases[ci].block_index);
         // Record default block structure for Duff's device compensation.

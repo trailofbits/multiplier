@@ -32,16 +32,6 @@ struct Block @0xb1141386bcc94b26 {
   parentStructureId @7 :UInt64;   # IRStructureId of enclosing structure
 }
 
-struct SwitchCase @0x93795f3c8abc1070 {
-  low @0 :Int64;              # Case value lower bound
-  high @1 :Int64;             # Case value upper bound (== low for normal cases)
-  targetBlockId @2 :UInt64;   # IRBlockId of target block
-  sourceEntityId @3 :UInt64;  # CaseStmt/DefaultStmt AST entity ID
-  valueTypeId @4 :UInt64;     # Integral type for interpreting values
-  isDefault @5 :Bool;         # True for the default case
-  switchInstructionId @6 :UInt64;  # IRInstructionId of parent switch
-}
-
 struct Structure @0xd4a8b7c2e9f31056 {
   sourceEntityId @0 :UInt64;    # AST Stmt/Decl entity ID
   parentId @1 :UInt64;          # IRStructureId of parent (or IRFunctionId)

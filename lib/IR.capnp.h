@@ -21,7 +21,7 @@ namespace schemas {
 CAPNP_DECLARE_SCHEMA(a7625c6bfddc036b);
 CAPNP_DECLARE_SCHEMA(c6bb311936d9962b);
 CAPNP_DECLARE_SCHEMA(b1141386bcc94b26);
-CAPNP_DECLARE_SCHEMA(93795f3c8abc1070);
+CAPNP_DECLARE_SCHEMA(d4a8b7c2e9f31056);
 CAPNP_DECLARE_SCHEMA(e6be31a259218610);
 
 }  // namespace schemas
@@ -69,22 +69,22 @@ struct Block {
   class Pipeline;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(b1141386bcc94b26, 2, 0)
+    CAPNP_DECLARE_STRUCT_HEADER(b1141386bcc94b26, 3, 0)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
   };
 };
 
-struct SwitchCase {
-  SwitchCase() = delete;
+struct Structure {
+  Structure() = delete;
 
   class Reader;
   class Builder;
   class Pipeline;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(93795f3c8abc1070, 7, 0)
+    CAPNP_DECLARE_STRUCT_HEADER(d4a8b7c2e9f31056, 6, 0)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
@@ -99,7 +99,7 @@ struct Function {
   class Pipeline;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(e6be31a259218610, 4, 0)
+    CAPNP_DECLARE_STRUCT_HEADER(e6be31a259218610, 5, 0)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
@@ -347,6 +347,8 @@ public:
 
   inline  ::uint8_t getKind() const;
 
+  inline  ::uint64_t getParentStructureId() const;
+
 private:
   ::capnp::_::StructReader _reader;
   template <typename, ::capnp::Kind>
@@ -396,6 +398,9 @@ public:
   inline  ::uint8_t getKind();
   inline void setKind( ::uint8_t value);
 
+  inline  ::uint64_t getParentStructureId();
+  inline void setParentStructureId( ::uint64_t value);
+
 private:
   ::capnp::_::StructBuilder _builder;
   template <typename, ::capnp::Kind>
@@ -422,9 +427,9 @@ private:
 };
 #endif  // !CAPNP_LITE
 
-class SwitchCase::Reader {
+class Structure::Reader {
 public:
-  typedef SwitchCase Reads;
+  typedef Structure Reads;
 
   Reader() = default;
   inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
@@ -439,19 +444,23 @@ public:
   }
 #endif  // !CAPNP_LITE
 
-  inline  ::int64_t getLow() const;
-
-  inline  ::int64_t getHigh() const;
-
-  inline  ::uint64_t getTargetBlockId() const;
-
   inline  ::uint64_t getSourceEntityId() const;
 
-  inline  ::uint64_t getValueTypeId() const;
+  inline  ::uint64_t getParentId() const;
+
+  inline  ::uint8_t getKind() const;
+
+  inline  ::uint32_t getEntityOffset() const;
+
+  inline  ::uint16_t getNumChildren() const;
+
+  inline  ::uint16_t getNumObjects() const;
+
+  inline  ::int64_t getCaseLow() const;
+
+  inline  ::int64_t getCaseHigh() const;
 
   inline bool getIsDefault() const;
-
-  inline  ::uint64_t getSwitchInstructionId() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -465,9 +474,9 @@ private:
   friend class ::capnp::Orphanage;
 };
 
-class SwitchCase::Builder {
+class Structure::Builder {
 public:
-  typedef SwitchCase Builds;
+  typedef Structure Builds;
 
   Builder() = delete;  // Deleted to discourage incorrect usage.
                        // You can explicitly initialize to nullptr instead.
@@ -481,26 +490,32 @@ public:
   inline ::kj::StringTree toString() const { return asReader().toString(); }
 #endif  // !CAPNP_LITE
 
-  inline  ::int64_t getLow();
-  inline void setLow( ::int64_t value);
-
-  inline  ::int64_t getHigh();
-  inline void setHigh( ::int64_t value);
-
-  inline  ::uint64_t getTargetBlockId();
-  inline void setTargetBlockId( ::uint64_t value);
-
   inline  ::uint64_t getSourceEntityId();
   inline void setSourceEntityId( ::uint64_t value);
 
-  inline  ::uint64_t getValueTypeId();
-  inline void setValueTypeId( ::uint64_t value);
+  inline  ::uint64_t getParentId();
+  inline void setParentId( ::uint64_t value);
+
+  inline  ::uint8_t getKind();
+  inline void setKind( ::uint8_t value);
+
+  inline  ::uint32_t getEntityOffset();
+  inline void setEntityOffset( ::uint32_t value);
+
+  inline  ::uint16_t getNumChildren();
+  inline void setNumChildren( ::uint16_t value);
+
+  inline  ::uint16_t getNumObjects();
+  inline void setNumObjects( ::uint16_t value);
+
+  inline  ::int64_t getCaseLow();
+  inline void setCaseLow( ::int64_t value);
+
+  inline  ::int64_t getCaseHigh();
+  inline void setCaseHigh( ::int64_t value);
 
   inline bool getIsDefault();
   inline void setIsDefault(bool value);
-
-  inline  ::uint64_t getSwitchInstructionId();
-  inline void setSwitchInstructionId( ::uint64_t value);
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -512,9 +527,9 @@ private:
 };
 
 #if !CAPNP_LITE
-class SwitchCase::Pipeline {
+class Structure::Pipeline {
 public:
-  typedef SwitchCase Pipelines;
+  typedef Structure Pipelines;
 
   inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
   inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
@@ -556,6 +571,8 @@ public:
   inline  ::uint32_t getEntityOffset() const;
 
   inline  ::uint8_t getKind() const;
+
+  inline  ::uint64_t getBodyScopeId() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -602,6 +619,9 @@ public:
 
   inline  ::uint8_t getKind();
   inline void setKind( ::uint8_t value);
+
+  inline  ::uint64_t getBodyScopeId();
+  inline void setBodyScopeId( ::uint64_t value);
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -921,102 +941,144 @@ inline void Block::Builder::setKind( ::uint8_t value) {
       ::capnp::bounded<14>() * ::capnp::ELEMENTS, value);
 }
 
-inline  ::int64_t SwitchCase::Reader::getLow() const {
-  return _reader.getDataField< ::int64_t>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
-}
-
-inline  ::int64_t SwitchCase::Builder::getLow() {
-  return _builder.getDataField< ::int64_t>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
-}
-inline void SwitchCase::Builder::setLow( ::int64_t value) {
-  _builder.setDataField< ::int64_t>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
-}
-
-inline  ::int64_t SwitchCase::Reader::getHigh() const {
-  return _reader.getDataField< ::int64_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
-}
-
-inline  ::int64_t SwitchCase::Builder::getHigh() {
-  return _builder.getDataField< ::int64_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
-}
-inline void SwitchCase::Builder::setHigh( ::int64_t value) {
-  _builder.setDataField< ::int64_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
-}
-
-inline  ::uint64_t SwitchCase::Reader::getTargetBlockId() const {
+inline  ::uint64_t Block::Reader::getParentStructureId() const {
   return _reader.getDataField< ::uint64_t>(
       ::capnp::bounded<2>() * ::capnp::ELEMENTS);
 }
 
-inline  ::uint64_t SwitchCase::Builder::getTargetBlockId() {
+inline  ::uint64_t Block::Builder::getParentStructureId() {
   return _builder.getDataField< ::uint64_t>(
       ::capnp::bounded<2>() * ::capnp::ELEMENTS);
 }
-inline void SwitchCase::Builder::setTargetBlockId( ::uint64_t value) {
+inline void Block::Builder::setParentStructureId( ::uint64_t value) {
   _builder.setDataField< ::uint64_t>(
       ::capnp::bounded<2>() * ::capnp::ELEMENTS, value);
 }
 
-inline  ::uint64_t SwitchCase::Reader::getSourceEntityId() const {
+inline  ::uint64_t Structure::Reader::getSourceEntityId() const {
   return _reader.getDataField< ::uint64_t>(
-      ::capnp::bounded<3>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
 }
 
-inline  ::uint64_t SwitchCase::Builder::getSourceEntityId() {
+inline  ::uint64_t Structure::Builder::getSourceEntityId() {
   return _builder.getDataField< ::uint64_t>(
-      ::capnp::bounded<3>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
 }
-inline void SwitchCase::Builder::setSourceEntityId( ::uint64_t value) {
+inline void Structure::Builder::setSourceEntityId( ::uint64_t value) {
   _builder.setDataField< ::uint64_t>(
-      ::capnp::bounded<3>() * ::capnp::ELEMENTS, value);
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
 }
 
-inline  ::uint64_t SwitchCase::Reader::getValueTypeId() const {
+inline  ::uint64_t Structure::Reader::getParentId() const {
   return _reader.getDataField< ::uint64_t>(
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
+}
+
+inline  ::uint64_t Structure::Builder::getParentId() {
+  return _builder.getDataField< ::uint64_t>(
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
+}
+inline void Structure::Builder::setParentId( ::uint64_t value) {
+  _builder.setDataField< ::uint64_t>(
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
+}
+
+inline  ::uint8_t Structure::Reader::getKind() const {
+  return _reader.getDataField< ::uint8_t>(
+      ::capnp::bounded<16>() * ::capnp::ELEMENTS);
+}
+
+inline  ::uint8_t Structure::Builder::getKind() {
+  return _builder.getDataField< ::uint8_t>(
+      ::capnp::bounded<16>() * ::capnp::ELEMENTS);
+}
+inline void Structure::Builder::setKind( ::uint8_t value) {
+  _builder.setDataField< ::uint8_t>(
+      ::capnp::bounded<16>() * ::capnp::ELEMENTS, value);
+}
+
+inline  ::uint32_t Structure::Reader::getEntityOffset() const {
+  return _reader.getDataField< ::uint32_t>(
+      ::capnp::bounded<5>() * ::capnp::ELEMENTS);
+}
+
+inline  ::uint32_t Structure::Builder::getEntityOffset() {
+  return _builder.getDataField< ::uint32_t>(
+      ::capnp::bounded<5>() * ::capnp::ELEMENTS);
+}
+inline void Structure::Builder::setEntityOffset( ::uint32_t value) {
+  _builder.setDataField< ::uint32_t>(
+      ::capnp::bounded<5>() * ::capnp::ELEMENTS, value);
+}
+
+inline  ::uint16_t Structure::Reader::getNumChildren() const {
+  return _reader.getDataField< ::uint16_t>(
+      ::capnp::bounded<9>() * ::capnp::ELEMENTS);
+}
+
+inline  ::uint16_t Structure::Builder::getNumChildren() {
+  return _builder.getDataField< ::uint16_t>(
+      ::capnp::bounded<9>() * ::capnp::ELEMENTS);
+}
+inline void Structure::Builder::setNumChildren( ::uint16_t value) {
+  _builder.setDataField< ::uint16_t>(
+      ::capnp::bounded<9>() * ::capnp::ELEMENTS, value);
+}
+
+inline  ::uint16_t Structure::Reader::getNumObjects() const {
+  return _reader.getDataField< ::uint16_t>(
+      ::capnp::bounded<12>() * ::capnp::ELEMENTS);
+}
+
+inline  ::uint16_t Structure::Builder::getNumObjects() {
+  return _builder.getDataField< ::uint16_t>(
+      ::capnp::bounded<12>() * ::capnp::ELEMENTS);
+}
+inline void Structure::Builder::setNumObjects( ::uint16_t value) {
+  _builder.setDataField< ::uint16_t>(
+      ::capnp::bounded<12>() * ::capnp::ELEMENTS, value);
+}
+
+inline  ::int64_t Structure::Reader::getCaseLow() const {
+  return _reader.getDataField< ::int64_t>(
       ::capnp::bounded<4>() * ::capnp::ELEMENTS);
 }
 
-inline  ::uint64_t SwitchCase::Builder::getValueTypeId() {
-  return _builder.getDataField< ::uint64_t>(
+inline  ::int64_t Structure::Builder::getCaseLow() {
+  return _builder.getDataField< ::int64_t>(
       ::capnp::bounded<4>() * ::capnp::ELEMENTS);
 }
-inline void SwitchCase::Builder::setValueTypeId( ::uint64_t value) {
-  _builder.setDataField< ::uint64_t>(
+inline void Structure::Builder::setCaseLow( ::int64_t value) {
+  _builder.setDataField< ::int64_t>(
       ::capnp::bounded<4>() * ::capnp::ELEMENTS, value);
 }
 
-inline bool SwitchCase::Reader::getIsDefault() const {
+inline  ::int64_t Structure::Reader::getCaseHigh() const {
+  return _reader.getDataField< ::int64_t>(
+      ::capnp::bounded<5>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int64_t Structure::Builder::getCaseHigh() {
+  return _builder.getDataField< ::int64_t>(
+      ::capnp::bounded<5>() * ::capnp::ELEMENTS);
+}
+inline void Structure::Builder::setCaseHigh( ::int64_t value) {
+  _builder.setDataField< ::int64_t>(
+      ::capnp::bounded<5>() * ::capnp::ELEMENTS, value);
+}
+
+inline bool Structure::Reader::getIsDefault() const {
   return _reader.getDataField<bool>(
-      ::capnp::bounded<320>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<136>() * ::capnp::ELEMENTS);
 }
 
-inline bool SwitchCase::Builder::getIsDefault() {
+inline bool Structure::Builder::getIsDefault() {
   return _builder.getDataField<bool>(
-      ::capnp::bounded<320>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<136>() * ::capnp::ELEMENTS);
 }
-inline void SwitchCase::Builder::setIsDefault(bool value) {
+inline void Structure::Builder::setIsDefault(bool value) {
   _builder.setDataField<bool>(
-      ::capnp::bounded<320>() * ::capnp::ELEMENTS, value);
-}
-
-inline  ::uint64_t SwitchCase::Reader::getSwitchInstructionId() const {
-  return _reader.getDataField< ::uint64_t>(
-      ::capnp::bounded<6>() * ::capnp::ELEMENTS);
-}
-
-inline  ::uint64_t SwitchCase::Builder::getSwitchInstructionId() {
-  return _builder.getDataField< ::uint64_t>(
-      ::capnp::bounded<6>() * ::capnp::ELEMENTS);
-}
-inline void SwitchCase::Builder::setSwitchInstructionId( ::uint64_t value) {
-  _builder.setDataField< ::uint64_t>(
-      ::capnp::bounded<6>() * ::capnp::ELEMENTS, value);
+      ::capnp::bounded<136>() * ::capnp::ELEMENTS, value);
 }
 
 inline  ::uint64_t Function::Reader::getSourceDeclEntityId() const {
@@ -1101,6 +1163,20 @@ inline  ::uint8_t Function::Builder::getKind() {
 inline void Function::Builder::setKind( ::uint8_t value) {
   _builder.setDataField< ::uint8_t>(
       ::capnp::bounded<24>() * ::capnp::ELEMENTS, value);
+}
+
+inline  ::uint64_t Function::Reader::getBodyScopeId() const {
+  return _reader.getDataField< ::uint64_t>(
+      ::capnp::bounded<4>() * ::capnp::ELEMENTS);
+}
+
+inline  ::uint64_t Function::Builder::getBodyScopeId() {
+  return _builder.getDataField< ::uint64_t>(
+      ::capnp::bounded<4>() * ::capnp::ELEMENTS);
+}
+inline void Function::Builder::setBodyScopeId( ::uint64_t value) {
+  _builder.setDataField< ::uint64_t>(
+      ::capnp::bounded<4>() * ::capnp::ELEMENTS, value);
 }
 
 }  // namespace

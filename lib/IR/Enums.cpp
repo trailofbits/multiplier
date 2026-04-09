@@ -173,7 +173,6 @@ const char *EnumeratorName(IREntityKind kind) noexcept {
     case IREntityKind::IR_BLOCK: return "IR_BLOCK";
     case IREntityKind::IR_INSTRUCTION: return "IR_INSTRUCTION";
     case IREntityKind::IR_OBJECT: return "IR_OBJECT";
-    case IREntityKind::IR_SWITCH_CASE: return "IR_SWITCH_CASE";
     case IREntityKind::IR_STRUCTURE: return "IR_STRUCTURE";
   }
   return "UNKNOWN";

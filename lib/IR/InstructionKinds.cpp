@@ -4,7 +4,6 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include <multiplier/IR/InstructionKinds.h>
-#include <multiplier/IR/SwitchCase.h>
 #include <multiplier/IR/Structure.h>
 #include <multiplier/AST/FunctionDecl.h>
 #include <multiplier/AST/FieldDecl.h>
@@ -671,17 +670,19 @@ unsigned SwitchInst::num_cases(void) const {
   auto r = impl->reader();
   auto extra_base = ExtraBase(r, GetIntPool(*impl));
   // Extras: [caseType, case0_eid, case1_eid, ...]
-  // Count = total extras - 1 (for caseType).
-  // But we don't know total extras directly. Use the switch_cases count
-  // from the SwitchCaseIR data that was serialized.
-  // Actually, we can count by checking how many pool entries after caseType
-  // are IRSwitchCaseId.
+  // Count by checking how many pool entries after caseType are
+  // IRStructureId with SWITCH_CASE kind.
   unsigned count = 0;
   for (uint32_t i = extra_base + 1; ; ++i) {
     if (i >= pool.size()) break;
     auto vid = EntityId(pool[i]).Unpack();
-    if (!std::holds_alternative<IRSwitchCaseId>(vid)) break;
-    ++count;
+    if (auto *sid = std::get_if<IRStructureId>(&vid)) {
+      if (sid->structure_kind == ir::StructureKind::SWITCH_CASE) {
+        ++count;
+        continue;
+      }
+    }
+    break;
   }
   return count;
 }
@@ -691,7 +692,7 @@ std::optional<Type> SwitchInst::case_type(void) const {
   return MaybeResolveType(*impl, pool[ExtraBase(impl->reader(), GetIntPool(*impl))]);
 }
 
-gap::generator<IRSwitchCase> SwitchInst::cases(void) const & {
+gap::generator<IRSwitchCaseStructure> SwitchInst::cases(void) const & {
   auto pool = GetPool(*impl);
   auto r = impl->reader();
   auto extra_base = ExtraBase(r, GetIntPool(*impl));
@@ -700,12 +701,14 @@ gap::generator<IRSwitchCase> SwitchInst::cases(void) const & {
   for (uint32_t i = extra_base + 1; ; ++i) {
     if (i >= pool.size()) break;
     auto vid = EntityId(pool[i]).Unpack();
-    if (auto *scid = std::get_if<IRSwitchCaseId>(&vid)) {
-      co_yield IRSwitchCase(std::make_shared<IRSwitchCaseImpl>(
-          impl->frag, scid->offset, impl->fragment_id));
-    } else {
-      break;
+    if (auto *sid = std::get_if<IRStructureId>(&vid)) {
+      if (sid->structure_kind == ir::StructureKind::SWITCH_CASE) {
+        co_yield IRSwitchCaseStructure(std::make_shared<IRStructureImpl>(
+            impl->frag, sid->offset, impl->fragment_id));
+        continue;
+      }
     }
+    break;
   }
 }
 

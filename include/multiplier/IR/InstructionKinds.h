@@ -9,7 +9,7 @@
 #include "OpCode.h"
 #include "Block.h"
 #include "Object.h"
-#include "SwitchCase.h"
+#include "StructureKinds.h"
 #include "../AST/Decl.h"
 #include "../AST/Type.h"
 
@@ -368,7 +368,7 @@ class MX_EXPORT SwitchInst : public IRInstruction {
   MX_DECLARE_IR_INSTRUCTION(SwitchInst)
   IRInstruction selector(void) const;
   std::optional<Type> case_type(void) const;
-  gap::generator<IRSwitchCase> cases(void) const &;
+  gap::generator<IRSwitchCaseStructure> cases(void) const &;
   unsigned num_cases(void) const;
 };
 

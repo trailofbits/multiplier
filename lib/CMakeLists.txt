@@ -143,7 +143,6 @@ add_library("mx-api" OBJECT
   "IR/Block.cpp"
   "IR/Instruction.cpp"
   "IR/InstructionKinds.cpp"
-  "IR/SwitchCase.cpp"
   "IR/Structure.cpp"
   "IR/StructureKinds.cpp"
   "IR/Object.cpp"

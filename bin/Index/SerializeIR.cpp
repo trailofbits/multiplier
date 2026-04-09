@@ -613,21 +613,11 @@ void SerializeIR(
     struct_offset += static_cast<uint32_t>(func.structures.size());
   }
 
-  // Emit SwitchCase entities and fill in placeholder pool entries.
+  // Fill in switch instruction placeholder pool entries with IRStructureId
+  // references to the SWITCH_CASE structures.
   {
-    uint32_t total_switch_cases = 0;
-    for (const auto &func : ir_functions) {
-      for (const auto &inst : func.instructions) {
-        if (inst.opcode == mx::ir::OpCode::SWITCH) {
-          total_switch_cases += static_cast<uint32_t>(inst.switch_cases.size());
-        }
-      }
-    }
-
-    auto frag_cases = fb.initIrSwitchCases(total_switch_cases);
-    uint32_t sc_offset = 0;
-    uint32_t func_block_base = 0;
     uint32_t func_inst_base = 0;
+    uint32_t func_struct_base = 0;
 
     for (const auto &func : ir_functions) {
       for (uint32_t ii = 0; ii < func.instructions.size(); ++ii) {
@@ -642,36 +632,22 @@ void SerializeIR(
 
         for (size_t sci = 0; sci < inst.switch_cases.size(); ++sci) {
           const auto &sc = inst.switch_cases[sci];
-          auto cb = frag_cases[sc_offset];
-          cb.setLow(sc.low);
-          cb.setHigh(sc.high);
-          cb.setTargetBlockId(MakeBlockEid(func, fragment_id,
-                                            func_block_base, sc.block_index));
-          cb.setSourceEntityId(sc.source_entity_id);
-          cb.setValueTypeId(inst.type_entity_id);
-          cb.setIsDefault(sc.is_default);
 
-          // Store the parent switch instruction ID.
-          auto switch_eid = mx::EntityId(mx::IRInstructionId{
-              fragment_id, func_inst_base + ii,
-              mx::ir::OpCode::SWITCH}).Pack();
-          cb.setSwitchInstructionId(switch_eid);
-
-          // Overwrite the placeholder in the pool.
-          mx::IRSwitchCaseId scid{fragment_id, sc_offset};
-          auto sc_eid = mx::EntityId(scid).Pack();
+          // Overwrite the placeholder with an IRStructureId for the
+          // SWITCH_CASE structure.
+          auto sc_eid = MakeStructureEid(func, fragment_id,
+                                          func_struct_base,
+                                          sc.structure_index);
           pool.entities[placeholder_base + sci] = sc_eid;
 
-          // Map CaseStmt/DefaultStmt → IRSwitchCase.
+          // Map CaseStmt/DefaultStmt -> IRStructure (SWITCH_CASE).
           if (sc.source_entity_id != mx::kInvalidEntityId) {
             em.ir_for_entity[sc.source_entity_id] = sc_eid;
           }
-
-          ++sc_offset;
         }
       }
-      func_block_base += static_cast<uint32_t>(func.blocks.size());
       func_inst_base += static_cast<uint32_t>(func.instructions.size());
+      func_struct_base += static_cast<uint32_t>(func.structures.size());
     }
   }
 

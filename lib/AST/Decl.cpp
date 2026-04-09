@@ -63,10 +63,6 @@ static std::optional<VariantEntity> IrFromRaw(
     if (auto ptr = ep->IRObjectFor(ep, raw)) {
       return IRObject(std::move(ptr));
     }
-  } else if (auto *p = std::get_if<IRSwitchCaseId>(&vid)) {
-    if (auto ptr = ep->IRSwitchCaseFor(ep, raw)) {
-      return IRSwitchCase(std::move(ptr));
-    }
   } else if (auto *p = std::get_if<IRStructureId>(&vid)) {
     if (auto ptr = ep->IRStructureFor(ep, raw)) {
       return IRStructure(std::move(ptr));

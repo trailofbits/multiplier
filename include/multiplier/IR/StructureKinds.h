@@ -7,6 +7,7 @@
 
 #include "Structure.h"
 #include "StructureKind.h"
+#include "Block.h"
 
 namespace mx {
 
@@ -105,6 +106,9 @@ class MX_EXPORT IRSwitchCaseStructure : public IRStructure {
   int64_t high(void) const;
   bool is_range(void) const;
   bool is_default(void) const;
+
+  // The target block for this case (first child block).
+  IRBlock target_block(void) const;
 };
 
 }  // namespace mx

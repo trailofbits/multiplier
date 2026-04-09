@@ -923,7 +923,6 @@ BINDING_CPP_HEADER = """// Copyright (c) 2023-present, Trail of Bits, Inc.
 #include <multiplier/IR/Block.h>
 #include <multiplier/IR/Instruction.h>
 #include <multiplier/IR/Object.h>
-#include <multiplier/IR/SwitchCase.h>
 #include <multiplier/IR/OpCode.h>
 #include <multiplier/IR/ObjectKind.h>
 #include <multiplier/IR/BlockKind.h>
@@ -1806,7 +1805,6 @@ ENTITY_KINDS: Tuple[str] = (
   "IRBlock",
   "IRInstruction",
   "IRObject",
-  "IRSwitchCase",
   "IRStructure",
 )
 
