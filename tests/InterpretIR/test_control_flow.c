@@ -3,6 +3,40 @@
 // break (BREAK), continue (CONTINUE), nested loops, early return (RET),
 // and the ternary operator (SELECT).
 
+/*
+ * Expected IR (ENTRY block):
+ *
+ * function test_control_flow (NORMAL) {
+ *   objects:
+ *     obj_0 RETURN_SLOT size=4 align=1
+ *     obj_1 LOCAL_VALUE size=4 align=1 (result)
+ *     obj_2 LOCAL_VALUE size=4 align=1 (sum)
+ *     obj_3 LOCAL_VALUE size=4 align=1 (i)
+ *     obj_4 LOCAL_VALUE size=4 align=1 (fact)
+ *     obj_5 LOCAL_VALUE size=4 align=1 (j)
+ *     obj_6 LOCAL_VALUE size=4 align=1 (count)
+ *     obj_7 LOCAL_VALUE size=4 align=1 (brk)
+ *     obj_8 LOCAL_VALUE size=4 align=1 (k)
+ *     obj_9 LOCAL_VALUE size=4 align=1 (cont)
+ *     obj_10 LOCAL_VALUE size=4 align=1 (k)
+ *     obj_11 LOCAL_VALUE size=4 align=1 (nested)
+ *     obj_12 LOCAL_VALUE size=4 align=1 (a)
+ *     obj_13 LOCAL_VALUE size=4 align=1 (b)
+ *     obj_14 LOCAL_VALUE size=4 align=1 (sel)
+ *   blocks:
+ *   block_1 ENTRY:
+ *     >> %15 = ENTER_SCOPE
+ *          %result.0 = ALLOCA/LOCAL size=4 align=1
+ *          %16 = CONST/INT32 0
+ *     >> %result.17 = MEMORY/STORE_LE_32 [%result.0, %16]
+ *          %18 = CONST/INT32 1
+ *     >> %19 = COND_BRANCH [%18]  // if (1) result = 1; else result = -1
+ *     -> [block_2, block_3]
+ *   ... (truncated, continues with LOOP_PREHEADER, LOOP_CONDITION, LOOP_BODY,
+ *    LOOP_EXIT, LOOP_INCREMENT, BREAK, CONTINUE, SELECT blocks)
+ * }
+ */
+
 int test_control_flow(void) {
     int result = 0;
 
