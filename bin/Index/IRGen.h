@@ -320,7 +320,7 @@ class IRGenerator {
   std::optional<uint32_t> TypeSizeBytes(const pasta::Type &t);
   std::optional<uint32_t> TypeAlignBytes(const pasta::Type &t);
   mx::ir::MemOp DetermineMemOp(bool is_store, bool is_atomic,
-                                unsigned size_bytes);
+                                unsigned size_bytes, bool is_float = false);
 
   // --- Pre-scan ---
   void ScanAddressTaken(const pasta::Stmt &s);

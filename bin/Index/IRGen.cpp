@@ -655,8 +655,9 @@ uint32_t IRGenerator::EmitLoadFromLValue(const pasta::Expr &e) {
     unsigned sz = 8;
     if (auto s = TypeSizeBytes(*t)) sz = *s;
     bool is_atomic = t->IsAtomicType();
+    bool is_float = t->IsFloatingType();
     inst.mem_op = static_cast<uint8_t>(
-        DetermineMemOp(false, is_atomic, sz));
+        DetermineMemOp(false, is_atomic, sz, is_float));
   } else {
     inst.mem_op = static_cast<uint8_t>(
         DetermineMemOp(false, false, 8));
@@ -1982,8 +1983,9 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         unsigned sz = 8;
         if (auto s = TypeSizeBytes(*maybe_type)) sz = *s;
         bool is_atomic = maybe_type->IsAtomicType();
+        bool is_float = maybe_type->IsFloatingType();
         inst.mem_op = static_cast<uint8_t>(
-            DetermineMemOp(false, is_atomic, sz));
+            DetermineMemOp(false, is_atomic, sz, is_float));
       } else {
         inst.mem_op = static_cast<uint8_t>(
             DetermineMemOp(false, false, 8));
@@ -2289,8 +2291,9 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         inst.operand_indices = {addr_idx, val_idx};
         auto lhs_type = bo->LHS().Type();
         bool is_atomic = lhs_type && lhs_type->IsAtomicType();
+        bool is_float = lhs_type && lhs_type->IsFloatingType();
         inst.mem_op = static_cast<uint8_t>(
-            DetermineMemOp(true, is_atomic, sz));
+            DetermineMemOp(true, is_atomic, sz, is_float));
         return emit_typed(std::move(inst));
       }
 
@@ -2426,6 +2429,17 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         case pasta::BinaryOperatorKind::kShl: arith_op = mx::ir::OpCode::SHL; break;
         case pasta::BinaryOperatorKind::kShr: arith_op = mx::ir::OpCode::SHR; break;
         default: break;
+      }
+
+      // Use unsigned opcodes for unsigned operands.
+      {
+        auto op_type = e.Type();
+        bool is_unsigned = op_type && op_type->IsUnsignedIntegerType();
+        if (is_unsigned) {
+          if (arith_op == mx::ir::OpCode::DIV) arith_op = mx::ir::OpCode::UDIV;
+          else if (arith_op == mx::ir::OpCode::REM) arith_op = mx::ir::OpCode::UREM;
+          else if (arith_op == mx::ir::OpCode::SHR) arith_op = mx::ir::OpCode::USHR;
+        }
       }
 
       // Check for pointer arithmetic.
@@ -3687,7 +3701,18 @@ std::optional<uint32_t> IRGenerator::TypeAlignBytes(const pasta::Type &t) {
 }
 
 mx::ir::MemOp IRGenerator::DetermineMemOp(
-    bool is_store, bool is_atomic, unsigned size_bytes) {
+    bool is_store, bool is_atomic, unsigned size_bytes, bool is_float) {
+  // Float load/store: separate sub-opcodes for 32-bit and 64-bit.
+  if (is_float && !is_atomic && (size_bytes == 4 || size_bytes == 8)) {
+    bool big_endian = ctx_.getTargetInfo().isBigEndian();
+    if (!is_store) {
+      if (size_bytes == 4) return big_endian ? mx::ir::MemOp::LOAD_F32_BE : mx::ir::MemOp::LOAD_F32_LE;
+      return big_endian ? mx::ir::MemOp::LOAD_F64_BE : mx::ir::MemOp::LOAD_F64_LE;
+    } else {
+      if (size_bytes == 4) return big_endian ? mx::ir::MemOp::STORE_F32_BE : mx::ir::MemOp::STORE_F32_LE;
+      return big_endian ? mx::ir::MemOp::STORE_F64_BE : mx::ir::MemOp::STORE_F64_LE;
+    }
+  }
   assert(IsScalarSize(size_bytes) &&
          "DetermineMemOp called with non-scalar size; use MEMCPY instead");
   unsigned size_idx;

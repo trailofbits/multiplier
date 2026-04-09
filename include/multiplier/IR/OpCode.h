@@ -277,6 +277,11 @@ enum class OpCode : uint8_t {
   // storage. No operands. The caller's CALL instruction references the
   // return alloca; RETURN_PTR in the callee resolves to the same storage.
   RETURN_PTR = 71,
+
+  // Unsigned arithmetic: distinct from signed because C semantics differ.
+  UDIV = 72,       // Unsigned division.
+  UREM = 73,       // Unsigned remainder.
+  USHR = 74,       // Unsigned (logical) right shift.
 };
 
 // Returns the human-readable name of an opcode.
@@ -290,7 +295,7 @@ MX_EXPORT const char *EnumeratorName(AllocaKind op) noexcept;
 MX_EXPORT const char *EnumeratorName(CastOp op) noexcept;
 
 inline static constexpr unsigned NumEnumerators(OpCode) {
-  return 72u;
+  return 75u;
 }
 
 // Sub-opcodes for MEMORY. Stored in the int pool (int_pool[0]).
@@ -353,6 +358,12 @@ enum class MemOp : uint8_t {
   // in the caller's EXPRESSION_SCOPE, then increments the va_list index.
   // type_entity_id specifies the type/size being consumed.
   CONSUME_VA_PARAM = 69,
+
+  // Float loads/stores (non-atomic).
+  LOAD_F32_LE = 70, LOAD_F64_LE = 71,
+  LOAD_F32_BE = 72, LOAD_F64_BE = 73,
+  STORE_F32_LE = 74, STORE_F64_LE = 75,
+  STORE_F32_BE = 76, STORE_F64_BE = 77,
 };
 
 // MemOp classification helpers.
@@ -360,16 +371,32 @@ inline bool IsLoad(MemOp op) { return static_cast<uint8_t>(op) < 8; }
 inline bool IsStore(MemOp op) { auto v = static_cast<uint8_t>(op); return v >= 8 && v < 16; }
 inline bool IsAtomicLoad(MemOp op) { auto v = static_cast<uint8_t>(op); return v >= 16 && v < 24; }
 inline bool IsAtomicStore(MemOp op) { auto v = static_cast<uint8_t>(op); return v >= 24 && v < 32; }
-inline bool IsAnyLoad(MemOp op) { return IsLoad(op) || IsAtomicLoad(op); }
-inline bool IsAnyStore(MemOp op) { return IsStore(op) || IsAtomicStore(op); }
+inline bool IsFloatLoad(MemOp op) { return op >= MemOp::LOAD_F32_LE && op <= MemOp::LOAD_F64_BE; }
+inline bool IsFloatStore(MemOp op) { return op >= MemOp::STORE_F32_LE && op <= MemOp::STORE_F64_BE; }
+inline bool IsAnyLoad(MemOp op) { return IsLoad(op) || IsAtomicLoad(op) || IsFloatLoad(op); }
+inline bool IsAnyStore(MemOp op) { return IsStore(op) || IsAtomicStore(op) || IsFloatStore(op); }
 inline bool IsAtomic(MemOp op) { return static_cast<uint8_t>(op) >= 16 && static_cast<uint8_t>(op) < 32; }
-inline bool IsBigEndian(MemOp op) { return static_cast<uint8_t>(op) < 32 && (static_cast<uint8_t>(op) % 8) >= 4; }
+inline bool IsBigEndian(MemOp op) {
+  if (static_cast<uint8_t>(op) < 32) return (static_cast<uint8_t>(op) % 8) >= 4;
+  if (IsFloatLoad(op) || IsFloatStore(op)) {
+    return op == MemOp::LOAD_F32_BE || op == MemOp::LOAD_F64_BE ||
+           op == MemOp::STORE_F32_BE || op == MemOp::STORE_F64_BE;
+  }
+  return false;
+}
 inline unsigned AccessSize(MemOp op) {
-  if (static_cast<uint8_t>(op) >= 32) return 0; // not a load/store
-  switch (static_cast<uint8_t>(op) % 4) { case 0: return 1; case 1: return 2; case 2: return 4; case 3: return 8; }
+  if (static_cast<uint8_t>(op) < 32) {
+    switch (static_cast<uint8_t>(op) % 4) { case 0: return 1; case 1: return 2; case 2: return 4; case 3: return 8; }
+  }
+  if (IsFloatLoad(op) || IsFloatStore(op)) {
+    return (op == MemOp::LOAD_F32_LE || op == MemOp::LOAD_F32_BE ||
+            op == MemOp::STORE_F32_LE || op == MemOp::STORE_F32_BE) ? 4 : 8;
+  }
   return 0;
 }
-inline bool IsDirectLoadStore(MemOp op) { return static_cast<uint8_t>(op) < 32; }
+inline bool IsDirectLoadStore(MemOp op) {
+  return static_cast<uint8_t>(op) < 32 || IsFloatLoad(op) || IsFloatStore(op);
+}
 inline bool IsStringToNumber(MemOp op) { return op >= MemOp::STRTOI32 && op <= MemOp::STRTOF64; }
 inline bool IsMemoryBulk(MemOp op) { return op >= MemOp::MEMSET && op <= MemOp::BZERO; }
 inline bool IsStringOp(MemOp op) { return op >= MemOp::STRLEN && op <= MemOp::STPNCPY; }
@@ -482,7 +509,8 @@ inline bool IsConstant(OpCode op) {
 }
 
 inline bool IsBinaryOp(OpCode op) {
-  return op >= OpCode::ADD && op <= OpCode::PTR_DIFF;
+  return (op >= OpCode::ADD && op <= OpCode::PTR_DIFF) ||
+         (op >= OpCode::UDIV && op <= OpCode::USHR);
 }
 
 inline bool IsComparison(OpCode op) {

@@ -83,6 +83,9 @@ const char *EnumeratorName(OpCode op) noexcept {
     case OpCode::LAST_VALUE: return "LAST_VALUE";
     case OpCode::UNKNOWN: return "UNKNOWN";
     case OpCode::RETURN_PTR: return "RETURN_PTR";
+    case OpCode::UDIV: return "UDIV";
+    case OpCode::UREM: return "UREM";
+    case OpCode::USHR: return "USHR";
   }
   return "UNKNOWN";
 }
@@ -258,6 +261,14 @@ const char *EnumeratorName(MemOp op) noexcept {
     case MemOp::CMPXCHG_BE_32: return "CMPXCHG_BE_32";
     case MemOp::CMPXCHG_BE_64: return "CMPXCHG_BE_64";
     case MemOp::CONSUME_VA_PARAM: return "CONSUME_VA_PARAM";
+    case MemOp::LOAD_F32_LE: return "LOAD_F32_LE";
+    case MemOp::LOAD_F64_LE: return "LOAD_F64_LE";
+    case MemOp::LOAD_F32_BE: return "LOAD_F32_BE";
+    case MemOp::LOAD_F64_BE: return "LOAD_F64_BE";
+    case MemOp::STORE_F32_LE: return "STORE_F32_LE";
+    case MemOp::STORE_F64_LE: return "STORE_F64_LE";
+    case MemOp::STORE_F32_BE: return "STORE_F32_BE";
+    case MemOp::STORE_F64_BE: return "STORE_F64_BE";
   }
   return "UNKNOWN";
 }

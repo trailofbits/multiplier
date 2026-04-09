@@ -397,10 +397,11 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
         auto sub = mi->sub_opcode();
         if (mx::ir::IsDirectLoadStore(sub)) {
           unsigned sz = mx::ir::AccessSize(sub);
+          bool is_float = mx::ir::IsFloatLoad(sub);
           if (mx::ir::IsAnyLoad(sub)) {
             Value addr = GetValue(mi->address());
             if (addr.kind == Value::POINTER) {
-              result = MemReadValue(addr.ptr, sz, false);
+              result = MemReadValue(addr.ptr, sz, is_float);
             } else {
               LOG(WARNING) << "MEMORY load from non-pointer value";
             }
@@ -1048,6 +1049,34 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       if (bin) {
         // Arithmetic shift right (sign-extending).
         result = Value::Int(GetValue(bin->lhs()).as_int() >> GetValue(bin->rhs()).as_int());
+      }
+      break;
+    }
+    // Unsigned arithmetic.
+    case mx::ir::OpCode::UDIV: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) {
+        uint64_t l = static_cast<uint64_t>(GetValue(bin->lhs()).as_int());
+        uint64_t r = static_cast<uint64_t>(GetValue(bin->rhs()).as_int());
+        result = Value::Int(static_cast<int64_t>(r != 0 ? l / r : 0));
+      }
+      break;
+    }
+    case mx::ir::OpCode::UREM: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) {
+        uint64_t l = static_cast<uint64_t>(GetValue(bin->lhs()).as_int());
+        uint64_t r = static_cast<uint64_t>(GetValue(bin->rhs()).as_int());
+        result = Value::Int(static_cast<int64_t>(r != 0 ? l % r : 0));
+      }
+      break;
+    }
+    case mx::ir::OpCode::USHR: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) {
+        uint64_t l = static_cast<uint64_t>(GetValue(bin->lhs()).as_int());
+        uint64_t r = static_cast<uint64_t>(GetValue(bin->rhs()).as_int());
+        result = Value::Int(static_cast<int64_t>(l >> r));
       }
       break;
     }
