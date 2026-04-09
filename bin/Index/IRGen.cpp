@@ -2212,6 +2212,46 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       // Assignment: always MEMCPY when RHS is an lvalue (has an address).
       // For computed scalars (arithmetic results), use STORE.
       if (oc == pasta::BinaryOperatorKind::kAssign) {
+        // Bit-field assignment: use BIT_WRITE instead of GEP_FIELD + STORE.
+        if (auto me = pasta::MemberExpr::From(bo->LHS())) {
+          auto member = me->MemberDeclaration();
+          if (auto fd = pasta::FieldDecl::From(member)) {
+            if (fd->IsBitField()) {
+              uint32_t base_idx;
+              if (me->IsArrow()) {
+                base_idx = EmitRValue(me->Base());
+              } else {
+                base_idx = EmitLValue(me->Base());
+              }
+              uint32_t val_idx = EmitRValue(bo->RHS());
+              InstructionIR inst;
+              inst.opcode = mx::ir::OpCode::MEMORY;
+              inst.source_entity_id = eid;
+              inst.operand_indices = {base_idx, val_idx};
+              inst.target_entity_id = EntityIdOf(member);
+              if (auto bits = fd->OffsetInBits()) {
+                inst.bit_offset = static_cast<uint32_t>(*bits);
+              }
+              if (auto bw = fd->BitWidth()) {
+                auto *raw_bw = reinterpret_cast<const clang::Expr *>(
+                    bw->RawStmt());
+                if (raw_bw) {
+                  clang::Expr::EvalResult result;
+                  if (raw_bw->EvaluateAsInt(result, ctx_)) {
+                    inst.bit_width = static_cast<uint32_t>(
+                        result.Val.getInt().getZExtValue());
+                  }
+                }
+              }
+              bool big_endian = ctx_.getTargetInfo().isBigEndian();
+              inst.mem_op = static_cast<uint8_t>(
+                  big_endian ? mx::ir::MemOp::BIT_WRITE_BE
+                             : mx::ir::MemOp::BIT_WRITE_LE);
+              return emit_typed(std::move(inst));
+            }
+          }
+        }
+
         uint32_t addr_idx = EmitLValue(bo->LHS());
         auto rhs = bo->RHS();
         unsigned sz = 8;
