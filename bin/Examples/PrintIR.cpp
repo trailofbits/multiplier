@@ -26,6 +26,17 @@ DEFINE_bool(all, false, "Print IR for all functions");
 
 namespace {
 
+// Extract offset from an entity ID for readable printing.
+uint32_t OffsetOf(mx::EntityId eid) {
+  auto vid = eid.Unpack();
+  if (auto *p = std::get_if<mx::IRInstructionId>(&vid)) return p->offset;
+  if (auto *p = std::get_if<mx::IRBlockId>(&vid)) return p->offset;
+  if (auto *p = std::get_if<mx::IRObjectId>(&vid)) return p->offset;
+  if (auto *p = std::get_if<mx::IRStructureId>(&vid)) return p->offset;
+  if (auto *p = std::get_if<mx::IRFunctionId>(&vid)) return p->offset;
+  return static_cast<uint32_t>(eid.Pack() & 0xFFFF);
+}
+
 // Truncate and clean a string for display.
 std::string Truncate(std::string_view data, size_t max_len = 50) {
   std::string s(data.begin(), data.end());
@@ -43,9 +54,7 @@ void PrintInstruction(std::ostream &os, const mx::IRInstruction &inst,
   if (is_root) os << ">> ";
   else os << "   ";
 
-  // Instruction ID (low 16 bits for readability).
-  auto eid = mx::EntityId(inst.id()).Pack();
-  os << "%" << (eid & 0xFFFF) << " = ";
+  os << "%" << OffsetOf(inst.id()) << " = ";
 
   // Opcode name.
   os << mx::ir::EnumeratorName(op);
@@ -125,7 +134,7 @@ void PrintInstruction(std::ostream &os, const mx::IRInstruction &inst,
     for (unsigned i = 0; i < n; ++i) {
       if (i) os << ", ";
       auto operand = inst.nth_operand(i);
-      os << "%" << (mx::EntityId(operand.id()).Pack() & 0xFFFF);
+      os << "%" << OffsetOf(operand.id());
     }
     os << "]";
   }
@@ -144,9 +153,8 @@ void PrintInstruction(std::ostream &os, const mx::IRInstruction &inst,
 // Print a block.
 void PrintBlock(std::ostream &os, const mx::IRBlock &block) {
   auto kind = block.kind();
-  auto eid = mx::EntityId(block.id()).Pack();
 
-  os << "  block_" << (eid & 0xFFFF) << " "
+  os << "  block_" << OffsetOf(block.id()) << " "
      << mx::ir::EnumeratorName(kind);
 
   // Predecessors.
@@ -155,7 +163,7 @@ void PrintBlock(std::ostream &os, const mx::IRBlock &block) {
     for (auto pred : block.predecessors()) {
       if (first) { os << "  <- ["; first = false; }
       else os << ", ";
-      os << "block_" << (mx::EntityId(pred.id()).Pack() & 0xFFFF);
+      os << "block_" << OffsetOf(pred.id());
     }
     if (!first) os << "]";
   }
@@ -177,7 +185,7 @@ void PrintBlock(std::ostream &os, const mx::IRBlock &block) {
     for (auto succ : block.successors()) {
       if (first) { os << "    -> ["; first = false; }
       else os << ", ";
-      os << "block_" << (mx::EntityId(succ.id()).Pack() & 0xFFFF);
+      os << "block_" << OffsetOf(succ.id());
     }
     if (!first) os << "]\n";
   }
@@ -199,7 +207,7 @@ void PrintFunction(std::ostream &os, const mx::IRFunction &func) {
   // Objects.
   os << "  objects:\n";
   for (auto obj : func.objects()) {
-    os << "    obj_" << (mx::EntityId(obj.id()).Pack() & 0xFFFF)
+    os << "    obj_" << OffsetOf(obj.id())
        << " " << mx::ir::EnumeratorName(obj.kind())
        << " size=" << obj.size_bytes()
        << " align=" << obj.align_bytes();

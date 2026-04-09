@@ -2138,8 +2138,24 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         bool is_pre = (oc == pasta::UnaryOperatorKind::kPreIncrement ||
                        oc == pasta::UnaryOperatorKind::kPreDecrement);
 
-        // Emit CONST(+1 or -1) as the delta operand.
-        int64_t delta = is_inc ? 1 : -1;
+        // Determine underlying op and element size for pointers.
+        auto sub_type = sub.Type();
+        bool is_ptr = sub_type && sub_type->IsAnyPointerType();
+        mx::ir::OpCode underlying = is_inc ? mx::ir::OpCode::ADD
+                                           : mx::ir::OpCode::SUB;
+        uint32_t elem_sz = 0;
+        // Delta: +1 for integers (ADD/SUB handles direction).
+        // For pointers: +1 (increment) or -1 (decrement) with PTR_ADD.
+        int64_t delta = 1;
+        if (is_ptr) {
+          underlying = mx::ir::OpCode::PTR_ADD;
+          if (!is_inc) delta = -1;
+          if (auto pt = sub_type->PointeeType()) {
+            if (auto sz = TypeSizeBytes(*pt)) elem_sz = *sz;
+          }
+        }
+
+        // Emit the delta CONST now that we know the final value.
         InstructionIR delta_inst;
         delta_inst.opcode = mx::ir::OpCode::CONST;
         delta_inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::INT64);
@@ -2149,20 +2165,6 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         delta_inst.width = 64;
         if (expr_type) delta_inst.type_entity_id = TypeEntityIdOf(*expr_type);
         uint32_t delta_idx = EmitInstruction(std::move(delta_inst));
-
-        // Determine underlying op and element size for pointers.
-        auto sub_type = sub.Type();
-        bool is_ptr = sub_type && sub_type->IsAnyPointerType();
-        mx::ir::OpCode underlying = is_inc ? mx::ir::OpCode::ADD
-                                           : mx::ir::OpCode::SUB;
-        uint32_t elem_sz = 0;
-        if (is_ptr) {
-          // PTR_ADD with +1/-1 handles both increment and decrement.
-          underlying = mx::ir::OpCode::PTR_ADD;
-          if (auto pt = sub_type->PointeeType()) {
-            if (auto sz = TypeSizeBytes(*pt)) elem_sz = *sz;
-          }
-        }
 
         InstructionIR inst;
         inst.opcode = mx::ir::OpCode::READ_MODIFY_WRITE;
