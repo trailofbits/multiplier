@@ -802,13 +802,13 @@ DatabaseWriterImpl::~DatabaseWriterImpl(void) {
   insertion_queue.enqueue(ExitSignal{});
   bulk_insertion_thread.join();
 
-  // ExitRecords may fail (e.g., FTS optimize on "database is locked").
-  // Don't let it prevent the checkpoint.
+  // These may fail with "database is locked" if the async writer's
+  // SQLite connection hasn't fully released its WAL lock.
+  // Each step is isolated so failures don't cascade.
   try { ExitRecords(); } catch (...) {}
-
-  ExitMetadata();
-  db.Execute("PRAGMA wal_checkpoint(FULL)");
-  db.Optimize();
+  try { ExitMetadata(); } catch (...) {}
+  try { db.Execute("PRAGMA wal_checkpoint(FULL)"); } catch (...) {}
+  try { db.Optimize(); } catch (...) {}
 }
 
 DatabaseWriterImpl::DatabaseWriterImpl(const std::filesystem::path &db_path_,
