@@ -1041,30 +1041,49 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       break;
     }
     // Unsigned arithmetic.
-    case mx::ir::OpCode::UDIV: {
-      auto bin = mx::BinaryInst::from(inst);
-      if (bin) {
-        uint64_t l = static_cast<uint64_t>(GetValue(bin->lhs()).as_int());
-        uint64_t r = static_cast<uint64_t>(GetValue(bin->rhs()).as_int());
-        result = Value::Int(static_cast<int64_t>(r != 0 ? l / r : 0));
-      }
-      break;
-    }
-    case mx::ir::OpCode::UREM: {
-      auto bin = mx::BinaryInst::from(inst);
-      if (bin) {
-        uint64_t l = static_cast<uint64_t>(GetValue(bin->lhs()).as_int());
-        uint64_t r = static_cast<uint64_t>(GetValue(bin->rhs()).as_int());
-        result = Value::Int(static_cast<int64_t>(r != 0 ? l % r : 0));
-      }
-      break;
-    }
+    // Unsigned arithmetic: width-aware. The operand width (in bytes) is
+    // stored in int_pool[0]. Values are masked to the correct width before
+    // the unsigned operation, then sign-extended back to int64.
+    case mx::ir::OpCode::UDIV:
+    case mx::ir::OpCode::UREM:
     case mx::ir::OpCode::USHR: {
       auto bin = mx::BinaryInst::from(inst);
       if (bin) {
-        uint64_t l = static_cast<uint64_t>(GetValue(bin->lhs()).as_int());
-        uint64_t r = static_cast<uint64_t>(GetValue(bin->rhs()).as_int());
-        result = Value::Int(static_cast<int64_t>(l >> r));
+        int64_t lv = GetValue(bin->lhs()).as_int();
+        int64_t rv = GetValue(bin->rhs()).as_int();
+
+        // Get operand width from result type.
+        unsigned width_bytes = 8;  // default 64-bit
+        auto rt = bin->result_type();
+        if (auto bits = rt.size_in_bits()) {
+          width_bytes = static_cast<unsigned>((*bits + 7) / 8);
+        }
+
+        // Mask to width for unsigned interpretation.
+        uint64_t mask = (width_bytes >= 8) ? ~uint64_t{0}
+                        : ((uint64_t{1} << (width_bytes * 8)) - 1);
+        uint64_t l = static_cast<uint64_t>(lv) & mask;
+        uint64_t r = static_cast<uint64_t>(rv) & mask;
+
+        uint64_t res = 0;
+        if (op == mx::ir::OpCode::UDIV) {
+          res = r != 0 ? l / r : 0;
+        } else if (op == mx::ir::OpCode::UREM) {
+          res = r != 0 ? l % r : 0;
+        } else {  // USHR
+          res = l >> (r & 63);
+        }
+
+        // Sign-extend result back to int64 (to match LOAD representation).
+        res &= mask;
+        int64_t sres = static_cast<int64_t>(res);
+        switch (width_bytes) {
+          case 1: sres = static_cast<int64_t>(static_cast<int8_t>(res)); break;
+          case 2: sres = static_cast<int64_t>(static_cast<int16_t>(res)); break;
+          case 4: sres = static_cast<int64_t>(static_cast<int32_t>(res)); break;
+          default: break;
+        }
+        result = Value::Int(sres);
       }
       break;
     }
@@ -1321,7 +1340,7 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
                 wide = static_cast<__int128>(a.as_int()) * static_cast<__int128>(b.as_int());
               new_val = Value::Int(static_cast<int64_t>(wide));
               bool overflow = (wide != static_cast<__int128>(static_cast<int64_t>(wide)));
-              MemWriteValue(addr.ptr, new_val, 8);
+              MemWriteValue(addr.ptr, new_val, access_sz);
               result = Value::Int(overflow ? 1 : 0);
               break;
             }
@@ -1864,7 +1883,10 @@ Value Interpreter::Run(const std::vector<Value> &args) {
         // Fallback: read from RETURN_PTR storage if direct operand is undef.
         if (return_value.kind == Value::UNDEFINED &&
             return_ptr_.kind == Value::POINTER) {
-          return_value = MemReadValue(return_ptr_.ptr, 4, false);  // TODO: size from return type
+          // Determine return size from the RETURN_SLOT object.
+          auto it = memory_.find(return_ptr_.ptr.object_id);
+          size_t ret_sz = (it != memory_.end()) ? it->second.bytes.size() : 8;
+          return_value = MemReadValue(return_ptr_.ptr, ret_sz, false);
         }
         goto done;
       }

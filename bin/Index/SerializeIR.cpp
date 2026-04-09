@@ -217,6 +217,12 @@ static uint32_t EmitInstructionConsts(
       pool.AddInt(static_cast<int64_t>(inst.size_bytes));  // element size
       break;
 
+    case OC::UDIV:
+    case OC::UREM:
+    case OC::USHR:
+      pool.AddInt(static_cast<int64_t>(inst.size_bytes));  // operand width in bytes
+      break;
+
     case OC::READ_MODIFY_WRITE:
       pool.AddInt(static_cast<int64_t>(inst.compound_op));  // underlying opcode
       pool.AddInt(static_cast<int64_t>(inst.size_bytes));    // element size

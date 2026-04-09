@@ -2512,8 +2512,15 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       inst.opcode = arith_op;
       inst.source_entity_id = eid;
       inst.operand_indices = {lhs_idx, rhs_idx};
-      auto result = emit_typed(std::move(inst));
-      return result;
+      // For unsigned ops, store the operand width so the interpreter
+      // can mask to the correct bit width before operating.
+      if (arith_op >= mx::ir::OpCode::UDIV &&
+          arith_op <= mx::ir::OpCode::USHR) {
+        if (auto t = e.Type()) {
+          if (auto sz = TypeSizeBytes(*t)) inst.size_bytes = *sz;
+        }
+      }
+      return emit_typed(std::move(inst));
     }
   }
 
