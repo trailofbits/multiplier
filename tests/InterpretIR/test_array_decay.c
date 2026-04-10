@@ -4,128 +4,6 @@
 /*
  * Expected IR:
  *
- * function sum_array (NORMAL) {
- *   objects:
- *     obj_0 PARAMETER_VALUE size=8 align=1 (arr)
- *     obj_1 PARAMETER_VALUE size=4 align=1 (n)
- *     obj_2 RETURN_SLOT size=4 align=1
- *     obj_3 LOCAL_VALUE size=4 align=1 (total)
- *     obj_4 LOCAL_VALUE size=4 align=1 (i)
- *   body_scope: FUNCTION_SCOPE
- *   blocks:
- *   block_0 FRAME:
- *     >> %arr.0 = ALLOCA/LOCAL size=8 align=1
- *     >> %n.1 = ALLOCA/LOCAL size=4 align=1
- *     >> %4 = IMPLICIT_GOTO
- *     -> [block_1]
- *   block_1 ENTRY  <- [block_0]:
- *     >> %5 = ENTER_SCOPE  // {     int total = 0;     for (int i = 0; i < n;...
- *          %total.2 = ALLOCA/LOCAL size=4 align=1
- *          %8 = CONST/INT32 0  // 0
- *     >> %total.9 = MEMORY/STORE_LE_32 [%total.2, %8]
- *     >> %10 = ENTER_SCOPE  // for (int i = 0; i < n; i++) {         total += ...
- *     >> %11 = IMPLICIT_GOTO
- *     -> [block_2]
- *   block_2 LOOP_PREHEADER  <- [block_1]:
- *          %i.3 = ALLOCA/LOCAL size=4 align=1
- *          %12 = CONST/INT32 0  // 0
- *     >> %i.13 = MEMORY/STORE_LE_32 [%i.3, %12]
- *     >> %14 = IMPLICIT_GOTO
- *     -> [block_3]
- *   block_3 LOOP_CONDITION  <- [block_2, block_5]:
- *          %17 = CMP_LT [%15, %16]  // i < n
- *     >> %18 = COND_BRANCH [%17]  // for (int i = 0; i < n; i++) {         total += ...
- *     -> [block_4, block_6]
- *   block_6 LOOP_EXIT  <- [block_3]:
- *     >> %30 = EXIT_SCOPE  // for (int i = 0; i < n; i++) {         total += ...
- *          %32 = RETURN_PTR  // return total
- *          %31 = MEMORY/LOAD_LE_32 [%total.2]  // total
- *     >> %33 = MEMORY/STORE_LE_32 [%32, %31]  // return total
- *     >> %34 = EXIT_SCOPE  // {     int total = 0;     for (int i = 0; i < n;...
- *          %31 = MEMORY/LOAD_LE_32 [%total.2]  // total
- *     >> %35 = RET [%31]  // return total
- *   block_4 LOOP_BODY  <- [block_3]:
- *     >> %19 = ENTER_SCOPE  // {         total += arr[i];     }
- *          %total.2 = ALLOCA/LOCAL size=4 align=1
- *          %23 = MEMORY/LOAD_LE_32 [%22]  // arr[i]
- *     >> %24 = READ_MODIFY_WRITE(ADD new) [%total.2, %23]  // total += arr[i]
- *     >> %25 = EXIT_SCOPE  // {         total += arr[i];     }
- *     >> %26 = IMPLICIT_GOTO
- *     -> [block_5]
- *   block_5 LOOP_INCREMENT  <- [block_4]:
- *          %i.3 = ALLOCA/LOCAL size=4 align=1
- *          %27 = CONST/INT64 1  // i++
- *     >> %28 = READ_MODIFY_WRITE(ADD old) [%i.3, %27]  // i++
- *     >> %29 = IMPLICIT_GOTO
- *     -> [block_3]
- * }
- * function first_element (NORMAL) {
- *   objects:
- *     obj_0 PARAMETER_VALUE size=8 align=1 (arr)
- *     obj_1 RETURN_SLOT size=4 align=1
- *   body_scope: FUNCTION_SCOPE
- *   blocks:
- *   block_0 FRAME:
- *     >> %arr.0 = ALLOCA/LOCAL size=8 align=1
- *     >> %1 = IMPLICIT_GOTO
- *     -> [block_1]
- *   block_1 ENTRY  <- [block_0]:
- *     >> %2 = ENTER_SCOPE  // {     // Clang adjusts int arr[10] to int *arr....
- *          %8 = RETURN_PTR  // return arr[0]
- *          %7 = MEMORY/LOAD_LE_32 [%6]  // arr[0]
- *     >> %9 = MEMORY/STORE_LE_32 [%8, %7]  // return arr[0]
- *     >> %10 = EXIT_SCOPE  // {     // Clang adjusts int arr[10] to int *arr....
- *          %7 = MEMORY/LOAD_LE_32 [%6]  // arr[0]
- *     >> %11 = RET [%7]  // return arr[0]
- * }
- * function fill_array (NORMAL) {
- *   objects:
- *     obj_0 PARAMETER_VALUE size=8 align=1 (dst)
- *     obj_1 PARAMETER_VALUE size=4 align=1 (val)
- *     obj_2 PARAMETER_VALUE size=4 align=1 (n)
- *     obj_3 LOCAL_VALUE size=4 align=1 (i)
- *   body_scope: FUNCTION_SCOPE
- *   blocks:
- *   block_0 FRAME:
- *     >> %dst.0 = ALLOCA/LOCAL size=8 align=1
- *     >> %val.1 = ALLOCA/LOCAL size=4 align=1
- *     >> %n.2 = ALLOCA/LOCAL size=4 align=1
- *     >> %4 = IMPLICIT_GOTO
- *     -> [block_1]
- *   block_1 ENTRY  <- [block_0]:
- *     >> %5 = ENTER_SCOPE  // {     for (int i = 0; i < n; i++) {         dst...
- *     >> %9 = ENTER_SCOPE  // for (int i = 0; i < n; i++) {         dst[i] = ...
- *     >> %10 = IMPLICIT_GOTO
- *     -> [block_2]
- *   block_2 LOOP_PREHEADER  <- [block_1]:
- *          %i.3 = ALLOCA/LOCAL size=4 align=1
- *          %11 = CONST/INT32 0  // 0
- *     >> %i.12 = MEMORY/STORE_LE_32 [%i.3, %11]
- *     >> %13 = IMPLICIT_GOTO
- *     -> [block_3]
- *   block_3 LOOP_CONDITION  <- [block_2, block_5]:
- *          %16 = CMP_LT [%14, %15]  // i < n
- *     >> %17 = COND_BRANCH [%16]  // for (int i = 0; i < n; i++) {         dst[i] = ...
- *     -> [block_4, block_6]
- *   block_6 LOOP_EXIT  <- [block_3]:
- *     >> %29 = EXIT_SCOPE  // for (int i = 0; i < n; i++) {         dst[i] = ...
- *     >> %30 = EXIT_SCOPE  // {     for (int i = 0; i < n; i++) {         dst...
- *     >> %31 = RET
- *   block_4 LOOP_BODY  <- [block_3]:
- *     >> %18 = ENTER_SCOPE  // {         dst[i] = val;     }
- *          %21 = PTR_ADD elem_size=4 [%19, %20]  // dst[i]
- *          %22 = MEMORY/LOAD_LE_32 [%val.7]  // val
- *     >> %23 = MEMORY/STORE_LE_32 [%21, %22]  // dst[i] = val
- *     >> %24 = EXIT_SCOPE  // {         dst[i] = val;     }
- *     >> %25 = IMPLICIT_GOTO
- *     -> [block_5]
- *   block_5 LOOP_INCREMENT  <- [block_4]:
- *          %i.3 = ALLOCA/LOCAL size=4 align=1
- *          %26 = CONST/INT64 1  // i++
- *     >> %27 = READ_MODIFY_WRITE(ADD old) [%i.3, %26]  // i++
- *     >> %28 = IMPLICIT_GOTO
- *     -> [block_3]
- * }
  * function test_array_decay (NORMAL) {
  *   objects:
  *     obj_0 RETURN_SLOT size=4 align=1
@@ -320,6 +198,7 @@
  *     >> %48 = RET [%43]  // return 1
  * }
  */
+
 
 
 

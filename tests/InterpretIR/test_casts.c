@@ -75,7 +75,7 @@
  *     >> %ival.75 = MEMORY/STORE_LE_32 [%ival.6, %74]
  *          %dval.7 = ALLOCA/LOCAL size=8 align=1
  *          %77 = CAST/SI32_TO_F64 [%76]  // (double)ival
- *     >> %dval.78 = MEMORY/STORE_LE_64 [%dval.7, %77]
+ *     >> %dval.78 = MEMORY/STORE_F64_LE [%dval.7, %77]
  *          %back.8 = ALLOCA/LOCAL size=4 align=1
  *          %80 = CAST/F64_TO_SI32 [%79]  // (int)dval
  *     >> %back.81 = MEMORY/STORE_LE_32 [%back.8, %80]
@@ -88,7 +88,7 @@
  *   block_13 IF_MERGE  <- [block_12]:
  *          %pi.9 = ALLOCA/LOCAL size=8 align=1
  *          %92 = CONST/FLOAT64 3.14  // 3.14
- *     >> %pi.93 = MEMORY/STORE_LE_64 [%pi.9, %92]
+ *     >> %pi.93 = MEMORY/STORE_F64_LE [%pi.9, %92]
  *          %ipi.10 = ALLOCA/LOCAL size=4 align=1
  *          %95 = CAST/F64_TO_SI32 [%94]  // (int)pi
  *     >> %ipi.96 = MEMORY/STORE_LE_32 [%ipi.10, %95]
@@ -101,10 +101,10 @@
  *   block_16 IF_MERGE  <- [block_15]:
  *          %f.11 = ALLOCA/LOCAL size=4 align=1
  *          %107 = CONST/FLOAT32 1.5  // 1.5f
- *     >> %f.108 = MEMORY/STORE_LE_32 [%f.11, %107]
+ *     >> %f.108 = MEMORY/STORE_F32_LE [%f.11, %107]
  *          %d.12 = ALLOCA/LOCAL size=8 align=1
  *          %110 = CAST/F32_TO_F64 [%109]  // (double)f
- *     >> %d.111 = MEMORY/STORE_LE_64 [%d.12, %110]
+ *     >> %d.111 = MEMORY/STORE_F64_LE [%d.12, %110]
  *          %id.13 = ALLOCA/LOCAL size=4 align=1
  *          %115 = CAST/F64_TO_SI32 [%114]  // (int)(d * 2.0)
  *     >> %id.116 = MEMORY/STORE_LE_32 [%id.13, %115]
@@ -171,6 +171,7 @@
  *     >> %34 = RET [%30]  // return 1
  * }
  */
+
 
 
 

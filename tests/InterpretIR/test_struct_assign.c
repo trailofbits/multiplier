@@ -5,53 +5,6 @@
 /*
  * Expected IR:
  *
- * function make_small (NORMAL) {
- *   objects:
- *     obj_0 PARAMETER_VALUE size=4 align=1 (x)
- *     obj_1 PARAMETER_VALUE size=4 align=1 (y)
- *     obj_2 RETURN_SLOT size=8 align=1
- *     obj_3 LOCAL_VALUE size=8 align=1 (s)
- *   body_scope: FUNCTION_SCOPE
- *   blocks:
- *   block_0 FRAME:
- *     >> %x.0 = ALLOCA/LOCAL size=4 align=1
- *     >> %y.1 = ALLOCA/LOCAL size=4 align=1
- *     >> %3 = IMPLICIT_GOTO
- *     -> [block_1]
- *   block_1 ENTRY  <- [block_0]:
- *     >> %4 = ENTER_SCOPE  // {     struct Small s;     s.x = x;     s.y = y;...
- *          %7 = GEP_FIELD offset=0 .x [%s.2]  // s.x
- *          %8 = MEMORY/LOAD_LE_32 [%x.5]  // x
- *     >> %9 = MEMORY/STORE_LE_32 [%7, %8]  // s.x = x
- *          %10 = GEP_FIELD offset=4 .y [%s.2]  // s.y
- *          %11 = MEMORY/LOAD_LE_32 [%y.6]  // y
- *     >> %12 = MEMORY/STORE_LE_32 [%10, %11]  // s.y = y
- *          %14 = RETURN_PTR  // return s
- *          %13 = MEMORY/LOAD_LE_64 [%s.2]  // s
- *     >> %15 = MEMORY/STORE_LE_64 [%14, %13]  // return s
- *     >> %16 = EXIT_SCOPE  // {     struct Small s;     s.x = x;     s.y = y;...
- *          %13 = MEMORY/LOAD_LE_64 [%s.2]  // s
- *     >> %17 = RET [%13]  // return s
- * }
- * function sum_large (NORMAL) {
- *   objects:
- *     obj_0 PARAMETER_VALUE size=20 align=1 (l)
- *     obj_1 RETURN_SLOT size=4 align=1
- *   body_scope: FUNCTION_SCOPE
- *   blocks:
- *   block_0 FRAME:
- *     >> %l.0 = ALLOCA/LOCAL size=20 align=1
- *     >> %1 = IMPLICIT_GOTO
- *     -> [block_1]
- *   block_1 ENTRY  <- [block_0]:
- *     >> %2 = ENTER_SCOPE  // {     return l.a + l.b + l.c + l.d + l.e; }
- *          %18 = RETURN_PTR  // return l.a + l.b + l.c + l.d + l.e
- *          %17 = ADD [%14, %16]  // l.a + l.b + l.c + l.d + l.e
- *     >> %19 = MEMORY/STORE_LE_32 [%18, %17]  // return l.a + l.b + l.c + l.d + l.e
- *     >> %20 = EXIT_SCOPE  // {     return l.a + l.b + l.c + l.d + l.e; }
- *          %17 = ADD [%14, %16]  // l.a + l.b + l.c + l.d + l.e
- *     >> %21 = RET [%17]  // return l.a + l.b + l.c + l.d + l.e
- * }
  * function test_struct_assign (NORMAL) {
  *   objects:
  *     obj_0 RETURN_SLOT size=4 align=1
@@ -327,6 +280,7 @@
  *     >> %28 = RET [%24]  // return 1
  * }
  */
+
 
 
 

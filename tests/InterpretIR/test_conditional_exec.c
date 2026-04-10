@@ -5,45 +5,6 @@
 /*
  * Expected IR:
  *
- * function increment_and_return (NORMAL) {
- *   objects:
- *     obj_0 PARAMETER_VALUE size=4 align=1 (val)
- *     obj_1 RETURN_SLOT size=4 align=1
- *   body_scope: FUNCTION_SCOPE
- *   blocks:
- *   block_0 FRAME:
- *     >> %val.0 = ALLOCA/LOCAL size=4 align=1
- *     >> %1 = IMPLICIT_GOTO
- *     -> [block_1]
- *   block_1 ENTRY  <- [block_0]:
- *     >> %2 = ENTER_SCOPE  // {     side_effect_counter++;     return val; }
- *          %4 = GLOBAL_PTR  // side_effect_counter
- *          %5 = CONST/INT64 1  // side_effect_counter++
- *     >> %6 = READ_MODIFY_WRITE(ADD old) [%4, %5]  // side_effect_counter++
- *          %8 = RETURN_PTR  // return val
- *          %7 = MEMORY/LOAD_LE_32 [%val.3]  // val
- *     >> %9 = MEMORY/STORE_LE_32 [%8, %7]  // return val
- *     >> %10 = EXIT_SCOPE  // {     side_effect_counter++;     return val; }
- *          %7 = MEMORY/LOAD_LE_32 [%val.3]  // val
- *     >> %11 = RET [%7]  // return val
- * }
- * function unreachable_function (NORMAL) {
- *   objects:
- *     obj_0 RETURN_SLOT size=4 align=1
- *   body_scope: FUNCTION_SCOPE
- *   blocks:
- *   block_0 FRAME:
- *     >> %0 = IMPLICIT_GOTO
- *     -> [block_1]
- *   block_1 ENTRY  <- [block_0]:
- *     >> %1 = ENTER_SCOPE  // {     // If this is ever "executed" by the inte...
- *          %3 = RETURN_PTR  // return 99999
- *          %2 = CONST/INT32 99999  // 99999
- *     >> %4 = MEMORY/STORE_LE_32 [%3, %2]  // return 99999
- *     >> %5 = EXIT_SCOPE  // {     // If this is ever "executed" by the inte...
- *          %2 = CONST/INT32 99999  // 99999
- *     >> %6 = RET [%2]  // return 99999
- * }
  * function test_conditional_exec (NORMAL) {
  *   objects:
  *     obj_0 RETURN_SLOT size=4 align=1
@@ -461,6 +422,7 @@
  *     >> %48 = RET [%43]  // return 1
  * }
  */
+
 
 
 
