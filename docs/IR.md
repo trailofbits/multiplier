@@ -283,6 +283,10 @@ Used for: `++i` (ADD), `i += 5` (ADD), `++ptr` (PTR_ADD), `--ptr` (PTR_ADD with 
 
 Key methods: `kind()`, `source_declaration()`, `type()`, `size_bytes()`, `align_bytes()`, `needs_memory()`.
 
+### String Literal Objects
+
+`STRING_LITERAL` objects hold the storage for string literals. The object's `size_bytes()` includes the null terminator (`ByteLength() + CharacterByteWidth()`). The actual string content is available from the AST via the `source_entity_id` → `StringLiteral::Bytes()`, which returns the raw bytes in **target byte order** and does **NOT** include the trailing null terminator. Consumers should zero-fill the object first, then copy `Bytes()` into it. For wide strings (`L"..."`, `u"..."`, `U"..."`), `CharacterByteWidth()` is 2 or 4, and `Bytes()` contains multi-byte characters in target byte order.
+
 ## Structural Hierarchy
 
 `IRStructure` forms a tree rooted at `FUNCTION_SCOPE`. Every block has a `parent_structure()`.
