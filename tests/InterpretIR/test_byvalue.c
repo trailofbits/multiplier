@@ -7,37 +7,36 @@
  *
  * function test_byvalue (NORMAL) {
  *   objects:
- *     obj_0 RETURN_SLOT size=4 align=1
- *     obj_1 LOCAL_VALUE size=8 align=1 (s)
- *     obj_2 LOCAL_VALUE size=4 align=1 (sum)
- *     obj_3 LOCAL_VALUE size=20 align=1 (l)
- *     obj_4 LOCAL_VALUE size=4 align=1 (lsum)
- *     obj_5 LOCAL_VALUE size=3 align=1 (p)
- *     obj_6 LOCAL_VALUE size=4 align=1 (psum)
- *     obj_7 LOCAL_VALUE size=8 align=1 (s2)
- *     obj_8 LOCAL_VALUE size=4 align=1 (chained)
- *     obj_9 LOCAL_VALUE size=4 align=1 (nested)
+ *     obj_0 LOCAL_VALUE size=8 align=1 (s)
+ *     obj_1 LOCAL_VALUE size=4 align=1 (sum)
+ *     obj_2 LOCAL_VALUE size=20 align=1 (l)
+ *     obj_3 LOCAL_VALUE size=4 align=1 (lsum)
+ *     obj_4 LOCAL_VALUE size=3 align=1 (p)
+ *     obj_5 LOCAL_VALUE size=4 align=1 (psum)
+ *     obj_6 LOCAL_VALUE size=8 align=1 (s2)
+ *     obj_7 LOCAL_VALUE size=4 align=1 (chained)
+ *     obj_8 LOCAL_VALUE size=4 align=1 (nested)
+ *     obj_9 PARAMETER size=4 align=1
  *     obj_10 PARAMETER size=4 align=1
- *     obj_11 PARAMETER size=4 align=1
- *     obj_12 RETURN_SLOT size=8 align=1
- *     obj_13 PARAMETER size=8 align=1
- *     obj_14 RETURN_SLOT size=4 align=1
- *     obj_15 PARAMETER size=4 align=1
- *     obj_16 RETURN_SLOT size=20 align=1
- *     obj_17 PARAMETER size=20 align=1
- *     obj_18 RETURN_SLOT size=4 align=1
- *     obj_19 PARAMETER size=3 align=1
- *     obj_20 RETURN_SLOT size=4 align=1
- *     obj_21 PARAMETER size=8 align=1
- *     obj_22 RETURN_SLOT size=8 align=1
+ *     obj_11 RETURN_SLOT size=8 align=1
+ *     obj_12 PARAMETER size=8 align=1
+ *     obj_13 RETURN_SLOT size=4 align=1
+ *     obj_14 PARAMETER size=4 align=1
+ *     obj_15 RETURN_SLOT size=20 align=1
+ *     obj_16 PARAMETER size=20 align=1
+ *     obj_17 RETURN_SLOT size=4 align=1
+ *     obj_18 PARAMETER size=3 align=1
+ *     obj_19 RETURN_SLOT size=4 align=1
+ *     obj_20 PARAMETER size=8 align=1
+ *     obj_21 RETURN_SLOT size=8 align=1
+ *     obj_22 PARAMETER size=4 align=1
  *     obj_23 PARAMETER size=4 align=1
- *     obj_24 PARAMETER size=4 align=1
- *     obj_25 RETURN_SLOT size=4 align=1
+ *     obj_24 RETURN_SLOT size=4 align=1
+ *     obj_25 PARAMETER size=4 align=1
  *     obj_26 PARAMETER size=4 align=1
- *     obj_27 PARAMETER size=4 align=1
- *     obj_28 RETURN_SLOT size=8 align=1
- *     obj_29 PARAMETER size=8 align=1
- *     obj_30 RETURN_SLOT size=4 align=1
+ *     obj_27 RETURN_SLOT size=8 align=1
+ *     obj_28 PARAMETER size=8 align=1
+ *     obj_29 RETURN_SLOT size=4 align=1
  *   body_scope: FUNCTION_SCOPE
  *   blocks:
  *   block_0 FRAME:
@@ -303,6 +302,9 @@
  *     >> %32 = RET [%27]  // return 1
  * }
  */
+
+
+
 
 
 

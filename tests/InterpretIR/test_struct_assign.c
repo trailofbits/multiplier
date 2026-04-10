@@ -7,21 +7,20 @@
  *
  * function test_struct_assign (NORMAL) {
  *   objects:
- *     obj_0 RETURN_SLOT size=4 align=1
- *     obj_1 LOCAL_VALUE size=8 align=1 (a)
- *     obj_2 LOCAL_VALUE size=8 align=1 (b)
- *     obj_3 LOCAL_VALUE size=20 align=1 (la)
- *     obj_4 LOCAL_VALUE size=20 align=1 (lb)
- *     obj_5 LOCAL_VALUE size=4 align=1 (total)
- *     obj_6 LOCAL_VALUE size=8 align=1 (c)
- *     obj_7 LOCAL_VALUE size=12 align=1 (n1)
- *     obj_8 LOCAL_VALUE size=12 align=1 (n2)
- *     obj_9 LOCAL_VALUE size=8 align=1 (d)
- *     obj_10 PARAMETER size=20 align=1
- *     obj_11 RETURN_SLOT size=4 align=1
+ *     obj_0 LOCAL_VALUE size=8 align=1 (a)
+ *     obj_1 LOCAL_VALUE size=8 align=1 (b)
+ *     obj_2 LOCAL_VALUE size=20 align=1 (la)
+ *     obj_3 LOCAL_VALUE size=20 align=1 (lb)
+ *     obj_4 LOCAL_VALUE size=4 align=1 (total)
+ *     obj_5 LOCAL_VALUE size=8 align=1 (c)
+ *     obj_6 LOCAL_VALUE size=12 align=1 (n1)
+ *     obj_7 LOCAL_VALUE size=12 align=1 (n2)
+ *     obj_8 LOCAL_VALUE size=8 align=1 (d)
+ *     obj_9 PARAMETER size=20 align=1
+ *     obj_10 RETURN_SLOT size=4 align=1
+ *     obj_11 PARAMETER size=4 align=1
  *     obj_12 PARAMETER size=4 align=1
- *     obj_13 PARAMETER size=4 align=1
- *     obj_14 RETURN_SLOT size=8 align=1
+ *     obj_13 RETURN_SLOT size=8 align=1
  *   body_scope: FUNCTION_SCOPE
  *   blocks:
  *   block_0 FRAME:
@@ -280,6 +279,9 @@
  *     >> %28 = RET [%24]  // return 1
  * }
  */
+
+
+
 
 
 

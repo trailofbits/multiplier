@@ -6,23 +6,22 @@
  *
  * function test_unsigned (NORMAL) {
  *   objects:
- *     obj_0 RETURN_SLOT size=4 align=1
- *     obj_1 LOCAL_VALUE size=4 align=1 (ua)
- *     obj_2 LOCAL_VALUE size=4 align=1 (ub)
- *     obj_3 LOCAL_VALUE size=4 align=1 (sum)
- *     obj_4 LOCAL_VALUE size=4 align=1 (diff)
- *     obj_5 LOCAL_VALUE size=4 align=1 (wrapped)
- *     obj_6 LOCAL_VALUE size=1 align=1 (uc)
- *     obj_7 LOCAL_VALUE size=4 align=1 (zext)
- *     obj_8 LOCAL_VALUE size=1 align=1 (sc)
- *     obj_9 LOCAL_VALUE size=4 align=1 (sext)
- *     obj_10 LOCAL_VALUE size=4 align=1 (udiv)
- *     obj_11 LOCAL_VALUE size=4 align=1 (umod)
- *     obj_12 LOCAL_VALUE size=4 align=1 (large)
- *     obj_13 LOCAL_VALUE size=4 align=1 (half)
- *     obj_14 LOCAL_VALUE size=4 align=1 (shifted)
- *     obj_15 LOCAL_VALUE size=4 align=1 (rshifted)
- *     obj_16 LOCAL_VALUE size=4 align=1 (uval)
+ *     obj_0 LOCAL_VALUE size=4 align=1 (ua)
+ *     obj_1 LOCAL_VALUE size=4 align=1 (ub)
+ *     obj_2 LOCAL_VALUE size=4 align=1 (sum)
+ *     obj_3 LOCAL_VALUE size=4 align=1 (diff)
+ *     obj_4 LOCAL_VALUE size=4 align=1 (wrapped)
+ *     obj_5 LOCAL_VALUE size=1 align=1 (uc)
+ *     obj_6 LOCAL_VALUE size=4 align=1 (zext)
+ *     obj_7 LOCAL_VALUE size=1 align=1 (sc)
+ *     obj_8 LOCAL_VALUE size=4 align=1 (sext)
+ *     obj_9 LOCAL_VALUE size=4 align=1 (udiv)
+ *     obj_10 LOCAL_VALUE size=4 align=1 (umod)
+ *     obj_11 LOCAL_VALUE size=4 align=1 (large)
+ *     obj_12 LOCAL_VALUE size=4 align=1 (half)
+ *     obj_13 LOCAL_VALUE size=4 align=1 (shifted)
+ *     obj_14 LOCAL_VALUE size=4 align=1 (rshifted)
+ *     obj_15 LOCAL_VALUE size=4 align=1 (uval)
  *   body_scope: FUNCTION_SCOPE
  *   blocks:
  *   block_0 FRAME:
@@ -296,6 +295,9 @@
  *     >> %37 = RET [%33]  // return 1
  * }
  */
+
+
+
 
 
 

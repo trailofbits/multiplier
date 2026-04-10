@@ -7,18 +7,17 @@
  *
  * function test_scopes (NORMAL) {
  *   objects:
- *     obj_0 RETURN_SLOT size=4 align=1
- *     obj_1 LOCAL_VALUE size=4 align=1 (result)
+ *     obj_0 LOCAL_VALUE size=4 align=1 (result)
+ *     obj_1 LOCAL_VALUE size=4 align=1 (x)
  *     obj_2 LOCAL_VALUE size=4 align=1 (x)
- *     obj_3 LOCAL_VALUE size=4 align=1 (x)
- *     obj_4 LOCAL_VALUE size=4 align=1 (sum)
- *     obj_5 LOCAL_VALUE size=4 align=1 (i)
- *     obj_6 LOCAL_VALUE size=4 align=1 (total)
+ *     obj_3 LOCAL_VALUE size=4 align=1 (sum)
+ *     obj_4 LOCAL_VALUE size=4 align=1 (i)
+ *     obj_5 LOCAL_VALUE size=4 align=1 (total)
+ *     obj_6 LOCAL_VALUE size=4 align=1 (i)
  *     obj_7 LOCAL_VALUE size=4 align=1 (i)
- *     obj_8 LOCAL_VALUE size=4 align=1 (i)
- *     obj_9 LOCAL_VALUE size=4 align=1 (block_val)
- *     obj_10 LOCAL_VALUE size=4 align=1 (a)
- *     obj_11 LOCAL_VALUE size=4 align=1 (b)
+ *     obj_8 LOCAL_VALUE size=4 align=1 (block_val)
+ *     obj_9 LOCAL_VALUE size=4 align=1 (a)
+ *     obj_10 LOCAL_VALUE size=4 align=1 (b)
  *   body_scope: FUNCTION_SCOPE
  *   blocks:
  *   block_0 FRAME:
@@ -210,6 +209,9 @@
  *     >> %35 = RET [%31]  // return 1
  * }
  */
+
+
+
 
 
 

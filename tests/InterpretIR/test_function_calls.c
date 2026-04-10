@@ -7,25 +7,24 @@
  *
  * function test_function_calls (NORMAL) {
  *   objects:
- *     obj_0 RETURN_SLOT size=4 align=1
- *     obj_1 LOCAL_VALUE size=8 align=1 (fp)
+ *     obj_0 LOCAL_VALUE size=8 align=1 (fp)
+ *     obj_1 PARAMETER size=4 align=1
  *     obj_2 PARAMETER size=4 align=1
- *     obj_3 PARAMETER size=4 align=1
- *     obj_4 RETURN_SLOT size=4 align=1
- *     obj_5 PARAMETER size=4 align=1
- *     obj_6 RETURN_SLOT size=4 align=1
+ *     obj_3 RETURN_SLOT size=4 align=1
+ *     obj_4 PARAMETER size=4 align=1
+ *     obj_5 RETURN_SLOT size=4 align=1
+ *     obj_6 PARAMETER size=4 align=1
  *     obj_7 PARAMETER size=4 align=1
- *     obj_8 PARAMETER size=4 align=1
- *     obj_9 RETURN_SLOT size=4 align=1
- *     obj_10 PARAMETER size=8 align=1
+ *     obj_8 RETURN_SLOT size=4 align=1
+ *     obj_9 PARAMETER size=8 align=1
+ *     obj_10 PARAMETER size=4 align=1
  *     obj_11 PARAMETER size=4 align=1
- *     obj_12 PARAMETER size=4 align=1
- *     obj_13 RETURN_SLOT size=4 align=1
+ *     obj_12 RETURN_SLOT size=4 align=1
+ *     obj_13 PARAMETER size=4 align=1
  *     obj_14 PARAMETER size=4 align=1
  *     obj_15 PARAMETER size=4 align=1
  *     obj_16 PARAMETER size=4 align=1
- *     obj_17 PARAMETER size=4 align=1
- *     obj_18 RETURN_SLOT size=4 align=1
+ *     obj_17 RETURN_SLOT size=4 align=1
  *   body_scope: FUNCTION_SCOPE
  *   blocks:
  *   block_0 FRAME:
@@ -160,6 +159,9 @@
  *     >> %20 = RET [%16]  // return 1
  * }
  */
+
+
+
 
 
 

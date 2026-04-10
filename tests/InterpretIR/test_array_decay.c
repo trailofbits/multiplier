@@ -6,21 +6,20 @@
  *
  * function test_array_decay (NORMAL) {
  *   objects:
- *     obj_0 RETURN_SLOT size=4 align=1
- *     obj_1 LOCAL_VALUE size=20 align=1 (arr)
- *     obj_2 LOCAL_VALUE size=4 align=1 (total)
- *     obj_3 LOCAL_VALUE size=4 align=1 (first)
- *     obj_4 LOCAL_VALUE size=12 align=1 (buf)
- *     obj_5 LOCAL_VALUE size=8 align=1 (p)
- *     obj_6 LOCAL_VALUE size=8 align=1 (q)
- *     obj_7 PARAMETER size=8 align=1
- *     obj_8 PARAMETER size=4 align=1
- *     obj_9 RETURN_SLOT size=4 align=1
- *     obj_10 PARAMETER size=8 align=1
- *     obj_11 RETURN_SLOT size=4 align=1
- *     obj_12 PARAMETER size=8 align=1
+ *     obj_0 LOCAL_VALUE size=20 align=1 (arr)
+ *     obj_1 LOCAL_VALUE size=4 align=1 (total)
+ *     obj_2 LOCAL_VALUE size=4 align=1 (first)
+ *     obj_3 LOCAL_VALUE size=12 align=1 (buf)
+ *     obj_4 LOCAL_VALUE size=8 align=1 (p)
+ *     obj_5 LOCAL_VALUE size=8 align=1 (q)
+ *     obj_6 PARAMETER size=8 align=1
+ *     obj_7 PARAMETER size=4 align=1
+ *     obj_8 RETURN_SLOT size=4 align=1
+ *     obj_9 PARAMETER size=8 align=1
+ *     obj_10 RETURN_SLOT size=4 align=1
+ *     obj_11 PARAMETER size=8 align=1
+ *     obj_12 PARAMETER size=4 align=1
  *     obj_13 PARAMETER size=4 align=1
- *     obj_14 PARAMETER size=4 align=1
  *   body_scope: FUNCTION_SCOPE
  *   blocks:
  *   block_0 FRAME:
@@ -198,6 +197,9 @@
  *     >> %48 = RET [%43]  // return 1
  * }
  */
+
+
+
 
 
 

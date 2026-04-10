@@ -6,14 +6,13 @@
  *
  * function test_dynamic_alloca (NORMAL) {
  *   objects:
- *     obj_0 RETURN_SLOT size=4 align=1
- *     obj_1 LOCAL_VALUE size=4 align=1 (n)
- *     obj_2 LOCAL_VALUE size=0 align=1 (vla)
- *     obj_3 LOCAL_VALUE size=4 align=1 (i)
- *     obj_4 LOCAL_VALUE size=4 align=1 (m)
- *     obj_5 LOCAL_VALUE size=0 align=1 (inner_vla)
- *     obj_6 LOCAL_VALUE size=4 align=1 (sz)
- *     obj_7 LOCAL_VALUE size=0 align=1 (bigger_vla)
+ *     obj_0 LOCAL_VALUE size=4 align=1 (n)
+ *     obj_1 LOCAL_VALUE size=0 align=1 (vla)
+ *     obj_2 LOCAL_VALUE size=4 align=1 (i)
+ *     obj_3 LOCAL_VALUE size=4 align=1 (m)
+ *     obj_4 LOCAL_VALUE size=0 align=1 (inner_vla)
+ *     obj_5 LOCAL_VALUE size=4 align=1 (sz)
+ *     obj_6 LOCAL_VALUE size=0 align=1 (bigger_vla)
  *   body_scope: FUNCTION_SCOPE
  *   blocks:
  *   block_0 FRAME:
@@ -167,6 +166,9 @@
  *     -> [block_3]
  * }
  */
+
+
+
 
 
 

@@ -8,21 +8,20 @@
  *
  * function test_control_flow (NORMAL) {
  *   objects:
- *     obj_0 RETURN_SLOT size=4 align=1
- *     obj_1 LOCAL_VALUE size=4 align=1 (result)
- *     obj_2 LOCAL_VALUE size=4 align=1 (sum)
- *     obj_3 LOCAL_VALUE size=4 align=1 (i)
- *     obj_4 LOCAL_VALUE size=4 align=1 (fact)
- *     obj_5 LOCAL_VALUE size=4 align=1 (j)
- *     obj_6 LOCAL_VALUE size=4 align=1 (count)
- *     obj_7 LOCAL_VALUE size=4 align=1 (brk)
- *     obj_8 LOCAL_VALUE size=4 align=1 (k)
- *     obj_9 LOCAL_VALUE size=4 align=1 (cont)
- *     obj_10 LOCAL_VALUE size=4 align=1 (k)
- *     obj_11 LOCAL_VALUE size=4 align=1 (nested)
- *     obj_12 LOCAL_VALUE size=4 align=1 (a)
- *     obj_13 LOCAL_VALUE size=4 align=1 (b)
- *     obj_14 LOCAL_VALUE size=4 align=1 (sel)
+ *     obj_0 LOCAL_VALUE size=4 align=1 (result)
+ *     obj_1 LOCAL_VALUE size=4 align=1 (sum)
+ *     obj_2 LOCAL_VALUE size=4 align=1 (i)
+ *     obj_3 LOCAL_VALUE size=4 align=1 (fact)
+ *     obj_4 LOCAL_VALUE size=4 align=1 (j)
+ *     obj_5 LOCAL_VALUE size=4 align=1 (count)
+ *     obj_6 LOCAL_VALUE size=4 align=1 (brk)
+ *     obj_7 LOCAL_VALUE size=4 align=1 (k)
+ *     obj_8 LOCAL_VALUE size=4 align=1 (cont)
+ *     obj_9 LOCAL_VALUE size=4 align=1 (k)
+ *     obj_10 LOCAL_VALUE size=4 align=1 (nested)
+ *     obj_11 LOCAL_VALUE size=4 align=1 (a)
+ *     obj_12 LOCAL_VALUE size=4 align=1 (b)
+ *     obj_13 LOCAL_VALUE size=4 align=1 (sel)
  *   body_scope: FUNCTION_SCOPE
  *   blocks:
  *   block_0 FRAME:
@@ -396,6 +395,9 @@
  *     >> %35 = RET [%31]  // return 1
  * }
  */
+
+
+
 
 
 

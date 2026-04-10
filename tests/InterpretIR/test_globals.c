@@ -7,7 +7,6 @@
  *
  * function test_globals (NORMAL) {
  *   objects:
- *     obj_0 RETURN_SLOT size=4 align=1
  *   body_scope: FUNCTION_SCOPE
  *   blocks:
  *   block_0 FRAME:
@@ -166,6 +165,9 @@
  *     >> %11 = RET [%7]  // return 1
  * }
  */
+
+
+
 
 
 

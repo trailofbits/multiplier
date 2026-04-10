@@ -7,36 +7,35 @@
  *
  * function test_conditional_exec (NORMAL) {
  *   objects:
- *     obj_0 RETURN_SLOT size=4 align=1
- *     obj_1 LOCAL_VALUE size=4 align=1 (r1)
- *     obj_2 LOCAL_VALUE size=4 align=1 (r2)
- *     obj_3 LOCAL_VALUE size=4 align=1 (r3)
- *     obj_4 LOCAL_VALUE size=4 align=1 (r4)
- *     obj_5 LOCAL_VALUE size=4 align=1 (r5)
- *     obj_6 LOCAL_VALUE size=4 align=1 (r6)
- *     obj_7 LOCAL_VALUE size=4 align=1 (r7)
- *     obj_8 LOCAL_VALUE size=4 align=1 (r8)
- *     obj_9 LOCAL_VALUE size=4 align=1 (r9)
- *     obj_10 LOCAL_VALUE size=4 align=1 (x)
- *     obj_11 LOCAL_VALUE size=4 align=1 (r10)
- *     obj_12 LOCAL_VALUE size=4 align=1 (r11)
- *     obj_13 LOCAL_VALUE size=4 align=1 (r12)
- *     obj_14 LOCAL_VALUE size=4 align=1 (r13)
- *     obj_15 LOCAL_VALUE size=4 align=1 (r14)
- *     obj_16 LOCAL_VALUE size=4 align=1 (r15)
- *     obj_17 LOCAL_VALUE size=4 align=1 (a)
- *     obj_18 LOCAL_VALUE size=4 align=1 (b)
- *     obj_19 LOCAL_VALUE size=4 align=1 (c)
- *     obj_20 LOCAL_VALUE size=4 align=1 (r16)
- *     obj_21 LOCAL_VALUE size=4 align=1 (r17)
- *     obj_22 LOCAL_VALUE size=4 align=1 (r18)
- *     obj_23 LOCAL_VALUE size=4 align=1 (r19)
- *     obj_24 LOCAL_VALUE size=4 align=1 (r20)
- *     obj_25 PARAMETER size=4 align=1
+ *     obj_0 LOCAL_VALUE size=4 align=1 (r1)
+ *     obj_1 LOCAL_VALUE size=4 align=1 (r2)
+ *     obj_2 LOCAL_VALUE size=4 align=1 (r3)
+ *     obj_3 LOCAL_VALUE size=4 align=1 (r4)
+ *     obj_4 LOCAL_VALUE size=4 align=1 (r5)
+ *     obj_5 LOCAL_VALUE size=4 align=1 (r6)
+ *     obj_6 LOCAL_VALUE size=4 align=1 (r7)
+ *     obj_7 LOCAL_VALUE size=4 align=1 (r8)
+ *     obj_8 LOCAL_VALUE size=4 align=1 (r9)
+ *     obj_9 LOCAL_VALUE size=4 align=1 (x)
+ *     obj_10 LOCAL_VALUE size=4 align=1 (r10)
+ *     obj_11 LOCAL_VALUE size=4 align=1 (r11)
+ *     obj_12 LOCAL_VALUE size=4 align=1 (r12)
+ *     obj_13 LOCAL_VALUE size=4 align=1 (r13)
+ *     obj_14 LOCAL_VALUE size=4 align=1 (r14)
+ *     obj_15 LOCAL_VALUE size=4 align=1 (r15)
+ *     obj_16 LOCAL_VALUE size=4 align=1 (a)
+ *     obj_17 LOCAL_VALUE size=4 align=1 (b)
+ *     obj_18 LOCAL_VALUE size=4 align=1 (c)
+ *     obj_19 LOCAL_VALUE size=4 align=1 (r16)
+ *     obj_20 LOCAL_VALUE size=4 align=1 (r17)
+ *     obj_21 LOCAL_VALUE size=4 align=1 (r18)
+ *     obj_22 LOCAL_VALUE size=4 align=1 (r19)
+ *     obj_23 LOCAL_VALUE size=4 align=1 (r20)
+ *     obj_24 PARAMETER size=4 align=1
+ *     obj_25 RETURN_SLOT size=4 align=1
  *     obj_26 RETURN_SLOT size=4 align=1
  *     obj_27 RETURN_SLOT size=4 align=1
  *     obj_28 RETURN_SLOT size=4 align=1
- *     obj_29 RETURN_SLOT size=4 align=1
  *   body_scope: FUNCTION_SCOPE
  *   blocks:
  *   block_0 FRAME:
@@ -422,6 +421,9 @@
  *     >> %48 = RET [%43]  // return 1
  * }
  */
+
+
+
 
 
 

@@ -8,15 +8,14 @@
  *
  * function test_pointers (NORMAL) {
  *   objects:
- *     obj_0 RETURN_SLOT size=4 align=1
- *     obj_1 LOCAL_VALUE size=20 align=1 (arr)
- *     obj_2 LOCAL_VALUE size=8 align=1 (p)
- *     obj_3 LOCAL_VALUE size=8 align=1 (q)
- *     obj_4 LOCAL_VALUE size=8 align=1 (diff)
- *     obj_5 LOCAL_VALUE size=8 align=1 (r)
- *     obj_6 LOCAL_VALUE size=8 align=1 (s)
- *     obj_7 LOCAL size=8 align=1 (pt)
- *     obj_8 LOCAL_VALUE size=8 align=1 (pp)
+ *     obj_0 LOCAL_VALUE size=20 align=1 (arr)
+ *     obj_1 LOCAL_VALUE size=8 align=1 (p)
+ *     obj_2 LOCAL_VALUE size=8 align=1 (q)
+ *     obj_3 LOCAL_VALUE size=8 align=1 (diff)
+ *     obj_4 LOCAL_VALUE size=8 align=1 (r)
+ *     obj_5 LOCAL_VALUE size=8 align=1 (s)
+ *     obj_6 LOCAL size=8 align=1 (pt)
+ *     obj_7 LOCAL_VALUE size=8 align=1 (pp)
  *   body_scope: FUNCTION_SCOPE
  *   blocks:
  *   block_0 FRAME:
@@ -250,6 +249,9 @@
  *     >> %41 = RET [%37]  // return 1
  * }
  */
+
+
+
 
 
 

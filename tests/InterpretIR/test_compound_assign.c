@@ -8,12 +8,11 @@
  *
  * function test_compound_assign (NORMAL) {
  *   objects:
- *     obj_0 RETURN_SLOT size=4 align=1
- *     obj_1 LOCAL_VALUE size=4 align=1 (x)
- *     obj_2 LOCAL_VALUE size=4 align=1 (pre)
- *     obj_3 LOCAL_VALUE size=4 align=1 (post)
- *     obj_4 LOCAL_VALUE size=12 align=1 (arr)
- *     obj_5 LOCAL_VALUE size=8 align=1 (p)
+ *     obj_0 LOCAL_VALUE size=4 align=1 (x)
+ *     obj_1 LOCAL_VALUE size=4 align=1 (pre)
+ *     obj_2 LOCAL_VALUE size=4 align=1 (post)
+ *     obj_3 LOCAL_VALUE size=12 align=1 (arr)
+ *     obj_4 LOCAL_VALUE size=8 align=1 (p)
  *   body_scope: FUNCTION_SCOPE
  *   blocks:
  *   block_0 FRAME:
@@ -420,6 +419,9 @@
  *     >> %19 = RET [%15]  // return 1
  * }
  */
+
+
+
 
 
 

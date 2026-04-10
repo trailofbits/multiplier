@@ -8,15 +8,14 @@
  *
  * function test_init_lists (NORMAL) {
  *   objects:
- *     obj_0 RETURN_SLOT size=4 align=1
- *     obj_1 LOCAL_VALUE size=16 align=1 (arr)
- *     obj_2 LOCAL_VALUE size=20 align=1 (partial)
- *     obj_3 LOCAL_VALUE size=8 align=1 (s)
- *     obj_4 LOCAL_VALUE size=12 align=1 (o)
- *     obj_5 LOCAL_VALUE size=8 align=1 (d)
- *     obj_6 LOCAL_VALUE size=8 align=1 (cl)
- *     obj_7 LOCAL_VALUE size=12 align=1 (z)
- *     obj_8 COMPOUND_LITERAL size=8 align=1
+ *     obj_0 LOCAL_VALUE size=16 align=1 (arr)
+ *     obj_1 LOCAL_VALUE size=20 align=1 (partial)
+ *     obj_2 LOCAL_VALUE size=8 align=1 (s)
+ *     obj_3 LOCAL_VALUE size=12 align=1 (o)
+ *     obj_4 LOCAL_VALUE size=8 align=1 (d)
+ *     obj_5 LOCAL_VALUE size=8 align=1 (cl)
+ *     obj_6 LOCAL_VALUE size=12 align=1 (z)
+ *     obj_7 COMPOUND_LITERAL size=8 align=1
  *   body_scope: FUNCTION_SCOPE
  *   blocks:
  *   block_0 FRAME:
@@ -363,6 +362,9 @@
  *     >> %36 = RET [%32]  // return 1
  * }
  */
+
+
+
 
 
 

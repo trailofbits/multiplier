@@ -6,8 +6,7 @@
  *
  * function test_sizeof_alignof (NORMAL) {
  *   objects:
- *     obj_0 RETURN_SLOT size=4 align=1
- *     obj_1 LOCAL_VALUE size=40 align=1 (arr)
+ *     obj_0 LOCAL_VALUE size=40 align=1 (arr)
  *   body_scope: FUNCTION_SCOPE
  *   blocks:
  *   block_0 FRAME:
@@ -164,6 +163,9 @@
  *     >> %12 = RET [%8]  // return 1
  * }
  */
+
+
+
 
 
 

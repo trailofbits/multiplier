@@ -7,31 +7,30 @@
  *
  * function test_arithmetic (NORMAL) {
  *   objects:
- *     obj_0 RETURN_SLOT size=4 align=1
- *     obj_1 LOCAL_VALUE size=4 align=1 (a)
- *     obj_2 LOCAL_VALUE size=4 align=1 (b)
- *     obj_3 LOCAL_VALUE size=4 align=1 (add)
- *     obj_4 LOCAL_VALUE size=4 align=1 (sub)
- *     obj_5 LOCAL_VALUE size=4 align=1 (mul)
- *     obj_6 LOCAL_VALUE size=4 align=1 (div)
- *     obj_7 LOCAL_VALUE size=4 align=1 (rem)
- *     obj_8 LOCAL_VALUE size=4 align=1 (neg)
- *     obj_9 LOCAL_VALUE size=4 align=1 (band)
- *     obj_10 LOCAL_VALUE size=4 align=1 (bor)
- *     obj_11 LOCAL_VALUE size=4 align=1 (bxor)
- *     obj_12 LOCAL_VALUE size=4 align=1 (shl)
- *     obj_13 LOCAL_VALUE size=4 align=1 (shr)
- *     obj_14 LOCAL_VALUE size=4 align=1 (bnot)
- *     obj_15 LOCAL_VALUE size=4 align=1 (land)
- *     obj_16 LOCAL_VALUE size=4 align=1 (lor)
- *     obj_17 LOCAL_VALUE size=4 align=1 (lnot)
- *     obj_18 LOCAL_VALUE size=4 align=1 (eq)
- *     obj_19 LOCAL_VALUE size=4 align=1 (ne)
- *     obj_20 LOCAL_VALUE size=4 align=1 (lt)
- *     obj_21 LOCAL_VALUE size=4 align=1 (le)
- *     obj_22 LOCAL_VALUE size=4 align=1 (gt)
- *     obj_23 LOCAL_VALUE size=4 align=1 (ge)
- *     obj_24 LOCAL_VALUE size=4 align=1 (comma)
+ *     obj_0 LOCAL_VALUE size=4 align=1 (a)
+ *     obj_1 LOCAL_VALUE size=4 align=1 (b)
+ *     obj_2 LOCAL_VALUE size=4 align=1 (add)
+ *     obj_3 LOCAL_VALUE size=4 align=1 (sub)
+ *     obj_4 LOCAL_VALUE size=4 align=1 (mul)
+ *     obj_5 LOCAL_VALUE size=4 align=1 (div)
+ *     obj_6 LOCAL_VALUE size=4 align=1 (rem)
+ *     obj_7 LOCAL_VALUE size=4 align=1 (neg)
+ *     obj_8 LOCAL_VALUE size=4 align=1 (band)
+ *     obj_9 LOCAL_VALUE size=4 align=1 (bor)
+ *     obj_10 LOCAL_VALUE size=4 align=1 (bxor)
+ *     obj_11 LOCAL_VALUE size=4 align=1 (shl)
+ *     obj_12 LOCAL_VALUE size=4 align=1 (shr)
+ *     obj_13 LOCAL_VALUE size=4 align=1 (bnot)
+ *     obj_14 LOCAL_VALUE size=4 align=1 (land)
+ *     obj_15 LOCAL_VALUE size=4 align=1 (lor)
+ *     obj_16 LOCAL_VALUE size=4 align=1 (lnot)
+ *     obj_17 LOCAL_VALUE size=4 align=1 (eq)
+ *     obj_18 LOCAL_VALUE size=4 align=1 (ne)
+ *     obj_19 LOCAL_VALUE size=4 align=1 (lt)
+ *     obj_20 LOCAL_VALUE size=4 align=1 (le)
+ *     obj_21 LOCAL_VALUE size=4 align=1 (gt)
+ *     obj_22 LOCAL_VALUE size=4 align=1 (ge)
+ *     obj_23 LOCAL_VALUE size=4 align=1 (comma)
  *   body_scope: FUNCTION_SCOPE
  *   blocks:
  *   block_0 FRAME:
@@ -427,6 +426,9 @@
  *     >> %125 = RET [%121]  // return 1
  * }
  */
+
+
+
 
 
 

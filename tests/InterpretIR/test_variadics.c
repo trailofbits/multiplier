@@ -6,30 +6,29 @@
  *
  * function test_variadics (NORMAL) {
  *   objects:
- *     obj_0 RETURN_SLOT size=4 align=1
- *     obj_1 LOCAL_VALUE size=4 align=1 (s1)
- *     obj_2 LOCAL_VALUE size=4 align=1 (s2)
- *     obj_3 LOCAL_VALUE size=4 align=1 (s3)
- *     obj_4 LOCAL_VALUE size=4 align=1 (first)
- *     obj_5 LOCAL_VALUE size=4 align=1 (copy_result)
+ *     obj_0 LOCAL_VALUE size=4 align=1 (s1)
+ *     obj_1 LOCAL_VALUE size=4 align=1 (s2)
+ *     obj_2 LOCAL_VALUE size=4 align=1 (s3)
+ *     obj_3 LOCAL_VALUE size=4 align=1 (first)
+ *     obj_4 LOCAL_VALUE size=4 align=1 (copy_result)
+ *     obj_5 PARAMETER size=4 align=1
  *     obj_6 PARAMETER size=4 align=1
  *     obj_7 PARAMETER size=4 align=1
  *     obj_8 PARAMETER size=4 align=1
- *     obj_9 PARAMETER size=4 align=1
- *     obj_10 RETURN_SLOT size=4 align=1
+ *     obj_9 RETURN_SLOT size=4 align=1
+ *     obj_10 PARAMETER size=4 align=1
  *     obj_11 PARAMETER size=4 align=1
- *     obj_12 PARAMETER size=4 align=1
- *     obj_13 RETURN_SLOT size=4 align=1
- *     obj_14 PARAMETER size=4 align=1
- *     obj_15 RETURN_SLOT size=4 align=1
+ *     obj_12 RETURN_SLOT size=4 align=1
+ *     obj_13 PARAMETER size=4 align=1
+ *     obj_14 RETURN_SLOT size=4 align=1
+ *     obj_15 PARAMETER size=4 align=1
  *     obj_16 PARAMETER size=4 align=1
- *     obj_17 PARAMETER size=4 align=1
- *     obj_18 RETURN_SLOT size=4 align=1
+ *     obj_17 RETURN_SLOT size=4 align=1
+ *     obj_18 PARAMETER size=4 align=1
  *     obj_19 PARAMETER size=4 align=1
  *     obj_20 PARAMETER size=4 align=1
  *     obj_21 PARAMETER size=4 align=1
- *     obj_22 PARAMETER size=4 align=1
- *     obj_23 RETURN_SLOT size=4 align=1
+ *     obj_22 RETURN_SLOT size=4 align=1
  *   body_scope: FUNCTION_SCOPE
  *   blocks:
  *   block_0 FRAME:
@@ -184,6 +183,9 @@
  *     >> %33 = RET [%28]  // return 1
  * }
  */
+
+
+
 
 
 

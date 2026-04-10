@@ -7,9 +7,8 @@
  *
  * function test_goto (NORMAL) {
  *   objects:
- *     obj_0 RETURN_SLOT size=4 align=1
- *     obj_1 LOCAL_VALUE size=4 align=1 (result)
- *     obj_2 LOCAL_VALUE size=4 align=1 (count)
+ *     obj_0 LOCAL_VALUE size=4 align=1 (result)
+ *     obj_1 LOCAL_VALUE size=4 align=1 (count)
  *   body_scope: FUNCTION_SCOPE
  *   blocks:
  *   block_0 FRAME:
@@ -136,6 +135,9 @@
  *     >> %19 = RET [%15]  // return 1
  * }
  */
+
+
+
 
 
 

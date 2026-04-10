@@ -7,23 +7,22 @@
  *
  * function test_casts (NORMAL) {
  *   objects:
- *     obj_0 RETURN_SLOT size=4 align=1
- *     obj_1 LOCAL_VALUE size=1 align=1 (sc)
- *     obj_2 LOCAL_VALUE size=4 align=1 (sext)
- *     obj_3 LOCAL_VALUE size=1 align=1 (uc)
- *     obj_4 LOCAL_VALUE size=4 align=1 (zext)
- *     obj_5 LOCAL_VALUE size=4 align=1 (big)
- *     obj_6 LOCAL_VALUE size=1 align=1 (trunc)
- *     obj_7 LOCAL_VALUE size=4 align=1 (ival)
- *     obj_8 LOCAL_VALUE size=8 align=1 (dval)
- *     obj_9 LOCAL_VALUE size=4 align=1 (back)
- *     obj_10 LOCAL_VALUE size=8 align=1 (pi)
- *     obj_11 LOCAL_VALUE size=4 align=1 (ipi)
- *     obj_12 LOCAL_VALUE size=4 align=1 (f)
- *     obj_13 LOCAL_VALUE size=8 align=1 (d)
- *     obj_14 LOCAL_VALUE size=4 align=1 (id)
- *     obj_15 LOCAL size=4 align=1 (x)
- *     obj_16 LOCAL_VALUE size=8 align=1 (ptr_as_int)
+ *     obj_0 LOCAL_VALUE size=1 align=1 (sc)
+ *     obj_1 LOCAL_VALUE size=4 align=1 (sext)
+ *     obj_2 LOCAL_VALUE size=1 align=1 (uc)
+ *     obj_3 LOCAL_VALUE size=4 align=1 (zext)
+ *     obj_4 LOCAL_VALUE size=4 align=1 (big)
+ *     obj_5 LOCAL_VALUE size=1 align=1 (trunc)
+ *     obj_6 LOCAL_VALUE size=4 align=1 (ival)
+ *     obj_7 LOCAL_VALUE size=8 align=1 (dval)
+ *     obj_8 LOCAL_VALUE size=4 align=1 (back)
+ *     obj_9 LOCAL_VALUE size=8 align=1 (pi)
+ *     obj_10 LOCAL_VALUE size=4 align=1 (ipi)
+ *     obj_11 LOCAL_VALUE size=4 align=1 (f)
+ *     obj_12 LOCAL_VALUE size=8 align=1 (d)
+ *     obj_13 LOCAL_VALUE size=4 align=1 (id)
+ *     obj_14 LOCAL size=4 align=1 (x)
+ *     obj_15 LOCAL_VALUE size=8 align=1 (ptr_as_int)
  *   body_scope: FUNCTION_SCOPE
  *   blocks:
  *   block_0 FRAME:
@@ -171,6 +170,9 @@
  *     >> %34 = RET [%30]  // return 1
  * }
  */
+
+
+
 
 
 

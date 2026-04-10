@@ -7,9 +7,8 @@
  *
  * function test_bitfields (NORMAL) {
  *   objects:
- *     obj_0 RETURN_SLOT size=4 align=1
- *     obj_1 LOCAL_VALUE size=4 align=1 (f)
- *     obj_2 LOCAL_VALUE size=4 align=1 (g)
+ *     obj_0 LOCAL_VALUE size=4 align=1 (f)
+ *     obj_1 LOCAL_VALUE size=4 align=1 (g)
  *   body_scope: FUNCTION_SCOPE
  *   blocks:
  *   block_0 FRAME:
@@ -204,6 +203,9 @@
  *     >> %39 = RET [%35]  // return 1
  * }
  */
+
+
+
 
 
 
