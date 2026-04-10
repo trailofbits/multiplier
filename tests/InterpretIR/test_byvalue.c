@@ -486,6 +486,7 @@
  */
 
 
+
 struct Small {
     int x;
     int y;

@@ -1516,8 +1516,10 @@ void IRGenerator::EmitReturnStmt(const pasta::Stmt &s) {
       store.mem_op = static_cast<uint8_t>(mx::ir::MemOp::MEMCPY);
     } else {
       store.operand_indices = {ret_ptr_idx, val_idx};
+      bool ret_is_float = false;
+      if (auto t = rv->Type()) ret_is_float = t->IsFloatingType();
       store.mem_op = static_cast<uint8_t>(
-          DetermineMemOp(true, false, sz));
+          DetermineMemOp(true, false, sz, ret_is_float));
     }
     EmitTopLevel(std::move(store));
   }
@@ -1822,8 +1824,10 @@ scalar_fallback:
       store.mem_op = static_cast<uint8_t>(mx::ir::MemOp::MEMCPY);
     } else {
       store.operand_indices = {dest_addr_idx, val_idx};
+      bool is_float = false;
+      if (auto t = init.Type()) is_float = t->IsFloatingType();
       store.mem_op = static_cast<uint8_t>(
-          DetermineMemOp(true, false, sz));
+          DetermineMemOp(true, false, sz, is_float));
     }
     EmitTopLevel(std::move(store));
   }
@@ -3324,8 +3328,10 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       } else {
         // Scalar rvalue: STORE.
         store.operand_indices = {alloca_idx, val_idx};
+        bool arg_is_float = false;
+        if (auto t = arg_expr.Type()) arg_is_float = t->IsFloatingType();
         store.mem_op = static_cast<uint8_t>(
-            DetermineMemOp(true, false, sz));
+            DetermineMemOp(true, false, sz, arg_is_float));
       }
       EmitTopLevel(std::move(store));
 

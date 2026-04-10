@@ -168,6 +168,7 @@
  */
 
 
+
 int g_simple = 42;
 int g_array[3] = {1, 2, 3};
 

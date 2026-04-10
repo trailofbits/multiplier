@@ -715,6 +715,7 @@
  */
 
 
+
 // Classic Duff's device: copy n bytes from src to dst.
 static void duffs_copy(char *dst, const char *src, int n) {
     int remaining = n;

@@ -212,6 +212,7 @@
  */
 
 
+
 int test_scopes(void) {
     int result = 0;
 
