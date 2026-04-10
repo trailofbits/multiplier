@@ -1866,8 +1866,12 @@ scalar_fallback:
     // destination (e.g., "hello" has type char[32] for `char x[32] = "hello"`).
     // Use the actual string byte length (including null terminator) to avoid
     // reading past the literal's storage.
-    if (auto sl = pasta::StringLiteral::From(init)) {
-      unsigned str_sz = sl->ByteLength() + sl->CharacterByteWidth();  // + null terminator
+    // String literals always use MEMCPY — EmitRValue returns a pointer
+    // (the string literal ALLOCA), not a scalar value.
+    bool is_string_literal = pasta::StringLiteral::From(init).has_value();
+    if (is_string_literal) {
+      auto sl = pasta::StringLiteral::From(init);
+      unsigned str_sz = sl->ByteLength() + sl->CharacterByteWidth();
       if (str_sz > 0 && str_sz < sz) sz = str_sz;
     }
 
@@ -1876,7 +1880,7 @@ scalar_fallback:
     store.opcode = mx::ir::OpCode::MEMORY;
     store.source_entity_id = source_eid;
 
-    if (!IsScalarSize(sz)) {
+    if (is_string_literal || !IsScalarSize(sz)) {
       // Non-scalar size (e.g., string literal char[6]): MEMCPY.
       // val_idx is a pointer for non-scalar types.
       InstructionIR size_inst;
