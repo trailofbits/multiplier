@@ -714,10 +714,8 @@ void IRGenerator::EmitEntryBlockAllocas(const pasta::Stmt &body) {
         alloca_inst.source_entity_id = EntityIdOf(decl);
         alloca_inst.object_index = obj_idx;
         alloca_inst.type_entity_id = TypeEntityIdOf(vd->Type());
-        // Detect VLAs: VariableArrayType has runtime size.
-        // Check both the direct type and the unqualified/canonical type.
-        if (pasta::VariableArrayType::From(vd->Type()) ||
-            pasta::VariableArrayType::From(vd->Type().CanonicalType())) {
+        // Detect VLAs: variably modified types have runtime size.
+        if (vd->Type().IsVariablyModifiedType()) {
           alloca_inst.alloca_kind = static_cast<uint8_t>(
               mx::ir::AllocaKind::DYNAMIC);
         }
