@@ -172,6 +172,7 @@
  * }
  */
 
+
 int test_casts(void) {
     // Sign extension.
     signed char sc = -5;

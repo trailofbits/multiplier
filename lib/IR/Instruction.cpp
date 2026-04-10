@@ -256,6 +256,8 @@ void IRInstruction::format(std::ostream &os) const {
     auto sub = ci->sub_opcode();
     if (sub >= ir::ConstOp::FLOAT32 && sub <= ir::ConstOp::FLOAT64) {
       os << " " << ci->float_value();
+    } else if (sub >= ir::ConstOp::UINT8 && sub <= ir::ConstOp::UINT64) {
+      os << " " << ci->unsigned_value();
     } else if (sub != ir::ConstOp::NULL_PTR) {
       os << " " << ci->signed_value();
     }

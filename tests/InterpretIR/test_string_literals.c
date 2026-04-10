@@ -72,7 +72,7 @@
  *     >> %7 = ENTER_SCOPE  // {     // String literal initialization of char ...
  *          %buf.0 = ALLOCA/LOCAL size=6 align=1
  *          %8 = ALLOCA/LOCAL size=7 align=1  // "hello"
- *          %9 = CONST/UINT64 0
+ *          %9 = CONST/UINT64 6
  *     >> %buf.10 = MEMORY/MEMCPY [%buf.0, %8, %9]
  *          %16 = CMP_NE [%14, %15]  // buf[0] != 'h'
  *     >> %17 = COND_BRANCH [%16]  // if (buf[0] != 'h') return 1
@@ -129,7 +129,7 @@
  *   block_19 IF_MERGE  <- [block_18]:
  *          %long_buf.3 = ALLOCA/LOCAL size=16 align=1
  *          %99 = ALLOCA/LOCAL size=17 align=1  // "0123456789abcde"
- *          %100 = CONST/UINT64 0
+ *          %100 = CONST/UINT64 16
  *     >> %long_buf.101 = MEMORY/MEMCPY [%long_buf.3, %99, %100]
  *          %107 = CMP_NE [%105, %106]  // long_buf[0] != '0'
  *     >> %108 = COND_BRANCH [%107]  // if (long_buf[0] != '0') return 7
@@ -286,6 +286,7 @@
  *     >> %22 = RET [%18]  // return 1
  * }
  */
+
 
 static int my_strlen(const char *s) {
     int len = 0;

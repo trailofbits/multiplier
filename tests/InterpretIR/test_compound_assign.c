@@ -421,6 +421,7 @@
  * }
  */
 
+
 int test_compound_assign(void) {
     int x = 10;
 

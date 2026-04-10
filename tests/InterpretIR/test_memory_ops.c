@@ -42,7 +42,7 @@
  *   block_1 ENTRY  <- [block_0]:
  *     >> %8 = ENTER_SCOPE  // {     // memset.     char buf[16];     __builti...
  *          %9 = CAST/BITCAST [%buf.0]  // buf
- *          %10 = CONST/UINT8 65  // 'A'
+ *          %10 = CONST/UINT8 0  // 'A'
  *          %12 = CAST/SEXT_I32_I64 [%11]  // 10
  *     >> %13 = MEMORY/MEMSET [%9, %10, %12]  // __builtin_memset(buf, 'A', 10)
  *          %15 = PTR_ADD elem_size=1 [%buf.0, %14]  // buf[10]
@@ -64,7 +64,7 @@
  *   block_7 IF_MERGE  <- [block_6]:
  *          %src.1 = ALLOCA/LOCAL size=6 align=1
  *          %45 = ALLOCA/LOCAL size=7 align=1  // "hello"
- *          %46 = CONST/UINT64 0
+ *          %46 = CONST/UINT64 6
  *     >> %src.47 = MEMORY/MEMCPY [%src.1, %45, %46]
  *          %48 = CAST/BITCAST [%dst.2]  // dst
  *          %49 = CAST/BITCAST [%src.1]  // src
@@ -86,7 +86,7 @@
  *   block_13 IF_MERGE  <- [block_12]:
  *          %overlap.3 = ALLOCA/LOCAL size=9 align=1
  *          %79 = ALLOCA/LOCAL size=10 align=1  // "abcdefgh"
- *          %80 = CONST/UINT64 0
+ *          %80 = CONST/UINT64 9
  *     >> %overlap.81 = MEMORY/MEMCPY [%overlap.3, %79, %80]
  *          %84 = CAST/BITCAST [%83]  // overlap + 2
  *          %85 = CAST/BITCAST [%overlap.3]  // overlap
@@ -177,7 +177,7 @@
  *   block_46 IF_MERGE  <- [block_45]:
  *          %dest3.6 = ALLOCA/LOCAL size=32 align=1
  *          %238 = ALLOCA/LOCAL size=7 align=1  // "hello"
- *          %239 = CONST/UINT64 0
+ *          %239 = CONST/UINT64 32
  *     >> %dest3.240 = MEMORY/MEMCPY [%dest3.6, %238, %239]
  *          %dest3.6 = ALLOCA/LOCAL size=32 align=1
  *          %241 = ALLOCA/LOCAL size=8 align=1  // " world"
@@ -309,6 +309,7 @@
  *     >> %30 = RET [%26]  // return 1
  * }
  */
+
 
 typedef unsigned long size_t;
 

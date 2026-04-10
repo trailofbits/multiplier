@@ -68,6 +68,9 @@ void PrintInstruction(std::ostream &os, const mx::IRInstruction &inst,
       os << " " << ci->float_value();
     } else if (sub == mx::ir::ConstOp::NULL_PTR) {
       // no extra
+    } else if (sub >= mx::ir::ConstOp::UINT8 &&
+               sub <= mx::ir::ConstOp::UINT64) {
+      os << " " << ci->unsigned_value();
     } else {
       os << " " << ci->signed_value();
     }

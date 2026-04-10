@@ -405,7 +405,7 @@
  *     >> %5 = ENTER_SCOPE  // {         char src[11] = "0123456789";         ...
  *          %src.0 = ALLOCA/LOCAL size=11 align=1
  *          %6 = ALLOCA/LOCAL size=12 align=1  // "0123456789"
- *          %7 = CONST/UINT64 0
+ *          %7 = CONST/UINT64 11
  *     >> %src.8 = MEMORY/MEMCPY [%src.0, %6, %7]
  *          %dst.1 = ALLOCA/LOCAL size=11 align=1
  *          %dst.9 = CONST/UINT8 0
@@ -713,6 +713,7 @@
  *     >> %37 = RET [%32]  // return 1
  * }
  */
+
 
 // Classic Duff's device: copy n bytes from src to dst.
 static void duffs_copy(char *dst, const char *src, int n) {

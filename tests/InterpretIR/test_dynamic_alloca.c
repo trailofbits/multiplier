@@ -168,6 +168,7 @@
  * }
  */
 
+
 int test_dynamic_alloca(void) {
     int n = 5;
 

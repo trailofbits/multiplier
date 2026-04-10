@@ -63,7 +63,7 @@
  *     >> %27 = MEMORY/STORE_LE_32 [%23, %26]  // l.e = base + 4
  *          %28 = RETURN_PTR  // return l
  *          %l.1 = ALLOCA/LOCAL size=20 align=1
- *          %29 = CONST/UINT64 0
+ *          %29 = CONST/UINT64 20
  *     >> %30 = MEMORY/MEMCPY [%28, %l.1, %29]  // return l
  *     >> %31 = EXIT_SCOPE  // {     struct Large l;     l.a = base;     l.b =...
  *          %l.1 = ALLOCA/LOCAL size=20 align=1
@@ -272,7 +272,7 @@
  *     >> %67 = MEMORY/STORE_LE_32 [%66, %65]  // 100
  *          %l.2 = ALLOCA/LOCAL size=20 align=1
  *          %69 = CALL @make_large [%66]  // make_large(100)
- *          %70 = CONST/UINT64 0
+ *          %70 = CONST/UINT64 20
  *     >> %l.71 = MEMORY/MEMCPY [%l.2, %69, %70]
  *     >> %76 = EXIT_SCOPE
  *          %75 = CMP_NE [%73, %74]  // l.a != 100
@@ -292,7 +292,7 @@
  *     >> %96 = ENTER_SCOPE  // sum_large(l)
  *          %97 = ALLOCA/ARG size=20 align=1  // l
  *          %l.2 = ALLOCA/LOCAL size=20 align=1
- *          %98 = CONST/UINT64 0
+ *          %98 = CONST/UINT64 20
  *     >> %99 = MEMORY/MEMCPY [%97, %l.2, %98]  // l
  *          %lsum.3 = ALLOCA/LOCAL size=4 align=1
  *          %101 = CALL @sum_large [%97]  // sum_large(l)
@@ -317,7 +317,7 @@
  *     >> %127 = ENTER_SCOPE  // sum_packed3(p)
  *          %128 = ALLOCA/ARG size=3 align=1  // p
  *          %p.4 = ALLOCA/LOCAL size=3 align=1
- *          %129 = CONST/UINT64 0
+ *          %129 = CONST/UINT64 3
  *     >> %130 = MEMORY/MEMCPY [%128, %p.4, %129]  // p
  *          %psum.5 = ALLOCA/LOCAL size=4 align=1
  *          %132 = CALL @sum_packed3 [%128]  // sum_packed3(p)
@@ -484,6 +484,7 @@
  *     >> %32 = RET [%27]  // return 1
  * }
  */
+
 
 struct Small {
     int x;

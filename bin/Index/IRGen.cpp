@@ -1507,6 +1507,7 @@ void IRGenerator::EmitReturnStmt(const pasta::Stmt &s) {
       InstructionIR size_inst;
       size_inst.opcode = mx::ir::OpCode::CONST;
       size_inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::UINT64);
+      size_inst.int_value = static_cast<int64_t>(sz);
       size_inst.uint_value = sz;
       size_inst.width = 64;
       uint32_t size_idx = EmitInstruction(std::move(size_inst));
@@ -1813,6 +1814,7 @@ scalar_fallback:
       InstructionIR size_inst;
       size_inst.opcode = mx::ir::OpCode::CONST;
       size_inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::UINT64);
+      size_inst.int_value = static_cast<int64_t>(sz);
       size_inst.uint_value = sz;
       size_inst.width = 64;
       uint32_t size_idx = EmitInstruction(std::move(size_inst));
@@ -2314,7 +2316,8 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
           InstructionIR size_inst;
           size_inst.opcode = mx::ir::OpCode::CONST;
           size_inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::UINT64);
-          size_inst.uint_value = sz;
+          size_inst.int_value = static_cast<int64_t>(sz);
+      size_inst.uint_value = sz;
           size_inst.width = 64;
           uint32_t size_idx = EmitInstruction(std::move(size_inst));
           InstructionIR inst;
@@ -3300,7 +3303,8 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         InstructionIR size_inst;
         size_inst.opcode = mx::ir::OpCode::CONST;
         size_inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::UINT64);
-        size_inst.uint_value = sz;
+        size_inst.int_value = static_cast<int64_t>(sz);
+      size_inst.uint_value = sz;
         size_inst.width = 64;
         uint32_t size_idx = EmitInstruction(std::move(size_inst));
         store.operand_indices = {alloca_idx, val_idx, size_idx};
@@ -3311,7 +3315,8 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         InstructionIR size_inst;
         size_inst.opcode = mx::ir::OpCode::CONST;
         size_inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::UINT64);
-        size_inst.uint_value = sz;
+        size_inst.int_value = static_cast<int64_t>(sz);
+      size_inst.uint_value = sz;
         size_inst.width = 64;
         uint32_t size_idx = EmitInstruction(std::move(size_inst));
         store.operand_indices = {alloca_idx, src_idx, size_idx};

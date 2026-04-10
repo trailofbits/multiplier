@@ -126,7 +126,7 @@
  *     >> %69 = MEMORY/STORE_LE_32 [%67, %68]  // la.e = 5
  *          %lb.3 = ALLOCA/LOCAL size=20 align=1
  *          %la.2 = ALLOCA/LOCAL size=20 align=1
- *          %70 = CONST/UINT64 0
+ *          %70 = CONST/UINT64 20
  *     >> %lb.71 = MEMORY/MEMCPY [%lb.3, %la.2, %70]
  *          %75 = CMP_NE [%73, %74]  // lb.a != 1
  *     >> %76 = COND_BRANCH [%75]  // if (lb.a != 1) return 4
@@ -145,7 +145,7 @@
  *     >> %94 = ENTER_SCOPE  // sum_large(la)
  *          %95 = ALLOCA/ARG size=20 align=1  // la
  *          %la.2 = ALLOCA/LOCAL size=20 align=1
- *          %96 = CONST/UINT64 0
+ *          %96 = CONST/UINT64 20
  *     >> %97 = MEMORY/MEMCPY [%95, %la.2, %96]  // la
  *          %total.4 = ALLOCA/LOCAL size=4 align=1
  *          %99 = CALL @sum_large [%95]  // sum_large(la)
@@ -194,7 +194,7 @@
  *     >> %157 = MEMORY/STORE_LE_32 [%155, %156]  // n1.z = 3
  *          %n2.7 = ALLOCA/LOCAL size=12 align=1
  *          %n1.6 = ALLOCA/LOCAL size=12 align=1
- *          %158 = CONST/UINT64 0
+ *          %158 = CONST/UINT64 12
  *     >> %n2.159 = MEMORY/MEMCPY [%n2.7, %n1.6, %158]
  *          %164 = CMP_NE [%162, %163]  // n2.s.x != 1
  *     >> %165 = COND_BRANCH [%164]  // if (n2.s.x != 1) return 9
@@ -327,6 +327,7 @@
  *     >> %28 = RET [%24]  // return 1
  * }
  */
+
 
 struct Small {
     int x;

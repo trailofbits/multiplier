@@ -134,7 +134,7 @@
  *     -> [block_31]
  *   block_31 IF_MERGE  <- [block_30]:
  *          %large.11 = ALLOCA/LOCAL size=4 align=1
- *          %164 = CONST/UINT32 -1  // 0xFFFFFFFF
+ *          %164 = CONST/UINT32 4294967295  // 0xFFFFFFFF
  *     >> %large.165 = MEMORY/STORE_LE_32 [%large.11, %164]
  *          %168 = CMP_NE [%166, %167]  // large != 4294967295u
  *     >> %169 = COND_BRANCH [%168]  // if (large != 4294967295u) return 11
@@ -296,6 +296,7 @@
  *     >> %37 = RET [%33]  // return 1
  * }
  */
+
 
 int test_unsigned(void) {
     // Basic unsigned values.
