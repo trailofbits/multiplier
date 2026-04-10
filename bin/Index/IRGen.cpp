@@ -1997,9 +1997,12 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
 
   // String literal.
   if (auto sl = pasta::StringLiteral::From(e)) {
+    uint32_t char_width = sl->CharacterByteWidth();
+    uint32_t total_bytes = sl->ByteLength() + char_width;  // + null terminator
+
     ObjectIR obj;
     obj.kind = mx::ir::ObjectKind::STRING_LITERAL;
-    obj.size_bytes = sl->ByteLength() + sl->CharacterByteWidth();  // + null terminator
+    obj.size_bytes = total_bytes;
     uint32_t obj_idx = next_obj_index_++;
     func_.objects.push_back(std::move(obj));
 
@@ -2010,6 +2013,11 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     if (auto t = e.Type()) alloca_inst.type_entity_id = TypeEntityIdOf(*t);
     uint32_t alloca_idx = emit_typed(std::move(alloca_inst));
     object_to_alloca_[obj_idx] = alloca_idx;
+
+    // The STRING_LITERAL object's content comes from the AST at interpreter
+    // time via StringLiteral::Bytes(). The bytes are in target byte order.
+    // No per-character stores needed in the IR — the interpreter initializes
+    // STRING_LITERAL objects from the source entity.
     return alloca_idx;
   }
 
