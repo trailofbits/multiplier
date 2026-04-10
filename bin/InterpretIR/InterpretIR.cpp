@@ -126,6 +126,13 @@ class Interpreter {
   // Pointer to return value storage. RETURN_PTR returns this.
   Value return_ptr_ = Value::Undef();
 
+  // Counter for interpreter-allocated objects (return storage, etc.).
+  // The memory_ map uses uint64_t keys. Real entity IDs use packed
+  // formats with category/fragment/offset bits. We use small integers
+  // (1, 2, 3...) which can't collide with packed entity IDs since those
+  // always have category bits set in the high word.
+  uint64_t next_interp_object_id_{1};
+
   uint64_t steps_{0};
 
   // Evaluate a single instruction, storing result in values_.
@@ -1824,8 +1831,8 @@ Value Interpreter::Run(const std::vector<Value> &args) {
     }
   }
 
-  // Allocate synthetic return storage (callee no longer has RETURN_SLOT).
-  // The return type size comes from the FunctionDecl.
+  // Allocate return storage (callee no longer has RETURN_SLOT object).
+  // Use a monotonically increasing ID that won't collide with entity IDs.
   if (return_ptr_.kind == Value::UNDEFINED) {
     if (auto decl = func_.source_declaration()) {
       if (auto fd = mx::FunctionDecl::from(*decl)) {
@@ -1833,8 +1840,7 @@ Value Interpreter::Run(const std::vector<Value> &args) {
         if (auto bits = rt.size_in_bits()) {
           uint32_t sz = static_cast<uint32_t>((*bits + 7) / 8);
           if (sz > 0) {
-            // Use a synthetic object ID (won't collide with real objects).
-            mx::RawEntityId ret_eid = ~mx::RawEntityId{0};
+            uint64_t ret_eid = next_interp_object_id_++;
             auto &mem = memory_[ret_eid];
             mem.bytes.resize(sz, 0);
             mem.allocated = true;
