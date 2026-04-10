@@ -1880,7 +1880,14 @@ scalar_fallback:
     store.opcode = mx::ir::OpCode::MEMORY;
     store.source_entity_id = source_eid;
 
-    if (is_string_literal || !IsScalarSize(sz)) {
+    // Use MEMCPY for string literals, non-scalar sizes, and aggregate types
+    // (structs/arrays). Aggregate types may contain pointers that need the
+    // shadow map, and LOAD+STORE would lose pointer identity.
+    bool is_aggregate = false;
+    if (auto t = init.Type()) {
+      is_aggregate = t->IsRecordType() || t->IsArrayType();
+    }
+    if (is_string_literal || is_aggregate || !IsScalarSize(sz)) {
       // Non-scalar size (e.g., string literal char[6]): MEMCPY.
       // val_idx is a pointer for non-scalar types.
       InstructionIR size_inst;
