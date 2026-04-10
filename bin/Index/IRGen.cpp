@@ -1835,10 +1835,10 @@ scalar_fallback:
     }
     // For string literal initializers, Clang widens the type to match the
     // destination (e.g., "hello" has type char[32] for `char x[32] = "hello"`).
-    // Use the actual string size to avoid reading past the literal's storage.
+    // Use the actual string byte length (including null terminator) to avoid
+    // reading past the literal's storage.
     if (auto sl = pasta::StringLiteral::From(init)) {
-      auto str_data = sl->Tokens().Data();
-      unsigned str_sz = static_cast<unsigned>(str_data.size());
+      unsigned str_sz = sl->ByteLength();
       if (str_sz > 0 && str_sz < sz) sz = str_sz;
     }
 
@@ -1965,7 +1965,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
   if (auto sl = pasta::StringLiteral::From(e)) {
     ObjectIR obj;
     obj.kind = mx::ir::ObjectKind::STRING_LITERAL;
-    obj.size_bytes = static_cast<uint32_t>(sl->Tokens().Data().size());
+    obj.size_bytes = sl->ByteLength();
     uint32_t obj_idx = next_obj_index_++;
     func_.objects.push_back(std::move(obj));
 
