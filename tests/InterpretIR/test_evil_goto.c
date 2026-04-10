@@ -9,7 +9,7 @@
  *     obj_0 LOCAL_VALUE size=11 align=1 (src)
  *     obj_1 LOCAL_VALUE size=11 align=1 (dst)
  *     obj_2 LOCAL_VALUE size=4 align=1 (dst2)
- *     obj_3 STRING_LITERAL size=12 align=1
+ *     obj_3 STRING_LITERAL size=11 align=1
  *     obj_4 PARAMETER size=8 align=1
  *     obj_5 PARAMETER size=8 align=1
  *     obj_6 PARAMETER size=4 align=1
@@ -41,7 +41,7 @@
  *     >> %4 = ENTER_SCOPE  // {     // Duff's device.     {         char src[...
  *     >> %5 = ENTER_SCOPE  // {         char src[11] = "0123456789";         ...
  *          %src.0 = ALLOCA/LOCAL size=11 align=1
- *          %6 = ALLOCA/LOCAL size=12 align=1  // "0123456789"
+ *          %6 = ALLOCA/LOCAL size=11 align=1  // "0123456789"
  *          %7 = CONST/UINT64 11
  *     >> %src.8 = MEMORY/MEMCPY [%src.0, %6, %7]
  *          %dst.1 = ALLOCA/LOCAL size=11 align=1
@@ -350,6 +350,8 @@
  *     >> %37 = RET [%32]  // return 1
  * }
  */
+
+
 
 
 

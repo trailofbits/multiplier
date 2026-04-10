@@ -15,24 +15,24 @@
  *     obj_4 LOCAL_VALUE size=8 align=1 (sc)
  *     obj_5 LOCAL_VALUE size=16 align=1 (dest2)
  *     obj_6 LOCAL_VALUE size=32 align=1 (dest3)
- *     obj_7 STRING_LITERAL size=7 align=1
- *     obj_8 STRING_LITERAL size=10 align=1
- *     obj_9 STRING_LITERAL size=5 align=1
- *     obj_10 STRING_LITERAL size=5 align=1
- *     obj_11 STRING_LITERAL size=5 align=1
- *     obj_12 STRING_LITERAL size=5 align=1
- *     obj_13 STRING_LITERAL size=7 align=1
- *     obj_14 STRING_LITERAL size=2 align=1
- *     obj_15 STRING_LITERAL size=5 align=1
- *     obj_16 STRING_LITERAL size=5 align=1
- *     obj_17 STRING_LITERAL size=5 align=1
- *     obj_18 STRING_LITERAL size=5 align=1
- *     obj_19 STRING_LITERAL size=8 align=1
- *     obj_20 STRING_LITERAL size=8 align=1
- *     obj_21 STRING_LITERAL size=13 align=1
- *     obj_22 STRING_LITERAL size=6 align=1
- *     obj_23 STRING_LITERAL size=7 align=1
- *     obj_24 STRING_LITERAL size=8 align=1
+ *     obj_7 STRING_LITERAL size=6 align=1
+ *     obj_8 STRING_LITERAL size=9 align=1
+ *     obj_9 STRING_LITERAL size=4 align=1
+ *     obj_10 STRING_LITERAL size=4 align=1
+ *     obj_11 STRING_LITERAL size=4 align=1
+ *     obj_12 STRING_LITERAL size=4 align=1
+ *     obj_13 STRING_LITERAL size=6 align=1
+ *     obj_14 STRING_LITERAL size=1 align=1
+ *     obj_15 STRING_LITERAL size=4 align=1
+ *     obj_16 STRING_LITERAL size=4 align=1
+ *     obj_17 STRING_LITERAL size=4 align=1
+ *     obj_18 STRING_LITERAL size=4 align=1
+ *     obj_19 STRING_LITERAL size=7 align=1
+ *     obj_20 STRING_LITERAL size=7 align=1
+ *     obj_21 STRING_LITERAL size=12 align=1
+ *     obj_22 STRING_LITERAL size=5 align=1
+ *     obj_23 STRING_LITERAL size=6 align=1
+ *     obj_24 STRING_LITERAL size=7 align=1
  *   body_scope: FUNCTION_SCOPE
  *   blocks:
  *   block_0 FRAME:
@@ -41,7 +41,7 @@
  *   block_1 ENTRY  <- [block_0]:
  *     >> %8 = ENTER_SCOPE  // {     // memset.     char buf[16];     __builti...
  *          %9 = CAST/BITCAST [%buf.0]  // buf
- *          %10 = CONST/UINT8 0  // 'A'
+ *          %10 = CONST/UINT8 65  // 'A'
  *          %12 = CAST/SEXT_I32_I64 [%11]  // 10
  *     >> %13 = MEMORY/MEMSET [%9, %10, %12]  // __builtin_memset(buf, 'A', 10)
  *          %15 = PTR_ADD elem_size=1 [%buf.0, %14]  // buf[10]
@@ -62,7 +62,7 @@
  *     -> [block_7]
  *   block_7 IF_MERGE  <- [block_6]:
  *          %src.1 = ALLOCA/LOCAL size=6 align=1
- *          %45 = ALLOCA/LOCAL size=7 align=1  // "hello"
+ *          %45 = ALLOCA/LOCAL size=6 align=1  // "hello"
  *          %46 = CONST/UINT64 6
  *     >> %src.47 = MEMORY/MEMCPY [%src.1, %45, %46]
  *          %48 = CAST/BITCAST [%dst.2]  // dst
@@ -84,7 +84,7 @@
  *     -> [block_13]
  *   block_13 IF_MERGE  <- [block_12]:
  *          %overlap.3 = ALLOCA/LOCAL size=9 align=1
- *          %79 = ALLOCA/LOCAL size=10 align=1  // "abcdefgh"
+ *          %79 = ALLOCA/LOCAL size=9 align=1  // "abcdefgh"
  *          %80 = CONST/UINT64 9
  *     >> %overlap.81 = MEMORY/MEMCPY [%overlap.3, %79, %80]
  *          %84 = CAST/BITCAST [%83]  // overlap + 2
@@ -165,7 +165,7 @@
  *     -> [block_43]
  *   block_43 IF_MERGE  <- [block_42]:
  *          %dest2.5 = ALLOCA/LOCAL size=16 align=1
- *          %223 = ALLOCA/LOCAL size=6 align=1  // "test"
+ *          %223 = ALLOCA/LOCAL size=5 align=1  // "test"
  *     >> %224 = MEMORY/STRCPY [%dest2.5, %223]  // __builtin_strcpy(dest2, "test")
  *          %230 = CMP_NE [%228, %229]  // dest2[0] != 't'
  *     >> %231 = COND_BRANCH [%230]  // if (dest2[0] != 't') return 17
@@ -175,11 +175,11 @@
  *     -> [block_46]
  *   block_46 IF_MERGE  <- [block_45]:
  *          %dest3.6 = ALLOCA/LOCAL size=32 align=1
- *          %238 = ALLOCA/LOCAL size=7 align=1  // "hello"
- *          %239 = CONST/UINT64 32
+ *          %238 = ALLOCA/LOCAL size=6 align=1  // "hello"
+ *          %239 = CONST/UINT64 6
  *     >> %dest3.240 = MEMORY/MEMCPY [%dest3.6, %238, %239]
  *          %dest3.6 = ALLOCA/LOCAL size=32 align=1
- *          %241 = ALLOCA/LOCAL size=8 align=1  // " world"
+ *          %241 = ALLOCA/LOCAL size=7 align=1  // " world"
  *     >> %242 = MEMORY/STRCAT [%dest3.6, %241]  // __builtin_strcat(dest3, " world")
  *          %246 = CMP_NE [%243, %245]  // __builtin_strlen(dest3) != 11
  *     >> %247 = COND_BRANCH [%246]  // if (__builtin_strlen(dest3) != 11) return 18
@@ -308,6 +308,8 @@
  *     >> %30 = RET [%26]  // return 1
  * }
  */
+
+
 
 
 
