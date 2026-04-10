@@ -251,6 +251,7 @@
 
 
 
+
 static int my_strlen(const char *s) {
     int len = 0;
     while (s[len] != '\0') {
@@ -291,6 +292,34 @@ int test_string_literals(void) {
     char single[2] = "x";
     if (single[0] != 'x') return 12;
     if (single[1] != '\0') return 13;
+
+    // Wide string literal (wchar_t, typically 4 bytes per char on this platform).
+    // L"hi" is 3 wchar_t values: 'h', 'i', '\0'.
+    typedef __WCHAR_TYPE__ wchar_t;
+    _Static_assert(sizeof(L'x') == 4, "wchar_t must be 4 bytes");
+    wchar_t wbuf[3] = L"hi";
+    if (wbuf[0] != L'h') return 14;
+    if (wbuf[1] != L'i') return 15;
+    if (wbuf[2] != L'\0') return 16;
+
+    // char16_t string (C11 u"..." — 2 bytes per char).
+    // Requires <uchar.h> but we can use __CHAR16_TYPE__ directly.
+    typedef __CHAR16_TYPE__ char16_t;
+    char16_t u16buf[4] = u"abc";
+    if (u16buf[0] != u'a') return 17;
+    if (u16buf[3] != 0) return 18;
+
+    // char32_t string (C11 U"..." — 4 bytes per char).
+    typedef __CHAR32_TYPE__ char32_t;
+    char32_t u32buf[3] = U"ab";
+    if (u32buf[0] != U'a') return 19;
+    if (u32buf[2] != 0) return 20;
+
+    // Oversized destination: char x[20] = "hi" — 3 bytes copied, rest zero.
+    char oversized[20] = "hi";
+    if (oversized[0] != 'h') return 21;
+    if (oversized[2] != '\0') return 22;
+    if (oversized[19] != '\0') return 23;
 
     return 0;
 }
