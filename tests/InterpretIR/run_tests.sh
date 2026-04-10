@@ -35,6 +35,7 @@ TEST_FUNCS=(
   test_evil_goto
   test_conditional_exec
   test_unsigned
+  test_c23
 )
 
 for func in "${TEST_FUNCS[@]}"; do

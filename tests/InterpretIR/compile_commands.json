@@ -136,4 +136,10 @@
     "command": "/Users/orangesloth/Install/multiplier/Release/bin/clang -c -std=c11 /Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_unsigned.c",
     "file": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_unsigned.c"
   }
+,
+  {
+    "directory": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR",
+    "command": "/Users/orangesloth/Install/multiplier/Release/bin/clang -c -std=c23 /Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_c23.c",
+    "file": "/Users/orangesloth/Code/multiplier/multiplier/tests/InterpretIR/test_c23.c"
+  }
 ]

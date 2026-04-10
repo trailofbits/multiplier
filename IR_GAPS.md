@@ -58,11 +58,10 @@
 12. **No call inlining** — Interpreter doesn't step into callees.
 13. **No external function modeling** — malloc/free/memcpy/printf etc. not modeled.
 
-### Testing
-14. **mx-print-ir output format** — Uses numeric opcodes instead of names. Needs human-readable format update.
-15. **Test files lack IR output documentation** — Test .c files describe expected behavior but don't show expected IR shape.
+### C23
+14. **`#embed` directive** — C23's `#embed` for embedding binary data. Not handled.
 
 ### Documentation
-16. **IR_GAPS.md** — This file (kept up to date).
-17. **docs/IR.md** — Updated.
-18. **docs/InterpreterLibraryPlan.md** — Written.
+15. **IR_GAPS.md** — This file (kept up to date).
+16. **docs/IR.md** — Updated.
+17. **docs/InterpreterLibraryPlan.md** — Written.
