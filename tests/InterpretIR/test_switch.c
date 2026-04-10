@@ -193,6 +193,7 @@
 
 
 
+
 int test_switch(void) {
     // Basic switch.
     int val = 2;
