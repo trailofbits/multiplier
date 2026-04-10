@@ -47,6 +47,35 @@ static mx::ir::ConstOp IntConstOp(uint8_t width, bool is_signed = true) {
   return is_signed ? mx::ir::ConstOp::INT64 : mx::ir::ConstOp::UINT64;
 }
 
+// Helper: create a properly initialized integer CONST instruction.
+// Always sets both int_value and uint_value to keep them in sync.
+static InstructionIR MakeIntConst(mx::ir::ConstOp sub, int64_t sval,
+                                   uint64_t uval, uint8_t width,
+                                   mx::RawEntityId source_eid = mx::kInvalidEntityId) {
+  InstructionIR inst;
+  inst.opcode = mx::ir::OpCode::CONST;
+  inst.const_op = static_cast<uint8_t>(sub);
+  inst.int_value = sval;
+  inst.uint_value = uval;
+  inst.width = width;
+  inst.source_entity_id = source_eid;
+  return inst;
+}
+
+// Convenience: create CONST from a signed value.
+static InstructionIR MakeSignedConst(int64_t val, uint8_t width,
+                                      mx::RawEntityId source_eid = mx::kInvalidEntityId) {
+  return MakeIntConst(IntConstOp(width, true), val,
+                      static_cast<uint64_t>(val), width, source_eid);
+}
+
+// Convenience: create CONST/UINT64 for sizes, counts, etc.
+static InstructionIR MakeUint64Const(uint64_t val,
+                                      mx::RawEntityId source_eid = mx::kInvalidEntityId) {
+  return MakeIntConst(mx::ir::ConstOp::UINT64,
+                      static_cast<int64_t>(val), val, 64, source_eid);
+}
+
 // Helper: determine ConstOp for float constants.
 static mx::ir::ConstOp FloatConstOp(uint8_t width) {
   if (width <= 16) return mx::ir::ConstOp::FLOAT16;
@@ -1934,6 +1963,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     auto *raw = reinterpret_cast<const clang::CharacterLiteral *>(cl->RawStmt());
     if (raw) {
       inst.int_value = raw->getValue();
+      inst.uint_value = raw->getValue();
       // Determine char width from Clang's CharacterKind.
       switch (raw->getKind()) {
         case clang::CharacterLiteralKind::Wide:
