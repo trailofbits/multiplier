@@ -714,11 +714,9 @@ void IRGenerator::EmitEntryBlockAllocas(const pasta::Stmt &body) {
         alloca_inst.source_entity_id = EntityIdOf(decl);
         alloca_inst.object_index = obj_idx;
         alloca_inst.type_entity_id = TypeEntityIdOf(vd->Type());
-        // Detect VLAs: variably modified types have runtime size.
-        if (vd->Type().IsVariablyModifiedType()) {
-          alloca_inst.alloca_kind = static_cast<uint8_t>(
-              mx::ir::AllocaKind::DYNAMIC);
-        }
+        // Skip VLAs in FRAME — they're emitted at declaration time
+        // in EmitDeclStmt with a runtime size operand.
+        if (vd->Type().IsVariablyModifiedType()) continue;
         uint32_t alloca_idx = EmitTopLevel(std::move(alloca_inst));
         object_to_alloca_[obj_idx] = alloca_idx;
       }
@@ -1542,6 +1540,50 @@ void IRGenerator::EmitDeclStmt(const pasta::Stmt &s) {
 
     uint32_t obj_idx = GetOrMakeObject(decl);
     AssociateObjectWithScope(obj_idx);
+
+    // VLA: emit ALLOCA/DYNAMIC with runtime size at declaration point.
+    if (vd->Type().IsVariablyModifiedType()) {
+      // Get the size expression from the VariableArrayType.
+      auto vla_type = pasta::VariableArrayType::From(vd->Type());
+      if (!vla_type) vla_type = pasta::VariableArrayType::From(
+          vd->Type().CanonicalType());
+
+      uint32_t size_idx = UINT32_MAX;
+      if (vla_type) {
+        // Runtime size = element_count * element_size.
+        auto size_expr = vla_type->SizeExpression();
+        uint32_t count_idx = EmitRValue(size_expr);
+        // Get element size from the element type.
+        auto elem_type = vla_type->ElementType();
+        uint32_t elem_sz = 1;
+        if (auto sz = TypeSizeBytes(elem_type)) elem_sz = *sz;
+        InstructionIR elem_const;
+        elem_const.opcode = mx::ir::OpCode::CONST;
+        elem_const.const_op = static_cast<uint8_t>(mx::ir::ConstOp::UINT64);
+        elem_const.int_value = static_cast<int64_t>(elem_sz);
+        elem_const.uint_value = elem_sz;
+        elem_const.width = 64;
+        uint32_t elem_idx = EmitInstruction(std::move(elem_const));
+        InstructionIR mul;
+        mul.opcode = mx::ir::OpCode::MUL;
+        mul.source_entity_id = EntityIdOf(decl);
+        mul.operand_indices = {count_idx, elem_idx};
+        size_idx = EmitInstruction(std::move(mul));
+      }
+
+      InstructionIR alloca_inst;
+      alloca_inst.opcode = mx::ir::OpCode::ALLOCA;
+      alloca_inst.alloca_kind = static_cast<uint8_t>(mx::ir::AllocaKind::DYNAMIC);
+      alloca_inst.source_entity_id = EntityIdOf(decl);
+      alloca_inst.object_index = obj_idx;
+      alloca_inst.type_entity_id = TypeEntityIdOf(vd->Type());
+      if (size_idx != UINT32_MAX) {
+        alloca_inst.operand_indices = {size_idx};
+      }
+      uint32_t alloca_idx = EmitTopLevel(std::move(alloca_inst));
+      object_to_alloca_[obj_idx] = alloca_idx;
+      continue;
+    }
 
     if (auto init = vd->Initializer()) {
       uint32_t addr_idx = object_to_alloca_[obj_idx];
