@@ -347,6 +347,8 @@ Fragment {
 }
 ```
 
+**Byte order**: All numeric values in the int pool (constants, sizes, offsets) are stored in host byte order. The index is architecture-specific — type sizes, alignment, and ABI are all target-dependent. Databases indexed on a little-endian host are not portable to big-endian (and vice versa). This is inherent to the design; the entire index is tied to the target triple.
+
 ## Design Rationale
 
 **Statement-level CFG**: Expressions stay as nested trees. `if ((x+y) && z)` is one block with `LOGICAL_AND(ADD(LOAD(x), LOAD(y)), LOAD(z))`.
