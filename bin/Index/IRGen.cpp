@@ -1838,7 +1838,7 @@ scalar_fallback:
     // Use the actual string byte length (including null terminator) to avoid
     // reading past the literal's storage.
     if (auto sl = pasta::StringLiteral::From(init)) {
-      unsigned str_sz = sl->ByteLength();
+      unsigned str_sz = sl->ByteLength() + sl->CharacterByteWidth();  // + null terminator
       if (str_sz > 0 && str_sz < sz) sz = str_sz;
     }
 
@@ -1965,7 +1965,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
   if (auto sl = pasta::StringLiteral::From(e)) {
     ObjectIR obj;
     obj.kind = mx::ir::ObjectKind::STRING_LITERAL;
-    obj.size_bytes = sl->ByteLength();
+    obj.size_bytes = sl->ByteLength() + sl->CharacterByteWidth();  // + null terminator
     uint32_t obj_idx = next_obj_index_++;
     func_.objects.push_back(std::move(obj));
 
