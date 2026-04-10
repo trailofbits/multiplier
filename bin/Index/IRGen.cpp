@@ -1833,6 +1833,14 @@ scalar_fallback:
     if (auto t = init.Type()) {
       if (auto s = TypeSizeBytes(*t)) sz = *s;
     }
+    // For string literal initializers, Clang widens the type to match the
+    // destination (e.g., "hello" has type char[32] for `char x[32] = "hello"`).
+    // Use the actual string size to avoid reading past the literal's storage.
+    if (auto sl = pasta::StringLiteral::From(init)) {
+      auto str_data = sl->Tokens().Data();
+      unsigned str_sz = static_cast<unsigned>(str_data.size());
+      if (str_sz > 0 && str_sz < sz) sz = str_sz;
+    }
 
     uint32_t val_idx = EmitRValue(init);
     InstructionIR store;
