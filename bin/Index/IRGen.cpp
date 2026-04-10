@@ -1962,8 +1962,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     inst.source_entity_id = eid;
     auto *raw = reinterpret_cast<const clang::CharacterLiteral *>(cl->RawStmt());
     if (raw) {
-      inst.int_value = raw->getValue();
-      inst.uint_value = raw->getValue();
+      unsigned val = raw->getValue();
       // Determine char width from Clang's CharacterKind.
       switch (raw->getKind()) {
         case clang::CharacterLiteralKind::Wide:
@@ -1984,6 +1983,11 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
           inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::UINT8);
           break;
       }
+      // Set both signed and unsigned representations using APInt
+      // for correct sign/zero extension from the character width.
+      llvm::APInt ap(inst.width, static_cast<uint64_t>(val));
+      inst.int_value = ap.getSExtValue();
+      inst.uint_value = ap.getZExtValue();
     } else {
       inst.width = 8;
       inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::UINT8);
