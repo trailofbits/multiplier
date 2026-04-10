@@ -715,7 +715,9 @@ void IRGenerator::EmitEntryBlockAllocas(const pasta::Stmt &body) {
         alloca_inst.object_index = obj_idx;
         alloca_inst.type_entity_id = TypeEntityIdOf(vd->Type());
         // Detect VLAs: VariableArrayType has runtime size.
-        if (pasta::VariableArrayType::From(vd->Type())) {
+        // Check both the direct type and the unqualified/canonical type.
+        if (pasta::VariableArrayType::From(vd->Type()) ||
+            pasta::VariableArrayType::From(vd->Type().CanonicalType())) {
           alloca_inst.alloca_kind = static_cast<uint8_t>(
               mx::ir::AllocaKind::DYNAMIC);
         }
@@ -2156,8 +2158,9 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
           inst.type_entity_id = TypeEntityIdOf(*t__);
           unsigned sz = 8;
           if (auto s = TypeSizeBytes(*t__)) sz = *s;
+          bool deref_is_float = t__->IsFloatingType();
           inst.mem_op = static_cast<uint8_t>(
-              DetermineMemOp(false, false, sz));
+              DetermineMemOp(false, false, sz, deref_is_float));
         } else {
           inst.mem_op = static_cast<uint8_t>(
               DetermineMemOp(false, false, 8));
