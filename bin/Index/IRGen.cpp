@@ -192,19 +192,6 @@ std::optional<FunctionIR> IRGenerator::Generate(
       MakeObject(kind, &param);
     }
 
-    // Return slot if non-void.
-    auto rt = func.ReturnType();
-    auto rt_size = TypeSizeBytes(rt);
-    if (rt_size && *rt_size > 0) {
-      ObjectIR obj;
-      obj.kind = mx::ir::ObjectKind::RETURN_SLOT;
-      obj.type_entity_id = TypeEntityIdOf(rt);
-      if (auto sz = TypeSizeBytes(rt)) obj.size_bytes = *sz;
-      if (auto al = TypeAlignBytes(rt)) obj.align_bytes = *al;
-      func_.objects.push_back(std::move(obj));
-      next_obj_index_++;
-    }
-
     // --- Frame block: all ALLOCAs (parameters + locals) ---
     uint32_t frame = NewBlock(mx::ir::BlockKind::FRAME);
     func_.entry_block_index = frame;

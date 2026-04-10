@@ -1820,10 +1820,27 @@ Value Interpreter::Run(const std::vector<Value> &args) {
         }
         param_ptrs_.push_back(Value::Ptr(eid, 0));
         ++param_idx;
-      } else if (k == mx::ir::ObjectKind::RETURN_SLOT) {
-        auto eid = mx::EntityId(obj.id()).Pack();
-        AllocateObject(obj);
-        return_ptr_ = Value::Ptr(eid, 0);
+      }
+    }
+  }
+
+  // Allocate synthetic return storage (callee no longer has RETURN_SLOT).
+  // The return type size comes from the FunctionDecl.
+  if (return_ptr_.kind == Value::UNDEFINED) {
+    if (auto decl = func_.source_declaration()) {
+      if (auto fd = mx::FunctionDecl::from(*decl)) {
+        auto rt = fd->return_type();
+        if (auto bits = rt.size_in_bits()) {
+          uint32_t sz = static_cast<uint32_t>((*bits + 7) / 8);
+          if (sz > 0) {
+            // Use a synthetic object ID (won't collide with real objects).
+            mx::RawEntityId ret_eid = ~mx::RawEntityId{0};
+            auto &mem = memory_[ret_eid];
+            mem.bytes.resize(sz, 0);
+            mem.allocated = true;
+            return_ptr_ = Value::Ptr(ret_eid, 0);
+          }
+        }
       }
     }
   }
