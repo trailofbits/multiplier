@@ -7,299 +7,335 @@
  *
  * function test_byvalue (NORMAL) {
  *   objects:
- *     obj_0 LOCAL_VALUE size=8 align=1 (s)
- *     obj_1 LOCAL_VALUE size=4 align=1 (sum)
- *     obj_2 LOCAL_VALUE size=20 align=1 (l)
- *     obj_3 LOCAL_VALUE size=4 align=1 (lsum)
+ *     obj_0 LOCAL_VALUE size=8 align=4 (s)
+ *     obj_1 LOCAL_VALUE size=4 align=4 (sum)
+ *     obj_2 LOCAL_VALUE size=20 align=4 (l)
+ *     obj_3 LOCAL_VALUE size=4 align=4 (lsum)
  *     obj_4 LOCAL_VALUE size=3 align=1 (p)
- *     obj_5 LOCAL_VALUE size=4 align=1 (psum)
- *     obj_6 LOCAL_VALUE size=8 align=1 (s2)
- *     obj_7 LOCAL_VALUE size=4 align=1 (chained)
- *     obj_8 LOCAL_VALUE size=4 align=1 (nested)
- *     obj_9 PARAMETER size=4 align=1
- *     obj_10 PARAMETER size=4 align=1
- *     obj_11 RETURN_SLOT size=8 align=1
- *     obj_12 PARAMETER size=8 align=1
- *     obj_13 RETURN_SLOT size=4 align=1
- *     obj_14 PARAMETER size=4 align=1
- *     obj_15 RETURN_SLOT size=20 align=1
- *     obj_16 PARAMETER size=20 align=1
- *     obj_17 RETURN_SLOT size=4 align=1
+ *     obj_5 LOCAL_VALUE size=4 align=4 (psum)
+ *     obj_6 LOCAL_VALUE size=8 align=4 (s2)
+ *     obj_7 LOCAL_VALUE size=4 align=4 (chained)
+ *     obj_8 LOCAL_VALUE size=4 align=4 (nested)
+ *     obj_9 PARAMETER size=4 align=4
+ *     obj_10 PARAMETER size=4 align=4
+ *     obj_11 RETURN_SLOT size=8 align=4
+ *     obj_12 PARAMETER size=8 align=4
+ *     obj_13 RETURN_SLOT size=4 align=4
+ *     obj_14 PARAMETER size=4 align=4
+ *     obj_15 RETURN_SLOT size=20 align=4
+ *     obj_16 PARAMETER size=20 align=4
+ *     obj_17 RETURN_SLOT size=4 align=4
  *     obj_18 PARAMETER size=3 align=1
- *     obj_19 RETURN_SLOT size=4 align=1
- *     obj_20 PARAMETER size=8 align=1
- *     obj_21 RETURN_SLOT size=8 align=1
- *     obj_22 PARAMETER size=4 align=1
- *     obj_23 PARAMETER size=4 align=1
- *     obj_24 RETURN_SLOT size=4 align=1
- *     obj_25 PARAMETER size=4 align=1
- *     obj_26 PARAMETER size=4 align=1
- *     obj_27 RETURN_SLOT size=8 align=1
- *     obj_28 PARAMETER size=8 align=1
- *     obj_29 RETURN_SLOT size=4 align=1
+ *     obj_19 RETURN_SLOT size=4 align=4
+ *     obj_20 PARAMETER size=8 align=4
+ *     obj_21 RETURN_SLOT size=8 align=4
+ *     obj_22 PARAMETER size=4 align=4
+ *     obj_23 PARAMETER size=4 align=4
+ *     obj_24 RETURN_SLOT size=4 align=4
+ *     obj_25 PARAMETER size=4 align=4
+ *     obj_26 PARAMETER size=4 align=4
+ *     obj_27 RETURN_SLOT size=8 align=4
+ *     obj_28 PARAMETER size=8 align=4
+ *     obj_29 RETURN_SLOT size=4 align=4
  *   body_scope: FUNCTION_SCOPE
+ * 
  *   blocks:
  *   block_0 FRAME:
+ *     >> %s.0 = ALLOCA/LOCAL size=8 align=4
+ *     >> %sum.1 = ALLOCA/LOCAL size=4 align=4
+ *     >> %l.2 = ALLOCA/LOCAL size=20 align=4
+ *     >> %lsum.3 = ALLOCA/LOCAL size=4 align=4
+ *     >> %p.4 = ALLOCA/LOCAL size=3 align=1
+ *     >> %psum.5 = ALLOCA/LOCAL size=4 align=4
+ *     >> %s2.6 = ALLOCA/LOCAL size=8 align=4
+ *     >> %chained.7 = ALLOCA/LOCAL size=4 align=4
+ *     >> %nested.8 = ALLOCA/LOCAL size=4 align=4
  *     >> %9 = IMPLICIT_GOTO
  *     -> [block_1]
  *   block_1 ENTRY  <- [block_0]:
  *     >> %10 = ENTER_SCOPE  // {     // Small struct return.     struct Small ...
  *     >> %11 = ENTER_SCOPE  // make_small(10, 20)
- *          %13 = ALLOCA/ARG size=4 align=1  // 10
+ *          %13 = ALLOCA/ARG size=4 align=4  // 10
  *          %12 = CONST/INT32 10  // 10
  *     >> %14 = MEMORY/STORE_LE_32 [%13, %12]  // 10
- *          %16 = ALLOCA/ARG size=4 align=1  // 20
+ *          %16 = ALLOCA/ARG size=4 align=4  // 20
  *          %15 = CONST/INT32 20  // 20
  *     >> %17 = MEMORY/STORE_LE_32 [%16, %15]  // 20
- *          %s.0 = ALLOCA/LOCAL size=8 align=1
+ *          %s.0 = ALLOCA/LOCAL size=8 align=4
  *          %19 = CALL @make_small [%13, %16]  // make_small(10, 20)
- *     >> %s.20 = MEMORY/STORE_LE_64 [%s.0, %19]
- *     >> %25 = EXIT_SCOPE
- *          %24 = CMP_NE [%22, %23]  // s.x != 10
- *     >> %26 = COND_BRANCH [%24]  // if (s.x != 10) return 1
+ *          %20 = CONST/UINT64 8
+ *     >> %s.21 = MEMORY/MEMCPY [%s.0, %19, %20]
+ *     >> %26 = EXIT_SCOPE
+ *          %22 = GEP_FIELD offset=0 .x [%s.0]  // s.x
+ *          %23 = MEMORY/LOAD_LE_32 [%22]  // s.x
+ *          %24 = CONST/INT32 10  // 10
+ *          %25 = CMP_NE [%23, %24]  // s.x != 10
+ *     >> %27 = COND_BRANCH [%25]  // if (s.x != 10) return 1
  *     -> [block_2, block_3]
  *   block_3 IF_ELSE  <- [block_1]:
- *     >> %33 = IMPLICIT_GOTO
+ *     >> %34 = IMPLICIT_GOTO
  *     -> [block_4]
  *   block_4 IF_MERGE  <- [block_3]:
- *          %37 = CMP_NE [%35, %36]  // s.y != 20
- *     >> %38 = COND_BRANCH [%37]  // if (s.y != 20) return 2
+ *          %s.0 = ALLOCA/LOCAL size=8 align=4
+ *          %35 = GEP_FIELD offset=4 .y [%s.0]  // s.y
+ *          %36 = MEMORY/LOAD_LE_32 [%35]  // s.y
+ *          %37 = CONST/INT32 20  // 20
+ *          %38 = CMP_NE [%36, %37]  // s.y != 20
+ *     >> %39 = COND_BRANCH [%38]  // if (s.y != 20) return 2
  *     -> [block_5, block_6]
  *   block_6 IF_ELSE  <- [block_4]:
- *     >> %44 = IMPLICIT_GOTO
+ *     >> %45 = IMPLICIT_GOTO
  *     -> [block_7]
  *   block_7 IF_MERGE  <- [block_6]:
- *     >> %45 = ENTER_SCOPE  // sum_small(s)
- *          %47 = ALLOCA/ARG size=8 align=1  // s
- *          %46 = MEMORY/LOAD_LE_64 [%s.0]  // s
- *     >> %48 = MEMORY/STORE_LE_64 [%47, %46]  // s
- *          %sum.1 = ALLOCA/LOCAL size=4 align=1
- *          %50 = CALL @sum_small [%47]  // sum_small(s)
- *     >> %sum.51 = MEMORY/STORE_LE_32 [%sum.1, %50]
- *     >> %55 = EXIT_SCOPE
- *          %54 = CMP_NE [%52, %53]  // sum != 30
- *     >> %56 = COND_BRANCH [%54]  // if (sum != 30) return 3
+ *     >> %46 = ENTER_SCOPE  // sum_small(s)
+ *          %48 = ALLOCA/ARG size=8 align=4  // s
+ *          %s.0 = ALLOCA/LOCAL size=8 align=4
+ *          %47 = MEMORY/LOAD_LE_64 [%s.0]  // s
+ *     >> %49 = MEMORY/STORE_LE_64 [%48, %47]  // s
+ *          %sum.1 = ALLOCA/LOCAL size=4 align=4
+ *          %51 = CALL @sum_small [%48]  // sum_small(s)
+ *     >> %sum.52 = MEMORY/STORE_LE_32 [%sum.1, %51]
+ *     >> %56 = EXIT_SCOPE
+ *          %53 = MEMORY/LOAD_LE_32 [%sum.1]  // sum
+ *          %54 = CONST/INT32 30  // 30
+ *          %55 = CMP_NE [%53, %54]  // sum != 30
+ *     >> %57 = COND_BRANCH [%55]  // if (sum != 30) return 3
  *     -> [block_8, block_9]
  *   block_9 IF_ELSE  <- [block_7]:
- *     >> %63 = IMPLICIT_GOTO
+ *     >> %64 = IMPLICIT_GOTO
  *     -> [block_10]
  *   block_10 IF_MERGE  <- [block_9]:
- *     >> %64 = ENTER_SCOPE  // make_large(100)
- *          %66 = ALLOCA/ARG size=4 align=1  // 100
- *          %65 = CONST/INT32 100  // 100
- *     >> %67 = MEMORY/STORE_LE_32 [%66, %65]  // 100
- *          %l.2 = ALLOCA/LOCAL size=20 align=1
- *          %69 = CALL @make_large [%66]  // make_large(100)
- *          %70 = CONST/UINT64 20
- *     >> %l.71 = MEMORY/MEMCPY [%l.2, %69, %70]
- *     >> %76 = EXIT_SCOPE
- *          %75 = CMP_NE [%73, %74]  // l.a != 100
- *     >> %77 = COND_BRANCH [%75]  // if (l.a != 100) return 4
+ *     >> %65 = ENTER_SCOPE  // make_large(100)
+ *          %67 = ALLOCA/ARG size=4 align=4  // 100
+ *          %66 = CONST/INT32 100  // 100
+ *     >> %68 = MEMORY/STORE_LE_32 [%67, %66]  // 100
+ *          %l.2 = ALLOCA/LOCAL size=20 align=4
+ *          %70 = CALL @make_large [%67]  // make_large(100)
+ *          %71 = CONST/UINT64 20
+ *     >> %l.72 = MEMORY/MEMCPY [%l.2, %70, %71]
+ *     >> %77 = EXIT_SCOPE
+ *          %73 = GEP_FIELD offset=0 .a [%l.2]  // l.a
+ *          %74 = MEMORY/LOAD_LE_32 [%73]  // l.a
+ *          %75 = CONST/INT32 100  // 100
+ *          %76 = CMP_NE [%74, %75]  // l.a != 100
+ *     >> %78 = COND_BRANCH [%76]  // if (l.a != 100) return 4
  *     -> [block_11, block_12]
  *   block_12 IF_ELSE  <- [block_10]:
- *     >> %84 = IMPLICIT_GOTO
+ *     >> %85 = IMPLICIT_GOTO
  *     -> [block_13]
  *   block_13 IF_MERGE  <- [block_12]:
- *          %88 = CMP_NE [%86, %87]  // l.e != 104
- *     >> %89 = COND_BRANCH [%88]  // if (l.e != 104) return 5
+ *          %l.2 = ALLOCA/LOCAL size=20 align=4
+ *          %86 = GEP_FIELD offset=16 .e [%l.2]  // l.e
+ *          %87 = MEMORY/LOAD_LE_32 [%86]  // l.e
+ *          %88 = CONST/INT32 104  // 104
+ *          %89 = CMP_NE [%87, %88]  // l.e != 104
+ *     >> %90 = COND_BRANCH [%89]  // if (l.e != 104) return 5
  *     -> [block_14, block_15]
  *   block_15 IF_ELSE  <- [block_13]:
- *     >> %95 = IMPLICIT_GOTO
+ *     >> %96 = IMPLICIT_GOTO
  *     -> [block_16]
  *   block_16 IF_MERGE  <- [block_15]:
- *     >> %96 = ENTER_SCOPE  // sum_large(l)
- *          %97 = ALLOCA/ARG size=20 align=1  // l
- *          %l.2 = ALLOCA/LOCAL size=20 align=1
- *          %98 = CONST/UINT64 20
- *     >> %99 = MEMORY/MEMCPY [%97, %l.2, %98]  // l
- *          %lsum.3 = ALLOCA/LOCAL size=4 align=1
- *          %101 = CALL @sum_large [%97]  // sum_large(l)
- *     >> %lsum.102 = MEMORY/STORE_LE_32 [%lsum.3, %101]
- *     >> %106 = EXIT_SCOPE
- *          %105 = CMP_NE [%103, %104]  // lsum != 510
- *     >> %107 = COND_BRANCH [%105]  // if (lsum != 510) return 6
+ *     >> %97 = ENTER_SCOPE  // sum_large(l)
+ *          %98 = ALLOCA/ARG size=20 align=4  // l
+ *          %l.2 = ALLOCA/LOCAL size=20 align=4
+ *          %99 = CONST/UINT64 20
+ *     >> %100 = MEMORY/MEMCPY [%98, %l.2, %99]  // l
+ *          %lsum.3 = ALLOCA/LOCAL size=4 align=4
+ *          %102 = CALL @sum_large [%98]  // sum_large(l)
+ *     >> %lsum.103 = MEMORY/STORE_LE_32 [%lsum.3, %102]
+ *     >> %107 = EXIT_SCOPE
+ *          %104 = MEMORY/LOAD_LE_32 [%lsum.3]  // lsum
+ *          %105 = CONST/INT32 510  // 510
+ *          %106 = CMP_NE [%104, %105]  // lsum != 510
+ *     >> %108 = COND_BRANCH [%106]  // if (lsum != 510) return 6
  *     -> [block_17, block_18]
  *   block_18 IF_ELSE  <- [block_16]:
- *     >> %114 = IMPLICIT_GOTO
+ *     >> %115 = IMPLICIT_GOTO
  *     -> [block_19]
  *   block_19 IF_MERGE  <- [block_18]:
- *          %115 = GEP_FIELD offset=0 .a [%p.4]  // p.a
- *          %117 = CAST/TRUNC_I32_I8 [%116]  // 1
- *     >> %118 = MEMORY/STORE_LE_8 [%115, %117]  // p.a = 1
- *          %119 = GEP_FIELD offset=1 .b [%p.4]  // p.b
- *          %121 = CAST/TRUNC_I32_I8 [%120]  // 2
- *     >> %122 = MEMORY/STORE_LE_8 [%119, %121]  // p.b = 2
- *          %123 = GEP_FIELD offset=2 .c [%p.4]  // p.c
- *          %125 = CAST/TRUNC_I32_I8 [%124]  // 3
- *     >> %126 = MEMORY/STORE_LE_8 [%123, %125]  // p.c = 3
- *     >> %127 = ENTER_SCOPE  // sum_packed3(p)
- *          %128 = ALLOCA/ARG size=3 align=1  // p
  *          %p.4 = ALLOCA/LOCAL size=3 align=1
- *          %129 = CONST/UINT64 3
- *     >> %130 = MEMORY/MEMCPY [%128, %p.4, %129]  // p
- *          %psum.5 = ALLOCA/LOCAL size=4 align=1
- *          %132 = CALL @sum_packed3 [%128]  // sum_packed3(p)
- *     >> %psum.133 = MEMORY/STORE_LE_32 [%psum.5, %132]
- *     >> %137 = EXIT_SCOPE
- *          %136 = CMP_NE [%134, %135]  // psum != 6
- *     >> %138 = COND_BRANCH [%136]  // if (psum != 6) return 7
+ *          %116 = GEP_FIELD offset=0 .a [%p.4]  // p.a
+ *          %117 = CONST/INT32 1  // 1
+ *          %118 = CAST/TRUNC_I32_I8 [%117]  // 1
+ *     >> %119 = MEMORY/STORE_LE_8 [%116, %118]  // p.a = 1
+ *          %120 = GEP_FIELD offset=1 .b [%p.4]  // p.b
+ *          %121 = CONST/INT32 2  // 2
+ *          %122 = CAST/TRUNC_I32_I8 [%121]  // 2
+ *     >> %123 = MEMORY/STORE_LE_8 [%120, %122]  // p.b = 2
+ *          %124 = GEP_FIELD offset=2 .c [%p.4]  // p.c
+ *          %125 = CONST/INT32 3  // 3
+ *          %126 = CAST/TRUNC_I32_I8 [%125]  // 3
+ *     >> %127 = MEMORY/STORE_LE_8 [%124, %126]  // p.c = 3
+ *     >> %128 = ENTER_SCOPE  // sum_packed3(p)
+ *          %129 = ALLOCA/ARG size=3 align=1  // p
+ *          %130 = CONST/UINT64 3
+ *     >> %131 = MEMORY/MEMCPY [%129, %p.4, %130]  // p
+ *          %psum.5 = ALLOCA/LOCAL size=4 align=4
+ *          %133 = CALL @sum_packed3 [%129]  // sum_packed3(p)
+ *     >> %psum.134 = MEMORY/STORE_LE_32 [%psum.5, %133]
+ *     >> %138 = EXIT_SCOPE
+ *          %135 = MEMORY/LOAD_LE_32 [%psum.5]  // psum
+ *          %136 = CONST/INT32 6  // 6
+ *          %137 = CMP_NE [%135, %136]  // psum != 6
+ *     >> %139 = COND_BRANCH [%137]  // if (psum != 6) return 7
  *     -> [block_20, block_21]
  *   block_21 IF_ELSE  <- [block_19]:
- *     >> %145 = IMPLICIT_GOTO
+ *     >> %146 = IMPLICIT_GOTO
  *     -> [block_22]
  *   block_22 IF_MERGE  <- [block_21]:
- *     >> %146 = ENTER_SCOPE  // identity_small(s)
- *          %148 = ALLOCA/ARG size=8 align=1  // s
- *          %147 = MEMORY/LOAD_LE_64 [%s.0]  // s
- *     >> %149 = MEMORY/STORE_LE_64 [%148, %147]  // s
- *          %s2.6 = ALLOCA/LOCAL size=8 align=1
- *          %151 = CALL @identity_small [%148]  // identity_small(s)
- *     >> %s2.152 = MEMORY/STORE_LE_64 [%s2.6, %151]
- *     >> %157 = EXIT_SCOPE
- *          %156 = CMP_NE [%154, %155]  // s2.x != 10
- *     >> %158 = COND_BRANCH [%156]  // if (s2.x != 10) return 8
+ *     >> %147 = ENTER_SCOPE  // identity_small(s)
+ *          %149 = ALLOCA/ARG size=8 align=4  // s
+ *          %s.0 = ALLOCA/LOCAL size=8 align=4
+ *          %148 = MEMORY/LOAD_LE_64 [%s.0]  // s
+ *     >> %150 = MEMORY/STORE_LE_64 [%149, %148]  // s
+ *          %s2.6 = ALLOCA/LOCAL size=8 align=4
+ *          %152 = CALL @identity_small [%149]  // identity_small(s)
+ *          %153 = CONST/UINT64 8
+ *     >> %s2.154 = MEMORY/MEMCPY [%s2.6, %152, %153]
+ *     >> %159 = EXIT_SCOPE
+ *          %155 = GEP_FIELD offset=0 .x [%s2.6]  // s2.x
+ *          %156 = MEMORY/LOAD_LE_32 [%155]  // s2.x
+ *          %157 = CONST/INT32 10  // 10
+ *          %158 = CMP_NE [%156, %157]  // s2.x != 10
+ *     >> %160 = COND_BRANCH [%158]  // if (s2.x != 10) return 8
  *     -> [block_23, block_24]
  *   block_24 IF_ELSE  <- [block_22]:
- *     >> %165 = IMPLICIT_GOTO
+ *     >> %167 = IMPLICIT_GOTO
  *     -> [block_25]
  *   block_25 IF_MERGE  <- [block_24]:
- *          %169 = CMP_NE [%167, %168]  // s2.y != 20
- *     >> %170 = COND_BRANCH [%169]  // if (s2.y != 20) return 9
+ *          %s2.6 = ALLOCA/LOCAL size=8 align=4
+ *          %168 = GEP_FIELD offset=4 .y [%s2.6]  // s2.y
+ *          %169 = MEMORY/LOAD_LE_32 [%168]  // s2.y
+ *          %170 = CONST/INT32 20  // 20
+ *          %171 = CMP_NE [%169, %170]  // s2.y != 20
+ *     >> %172 = COND_BRANCH [%171]  // if (s2.y != 20) return 9
  *     -> [block_26, block_27]
  *   block_27 IF_ELSE  <- [block_25]:
- *     >> %176 = IMPLICIT_GOTO
+ *     >> %178 = IMPLICIT_GOTO
  *     -> [block_28]
  *   block_28 IF_MERGE  <- [block_27]:
- *     >> %177 = ENTER_SCOPE  // chain_test(5, 15)
- *          %179 = ALLOCA/ARG size=4 align=1  // 5
- *          %178 = CONST/INT32 5  // 5
- *     >> %180 = MEMORY/STORE_LE_32 [%179, %178]  // 5
- *          %182 = ALLOCA/ARG size=4 align=1  // 15
- *          %181 = CONST/INT32 15  // 15
- *     >> %183 = MEMORY/STORE_LE_32 [%182, %181]  // 15
- *          %chained.7 = ALLOCA/LOCAL size=4 align=1
- *          %185 = CALL @chain_test [%179, %182]  // chain_test(5, 15)
- *     >> %chained.186 = MEMORY/STORE_LE_32 [%chained.7, %185]
- *     >> %190 = EXIT_SCOPE
- *          %189 = CMP_NE [%187, %188]  // chained != 20
- *     >> %191 = COND_BRANCH [%189]  // if (chained != 20) return 10
+ *     >> %179 = ENTER_SCOPE  // chain_test(5, 15)
+ *          %181 = ALLOCA/ARG size=4 align=4  // 5
+ *          %180 = CONST/INT32 5  // 5
+ *     >> %182 = MEMORY/STORE_LE_32 [%181, %180]  // 5
+ *          %184 = ALLOCA/ARG size=4 align=4  // 15
+ *          %183 = CONST/INT32 15  // 15
+ *     >> %185 = MEMORY/STORE_LE_32 [%184, %183]  // 15
+ *          %chained.7 = ALLOCA/LOCAL size=4 align=4
+ *          %187 = CALL @chain_test [%181, %184]  // chain_test(5, 15)
+ *     >> %chained.188 = MEMORY/STORE_LE_32 [%chained.7, %187]
+ *     >> %192 = EXIT_SCOPE
+ *          %189 = MEMORY/LOAD_LE_32 [%chained.7]  // chained
+ *          %190 = CONST/INT32 20  // 20
+ *          %191 = CMP_NE [%189, %190]  // chained != 20
+ *     >> %193 = COND_BRANCH [%191]  // if (chained != 20) return 10
  *     -> [block_29, block_30]
  *   block_30 IF_ELSE  <- [block_28]:
- *     >> %198 = IMPLICIT_GOTO
+ *     >> %200 = IMPLICIT_GOTO
  *     -> [block_31]
  *   block_31 IF_MERGE  <- [block_30]:
- *     >> %199 = ENTER_SCOPE  // sum_small(make_small(1, 2))
- *          %201 = ALLOCA/ARG size=4 align=1  // 1
- *          %200 = CONST/INT32 1  // 1
- *     >> %202 = MEMORY/STORE_LE_32 [%201, %200]  // 1
- *          %204 = ALLOCA/ARG size=4 align=1  // 2
- *          %203 = CONST/INT32 2  // 2
- *     >> %205 = MEMORY/STORE_LE_32 [%204, %203]  // 2
- *          %208 = ALLOCA/ARG size=8 align=1  // make_small(1, 2)
- *          %207 = CALL @make_small [%201, %204]  // make_small(1, 2)
- *     >> %209 = MEMORY/STORE_LE_64 [%208, %207]  // make_small(1, 2)
- *          %nested.8 = ALLOCA/LOCAL size=4 align=1
- *          %211 = CALL @sum_small [%208]  // sum_small(make_small(1, 2))
- *     >> %nested.212 = MEMORY/STORE_LE_32 [%nested.8, %211]
- *     >> %216 = EXIT_SCOPE
- *          %215 = CMP_NE [%213, %214]  // nested != 3
- *     >> %217 = COND_BRANCH [%215]  // if (nested != 3) return 11
+ *     >> %201 = ENTER_SCOPE  // sum_small(make_small(1, 2))
+ *          %203 = ALLOCA/ARG size=4 align=4  // 1
+ *          %202 = CONST/INT32 1  // 1
+ *     >> %204 = MEMORY/STORE_LE_32 [%203, %202]  // 1
+ *          %206 = ALLOCA/ARG size=4 align=4  // 2
+ *          %205 = CONST/INT32 2  // 2
+ *     >> %207 = MEMORY/STORE_LE_32 [%206, %205]  // 2
+ *          %210 = ALLOCA/ARG size=8 align=4  // make_small(1, 2)
+ *          %209 = CALL @make_small [%203, %206]  // make_small(1, 2)
+ *     >> %211 = MEMORY/STORE_LE_64 [%210, %209]  // make_small(1, 2)
+ *          %nested.8 = ALLOCA/LOCAL size=4 align=4
+ *          %213 = CALL @sum_small [%210]  // sum_small(make_small(1, 2))
+ *     >> %nested.214 = MEMORY/STORE_LE_32 [%nested.8, %213]
+ *     >> %218 = EXIT_SCOPE
+ *          %215 = MEMORY/LOAD_LE_32 [%nested.8]  // nested
+ *          %216 = CONST/INT32 3  // 3
+ *          %217 = CMP_NE [%215, %216]  // nested != 3
+ *     >> %219 = COND_BRANCH [%217]  // if (nested != 3) return 11
  *     -> [block_32, block_33]
  *   block_33 IF_ELSE  <- [block_31]:
- *     >> %224 = IMPLICIT_GOTO
+ *     >> %226 = IMPLICIT_GOTO
  *     -> [block_34]
  *   block_34 IF_MERGE  <- [block_33]:
- *          %226 = RETURN_PTR  // return 0
- *          %225 = CONST/INT32 0  // 0
- *     >> %227 = MEMORY/STORE_LE_32 [%226, %225]  // return 0
- *     >> %228 = EXIT_SCOPE  // {     // Small struct return.     struct Small ...
- *          %225 = CONST/INT32 0  // 0
- *     >> %229 = RET [%225]  // return 0
+ *          %228 = RETURN_PTR  // return 0
+ *          %227 = CONST/INT32 0  // 0
+ *     >> %229 = MEMORY/STORE_LE_32 [%228, %227]  // return 0
+ *     >> %230 = EXIT_SCOPE  // {     // Small struct return.     struct Small ...
+ *     >> %231 = RET [%227]  // return 0
  *   block_32 IF_THEN  <- [block_31]:
- *          %219 = RETURN_PTR  // return 11
- *          %218 = CONST/INT32 11  // 11
- *     >> %220 = MEMORY/STORE_LE_32 [%219, %218]  // return 11
- *     >> %221 = EXIT_SCOPE  // sum_small(make_small(1, 2))
- *     >> %222 = EXIT_SCOPE  // {     // Small struct return.     struct Small ...
- *          %218 = CONST/INT32 11  // 11
- *     >> %223 = RET [%218]  // return 11
+ *          %221 = RETURN_PTR  // return 11
+ *          %220 = CONST/INT32 11  // 11
+ *     >> %222 = MEMORY/STORE_LE_32 [%221, %220]  // return 11
+ *     >> %223 = EXIT_SCOPE  // sum_small(make_small(1, 2))
+ *     >> %224 = EXIT_SCOPE  // {     // Small struct return.     struct Small ...
+ *     >> %225 = RET [%220]  // return 11
  *   block_29 IF_THEN  <- [block_28]:
- *          %193 = RETURN_PTR  // return 10
- *          %192 = CONST/INT32 10  // 10
- *     >> %194 = MEMORY/STORE_LE_32 [%193, %192]  // return 10
- *     >> %195 = EXIT_SCOPE  // chain_test(5, 15)
- *     >> %196 = EXIT_SCOPE  // {     // Small struct return.     struct Small ...
- *          %192 = CONST/INT32 10  // 10
- *     >> %197 = RET [%192]  // return 10
+ *          %195 = RETURN_PTR  // return 10
+ *          %194 = CONST/INT32 10  // 10
+ *     >> %196 = MEMORY/STORE_LE_32 [%195, %194]  // return 10
+ *     >> %197 = EXIT_SCOPE  // chain_test(5, 15)
+ *     >> %198 = EXIT_SCOPE  // {     // Small struct return.     struct Small ...
+ *     >> %199 = RET [%194]  // return 10
  *   block_26 IF_THEN  <- [block_25]:
- *          %172 = RETURN_PTR  // return 9
- *          %171 = CONST/INT32 9  // 9
- *     >> %173 = MEMORY/STORE_LE_32 [%172, %171]  // return 9
- *     >> %174 = EXIT_SCOPE  // {     // Small struct return.     struct Small ...
- *          %171 = CONST/INT32 9  // 9
- *     >> %175 = RET [%171]  // return 9
+ *          %174 = RETURN_PTR  // return 9
+ *          %173 = CONST/INT32 9  // 9
+ *     >> %175 = MEMORY/STORE_LE_32 [%174, %173]  // return 9
+ *     >> %176 = EXIT_SCOPE  // {     // Small struct return.     struct Small ...
+ *     >> %177 = RET [%173]  // return 9
  *   block_23 IF_THEN  <- [block_22]:
- *          %160 = RETURN_PTR  // return 8
- *          %159 = CONST/INT32 8  // 8
- *     >> %161 = MEMORY/STORE_LE_32 [%160, %159]  // return 8
- *     >> %162 = EXIT_SCOPE  // identity_small(s)
- *     >> %163 = EXIT_SCOPE  // {     // Small struct return.     struct Small ...
- *          %159 = CONST/INT32 8  // 8
- *     >> %164 = RET [%159]  // return 8
+ *          %162 = RETURN_PTR  // return 8
+ *          %161 = CONST/INT32 8  // 8
+ *     >> %163 = MEMORY/STORE_LE_32 [%162, %161]  // return 8
+ *     >> %164 = EXIT_SCOPE  // identity_small(s)
+ *     >> %165 = EXIT_SCOPE  // {     // Small struct return.     struct Small ...
+ *     >> %166 = RET [%161]  // return 8
  *   block_20 IF_THEN  <- [block_19]:
- *          %140 = RETURN_PTR  // return 7
- *          %139 = CONST/INT32 7  // 7
- *     >> %141 = MEMORY/STORE_LE_32 [%140, %139]  // return 7
- *     >> %142 = EXIT_SCOPE  // sum_packed3(p)
- *     >> %143 = EXIT_SCOPE  // {     // Small struct return.     struct Small ...
- *          %139 = CONST/INT32 7  // 7
- *     >> %144 = RET [%139]  // return 7
+ *          %141 = RETURN_PTR  // return 7
+ *          %140 = CONST/INT32 7  // 7
+ *     >> %142 = MEMORY/STORE_LE_32 [%141, %140]  // return 7
+ *     >> %143 = EXIT_SCOPE  // sum_packed3(p)
+ *     >> %144 = EXIT_SCOPE  // {     // Small struct return.     struct Small ...
+ *     >> %145 = RET [%140]  // return 7
  *   block_17 IF_THEN  <- [block_16]:
- *          %109 = RETURN_PTR  // return 6
- *          %108 = CONST/INT32 6  // 6
- *     >> %110 = MEMORY/STORE_LE_32 [%109, %108]  // return 6
- *     >> %111 = EXIT_SCOPE  // sum_large(l)
- *     >> %112 = EXIT_SCOPE  // {     // Small struct return.     struct Small ...
- *          %108 = CONST/INT32 6  // 6
- *     >> %113 = RET [%108]  // return 6
+ *          %110 = RETURN_PTR  // return 6
+ *          %109 = CONST/INT32 6  // 6
+ *     >> %111 = MEMORY/STORE_LE_32 [%110, %109]  // return 6
+ *     >> %112 = EXIT_SCOPE  // sum_large(l)
+ *     >> %113 = EXIT_SCOPE  // {     // Small struct return.     struct Small ...
+ *     >> %114 = RET [%109]  // return 6
  *   block_14 IF_THEN  <- [block_13]:
- *          %91 = RETURN_PTR  // return 5
- *          %90 = CONST/INT32 5  // 5
- *     >> %92 = MEMORY/STORE_LE_32 [%91, %90]  // return 5
- *     >> %93 = EXIT_SCOPE  // {     // Small struct return.     struct Small ...
- *          %90 = CONST/INT32 5  // 5
- *     >> %94 = RET [%90]  // return 5
+ *          %92 = RETURN_PTR  // return 5
+ *          %91 = CONST/INT32 5  // 5
+ *     >> %93 = MEMORY/STORE_LE_32 [%92, %91]  // return 5
+ *     >> %94 = EXIT_SCOPE  // {     // Small struct return.     struct Small ...
+ *     >> %95 = RET [%91]  // return 5
  *   block_11 IF_THEN  <- [block_10]:
- *          %79 = RETURN_PTR  // return 4
- *          %78 = CONST/INT32 4  // 4
- *     >> %80 = MEMORY/STORE_LE_32 [%79, %78]  // return 4
- *     >> %81 = EXIT_SCOPE  // make_large(100)
- *     >> %82 = EXIT_SCOPE  // {     // Small struct return.     struct Small ...
- *          %78 = CONST/INT32 4  // 4
- *     >> %83 = RET [%78]  // return 4
+ *          %80 = RETURN_PTR  // return 4
+ *          %79 = CONST/INT32 4  // 4
+ *     >> %81 = MEMORY/STORE_LE_32 [%80, %79]  // return 4
+ *     >> %82 = EXIT_SCOPE  // make_large(100)
+ *     >> %83 = EXIT_SCOPE  // {     // Small struct return.     struct Small ...
+ *     >> %84 = RET [%79]  // return 4
  *   block_8 IF_THEN  <- [block_7]:
- *          %58 = RETURN_PTR  // return 3
- *          %57 = CONST/INT32 3  // 3
- *     >> %59 = MEMORY/STORE_LE_32 [%58, %57]  // return 3
- *     >> %60 = EXIT_SCOPE  // sum_small(s)
- *     >> %61 = EXIT_SCOPE  // {     // Small struct return.     struct Small ...
- *          %57 = CONST/INT32 3  // 3
- *     >> %62 = RET [%57]  // return 3
+ *          %59 = RETURN_PTR  // return 3
+ *          %58 = CONST/INT32 3  // 3
+ *     >> %60 = MEMORY/STORE_LE_32 [%59, %58]  // return 3
+ *     >> %61 = EXIT_SCOPE  // sum_small(s)
+ *     >> %62 = EXIT_SCOPE  // {     // Small struct return.     struct Small ...
+ *     >> %63 = RET [%58]  // return 3
  *   block_5 IF_THEN  <- [block_4]:
- *          %40 = RETURN_PTR  // return 2
- *          %39 = CONST/INT32 2  // 2
- *     >> %41 = MEMORY/STORE_LE_32 [%40, %39]  // return 2
- *     >> %42 = EXIT_SCOPE  // {     // Small struct return.     struct Small ...
- *          %39 = CONST/INT32 2  // 2
- *     >> %43 = RET [%39]  // return 2
+ *          %41 = RETURN_PTR  // return 2
+ *          %40 = CONST/INT32 2  // 2
+ *     >> %42 = MEMORY/STORE_LE_32 [%41, %40]  // return 2
+ *     >> %43 = EXIT_SCOPE  // {     // Small struct return.     struct Small ...
+ *     >> %44 = RET [%40]  // return 2
  *   block_2 IF_THEN  <- [block_1]:
- *          %28 = RETURN_PTR  // return 1
- *          %27 = CONST/INT32 1  // 1
- *     >> %29 = MEMORY/STORE_LE_32 [%28, %27]  // return 1
- *     >> %30 = EXIT_SCOPE  // make_small(10, 20)
- *     >> %31 = EXIT_SCOPE  // {     // Small struct return.     struct Small ...
- *          %27 = CONST/INT32 1  // 1
- *     >> %32 = RET [%27]  // return 1
+ *          %29 = RETURN_PTR  // return 1
+ *          %28 = CONST/INT32 1  // 1
+ *     >> %30 = MEMORY/STORE_LE_32 [%29, %28]  // return 1
+ *     >> %31 = EXIT_SCOPE  // make_small(10, 20)
+ *     >> %32 = EXIT_SCOPE  // {     // Small struct return.     struct Small ...
+ *     >> %33 = RET [%28]  // return 1
  * }
  */
 

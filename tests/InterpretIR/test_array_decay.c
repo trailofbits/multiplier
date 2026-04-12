@@ -6,57 +6,68 @@
  *
  * function test_array_decay (NORMAL) {
  *   objects:
- *     obj_0 LOCAL_VALUE size=20 align=1 (arr)
- *     obj_1 LOCAL_VALUE size=4 align=1 (total)
- *     obj_2 LOCAL_VALUE size=4 align=1 (first)
- *     obj_3 LOCAL_VALUE size=12 align=1 (buf)
- *     obj_4 LOCAL_VALUE size=8 align=1 (p)
- *     obj_5 LOCAL_VALUE size=8 align=1 (q)
- *     obj_6 PARAMETER size=8 align=1
- *     obj_7 PARAMETER size=4 align=1
- *     obj_8 RETURN_SLOT size=4 align=1
- *     obj_9 PARAMETER size=8 align=1
- *     obj_10 RETURN_SLOT size=4 align=1
- *     obj_11 PARAMETER size=8 align=1
- *     obj_12 PARAMETER size=4 align=1
- *     obj_13 PARAMETER size=4 align=1
+ *     obj_0 LOCAL_VALUE size=20 align=4 (arr)
+ *     obj_1 LOCAL_VALUE size=4 align=4 (total)
+ *     obj_2 LOCAL_VALUE size=4 align=4 (first)
+ *     obj_3 LOCAL_VALUE size=12 align=4 (buf)
+ *     obj_4 LOCAL_VALUE size=8 align=8 (p)
+ *     obj_5 LOCAL_VALUE size=8 align=8 (q)
+ *     obj_6 PARAMETER size=8 align=8
+ *     obj_7 PARAMETER size=4 align=4
+ *     obj_8 RETURN_SLOT size=4 align=4
+ *     obj_9 PARAMETER size=8 align=8
+ *     obj_10 RETURN_SLOT size=4 align=4
+ *     obj_11 PARAMETER size=8 align=8
+ *     obj_12 PARAMETER size=4 align=4
+ *     obj_13 PARAMETER size=4 align=4
  *   body_scope: FUNCTION_SCOPE
+ * 
  *   blocks:
  *   block_0 FRAME:
+ *     >> %arr.0 = ALLOCA/LOCAL size=20 align=4
+ *     >> %total.1 = ALLOCA/LOCAL size=4 align=4
+ *     >> %first.2 = ALLOCA/LOCAL size=4 align=4
+ *     >> %buf.3 = ALLOCA/LOCAL size=12 align=4
+ *     >> %p.4 = ALLOCA/LOCAL size=8 align=8
+ *     >> %q.5 = ALLOCA/LOCAL size=8 align=8
  *     >> %6 = IMPLICIT_GOTO
  *     -> [block_1]
  *   block_1 ENTRY  <- [block_0]:
  *     >> %7 = ENTER_SCOPE  // {     int arr[5] = {10, 20, 30, 40, 50};      /...
- *          %arr.0 = ALLOCA/LOCAL size=20 align=1
+ *          %arr.0 = ALLOCA/LOCAL size=20 align=4
  *          %arr.8 = CONST/UINT8 0
  *          %arr.9 = CONST/UINT64 20
  *     >> %arr.10 = MEMORY/MEMSET [%arr.0, %arr.8, %arr.9]
- *          %arr.0 = ALLOCA/LOCAL size=20 align=1
  *          %11 = CONST/INT32 10  // 10
  *     >> %arr.12 = MEMORY/STORE_LE_32 [%arr.0, %11]
+ *          %arr.13 = CONST/INT64 1
  *          %arr.14 = PTR_ADD elem_size=4 [%arr.0, %arr.13]
  *          %15 = CONST/INT32 20  // 20
  *     >> %arr.16 = MEMORY/STORE_LE_32 [%arr.14, %15]
+ *          %arr.17 = CONST/INT64 2
  *          %arr.18 = PTR_ADD elem_size=4 [%arr.0, %arr.17]
  *          %19 = CONST/INT32 30  // 30
  *     >> %arr.20 = MEMORY/STORE_LE_32 [%arr.18, %19]
+ *          %arr.21 = CONST/INT64 3
  *          %arr.22 = PTR_ADD elem_size=4 [%arr.0, %arr.21]
  *          %23 = CONST/INT32 40  // 40
  *     >> %arr.24 = MEMORY/STORE_LE_32 [%arr.22, %23]
+ *          %arr.25 = CONST/INT64 4
  *          %arr.26 = PTR_ADD elem_size=4 [%arr.0, %arr.25]
  *          %27 = CONST/INT32 50  // 50
  *     >> %arr.28 = MEMORY/STORE_LE_32 [%arr.26, %27]
  *     >> %29 = ENTER_SCOPE  // sum_array(arr, 5)
- *          %30 = ALLOCA/ARG size=8 align=1  // arr
- *          %arr.0 = ALLOCA/LOCAL size=20 align=1
+ *          %30 = ALLOCA/ARG size=8 align=8  // arr
  *     >> %31 = MEMORY/STORE_LE_64 [%30, %arr.0]  // arr
- *          %33 = ALLOCA/ARG size=4 align=1  // 5
+ *          %33 = ALLOCA/ARG size=4 align=4  // 5
  *          %32 = CONST/INT32 5  // 5
  *     >> %34 = MEMORY/STORE_LE_32 [%33, %32]  // 5
- *          %total.1 = ALLOCA/LOCAL size=4 align=1
+ *          %total.1 = ALLOCA/LOCAL size=4 align=4
  *          %36 = CALL @sum_array [%30, %33]  // sum_array(arr, 5)
  *     >> %total.37 = MEMORY/STORE_LE_32 [%total.1, %36]
  *     >> %41 = EXIT_SCOPE
+ *          %38 = MEMORY/LOAD_LE_32 [%total.1]  // total
+ *          %39 = CONST/INT32 150  // 150
  *          %40 = CMP_NE [%38, %39]  // total != 150
  *     >> %42 = COND_BRANCH [%40]  // if (total != 150) return 1
  *     -> [block_2, block_3]
@@ -65,13 +76,15 @@
  *     -> [block_4]
  *   block_4 IF_MERGE  <- [block_3]:
  *     >> %50 = ENTER_SCOPE  // first_element(arr)
- *          %51 = ALLOCA/ARG size=8 align=1  // arr
- *          %arr.0 = ALLOCA/LOCAL size=20 align=1
+ *          %51 = ALLOCA/ARG size=8 align=8  // arr
+ *          %arr.0 = ALLOCA/LOCAL size=20 align=4
  *     >> %52 = MEMORY/STORE_LE_64 [%51, %arr.0]  // arr
- *          %first.2 = ALLOCA/LOCAL size=4 align=1
+ *          %first.2 = ALLOCA/LOCAL size=4 align=4
  *          %54 = CALL @first_element [%51]  // first_element(arr)
  *     >> %first.55 = MEMORY/STORE_LE_32 [%first.2, %54]
  *     >> %59 = EXIT_SCOPE
+ *          %56 = MEMORY/LOAD_LE_32 [%first.2]  // first
+ *          %57 = CONST/INT32 10  // 10
  *          %58 = CMP_NE [%56, %57]  // first != 10
  *     >> %60 = COND_BRANCH [%58]  // if (first != 10) return 2
  *     -> [block_5, block_6]
@@ -80,20 +93,21 @@
  *     -> [block_7]
  *   block_7 IF_MERGE  <- [block_6]:
  *     >> %68 = ENTER_SCOPE  // fill_array(buf, 42, 3)
- *          %69 = ALLOCA/ARG size=8 align=1  // buf
- *          %buf.3 = ALLOCA/LOCAL size=12 align=1
+ *          %69 = ALLOCA/ARG size=8 align=8  // buf
+ *          %buf.3 = ALLOCA/LOCAL size=12 align=4
  *     >> %70 = MEMORY/STORE_LE_64 [%69, %buf.3]  // buf
- *          %72 = ALLOCA/ARG size=4 align=1  // 42
+ *          %72 = ALLOCA/ARG size=4 align=4  // 42
  *          %71 = CONST/INT32 42  // 42
  *     >> %73 = MEMORY/STORE_LE_32 [%72, %71]  // 42
- *          %75 = ALLOCA/ARG size=4 align=1  // 3
+ *          %75 = ALLOCA/ARG size=4 align=4  // 3
  *          %74 = CONST/INT32 3  // 3
  *     >> %76 = MEMORY/STORE_LE_32 [%75, %74]  // 3
- *          %69 = ALLOCA/ARG size=8 align=1  // buf
- *          %72 = ALLOCA/ARG size=4 align=1  // 42
- *          %75 = ALLOCA/ARG size=4 align=1  // 3
  *     >> %77 = CALL @fill_array [%69, %72, %75]  // fill_array(buf, 42, 3)
  *     >> %78 = EXIT_SCOPE
+ *          %79 = CONST/INT32 0  // 0
+ *          %80 = PTR_ADD elem_size=4 [%buf.3, %79]  // buf[0]
+ *          %81 = MEMORY/LOAD_LE_32 [%80]  // buf[0]
+ *          %82 = CONST/INT32 42  // 42
  *          %83 = CMP_NE [%81, %82]  // buf[0] != 42
  *     >> %84 = COND_BRANCH [%83]  // if (buf[0] != 42) return 3
  *     -> [block_8, block_9]
@@ -101,6 +115,11 @@
  *     >> %90 = IMPLICIT_GOTO
  *     -> [block_10]
  *   block_10 IF_MERGE  <- [block_9]:
+ *          %buf.3 = ALLOCA/LOCAL size=12 align=4
+ *          %91 = CONST/INT32 1  // 1
+ *          %92 = PTR_ADD elem_size=4 [%buf.3, %91]  // buf[1]
+ *          %93 = MEMORY/LOAD_LE_32 [%92]  // buf[1]
+ *          %94 = CONST/INT32 42  // 42
  *          %95 = CMP_NE [%93, %94]  // buf[1] != 42
  *     >> %96 = COND_BRANCH [%95]  // if (buf[1] != 42) return 4
  *     -> [block_11, block_12]
@@ -108,6 +127,11 @@
  *     >> %102 = IMPLICIT_GOTO
  *     -> [block_13]
  *   block_13 IF_MERGE  <- [block_12]:
+ *          %buf.3 = ALLOCA/LOCAL size=12 align=4
+ *          %103 = CONST/INT32 2  // 2
+ *          %104 = PTR_ADD elem_size=4 [%buf.3, %103]  // buf[2]
+ *          %105 = MEMORY/LOAD_LE_32 [%104]  // buf[2]
+ *          %106 = CONST/INT32 42  // 42
  *          %107 = CMP_NE [%105, %106]  // buf[2] != 42
  *     >> %108 = COND_BRANCH [%107]  // if (buf[2] != 42) return 5
  *     -> [block_14, block_15]
@@ -115,12 +139,18 @@
  *     >> %114 = IMPLICIT_GOTO
  *     -> [block_16]
  *   block_16 IF_MERGE  <- [block_15]:
- *          %p.4 = ALLOCA/LOCAL size=8 align=1
- *          %arr.0 = ALLOCA/LOCAL size=20 align=1
+ *          %p.4 = ALLOCA/LOCAL size=8 align=8
+ *          %arr.0 = ALLOCA/LOCAL size=20 align=4
  *     >> %p.115 = MEMORY/STORE_LE_64 [%p.4, %arr.0]
+ *          %116 = MEMORY/LOAD_LE_64 [%p.4]  // p
+ *          %117 = CONST/INT32 2  // 2
  *          %118 = PTR_ADD elem_size=4 [%116, %117]  // p[2]
  *          %119 = CONST/INT32 99  // 99
  *     >> %120 = MEMORY/STORE_LE_32 [%118, %119]  // p[2] = 99
+ *          %121 = CONST/INT32 2  // 2
+ *          %122 = PTR_ADD elem_size=4 [%arr.0, %121]  // arr[2]
+ *          %123 = MEMORY/LOAD_LE_32 [%122]  // arr[2]
+ *          %124 = CONST/INT32 99  // 99
  *          %125 = CMP_NE [%123, %124]  // arr[2] != 99
  *     >> %126 = COND_BRANCH [%125]  // if (arr[2] != 99) return 6
  *     -> [block_17, block_18]
@@ -128,9 +158,14 @@
  *     >> %132 = IMPLICIT_GOTO
  *     -> [block_19]
  *   block_19 IF_MERGE  <- [block_18]:
- *          %q.5 = ALLOCA/LOCAL size=8 align=1
+ *          %q.5 = ALLOCA/LOCAL size=8 align=8
+ *          %arr.0 = ALLOCA/LOCAL size=20 align=4
+ *          %133 = CONST/INT32 3  // 3
  *          %134 = PTR_ADD elem_size=4 [%arr.0, %133]  // arr + 3
  *     >> %q.135 = MEMORY/STORE_LE_64 [%q.5, %134]
+ *          %136 = MEMORY/LOAD_LE_64 [%q.5]  // q
+ *          %137 = MEMORY/LOAD_LE_32 [%136]  // *q
+ *          %138 = CONST/INT32 40  // 40
  *          %139 = CMP_NE [%137, %138]  // *q != 40
  *     >> %140 = COND_BRANCH [%139]  // if (*q != 40) return 7
  *     -> [block_20, block_21]
@@ -142,42 +177,36 @@
  *          %147 = CONST/INT32 0  // 0
  *     >> %149 = MEMORY/STORE_LE_32 [%148, %147]  // return 0
  *     >> %150 = EXIT_SCOPE  // {     int arr[5] = {10, 20, 30, 40, 50};      /...
- *          %147 = CONST/INT32 0  // 0
  *     >> %151 = RET [%147]  // return 0
  *   block_20 IF_THEN  <- [block_19]:
  *          %142 = RETURN_PTR  // return 7
  *          %141 = CONST/INT32 7  // 7
  *     >> %143 = MEMORY/STORE_LE_32 [%142, %141]  // return 7
  *     >> %144 = EXIT_SCOPE  // {     int arr[5] = {10, 20, 30, 40, 50};      /...
- *          %141 = CONST/INT32 7  // 7
  *     >> %145 = RET [%141]  // return 7
  *   block_17 IF_THEN  <- [block_16]:
  *          %128 = RETURN_PTR  // return 6
  *          %127 = CONST/INT32 6  // 6
  *     >> %129 = MEMORY/STORE_LE_32 [%128, %127]  // return 6
  *     >> %130 = EXIT_SCOPE  // {     int arr[5] = {10, 20, 30, 40, 50};      /...
- *          %127 = CONST/INT32 6  // 6
  *     >> %131 = RET [%127]  // return 6
  *   block_14 IF_THEN  <- [block_13]:
  *          %110 = RETURN_PTR  // return 5
  *          %109 = CONST/INT32 5  // 5
  *     >> %111 = MEMORY/STORE_LE_32 [%110, %109]  // return 5
  *     >> %112 = EXIT_SCOPE  // {     int arr[5] = {10, 20, 30, 40, 50};      /...
- *          %109 = CONST/INT32 5  // 5
  *     >> %113 = RET [%109]  // return 5
  *   block_11 IF_THEN  <- [block_10]:
  *          %98 = RETURN_PTR  // return 4
  *          %97 = CONST/INT32 4  // 4
  *     >> %99 = MEMORY/STORE_LE_32 [%98, %97]  // return 4
  *     >> %100 = EXIT_SCOPE  // {     int arr[5] = {10, 20, 30, 40, 50};      /...
- *          %97 = CONST/INT32 4  // 4
  *     >> %101 = RET [%97]  // return 4
  *   block_8 IF_THEN  <- [block_7]:
  *          %86 = RETURN_PTR  // return 3
  *          %85 = CONST/INT32 3  // 3
  *     >> %87 = MEMORY/STORE_LE_32 [%86, %85]  // return 3
  *     >> %88 = EXIT_SCOPE  // {     int arr[5] = {10, 20, 30, 40, 50};      /...
- *          %85 = CONST/INT32 3  // 3
  *     >> %89 = RET [%85]  // return 3
  *   block_5 IF_THEN  <- [block_4]:
  *          %62 = RETURN_PTR  // return 2
@@ -185,7 +214,6 @@
  *     >> %63 = MEMORY/STORE_LE_32 [%62, %61]  // return 2
  *     >> %64 = EXIT_SCOPE  // first_element(arr)
  *     >> %65 = EXIT_SCOPE  // {     int arr[5] = {10, 20, 30, 40, 50};      /...
- *          %61 = CONST/INT32 2  // 2
  *     >> %66 = RET [%61]  // return 2
  *   block_2 IF_THEN  <- [block_1]:
  *          %44 = RETURN_PTR  // return 1
@@ -193,7 +221,6 @@
  *     >> %45 = MEMORY/STORE_LE_32 [%44, %43]  // return 1
  *     >> %46 = EXIT_SCOPE  // sum_array(arr, 5)
  *     >> %47 = EXIT_SCOPE  // {     int arr[5] = {10, 20, 30, 40, 50};      /...
- *          %43 = CONST/INT32 1  // 1
  *     >> %48 = RET [%43]  // return 1
  * }
  */

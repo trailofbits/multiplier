@@ -366,3 +366,21 @@ Fragment {
 **Assignment model**: Direct assignment `a = b` always uses `MEMCPY(dest, src, size)`. Scalar `LOAD`/`STORE` only for feeding values into arithmetic and writing computed results back. This avoids endianness issues for direct copies and naturally handles all sizes.
 
 **Provenance**: Every instruction has `source_entity_id`. Calls have `target()`. GEP fields have `field()`. Navigate to AST for names and source locations.
+
+## Known Gaps and TODO
+
+### Address Assignment for Globals, Strings, and Functions
+
+`GLOBAL_PTR`, `THREAD_LOCAL_PTR`, `FUNC_PTR`, and `STRING_PTR` produce
+pointers to entities that live outside the function's stack frame. The IR does
+not prescribe what addresses these get — it is the interpreter's responsibility
+to assign concrete addresses. The interpreter should give each entity a
+consistent address for the duration of the program (e.g., via a flat virtual
+address space with lazy allocation).
+
+`STRING_PTR`'s `source_entity_id` points to the `StringLiteral` AST node.
+The interpreter populates storage from `StringLiteral::bytes()`.
+
+### `#embed`
+
+C23 `#embed` is not yet handled.

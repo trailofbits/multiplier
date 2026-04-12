@@ -83,9 +83,38 @@ const char *EnumeratorName(OpCode op) noexcept {
     case OpCode::LAST_VALUE: return "LAST_VALUE";
     case OpCode::UNKNOWN: return "UNKNOWN";
     case OpCode::RETURN_PTR: return "RETURN_PTR";
+    case OpCode::STRING_PTR: return "STRING_PTR";
     case OpCode::UDIV: return "UDIV";
     case OpCode::UREM: return "UREM";
     case OpCode::USHR: return "USHR";
+    case OpCode::UCMP_LT: return "UCMP_LT";
+    case OpCode::UCMP_LE: return "UCMP_LE";
+    case OpCode::UCMP_GT: return "UCMP_GT";
+    case OpCode::UCMP_GE: return "UCMP_GE";
+    case OpCode::FCMP_EQ_32: return "FCMP_EQ_32";
+    case OpCode::FCMP_EQ_64: return "FCMP_EQ_64";
+    case OpCode::FCMP_NE_32: return "FCMP_NE_32";
+    case OpCode::FCMP_NE_64: return "FCMP_NE_64";
+    case OpCode::FCMP_LT_32: return "FCMP_LT_32";
+    case OpCode::FCMP_LT_64: return "FCMP_LT_64";
+    case OpCode::FCMP_LE_32: return "FCMP_LE_32";
+    case OpCode::FCMP_LE_64: return "FCMP_LE_64";
+    case OpCode::FCMP_GT_32: return "FCMP_GT_32";
+    case OpCode::FCMP_GT_64: return "FCMP_GT_64";
+    case OpCode::FCMP_GE_32: return "FCMP_GE_32";
+    case OpCode::FCMP_GE_64: return "FCMP_GE_64";
+    case OpCode::FADD_32: return "FADD_32";
+    case OpCode::FADD_64: return "FADD_64";
+    case OpCode::FSUB_32: return "FSUB_32";
+    case OpCode::FSUB_64: return "FSUB_64";
+    case OpCode::FMUL_32: return "FMUL_32";
+    case OpCode::FMUL_64: return "FMUL_64";
+    case OpCode::FDIV_32: return "FDIV_32";
+    case OpCode::FDIV_64: return "FDIV_64";
+    case OpCode::FREM_32: return "FREM_32";
+    case OpCode::FREM_64: return "FREM_64";
+    case OpCode::FNEG_32: return "FNEG_32";
+    case OpCode::FNEG_64: return "FNEG_64";
   }
   return "UNKNOWN";
 }

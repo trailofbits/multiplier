@@ -231,10 +231,11 @@ enum class OpCode : uint8_t {
   // int_pool[0] = parameter index.
   PARAM_PTR = 49,
 
-  // Address-of for globals, thread-locals, and functions (external to frame).
+  // Address-of for globals, thread-locals, functions, and string literals.
   GLOBAL_PTR = 50,        // pointer to a global or static variable
   THREAD_LOCAL_PTR = 51,  // pointer to a thread-local variable
   FUNC_PTR = 52,          // pointer to a function
+  STRING_PTR = 56,        // pointer to a string literal; source_entity_id → StringLiteral
 
   // Bitwise/intrinsic operations. Sub-opcode in int_pool[0] selects the
   // specific operation (see BitwiseOp enum). op[0] = primary operand.
@@ -282,6 +283,30 @@ enum class OpCode : uint8_t {
   UDIV = 72,       // Unsigned division.
   UREM = 73,       // Unsigned remainder.
   USHR = 74,       // Unsigned (logical) right shift.
+
+  // Unsigned comparisons: distinct from signed because C semantics differ
+  // for values where the sign bit is set.
+  UCMP_LT = 75,   // Unsigned less-than.
+  UCMP_LE = 76,   // Unsigned less-than-or-equal.
+  UCMP_GT = 77,   // Unsigned greater-than.
+  UCMP_GE = 78,   // Unsigned greater-than-or-equal.
+
+  // Floating-point comparisons (IEEE 754 semantics, width-specific).
+  FCMP_EQ_32 = 79,  FCMP_EQ_64 = 80,
+  FCMP_NE_32 = 81,  FCMP_NE_64 = 82,
+  FCMP_LT_32 = 83,  FCMP_LT_64 = 84,
+  FCMP_LE_32 = 85,  FCMP_LE_64 = 86,
+  FCMP_GT_32 = 87,  FCMP_GT_64 = 88,
+  FCMP_GE_32 = 89,  FCMP_GE_64 = 90,
+
+  // Floating-point arithmetic (width-specific).
+  // Integer ADD/SUB/MUL/DIV/REM must not be used for float operands.
+  FADD_32 = 91,    FADD_64 = 92,
+  FSUB_32 = 93,    FSUB_64 = 94,
+  FMUL_32 = 95,    FMUL_64 = 96,
+  FDIV_32 = 97,    FDIV_64 = 98,
+  FREM_32 = 99,    FREM_64 = 100,   // C fmod semantics.
+  FNEG_32 = 101,   FNEG_64 = 102,
 };
 
 // Returns the human-readable name of an opcode.
@@ -295,7 +320,7 @@ MX_EXPORT const char *EnumeratorName(AllocaKind op) noexcept;
 MX_EXPORT const char *EnumeratorName(CastOp op) noexcept;
 
 inline static constexpr unsigned NumEnumerators(OpCode) {
-  return 75u;
+  return 103u;
 }
 
 // Sub-opcodes for MEMORY. Stored in the int pool (int_pool[0]).
@@ -510,15 +535,29 @@ inline bool IsConstant(OpCode op) {
 
 inline bool IsBinaryOp(OpCode op) {
   return (op >= OpCode::ADD && op <= OpCode::PTR_DIFF) ||
-         (op >= OpCode::UDIV && op <= OpCode::USHR);
+         (op >= OpCode::UDIV && op <= OpCode::USHR) ||
+         (op >= OpCode::UCMP_LT && op <= OpCode::UCMP_GE) ||
+         (op >= OpCode::FCMP_EQ_32 && op <= OpCode::FCMP_GE_64) ||
+         (op >= OpCode::FADD_32 && op <= OpCode::FREM_64);
+}
+
+inline bool IsFloatArithmetic(OpCode op) {
+  return op >= OpCode::FADD_32 && op <= OpCode::FNEG_64;
 }
 
 inline bool IsComparison(OpCode op) {
-  return op >= OpCode::CMP_EQ && op <= OpCode::CMP_GE;
+  return (op >= OpCode::CMP_EQ && op <= OpCode::CMP_GE) ||
+         (op >= OpCode::UCMP_LT && op <= OpCode::UCMP_GE) ||
+         (op >= OpCode::FCMP_EQ_32 && op <= OpCode::FCMP_GE_64);
+}
+
+inline bool IsFloatComparison(OpCode op) {
+  return op >= OpCode::FCMP_EQ_32 && op <= OpCode::FCMP_GE_64;
 }
 
 inline bool IsUnaryOp(OpCode op) {
-  return op >= OpCode::NEG && op <= OpCode::LOGICAL_NOT;
+  return (op >= OpCode::NEG && op <= OpCode::LOGICAL_NOT) ||
+         op == OpCode::FNEG_32 || op == OpCode::FNEG_64;
 }
 
 inline bool IsCast(OpCode op) {

@@ -12,8 +12,9 @@
 // Critique notes (embedded for future reference):
 // - The IR API requires downcasting to get result_type() from most instructions.
 //   A base-class result_type() would simplify the interpreter significantly.
-// - IRObject doesn't expose string literal bytes, so STRING_LITERAL objects
-//   are initialized to zero. An interpreter needs this data.
+// - STRING_PTR returns a pointer to interpreter-managed storage populated
+//   from StringLiteral::bytes(). Each STRING_PTR instruction gets a unique
+//   address keyed by its entity ID.
 
 #include <algorithm>
 #include <cassert>
@@ -78,6 +79,7 @@ struct Value {
   }
 
   int64_t as_int() const { return ival; }
+  uint64_t as_uint() const { return static_cast<uint64_t>(ival); }
   double as_float() const { return fval; }
 };
 
@@ -385,6 +387,30 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
         }
         result = Value::Ptr(obj_eid, 0);
       }
+      break;
+    }
+
+    // STRING_PTR: pointer to a string literal. The interpreter allocates
+    // storage keyed by the instruction's entity ID and populates it from
+    // StringLiteral::bytes(). Subsequent evaluations return the same pointer.
+    case mx::ir::OpCode::STRING_PTR: {
+      auto inst_eid = mx::EntityId(inst.id()).Pack();
+      if (memory_.find(inst_eid) == memory_.end()) {
+        if (auto src = inst.source_statement()) {
+          if (auto sl = mx::StringLiteral::from(*src)) {
+            auto bytes = sl->bytes();
+            uint32_t char_width = sl->character_byte_width();
+            uint32_t total = sl->byte_length() + char_width;
+            auto &mem = memory_[inst_eid];
+            mem.bytes.resize(total, 0);
+            mem.allocated = true;
+            mem.poisoned = false;
+            size_t copy_len = std::min<size_t>(bytes.size(), total);
+            std::memcpy(mem.bytes.data(), bytes.data(), copy_len);
+          }
+        }
+      }
+      result = Value::Ptr(inst_eid, 0);
       break;
     }
     case mx::ir::OpCode::MEMORY: {
@@ -963,60 +989,68 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       break;
     }
 
-    // --- Binary arithmetic ---
+    // --- Integer binary arithmetic ---
     case mx::ir::OpCode::ADD: {
       auto bin = mx::BinaryInst::from(inst);
-      if (bin) {
-        Value l = GetValue(bin->lhs()), r = GetValue(bin->rhs());
-        if (l.kind == Value::FLOATING || r.kind == Value::FLOATING)
-          result = Value::Float(l.as_float() + r.as_float());
-        else
-          result = Value::Int(l.as_int() + r.as_int());
-      }
+      if (bin) result = Value::Int(GetValue(bin->lhs()).as_int() + GetValue(bin->rhs()).as_int());
       break;
     }
     case mx::ir::OpCode::SUB: {
       auto bin = mx::BinaryInst::from(inst);
-      if (bin) {
-        Value l = GetValue(bin->lhs()), r = GetValue(bin->rhs());
-        if (l.kind == Value::FLOATING || r.kind == Value::FLOATING)
-          result = Value::Float(l.as_float() - r.as_float());
-        else
-          result = Value::Int(l.as_int() - r.as_int());
-      }
+      if (bin) result = Value::Int(GetValue(bin->lhs()).as_int() - GetValue(bin->rhs()).as_int());
       break;
     }
     case mx::ir::OpCode::MUL: {
       auto bin = mx::BinaryInst::from(inst);
-      if (bin) {
-        Value l = GetValue(bin->lhs()), r = GetValue(bin->rhs());
-        if (l.kind == Value::FLOATING || r.kind == Value::FLOATING)
-          result = Value::Float(l.as_float() * r.as_float());
-        else
-          result = Value::Int(l.as_int() * r.as_int());
-      }
+      if (bin) result = Value::Int(GetValue(bin->lhs()).as_int() * GetValue(bin->rhs()).as_int());
       break;
     }
     case mx::ir::OpCode::DIV: {
       auto bin = mx::BinaryInst::from(inst);
       if (bin) {
-        Value l = GetValue(bin->lhs()), r = GetValue(bin->rhs());
-        if (l.kind == Value::FLOATING || r.kind == Value::FLOATING)
-          result = Value::Float(r.as_float() != 0 ? l.as_float() / r.as_float() : 0.0);
-        else
-          result = Value::Int(r.as_int() != 0 ? l.as_int() / r.as_int() : 0);
+        int64_t r = GetValue(bin->rhs()).as_int();
+        result = Value::Int(r != 0 ? GetValue(bin->lhs()).as_int() / r : 0);
       }
       break;
     }
     case mx::ir::OpCode::REM: {
       auto bin = mx::BinaryInst::from(inst);
       if (bin) {
-        Value l = GetValue(bin->lhs()), r = GetValue(bin->rhs());
-        if (l.kind == Value::FLOATING || r.kind == Value::FLOATING)
-          result = Value::Float(std::fmod(l.as_float(), r.as_float()));
-        else
-          result = Value::Int(r.as_int() != 0 ? l.as_int() % r.as_int() : 0);
+        int64_t r = GetValue(bin->rhs()).as_int();
+        result = Value::Int(r != 0 ? GetValue(bin->lhs()).as_int() % r : 0);
       }
+      break;
+    }
+
+    // --- Float binary arithmetic ---
+    case mx::ir::OpCode::FADD_32:
+    case mx::ir::OpCode::FADD_64: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Float(GetValue(bin->lhs()).as_float() + GetValue(bin->rhs()).as_float());
+      break;
+    }
+    case mx::ir::OpCode::FSUB_32:
+    case mx::ir::OpCode::FSUB_64: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Float(GetValue(bin->lhs()).as_float() - GetValue(bin->rhs()).as_float());
+      break;
+    }
+    case mx::ir::OpCode::FMUL_32:
+    case mx::ir::OpCode::FMUL_64: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Float(GetValue(bin->lhs()).as_float() * GetValue(bin->rhs()).as_float());
+      break;
+    }
+    case mx::ir::OpCode::FDIV_32:
+    case mx::ir::OpCode::FDIV_64: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Float(GetValue(bin->lhs()).as_float() / GetValue(bin->rhs()).as_float());
+      break;
+    }
+    case mx::ir::OpCode::FREM_32:
+    case mx::ir::OpCode::FREM_64: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Float(std::fmod(GetValue(bin->lhs()).as_float(), GetValue(bin->rhs()).as_float()));
       break;
     }
     case mx::ir::OpCode::BIT_AND: {
@@ -1128,27 +1162,72 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       break;
     }
 
-    // --- Comparisons ---
+    // --- Comparisons (signed, unsigned, and float) ---
     case mx::ir::OpCode::CMP_EQ:
     case mx::ir::OpCode::CMP_NE:
     case mx::ir::OpCode::CMP_LT:
     case mx::ir::OpCode::CMP_LE:
     case mx::ir::OpCode::CMP_GT:
-    case mx::ir::OpCode::CMP_GE: {
+    case mx::ir::OpCode::CMP_GE:
+    case mx::ir::OpCode::UCMP_LT:
+    case mx::ir::OpCode::UCMP_LE:
+    case mx::ir::OpCode::UCMP_GT:
+    case mx::ir::OpCode::UCMP_GE:
+    case mx::ir::OpCode::FCMP_EQ_32: case mx::ir::OpCode::FCMP_EQ_64:
+    case mx::ir::OpCode::FCMP_NE_32: case mx::ir::OpCode::FCMP_NE_64:
+    case mx::ir::OpCode::FCMP_LT_32: case mx::ir::OpCode::FCMP_LT_64:
+    case mx::ir::OpCode::FCMP_LE_32: case mx::ir::OpCode::FCMP_LE_64:
+    case mx::ir::OpCode::FCMP_GT_32: case mx::ir::OpCode::FCMP_GT_64:
+    case mx::ir::OpCode::FCMP_GE_32: case mx::ir::OpCode::FCMP_GE_64: {
       auto cmp = mx::ComparisonInst::from(inst);
       if (cmp) {
         Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
-        bool use_float = (l.kind == Value::FLOATING || r.kind == Value::FLOATING);
+        bool use_ptr = (l.kind == Value::POINTER || r.kind == Value::POINTER);
         bool res = false;
-        if (use_float) {
+        if (mx::ir::IsFloatComparison(op)) {
           double lv = l.as_float(), rv = r.as_float();
+          // Width-specific FCMP pairs are adjacent (32, 64), so strip width
+          // by mapping to the base comparison kind.
+          unsigned base = (static_cast<unsigned>(op) -
+                           static_cast<unsigned>(mx::ir::OpCode::FCMP_EQ_32)) / 2;
+          switch (base) {
+            case 0: res = lv == rv; break;  // EQ
+            case 1: res = lv != rv; break;  // NE
+            case 2: res = lv < rv; break;   // LT
+            case 3: res = lv <= rv; break;  // LE
+            case 4: res = lv > rv; break;   // GT
+            case 5: res = lv >= rv; break;  // GE
+            default: break;
+          }
+        } else if (use_ptr) {
+          // Pointer comparison: compare (object_id, offset) pairs.
+          // Same object: compare offsets. Different objects: compare object IDs.
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          // For equality, both object_id and offset must match.
+          // For ordering, same-object compares offset; cross-object compares ID.
+          auto lval = (lp.object_id == rp.object_id)
+                          ? lp.offset : static_cast<int64_t>(lp.object_id);
+          auto rval = (lp.object_id == rp.object_id)
+                          ? rp.offset : static_cast<int64_t>(rp.object_id);
           switch (op) {
-            case mx::ir::OpCode::CMP_EQ: res = lv == rv; break;
-            case mx::ir::OpCode::CMP_NE: res = lv != rv; break;
-            case mx::ir::OpCode::CMP_LT: res = lv < rv; break;
-            case mx::ir::OpCode::CMP_LE: res = lv <= rv; break;
-            case mx::ir::OpCode::CMP_GT: res = lv > rv; break;
-            case mx::ir::OpCode::CMP_GE: res = lv >= rv; break;
+            case mx::ir::OpCode::CMP_EQ:
+              res = (lp.object_id == rp.object_id && lp.offset == rp.offset); break;
+            case mx::ir::OpCode::CMP_NE:
+              res = (lp.object_id != rp.object_id || lp.offset != rp.offset); break;
+            case mx::ir::OpCode::CMP_LT: case mx::ir::OpCode::UCMP_LT: res = lval < rval; break;
+            case mx::ir::OpCode::CMP_LE: case mx::ir::OpCode::UCMP_LE: res = lval <= rval; break;
+            case mx::ir::OpCode::CMP_GT: case mx::ir::OpCode::UCMP_GT: res = lval > rval; break;
+            case mx::ir::OpCode::CMP_GE: case mx::ir::OpCode::UCMP_GE: res = lval >= rval; break;
+            default: break;
+          }
+        } else if (op >= mx::ir::OpCode::UCMP_LT) {
+          uint64_t lv = l.as_uint(), rv = r.as_uint();
+          switch (op) {
+            case mx::ir::OpCode::UCMP_LT: res = lv < rv; break;
+            case mx::ir::OpCode::UCMP_LE: res = lv <= rv; break;
+            case mx::ir::OpCode::UCMP_GT: res = lv > rv; break;
+            case mx::ir::OpCode::UCMP_GE: res = lv >= rv; break;
             default: break;
           }
         } else {
@@ -1171,11 +1250,13 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
     // --- Unary ---
     case mx::ir::OpCode::NEG: {
       auto u = mx::UnaryInst::from(inst);
-      if (u) {
-        Value v = GetValue(u->operand());
-        if (v.kind == Value::FLOATING) result = Value::Float(-v.fval);
-        else result = Value::Int(-v.ival);
-      }
+      if (u) result = Value::Int(-GetValue(u->operand()).as_int());
+      break;
+    }
+    case mx::ir::OpCode::FNEG_32:
+    case mx::ir::OpCode::FNEG_64: {
+      auto u = mx::UnaryInst::from(inst);
+      if (u) result = Value::Float(-GetValue(u->operand()).as_float());
       break;
     }
     case mx::ir::OpCode::BIT_NOT: {

@@ -215,9 +215,19 @@ std::optional<BinaryInst> BinaryInst::from(const IRInstruction &inst) {
     return BinaryInst(inst.impl_ptr());
   return std::nullopt;
 }
-IMPL_FROM_RANGE(ComparisonInst, CMP_EQ, CMP_GE)
+std::optional<ComparisonInst> ComparisonInst::from(const IRInstruction &inst) {
+  auto op = inst.opcode();
+  if (ir::IsComparison(op))
+    return ComparisonInst(inst.impl_ptr());
+  return std::nullopt;
+}
 IMPL_FROM_SINGLE(PtrDiffInst, PTR_DIFF)
-IMPL_FROM_RANGE(UnaryInst, NEG, LOGICAL_NOT)
+std::optional<UnaryInst> UnaryInst::from(const IRInstruction &inst) {
+  auto op = inst.opcode();
+  if (ir::IsUnaryOp(op))
+    return UnaryInst(inst.impl_ptr());
+  return std::nullopt;
+}
 IMPL_FROM_SINGLE(CastInst, CAST)
 
 std::optional<BranchInst> BranchInst::from(const IRInstruction &inst) {

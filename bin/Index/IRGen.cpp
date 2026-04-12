@@ -47,34 +47,7 @@ static mx::ir::ConstOp IntConstOp(uint8_t width, bool is_signed = true) {
   return is_signed ? mx::ir::ConstOp::INT64 : mx::ir::ConstOp::UINT64;
 }
 
-// Helper: create a properly initialized integer CONST instruction.
-// Always sets both int_value and uint_value to keep them in sync.
-static InstructionIR MakeIntConst(mx::ir::ConstOp sub, int64_t sval,
-                                   uint64_t uval, uint8_t width,
-                                   mx::RawEntityId source_eid = mx::kInvalidEntityId) {
-  InstructionIR inst;
-  inst.opcode = mx::ir::OpCode::CONST;
-  inst.const_op = static_cast<uint8_t>(sub);
-  inst.int_value = sval;
-  inst.uint_value = uval;
-  inst.width = width;
-  inst.source_entity_id = source_eid;
-  return inst;
-}
 
-// Convenience: create CONST from a signed value.
-static InstructionIR MakeSignedConst(int64_t val, uint8_t width,
-                                      mx::RawEntityId source_eid = mx::kInvalidEntityId) {
-  return MakeIntConst(IntConstOp(width, true), val,
-                      static_cast<uint64_t>(val), width, source_eid);
-}
-
-// Convenience: create CONST/UINT64 for sizes, counts, etc.
-static InstructionIR MakeUint64Const(uint64_t val,
-                                      mx::RawEntityId source_eid = mx::kInvalidEntityId) {
-  return MakeIntConst(mx::ir::ConstOp::UINT64,
-                      static_cast<int64_t>(val), val, 64, source_eid);
-}
 
 // Helper: determine ConstOp for float constants.
 static mx::ir::ConstOp FloatConstOp(uint8_t width) {
@@ -184,7 +157,16 @@ static mx::ir::CastOp DetermineCastOp(
 IRGenerator::IRGenerator(const pasta::AST &ast, const EntityMapper &em)
     : ast_(ast),
       em_(em),
-      ctx_(const_cast<clang::ASTContext &>(ast.UnderlyingAST())) {}
+      ctx_(const_cast<clang::ASTContext &>(ast.UnderlyingAST())) {
+  // Cache entity IDs and widths for built-in types.
+  auto size_qt = ctx_.getSizeType();
+  size_type_width_ = static_cast<uint8_t>(ctx_.getTypeSize(size_qt));
+  size_type_eid_ = em_.EntityId(ast_.Adopt(size_qt.getTypePtr()));
+
+  auto ptrdiff_qt = ctx_.getPointerDiffType();
+  ptrdiff_type_width_ = static_cast<uint8_t>(ctx_.getTypeSize(ptrdiff_qt));
+  ptrdiff_type_eid_ = em_.EntityId(ast_.Adopt(ptrdiff_qt.getTypePtr()));
+}
 
 std::optional<FunctionIR> IRGenerator::Generate(
     const pasta::FunctionDecl &func) {
@@ -326,6 +308,7 @@ std::optional<FunctionIR> IRGenerator::Generate(
       } else {
         term.opcode = mx::ir::OpCode::IMPLICIT_UNREACHABLE;
       }
+      term.is_root = true;
       uint32_t idx = static_cast<uint32_t>(func_.instructions.size());
       func_.instructions.push_back(std::move(term));
       block.instruction_indices.push_back(idx);
@@ -346,8 +329,13 @@ std::optional<FunctionIR> IRGenerator::Generate(
 
     return std::move(func_);
 
+  } catch (const std::exception &ex) {
+    LOG(ERROR) << "Exception during IR generation for function "
+               << func_.func_decl_entity_id << ": " << ex.what();
+    return std::nullopt;
   } catch (...) {
-    DCHECK(false) << "Exception during IR generation for function";
+    LOG(ERROR) << "Unknown exception during IR generation for function "
+               << func_.func_decl_entity_id;
     return std::nullopt;
   }
 }
@@ -442,6 +430,7 @@ std::optional<FunctionIR> IRGenerator::GenerateGlobalInit(
       } else {
         term.opcode = mx::ir::OpCode::IMPLICIT_UNREACHABLE;
       }
+      term.is_root = true;
       uint32_t idx = static_cast<uint32_t>(func_.instructions.size());
       func_.instructions.push_back(std::move(term));
       block.instruction_indices.push_back(idx);
@@ -457,8 +446,12 @@ std::optional<FunctionIR> IRGenerator::GenerateGlobalInit(
 
     return std::move(func_);
 
+  } catch (const std::exception &ex) {
+    LOG(ERROR) << "Exception during IR generation for global initializer: "
+               << ex.what();
+    return std::nullopt;
   } catch (...) {
-    DCHECK(false) << "Exception during IR generation for global initializer";
+    LOG(ERROR) << "Unknown exception during IR generation for global initializer";
     return std::nullopt;
   }
 }
@@ -542,6 +535,16 @@ uint32_t IRGenerator::NewBlock(mx::ir::BlockKind kind) {
   block.kind = kind;
   func_.blocks.push_back(std::move(block));
   return idx;
+}
+
+// Switch to a new dead block after a terminator (break/continue/return/goto).
+// The dead block gets an IMPLICIT_UNREACHABLE terminator immediately so that
+// CurrentBlockTerminated() returns true and dead-code skipping works.
+void IRGenerator::SwitchToDeadBlock() {
+  SwitchToBlock(NewBlock(mx::ir::BlockKind::UNREACHABLE));
+  InstructionIR term;
+  term.opcode = mx::ir::OpCode::IMPLICIT_UNREACHABLE;
+  EmitTopLevel(std::move(term));
 }
 
 void IRGenerator::SwitchToBlock(uint32_t block_idx) {
@@ -832,6 +835,7 @@ uint32_t IRGenerator::EmitTopLevel(InstructionIR inst) {
   func_.blocks[current_block_index_].instruction_indices.push_back(idx);
   // Root: parent instruction is none, parent block is the current block.
   func_.instructions[idx].parent_instruction_index = UINT32_MAX;
+  func_.instructions[idx].is_root = true;
   SetOperandParents(idx);
   return idx;
 }
@@ -839,7 +843,10 @@ uint32_t IRGenerator::EmitTopLevel(InstructionIR inst) {
 void IRGenerator::SetOperandParents(uint32_t inst_idx) {
   auto &inst = func_.instructions[inst_idx];
   for (auto op_idx : inst.operand_indices) {
-    func_.instructions[op_idx].parent_instruction_index = inst_idx;
+    auto &op = func_.instructions[op_idx];
+    // Don't reparent instructions that are roots in a block.
+    if (op.is_root) continue;
+    op.parent_instruction_index = inst_idx;
     SetOperandParents(op_idx);
   }
 }
@@ -847,6 +854,13 @@ void IRGenerator::SetOperandParents(uint32_t inst_idx) {
 // ---------------------------------------------------------------------------
 // Expression scope for calls
 // ---------------------------------------------------------------------------
+
+bool IRGenerator::CurrentBlockTerminated() const {
+  auto &blk = func_.blocks[current_block_index_];
+  if (blk.instruction_indices.empty()) return false;
+  return mx::ir::IsTerminator(
+      func_.instructions[blk.instruction_indices.back()].opcode);
+}
 
 bool IRGenerator::ContainsCall(const pasta::Expr &e) {
   if (pasta::CallExpr::From(e)) return true;
@@ -889,10 +903,13 @@ void IRGenerator::PopExpressionScope() {
 void IRGenerator::EmitBody(const pasta::Stmt &body) {
   if (auto cs = pasta::CompoundStmt::From(body)) {
     // Push a SCOPE structure for compound statements that are NOT the
-    // function body (which already has FUNCTION_SCOPE).
-    bool is_function_body = (current_structure_index_ != UINT32_MAX &&
-        func_.structures[current_structure_index_].kind ==
-            mx::ir::StructureKind::FUNCTION_SCOPE);
+    // function body. The function body is identified by matching the
+    // body_scope's source entity ID — not by checking the current
+    // structure kind, which could be FUNCTION_SCOPE even for nested
+    // CompoundStmts that are direct children of the function body.
+    bool is_function_body = (func_.body_scope_index != UINT32_MAX &&
+        func_.structures[func_.body_scope_index].source_entity_id ==
+            EntityIdOf(body));
     if (!is_function_body) {
       PushStructure(mx::ir::StructureKind::SCOPE, EntityIdOf(body));
 
@@ -905,16 +922,28 @@ void IRGenerator::EmitBody(const pasta::Stmt &body) {
     }
 
     for (const auto &child : cs->Children()) {
+      // Skip dead code after a terminator (goto/return/break/continue),
+      // but always process labels and case/default — they start new
+      // reachable blocks.
+      if (CurrentBlockTerminated() &&
+          !pasta::LabelStmt::From(child) &&
+          !pasta::CaseStmt::From(child) &&
+          !pasta::DefaultStmt::From(child)) continue;
       EmitStmt(child);
     }
 
     if (!is_function_body) {
-      // Emit EXIT_SCOPE instruction.
-      InstructionIR exit_inst;
-      exit_inst.opcode = mx::ir::OpCode::EXIT_SCOPE;
-      exit_inst.source_entity_id = EntityIdOf(body);
-      exit_inst.structure_index = current_structure_index_;
-      EmitTopLevel(std::move(exit_inst));
+      // Only emit EXIT_SCOPE if the block isn't already terminated
+      // (e.g., all paths returned/broke). The scope exit is already
+      // handled by the terminating paths (return/goto emit their own
+      // EXIT_SCOPE before the terminator).
+      if (!CurrentBlockTerminated()) {
+        InstructionIR exit_inst;
+        exit_inst.opcode = mx::ir::OpCode::EXIT_SCOPE;
+        exit_inst.source_entity_id = EntityIdOf(body);
+        exit_inst.structure_index = current_structure_index_;
+        EmitTopLevel(std::move(exit_inst));
+      }
 
       PopStructure();
     }
@@ -1016,27 +1045,9 @@ void IRGenerator::EmitStmt(const pasta::Stmt &s) {
 
   // Compound statement (nested block) -- push/pop a SCOPE.
   if (auto cs = pasta::CompoundStmt::From(s)) {
-    auto scope_eid = EntityIdOf(s);
-    uint32_t scope_idx = PushStructure(mx::ir::StructureKind::SCOPE, scope_eid);
-    AssociateBlockWithStructure(current_block_index_);
-    {
-      InstructionIR enter;
-      enter.opcode = mx::ir::OpCode::ENTER_SCOPE;
-      enter.source_entity_id = scope_eid;
-      enter.structure_index = scope_idx;
-      EmitTopLevel(std::move(enter));
-    }
-    for (const auto &child : cs->Children()) {
-      EmitStmt(child);
-    }
-    {
-      InstructionIR exit_inst;
-      exit_inst.opcode = mx::ir::OpCode::EXIT_SCOPE;
-      exit_inst.source_entity_id = scope_eid;
-      exit_inst.structure_index = scope_idx;
-      EmitTopLevel(std::move(exit_inst));
-    }
-    PopStructure();
+    // Delegate to EmitBody which handles dead-code skipping and
+    // EXIT_SCOPE guarding for terminated blocks.
+    EmitBody(s);
     return;
   }
 
@@ -1044,6 +1055,8 @@ void IRGenerator::EmitStmt(const pasta::Stmt &s) {
   if (auto expr = pasta::Expr::From(s)) {
     uint32_t val_idx = EmitRValue(*expr);
     func_.blocks[current_block_index_].instruction_indices.push_back(val_idx);
+    func_.instructions[val_idx].parent_instruction_index = UINT32_MAX;
+    func_.instructions[val_idx].is_root = true;
     SetOperandParents(val_idx);
     // Pop expression scope at the full-expression boundary (the `;`).
     PopExpressionScope();
@@ -1060,7 +1073,7 @@ void IRGenerator::EmitStmt(const pasta::Stmt &s) {
         unreach.opcode = mx::ir::OpCode::UNREACHABLE;
         unreach.source_entity_id = EntityIdOf(s);
         EmitTopLevel(std::move(unreach));
-        SwitchToBlock(NewBlock(mx::ir::BlockKind::UNREACHABLE));
+        SwitchToDeadBlock();
       }
     }
     return;
@@ -1080,15 +1093,23 @@ void IRGenerator::EmitIfStmt(const pasta::Stmt &s) {
   PopExpressionScope();
   uint32_t then_block = NewBlock(mx::ir::BlockKind::IF_THEN);
   uint32_t else_block = NewBlock(mx::ir::BlockKind::IF_ELSE);
-  uint32_t merge_block = NewBlock(mx::ir::BlockKind::IF_MERGE);
 
   EmitCondBranch(cond_idx, then_block, else_block, EntityIdOf(s));
+
+  // Lazily create the merge block when a branch falls through.
+  uint32_t merge_block = UINT32_MAX;
+  auto get_merge = [&]() -> uint32_t {
+    if (merge_block == UINT32_MAX) {
+      merge_block = NewBlock(mx::ir::BlockKind::IF_MERGE);
+    }
+    return merge_block;
+  };
 
   PushStructure(mx::ir::StructureKind::IF_THEN, EntityIdOf(ifs->Then()));
   SwitchToBlock(then_block);
   AssociateBlockWithStructure(then_block);
   EmitBody(ifs->Then());
-  EmitBranch(merge_block);
+  if (!CurrentBlockTerminated()) EmitBranch(get_merge());
   PopStructure();  // IF_THEN
 
   PushStructure(mx::ir::StructureKind::IF_ELSE);
@@ -1097,11 +1118,16 @@ void IRGenerator::EmitIfStmt(const pasta::Stmt &s) {
   if (auto else_body = ifs->Else()) {
     EmitBody(*else_body);
   }
-  EmitBranch(merge_block);
+  if (!CurrentBlockTerminated()) EmitBranch(get_merge());
   PopStructure();  // IF_ELSE
 
-  AssociateBlockWithStructure(merge_block);
-  SwitchToBlock(merge_block);
+  if (merge_block != UINT32_MAX) {
+    AssociateBlockWithStructure(merge_block);
+    SwitchToBlock(merge_block);
+  } else {
+    // Both branches terminated — no merge needed.
+    SwitchToDeadBlock();
+  }
 
   PopStructure();  // IF
 }
@@ -1250,6 +1276,8 @@ void IRGenerator::EmitForStmt(const pasta::Stmt &s) {
     uint32_t inc_idx = EmitRValue(*inc);
     PopExpressionScope();
     func_.blocks[current_block_index_].instruction_indices.push_back(inc_idx);
+    func_.instructions[inc_idx].parent_instruction_index = UINT32_MAX;
+    func_.instructions[inc_idx].is_root = true;
     SetOperandParents(inc_idx);
   }
   EmitBranch(cond_block);
@@ -1368,8 +1396,6 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
     AddEdge(current_block_index_, ci.block_index);
   }
 
-  uint32_t switch_block_idx = current_block_index_;
-  uint32_t switch_structure_idx = current_structure_index_;
   uint32_t term_idx = EmitTopLevel(std::move(term));
 
   // Push switch context so break statements work.
@@ -1387,6 +1413,8 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
       auto &last = func_.instructions[blk.instruction_indices.back()];
       if (mx::ir::IsTerminator(last.opcode)) return;
     }
+    // (Empty UNREACHABLE blocks now have IMPLICIT_UNREACHABLE terminators,
+    // so the terminator check above catches them.)
     // Current block has no terminator -- implicit fallthrough.
     InstructionIR inst;
     inst.opcode = mx::ir::OpCode::IMPLICIT_FALLTHROUGH;
@@ -1414,11 +1442,8 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
             current_structure_index_;
         SwitchToBlock(cases[ci].block_index);
         AssociateBlockWithStructure(cases[ci].block_index);
-        // Record case block structure for Duff's device compensation.
+        // Record case block structure for Duff's device (external goto into case).
         label_structure_[cases[ci].block_index] = current_structure_index_;
-        pending_gotos_.push_back({term_idx, switch_block_idx,
-                                  cases[ci].block_index,
-                                  switch_structure_idx});
         ci++;
         // If SubStatement is another case/default, handle it via recursion
         // (empty case fallthrough: case 1: case 2: case 3: body).
@@ -1444,9 +1469,6 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
         SwitchToBlock(cases[ci].block_index);
         AssociateBlockWithStructure(cases[ci].block_index);
         label_structure_[cases[ci].block_index] = current_structure_index_;
-        pending_gotos_.push_back({term_idx, switch_block_idx,
-                                  cases[ci].block_index,
-                                  switch_structure_idx});
         ci++;
         auto sub = ds->SubStatement();
         if (pasta::CaseStmt::From(sub) || pasta::DefaultStmt::From(sub)) {
@@ -1463,6 +1485,10 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
     // are emitted directly.
     if (pasta::CompoundStmt::From(stmt)) {
       for (const auto &child : stmt.Children()) {
+        // Skip dead code after a terminator, but always process case/default.
+        if (CurrentBlockTerminated() &&
+            !pasta::CaseStmt::From(child) &&
+            !pasta::DefaultStmt::From(child)) continue;
         emit_case_bodies(child);
       }
     } else {
@@ -1473,8 +1499,10 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
   emit_case_bodies(body);
 
   // After all cases, if the last case didn't terminate, branch to exit.
-  maybe_emit_implicit_fallthrough(exit_block);
-  EmitBranch(exit_block);
+  if (!CurrentBlockTerminated()) {
+    maybe_emit_implicit_fallthrough(exit_block);
+    EmitBranch(exit_block);
+  }
 
   loop_stack_.pop_back();
   AssociateBlockWithStructure(exit_block);
@@ -1518,13 +1546,7 @@ void IRGenerator::EmitReturnStmt(const pasta::Stmt &s) {
     store.source_entity_id = EntityIdOf(s);
     if (!IsScalarSize(sz) || rv->IsLValue()) {
       // Large or lvalue: MEMCPY.
-      InstructionIR size_inst;
-      size_inst.opcode = mx::ir::OpCode::CONST;
-      size_inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::UINT64);
-      size_inst.int_value = static_cast<int64_t>(sz);
-      size_inst.uint_value = sz;
-      size_inst.width = 64;
-      uint32_t size_idx = EmitInstruction(std::move(size_inst));
+      uint32_t size_idx = EmitSizeConst(sz);
       uint32_t src_idx = rv->IsLValue() ? EmitLValue(*rv) : val_idx;
       store.operand_indices = {ret_ptr_idx, src_idx, size_idx};
       store.mem_op = static_cast<uint8_t>(mx::ir::MemOp::MEMCPY);
@@ -1586,13 +1608,7 @@ void IRGenerator::EmitDeclStmt(const pasta::Stmt &s) {
         auto elem_type = vla_type->ElementType();
         uint32_t elem_sz = 1;
         if (auto sz = TypeSizeBytes(elem_type)) elem_sz = *sz;
-        InstructionIR elem_const;
-        elem_const.opcode = mx::ir::OpCode::CONST;
-        elem_const.const_op = static_cast<uint8_t>(mx::ir::ConstOp::UINT64);
-        elem_const.int_value = static_cast<int64_t>(elem_sz);
-        elem_const.uint_value = elem_sz;
-        elem_const.width = 64;
-        uint32_t elem_idx = EmitInstruction(std::move(elem_const));
+        uint32_t elem_idx = EmitSizeConst(elem_sz);
         InstructionIR mul;
         mul.opcode = mx::ir::OpCode::MUL;
         mul.source_entity_id = EntityIdOf(decl);
@@ -1626,7 +1642,7 @@ void IRGenerator::EmitBreakStmt(const pasta::Stmt &s) {
     EmitScopeExits(it->structure_index);
     EmitBranchWithOpCode(mx::ir::OpCode::BREAK, it->break_block,
                           EntityIdOf(s));
-    SwitchToBlock(NewBlock(mx::ir::BlockKind::UNREACHABLE));
+    SwitchToDeadBlock();
     return;
   }
   DCHECK(false) << "break statement outside of loop/switch";
@@ -1638,7 +1654,7 @@ void IRGenerator::EmitContinueStmt(const pasta::Stmt &s) {
       EmitScopeExits(it->structure_index);
       EmitBranchWithOpCode(mx::ir::OpCode::CONTINUE, it->continue_block,
                             EntityIdOf(s));
-      SwitchToBlock(NewBlock(mx::ir::BlockKind::UNREACHABLE));
+      SwitchToDeadBlock();
       return;
     }
   }
@@ -1669,7 +1685,7 @@ void IRGenerator::EmitGotoStmt(const pasta::Stmt &s) {
     pending_gotos_.push_back({goto_idx, current_block_index_, target,
                               current_structure_index_});
   }
-  SwitchToBlock(NewBlock(mx::ir::BlockKind::UNREACHABLE));
+  SwitchToDeadBlock();
 }
 
 void IRGenerator::EmitLabelStmt(const pasta::Stmt &s) {
@@ -1729,14 +1745,7 @@ void IRGenerator::EmitInitializer(uint32_t dest_addr_idx,
       zero.width = 8;
       uint32_t zero_idx = EmitInstruction(std::move(zero));
 
-      InstructionIR sz;
-      sz.opcode = mx::ir::OpCode::CONST;
-      sz.const_op = static_cast<uint8_t>(mx::ir::ConstOp::UINT64);
-      sz.source_entity_id = source_eid;
-      sz.int_value = static_cast<int64_t>(*total_size);
-      sz.uint_value = static_cast<uint64_t>(*total_size);
-      sz.width = 64;
-      uint32_t sz_idx = EmitInstruction(std::move(sz));
+      uint32_t sz_idx = EmitSizeConst(*total_size, source_eid);
 
       InstructionIR memset_inst;
       memset_inst.opcode = mx::ir::OpCode::MEMORY;
@@ -1760,14 +1769,15 @@ void IRGenerator::EmitInitializer(uint32_t dest_addr_idx,
         if (i == 0) {
           elem_addr = dest_addr_idx;
         } else {
-          // PTR_ADD base, i.
+          // PTR_ADD base, i. Index is ptrdiff_t.
           InstructionIR ci;
           ci.opcode = mx::ir::OpCode::CONST;
-          ci.const_op = static_cast<uint8_t>(mx::ir::ConstOp::INT64);
+          ci.const_op = static_cast<uint8_t>(IntConstOp(ptrdiff_type_width_, true));
           ci.source_entity_id = source_eid;
           ci.int_value = static_cast<int64_t>(i);
           ci.uint_value = static_cast<uint64_t>(i);
-          ci.width = 64;
+          ci.width = ptrdiff_type_width_;
+          ci.type_entity_id = ptrdiff_type_eid_;
           uint32_t idx_val = EmitInstruction(std::move(ci));
 
           InstructionIR pa;
@@ -1875,28 +1885,23 @@ scalar_fallback:
       if (str_sz > 0 && str_sz < sz) sz = str_sz;
     }
 
-    uint32_t val_idx = EmitRValue(init);
-    InstructionIR store;
-    store.opcode = mx::ir::OpCode::MEMORY;
-    store.source_entity_id = source_eid;
-
-    // Use MEMCPY for string literals, non-scalar sizes, and aggregate types
-    // (structs/arrays). Aggregate types may contain pointers that need the
-    // shadow map, and LOAD+STORE would lose pointer identity.
+    // Use MEMCPY for string literals, non-scalar sizes, and aggregate types.
     bool is_aggregate = false;
     if (auto t = init.Type()) {
       is_aggregate = t->IsRecordType() || t->IsArrayType();
     }
-    if (is_string_literal || is_aggregate || !IsScalarSize(sz)) {
+    bool use_memcpy = is_string_literal || is_aggregate || !IsScalarSize(sz);
+
+    // For MEMCPY, get the source address. For scalar STORE, get the value.
+    uint32_t val_idx = use_memcpy ? EmitLValue(init) : EmitRValue(init);
+    InstructionIR store;
+    store.opcode = mx::ir::OpCode::MEMORY;
+    store.source_entity_id = source_eid;
+
+    if (use_memcpy) {
       // Non-scalar size (e.g., string literal char[6]): MEMCPY.
       // val_idx is a pointer for non-scalar types.
-      InstructionIR size_inst;
-      size_inst.opcode = mx::ir::OpCode::CONST;
-      size_inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::UINT64);
-      size_inst.int_value = static_cast<int64_t>(sz);
-      size_inst.uint_value = sz;
-      size_inst.width = 64;
-      uint32_t size_idx = EmitInstruction(std::move(size_inst));
+      uint32_t size_idx = EmitSizeConst(sz);
       store.operand_indices = {dest_addr_idx, val_idx, size_idx};
       store.mem_op = static_cast<uint8_t>(mx::ir::MemOp::MEMCPY);
     } else {
@@ -2006,30 +2011,16 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     return emit_typed(std::move(inst));
   }
 
-  // String literal.
-  if (auto sl = pasta::StringLiteral::From(e)) {
-    uint32_t char_width = sl->CharacterByteWidth();
-    uint32_t total_bytes = sl->ByteLength() + char_width;  // + null terminator
-
-    ObjectIR obj;
-    obj.kind = mx::ir::ObjectKind::STRING_LITERAL;
-    obj.size_bytes = total_bytes;
-    uint32_t obj_idx = next_obj_index_++;
-    func_.objects.push_back(std::move(obj));
-
-    InstructionIR alloca_inst;
-    alloca_inst.opcode = mx::ir::OpCode::ALLOCA;
-    alloca_inst.source_entity_id = eid;
-    alloca_inst.object_index = obj_idx;
-    if (auto t = e.Type()) alloca_inst.type_entity_id = TypeEntityIdOf(*t);
-    uint32_t alloca_idx = emit_typed(std::move(alloca_inst));
-    object_to_alloca_[obj_idx] = alloca_idx;
-
-    // The STRING_LITERAL object's content comes from the AST at interpreter
-    // time via StringLiteral::Bytes(). The bytes are in target byte order.
-    // No per-character stores needed in the IR — the interpreter initializes
-    // STRING_LITERAL objects from the source entity.
-    return alloca_idx;
+  // String literal → STRING_PTR.
+  // Produces a pointer to the string's data. The interpreter is responsible
+  // for giving the string literal a concrete address and populating it from
+  // StringLiteral::bytes() (via source_entity_id).
+  if (pasta::StringLiteral::From(e)) {
+    InstructionIR inst;
+    inst.opcode = mx::ir::OpCode::STRING_PTR;
+    inst.source_entity_id = eid;
+    if (auto t = e.Type()) inst.type_entity_id = TypeEntityIdOf(*t);
+    return emit_typed(std::move(inst));
   }
 
   // Paren expr -- unwrap.
@@ -2296,15 +2287,26 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
           }
         }
 
-        // Emit the delta CONST now that we know the final value.
+        // Emit the delta CONST. For pointers use ptrdiff_t, else the operand type.
+        uint8_t delta_width = 32;
+        mx::RawEntityId delta_type_eid = mx::kInvalidEntityId;
+        if (is_ptr) {
+          delta_width = ptrdiff_type_width_;
+          delta_type_eid = ptrdiff_type_eid_;
+        } else if (sub_type) {
+          if (auto sz = TypeSizeBytes(*sub_type)) {
+            delta_width = static_cast<uint8_t>(*sz * 8);
+          }
+          delta_type_eid = TypeEntityIdOf(*sub_type);
+        }
         InstructionIR delta_inst;
         delta_inst.opcode = mx::ir::OpCode::CONST;
-        delta_inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::INT64);
+        delta_inst.const_op = static_cast<uint8_t>(IntConstOp(delta_width, true));
         delta_inst.source_entity_id = eid;
         delta_inst.int_value = delta;
         delta_inst.uint_value = static_cast<uint64_t>(delta);
-        delta_inst.width = 64;
-        if (expr_type) delta_inst.type_entity_id = TypeEntityIdOf(*expr_type);
+        delta_inst.width = delta_width;
+        delta_inst.type_entity_id = delta_type_eid;
         uint32_t delta_idx = EmitInstruction(std::move(delta_inst));
 
         InstructionIR inst;
@@ -2321,9 +2323,16 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       if (oc == pasta::UnaryOperatorKind::kMinus) {
         uint32_t sub_idx = EmitRValue(sub);
         InstructionIR inst;
-        inst.opcode = mx::ir::OpCode::NEG;
         inst.source_entity_id = eid;
         inst.operand_indices = {sub_idx};
+        if (sub.Type() && sub.Type()->IsFloatingType()) {
+          bool is_f64 = !TypeSizeBytes(*sub.Type()) ||
+                        *TypeSizeBytes(*sub.Type()) > 4;
+          inst.opcode = is_f64 ? mx::ir::OpCode::FNEG_64
+                               : mx::ir::OpCode::FNEG_32;
+        } else {
+          inst.opcode = mx::ir::OpCode::NEG;
+        }
         return emit_typed(std::move(inst));
       }
       if (oc == pasta::UnaryOperatorKind::kPlus) return EmitRValue(sub);
@@ -2408,13 +2417,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         if (rhs_is_lvalue || is_large) {
           // Get the address of the RHS.
           uint32_t src_idx = rhs_is_lvalue ? EmitLValue(rhs) : EmitRValue(rhs);
-          InstructionIR size_inst;
-          size_inst.opcode = mx::ir::OpCode::CONST;
-          size_inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::UINT64);
-          size_inst.int_value = static_cast<int64_t>(sz);
-      size_inst.uint_value = sz;
-          size_inst.width = 64;
-          uint32_t size_idx = EmitInstruction(std::move(size_inst));
+          uint32_t size_idx = EmitSizeConst(sz);
           InstructionIR inst;
           inst.opcode = mx::ir::OpCode::MEMORY;
           inst.source_entity_id = eid;
@@ -2533,17 +2536,45 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         return emit_typed(std::move(inst));
       }
 
-      // Comparison.
+      // Comparison. Use FCMP for floats, UCMP for unsigned/pointer, CMP for signed.
       mx::ir::OpCode cmp_op;
       bool is_cmp = true;
-      switch (oc) {
-        case pasta::BinaryOperatorKind::kEQ: cmp_op = mx::ir::OpCode::CMP_EQ; break;
-        case pasta::BinaryOperatorKind::kNE: cmp_op = mx::ir::OpCode::CMP_NE; break;
-        case pasta::BinaryOperatorKind::kLT: cmp_op = mx::ir::OpCode::CMP_LT; break;
-        case pasta::BinaryOperatorKind::kGT: cmp_op = mx::ir::OpCode::CMP_GT; break;
-        case pasta::BinaryOperatorKind::kLE: cmp_op = mx::ir::OpCode::CMP_LE; break;
-        case pasta::BinaryOperatorKind::kGE: cmp_op = mx::ir::OpCode::CMP_GE; break;
-        default: is_cmp = false; cmp_op = mx::ir::OpCode::CMP_EQ; break;
+      {
+        bool is_float = false;
+        bool is_f64 = false;
+        bool is_unsigned = false;
+        if (auto lhs_type = bo->LHS().Type()) {
+          auto canon = lhs_type->CanonicalType();
+          is_float = canon.IsFloatingType();
+          if (is_float) {
+            is_f64 = !TypeSizeBytes(canon) || *TypeSizeBytes(canon) > 4;
+          }
+          is_unsigned = canon.IsUnsignedIntegerType() ||
+                        canon.IsAnyPointerType();
+        }
+        // Pick the right opcode family: FCMP for float, UCMP for unsigned, CMP for signed.
+        // Float comparisons are width-specific (32/64).
+#define FCMP(base) (is_f64 ? mx::ir::OpCode::base ## _64 : mx::ir::OpCode::base ## _32)
+        switch (oc) {
+          case pasta::BinaryOperatorKind::kEQ:
+            cmp_op = is_float ? FCMP(FCMP_EQ) : mx::ir::OpCode::CMP_EQ; break;
+          case pasta::BinaryOperatorKind::kNE:
+            cmp_op = is_float ? FCMP(FCMP_NE) : mx::ir::OpCode::CMP_NE; break;
+          case pasta::BinaryOperatorKind::kLT:
+            cmp_op = is_float ? FCMP(FCMP_LT)
+                   : is_unsigned ? mx::ir::OpCode::UCMP_LT : mx::ir::OpCode::CMP_LT; break;
+          case pasta::BinaryOperatorKind::kGT:
+            cmp_op = is_float ? FCMP(FCMP_GT)
+                   : is_unsigned ? mx::ir::OpCode::UCMP_GT : mx::ir::OpCode::CMP_GT; break;
+          case pasta::BinaryOperatorKind::kLE:
+            cmp_op = is_float ? FCMP(FCMP_LE)
+                   : is_unsigned ? mx::ir::OpCode::UCMP_LE : mx::ir::OpCode::CMP_LE; break;
+          case pasta::BinaryOperatorKind::kGE:
+            cmp_op = is_float ? FCMP(FCMP_GE)
+                   : is_unsigned ? mx::ir::OpCode::UCMP_GE : mx::ir::OpCode::CMP_GE; break;
+#undef FCMP
+          default: is_cmp = false; cmp_op = mx::ir::OpCode::CMP_EQ; break;
+        }
       }
       if (is_cmp) {
         uint32_t lhs_idx = EmitRValue(bo->LHS());
@@ -2571,11 +2602,25 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         default: break;
       }
 
-      // Use unsigned opcodes for unsigned operands.
+      // Use float opcodes for float operands, unsigned for unsigned.
       {
         auto op_type = e.Type();
+        bool is_float = op_type && op_type->IsFloatingType();
         bool is_unsigned = op_type && op_type->IsUnsignedIntegerType();
-        if (is_unsigned) {
+        if (is_float) {
+          bool is_f64 = !op_type || !TypeSizeBytes(*op_type) ||
+                        *TypeSizeBytes(*op_type) > 4;
+          if (arith_op == mx::ir::OpCode::ADD)
+            arith_op = is_f64 ? mx::ir::OpCode::FADD_64 : mx::ir::OpCode::FADD_32;
+          else if (arith_op == mx::ir::OpCode::SUB)
+            arith_op = is_f64 ? mx::ir::OpCode::FSUB_64 : mx::ir::OpCode::FSUB_32;
+          else if (arith_op == mx::ir::OpCode::MUL)
+            arith_op = is_f64 ? mx::ir::OpCode::FMUL_64 : mx::ir::OpCode::FMUL_32;
+          else if (arith_op == mx::ir::OpCode::DIV)
+            arith_op = is_f64 ? mx::ir::OpCode::FDIV_64 : mx::ir::OpCode::FDIV_32;
+          else if (arith_op == mx::ir::OpCode::REM)
+            arith_op = is_f64 ? mx::ir::OpCode::FREM_64 : mx::ir::OpCode::FREM_32;
+        } else if (is_unsigned) {
           if (arith_op == mx::ir::OpCode::DIV) arith_op = mx::ir::OpCode::UDIV;
           else if (arith_op == mx::ir::OpCode::REM) arith_op = mx::ir::OpCode::UREM;
           else if (arith_op == mx::ir::OpCode::SHR) arith_op = mx::ir::OpCode::USHR;
@@ -2925,13 +2970,17 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
 
             if (bb.undef_for_zero) {
               // result = SELECT(val == 0, UNDEFINED, bw_result)
+              uint8_t arg_width = 32;
+              if (auto at = args[0].Type()) {
+                if (auto s = TypeSizeBytes(*at)) arg_width = static_cast<uint8_t>(*s * 8);
+              }
               InstructionIR zero;
               zero.opcode = mx::ir::OpCode::CONST;
-              zero.const_op = static_cast<uint8_t>(mx::ir::ConstOp::INT64);
+              zero.const_op = static_cast<uint8_t>(IntConstOp(arg_width, true));
               zero.source_entity_id = eid;
               zero.int_value = 0;
               zero.uint_value = 0;
-              zero.width = 64;
+              zero.width = arg_width;
               uint32_t zero_idx = EmitInstruction(std::move(zero));
 
               InstructionIR cmp;
@@ -3326,13 +3375,18 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         }
         // Fallback for __builtin_object_size: return -1 (unknown).
         if (callee_name == "__builtin_object_size") {
+          // Use the call expression's return type.
+          uint8_t w = 64;
+          if (auto t = e.Type()) {
+            if (auto s = TypeSizeBytes(*t)) w = static_cast<uint8_t>(*s * 8);
+          }
           InstructionIR inst;
           inst.opcode = mx::ir::OpCode::CONST;
-          inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::INT64);
+          inst.const_op = static_cast<uint8_t>(IntConstOp(w, false));
           inst.source_entity_id = eid;
           inst.int_value = -1;
-          inst.uint_value = static_cast<uint64_t>(-1);
-          inst.width = 64;
+          inst.uint_value = (w <= 32) ? 0xFFFFFFFFull : ~0ull;
+          inst.width = w;
           return emit_typed(std::move(inst));
         }
       }
@@ -3395,25 +3449,13 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       store.source_entity_id = EntityIdOf(arg_expr);
       if (!IsScalarSize(sz)) {
         // Large argument: MEMCPY.
-        InstructionIR size_inst;
-        size_inst.opcode = mx::ir::OpCode::CONST;
-        size_inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::UINT64);
-        size_inst.int_value = static_cast<int64_t>(sz);
-      size_inst.uint_value = sz;
-        size_inst.width = 64;
-        uint32_t size_idx = EmitInstruction(std::move(size_inst));
+        uint32_t size_idx = EmitSizeConst(sz);
         store.operand_indices = {alloca_idx, val_idx, size_idx};
         store.mem_op = static_cast<uint8_t>(mx::ir::MemOp::MEMCPY);
       } else if (arg_expr.IsLValue()) {
         // Lvalue arg: MEMCPY from source address.
         uint32_t src_idx = EmitLValue(arg_expr);
-        InstructionIR size_inst;
-        size_inst.opcode = mx::ir::OpCode::CONST;
-        size_inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::UINT64);
-        size_inst.int_value = static_cast<int64_t>(sz);
-      size_inst.uint_value = sz;
-        size_inst.width = 64;
-        uint32_t size_idx = EmitInstruction(std::move(size_inst));
+        uint32_t size_idx = EmitSizeConst(sz);
         store.operand_indices = {alloca_idx, src_idx, size_idx};
         store.mem_op = static_cast<uint8_t>(mx::ir::MemOp::MEMCPY);
       } else {
@@ -3487,13 +3529,18 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       val = TypeSizeBytes(arg_type);  // fallback
     }
     if (val) {
+      // Use the expression's own type for the constant width (e.g., size_t).
+      uint8_t w = SizeTypeWidth();
+      if (auto t = e.Type()) {
+        if (auto s = TypeSizeBytes(*t)) w = static_cast<uint8_t>(*s * 8);
+      }
       InstructionIR inst;
       inst.opcode = mx::ir::OpCode::CONST;
-      inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::UINT64);
+      inst.const_op = static_cast<uint8_t>(IntConstOp(w, false));
       inst.source_entity_id = eid;
       inst.int_value = static_cast<int64_t>(*val);
       inst.uint_value = static_cast<uint64_t>(*val);
-      inst.width = 64;
+      inst.width = w;
       return emit_typed(std::move(inst));
     }
   }
@@ -3656,11 +3703,18 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
   if (pasta::ImplicitValueInitExpr::From(e)) {
     InstructionIR inst;
     inst.opcode = mx::ir::OpCode::CONST;
-    inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::INT64);
     inst.source_entity_id = eid;
     inst.int_value = 0;
     inst.uint_value = 0;
-    inst.width = 64;
+    // Use the expression's type to pick the right constant width.
+    uint8_t width = 64;
+    if (auto t = e.Type()) {
+      if (auto sz = TypeSizeBytes(*t)) {
+        width = static_cast<uint8_t>(*sz * 8);
+      }
+    }
+    inst.width = width;
+    inst.const_op = static_cast<uint8_t>(IntConstOp(width, true));
     return emit_typed(std::move(inst));
   }
 
@@ -3683,13 +3737,18 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       clang::Expr::EvalResult eval_result;
       if (raw->EvaluateAsInt(eval_result, ctx_)) {
         auto ap_val = eval_result.Val.getInt();
+        // Use the expression's own type for the constant width (size_t).
+        uint8_t w = SizeTypeWidth();
+        if (auto t = e.Type()) {
+          if (auto s = TypeSizeBytes(*t)) w = static_cast<uint8_t>(*s * 8);
+        }
         InstructionIR inst;
         inst.opcode = mx::ir::OpCode::CONST;
-        inst.const_op = static_cast<uint8_t>(mx::ir::ConstOp::UINT64);
+        inst.const_op = static_cast<uint8_t>(IntConstOp(w, false));
         inst.source_entity_id = eid;
         inst.int_value = ap_val.getSExtValue();
         inst.uint_value = ap_val.getZExtValue();
-        inst.width = 64;
+        inst.width = w;
         return emit_typed(std::move(inst));
       }
     }
@@ -3847,10 +3906,30 @@ std::optional<uint32_t> IRGenerator::TypeSizeBytes(const pasta::Type &t) {
 
 std::optional<uint32_t> IRGenerator::TypeAlignBytes(const pasta::Type &t) {
   {
+    // pasta::Type::Alignment() already returns bytes.
     auto a = t.Alignment();
-    if (a && *a > 0) return static_cast<uint32_t>((*a + 7) / 8);
+    if (a && *a > 0) return static_cast<uint32_t>(*a);
   }
   return std::nullopt;
+}
+
+uint8_t IRGenerator::SizeTypeWidth() const {
+  return size_type_width_;
+}
+
+// Emit a CONST instruction holding a size_t value.
+uint32_t IRGenerator::EmitSizeConst(uint64_t val,
+                                     mx::RawEntityId source_eid) {
+  uint8_t w = size_type_width_;
+  InstructionIR inst;
+  inst.opcode = mx::ir::OpCode::CONST;
+  inst.const_op = static_cast<uint8_t>(IntConstOp(w, false));
+  inst.int_value = static_cast<int64_t>(val);
+  inst.uint_value = val;
+  inst.width = w;
+  inst.source_entity_id = source_eid;
+  inst.type_entity_id = size_type_eid_;
+  return EmitInstruction(std::move(inst));
 }
 
 mx::ir::MemOp IRGenerator::DetermineMemOp(
@@ -4214,15 +4293,40 @@ void IRGenerator::VerifyBlocks() {
     DCHECK(!block.instruction_indices.empty())
         << "Block " << bi << " has no instructions";
 
+    // Every instruction in the block must be marked as a root.
+    for (auto idx : block.instruction_indices) {
+      DCHECK(idx < instructions.size())
+          << "Block " << bi << " instruction index " << idx << " out of range";
+      DCHECK(instructions[idx].is_root)
+          << "Block " << bi << " instruction " << idx
+          << " (opcode=" << static_cast<int>(instructions[idx].opcode)
+          << ") is in instruction_indices but is_root is false";
+      DCHECK(instructions[idx].parent_instruction_index == UINT32_MAX)
+          << "Block " << bi << " root instruction " << idx
+          << " has parent_instruction_index="
+          << instructions[idx].parent_instruction_index
+          << " (should be UINT32_MAX)";
+    }
+
     // The last top-level instruction must be a terminator.
+    // No non-terminator instructions may appear after the terminator.
     {
       auto last_idx = block.instruction_indices.back();
-      DCHECK(last_idx < instructions.size())
-          << "Block " << bi << " last instruction index out of range";
       auto last_op = instructions[last_idx].opcode;
       DCHECK(mx::ir::IsTerminator(last_op))
           << "Block " << bi << " last instruction is not a terminator (opcode="
           << static_cast<int>(last_op) << ")";
+
+      bool seen_terminator = false;
+      for (auto idx : block.instruction_indices) {
+        DCHECK(!seen_terminator)
+            << "Block " << bi << " has instruction " << idx
+            << " (opcode=" << static_cast<int>(instructions[idx].opcode)
+            << ") after terminator";
+        if (mx::ir::IsTerminator(instructions[idx].opcode)) {
+          seen_terminator = true;
+        }
+      }
     }
 
     // Successor/predecessor edges must be symmetric.

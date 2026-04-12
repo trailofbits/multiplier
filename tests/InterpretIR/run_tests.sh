@@ -43,7 +43,7 @@ for func in "${TEST_FUNCS[@]}"; do
   exit_code=$?
 
   # Look for the return value in the output.
-  ret_val=$(echo "$output" | grep -oP 'Return value: \K[-0-9]+' | tail -1)
+  ret_val=$(echo "$output" | sed -n 's/.*Return value: \([-0-9]*\).*/\1/p' | tail -1)
 
   if [ $exit_code -ne 0 ]; then
     echo "CRASH  $func (exit code $exit_code)"

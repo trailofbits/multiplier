@@ -61,6 +61,10 @@ struct InstructionIR {
   // Block this instruction was emitted into (set by EmitInstruction).
   uint32_t parent_block_index{UINT32_MAX};
 
+  // True if this instruction was emitted via EmitTopLevel (is a block root).
+  // SetOperandParents will not reparent root instructions.
+  bool is_root{false};
+
   // OpCode-specific fields.
   uint32_t object_index{0};
   mx::RawEntityId type_entity_id{mx::kInvalidEntityId};
@@ -182,7 +186,13 @@ class IRGenerator {
  private:
   const pasta::AST &ast_;
   const EntityMapper &em_;
-  clang::ASTContext &ctx_;  // from ast_.UnderlyingAST(), for type sizes etc.
+  clang::ASTContext &ctx_;
+
+  // Cached entity IDs for built-in types (size_t, ptrdiff_t).
+  mx::RawEntityId size_type_eid_{mx::kInvalidEntityId};
+  uint8_t size_type_width_{64};
+  mx::RawEntityId ptrdiff_type_eid_{mx::kInvalidEntityId};
+  uint8_t ptrdiff_type_width_{64};
 
   FunctionIR func_;
   uint32_t current_block_index_{0};
@@ -299,6 +309,10 @@ class IRGenerator {
   void PopExpressionScope();
   // Check if an expression contains any function calls.
   bool ContainsCall(const pasta::Expr &e);
+  // True if the current block already has a terminator.
+  bool CurrentBlockTerminated() const;
+  // Switch to a new dead block (after break/return/goto/continue).
+  void SwitchToDeadBlock();
 
   // --- Initializer emission (decomposes aggregates into element stores) ---
   void EmitInitializer(uint32_t dest_addr_idx, const pasta::Expr &init,
@@ -319,6 +333,11 @@ class IRGenerator {
   // --- Type helpers ---
   std::optional<uint32_t> TypeSizeBytes(const pasta::Type &t);
   std::optional<uint32_t> TypeAlignBytes(const pasta::Type &t);
+  // Target's size_t / pointer width in bits.
+  uint8_t SizeTypeWidth() const;
+  // Emit a CONST instruction holding a size_t value (target-width unsigned).
+  uint32_t EmitSizeConst(uint64_t val,
+                          mx::RawEntityId source_eid = mx::kInvalidEntityId);
   mx::ir::MemOp DetermineMemOp(bool is_store, bool is_atomic,
                                 unsigned size_bytes, bool is_float = false);
 

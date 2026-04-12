@@ -8,9 +8,11 @@
 //
 // With --all, prints IR for every function in the index.
 
+#include <functional>
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <iostream>
+#include <set>
 #include <sstream>
 #include <string>
 
@@ -127,7 +129,22 @@ void PrintInstruction(std::ostream &os, const mx::IRInstruction &inst,
     }
   } else if (op == mx::ir::OpCode::SWITCH) {
     if (auto si = mx::SwitchInst::from(inst)) {
-      os << " cases=" << si->num_cases();
+      os << " cases=" << si->num_cases() << " {";
+      bool first = true;
+      for (auto sc : si->cases()) {
+        if (!first) os << ",";
+        first = false;
+        if (sc.is_default()) {
+          os << " default->block_" << OffsetOf(sc.target_block().id());
+        } else if (sc.is_range()) {
+          os << " " << sc.low() << ".." << sc.high()
+             << "->block_" << OffsetOf(sc.target_block().id());
+        } else {
+          os << " " << sc.low()
+             << "->block_" << OffsetOf(sc.target_block().id());
+        }
+      }
+      os << " }";
     }
   }
 
@@ -175,11 +192,21 @@ void PrintBlock(std::ostream &os, const mx::IRBlock &block) {
   os << ":\n";
 
   // Top-level instructions (roots).
-  for (auto inst : block.instructions()) {
-    // Print sub-expressions first, then the root.
-    for (auto sub : inst.operands()) {
+  // Recursively print all sub-expressions depth-first before the root,
+  // deduplicating by entity ID.
+  std::set<uint64_t> printed;
+  std::function<void(const mx::IRInstruction &)> print_subs;
+  print_subs = [&](const mx::IRInstruction &parent) {
+    for (auto sub : parent.operands()) {
+      auto sub_eid = mx::EntityId(sub.id()).Pack();
+      if (printed.count(sub_eid)) continue;
+      print_subs(sub);
+      printed.insert(sub_eid);
       PrintInstruction(os, sub, "      ", false);
     }
+  };
+  for (auto inst : block.instructions()) {
+    print_subs(inst);
     PrintInstruction(os, inst, "    ", true);
   }
 
