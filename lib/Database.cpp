@@ -627,6 +627,8 @@ void DatabaseWriterImpl::InitMetadata(void) {
   check.ExecuteStep();
   int64_t count = 0;
   check.Row().Columns(count);
+  check.Reset();
+
   if (count == 0) {
     std::random_device rd;
     std::mt19937_64 gen(rd());
@@ -805,10 +807,10 @@ DatabaseWriterImpl::~DatabaseWriterImpl(void) {
   // These may fail with "database is locked" if the async writer's
   // SQLite connection hasn't fully released its WAL lock.
   // Each step is isolated so failures don't cascade.
-  try { ExitRecords(); } catch (...) {}
-  try { ExitMetadata(); } catch (...) {}
-  try { db.Execute("PRAGMA wal_checkpoint(FULL)"); } catch (...) {}
-  try { db.Optimize(); } catch (...) {}
+  ExitRecords();
+  ExitMetadata();
+  db.Execute("PRAGMA wal_checkpoint(FULL)");
+  db.Optimize();
 }
 
 DatabaseWriterImpl::DatabaseWriterImpl(const std::filesystem::path &db_path_,
@@ -1026,13 +1028,11 @@ void DatabaseWriterImpl::InitRecords(void) {
 void DatabaseWriterImpl::ExitRecords(void) {
 #ifndef __CDT_PARSER__
 #define MX_EXEC_TEARDOWNS(record) \
-  for (const char *stmt : record::kExitStatements) { \
-    if (stmt) { \
-      try { \
+  { \
+    sqlite::ExclusiveTransaction transaction(db); \
+    for (const char *stmt : record::kExitStatements) { \
+      if (stmt) { \
         db.Execute(stmt); \
-      } catch (...) { \
-        /* FTS optimize and other teardown statements may fail; */ \
-        /* don't let them prevent WAL checkpoint. */ \
       } \
     } \
   }
