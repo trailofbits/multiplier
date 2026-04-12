@@ -1366,7 +1366,10 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
       }
       return;
     }
+    // Recurse into children, but stop at nested switch statements —
+    // their cases belong to the inner switch, not this one.
     for (const auto &child : stmt.Children()) {
+      if (pasta::SwitchStmt::From(child)) continue;
       collect_cases(child);
     }
   };
@@ -1489,7 +1492,13 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
         if (CurrentBlockTerminated() &&
             !pasta::CaseStmt::From(child) &&
             !pasta::DefaultStmt::From(child)) continue;
-        emit_case_bodies(child);
+        // Don't descend into nested switch statements — their cases
+        // belong to the inner switch, not this one.
+        if (pasta::SwitchStmt::From(child)) {
+          EmitStmt(child);
+        } else {
+          emit_case_bodies(child);
+        }
       }
     } else {
       // Regular statement between cases (e.g., break, goto, assignment).
@@ -1497,6 +1506,18 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
     }
   };
   emit_case_bodies(body);
+
+  // Verify all switch cases got their structure index set.
+  for (size_t sci = 0; sci < func_.instructions[term_idx].switch_cases.size();
+       ++sci) {
+    auto &sc = func_.instructions[term_idx].switch_cases[sci];
+    DCHECK(sc.structure_index != UINT32_MAX)
+        << "Switch case " << sci << " (of "
+        << func_.instructions[term_idx].switch_cases.size()
+        << ") has no structure_index; ci=" << ci
+        << " low=" << sc.low << " is_default=" << sc.is_default
+        << " func_eid=" << func_.func_decl_entity_id;
+  }
 
   // After all cases, if the last case didn't terminate, branch to exit.
   if (!CurrentBlockTerminated()) {

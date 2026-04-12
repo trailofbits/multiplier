@@ -168,11 +168,125 @@
  *     >> %110 = IMPLICIT_GOTO
  *     -> [block_41]
  *   block_41 IF_MERGE  <- [block_40]:
- *          %112 = RETURN_PTR  // return 0
+ *          %result.1 = ALLOCA/LOCAL size=4 align=4
  *          %111 = CONST/INT32 0  // 0
- *     >> %113 = MEMORY/STORE_LE_32 [%112, %111]  // return 0
- *     >> %114 = EXIT_SCOPE  // {     // Basic switch.     int val = 2;     int...
- *     >> %115 = RET [%111]  // return 0
+ *     >> %112 = MEMORY/STORE_LE_32 [%result.1, %111]  // result = 0
+ *          %113 = CONST/INT32 1  // 1
+ *     >> %114 = SWITCH cases=3 { 1->block_43, 2->block_44, default->block_45 } [%113]  // switch (1) {         case 1:             switch...
+ *     -> [block_43, block_44, block_45]
+ *   block_45 SWITCH_DEFAULT  <- [block_41]:
+ *          %result.1 = ALLOCA/LOCAL size=4 align=4
+ *          %135 = CONST/INT32 90  // 90
+ *     >> %136 = MEMORY/STORE_LE_32 [%result.1, %135]  // result = 90
+ *     >> %137 = BREAK  // break
+ *     -> [block_42]
+ *   block_44 SWITCH_CASE  <- [block_41]:
+ *          %result.1 = ALLOCA/LOCAL size=4 align=4
+ *          %131 = CONST/INT32 80  // 80
+ *     >> %132 = MEMORY/STORE_LE_32 [%result.1, %131]  // result = 80
+ *     >> %133 = BREAK  // break
+ *     -> [block_42]
+ *   block_43 SWITCH_CASE  <- [block_41]:
+ *          %115 = CONST/INT32 10  // 10
+ *     >> %116 = SWITCH cases=3 { 10->block_47, 20->block_48, default->block_49 } [%115]  // switch (10) {                 case 10: result =...
+ *     -> [block_47, block_48, block_49]
+ *   block_49 SWITCH_DEFAULT  <- [block_43]:
+ *          %result.1 = ALLOCA/LOCAL size=4 align=4
+ *          %125 = CONST/INT32 70  // 70
+ *     >> %126 = MEMORY/STORE_LE_32 [%result.1, %125]  // result = 70
+ *     >> %127 = BREAK  // break
+ *     -> [block_46]
+ *   block_48 SWITCH_CASE  <- [block_43]:
+ *          %result.1 = ALLOCA/LOCAL size=4 align=4
+ *          %121 = CONST/INT32 60  // 60
+ *     >> %122 = MEMORY/STORE_LE_32 [%result.1, %121]  // result = 60
+ *     >> %123 = BREAK  // break
+ *     -> [block_46]
+ *   block_47 SWITCH_CASE  <- [block_43]:
+ *          %result.1 = ALLOCA/LOCAL size=4 align=4
+ *          %117 = CONST/INT32 50  // 50
+ *     >> %118 = MEMORY/STORE_LE_32 [%result.1, %117]  // result = 50
+ *     >> %119 = BREAK  // break
+ *     -> [block_46]
+ *   block_46 SWITCH_EXIT  <- [block_47, block_48, block_49]:
+ *     >> %129 = BREAK  // break
+ *     -> [block_42]
+ *   block_42 SWITCH_EXIT  <- [block_46, block_44, block_45]:
+ *          %result.1 = ALLOCA/LOCAL size=4 align=4
+ *          %139 = MEMORY/LOAD_LE_32 [%result.1]  // result
+ *          %140 = CONST/INT32 50  // 50
+ *          %141 = CMP_NE [%139, %140]  // result != 50
+ *     >> %142 = COND_BRANCH [%141]  // if (result != 50) return 5
+ *     -> [block_56, block_57]
+ *   block_57 IF_ELSE  <- [block_42]:
+ *     >> %148 = IMPLICIT_GOTO
+ *     -> [block_58]
+ *   block_58 IF_MERGE  <- [block_57]:
+ *          %result.1 = ALLOCA/LOCAL size=4 align=4
+ *          %149 = CONST/INT32 0  // 0
+ *     >> %150 = MEMORY/STORE_LE_32 [%result.1, %149]  // result = 0
+ *          %151 = CONST/INT32 2  // 2
+ *     >> %152 = SWITCH cases=3 { 1->block_60, 2->block_61, 3->block_62 } [%151]  // switch (2) {         case 1:             result...
+ *     -> [block_60, block_61, block_62]
+ *   block_62 SWITCH_CASE  <- [block_58]:
+ *          %result.1 = ALLOCA/LOCAL size=4 align=4
+ *          %168 = CONST/INT32 1000  // 1000
+ *     >> %169 = READ_MODIFY_WRITE(ADD new) [%result.1, %168]  // result += 1000
+ *     >> %170 = BREAK  // break
+ *     -> [block_59]
+ *   block_60 SWITCH_CASE  <- [block_58]:
+ *          %result.1 = ALLOCA/LOCAL size=4 align=4
+ *          %153 = CONST/INT32 1  // 1
+ *     >> %154 = READ_MODIFY_WRITE(ADD new) [%result.1, %153]  // result += 1
+ *     >> %155 = IMPLICIT_FALLTHROUGH
+ *     -> [block_61]
+ *   block_61 SWITCH_CASE  <- [block_58, block_60]:
+ *          %156 = CONST/INT32 20  // 20
+ *     >> %157 = SWITCH cases=2 { 10->block_64, 20->block_65 } [%156]  // switch (20) {                 case 10: result +...
+ *     -> [block_64, block_65]
+ *   block_65 SWITCH_CASE  <- [block_61]:
+ *          %result.1 = ALLOCA/LOCAL size=4 align=4
+ *          %162 = CONST/INT32 200  // 200
+ *     >> %163 = READ_MODIFY_WRITE(ADD new) [%result.1, %162]  // result += 200
+ *     >> %164 = BREAK  // break
+ *     -> [block_63]
+ *   block_64 SWITCH_CASE  <- [block_61]:
+ *          %result.1 = ALLOCA/LOCAL size=4 align=4
+ *          %158 = CONST/INT32 100  // 100
+ *     >> %159 = READ_MODIFY_WRITE(ADD new) [%result.1, %158]  // result += 100
+ *     >> %160 = BREAK  // break
+ *     -> [block_63]
+ *   block_63 SWITCH_EXIT  <- [block_64, block_65]:
+ *     >> %166 = BREAK  // break
+ *     -> [block_59]
+ *   block_59 SWITCH_EXIT  <- [block_63, block_62]:
+ *          %result.1 = ALLOCA/LOCAL size=4 align=4
+ *          %172 = MEMORY/LOAD_LE_32 [%result.1]  // result
+ *          %173 = CONST/INT32 200  // 200
+ *          %174 = CMP_NE [%172, %173]  // result != 200
+ *     >> %175 = COND_BRANCH [%174]  // if (result != 200) return 6
+ *     -> [block_70, block_71]
+ *   block_71 IF_ELSE  <- [block_59]:
+ *     >> %181 = IMPLICIT_GOTO
+ *     -> [block_72]
+ *   block_72 IF_MERGE  <- [block_71]:
+ *          %183 = RETURN_PTR  // return 0
+ *          %182 = CONST/INT32 0  // 0
+ *     >> %184 = MEMORY/STORE_LE_32 [%183, %182]  // return 0
+ *     >> %185 = EXIT_SCOPE  // {     // Basic switch.     int val = 2;     int...
+ *     >> %186 = RET [%182]  // return 0
+ *   block_70 IF_THEN  <- [block_59]:
+ *          %177 = RETURN_PTR  // return 6
+ *          %176 = CONST/INT32 6  // 6
+ *     >> %178 = MEMORY/STORE_LE_32 [%177, %176]  // return 6
+ *     >> %179 = EXIT_SCOPE  // {     // Basic switch.     int val = 2;     int...
+ *     >> %180 = RET [%176]  // return 6
+ *   block_56 IF_THEN  <- [block_42]:
+ *          %144 = RETURN_PTR  // return 5
+ *          %143 = CONST/INT32 5  // 5
+ *     >> %145 = MEMORY/STORE_LE_32 [%144, %143]  // return 5
+ *     >> %146 = EXIT_SCOPE  // {     // Basic switch.     int val = 2;     int...
+ *     >> %147 = RET [%143]  // return 5
  *   block_39 IF_THEN  <- [block_32]:
  *          %106 = RETURN_PTR  // return 4
  *          %105 = CONST/INT32 4  // 4
@@ -251,6 +365,42 @@ int test_switch(void) {
             break;
     }
     if (result != 100) return 4;
+
+    // Nested switch: inner switch cases must not leak into outer switch.
+    result = 0;
+    switch (1) {
+        case 1:
+            switch (10) {
+                case 10: result = 50; break;
+                case 20: result = 60; break;
+                default: result = 70; break;
+            }
+            break;
+        case 2:
+            result = 80;
+            break;
+        default:
+            result = 90;
+            break;
+    }
+    if (result != 50) return 5;
+
+    // Nested switch with outer fallthrough.
+    result = 0;
+    switch (2) {
+        case 1:
+            result += 1;
+        case 2:
+            switch (20) {
+                case 10: result += 100; break;
+                case 20: result += 200; break;
+            }
+            break;
+        case 3:
+            result += 1000;
+            break;
+    }
+    if (result != 200) return 6;
 
     return 0;
 }

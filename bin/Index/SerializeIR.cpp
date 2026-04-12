@@ -651,6 +651,8 @@ void SerializeIR(
 
           // Overwrite the placeholder with an IRStructureId for the
           // SWITCH_CASE structure.
+          CHECK(sc.structure_index != UINT32_MAX)
+              << "Switch case " << sci << " has no structure_index";
           auto sc_eid = MakeStructureEid(func, fragment_id,
                                           func_struct_base,
                                           sc.structure_index);
