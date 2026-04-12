@@ -577,5 +577,9 @@ builds/
 install/
 
 *.db
+*.db-shm
+*.db-wal
 mx-workspace/
-mx-workspace/
+.claude/
+.mcp.json
+*_PROMPT.md
