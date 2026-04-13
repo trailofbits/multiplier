@@ -210,7 +210,12 @@ std::optional<FuncPtrInst> FuncPtrInst::from(const IRInstruction &inst) {
   return std::nullopt;
 }
 // MultimemInst removed: merged into MemoryInst.
-IMPL_FROM_SINGLE(BitwiseOpInst, BITWISE)
+std::optional<BitwiseOpInst> BitwiseOpInst::from(const IRInstruction &inst) {
+  auto op = inst.opcode();
+  if (op >= ir::OpCode::BITWISE_8 && op <= ir::OpCode::BITWISE_64)
+    return BitwiseOpInst(inst.impl_ptr());
+  return std::nullopt;
+}
 IMPL_FROM_SINGLE(FloatOpInst, FLOAT)
 std::optional<FramePtrInst> FramePtrInst::from(const IRInstruction &inst) {
   auto op = inst.opcode();

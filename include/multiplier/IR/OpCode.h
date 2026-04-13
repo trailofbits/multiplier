@@ -205,9 +205,7 @@ enum class OpCode : uint8_t {
   // (Pointer-producing ops are sized: see GEP_FIELD_32/64, PTR_ADD_32/64,
   //  PARAM_PTR_32/64, GLOBAL_PTR_32/64, etc. at the end of the enum.)
 
-  // Bitwise/intrinsic operations. Sub-opcode in int_pool[0] selects the
-  // specific operation (see BitwiseOp enum). op[0] = primary operand.
-  BITWISE = 53,
+  // (BITWISE and ABS are sized: see end of enum.)
 
   // Floating-point operations. Sub-opcode in int_pool[0] selects the
   // specific operation (see FloatOp enum). op[0] = primary operand.
@@ -311,8 +309,13 @@ enum class OpCode : uint8_t {
   MUL_OVERFLOW_8 = 64, MUL_OVERFLOW_16 = 65, MUL_OVERFLOW_32 = 66, MUL_OVERFLOW_64 = 67,
 
   // Width-specific pointer difference (result is ptrdiff_t).
-  // Placed in gap left by removed unsized opcodes (3-4).
   PTR_DIFF_32 = 3,    PTR_DIFF_64 = 4,
+
+  // Width-specific bitwise intrinsics (sub-opcode in int_pool[0] selects BitwiseOp).
+  BITWISE_8 = 5,  BITWISE_16 = 6,  BITWISE_32 = 7,  BITWISE_64 = 8,
+
+  // Width-specific integer absolute value.
+  ABS_8 = 9,  ABS_16 = 10,  ABS_32 = 11,  ABS_64 = 12,
 };
 
 // Returns the human-readable name of an opcode.
@@ -461,9 +464,7 @@ enum class BitwiseOp : uint8_t {
   ROTL = 8,                // Rotate left. op[0] = value, op[1] = amount.
   ROTR = 9,                // Rotate right. op[0] = value, op[1] = amount.
 
-  // Absolute value (integer).
-  ABS = 10,                // __builtin_abs. UNDEFINED for INT_MIN (signed overflow).
-
+  // 10: removed (ABS is now a sized opcode, not a bitwise sub-opcode)
   // 11, 12: removed (EXPECT/ASSUME were compiler hints, not operations)
 };
 
@@ -560,7 +561,8 @@ inline bool IsFloatComparison(OpCode op) {
 inline bool IsUnaryOp(OpCode op) {
   return op == OpCode::LOGICAL_NOT ||
          op == OpCode::FNEG_32 || op == OpCode::FNEG_64 ||
-         (op >= OpCode::NEG_8 && op <= OpCode::BIT_NOT_64);
+         (op >= OpCode::NEG_8 && op <= OpCode::BIT_NOT_64) ||
+         (op >= OpCode::ABS_8 && op <= OpCode::ABS_64);
 }
 
 inline bool IsCast(OpCode op) {

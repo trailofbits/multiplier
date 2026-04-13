@@ -227,7 +227,8 @@ static uint32_t EmitInstructionConsts(
       pool.AddInt(inst.int_value);  // parameter index
       break;
 
-    case OC::BITWISE:
+    case OC::BITWISE_8: case OC::BITWISE_16:
+    case OC::BITWISE_32: case OC::BITWISE_64:
       pool.AddInt(static_cast<int64_t>(inst.bitwise_op));  // BitwiseOp sub-opcode
       break;
 

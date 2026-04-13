@@ -42,7 +42,14 @@ const char *EnumeratorName(OpCode op) noexcept {
     case OpCode::VA_END: return "VA_END";
     case OpCode::ENTER_SCOPE: return "ENTER_SCOPE";
     case OpCode::EXIT_SCOPE: return "EXIT_SCOPE";
-    case OpCode::BITWISE: return "BITWISE";
+    case OpCode::BITWISE_8: return "BITWISE_8";
+    case OpCode::BITWISE_16: return "BITWISE_16";
+    case OpCode::BITWISE_32: return "BITWISE_32";
+    case OpCode::BITWISE_64: return "BITWISE_64";
+    case OpCode::ABS_8: return "ABS_8";
+    case OpCode::ABS_16: return "ABS_16";
+    case OpCode::ABS_32: return "ABS_32";
+    case OpCode::ABS_64: return "ABS_64";
     case OpCode::FLOAT: return "FLOAT";
     case OpCode::UNDEFINED: return "UNDEFINED";
     case OpCode::ATOMIC_ADD_8: return "ATOMIC_ADD_8";
@@ -430,7 +437,7 @@ const char *EnumeratorName(BitwiseOp op) noexcept {
     case BitwiseOp::PARITY: return "PARITY";
     case BitwiseOp::ROTL: return "ROTL";
     case BitwiseOp::ROTR: return "ROTR";
-    case BitwiseOp::ABS: return "ABS";
+    // (ABS moved to sized opcode)
   }
   return "UNKNOWN";
 }

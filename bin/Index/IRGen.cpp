@@ -115,6 +115,22 @@ static mx::ir::OpCode SizedIntOp(IntOp group, unsigned width_bytes) {
       static_cast<unsigned>(group) * 4 + wi);
 }
 
+// Map a width to the corresponding BITWISE or ABS opcode.
+// BITWISE_8=5,_16=6,_32=7,_64=8. ABS_8=9,_16=10,_32=11,_64=12.
+static mx::ir::OpCode SizedBitwiseOp(unsigned width_bytes) {
+  if (width_bytes <= 1) return mx::ir::OpCode::BITWISE_8;
+  if (width_bytes <= 2) return mx::ir::OpCode::BITWISE_16;
+  if (width_bytes <= 4) return mx::ir::OpCode::BITWISE_32;
+  return mx::ir::OpCode::BITWISE_64;
+}
+
+static mx::ir::OpCode SizedAbsOp(unsigned width_bytes) {
+  if (width_bytes <= 1) return mx::ir::OpCode::ABS_8;
+  if (width_bytes <= 2) return mx::ir::OpCode::ABS_16;
+  if (width_bytes <= 4) return mx::ir::OpCode::ABS_32;
+  return mx::ir::OpCode::ABS_64;
+}
+
 // Map a pointer-producing op to its 32 or 64-bit variant.
 static mx::ir::OpCode SizedPtrOp(mx::ir::OpCode base_32, unsigned ptr_bytes) {
   // base_32 is the _32 variant; _64 is always base_32 + 1.
@@ -3166,14 +3182,29 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
           {"__builtin_parity", BO::PARITY, false},
           {"__builtin_parityl", BO::PARITY, false},
           {"__builtin_parityll", BO::PARITY, false},
-          {"__builtin_abs", BO::ABS, false},
         };
+        // __builtin_abs → sized ABS opcode (not a BitwiseOp).
+        if (callee_name == "__builtin_abs" && !args.empty()) {
+          uint32_t val_idx = EmitRValue(args[0]);
+          unsigned sz = 8;
+          if (auto at = args[0].Type()) {
+            if (auto s = TypeSizeBytes(*at)) sz = *s;
+          }
+          InstructionIR inst;
+          inst.opcode = SizedAbsOp(sz);
+          inst.source_entity_id = eid;
+          inst.operand_indices.push_back(val_idx);
+          return emit_typed(std::move(inst));
+        }
         for (const auto &bb : bitwise_builtins) {
           if (callee_name == bb.name && !args.empty()) {
             uint32_t val_idx = EmitRValue(args[0]);
-
+            unsigned bw_sz = 8;
+            if (auto at = args[0].Type()) {
+              if (auto s = TypeSizeBytes(*at)) bw_sz = *s;
+            }
             InstructionIR bw;
-            bw.opcode = mx::ir::OpCode::BITWISE;
+            bw.opcode = SizedBitwiseOp(bw_sz);
             bw.source_entity_id = eid;
             bw.bitwise_op = static_cast<uint8_t>(bb.op);
             bw.operand_indices.push_back(val_idx);

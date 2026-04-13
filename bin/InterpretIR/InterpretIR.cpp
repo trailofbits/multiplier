@@ -2684,55 +2684,117 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
     // MULTIMEM removed: merged into MEMORY case above.
 
     // --- Bitwise/intrinsic operations ---
-    case mx::ir::OpCode::BITWISE: {
+    case mx::ir::OpCode::BITWISE_8:
+    case mx::ir::OpCode::BITWISE_16:
+    case mx::ir::OpCode::BITWISE_32:
+    case mx::ir::OpCode::BITWISE_64: {
       if (auto bw = mx::BitwiseOpInst::from(inst)) {
-        // Get the primary operand (op[0]).
         Value val = Value::Undef();
         auto ops = inst.operands();
-        for (auto op_inst : ops) {
-          val = GetValue(op_inst);
-          break;
-        }
+        for (auto op_inst : ops) { val = GetValue(op_inst); break; }
         int64_t v = val.as_int();
         using BO = mx::ir::BitwiseOp;
-        switch (bw->sub_opcode()) {
+        auto sub = bw->sub_opcode();
+        switch (sub) {
           case BO::BSWAP16:
-            result = Value::Int(static_cast<int64_t>(__builtin_bswap16(
-                static_cast<uint16_t>(v))));
-            break;
+            result = Value::Int(static_cast<int16_t>(__builtin_bswap16(static_cast<uint16_t>(v)))); break;
           case BO::BSWAP32:
-            result = Value::Int(static_cast<int64_t>(__builtin_bswap32(
-                static_cast<uint32_t>(v))));
-            break;
+            result = Value::Int(static_cast<int32_t>(__builtin_bswap32(static_cast<uint32_t>(v)))); break;
           case BO::BSWAP64:
-            result = Value::Int(static_cast<int64_t>(__builtin_bswap64(
-                static_cast<uint64_t>(v))));
-            break;
+            result = Value::Int(static_cast<int64_t>(__builtin_bswap64(static_cast<uint64_t>(v)))); break;
           case BO::POPCOUNT:
-            result = Value::Int(__builtin_popcountll(static_cast<uint64_t>(v)));
+            switch (op) {
+              case mx::ir::OpCode::BITWISE_8:  result = Value::Int(__builtin_popcount(static_cast<uint8_t>(v))); break;
+              case mx::ir::OpCode::BITWISE_16: result = Value::Int(__builtin_popcount(static_cast<uint16_t>(v))); break;
+              case mx::ir::OpCode::BITWISE_32: result = Value::Int(__builtin_popcount(static_cast<uint32_t>(v))); break;
+              default: result = Value::Int(__builtin_popcountll(static_cast<uint64_t>(v))); break;
+            }
             break;
           case BO::CLZ:
-            result = v ? Value::Int(__builtin_clzll(static_cast<uint64_t>(v)))
-                       : Value::Undef();
+            if (!v) { result = Value::Undef(); break; }
+            switch (op) {
+              case mx::ir::OpCode::BITWISE_8:  result = Value::Int(__builtin_clz(static_cast<uint8_t>(v)) - 24); break;
+              case mx::ir::OpCode::BITWISE_16: result = Value::Int(__builtin_clz(static_cast<uint16_t>(v)) - 16); break;
+              case mx::ir::OpCode::BITWISE_32: result = Value::Int(__builtin_clz(static_cast<uint32_t>(v))); break;
+              default: result = Value::Int(__builtin_clzll(static_cast<uint64_t>(v))); break;
+            }
             break;
           case BO::CTZ:
-            result = v ? Value::Int(__builtin_ctzll(static_cast<uint64_t>(v)))
-                       : Value::Undef();
+            if (!v) { result = Value::Undef(); break; }
+            switch (op) {
+              case mx::ir::OpCode::BITWISE_8:  result = Value::Int(__builtin_ctz(static_cast<uint8_t>(v))); break;
+              case mx::ir::OpCode::BITWISE_16: result = Value::Int(__builtin_ctz(static_cast<uint16_t>(v))); break;
+              case mx::ir::OpCode::BITWISE_32: result = Value::Int(__builtin_ctz(static_cast<uint32_t>(v))); break;
+              default: result = Value::Int(__builtin_ctzll(static_cast<uint64_t>(v))); break;
+            }
             break;
           case BO::FFS:
-            result = Value::Int(__builtin_ffsll(v));
+            switch (op) {
+              case mx::ir::OpCode::BITWISE_8:  result = Value::Int(__builtin_ffs(static_cast<uint8_t>(v))); break;
+              case mx::ir::OpCode::BITWISE_16: result = Value::Int(__builtin_ffs(static_cast<uint16_t>(v))); break;
+              case mx::ir::OpCode::BITWISE_32: result = Value::Int(__builtin_ffs(static_cast<uint32_t>(v))); break;
+              default: result = Value::Int(__builtin_ffsll(static_cast<uint64_t>(v))); break;
+            }
             break;
           case BO::PARITY:
-            result = Value::Int(__builtin_parityll(static_cast<uint64_t>(v)));
+            switch (op) {
+              case mx::ir::OpCode::BITWISE_8:  result = Value::Int(__builtin_parity(static_cast<uint8_t>(v))); break;
+              case mx::ir::OpCode::BITWISE_16: result = Value::Int(__builtin_parity(static_cast<uint16_t>(v))); break;
+              case mx::ir::OpCode::BITWISE_32: result = Value::Int(__builtin_parity(static_cast<uint32_t>(v))); break;
+              default: result = Value::Int(__builtin_parityll(static_cast<uint64_t>(v))); break;
+            }
             break;
-          case BO::ABS:
-            result = Value::Int(v < 0 ? -v : v);
+          case BO::ROTL: case BO::ROTR: {
+            Value val2 = Value::Undef();
+            int count = 0;
+            for (auto op_inst : ops) {
+              if (count == 1) { val2 = GetValue(op_inst); break; }
+              count++;
+            }
+            int64_t amount = val2.as_int();
+            if (sub == BO::ROTL) {
+              switch (op) {
+                case mx::ir::OpCode::BITWISE_8:  { uint8_t  x = static_cast<uint8_t>(v);  result = Value::Int(static_cast<int8_t>((x << (amount & 7)) | (x >> (8 - (amount & 7))))); break; }
+                case mx::ir::OpCode::BITWISE_16: { uint16_t x = static_cast<uint16_t>(v); result = Value::Int(static_cast<int16_t>((x << (amount & 15)) | (x >> (16 - (amount & 15))))); break; }
+                case mx::ir::OpCode::BITWISE_32: { uint32_t x = static_cast<uint32_t>(v); result = Value::Int(static_cast<int32_t>((x << (amount & 31)) | (x >> (32 - (amount & 31))))); break; }
+                default: { uint64_t x = static_cast<uint64_t>(v); result = Value::Int(static_cast<int64_t>((x << (amount & 63)) | (x >> (64 - (amount & 63))))); break; }
+              }
+            } else {
+              switch (op) {
+                case mx::ir::OpCode::BITWISE_8:  { uint8_t  x = static_cast<uint8_t>(v);  result = Value::Int(static_cast<int8_t>((x >> (amount & 7)) | (x << (8 - (amount & 7))))); break; }
+                case mx::ir::OpCode::BITWISE_16: { uint16_t x = static_cast<uint16_t>(v); result = Value::Int(static_cast<int16_t>((x >> (amount & 15)) | (x << (16 - (amount & 15))))); break; }
+                case mx::ir::OpCode::BITWISE_32: { uint32_t x = static_cast<uint32_t>(v); result = Value::Int(static_cast<int32_t>((x >> (amount & 31)) | (x << (32 - (amount & 31))))); break; }
+                default: { uint64_t x = static_cast<uint64_t>(v); result = Value::Int(static_cast<int64_t>((x >> (amount & 63)) | (x << (64 - (amount & 63))))); break; }
+              }
+            }
             break;
+          }
           default:
             result = val;
             break;
         }
       }
+      break;
+    }
+    // Width-specific ABS (integer absolute value).
+    case mx::ir::OpCode::ABS_8: {
+      auto u = mx::UnaryInst::from(inst);
+      if (u) { int8_t v = static_cast<int8_t>(GetValue(u->operand()).as_int()); result = Value::Int(v < 0 ? -v : v); }
+      break;
+    }
+    case mx::ir::OpCode::ABS_16: {
+      auto u = mx::UnaryInst::from(inst);
+      if (u) { int16_t v = static_cast<int16_t>(GetValue(u->operand()).as_int()); result = Value::Int(v < 0 ? -v : v); }
+      break;
+    }
+    case mx::ir::OpCode::ABS_32: {
+      auto u = mx::UnaryInst::from(inst);
+      if (u) { int32_t v = static_cast<int32_t>(GetValue(u->operand()).as_int()); result = Value::Int(v < 0 ? -v : v); }
+      break;
+    }
+    case mx::ir::OpCode::ABS_64: {
+      auto u = mx::UnaryInst::from(inst);
+      if (u) { int64_t v = GetValue(u->operand()).as_int(); result = Value::Int(v < 0 ? -v : v); }
       break;
     }
 
