@@ -162,8 +162,19 @@ FieldDecl ResolveField(const IRInstructionImpl &impl, uint64_t eid) {
 IMPL_FROM_SINGLE(ConstInst, CONST)
 IMPL_FROM_SINGLE(AllocaInst, ALLOCA)
 IMPL_FROM_SINGLE(MemoryInst, MEMORY)
-IMPL_FROM_SINGLE(GEPFieldInst, GEP_FIELD)
-IMPL_FROM_SINGLE(PtrAddInst, PTR_ADD)
+std::optional<GEPFieldInst> GEPFieldInst::from(const IRInstruction &inst) {
+  auto op = inst.opcode();
+  if (op == ir::OpCode::GEP_FIELD_32 || op == ir::OpCode::GEP_FIELD_64)
+    return GEPFieldInst(inst.impl_ptr());
+  return std::nullopt;
+}
+
+std::optional<PtrAddInst> PtrAddInst::from(const IRInstruction &inst) {
+  auto op = inst.opcode();
+  if (op == ir::OpCode::PTR_ADD_32 || op == ir::OpCode::PTR_ADD_64)
+    return PtrAddInst(inst.impl_ptr());
+  return std::nullopt;
+}
 IMPL_FROM_SINGLE(ReadModifyWriteInst, READ_MODIFY_WRITE)
 IMPL_FROM_SINGLE(CallInst, CALL)
 IMPL_FROM_SINGLE(LastValueInst, LAST_VALUE)
@@ -171,19 +182,58 @@ IMPL_FROM_SINGLE(SelectInst, SELECT)
 IMPL_FROM_SINGLE(VAStartInst, VA_START)
 IMPL_FROM_SINGLE(VAEndInst, VA_END)
 IMPL_FROM_SINGLE(VACopyInst, VA_COPY)
-IMPL_FROM_SINGLE(ParamPtrInst, PARAM_PTR)
-IMPL_FROM_SINGLE(GlobalPtrInst, GLOBAL_PTR)
-IMPL_FROM_SINGLE(ThreadLocalPtrInst, THREAD_LOCAL_PTR)
-IMPL_FROM_SINGLE(FuncPtrInst, FUNC_PTR)
+std::optional<ParamPtrInst> ParamPtrInst::from(const IRInstruction &inst) {
+  auto op = inst.opcode();
+  if (op == ir::OpCode::PARAM_PTR_32 || op == ir::OpCode::PARAM_PTR_64)
+    return ParamPtrInst(inst.impl_ptr());
+  return std::nullopt;
+}
+
+std::optional<GlobalPtrInst> GlobalPtrInst::from(const IRInstruction &inst) {
+  auto op = inst.opcode();
+  if (op == ir::OpCode::GLOBAL_PTR_32 || op == ir::OpCode::GLOBAL_PTR_64)
+    return GlobalPtrInst(inst.impl_ptr());
+  return std::nullopt;
+}
+
+std::optional<ThreadLocalPtrInst> ThreadLocalPtrInst::from(const IRInstruction &inst) {
+  auto op = inst.opcode();
+  if (op == ir::OpCode::THREAD_LOCAL_PTR_32 || op == ir::OpCode::THREAD_LOCAL_PTR_64)
+    return ThreadLocalPtrInst(inst.impl_ptr());
+  return std::nullopt;
+}
+
+std::optional<FuncPtrInst> FuncPtrInst::from(const IRInstruction &inst) {
+  auto op = inst.opcode();
+  if (op == ir::OpCode::FUNC_PTR_32 || op == ir::OpCode::FUNC_PTR_64)
+    return FuncPtrInst(inst.impl_ptr());
+  return std::nullopt;
+}
 // MultimemInst removed: merged into MemoryInst.
 IMPL_FROM_SINGLE(BitwiseOpInst, BITWISE)
 IMPL_FROM_SINGLE(FloatOpInst, FLOAT)
-IMPL_FROM_SINGLE(FramePtrInst, FRAME_PTR)
-IMPL_FROM_SINGLE(ReturnAddressInst, RETURN_ADDRESS)
+std::optional<FramePtrInst> FramePtrInst::from(const IRInstruction &inst) {
+  auto op = inst.opcode();
+  if (op == ir::OpCode::FRAME_PTR_32 || op == ir::OpCode::FRAME_PTR_64)
+    return FramePtrInst(inst.impl_ptr());
+  return std::nullopt;
+}
+
+std::optional<ReturnAddressInst> ReturnAddressInst::from(const IRInstruction &inst) {
+  auto op = inst.opcode();
+  if (op == ir::OpCode::RETURN_ADDRESS_32 || op == ir::OpCode::RETURN_ADDRESS_64)
+    return ReturnAddressInst(inst.impl_ptr());
+  return std::nullopt;
+}
 IMPL_FROM_SINGLE(EnterScopeInst, ENTER_SCOPE)
 IMPL_FROM_SINGLE(ExitScopeInst, EXIT_SCOPE)
 IMPL_FROM_SINGLE(UndefinedInst, UNDEFINED)
-IMPL_FROM_SINGLE(ReturnPtrInst, RETURN_PTR)
+std::optional<ReturnPtrInst> ReturnPtrInst::from(const IRInstruction &inst) {
+  auto op = inst.opcode();
+  if (op == ir::OpCode::RETURN_PTR_32 || op == ir::OpCode::RETURN_PTR_64)
+    return ReturnPtrInst(inst.impl_ptr());
+  return std::nullopt;
+}
 
 // ConsumeVAParamInst: matches MEMORY with CONSUME_VA_PARAM sub-opcode.
 std::optional<ConsumeVAParamInst> ConsumeVAParamInst::from(const IRInstruction &inst) {
@@ -208,7 +258,6 @@ std::optional<UnreachableInst> UnreachableInst::from(const IRInstruction &inst) 
 }
 IMPL_FROM_SINGLE(UnknownInst, UNKNOWN)
 
-// BinaryInst matches ADD..PTR_DIFF and UDIV..USHR.
 std::optional<BinaryInst> BinaryInst::from(const IRInstruction &inst) {
   auto op = inst.opcode();
   if (ir::IsBinaryOp(op))
@@ -221,7 +270,12 @@ std::optional<ComparisonInst> ComparisonInst::from(const IRInstruction &inst) {
     return ComparisonInst(inst.impl_ptr());
   return std::nullopt;
 }
-IMPL_FROM_SINGLE(PtrDiffInst, PTR_DIFF)
+std::optional<PtrDiffInst> PtrDiffInst::from(const IRInstruction &inst) {
+  auto op = inst.opcode();
+  if (op == ir::OpCode::PTR_DIFF_32 || op == ir::OpCode::PTR_DIFF_64)
+    return PtrDiffInst(inst.impl_ptr());
+  return std::nullopt;
+}
 std::optional<UnaryInst> UnaryInst::from(const IRInstruction &inst) {
   auto op = inst.opcode();
   if (ir::IsUnaryOp(op))
@@ -470,7 +524,7 @@ bool ReadModifyWriteInst::is_big_endian(void) const {
 
 bool ReadModifyWriteInst::is_atomic(void) const {
   auto op = underlying_op();
-  return op >= ir::OpCode::ATOMIC_ADD && op <= ir::OpCode::ATOMIC_EXCHANGE;
+  return op >= ir::OpCode::ATOMIC_ADD_8 && op <= ir::OpCode::ATOMIC_EXCHANGE_64;
 }
 
 bool ReadModifyWriteInst::returns_new_value(void) const {

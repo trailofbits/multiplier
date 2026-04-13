@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <memory>
 #include <multiplier/Types.h>
 #include <multiplier/IR.capnp.h>
 #include <multiplier/RPC.capnp.h>

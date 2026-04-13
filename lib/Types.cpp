@@ -56,7 +56,7 @@ static constexpr uint64_t kNumPseudoKinds = 5u;
 //   1+kNumBlockKinds..+kNumOpCodes → IRInstructionId (1 per OpCode)
 //   last                       → IRObjectId
 static constexpr uint64_t kNumBlockKinds = 17u;         // BlockKind enum count
-static constexpr uint64_t kNumOpCodes = 103u;            // OpCode enum count (FNEG_64=102)
+static constexpr uint64_t kNumOpCodes = 251u;            // OpCode enum count (ATOMIC_EXCHANGE_64=250)
 static constexpr uint64_t kNumStructureKinds = 19u;      // StructureKind enum count (EXPRESSION_SCOPE=18)
 static constexpr uint64_t kIRFunctionOffset = 0u;
 static constexpr uint64_t kIRBlockOffset = 1u;
@@ -65,7 +65,7 @@ static constexpr uint64_t kIRObjectOffset = kIRInstructionOffset + kNumOpCodes;
 static constexpr uint64_t kIRStructureOffset = kIRObjectOffset + 1u;
 static constexpr uint64_t kNumIREntityKinds = kIRStructureOffset + kNumStructureKinds;
 
-static constexpr unsigned kSubKindNumBits = 11u;
+static constexpr unsigned kSubKindNumBits = 12u;
 static_assert((kNumDeclKinds + kNumStmtKinds + kNumAttrKinds +
                kNumTokenKinds /* fragment tokens */ +
                kNumTokenKinds /* macro tokens */ +

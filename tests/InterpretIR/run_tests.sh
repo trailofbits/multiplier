@@ -36,6 +36,16 @@ TEST_FUNCS=(
   test_conditional_exec
   test_unsigned
   test_c23
+  test_float_compound
+  test_unsigned_compound
+  test_float_precision
+  test_width_arithmetic
+  test_width_comparisons
+  test_float_ops
+  test_logical_misc
+  test_width_rmw
+  test_overflow_exact
+  test_cast_precision
 )
 
 for func in "${TEST_FUNCS[@]}"; do

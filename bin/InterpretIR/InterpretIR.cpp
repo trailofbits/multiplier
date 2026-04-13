@@ -393,7 +393,8 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
     // STRING_PTR: pointer to a string literal. The interpreter allocates
     // storage keyed by the instruction's entity ID and populates it from
     // StringLiteral::bytes(). Subsequent evaluations return the same pointer.
-    case mx::ir::OpCode::STRING_PTR: {
+    case mx::ir::OpCode::STRING_PTR_32:
+    case mx::ir::OpCode::STRING_PTR_64: {
       auto inst_eid = mx::EntityId(inst.id()).Pack();
       if (memory_.find(inst_eid) == memory_.end()) {
         if (auto src = inst.source_statement()) {
@@ -966,7 +967,8 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       }
       break;
     }
-    case mx::ir::OpCode::GEP_FIELD: {
+    case mx::ir::OpCode::GEP_FIELD_32:
+    case mx::ir::OpCode::GEP_FIELD_64: {
       if (auto gep = mx::GEPFieldInst::from(inst)) {
         Value base = GetValue(gep->base());
         int64_t off = gep->byte_offset();
@@ -976,7 +978,8 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       }
       break;
     }
-    case mx::ir::OpCode::PTR_ADD: {
+    case mx::ir::OpCode::PTR_ADD_32:
+    case mx::ir::OpCode::PTR_ADD_64: {
       if (auto pa = mx::PtrAddInst::from(inst)) {
         Value base = GetValue(pa->base());
         Value idx = GetValue(pa->index());
@@ -989,23 +992,92 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       break;
     }
 
-    // --- Integer binary arithmetic ---
-    case mx::ir::OpCode::ADD: {
+    // --- Integer binary arithmetic (width-correct) ---
+    case mx::ir::OpCode::ADD_8: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Int(static_cast<int8_t>(static_cast<int8_t>(GetValue(bin->lhs()).as_int()) + static_cast<int8_t>(GetValue(bin->rhs()).as_int())));
+      break;
+    }
+    case mx::ir::OpCode::ADD_16: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Int(static_cast<int16_t>(static_cast<int16_t>(GetValue(bin->lhs()).as_int()) + static_cast<int16_t>(GetValue(bin->rhs()).as_int())));
+      break;
+    }
+    case mx::ir::OpCode::ADD_32: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Int(static_cast<int32_t>(static_cast<int32_t>(GetValue(bin->lhs()).as_int()) + static_cast<int32_t>(GetValue(bin->rhs()).as_int())));
+      break;
+    }
+    case mx::ir::OpCode::ADD_64: {
       auto bin = mx::BinaryInst::from(inst);
       if (bin) result = Value::Int(GetValue(bin->lhs()).as_int() + GetValue(bin->rhs()).as_int());
       break;
     }
-    case mx::ir::OpCode::SUB: {
+    case mx::ir::OpCode::SUB_8: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Int(static_cast<int8_t>(static_cast<int8_t>(GetValue(bin->lhs()).as_int()) - static_cast<int8_t>(GetValue(bin->rhs()).as_int())));
+      break;
+    }
+    case mx::ir::OpCode::SUB_16: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Int(static_cast<int16_t>(static_cast<int16_t>(GetValue(bin->lhs()).as_int()) - static_cast<int16_t>(GetValue(bin->rhs()).as_int())));
+      break;
+    }
+    case mx::ir::OpCode::SUB_32: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Int(static_cast<int32_t>(static_cast<int32_t>(GetValue(bin->lhs()).as_int()) - static_cast<int32_t>(GetValue(bin->rhs()).as_int())));
+      break;
+    }
+    case mx::ir::OpCode::SUB_64: {
       auto bin = mx::BinaryInst::from(inst);
       if (bin) result = Value::Int(GetValue(bin->lhs()).as_int() - GetValue(bin->rhs()).as_int());
       break;
     }
-    case mx::ir::OpCode::MUL: {
+    case mx::ir::OpCode::MUL_8: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Int(static_cast<int8_t>(static_cast<int8_t>(GetValue(bin->lhs()).as_int()) * static_cast<int8_t>(GetValue(bin->rhs()).as_int())));
+      break;
+    }
+    case mx::ir::OpCode::MUL_16: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Int(static_cast<int16_t>(static_cast<int16_t>(GetValue(bin->lhs()).as_int()) * static_cast<int16_t>(GetValue(bin->rhs()).as_int())));
+      break;
+    }
+    case mx::ir::OpCode::MUL_32: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Int(static_cast<int32_t>(static_cast<int32_t>(GetValue(bin->lhs()).as_int()) * static_cast<int32_t>(GetValue(bin->rhs()).as_int())));
+      break;
+    }
+    case mx::ir::OpCode::MUL_64: {
       auto bin = mx::BinaryInst::from(inst);
       if (bin) result = Value::Int(GetValue(bin->lhs()).as_int() * GetValue(bin->rhs()).as_int());
       break;
     }
-    case mx::ir::OpCode::DIV: {
+    case mx::ir::OpCode::DIV_8: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) {
+        int8_t r = static_cast<int8_t>(GetValue(bin->rhs()).as_int());
+        result = Value::Int(r ? static_cast<int8_t>(static_cast<int8_t>(GetValue(bin->lhs()).as_int()) / r) : 0);
+      }
+      break;
+    }
+    case mx::ir::OpCode::DIV_16: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) {
+        int16_t r = static_cast<int16_t>(GetValue(bin->rhs()).as_int());
+        result = Value::Int(r ? static_cast<int16_t>(static_cast<int16_t>(GetValue(bin->lhs()).as_int()) / r) : 0);
+      }
+      break;
+    }
+    case mx::ir::OpCode::DIV_32: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) {
+        int32_t r = static_cast<int32_t>(GetValue(bin->rhs()).as_int());
+        result = Value::Int(r ? static_cast<int32_t>(static_cast<int32_t>(GetValue(bin->lhs()).as_int()) / r) : 0);
+      }
+      break;
+    }
+    case mx::ir::OpCode::DIV_64: {
       auto bin = mx::BinaryInst::from(inst);
       if (bin) {
         int64_t r = GetValue(bin->rhs()).as_int();
@@ -1013,7 +1085,31 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       }
       break;
     }
-    case mx::ir::OpCode::REM: {
+    case mx::ir::OpCode::REM_8: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) {
+        int8_t r = static_cast<int8_t>(GetValue(bin->rhs()).as_int());
+        result = Value::Int(r ? static_cast<int8_t>(static_cast<int8_t>(GetValue(bin->lhs()).as_int()) % r) : 0);
+      }
+      break;
+    }
+    case mx::ir::OpCode::REM_16: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) {
+        int16_t r = static_cast<int16_t>(GetValue(bin->rhs()).as_int());
+        result = Value::Int(r ? static_cast<int16_t>(static_cast<int16_t>(GetValue(bin->lhs()).as_int()) % r) : 0);
+      }
+      break;
+    }
+    case mx::ir::OpCode::REM_32: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) {
+        int32_t r = static_cast<int32_t>(GetValue(bin->rhs()).as_int());
+        result = Value::Int(r ? static_cast<int32_t>(static_cast<int32_t>(GetValue(bin->lhs()).as_int()) % r) : 0);
+      }
+      break;
+    }
+    case mx::ir::OpCode::REM_64: {
       auto bin = mx::BinaryInst::from(inst);
       if (bin) {
         int64_t r = GetValue(bin->rhs()).as_int();
@@ -1023,109 +1119,247 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
     }
 
     // --- Float binary arithmetic ---
-    case mx::ir::OpCode::FADD_32:
+    case mx::ir::OpCode::FADD_32: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Float(static_cast<float>(GetValue(bin->lhs()).as_float()) + static_cast<float>(GetValue(bin->rhs()).as_float()));
+      break;
+    }
     case mx::ir::OpCode::FADD_64: {
       auto bin = mx::BinaryInst::from(inst);
       if (bin) result = Value::Float(GetValue(bin->lhs()).as_float() + GetValue(bin->rhs()).as_float());
       break;
     }
-    case mx::ir::OpCode::FSUB_32:
+    case mx::ir::OpCode::FSUB_32: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Float(static_cast<float>(GetValue(bin->lhs()).as_float()) - static_cast<float>(GetValue(bin->rhs()).as_float()));
+      break;
+    }
     case mx::ir::OpCode::FSUB_64: {
       auto bin = mx::BinaryInst::from(inst);
       if (bin) result = Value::Float(GetValue(bin->lhs()).as_float() - GetValue(bin->rhs()).as_float());
       break;
     }
-    case mx::ir::OpCode::FMUL_32:
+    case mx::ir::OpCode::FMUL_32: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Float(static_cast<float>(GetValue(bin->lhs()).as_float()) * static_cast<float>(GetValue(bin->rhs()).as_float()));
+      break;
+    }
     case mx::ir::OpCode::FMUL_64: {
       auto bin = mx::BinaryInst::from(inst);
       if (bin) result = Value::Float(GetValue(bin->lhs()).as_float() * GetValue(bin->rhs()).as_float());
       break;
     }
-    case mx::ir::OpCode::FDIV_32:
+    case mx::ir::OpCode::FDIV_32: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Float(static_cast<float>(GetValue(bin->lhs()).as_float()) / static_cast<float>(GetValue(bin->rhs()).as_float()));
+      break;
+    }
     case mx::ir::OpCode::FDIV_64: {
       auto bin = mx::BinaryInst::from(inst);
       if (bin) result = Value::Float(GetValue(bin->lhs()).as_float() / GetValue(bin->rhs()).as_float());
       break;
     }
-    case mx::ir::OpCode::FREM_32:
+    case mx::ir::OpCode::FREM_32: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Float(std::fmodf(static_cast<float>(GetValue(bin->lhs()).as_float()), static_cast<float>(GetValue(bin->rhs()).as_float())));
+      break;
+    }
     case mx::ir::OpCode::FREM_64: {
       auto bin = mx::BinaryInst::from(inst);
       if (bin) result = Value::Float(std::fmod(GetValue(bin->lhs()).as_float(), GetValue(bin->rhs()).as_float()));
       break;
     }
-    case mx::ir::OpCode::BIT_AND: {
+    case mx::ir::OpCode::BIT_AND_8: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Int(static_cast<int8_t>(GetValue(bin->lhs()).as_int() & GetValue(bin->rhs()).as_int()));
+      break;
+    }
+    case mx::ir::OpCode::BIT_AND_16: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Int(static_cast<int16_t>(GetValue(bin->lhs()).as_int() & GetValue(bin->rhs()).as_int()));
+      break;
+    }
+    case mx::ir::OpCode::BIT_AND_32: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Int(static_cast<int32_t>(GetValue(bin->lhs()).as_int() & GetValue(bin->rhs()).as_int()));
+      break;
+    }
+    case mx::ir::OpCode::BIT_AND_64: {
       auto bin = mx::BinaryInst::from(inst);
       if (bin) result = Value::Int(GetValue(bin->lhs()).as_int() & GetValue(bin->rhs()).as_int());
       break;
     }
-    case mx::ir::OpCode::BIT_OR: {
+    case mx::ir::OpCode::BIT_OR_8: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Int(static_cast<int8_t>(GetValue(bin->lhs()).as_int() | GetValue(bin->rhs()).as_int()));
+      break;
+    }
+    case mx::ir::OpCode::BIT_OR_16: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Int(static_cast<int16_t>(GetValue(bin->lhs()).as_int() | GetValue(bin->rhs()).as_int()));
+      break;
+    }
+    case mx::ir::OpCode::BIT_OR_32: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Int(static_cast<int32_t>(GetValue(bin->lhs()).as_int() | GetValue(bin->rhs()).as_int()));
+      break;
+    }
+    case mx::ir::OpCode::BIT_OR_64: {
       auto bin = mx::BinaryInst::from(inst);
       if (bin) result = Value::Int(GetValue(bin->lhs()).as_int() | GetValue(bin->rhs()).as_int());
       break;
     }
-    case mx::ir::OpCode::BIT_XOR: {
+    case mx::ir::OpCode::BIT_XOR_8: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Int(static_cast<int8_t>(GetValue(bin->lhs()).as_int() ^ GetValue(bin->rhs()).as_int()));
+      break;
+    }
+    case mx::ir::OpCode::BIT_XOR_16: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Int(static_cast<int16_t>(GetValue(bin->lhs()).as_int() ^ GetValue(bin->rhs()).as_int()));
+      break;
+    }
+    case mx::ir::OpCode::BIT_XOR_32: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Int(static_cast<int32_t>(GetValue(bin->lhs()).as_int() ^ GetValue(bin->rhs()).as_int()));
+      break;
+    }
+    case mx::ir::OpCode::BIT_XOR_64: {
       auto bin = mx::BinaryInst::from(inst);
       if (bin) result = Value::Int(GetValue(bin->lhs()).as_int() ^ GetValue(bin->rhs()).as_int());
       break;
     }
-    case mx::ir::OpCode::SHL: {
+    case mx::ir::OpCode::SHL_8: {
       auto bin = mx::BinaryInst::from(inst);
-      if (bin) result = Value::Int(GetValue(bin->lhs()).as_int() << GetValue(bin->rhs()).as_int());
+      if (bin) result = Value::Int(static_cast<int8_t>(static_cast<int8_t>(GetValue(bin->lhs()).as_int()) << (GetValue(bin->rhs()).as_int() & 7)));
       break;
     }
-    case mx::ir::OpCode::SHR: {
+    case mx::ir::OpCode::SHL_16: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Int(static_cast<int16_t>(static_cast<int16_t>(GetValue(bin->lhs()).as_int()) << (GetValue(bin->rhs()).as_int() & 15)));
+      break;
+    }
+    case mx::ir::OpCode::SHL_32: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Int(static_cast<int32_t>(static_cast<int32_t>(GetValue(bin->lhs()).as_int()) << (GetValue(bin->rhs()).as_int() & 31)));
+      break;
+    }
+    case mx::ir::OpCode::SHL_64: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Int(GetValue(bin->lhs()).as_int() << (GetValue(bin->rhs()).as_int() & 63));
+      break;
+    }
+    case mx::ir::OpCode::SHR_8: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Int(static_cast<int8_t>(GetValue(bin->lhs()).as_int()) >> (GetValue(bin->rhs()).as_int() & 7));
+      break;
+    }
+    case mx::ir::OpCode::SHR_16: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Int(static_cast<int16_t>(GetValue(bin->lhs()).as_int()) >> (GetValue(bin->rhs()).as_int() & 15));
+      break;
+    }
+    case mx::ir::OpCode::SHR_32: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Int(static_cast<int32_t>(GetValue(bin->lhs()).as_int()) >> (GetValue(bin->rhs()).as_int() & 31));
+      break;
+    }
+    case mx::ir::OpCode::SHR_64: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Int(GetValue(bin->lhs()).as_int() >> (GetValue(bin->rhs()).as_int() & 63));
+      break;
+    }
+    // Unsigned arithmetic: per-width cases.
+    case mx::ir::OpCode::UDIV_8: {
       auto bin = mx::BinaryInst::from(inst);
       if (bin) {
-        // Arithmetic shift right (sign-extending).
-        result = Value::Int(GetValue(bin->lhs()).as_int() >> GetValue(bin->rhs()).as_int());
+        uint8_t l = static_cast<uint8_t>(GetValue(bin->lhs()).as_int());
+        uint8_t r = static_cast<uint8_t>(GetValue(bin->rhs()).as_int());
+        result = Value::Int(static_cast<int8_t>(r ? l / r : 0));
       }
       break;
     }
-    // Unsigned arithmetic.
-    // Unsigned arithmetic: width-aware. The operand width (in bytes) is
-    // stored in int_pool[0]. Values are masked to the correct width before
-    // the unsigned operation, then sign-extended back to int64.
-    case mx::ir::OpCode::UDIV:
-    case mx::ir::OpCode::UREM:
-    case mx::ir::OpCode::USHR: {
+    case mx::ir::OpCode::UDIV_16: {
       auto bin = mx::BinaryInst::from(inst);
       if (bin) {
-        int64_t lv = GetValue(bin->lhs()).as_int();
-        int64_t rv = GetValue(bin->rhs()).as_int();
-
-        // Get operand width from result type.
-        unsigned width_bytes = 8;  // default 64-bit
-        auto rt = bin->result_type();
-        if (auto bits = rt.size_in_bits()) {
-          width_bytes = static_cast<unsigned>((*bits + 7) / 8);
-        }
-
-        // Mask to width for unsigned interpretation.
-        uint64_t mask = (width_bytes >= 8) ? ~uint64_t{0}
-                        : ((uint64_t{1} << (width_bytes * 8)) - 1);
-        uint64_t l = static_cast<uint64_t>(lv) & mask;
-        uint64_t r = static_cast<uint64_t>(rv) & mask;
-
-        uint64_t res = 0;
-        if (op == mx::ir::OpCode::UDIV) {
-          res = r != 0 ? l / r : 0;
-        } else if (op == mx::ir::OpCode::UREM) {
-          res = r != 0 ? l % r : 0;
-        } else {  // USHR
-          res = l >> (r & 63);
-        }
-
-        // Sign-extend result back to int64 (to match LOAD representation).
-        res &= mask;
-        int64_t sres = static_cast<int64_t>(res);
-        switch (width_bytes) {
-          case 1: sres = static_cast<int64_t>(static_cast<int8_t>(res)); break;
-          case 2: sres = static_cast<int64_t>(static_cast<int16_t>(res)); break;
-          case 4: sres = static_cast<int64_t>(static_cast<int32_t>(res)); break;
-          default: break;
-        }
-        result = Value::Int(sres);
+        uint16_t l = static_cast<uint16_t>(GetValue(bin->lhs()).as_int());
+        uint16_t r = static_cast<uint16_t>(GetValue(bin->rhs()).as_int());
+        result = Value::Int(static_cast<int16_t>(r ? l / r : 0));
       }
+      break;
+    }
+    case mx::ir::OpCode::UDIV_32: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) {
+        uint32_t l = static_cast<uint32_t>(GetValue(bin->lhs()).as_int());
+        uint32_t r = static_cast<uint32_t>(GetValue(bin->rhs()).as_int());
+        result = Value::Int(static_cast<int32_t>(r ? l / r : 0));
+      }
+      break;
+    }
+    case mx::ir::OpCode::UDIV_64: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) {
+        uint64_t l = static_cast<uint64_t>(GetValue(bin->lhs()).as_int());
+        uint64_t r = static_cast<uint64_t>(GetValue(bin->rhs()).as_int());
+        result = Value::Int(static_cast<int64_t>(r ? l / r : 0));
+      }
+      break;
+    }
+    case mx::ir::OpCode::UREM_8: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) {
+        uint8_t l = static_cast<uint8_t>(GetValue(bin->lhs()).as_int());
+        uint8_t r = static_cast<uint8_t>(GetValue(bin->rhs()).as_int());
+        result = Value::Int(static_cast<int8_t>(r ? l % r : 0));
+      }
+      break;
+    }
+    case mx::ir::OpCode::UREM_16: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) {
+        uint16_t l = static_cast<uint16_t>(GetValue(bin->lhs()).as_int());
+        uint16_t r = static_cast<uint16_t>(GetValue(bin->rhs()).as_int());
+        result = Value::Int(static_cast<int16_t>(r ? l % r : 0));
+      }
+      break;
+    }
+    case mx::ir::OpCode::UREM_32: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) {
+        uint32_t l = static_cast<uint32_t>(GetValue(bin->lhs()).as_int());
+        uint32_t r = static_cast<uint32_t>(GetValue(bin->rhs()).as_int());
+        result = Value::Int(static_cast<int32_t>(r ? l % r : 0));
+      }
+      break;
+    }
+    case mx::ir::OpCode::UREM_64: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) {
+        uint64_t l = static_cast<uint64_t>(GetValue(bin->lhs()).as_int());
+        uint64_t r = static_cast<uint64_t>(GetValue(bin->rhs()).as_int());
+        result = Value::Int(static_cast<int64_t>(r ? l % r : 0));
+      }
+      break;
+    }
+    case mx::ir::OpCode::USHR_8: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Int(static_cast<int8_t>(static_cast<uint8_t>(GetValue(bin->lhs()).as_int()) >> (GetValue(bin->rhs()).as_int() & 7)));
+      break;
+    }
+    case mx::ir::OpCode::USHR_16: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Int(static_cast<int16_t>(static_cast<uint16_t>(GetValue(bin->lhs()).as_int()) >> (GetValue(bin->rhs()).as_int() & 15)));
+      break;
+    }
+    case mx::ir::OpCode::USHR_32: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Int(static_cast<int32_t>(static_cast<uint32_t>(GetValue(bin->lhs()).as_int()) >> (GetValue(bin->rhs()).as_int() & 31)));
+      break;
+    }
+    case mx::ir::OpCode::USHR_64: {
+      auto bin = mx::BinaryInst::from(inst);
+      if (bin) result = Value::Int(static_cast<int64_t>(static_cast<uint64_t>(GetValue(bin->lhs()).as_int()) >> (GetValue(bin->rhs()).as_int() & 63)));
       break;
     }
     case mx::ir::OpCode::LOGICAL_AND: {
@@ -1148,7 +1382,8 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       }
       break;
     }
-    case mx::ir::OpCode::PTR_DIFF: {
+    case mx::ir::OpCode::PTR_DIFF_32:
+    case mx::ir::OpCode::PTR_DIFF_64: {
       auto pd = mx::PtrDiffInst::from(inst);
       if (pd) {
         Value l = GetValue(pd->lhs()), r = GetValue(pd->rhs());
@@ -1162,104 +1397,742 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       break;
     }
 
-    // --- Comparisons (signed, unsigned, and float) ---
-    case mx::ir::OpCode::CMP_EQ:
-    case mx::ir::OpCode::CMP_NE:
-    case mx::ir::OpCode::CMP_LT:
-    case mx::ir::OpCode::CMP_LE:
-    case mx::ir::OpCode::CMP_GT:
-    case mx::ir::OpCode::CMP_GE:
-    case mx::ir::OpCode::UCMP_LT:
-    case mx::ir::OpCode::UCMP_LE:
-    case mx::ir::OpCode::UCMP_GT:
-    case mx::ir::OpCode::UCMP_GE:
-    case mx::ir::OpCode::FCMP_EQ_32: case mx::ir::OpCode::FCMP_EQ_64:
-    case mx::ir::OpCode::FCMP_NE_32: case mx::ir::OpCode::FCMP_NE_64:
-    case mx::ir::OpCode::FCMP_LT_32: case mx::ir::OpCode::FCMP_LT_64:
-    case mx::ir::OpCode::FCMP_LE_32: case mx::ir::OpCode::FCMP_LE_64:
-    case mx::ir::OpCode::FCMP_GT_32: case mx::ir::OpCode::FCMP_GT_64:
-    case mx::ir::OpCode::FCMP_GE_32: case mx::ir::OpCode::FCMP_GE_64: {
+    // --- Signed equality (width-correct) ---
+    case mx::ir::OpCode::CMP_EQ_8: {
       auto cmp = mx::ComparisonInst::from(inst);
       if (cmp) {
         Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
-        bool use_ptr = (l.kind == Value::POINTER || r.kind == Value::POINTER);
-        bool res = false;
-        if (mx::ir::IsFloatComparison(op)) {
-          double lv = l.as_float(), rv = r.as_float();
-          // Width-specific FCMP pairs are adjacent (32, 64), so strip width
-          // by mapping to the base comparison kind.
-          unsigned base = (static_cast<unsigned>(op) -
-                           static_cast<unsigned>(mx::ir::OpCode::FCMP_EQ_32)) / 2;
-          switch (base) {
-            case 0: res = lv == rv; break;  // EQ
-            case 1: res = lv != rv; break;  // NE
-            case 2: res = lv < rv; break;   // LT
-            case 3: res = lv <= rv; break;  // LE
-            case 4: res = lv > rv; break;   // GT
-            case 5: res = lv >= rv; break;  // GE
-            default: break;
-          }
-        } else if (use_ptr) {
-          // Pointer comparison: compare (object_id, offset) pairs.
-          // Same object: compare offsets. Different objects: compare object IDs.
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
           auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
           auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
-          // For equality, both object_id and offset must match.
-          // For ordering, same-object compares offset; cross-object compares ID.
-          auto lval = (lp.object_id == rp.object_id)
-                          ? lp.offset : static_cast<int64_t>(lp.object_id);
-          auto rval = (lp.object_id == rp.object_id)
-                          ? rp.offset : static_cast<int64_t>(rp.object_id);
-          switch (op) {
-            case mx::ir::OpCode::CMP_EQ:
-              res = (lp.object_id == rp.object_id && lp.offset == rp.offset); break;
-            case mx::ir::OpCode::CMP_NE:
-              res = (lp.object_id != rp.object_id || lp.offset != rp.offset); break;
-            case mx::ir::OpCode::CMP_LT: case mx::ir::OpCode::UCMP_LT: res = lval < rval; break;
-            case mx::ir::OpCode::CMP_LE: case mx::ir::OpCode::UCMP_LE: res = lval <= rval; break;
-            case mx::ir::OpCode::CMP_GT: case mx::ir::OpCode::UCMP_GT: res = lval > rval; break;
-            case mx::ir::OpCode::CMP_GE: case mx::ir::OpCode::UCMP_GE: res = lval >= rval; break;
-            default: break;
-          }
-        } else if (op >= mx::ir::OpCode::UCMP_LT) {
-          uint64_t lv = l.as_uint(), rv = r.as_uint();
-          switch (op) {
-            case mx::ir::OpCode::UCMP_LT: res = lv < rv; break;
-            case mx::ir::OpCode::UCMP_LE: res = lv <= rv; break;
-            case mx::ir::OpCode::UCMP_GT: res = lv > rv; break;
-            case mx::ir::OpCode::UCMP_GE: res = lv >= rv; break;
-            default: break;
-          }
+          result = Value::Int((lp.object_id == rp.object_id && lp.offset == rp.offset) ? 1 : 0);
         } else {
-          int64_t lv = l.as_int(), rv = r.as_int();
-          switch (op) {
-            case mx::ir::OpCode::CMP_EQ: res = lv == rv; break;
-            case mx::ir::OpCode::CMP_NE: res = lv != rv; break;
-            case mx::ir::OpCode::CMP_LT: res = lv < rv; break;
-            case mx::ir::OpCode::CMP_LE: res = lv <= rv; break;
-            case mx::ir::OpCode::CMP_GT: res = lv > rv; break;
-            case mx::ir::OpCode::CMP_GE: res = lv >= rv; break;
-            default: break;
-          }
+          result = Value::Int(static_cast<int8_t>(l.as_int()) == static_cast<int8_t>(r.as_int()) ? 1 : 0);
         }
-        result = Value::Int(res ? 1 : 0);
       }
+      break;
+    }
+    case mx::ir::OpCode::CMP_EQ_16: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          result = Value::Int((lp.object_id == rp.object_id && lp.offset == rp.offset) ? 1 : 0);
+        } else {
+          result = Value::Int(static_cast<int16_t>(l.as_int()) == static_cast<int16_t>(r.as_int()) ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::CMP_EQ_32: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          result = Value::Int((lp.object_id == rp.object_id && lp.offset == rp.offset) ? 1 : 0);
+        } else {
+          result = Value::Int(static_cast<int32_t>(l.as_int()) == static_cast<int32_t>(r.as_int()) ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::CMP_EQ_64: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          result = Value::Int((lp.object_id == rp.object_id && lp.offset == rp.offset) ? 1 : 0);
+        } else {
+          result = Value::Int(l.as_int() == r.as_int() ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::CMP_NE_8: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          result = Value::Int((lp.object_id != rp.object_id || lp.offset != rp.offset) ? 1 : 0);
+        } else {
+          result = Value::Int(static_cast<int8_t>(l.as_int()) != static_cast<int8_t>(r.as_int()) ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::CMP_NE_16: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          result = Value::Int((lp.object_id != rp.object_id || lp.offset != rp.offset) ? 1 : 0);
+        } else {
+          result = Value::Int(static_cast<int16_t>(l.as_int()) != static_cast<int16_t>(r.as_int()) ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::CMP_NE_32: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          result = Value::Int((lp.object_id != rp.object_id || lp.offset != rp.offset) ? 1 : 0);
+        } else {
+          result = Value::Int(static_cast<int32_t>(l.as_int()) != static_cast<int32_t>(r.as_int()) ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::CMP_NE_64: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          result = Value::Int((lp.object_id != rp.object_id || lp.offset != rp.offset) ? 1 : 0);
+        } else {
+          result = Value::Int(l.as_int() != r.as_int() ? 1 : 0);
+        }
+      }
+      break;
+    }
+    // --- Signed ordering (width-correct) ---
+    case mx::ir::OpCode::CMP_LT_8: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          auto lval = (lp.object_id == rp.object_id) ? lp.offset : static_cast<int64_t>(lp.object_id);
+          auto rval = (lp.object_id == rp.object_id) ? rp.offset : static_cast<int64_t>(rp.object_id);
+          result = Value::Int(lval < rval ? 1 : 0);
+        } else {
+          result = Value::Int(static_cast<int8_t>(l.as_int()) < static_cast<int8_t>(r.as_int()) ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::CMP_LT_16: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          auto lval = (lp.object_id == rp.object_id) ? lp.offset : static_cast<int64_t>(lp.object_id);
+          auto rval = (lp.object_id == rp.object_id) ? rp.offset : static_cast<int64_t>(rp.object_id);
+          result = Value::Int(lval < rval ? 1 : 0);
+        } else {
+          result = Value::Int(static_cast<int16_t>(l.as_int()) < static_cast<int16_t>(r.as_int()) ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::CMP_LT_32: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          auto lval = (lp.object_id == rp.object_id) ? lp.offset : static_cast<int64_t>(lp.object_id);
+          auto rval = (lp.object_id == rp.object_id) ? rp.offset : static_cast<int64_t>(rp.object_id);
+          result = Value::Int(lval < rval ? 1 : 0);
+        } else {
+          result = Value::Int(static_cast<int32_t>(l.as_int()) < static_cast<int32_t>(r.as_int()) ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::CMP_LT_64: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          auto lval = (lp.object_id == rp.object_id) ? lp.offset : static_cast<int64_t>(lp.object_id);
+          auto rval = (lp.object_id == rp.object_id) ? rp.offset : static_cast<int64_t>(rp.object_id);
+          result = Value::Int(lval < rval ? 1 : 0);
+        } else {
+          result = Value::Int(l.as_int() < r.as_int() ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::CMP_LE_8: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          auto lval = (lp.object_id == rp.object_id) ? lp.offset : static_cast<int64_t>(lp.object_id);
+          auto rval = (lp.object_id == rp.object_id) ? rp.offset : static_cast<int64_t>(rp.object_id);
+          result = Value::Int(lval <= rval ? 1 : 0);
+        } else {
+          result = Value::Int(static_cast<int8_t>(l.as_int()) <= static_cast<int8_t>(r.as_int()) ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::CMP_LE_16: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          auto lval = (lp.object_id == rp.object_id) ? lp.offset : static_cast<int64_t>(lp.object_id);
+          auto rval = (lp.object_id == rp.object_id) ? rp.offset : static_cast<int64_t>(rp.object_id);
+          result = Value::Int(lval <= rval ? 1 : 0);
+        } else {
+          result = Value::Int(static_cast<int16_t>(l.as_int()) <= static_cast<int16_t>(r.as_int()) ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::CMP_LE_32: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          auto lval = (lp.object_id == rp.object_id) ? lp.offset : static_cast<int64_t>(lp.object_id);
+          auto rval = (lp.object_id == rp.object_id) ? rp.offset : static_cast<int64_t>(rp.object_id);
+          result = Value::Int(lval <= rval ? 1 : 0);
+        } else {
+          result = Value::Int(static_cast<int32_t>(l.as_int()) <= static_cast<int32_t>(r.as_int()) ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::CMP_LE_64: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          auto lval = (lp.object_id == rp.object_id) ? lp.offset : static_cast<int64_t>(lp.object_id);
+          auto rval = (lp.object_id == rp.object_id) ? rp.offset : static_cast<int64_t>(rp.object_id);
+          result = Value::Int(lval <= rval ? 1 : 0);
+        } else {
+          result = Value::Int(l.as_int() <= r.as_int() ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::CMP_GT_8: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          auto lval = (lp.object_id == rp.object_id) ? lp.offset : static_cast<int64_t>(lp.object_id);
+          auto rval = (lp.object_id == rp.object_id) ? rp.offset : static_cast<int64_t>(rp.object_id);
+          result = Value::Int(lval > rval ? 1 : 0);
+        } else {
+          result = Value::Int(static_cast<int8_t>(l.as_int()) > static_cast<int8_t>(r.as_int()) ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::CMP_GT_16: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          auto lval = (lp.object_id == rp.object_id) ? lp.offset : static_cast<int64_t>(lp.object_id);
+          auto rval = (lp.object_id == rp.object_id) ? rp.offset : static_cast<int64_t>(rp.object_id);
+          result = Value::Int(lval > rval ? 1 : 0);
+        } else {
+          result = Value::Int(static_cast<int16_t>(l.as_int()) > static_cast<int16_t>(r.as_int()) ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::CMP_GT_32: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          auto lval = (lp.object_id == rp.object_id) ? lp.offset : static_cast<int64_t>(lp.object_id);
+          auto rval = (lp.object_id == rp.object_id) ? rp.offset : static_cast<int64_t>(rp.object_id);
+          result = Value::Int(lval > rval ? 1 : 0);
+        } else {
+          result = Value::Int(static_cast<int32_t>(l.as_int()) > static_cast<int32_t>(r.as_int()) ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::CMP_GT_64: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          auto lval = (lp.object_id == rp.object_id) ? lp.offset : static_cast<int64_t>(lp.object_id);
+          auto rval = (lp.object_id == rp.object_id) ? rp.offset : static_cast<int64_t>(rp.object_id);
+          result = Value::Int(lval > rval ? 1 : 0);
+        } else {
+          result = Value::Int(l.as_int() > r.as_int() ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::CMP_GE_8: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          auto lval = (lp.object_id == rp.object_id) ? lp.offset : static_cast<int64_t>(lp.object_id);
+          auto rval = (lp.object_id == rp.object_id) ? rp.offset : static_cast<int64_t>(rp.object_id);
+          result = Value::Int(lval >= rval ? 1 : 0);
+        } else {
+          result = Value::Int(static_cast<int8_t>(l.as_int()) >= static_cast<int8_t>(r.as_int()) ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::CMP_GE_16: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          auto lval = (lp.object_id == rp.object_id) ? lp.offset : static_cast<int64_t>(lp.object_id);
+          auto rval = (lp.object_id == rp.object_id) ? rp.offset : static_cast<int64_t>(rp.object_id);
+          result = Value::Int(lval >= rval ? 1 : 0);
+        } else {
+          result = Value::Int(static_cast<int16_t>(l.as_int()) >= static_cast<int16_t>(r.as_int()) ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::CMP_GE_32: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          auto lval = (lp.object_id == rp.object_id) ? lp.offset : static_cast<int64_t>(lp.object_id);
+          auto rval = (lp.object_id == rp.object_id) ? rp.offset : static_cast<int64_t>(rp.object_id);
+          result = Value::Int(lval >= rval ? 1 : 0);
+        } else {
+          result = Value::Int(static_cast<int32_t>(l.as_int()) >= static_cast<int32_t>(r.as_int()) ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::CMP_GE_64: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          auto lval = (lp.object_id == rp.object_id) ? lp.offset : static_cast<int64_t>(lp.object_id);
+          auto rval = (lp.object_id == rp.object_id) ? rp.offset : static_cast<int64_t>(rp.object_id);
+          result = Value::Int(lval >= rval ? 1 : 0);
+        } else {
+          result = Value::Int(l.as_int() >= r.as_int() ? 1 : 0);
+        }
+      }
+      break;
+    }
+    // --- Unsigned ordering (width-correct) ---
+    case mx::ir::OpCode::UCMP_LT_8: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          auto lval = (lp.object_id == rp.object_id) ? lp.offset : static_cast<int64_t>(lp.object_id);
+          auto rval = (lp.object_id == rp.object_id) ? rp.offset : static_cast<int64_t>(rp.object_id);
+          result = Value::Int(lval < rval ? 1 : 0);
+        } else {
+          result = Value::Int(static_cast<uint8_t>(l.as_int()) < static_cast<uint8_t>(r.as_int()) ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::UCMP_LT_16: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          auto lval = (lp.object_id == rp.object_id) ? lp.offset : static_cast<int64_t>(lp.object_id);
+          auto rval = (lp.object_id == rp.object_id) ? rp.offset : static_cast<int64_t>(rp.object_id);
+          result = Value::Int(lval < rval ? 1 : 0);
+        } else {
+          result = Value::Int(static_cast<uint16_t>(l.as_int()) < static_cast<uint16_t>(r.as_int()) ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::UCMP_LT_32: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          auto lval = (lp.object_id == rp.object_id) ? lp.offset : static_cast<int64_t>(lp.object_id);
+          auto rval = (lp.object_id == rp.object_id) ? rp.offset : static_cast<int64_t>(rp.object_id);
+          result = Value::Int(lval < rval ? 1 : 0);
+        } else {
+          result = Value::Int(static_cast<uint32_t>(l.as_int()) < static_cast<uint32_t>(r.as_int()) ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::UCMP_LT_64: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          auto lval = (lp.object_id == rp.object_id) ? lp.offset : static_cast<int64_t>(lp.object_id);
+          auto rval = (lp.object_id == rp.object_id) ? rp.offset : static_cast<int64_t>(rp.object_id);
+          result = Value::Int(lval < rval ? 1 : 0);
+        } else {
+          result = Value::Int(l.as_uint() < r.as_uint() ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::UCMP_LE_8: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          auto lval = (lp.object_id == rp.object_id) ? lp.offset : static_cast<int64_t>(lp.object_id);
+          auto rval = (lp.object_id == rp.object_id) ? rp.offset : static_cast<int64_t>(rp.object_id);
+          result = Value::Int(lval <= rval ? 1 : 0);
+        } else {
+          result = Value::Int(static_cast<uint8_t>(l.as_int()) <= static_cast<uint8_t>(r.as_int()) ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::UCMP_LE_16: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          auto lval = (lp.object_id == rp.object_id) ? lp.offset : static_cast<int64_t>(lp.object_id);
+          auto rval = (lp.object_id == rp.object_id) ? rp.offset : static_cast<int64_t>(rp.object_id);
+          result = Value::Int(lval <= rval ? 1 : 0);
+        } else {
+          result = Value::Int(static_cast<uint16_t>(l.as_int()) <= static_cast<uint16_t>(r.as_int()) ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::UCMP_LE_32: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          auto lval = (lp.object_id == rp.object_id) ? lp.offset : static_cast<int64_t>(lp.object_id);
+          auto rval = (lp.object_id == rp.object_id) ? rp.offset : static_cast<int64_t>(rp.object_id);
+          result = Value::Int(lval <= rval ? 1 : 0);
+        } else {
+          result = Value::Int(static_cast<uint32_t>(l.as_int()) <= static_cast<uint32_t>(r.as_int()) ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::UCMP_LE_64: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          auto lval = (lp.object_id == rp.object_id) ? lp.offset : static_cast<int64_t>(lp.object_id);
+          auto rval = (lp.object_id == rp.object_id) ? rp.offset : static_cast<int64_t>(rp.object_id);
+          result = Value::Int(lval <= rval ? 1 : 0);
+        } else {
+          result = Value::Int(l.as_uint() <= r.as_uint() ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::UCMP_GT_8: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          auto lval = (lp.object_id == rp.object_id) ? lp.offset : static_cast<int64_t>(lp.object_id);
+          auto rval = (lp.object_id == rp.object_id) ? rp.offset : static_cast<int64_t>(rp.object_id);
+          result = Value::Int(lval > rval ? 1 : 0);
+        } else {
+          result = Value::Int(static_cast<uint8_t>(l.as_int()) > static_cast<uint8_t>(r.as_int()) ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::UCMP_GT_16: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          auto lval = (lp.object_id == rp.object_id) ? lp.offset : static_cast<int64_t>(lp.object_id);
+          auto rval = (lp.object_id == rp.object_id) ? rp.offset : static_cast<int64_t>(rp.object_id);
+          result = Value::Int(lval > rval ? 1 : 0);
+        } else {
+          result = Value::Int(static_cast<uint16_t>(l.as_int()) > static_cast<uint16_t>(r.as_int()) ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::UCMP_GT_32: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          auto lval = (lp.object_id == rp.object_id) ? lp.offset : static_cast<int64_t>(lp.object_id);
+          auto rval = (lp.object_id == rp.object_id) ? rp.offset : static_cast<int64_t>(rp.object_id);
+          result = Value::Int(lval > rval ? 1 : 0);
+        } else {
+          result = Value::Int(static_cast<uint32_t>(l.as_int()) > static_cast<uint32_t>(r.as_int()) ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::UCMP_GT_64: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          auto lval = (lp.object_id == rp.object_id) ? lp.offset : static_cast<int64_t>(lp.object_id);
+          auto rval = (lp.object_id == rp.object_id) ? rp.offset : static_cast<int64_t>(rp.object_id);
+          result = Value::Int(lval > rval ? 1 : 0);
+        } else {
+          result = Value::Int(l.as_uint() > r.as_uint() ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::UCMP_GE_8: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          auto lval = (lp.object_id == rp.object_id) ? lp.offset : static_cast<int64_t>(lp.object_id);
+          auto rval = (lp.object_id == rp.object_id) ? rp.offset : static_cast<int64_t>(rp.object_id);
+          result = Value::Int(lval >= rval ? 1 : 0);
+        } else {
+          result = Value::Int(static_cast<uint8_t>(l.as_int()) >= static_cast<uint8_t>(r.as_int()) ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::UCMP_GE_16: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          auto lval = (lp.object_id == rp.object_id) ? lp.offset : static_cast<int64_t>(lp.object_id);
+          auto rval = (lp.object_id == rp.object_id) ? rp.offset : static_cast<int64_t>(rp.object_id);
+          result = Value::Int(lval >= rval ? 1 : 0);
+        } else {
+          result = Value::Int(static_cast<uint16_t>(l.as_int()) >= static_cast<uint16_t>(r.as_int()) ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::UCMP_GE_32: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          auto lval = (lp.object_id == rp.object_id) ? lp.offset : static_cast<int64_t>(lp.object_id);
+          auto rval = (lp.object_id == rp.object_id) ? rp.offset : static_cast<int64_t>(rp.object_id);
+          result = Value::Int(lval >= rval ? 1 : 0);
+        } else {
+          result = Value::Int(static_cast<uint32_t>(l.as_int()) >= static_cast<uint32_t>(r.as_int()) ? 1 : 0);
+        }
+      }
+      break;
+    }
+    case mx::ir::OpCode::UCMP_GE_64: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) {
+        Value l = GetValue(cmp->lhs()), r = GetValue(cmp->rhs());
+        if (l.kind == Value::POINTER || r.kind == Value::POINTER) {
+          auto lp = l.kind == Value::POINTER ? l.ptr : Pointer{0, l.as_int()};
+          auto rp = r.kind == Value::POINTER ? r.ptr : Pointer{0, r.as_int()};
+          auto lval = (lp.object_id == rp.object_id) ? lp.offset : static_cast<int64_t>(lp.object_id);
+          auto rval = (lp.object_id == rp.object_id) ? rp.offset : static_cast<int64_t>(rp.object_id);
+          result = Value::Int(lval >= rval ? 1 : 0);
+        } else {
+          result = Value::Int(l.as_uint() >= r.as_uint() ? 1 : 0);
+        }
+      }
+      break;
+    }
+    // --- Float comparisons ---
+    case mx::ir::OpCode::FCMP_EQ_32: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) result = Value::Int(static_cast<float>(GetValue(cmp->lhs()).as_float()) == static_cast<float>(GetValue(cmp->rhs()).as_float()) ? 1 : 0);
+      break;
+    }
+    case mx::ir::OpCode::FCMP_EQ_64: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) result = Value::Int(GetValue(cmp->lhs()).as_float() == GetValue(cmp->rhs()).as_float() ? 1 : 0);
+      break;
+    }
+    case mx::ir::OpCode::FCMP_NE_32: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) result = Value::Int(static_cast<float>(GetValue(cmp->lhs()).as_float()) != static_cast<float>(GetValue(cmp->rhs()).as_float()) ? 1 : 0);
+      break;
+    }
+    case mx::ir::OpCode::FCMP_NE_64: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) result = Value::Int(GetValue(cmp->lhs()).as_float() != GetValue(cmp->rhs()).as_float() ? 1 : 0);
+      break;
+    }
+    case mx::ir::OpCode::FCMP_LT_32: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) result = Value::Int(static_cast<float>(GetValue(cmp->lhs()).as_float()) < static_cast<float>(GetValue(cmp->rhs()).as_float()) ? 1 : 0);
+      break;
+    }
+    case mx::ir::OpCode::FCMP_LT_64: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) result = Value::Int(GetValue(cmp->lhs()).as_float() < GetValue(cmp->rhs()).as_float() ? 1 : 0);
+      break;
+    }
+    case mx::ir::OpCode::FCMP_LE_32: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) result = Value::Int(static_cast<float>(GetValue(cmp->lhs()).as_float()) <= static_cast<float>(GetValue(cmp->rhs()).as_float()) ? 1 : 0);
+      break;
+    }
+    case mx::ir::OpCode::FCMP_LE_64: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) result = Value::Int(GetValue(cmp->lhs()).as_float() <= GetValue(cmp->rhs()).as_float() ? 1 : 0);
+      break;
+    }
+    case mx::ir::OpCode::FCMP_GT_32: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) result = Value::Int(static_cast<float>(GetValue(cmp->lhs()).as_float()) > static_cast<float>(GetValue(cmp->rhs()).as_float()) ? 1 : 0);
+      break;
+    }
+    case mx::ir::OpCode::FCMP_GT_64: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) result = Value::Int(GetValue(cmp->lhs()).as_float() > GetValue(cmp->rhs()).as_float() ? 1 : 0);
+      break;
+    }
+    case mx::ir::OpCode::FCMP_GE_32: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) result = Value::Int(static_cast<float>(GetValue(cmp->lhs()).as_float()) >= static_cast<float>(GetValue(cmp->rhs()).as_float()) ? 1 : 0);
+      break;
+    }
+    case mx::ir::OpCode::FCMP_GE_64: {
+      auto cmp = mx::ComparisonInst::from(inst);
+      if (cmp) result = Value::Int(GetValue(cmp->lhs()).as_float() >= GetValue(cmp->rhs()).as_float() ? 1 : 0);
       break;
     }
 
     // --- Unary ---
-    case mx::ir::OpCode::NEG: {
+    case mx::ir::OpCode::NEG_8: {
+      auto u = mx::UnaryInst::from(inst);
+      if (u) result = Value::Int(static_cast<int8_t>(-static_cast<int8_t>(GetValue(u->operand()).as_int())));
+      break;
+    }
+    case mx::ir::OpCode::NEG_16: {
+      auto u = mx::UnaryInst::from(inst);
+      if (u) result = Value::Int(static_cast<int16_t>(-static_cast<int16_t>(GetValue(u->operand()).as_int())));
+      break;
+    }
+    case mx::ir::OpCode::NEG_32: {
+      auto u = mx::UnaryInst::from(inst);
+      if (u) result = Value::Int(static_cast<int32_t>(-static_cast<int32_t>(GetValue(u->operand()).as_int())));
+      break;
+    }
+    case mx::ir::OpCode::NEG_64: {
       auto u = mx::UnaryInst::from(inst);
       if (u) result = Value::Int(-GetValue(u->operand()).as_int());
       break;
     }
-    case mx::ir::OpCode::FNEG_32:
+    case mx::ir::OpCode::FNEG_32: {
+      auto u = mx::UnaryInst::from(inst);
+      if (u) result = Value::Float(-static_cast<float>(GetValue(u->operand()).as_float()));
+      break;
+    }
     case mx::ir::OpCode::FNEG_64: {
       auto u = mx::UnaryInst::from(inst);
       if (u) result = Value::Float(-GetValue(u->operand()).as_float());
       break;
     }
-    case mx::ir::OpCode::BIT_NOT: {
+    case mx::ir::OpCode::BIT_NOT_8: {
+      auto u = mx::UnaryInst::from(inst);
+      if (u) result = Value::Int(static_cast<int8_t>(~static_cast<int8_t>(GetValue(u->operand()).as_int())));
+      break;
+    }
+    case mx::ir::OpCode::BIT_NOT_16: {
+      auto u = mx::UnaryInst::from(inst);
+      if (u) result = Value::Int(static_cast<int16_t>(~static_cast<int16_t>(GetValue(u->operand()).as_int())));
+      break;
+    }
+    case mx::ir::OpCode::BIT_NOT_32: {
+      auto u = mx::UnaryInst::from(inst);
+      if (u) result = Value::Int(static_cast<int32_t>(~static_cast<int32_t>(GetValue(u->operand()).as_int())));
+      break;
+    }
+    case mx::ir::OpCode::BIT_NOT_64: {
       auto u = mx::UnaryInst::from(inst);
       if (u) result = Value::Int(~GetValue(u->operand()).as_int());
       break;
@@ -1276,42 +2149,143 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       if (c) {
         auto sub = c->sub_opcode();
         Value v = GetValue(c->operand());
-        if (sub == mx::ir::CastOp::BITCAST || sub == mx::ir::CastOp::IDENTITY) {
+        if (sub == mx::ir::CastOp::IDENTITY) {
           result = v;
-        } else if (sub >= mx::ir::CastOp::PTR_TO_I32 &&
-                   sub <= mx::ir::CastOp::PTR_TO_I64) {
+        } else if (sub == mx::ir::CastOp::BITCAST) {
+          // Reinterpret bits: float↔int of same size.
+          if (v.kind == Value::FLOATING) {
+            // float/double bits → int
+            int64_t bits;
+            std::memcpy(&bits, &v.fval, sizeof(bits));
+            result = Value::Int(bits);
+          } else if (v.kind == Value::INTEGER) {
+            // int bits → float/double
+            double fv;
+            std::memcpy(&fv, &v.ival, sizeof(fv));
+            result = Value::Float(fv);
+          } else {
+            result = v;
+          }
+        } else if (sub == mx::ir::CastOp::PTR_TO_I32) {
+          int64_t iv = v.kind == Value::POINTER ? v.ptr.offset : v.ival;
+          result = Value::Int(static_cast<int32_t>(iv));
+        } else if (sub == mx::ir::CastOp::PTR_TO_I64) {
           result = Value::Int(v.kind == Value::POINTER ? v.ptr.offset : v.ival);
-        } else if (sub >= mx::ir::CastOp::I32_TO_PTR &&
-                   sub <= mx::ir::CastOp::I64_TO_PTR) {
+        } else if (sub == mx::ir::CastOp::I32_TO_PTR) {
+          result = Value::Ptr(mx::kInvalidEntityId, static_cast<int32_t>(v.as_int()));
+        } else if (sub == mx::ir::CastOp::I64_TO_PTR) {
           result = Value::Ptr(mx::kInvalidEntityId, v.as_int());
         } else if (mx::ir::IsFloatToInt(sub)) {
-          // If input is INTEGER (raw double bits from a LOAD), reinterpret.
           double fv;
           if (v.kind == Value::FLOATING) {
             fv = v.fval;
           } else {
-            // Raw bits → double.
             uint64_t bits = static_cast<uint64_t>(v.ival);
             std::memcpy(&fv, &bits, sizeof(fv));
           }
-          result = Value::Int(static_cast<int64_t>(fv));
+          // Use float precision for F32_TO_* sources.
+          if (sub >= mx::ir::CastOp::F32_TO_SI8 &&
+              sub <= mx::ir::CastOp::F32_TO_SI64) {
+            fv = static_cast<float>(fv);
+          } else if (sub >= mx::ir::CastOp::F32_TO_UI8 &&
+                     sub <= mx::ir::CastOp::F32_TO_UI64) {
+            fv = static_cast<float>(fv);
+          }
+          switch (sub) {
+            case mx::ir::CastOp::F32_TO_SI8:  case mx::ir::CastOp::F64_TO_SI8:
+              result = Value::Int(static_cast<int8_t>(fv)); break;
+            case mx::ir::CastOp::F32_TO_SI16: case mx::ir::CastOp::F64_TO_SI16:
+              result = Value::Int(static_cast<int16_t>(fv)); break;
+            case mx::ir::CastOp::F32_TO_SI32: case mx::ir::CastOp::F64_TO_SI32:
+              result = Value::Int(static_cast<int32_t>(fv)); break;
+            case mx::ir::CastOp::F32_TO_SI64: case mx::ir::CastOp::F64_TO_SI64:
+              result = Value::Int(static_cast<int64_t>(fv)); break;
+            case mx::ir::CastOp::F32_TO_UI8:  case mx::ir::CastOp::F64_TO_UI8:
+              result = Value::Int(static_cast<int64_t>(static_cast<uint8_t>(fv))); break;
+            case mx::ir::CastOp::F32_TO_UI16: case mx::ir::CastOp::F64_TO_UI16:
+              result = Value::Int(static_cast<int64_t>(static_cast<uint16_t>(fv))); break;
+            case mx::ir::CastOp::F32_TO_UI32: case mx::ir::CastOp::F64_TO_UI32:
+              result = Value::Int(static_cast<int64_t>(static_cast<uint32_t>(fv))); break;
+            case mx::ir::CastOp::F32_TO_UI64: case mx::ir::CastOp::F64_TO_UI64:
+              result = Value::Int(static_cast<int64_t>(static_cast<uint64_t>(fv))); break;
+            default:
+              result = Value::Int(static_cast<int64_t>(fv)); break;
+          }
         } else if (mx::ir::IsIntToFloat(sub)) {
-          result = Value::Float(static_cast<double>(v.as_int()));
-        } else if (sub == mx::ir::CastOp::F32_TO_F64 ||
-                   sub == mx::ir::CastOp::F64_TO_F32) {
+          // Width-correct int→float: cast to source width, then to float/double.
+          switch (sub) {
+            case mx::ir::CastOp::SI8_TO_F32:
+              result = Value::Float(static_cast<float>(static_cast<int8_t>(v.as_int()))); break;
+            case mx::ir::CastOp::SI8_TO_F64:
+              result = Value::Float(static_cast<double>(static_cast<int8_t>(v.as_int()))); break;
+            case mx::ir::CastOp::SI16_TO_F32:
+              result = Value::Float(static_cast<float>(static_cast<int16_t>(v.as_int()))); break;
+            case mx::ir::CastOp::SI16_TO_F64:
+              result = Value::Float(static_cast<double>(static_cast<int16_t>(v.as_int()))); break;
+            case mx::ir::CastOp::SI32_TO_F32:
+              result = Value::Float(static_cast<float>(static_cast<int32_t>(v.as_int()))); break;
+            case mx::ir::CastOp::SI32_TO_F64:
+              result = Value::Float(static_cast<double>(static_cast<int32_t>(v.as_int()))); break;
+            case mx::ir::CastOp::SI64_TO_F32:
+              result = Value::Float(static_cast<float>(v.as_int())); break;
+            case mx::ir::CastOp::SI64_TO_F64:
+              result = Value::Float(static_cast<double>(v.as_int())); break;
+            case mx::ir::CastOp::UI8_TO_F32:
+              result = Value::Float(static_cast<float>(static_cast<uint8_t>(v.as_int()))); break;
+            case mx::ir::CastOp::UI8_TO_F64:
+              result = Value::Float(static_cast<double>(static_cast<uint8_t>(v.as_int()))); break;
+            case mx::ir::CastOp::UI16_TO_F32:
+              result = Value::Float(static_cast<float>(static_cast<uint16_t>(v.as_int()))); break;
+            case mx::ir::CastOp::UI16_TO_F64:
+              result = Value::Float(static_cast<double>(static_cast<uint16_t>(v.as_int()))); break;
+            case mx::ir::CastOp::UI32_TO_F32:
+              result = Value::Float(static_cast<float>(static_cast<uint32_t>(v.as_int()))); break;
+            case mx::ir::CastOp::UI32_TO_F64:
+              result = Value::Float(static_cast<double>(static_cast<uint32_t>(v.as_int()))); break;
+            case mx::ir::CastOp::UI64_TO_F32:
+              result = Value::Float(static_cast<float>(static_cast<uint64_t>(v.as_int()))); break;
+            case mx::ir::CastOp::UI64_TO_F64:
+              result = Value::Float(static_cast<double>(static_cast<uint64_t>(v.as_int()))); break;
+            default:
+              result = Value::Float(static_cast<double>(v.as_int())); break;
+          }
+        } else if (sub == mx::ir::CastOp::F64_TO_F32) {
+          double fv;
           if (v.kind == Value::FLOATING) {
-            result = Value::Float(v.fval);
+            fv = v.fval;
           } else {
-            // Raw bits → float.
-            double fv;
             uint64_t bits = static_cast<uint64_t>(v.ival);
             std::memcpy(&fv, &bits, sizeof(fv));
-            result = Value::Float(fv);
+          }
+          result = Value::Float(static_cast<float>(fv));
+        } else if (sub == mx::ir::CastOp::F32_TO_F64) {
+          if (v.kind == Value::FLOATING) {
+            result = Value::Float(v.fval);  // already double internally
+          } else {
+            float fv;
+            uint32_t bits = static_cast<uint32_t>(v.ival);
+            std::memcpy(&fv, &bits, sizeof(fv));
+            result = Value::Float(static_cast<double>(fv));
           }
         } else if (mx::ir::IsSignExtend(sub)) {
-          // Sign-extend: LOADs already sign-extend to int64, so SEXT is
-          // a no-op (the value is already correctly sign-extended).
-          result = Value::Int(v.as_int());
+          // Sign-extend: cast to source signed type to get correct sign.
+          int64_t iv = v.as_int();
+          switch (sub) {
+            case mx::ir::CastOp::SEXT_I8_I16:
+            case mx::ir::CastOp::SEXT_I8_I32:
+            case mx::ir::CastOp::SEXT_I8_I64:
+              iv = static_cast<int8_t>(iv);
+              break;
+            case mx::ir::CastOp::SEXT_I16_I32:
+            case mx::ir::CastOp::SEXT_I16_I64:
+              iv = static_cast<int16_t>(iv);
+              break;
+            case mx::ir::CastOp::SEXT_I32_I64:
+              iv = static_cast<int32_t>(iv);
+              break;
+            default: break;
+          }
+          result = Value::Int(iv);
         } else if (mx::ir::IsZeroExtend(sub)) {
           // Zero-extend: mask to source width (undoing sign-extension from LOAD).
           int64_t iv = v.as_int();
@@ -1332,20 +2306,19 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
           }
           result = Value::Int(iv);
         } else if (mx::ir::IsTruncate(sub)) {
-          // Truncate: mask to target width.
           int64_t iv = v.as_int();
           switch (sub) {
             case mx::ir::CastOp::TRUNC_I16_I8:
             case mx::ir::CastOp::TRUNC_I32_I8:
             case mx::ir::CastOp::TRUNC_I64_I8:
-              iv = iv & 0xFF;
+              iv = static_cast<int8_t>(iv);
               break;
             case mx::ir::CastOp::TRUNC_I32_I16:
             case mx::ir::CastOp::TRUNC_I64_I16:
-              iv = iv & 0xFFFF;
+              iv = static_cast<int16_t>(iv);
               break;
             case mx::ir::CastOp::TRUNC_I64_I32:
-              iv = iv & 0xFFFFFFFF;
+              iv = static_cast<int32_t>(iv);
               break;
             default: break;
           }
@@ -1369,7 +2342,10 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
           if (it != memory_.end() && it->second.bytes.size() <= 8) {
             access_sz = it->second.bytes.size();
           }
-          Value old_val = MemReadValue(addr.ptr, access_sz, false);
+          // Determine if the underlying op is float to read correctly.
+          auto underlying = rmw->underlying_op();
+          bool rmw_is_float = mx::ir::IsFloatArithmetic(underlying);
+          Value old_val = MemReadValue(addr.ptr, access_sz, rmw_is_float);
           // Collect RHS operands (typically one value).
           Value rhs = Value::Int(0);
           for (auto rhs_op : rmw->rhs_operands()) {
@@ -1377,26 +2353,213 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
             break;  // Use first RHS operand.
           }
           Value new_val;
-          auto underlying = rmw->underlying_op();
           switch (underlying) {
-            case mx::ir::OpCode::ADD: new_val = Value::Int(old_val.as_int() + rhs.as_int()); break;
-            case mx::ir::OpCode::SUB: new_val = Value::Int(old_val.as_int() - rhs.as_int()); break;
-            case mx::ir::OpCode::MUL: new_val = Value::Int(old_val.as_int() * rhs.as_int()); break;
-            case mx::ir::OpCode::DIV: new_val = Value::Int(rhs.as_int() ? old_val.as_int() / rhs.as_int() : 0); break;
-            case mx::ir::OpCode::REM: new_val = Value::Int(rhs.as_int() ? old_val.as_int() % rhs.as_int() : 0); break;
-            case mx::ir::OpCode::BIT_AND: new_val = Value::Int(old_val.as_int() & rhs.as_int()); break;
-            case mx::ir::OpCode::BIT_OR: new_val = Value::Int(old_val.as_int() | rhs.as_int()); break;
-            case mx::ir::OpCode::BIT_XOR: new_val = Value::Int(old_val.as_int() ^ rhs.as_int()); break;
-            case mx::ir::OpCode::SHL: new_val = Value::Int(old_val.as_int() << rhs.as_int()); break;
-            case mx::ir::OpCode::SHR: new_val = Value::Int(old_val.as_int() >> rhs.as_int()); break;
-            case mx::ir::OpCode::ATOMIC_ADD: new_val = Value::Int(old_val.as_int() + rhs.as_int()); break;
-            case mx::ir::OpCode::ATOMIC_SUB: new_val = Value::Int(old_val.as_int() - rhs.as_int()); break;
-            case mx::ir::OpCode::ATOMIC_AND: new_val = Value::Int(old_val.as_int() & rhs.as_int()); break;
-            case mx::ir::OpCode::ATOMIC_OR: new_val = Value::Int(old_val.as_int() | rhs.as_int()); break;
-            case mx::ir::OpCode::ATOMIC_XOR: new_val = Value::Int(old_val.as_int() ^ rhs.as_int()); break;
-            case mx::ir::OpCode::ATOMIC_NAND: new_val = Value::Int(~(old_val.as_int() & rhs.as_int())); break;
-            case mx::ir::OpCode::ATOMIC_EXCHANGE: new_val = rhs; break;
-            case mx::ir::OpCode::PTR_ADD: {
+            case mx::ir::OpCode::ADD_8:
+              new_val = Value::Int(static_cast<int8_t>(static_cast<int8_t>(old_val.as_int()) + static_cast<int8_t>(rhs.as_int()))); break;
+            case mx::ir::OpCode::ADD_16:
+              new_val = Value::Int(static_cast<int16_t>(static_cast<int16_t>(old_val.as_int()) + static_cast<int16_t>(rhs.as_int()))); break;
+            case mx::ir::OpCode::ADD_32:
+              new_val = Value::Int(static_cast<int32_t>(static_cast<int32_t>(old_val.as_int()) + static_cast<int32_t>(rhs.as_int()))); break;
+            case mx::ir::OpCode::ADD_64:
+              new_val = Value::Int(old_val.as_int() + rhs.as_int()); break;
+            case mx::ir::OpCode::SUB_8:
+              new_val = Value::Int(static_cast<int8_t>(static_cast<int8_t>(old_val.as_int()) - static_cast<int8_t>(rhs.as_int()))); break;
+            case mx::ir::OpCode::SUB_16:
+              new_val = Value::Int(static_cast<int16_t>(static_cast<int16_t>(old_val.as_int()) - static_cast<int16_t>(rhs.as_int()))); break;
+            case mx::ir::OpCode::SUB_32:
+              new_val = Value::Int(static_cast<int32_t>(static_cast<int32_t>(old_val.as_int()) - static_cast<int32_t>(rhs.as_int()))); break;
+            case mx::ir::OpCode::SUB_64:
+              new_val = Value::Int(old_val.as_int() - rhs.as_int()); break;
+            case mx::ir::OpCode::MUL_8:
+              new_val = Value::Int(static_cast<int8_t>(static_cast<int8_t>(old_val.as_int()) * static_cast<int8_t>(rhs.as_int()))); break;
+            case mx::ir::OpCode::MUL_16:
+              new_val = Value::Int(static_cast<int16_t>(static_cast<int16_t>(old_val.as_int()) * static_cast<int16_t>(rhs.as_int()))); break;
+            case mx::ir::OpCode::MUL_32:
+              new_val = Value::Int(static_cast<int32_t>(static_cast<int32_t>(old_val.as_int()) * static_cast<int32_t>(rhs.as_int()))); break;
+            case mx::ir::OpCode::MUL_64:
+              new_val = Value::Int(old_val.as_int() * rhs.as_int()); break;
+            case mx::ir::OpCode::DIV_8: {
+              int8_t r = static_cast<int8_t>(rhs.as_int());
+              new_val = Value::Int(r ? static_cast<int8_t>(static_cast<int8_t>(old_val.as_int()) / r) : 0); break;
+            }
+            case mx::ir::OpCode::DIV_16: {
+              int16_t r = static_cast<int16_t>(rhs.as_int());
+              new_val = Value::Int(r ? static_cast<int16_t>(static_cast<int16_t>(old_val.as_int()) / r) : 0); break;
+            }
+            case mx::ir::OpCode::DIV_32: {
+              int32_t r = static_cast<int32_t>(rhs.as_int());
+              new_val = Value::Int(r ? static_cast<int32_t>(static_cast<int32_t>(old_val.as_int()) / r) : 0); break;
+            }
+            case mx::ir::OpCode::DIV_64:
+              new_val = Value::Int(rhs.as_int() ? old_val.as_int() / rhs.as_int() : 0); break;
+            case mx::ir::OpCode::REM_8: {
+              int8_t r = static_cast<int8_t>(rhs.as_int());
+              new_val = Value::Int(r ? static_cast<int8_t>(static_cast<int8_t>(old_val.as_int()) % r) : 0); break;
+            }
+            case mx::ir::OpCode::REM_16: {
+              int16_t r = static_cast<int16_t>(rhs.as_int());
+              new_val = Value::Int(r ? static_cast<int16_t>(static_cast<int16_t>(old_val.as_int()) % r) : 0); break;
+            }
+            case mx::ir::OpCode::REM_32: {
+              int32_t r = static_cast<int32_t>(rhs.as_int());
+              new_val = Value::Int(r ? static_cast<int32_t>(static_cast<int32_t>(old_val.as_int()) % r) : 0); break;
+            }
+            case mx::ir::OpCode::REM_64:
+              new_val = Value::Int(rhs.as_int() ? old_val.as_int() % rhs.as_int() : 0); break;
+            case mx::ir::OpCode::BIT_AND_8:
+              new_val = Value::Int(static_cast<int8_t>(old_val.as_int() & rhs.as_int())); break;
+            case mx::ir::OpCode::BIT_AND_16:
+              new_val = Value::Int(static_cast<int16_t>(old_val.as_int() & rhs.as_int())); break;
+            case mx::ir::OpCode::BIT_AND_32:
+              new_val = Value::Int(static_cast<int32_t>(old_val.as_int() & rhs.as_int())); break;
+            case mx::ir::OpCode::BIT_AND_64:
+              new_val = Value::Int(old_val.as_int() & rhs.as_int()); break;
+            case mx::ir::OpCode::BIT_OR_8:
+              new_val = Value::Int(static_cast<int8_t>(old_val.as_int() | rhs.as_int())); break;
+            case mx::ir::OpCode::BIT_OR_16:
+              new_val = Value::Int(static_cast<int16_t>(old_val.as_int() | rhs.as_int())); break;
+            case mx::ir::OpCode::BIT_OR_32:
+              new_val = Value::Int(static_cast<int32_t>(old_val.as_int() | rhs.as_int())); break;
+            case mx::ir::OpCode::BIT_OR_64:
+              new_val = Value::Int(old_val.as_int() | rhs.as_int()); break;
+            case mx::ir::OpCode::BIT_XOR_8:
+              new_val = Value::Int(static_cast<int8_t>(old_val.as_int() ^ rhs.as_int())); break;
+            case mx::ir::OpCode::BIT_XOR_16:
+              new_val = Value::Int(static_cast<int16_t>(old_val.as_int() ^ rhs.as_int())); break;
+            case mx::ir::OpCode::BIT_XOR_32:
+              new_val = Value::Int(static_cast<int32_t>(old_val.as_int() ^ rhs.as_int())); break;
+            case mx::ir::OpCode::BIT_XOR_64:
+              new_val = Value::Int(old_val.as_int() ^ rhs.as_int()); break;
+            case mx::ir::OpCode::SHL_8:
+              new_val = Value::Int(static_cast<int8_t>(static_cast<int8_t>(old_val.as_int()) << (rhs.as_int() & 7))); break;
+            case mx::ir::OpCode::SHL_16:
+              new_val = Value::Int(static_cast<int16_t>(static_cast<int16_t>(old_val.as_int()) << (rhs.as_int() & 15))); break;
+            case mx::ir::OpCode::SHL_32:
+              new_val = Value::Int(static_cast<int32_t>(static_cast<int32_t>(old_val.as_int()) << (rhs.as_int() & 31))); break;
+            case mx::ir::OpCode::SHL_64:
+              new_val = Value::Int(old_val.as_int() << (rhs.as_int() & 63)); break;
+            case mx::ir::OpCode::SHR_8:
+              new_val = Value::Int(static_cast<int8_t>(old_val.as_int()) >> (rhs.as_int() & 7)); break;
+            case mx::ir::OpCode::SHR_16:
+              new_val = Value::Int(static_cast<int16_t>(old_val.as_int()) >> (rhs.as_int() & 15)); break;
+            case mx::ir::OpCode::SHR_32:
+              new_val = Value::Int(static_cast<int32_t>(old_val.as_int()) >> (rhs.as_int() & 31)); break;
+            case mx::ir::OpCode::SHR_64:
+              new_val = Value::Int(old_val.as_int() >> (rhs.as_int() & 63)); break;
+            case mx::ir::OpCode::UDIV_8: {
+              uint8_t l = static_cast<uint8_t>(old_val.as_int()), r = static_cast<uint8_t>(rhs.as_int());
+              new_val = Value::Int(r ? l / r : 0); break;
+            }
+            case mx::ir::OpCode::UDIV_16: {
+              uint16_t l = static_cast<uint16_t>(old_val.as_int()), r = static_cast<uint16_t>(rhs.as_int());
+              new_val = Value::Int(r ? l / r : 0); break;
+            }
+            case mx::ir::OpCode::UDIV_32: {
+              uint32_t l = static_cast<uint32_t>(old_val.as_int()), r = static_cast<uint32_t>(rhs.as_int());
+              new_val = Value::Int(r ? l / r : 0); break;
+            }
+            case mx::ir::OpCode::UDIV_64: {
+              uint64_t l = static_cast<uint64_t>(old_val.as_int()), r = static_cast<uint64_t>(rhs.as_int());
+              new_val = Value::Int(static_cast<int64_t>(r ? l / r : 0)); break;
+            }
+            case mx::ir::OpCode::UREM_8: {
+              uint8_t l = static_cast<uint8_t>(old_val.as_int()), r = static_cast<uint8_t>(rhs.as_int());
+              new_val = Value::Int(r ? l % r : 0); break;
+            }
+            case mx::ir::OpCode::UREM_16: {
+              uint16_t l = static_cast<uint16_t>(old_val.as_int()), r = static_cast<uint16_t>(rhs.as_int());
+              new_val = Value::Int(r ? l % r : 0); break;
+            }
+            case mx::ir::OpCode::UREM_32: {
+              uint32_t l = static_cast<uint32_t>(old_val.as_int()), r = static_cast<uint32_t>(rhs.as_int());
+              new_val = Value::Int(r ? l % r : 0); break;
+            }
+            case mx::ir::OpCode::UREM_64: {
+              uint64_t l = static_cast<uint64_t>(old_val.as_int()), r = static_cast<uint64_t>(rhs.as_int());
+              new_val = Value::Int(static_cast<int64_t>(r ? l % r : 0)); break;
+            }
+            case mx::ir::OpCode::USHR_8:
+              new_val = Value::Int(static_cast<int8_t>(static_cast<uint8_t>(old_val.as_int()) >> (rhs.as_int() & 7))); break;
+            case mx::ir::OpCode::USHR_16:
+              new_val = Value::Int(static_cast<int16_t>(static_cast<uint16_t>(old_val.as_int()) >> (rhs.as_int() & 15))); break;
+            case mx::ir::OpCode::USHR_32:
+              new_val = Value::Int(static_cast<int32_t>(static_cast<uint32_t>(old_val.as_int()) >> (rhs.as_int() & 31))); break;
+            case mx::ir::OpCode::USHR_64:
+              new_val = Value::Int(static_cast<int64_t>(
+                  static_cast<uint64_t>(old_val.as_int()) >> (rhs.as_int() & 63))); break;
+            case mx::ir::OpCode::ATOMIC_ADD_8:
+              new_val = Value::Int(static_cast<int8_t>(static_cast<int8_t>(old_val.as_int()) + static_cast<int8_t>(rhs.as_int()))); break;
+            case mx::ir::OpCode::ATOMIC_ADD_16:
+              new_val = Value::Int(static_cast<int16_t>(static_cast<int16_t>(old_val.as_int()) + static_cast<int16_t>(rhs.as_int()))); break;
+            case mx::ir::OpCode::ATOMIC_ADD_32:
+              new_val = Value::Int(static_cast<int32_t>(static_cast<int32_t>(old_val.as_int()) + static_cast<int32_t>(rhs.as_int()))); break;
+            case mx::ir::OpCode::ATOMIC_ADD_64:
+              new_val = Value::Int(old_val.as_int() + rhs.as_int()); break;
+            case mx::ir::OpCode::ATOMIC_SUB_8:
+              new_val = Value::Int(static_cast<int8_t>(static_cast<int8_t>(old_val.as_int()) - static_cast<int8_t>(rhs.as_int()))); break;
+            case mx::ir::OpCode::ATOMIC_SUB_16:
+              new_val = Value::Int(static_cast<int16_t>(static_cast<int16_t>(old_val.as_int()) - static_cast<int16_t>(rhs.as_int()))); break;
+            case mx::ir::OpCode::ATOMIC_SUB_32:
+              new_val = Value::Int(static_cast<int32_t>(static_cast<int32_t>(old_val.as_int()) - static_cast<int32_t>(rhs.as_int()))); break;
+            case mx::ir::OpCode::ATOMIC_SUB_64:
+              new_val = Value::Int(old_val.as_int() - rhs.as_int()); break;
+            case mx::ir::OpCode::ATOMIC_AND_8:
+              new_val = Value::Int(static_cast<int8_t>(old_val.as_int() & rhs.as_int())); break;
+            case mx::ir::OpCode::ATOMIC_AND_16:
+              new_val = Value::Int(static_cast<int16_t>(old_val.as_int() & rhs.as_int())); break;
+            case mx::ir::OpCode::ATOMIC_AND_32:
+              new_val = Value::Int(static_cast<int32_t>(old_val.as_int() & rhs.as_int())); break;
+            case mx::ir::OpCode::ATOMIC_AND_64:
+              new_val = Value::Int(old_val.as_int() & rhs.as_int()); break;
+            case mx::ir::OpCode::ATOMIC_OR_8:
+              new_val = Value::Int(static_cast<int8_t>(old_val.as_int() | rhs.as_int())); break;
+            case mx::ir::OpCode::ATOMIC_OR_16:
+              new_val = Value::Int(static_cast<int16_t>(old_val.as_int() | rhs.as_int())); break;
+            case mx::ir::OpCode::ATOMIC_OR_32:
+              new_val = Value::Int(static_cast<int32_t>(old_val.as_int() | rhs.as_int())); break;
+            case mx::ir::OpCode::ATOMIC_OR_64:
+              new_val = Value::Int(old_val.as_int() | rhs.as_int()); break;
+            case mx::ir::OpCode::ATOMIC_XOR_8:
+              new_val = Value::Int(static_cast<int8_t>(old_val.as_int() ^ rhs.as_int())); break;
+            case mx::ir::OpCode::ATOMIC_XOR_16:
+              new_val = Value::Int(static_cast<int16_t>(old_val.as_int() ^ rhs.as_int())); break;
+            case mx::ir::OpCode::ATOMIC_XOR_32:
+              new_val = Value::Int(static_cast<int32_t>(old_val.as_int() ^ rhs.as_int())); break;
+            case mx::ir::OpCode::ATOMIC_XOR_64:
+              new_val = Value::Int(old_val.as_int() ^ rhs.as_int()); break;
+            case mx::ir::OpCode::ATOMIC_NAND_8:
+              new_val = Value::Int(static_cast<int8_t>(~(old_val.as_int() & rhs.as_int()))); break;
+            case mx::ir::OpCode::ATOMIC_NAND_16:
+              new_val = Value::Int(static_cast<int16_t>(~(old_val.as_int() & rhs.as_int()))); break;
+            case mx::ir::OpCode::ATOMIC_NAND_32:
+              new_val = Value::Int(static_cast<int32_t>(~(old_val.as_int() & rhs.as_int()))); break;
+            case mx::ir::OpCode::ATOMIC_NAND_64:
+              new_val = Value::Int(~(old_val.as_int() & rhs.as_int())); break;
+            case mx::ir::OpCode::ATOMIC_EXCHANGE_8: case mx::ir::OpCode::ATOMIC_EXCHANGE_16:
+            case mx::ir::OpCode::ATOMIC_EXCHANGE_32: case mx::ir::OpCode::ATOMIC_EXCHANGE_64:
+              new_val = rhs; break;
+            // Float compound assign (+=, -=, *=, /=, %=).
+            case mx::ir::OpCode::FADD_32:
+              new_val = Value::Float(static_cast<float>(old_val.as_float()) + static_cast<float>(rhs.as_float())); break;
+            case mx::ir::OpCode::FADD_64:
+              new_val = Value::Float(old_val.as_float() + rhs.as_float()); break;
+            case mx::ir::OpCode::FSUB_32:
+              new_val = Value::Float(static_cast<float>(old_val.as_float()) - static_cast<float>(rhs.as_float())); break;
+            case mx::ir::OpCode::FSUB_64:
+              new_val = Value::Float(old_val.as_float() - rhs.as_float()); break;
+            case mx::ir::OpCode::FMUL_32:
+              new_val = Value::Float(static_cast<float>(old_val.as_float()) * static_cast<float>(rhs.as_float())); break;
+            case mx::ir::OpCode::FMUL_64:
+              new_val = Value::Float(old_val.as_float() * rhs.as_float()); break;
+            case mx::ir::OpCode::FDIV_32:
+              new_val = Value::Float(static_cast<float>(old_val.as_float()) / static_cast<float>(rhs.as_float())); break;
+            case mx::ir::OpCode::FDIV_64:
+              new_val = Value::Float(old_val.as_float() / rhs.as_float()); break;
+            case mx::ir::OpCode::FREM_32:
+              new_val = Value::Float(std::fmodf(static_cast<float>(old_val.as_float()), static_cast<float>(rhs.as_float()))); break;
+            case mx::ir::OpCode::FREM_64:
+              new_val = Value::Float(std::fmod(old_val.as_float(), rhs.as_float())); break;
+            case mx::ir::OpCode::PTR_ADD_32: case mx::ir::OpCode::PTR_ADD_64: {
               int64_t elem_sz = rmw->element_size();
               if (elem_sz <= 0) elem_sz = 1;
               if (old_val.kind == Value::POINTER) {
@@ -1409,9 +2572,12 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
             }
             // Overflow-checked arithmetic: RMW stores the result, returns
             // the overflow flag (bool).
-            case mx::ir::OpCode::ADD_OVERFLOW:
-            case mx::ir::OpCode::SUB_OVERFLOW:
-            case mx::ir::OpCode::MUL_OVERFLOW: {
+            case mx::ir::OpCode::ADD_OVERFLOW_8: case mx::ir::OpCode::ADD_OVERFLOW_16:
+            case mx::ir::OpCode::ADD_OVERFLOW_32: case mx::ir::OpCode::ADD_OVERFLOW_64:
+            case mx::ir::OpCode::SUB_OVERFLOW_8: case mx::ir::OpCode::SUB_OVERFLOW_16:
+            case mx::ir::OpCode::SUB_OVERFLOW_32: case mx::ir::OpCode::SUB_OVERFLOW_64:
+            case mx::ir::OpCode::MUL_OVERFLOW_8: case mx::ir::OpCode::MUL_OVERFLOW_16:
+            case mx::ir::OpCode::MUL_OVERFLOW_32: case mx::ir::OpCode::MUL_OVERFLOW_64: {
               Value a = Value::Int(0), b = Value::Int(0);
               int rhs_i = 0;
               for (auto rhs_op : rmw->rhs_operands()) {
@@ -1420,9 +2586,11 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
                 ++rhs_i;
               }
               __int128 wide;
-              if (underlying == mx::ir::OpCode::ADD_OVERFLOW)
+              if (underlying >= mx::ir::OpCode::ADD_OVERFLOW_8 &&
+                  underlying <= mx::ir::OpCode::ADD_OVERFLOW_64)
                 wide = static_cast<__int128>(a.as_int()) + static_cast<__int128>(b.as_int());
-              else if (underlying == mx::ir::OpCode::SUB_OVERFLOW)
+              else if (underlying >= mx::ir::OpCode::SUB_OVERFLOW_8 &&
+                       underlying <= mx::ir::OpCode::SUB_OVERFLOW_64)
                 wide = static_cast<__int128>(a.as_int()) - static_cast<__int128>(b.as_int());
               else
                 wide = static_cast<__int128>(a.as_int()) * static_cast<__int128>(b.as_int());
@@ -1434,9 +2602,8 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
             }
             default: new_val = old_val; break;
           }
-          if (underlying != mx::ir::OpCode::ADD_OVERFLOW &&
-              underlying != mx::ir::OpCode::SUB_OVERFLOW &&
-              underlying != mx::ir::OpCode::MUL_OVERFLOW) {
+          if (!(underlying >= mx::ir::OpCode::ADD_OVERFLOW_8 &&
+                underlying <= mx::ir::OpCode::MUL_OVERFLOW_64)) {
             MemWriteValue(addr.ptr, new_val, access_sz);
             result = rmw->returns_new_value() ? new_val : old_val;
           }
@@ -1499,7 +2666,8 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
 
 
     // --- Param pointer ---
-    case mx::ir::OpCode::PARAM_PTR: {
+    case mx::ir::OpCode::PARAM_PTR_32:
+    case mx::ir::OpCode::PARAM_PTR_64: {
       if (auto pr = mx::ParamPtrInst::from(inst)) {
         uint32_t idx = pr->parameter_index();
         if (idx < param_ptrs_.size()) {
@@ -1559,12 +2727,6 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
             break;
           case BO::ABS:
             result = Value::Int(v < 0 ? -v : v);
-            break;
-          case BO::EXPECT:
-            result = val;  // identity
-            break;
-          case BO::ASSUME:
-            result = Value::Undef();  // no-op
             break;
           default:
             result = val;
@@ -1761,14 +2923,15 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
     }
 
     // --- Frame/return address intrinsics ---
-    case mx::ir::OpCode::FRAME_PTR:
-    case mx::ir::OpCode::RETURN_ADDRESS:
+    case mx::ir::OpCode::FRAME_PTR_32: case mx::ir::OpCode::FRAME_PTR_64:
+    case mx::ir::OpCode::RETURN_ADDRESS_32: case mx::ir::OpCode::RETURN_ADDRESS_64:
       // Not meaningfully interpretable; return undef.
       result = Value::Undef();
       break;
 
     // --- Return value pointer (callee side) ---
-    case mx::ir::OpCode::RETURN_PTR:
+    case mx::ir::OpCode::RETURN_PTR_32:
+    case mx::ir::OpCode::RETURN_PTR_64:
       result = return_ptr_;
       break;
 
@@ -1778,16 +2941,26 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
       break;
 
     // --- Overflow opcodes (only valid as RMW underlying ops, not standalone) ---
-    case mx::ir::OpCode::ADD_OVERFLOW:
-    case mx::ir::OpCode::SUB_OVERFLOW:
-    case mx::ir::OpCode::MUL_OVERFLOW:
-    case mx::ir::OpCode::ATOMIC_ADD:
-    case mx::ir::OpCode::ATOMIC_SUB:
-    case mx::ir::OpCode::ATOMIC_AND:
-    case mx::ir::OpCode::ATOMIC_OR:
-    case mx::ir::OpCode::ATOMIC_XOR:
-    case mx::ir::OpCode::ATOMIC_NAND:
-    case mx::ir::OpCode::ATOMIC_EXCHANGE:
+    case mx::ir::OpCode::ADD_OVERFLOW_8: case mx::ir::OpCode::ADD_OVERFLOW_16:
+    case mx::ir::OpCode::ADD_OVERFLOW_32: case mx::ir::OpCode::ADD_OVERFLOW_64:
+    case mx::ir::OpCode::SUB_OVERFLOW_8: case mx::ir::OpCode::SUB_OVERFLOW_16:
+    case mx::ir::OpCode::SUB_OVERFLOW_32: case mx::ir::OpCode::SUB_OVERFLOW_64:
+    case mx::ir::OpCode::MUL_OVERFLOW_8: case mx::ir::OpCode::MUL_OVERFLOW_16:
+    case mx::ir::OpCode::MUL_OVERFLOW_32: case mx::ir::OpCode::MUL_OVERFLOW_64:
+    case mx::ir::OpCode::ATOMIC_ADD_8: case mx::ir::OpCode::ATOMIC_ADD_16:
+    case mx::ir::OpCode::ATOMIC_ADD_32: case mx::ir::OpCode::ATOMIC_ADD_64:
+    case mx::ir::OpCode::ATOMIC_SUB_8: case mx::ir::OpCode::ATOMIC_SUB_16:
+    case mx::ir::OpCode::ATOMIC_SUB_32: case mx::ir::OpCode::ATOMIC_SUB_64:
+    case mx::ir::OpCode::ATOMIC_AND_8: case mx::ir::OpCode::ATOMIC_AND_16:
+    case mx::ir::OpCode::ATOMIC_AND_32: case mx::ir::OpCode::ATOMIC_AND_64:
+    case mx::ir::OpCode::ATOMIC_OR_8: case mx::ir::OpCode::ATOMIC_OR_16:
+    case mx::ir::OpCode::ATOMIC_OR_32: case mx::ir::OpCode::ATOMIC_OR_64:
+    case mx::ir::OpCode::ATOMIC_XOR_8: case mx::ir::OpCode::ATOMIC_XOR_16:
+    case mx::ir::OpCode::ATOMIC_XOR_32: case mx::ir::OpCode::ATOMIC_XOR_64:
+    case mx::ir::OpCode::ATOMIC_NAND_8: case mx::ir::OpCode::ATOMIC_NAND_16:
+    case mx::ir::OpCode::ATOMIC_NAND_32: case mx::ir::OpCode::ATOMIC_NAND_64:
+    case mx::ir::OpCode::ATOMIC_EXCHANGE_8: case mx::ir::OpCode::ATOMIC_EXCHANGE_16:
+    case mx::ir::OpCode::ATOMIC_EXCHANGE_32: case mx::ir::OpCode::ATOMIC_EXCHANGE_64:
       LOG(WARNING) << "RMW-only opcode used as standalone instruction";
       break;
 
@@ -1801,14 +2974,15 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
     }
 
     // --- Global/function address ---
-    case mx::ir::OpCode::GLOBAL_PTR:
-    case mx::ir::OpCode::THREAD_LOCAL_PTR: {
+    case mx::ir::OpCode::GLOBAL_PTR_32: case mx::ir::OpCode::GLOBAL_PTR_64:
+    case mx::ir::OpCode::THREAD_LOCAL_PTR_32: case mx::ir::OpCode::THREAD_LOCAL_PTR_64: {
       // In a real interpreter, this would look up the global/TLS storage.
       // For now, create a synthetic pointer using the target entity ID.
       result = Value::Ptr(inst.source_entity_id(), 0);
       break;
     }
-    case mx::ir::OpCode::FUNC_PTR: {
+    case mx::ir::OpCode::FUNC_PTR_32:
+    case mx::ir::OpCode::FUNC_PTR_64: {
       // Function pointer — use the source entity ID as a handle.
       result = Value::Ptr(inst.source_entity_id(), 0);
       break;

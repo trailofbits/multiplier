@@ -75,7 +75,7 @@ struct InstructionIR {
   uint8_t width{0};
   uint32_t size_bytes{0};
   uint8_t flags{0};
-  mx::ir::OpCode compound_op{mx::ir::OpCode::ADD};
+  mx::ir::OpCode compound_op{mx::ir::OpCode::ADD_64};
   uint8_t alloca_kind{0}; // AllocaKind sub-opcode for ALLOCA instructions
   uint8_t const_op{0};    // ConstOp sub-opcode for CONST instructions
   uint8_t cast_op{0};     // CastOp sub-opcode for CAST instructions

@@ -105,12 +105,12 @@ static void EmitInstructionExtras(
       }
       break;
 
-    case OC::GEP_FIELD:
+    case OC::GEP_FIELD_32: case OC::GEP_FIELD_64:
       pool.AddEntity(inst.target_entity_id);
       pool.AddEntity(inst.type_entity_id);
       break;
 
-    case OC::PTR_ADD:
+    case OC::PTR_ADD_32: case OC::PTR_ADD_64:
       pool.AddEntity(inst.type_entity_id);
       break;
 
@@ -122,12 +122,12 @@ static void EmitInstructionExtras(
       pool.AddEntity(MakeObjEid(fragment_id, obj_base, inst.object_index));
       break;
 
-    case OC::PARAM_PTR:
+    case OC::PARAM_PTR_32: case OC::PARAM_PTR_64:
       break;
 
-    case OC::GLOBAL_PTR:
-    case OC::THREAD_LOCAL_PTR:
-    case OC::FUNC_PTR:
+    case OC::GLOBAL_PTR_32: case OC::GLOBAL_PTR_64:
+    case OC::THREAD_LOCAL_PTR_32: case OC::THREAD_LOCAL_PTR_64:
+    case OC::FUNC_PTR_32: case OC::FUNC_PTR_64:
       pool.AddEntity(inst.target_entity_id);
       break;
 
@@ -208,19 +208,13 @@ static uint32_t EmitInstructionConsts(
       // Case values are now in SwitchCase entities, not the int pool.
       break;
 
-    case OC::GEP_FIELD:
+    case OC::GEP_FIELD_32: case OC::GEP_FIELD_64:
       pool.AddInt(static_cast<int64_t>(inst.size_bytes));  // byte offset
       break;
 
-    case OC::PTR_ADD:
-    case OC::PTR_DIFF:
+    case OC::PTR_ADD_32: case OC::PTR_ADD_64:
+    case OC::PTR_DIFF_32: case OC::PTR_DIFF_64:
       pool.AddInt(static_cast<int64_t>(inst.size_bytes));  // element size
-      break;
-
-    case OC::UDIV:
-    case OC::UREM:
-    case OC::USHR:
-      pool.AddInt(static_cast<int64_t>(inst.size_bytes));  // operand width in bytes
       break;
 
     case OC::READ_MODIFY_WRITE:
@@ -229,7 +223,7 @@ static uint32_t EmitInstructionConsts(
       pool.AddInt(static_cast<int64_t>(inst.is_big_endian ? 1 : 0));  // endianness
       break;
 
-    case OC::PARAM_PTR:
+    case OC::PARAM_PTR_32: case OC::PARAM_PTR_64:
       pool.AddInt(inst.int_value);  // parameter index
       break;
 

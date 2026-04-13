@@ -155,35 +155,11 @@ enum class OpCode : uint8_t {
   // Memory (ALLOCA sub-opcode in int_pool[0] selects AllocaKind).
   ALLOCA = 1,
   MEMORY = 2,          // Unified load/store/bulk/string (sub-opcode in int_pool[0] selects MemOp).
-  GEP_FIELD = 3,
-  PTR_ADD = 4,         // pointer + index; op[0]=base, op[1]=index
 
-  // Binary arithmetic/logic
-  ADD = 5,
-  SUB = 6,
-  MUL = 7,
-  DIV = 8,
-  REM = 9,
-  BIT_AND = 10,
-  BIT_OR = 11,
-  BIT_XOR = 12,
-  SHL = 13,
-  SHR = 14,
+  // Logical (produce 0 or 1, no width).
   LOGICAL_AND = 15,
   LOGICAL_OR = 16,
-  PTR_DIFF = 17,
 
-  // Comparison
-  CMP_EQ = 18,
-  CMP_NE = 19,
-  CMP_LT = 20,
-  CMP_LE = 21,
-  CMP_GT = 22,
-  CMP_GE = 23,
-
-  // Unary
-  NEG = 24,
-  BIT_NOT = 25,
   LOGICAL_NOT = 26,
 
   // Cast (sub-opcode in int_pool[0] selects CastOp).
@@ -226,16 +202,8 @@ enum class OpCode : uint8_t {
   ENTER_SCOPE = 47,        // marks scope entry; extra = IRStructureId of scope
   EXIT_SCOPE = 48,         // marks scope exit; extra = IRStructureId of scope
 
-  // Parameter pointer: returns a pointer to the Nth function parameter.
-  // The storage lives in the caller's EXPRESSION_SCOPE.
-  // int_pool[0] = parameter index.
-  PARAM_PTR = 49,
-
-  // Address-of for globals, thread-locals, functions, and string literals.
-  GLOBAL_PTR = 50,        // pointer to a global or static variable
-  THREAD_LOCAL_PTR = 51,  // pointer to a thread-local variable
-  FUNC_PTR = 52,          // pointer to a function
-  STRING_PTR = 56,        // pointer to a string literal; source_entity_id → StringLiteral
+  // (Pointer-producing ops are sized: see GEP_FIELD_32/64, PTR_ADD_32/64,
+  //  PARAM_PTR_32/64, GLOBAL_PTR_32/64, etc. at the end of the enum.)
 
   // Bitwise/intrinsic operations. Sub-opcode in int_pool[0] selects the
   // specific operation (see BitwiseOp enum). op[0] = primary operand.
@@ -249,24 +217,9 @@ enum class OpCode : uint8_t {
   // undefined (e.g., __builtin_clz(0)). An analyzer should flag any use.
   UNDEFINED = 55,
 
-  // Frame/return address intrinsics.
-  FRAME_PTR = 57,      // op[0] = level (CONST, usually 0). Returns frame ptr.
-  RETURN_ADDRESS = 58, // op[0] = level (CONST, usually 0). Returns return addr.
+  // (FRAME_PTR and RETURN_ADDRESS are sized: see end of enum.)
 
-  // Overflow-checked arithmetic (only used as RMW underlying opcodes).
-  // RMW returns bool (overflow flag), stores the arithmetic result.
-  ADD_OVERFLOW = 59,
-  SUB_OVERFLOW = 60,
-  MUL_OVERFLOW = 61,
-
-  // Atomic RMW underlying opcodes (only valid as RMW underlying ops).
-  ATOMIC_ADD = 62,
-  ATOMIC_SUB = 63,
-  ATOMIC_AND = 64,
-  ATOMIC_OR = 65,
-  ATOMIC_XOR = 66,
-  ATOMIC_NAND = 67,
-  ATOMIC_EXCHANGE = 68,
+  // (Overflow and atomic ops are sized: see end of enum.)
 
   // Evaluate all operands, return the last one's value.
   LAST_VALUE = 69,
@@ -274,22 +227,7 @@ enum class OpCode : uint8_t {
   // Unknown / unhandled expression
   UNKNOWN = 70,
 
-  // Return value pointer: callee-side pointer to the caller's ALLOCA/RETURN
-  // storage. No operands. The caller's CALL instruction references the
-  // return alloca; RETURN_PTR in the callee resolves to the same storage.
-  RETURN_PTR = 71,
-
-  // Unsigned arithmetic: distinct from signed because C semantics differ.
-  UDIV = 72,       // Unsigned division.
-  UREM = 73,       // Unsigned remainder.
-  USHR = 74,       // Unsigned (logical) right shift.
-
-  // Unsigned comparisons: distinct from signed because C semantics differ
-  // for values where the sign bit is set.
-  UCMP_LT = 75,   // Unsigned less-than.
-  UCMP_LE = 76,   // Unsigned less-than-or-equal.
-  UCMP_GT = 77,   // Unsigned greater-than.
-  UCMP_GE = 78,   // Unsigned greater-than-or-equal.
+  // (RETURN_PTR is sized: see end of enum.)
 
   // Floating-point comparisons (IEEE 754 semantics, width-specific).
   FCMP_EQ_32 = 79,  FCMP_EQ_64 = 80,
@@ -307,6 +245,74 @@ enum class OpCode : uint8_t {
   FDIV_32 = 97,    FDIV_64 = 98,
   FREM_32 = 99,    FREM_64 = 100,   // C fmod semantics.
   FNEG_32 = 101,   FNEG_64 = 102,
+
+  // Width-specific integer arithmetic (signed).
+  ADD_8 = 103, ADD_16 = 104, ADD_32 = 105, ADD_64 = 106,
+  SUB_8 = 107, SUB_16 = 108, SUB_32 = 109, SUB_64 = 110,
+  MUL_8 = 111, MUL_16 = 112, MUL_32 = 113, MUL_64 = 114,
+  DIV_8 = 115, DIV_16 = 116, DIV_32 = 117, DIV_64 = 118,
+  REM_8 = 119, REM_16 = 120, REM_32 = 121, REM_64 = 122,
+
+  // Width-specific unsigned arithmetic.
+  UDIV_8 = 123, UDIV_16 = 124, UDIV_32 = 125, UDIV_64 = 126,
+  UREM_8 = 127, UREM_16 = 128, UREM_32 = 129, UREM_64 = 130,
+  USHR_8 = 131, USHR_16 = 132, USHR_32 = 133, USHR_64 = 134,
+
+  // Width-specific bitwise operations.
+  BIT_AND_8 = 135, BIT_AND_16 = 136, BIT_AND_32 = 137, BIT_AND_64 = 138,
+  BIT_OR_8 = 139, BIT_OR_16 = 140, BIT_OR_32 = 141, BIT_OR_64 = 142,
+  BIT_XOR_8 = 143, BIT_XOR_16 = 144, BIT_XOR_32 = 145, BIT_XOR_64 = 146,
+  SHL_8 = 147, SHL_16 = 148, SHL_32 = 149, SHL_64 = 150,
+  SHR_8 = 151, SHR_16 = 152, SHR_32 = 153, SHR_64 = 154,
+
+  // Width-specific signed comparisons.
+  CMP_EQ_8 = 155, CMP_EQ_16 = 156, CMP_EQ_32 = 157, CMP_EQ_64 = 158,
+  CMP_NE_8 = 159, CMP_NE_16 = 160, CMP_NE_32 = 161, CMP_NE_64 = 162,
+  CMP_LT_8 = 163, CMP_LT_16 = 164, CMP_LT_32 = 165, CMP_LT_64 = 166,
+  CMP_LE_8 = 167, CMP_LE_16 = 168, CMP_LE_32 = 169, CMP_LE_64 = 170,
+  CMP_GT_8 = 171, CMP_GT_16 = 172, CMP_GT_32 = 173, CMP_GT_64 = 174,
+  CMP_GE_8 = 175, CMP_GE_16 = 176, CMP_GE_32 = 177, CMP_GE_64 = 178,
+
+  // Width-specific unsigned comparisons.
+  UCMP_LT_8 = 179, UCMP_LT_16 = 180, UCMP_LT_32 = 181, UCMP_LT_64 = 182,
+  UCMP_LE_8 = 183, UCMP_LE_16 = 184, UCMP_LE_32 = 185, UCMP_LE_64 = 186,
+  UCMP_GT_8 = 187, UCMP_GT_16 = 188, UCMP_GT_32 = 189, UCMP_GT_64 = 190,
+  UCMP_GE_8 = 191, UCMP_GE_16 = 192, UCMP_GE_32 = 193, UCMP_GE_64 = 194,
+
+  // Width-specific unary operations.
+  NEG_8 = 195, NEG_16 = 196, NEG_32 = 197, NEG_64 = 198,
+  BIT_NOT_8 = 199, BIT_NOT_16 = 200, BIT_NOT_32 = 201, BIT_NOT_64 = 202,
+
+  // Width-specific pointer operations.
+  PTR_ADD_32 = 203,           PTR_ADD_64 = 204,
+  GEP_FIELD_32 = 205,        GEP_FIELD_64 = 206,
+  GLOBAL_PTR_32 = 207,       GLOBAL_PTR_64 = 208,
+  THREAD_LOCAL_PTR_32 = 209,  THREAD_LOCAL_PTR_64 = 210,
+  FUNC_PTR_32 = 211,         FUNC_PTR_64 = 212,
+  STRING_PTR_32 = 213,       STRING_PTR_64 = 214,
+  PARAM_PTR_32 = 215,        PARAM_PTR_64 = 216,
+  FRAME_PTR_32 = 217,        FRAME_PTR_64 = 218,
+  RETURN_PTR_32 = 219,       RETURN_PTR_64 = 220,
+  RETURN_ADDRESS_32 = 221,   RETURN_ADDRESS_64 = 222,
+
+  // Width-specific atomic RMW underlying opcodes.
+  ATOMIC_ADD_8 = 223, ATOMIC_ADD_16 = 224, ATOMIC_ADD_32 = 225, ATOMIC_ADD_64 = 226,
+  ATOMIC_SUB_8 = 227, ATOMIC_SUB_16 = 228, ATOMIC_SUB_32 = 229, ATOMIC_SUB_64 = 230,
+  ATOMIC_AND_8 = 231, ATOMIC_AND_16 = 232, ATOMIC_AND_32 = 233, ATOMIC_AND_64 = 234,
+  ATOMIC_OR_8 = 235, ATOMIC_OR_16 = 236, ATOMIC_OR_32 = 237, ATOMIC_OR_64 = 238,
+  ATOMIC_XOR_8 = 239, ATOMIC_XOR_16 = 240, ATOMIC_XOR_32 = 241, ATOMIC_XOR_64 = 242,
+  ATOMIC_NAND_8 = 243, ATOMIC_NAND_16 = 244, ATOMIC_NAND_32 = 245, ATOMIC_NAND_64 = 246,
+  ATOMIC_EXCHANGE_8 = 247, ATOMIC_EXCHANGE_16 = 248, ATOMIC_EXCHANGE_32 = 249, ATOMIC_EXCHANGE_64 = 250,
+
+  // Width-specific overflow-checked arithmetic (RMW underlying opcodes).
+  // Placed in gap left by removed unsized opcodes (56-67).
+  ADD_OVERFLOW_8 = 56, ADD_OVERFLOW_16 = 57, ADD_OVERFLOW_32 = 58, ADD_OVERFLOW_64 = 59,
+  SUB_OVERFLOW_8 = 60, SUB_OVERFLOW_16 = 61, SUB_OVERFLOW_32 = 62, SUB_OVERFLOW_64 = 63,
+  MUL_OVERFLOW_8 = 64, MUL_OVERFLOW_16 = 65, MUL_OVERFLOW_32 = 66, MUL_OVERFLOW_64 = 67,
+
+  // Width-specific pointer difference (result is ptrdiff_t).
+  // Placed in gap left by removed unsized opcodes (3-4).
+  PTR_DIFF_32 = 3,    PTR_DIFF_64 = 4,
 };
 
 // Returns the human-readable name of an opcode.
@@ -320,7 +326,7 @@ MX_EXPORT const char *EnumeratorName(AllocaKind op) noexcept;
 MX_EXPORT const char *EnumeratorName(CastOp op) noexcept;
 
 inline static constexpr unsigned NumEnumerators(OpCode) {
-  return 103u;
+  return 251u;
 }
 
 // Sub-opcodes for MEMORY. Stored in the int pool (int_pool[0]).
@@ -458,11 +464,7 @@ enum class BitwiseOp : uint8_t {
   // Absolute value (integer).
   ABS = 10,                // __builtin_abs. UNDEFINED for INT_MIN (signed overflow).
 
-  // Expect (optimization hint, semantically identity on op[0]).
-  EXPECT = 11,             // __builtin_expect(x, v) -> x
-
-  // Assume (optimization hint, no-op).
-  ASSUME = 12,             // __builtin_assume(x)
+  // 11, 12: removed (EXPECT/ASSUME were compiler hints, not operations)
 };
 
 // Sub-opcodes for FLOAT. Stored in the int pool.
@@ -534,11 +536,12 @@ inline bool IsConstant(OpCode op) {
 }
 
 inline bool IsBinaryOp(OpCode op) {
-  return (op >= OpCode::ADD && op <= OpCode::PTR_DIFF) ||
-         (op >= OpCode::UDIV && op <= OpCode::USHR) ||
-         (op >= OpCode::UCMP_LT && op <= OpCode::UCMP_GE) ||
+  return op == OpCode::LOGICAL_AND || op == OpCode::LOGICAL_OR ||
+         op == OpCode::PTR_DIFF_32 || op == OpCode::PTR_DIFF_64 ||
          (op >= OpCode::FCMP_EQ_32 && op <= OpCode::FCMP_GE_64) ||
-         (op >= OpCode::FADD_32 && op <= OpCode::FREM_64);
+         (op >= OpCode::FADD_32 && op <= OpCode::FREM_64) ||
+         (op >= OpCode::ADD_8 && op <= OpCode::SHR_64) ||
+         (op >= OpCode::CMP_EQ_8 && op <= OpCode::UCMP_GE_64);
 }
 
 inline bool IsFloatArithmetic(OpCode op) {
@@ -546,9 +549,8 @@ inline bool IsFloatArithmetic(OpCode op) {
 }
 
 inline bool IsComparison(OpCode op) {
-  return (op >= OpCode::CMP_EQ && op <= OpCode::CMP_GE) ||
-         (op >= OpCode::UCMP_LT && op <= OpCode::UCMP_GE) ||
-         (op >= OpCode::FCMP_EQ_32 && op <= OpCode::FCMP_GE_64);
+  return (op >= OpCode::FCMP_EQ_32 && op <= OpCode::FCMP_GE_64) ||
+         (op >= OpCode::CMP_EQ_8 && op <= OpCode::UCMP_GE_64);
 }
 
 inline bool IsFloatComparison(OpCode op) {
@@ -556,17 +558,23 @@ inline bool IsFloatComparison(OpCode op) {
 }
 
 inline bool IsUnaryOp(OpCode op) {
-  return (op >= OpCode::NEG && op <= OpCode::LOGICAL_NOT) ||
-         op == OpCode::FNEG_32 || op == OpCode::FNEG_64;
+  return op == OpCode::LOGICAL_NOT ||
+         op == OpCode::FNEG_32 || op == OpCode::FNEG_64 ||
+         (op >= OpCode::NEG_8 && op <= OpCode::BIT_NOT_64);
 }
 
 inline bool IsCast(OpCode op) {
   return op == OpCode::CAST;
 }
 
+inline bool IsPtrOp(OpCode op) {
+  return (op >= OpCode::PTR_ADD_32 && op <= OpCode::RETURN_ADDRESS_64);
+}
+
 inline bool IsMemoryOp(OpCode op) {
   return op == OpCode::MEMORY || op == OpCode::ALLOCA ||
-         op == OpCode::GEP_FIELD || op == OpCode::PTR_ADD;
+         (op >= OpCode::GEP_FIELD_32 && op <= OpCode::GEP_FIELD_64) ||
+         (op >= OpCode::PTR_ADD_32 && op <= OpCode::PTR_ADD_64);
 }
 
 // MemOp write classification (bulk ops that write to memory).

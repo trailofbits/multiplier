@@ -56,6 +56,72 @@ static mx::ir::ConstOp FloatConstOp(uint8_t width) {
   return mx::ir::ConstOp::FLOAT64;
 }
 
+// Integer operation groups for SizedIntOp. These are NOT opcodes — they're
+// internal to IRGen for selecting the correct sized opcode.
+enum class IntOp : uint8_t {
+  ADD, SUB, MUL, DIV, REM,
+  UDIV, UREM, USHR,
+  BIT_AND, BIT_OR, BIT_XOR, SHL, SHR,
+  CMP_EQ, CMP_NE, CMP_LT, CMP_LE, CMP_GT, CMP_GE,
+  UCMP_LT, UCMP_LE, UCMP_GT, UCMP_GE,
+  NEG, BIT_NOT,
+  // Keep these in sync with the enum layout — groups of 4 continue
+  // at ATOMIC_ADD_8 = 223.
+};
+
+// Atomic RMW groups. Stride-4 starting at ATOMIC_ADD_8 = 223.
+enum class AtomicOp : uint8_t {
+  ATOMIC_ADD, ATOMIC_SUB, ATOMIC_AND, ATOMIC_OR,
+  ATOMIC_XOR, ATOMIC_NAND, ATOMIC_EXCHANGE,
+};
+
+static mx::ir::OpCode SizedAtomicOp(AtomicOp group, unsigned width_bytes) {
+  unsigned wi;
+  if (width_bytes <= 1) wi = 0;
+  else if (width_bytes <= 2) wi = 1;
+  else if (width_bytes <= 4) wi = 2;
+  else wi = 3;
+  return static_cast<mx::ir::OpCode>(
+      static_cast<unsigned>(mx::ir::OpCode::ATOMIC_ADD_8) +
+      static_cast<unsigned>(group) * 4 + wi);
+}
+
+// Overflow-checked arithmetic groups. Stride-4 starting at ADD_OVERFLOW_8 = 56.
+enum class OverflowOp : uint8_t {
+  ADD_OVERFLOW, SUB_OVERFLOW, MUL_OVERFLOW,
+};
+
+static mx::ir::OpCode SizedOverflowOp(OverflowOp group, unsigned width_bytes) {
+  unsigned wi;
+  if (width_bytes <= 1) wi = 0;
+  else if (width_bytes <= 2) wi = 1;
+  else if (width_bytes <= 4) wi = 2;
+  else wi = 3;
+  return static_cast<mx::ir::OpCode>(
+      static_cast<unsigned>(mx::ir::OpCode::ADD_OVERFLOW_8) +
+      static_cast<unsigned>(group) * 4 + wi);
+}
+
+// Map an IntOp group + byte width to a sized OpCode.
+// Non-power-of-2 widths round up (3→4, 6→8). Every call produces a sized opcode.
+static mx::ir::OpCode SizedIntOp(IntOp group, unsigned width_bytes) {
+  unsigned wi;
+  if (width_bytes <= 1) wi = 0;
+  else if (width_bytes <= 2) wi = 1;
+  else if (width_bytes <= 4) wi = 2;
+  else wi = 3;
+  return static_cast<mx::ir::OpCode>(
+      static_cast<unsigned>(mx::ir::OpCode::ADD_8) +
+      static_cast<unsigned>(group) * 4 + wi);
+}
+
+// Map a pointer-producing op to its 32 or 64-bit variant.
+static mx::ir::OpCode SizedPtrOp(mx::ir::OpCode base_32, unsigned ptr_bytes) {
+  // base_32 is the _32 variant; _64 is always base_32 + 1.
+  return (ptr_bytes <= 4) ? base_32
+      : static_cast<mx::ir::OpCode>(static_cast<unsigned>(base_32) + 1);
+}
+
 // Helper: determine CastOp from Clang CastKind and type info.
 // src_signed: whether the source integer type is signed.
 // dst_signed: whether the destination integer type is signed.
@@ -251,7 +317,8 @@ std::optional<FunctionIR> IRGenerator::Generate(
       uint32_t obj_idx = GetOrMakeObject(param);
 
       InstructionIR pr;
-      pr.opcode = mx::ir::OpCode::PARAM_PTR;
+      pr.opcode = SizedPtrOp(mx::ir::OpCode::PARAM_PTR_32,
+          static_cast<unsigned>(ctx_.getTargetInfo().getPointerWidth(clang::LangAS::Default)) / 8);
       pr.source_entity_id = EntityIdOf(param);
       pr.type_entity_id = TypeEntityIdOf(param.Type());
       pr.int_value = static_cast<int64_t>(pi);  // parameter index
@@ -390,7 +457,8 @@ std::optional<FunctionIR> IRGenerator::GenerateGlobalInit(
 
     // PARAM_PTR 0: the pointer to the global (passed by the caller).
     InstructionIR pr;
-    pr.opcode = mx::ir::OpCode::PARAM_PTR;
+    pr.opcode = SizedPtrOp(mx::ir::OpCode::PARAM_PTR_32,
+        static_cast<unsigned>(ctx_.getTargetInfo().getPointerWidth(clang::LangAS::Default)) / 8);
     pr.source_entity_id = EntityIdOf(var);
     pr.type_entity_id = TypeEntityIdOf(var.Type());
     pr.int_value = 0;  // parameter index 0
@@ -1552,7 +1620,8 @@ void IRGenerator::EmitReturnStmt(const pasta::Stmt &s) {
 
     // Emit RETURN_PTR to get pointer to caller's return storage.
     InstructionIR ret_ptr;
-    ret_ptr.opcode = mx::ir::OpCode::RETURN_PTR;
+    ret_ptr.opcode = SizedPtrOp(mx::ir::OpCode::RETURN_PTR_32,
+        static_cast<unsigned>(ctx_.getTargetInfo().getPointerWidth(clang::LangAS::Default)) / 8);
     ret_ptr.source_entity_id = EntityIdOf(s);
     if (auto t = rv->Type()) ret_ptr.type_entity_id = TypeEntityIdOf(*t);
     uint32_t ret_ptr_idx = EmitInstruction(std::move(ret_ptr));
@@ -1631,7 +1700,8 @@ void IRGenerator::EmitDeclStmt(const pasta::Stmt &s) {
         if (auto sz = TypeSizeBytes(elem_type)) elem_sz = *sz;
         uint32_t elem_idx = EmitSizeConst(elem_sz);
         InstructionIR mul;
-        mul.opcode = mx::ir::OpCode::MUL;
+        mul.opcode = SizedIntOp(IntOp::MUL,
+                                static_cast<unsigned>(ctx_.getTargetInfo().getPointerWidth(clang::LangAS::Default)) / 8);
         mul.source_entity_id = EntityIdOf(decl);
         mul.operand_indices = {count_idx, elem_idx};
         size_idx = EmitInstruction(std::move(mul));
@@ -1802,7 +1872,8 @@ void IRGenerator::EmitInitializer(uint32_t dest_addr_idx,
           uint32_t idx_val = EmitInstruction(std::move(ci));
 
           InstructionIR pa;
-          pa.opcode = mx::ir::OpCode::PTR_ADD;
+          pa.opcode = SizedPtrOp(mx::ir::OpCode::PTR_ADD_32,
+              static_cast<unsigned>(ctx_.getTargetInfo().getPointerWidth(clang::LangAS::Default)) / 8);
           pa.source_entity_id = source_eid;
           pa.operand_indices = {dest_addr_idx, idx_val};
           pa.type_entity_id = TypeEntityIdOf(elem_type);
@@ -1865,7 +1936,8 @@ void IRGenerator::EmitInitializer(uint32_t dest_addr_idx,
         uint32_t byte_offset = static_cast<uint32_t>(*offset_bits / 8);
 
         InstructionIR gep;
-        gep.opcode = mx::ir::OpCode::GEP_FIELD;
+        gep.opcode = SizedPtrOp(mx::ir::OpCode::GEP_FIELD_32,
+            static_cast<unsigned>(ctx_.getTargetInfo().getPointerWidth(clang::LangAS::Default)) / 8);
         gep.source_entity_id = source_eid;
         gep.operand_indices = {dest_addr_idx};
         gep.target_entity_id = EntityIdOf(field);
@@ -2038,7 +2110,8 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
   // StringLiteral::bytes() (via source_entity_id).
   if (pasta::StringLiteral::From(e)) {
     InstructionIR inst;
-    inst.opcode = mx::ir::OpCode::STRING_PTR;
+    inst.opcode = SizedPtrOp(mx::ir::OpCode::STRING_PTR_32,
+        static_cast<unsigned>(ctx_.getTargetInfo().getPointerWidth(clang::LangAS::Default)) / 8);
     inst.source_entity_id = eid;
     if (auto t = e.Type()) inst.type_entity_id = TypeEntityIdOf(*t);
     return emit_typed(std::move(inst));
@@ -2162,13 +2235,23 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     }
     if (ck == pasta::CastKind::kIntegralToBoolean) {
       uint32_t sub_idx = EmitRValue(sub);
+      unsigned sz = 8;
+      uint8_t zero_width = 64;
+      bool zero_signed = true;
+      if (auto st = sub.Type()) {
+        if (auto s = TypeSizeBytes(*st)) {
+          sz = *s;
+          zero_width = static_cast<uint8_t>(*s * 8);
+        }
+        zero_signed = st->IsSignedIntegerType();
+      }
       InstructionIR zero;
       zero.opcode = mx::ir::OpCode::CONST;
-      zero.const_op = static_cast<uint8_t>(mx::ir::ConstOp::INT32);
-      zero.int_value = 0; zero.width = 32;
+      zero.const_op = static_cast<uint8_t>(IntConstOp(zero_width, zero_signed));
+      zero.int_value = 0; zero.width = zero_width;
       uint32_t zero_idx = EmitInstruction(std::move(zero));
       InstructionIR inst;
-      inst.opcode = mx::ir::OpCode::CMP_NE;
+      inst.opcode = SizedIntOp(IntOp::CMP_NE, sz);
       inst.source_entity_id = eid;
       inst.operand_indices = {sub_idx, zero_idx};
       return emit_typed(std::move(inst));
@@ -2294,14 +2377,15 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         // Determine underlying op and element size for pointers.
         auto sub_type = sub.Type();
         bool is_ptr = sub_type && sub_type->IsAnyPointerType();
-        mx::ir::OpCode underlying = is_inc ? mx::ir::OpCode::ADD
-                                           : mx::ir::OpCode::SUB;
+        // For integer inc/dec: sized ADD/SUB. For pointer: sized PTR_ADD.
+        bool inc_is_ptr_op = false;
+        IntOp inc_int_group = is_inc ? IntOp::ADD : IntOp::SUB;
         uint32_t elem_sz = 0;
         // Delta: +1 for integers (ADD/SUB handles direction).
         // For pointers: +1 (increment) or -1 (decrement) with PTR_ADD.
         int64_t delta = 1;
         if (is_ptr) {
-          underlying = mx::ir::OpCode::PTR_ADD;
+          inc_is_ptr_op = true;
           if (!is_inc) delta = -1;
           if (auto pt = sub_type->PointeeType()) {
             if (auto sz = TypeSizeBytes(*pt)) elem_sz = *sz;
@@ -2320,21 +2404,46 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
           }
           delta_type_eid = TypeEntityIdOf(*sub_type);
         }
+        bool inc_is_float = !is_ptr && sub_type && sub_type->IsFloatingType();
         InstructionIR delta_inst;
         delta_inst.opcode = mx::ir::OpCode::CONST;
-        delta_inst.const_op = static_cast<uint8_t>(IntConstOp(delta_width, true));
         delta_inst.source_entity_id = eid;
-        delta_inst.int_value = delta;
-        delta_inst.uint_value = static_cast<uint64_t>(delta);
-        delta_inst.width = delta_width;
         delta_inst.type_entity_id = delta_type_eid;
+        if (inc_is_float) {
+          delta_inst.const_op = static_cast<uint8_t>(
+              FloatConstOp(delta_width));
+          delta_inst.float_value = static_cast<double>(delta);
+          delta_inst.width = delta_width;
+        } else {
+          delta_inst.const_op = static_cast<uint8_t>(IntConstOp(delta_width, true));
+          delta_inst.int_value = delta;
+          delta_inst.uint_value = static_cast<uint64_t>(delta);
+          delta_inst.width = delta_width;
+        }
         uint32_t delta_idx = EmitInstruction(std::move(delta_inst));
 
         InstructionIR inst;
         inst.opcode = mx::ir::OpCode::READ_MODIFY_WRITE;
         inst.source_entity_id = eid;
         inst.operand_indices = {addr_idx, delta_idx};
-        inst.compound_op = underlying;
+        if (inc_is_ptr_op) {
+          inst.compound_op = SizedPtrOp(mx::ir::OpCode::PTR_ADD_32,
+              static_cast<unsigned>(ctx_.getTargetInfo().getPointerWidth(clang::LangAS::Default)) / 8);
+        } else {
+          unsigned inc_sz = 8;
+          if (sub_type) {
+            if (auto s = TypeSizeBytes(*sub_type)) inc_sz = *s;
+          }
+          bool is_float = sub_type && sub_type->IsFloatingType();
+          if (is_float) {
+            bool is_f64 = inc_sz > 4;
+            inst.compound_op = is_inc
+                ? (is_f64 ? mx::ir::OpCode::FADD_64 : mx::ir::OpCode::FADD_32)
+                : (is_f64 ? mx::ir::OpCode::FSUB_64 : mx::ir::OpCode::FSUB_32);
+          } else {
+            inst.compound_op = SizedIntOp(inc_int_group, inc_sz);
+          }
+        }
         inst.size_bytes = elem_sz;
         inst.is_big_endian = ctx_.getTargetInfo().isBigEndian();
         // flags bit0 = returns_new_value: pre returns new, post returns old.
@@ -2352,7 +2461,11 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
           inst.opcode = is_f64 ? mx::ir::OpCode::FNEG_64
                                : mx::ir::OpCode::FNEG_32;
         } else {
-          inst.opcode = mx::ir::OpCode::NEG;
+          unsigned sz = 8;
+          if (sub.Type()) {
+            if (auto s = TypeSizeBytes(*sub.Type())) sz = *s;
+          }
+          inst.opcode = SizedIntOp(IntOp::NEG, sz);
         }
         return emit_typed(std::move(inst));
       }
@@ -2368,7 +2481,11 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       if (oc == pasta::UnaryOperatorKind::kNot) {
         uint32_t sub_idx = EmitRValue(sub);
         InstructionIR inst;
-        inst.opcode = mx::ir::OpCode::BIT_NOT;
+        unsigned sz = 8;
+        if (sub.Type()) {
+          if (auto s = TypeSizeBytes(*sub.Type())) sz = *s;
+        }
+        inst.opcode = SizedIntOp(IntOp::BIT_NOT, sz);
         inst.source_entity_id = eid;
         inst.operand_indices = {sub_idx};
         return emit_typed(std::move(inst));
@@ -2470,59 +2587,98 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         inst.source_entity_id = eid;
         inst.operand_indices = {addr_idx, val_idx};
 
-        // Check if LHS is a pointer type for += and -=.
-        // Check if LHS is _Atomic for atomic compound assignment.
+        // Check LHS type properties for dispatch.
         auto lhs_type = bo->LHS().Type();
         bool lhs_is_ptr = lhs_type && lhs_type->IsAnyPointerType();
         bool lhs_is_atomic = lhs_type && lhs_type->IsAtomicType();
+        bool lhs_is_float = lhs_type && lhs_type->IsFloatingType();
+
+        // Width for sized compound ops.
+        unsigned rmw_sz = 8;
+        if (lhs_type) {
+          if (auto s = TypeSizeBytes(*lhs_type)) rmw_sz = *s;
+        }
+        bool is_f64 = rmw_sz > 4;
+        unsigned ptr_bytes = static_cast<unsigned>(
+            ctx_.getTargetInfo().getPointerWidth(clang::LangAS::Default)) / 8;
 
         switch (oc) {
           case pasta::BinaryOperatorKind::kAddAssign:
             if (lhs_is_ptr) {
-              inst.compound_op = mx::ir::OpCode::PTR_ADD;
+              inst.compound_op = SizedPtrOp(mx::ir::OpCode::PTR_ADD_32, ptr_bytes);
               if (auto pt = lhs_type->PointeeType()) {
                 if (auto sz = TypeSizeBytes(*pt)) inst.size_bytes = *sz;
               }
+            } else if (lhs_is_float) {
+              inst.compound_op = is_f64 ? mx::ir::OpCode::FADD_64 : mx::ir::OpCode::FADD_32;
             } else {
-              inst.compound_op = lhs_is_atomic ? mx::ir::OpCode::ATOMIC_ADD
-                                               : mx::ir::OpCode::ADD;
+              inst.compound_op = lhs_is_atomic ? SizedAtomicOp(AtomicOp::ATOMIC_ADD, rmw_sz)
+                                               : SizedIntOp(IntOp::ADD, rmw_sz);
             }
             break;
           case pasta::BinaryOperatorKind::kSubAssign:
             if (lhs_is_ptr) {
               InstructionIR neg;
-              neg.opcode = mx::ir::OpCode::NEG;
+              {
+                unsigned sz = 8;
+                if (auto rhs_t = bo->RHS().Type()) {
+                  if (auto s = TypeSizeBytes(*rhs_t)) sz = *s;
+                }
+                neg.opcode = SizedIntOp(IntOp::NEG, sz);
+              }
               neg.source_entity_id = eid;
               neg.operand_indices = {val_idx};
               val_idx = EmitInstruction(std::move(neg));
               inst.operand_indices = {addr_idx, val_idx};
-              inst.compound_op = mx::ir::OpCode::PTR_ADD;
+              inst.compound_op = SizedPtrOp(mx::ir::OpCode::PTR_ADD_32, ptr_bytes);
               if (auto pt = lhs_type->PointeeType()) {
                 if (auto sz = TypeSizeBytes(*pt)) inst.size_bytes = *sz;
               }
+            } else if (lhs_is_float) {
+              inst.compound_op = is_f64 ? mx::ir::OpCode::FSUB_64 : mx::ir::OpCode::FSUB_32;
             } else {
-              inst.compound_op = lhs_is_atomic ? mx::ir::OpCode::ATOMIC_SUB
-                                               : mx::ir::OpCode::SUB;
+              inst.compound_op = lhs_is_atomic ? SizedAtomicOp(AtomicOp::ATOMIC_SUB, rmw_sz)
+                                               : SizedIntOp(IntOp::SUB, rmw_sz);
             }
             break;
-          case pasta::BinaryOperatorKind::kMulAssign: inst.compound_op = mx::ir::OpCode::MUL; break;
-          case pasta::BinaryOperatorKind::kDivAssign: inst.compound_op = mx::ir::OpCode::DIV; break;
-          case pasta::BinaryOperatorKind::kRemAssign: inst.compound_op = mx::ir::OpCode::REM; break;
+          case pasta::BinaryOperatorKind::kMulAssign:
+            inst.compound_op = lhs_is_float ? (is_f64 ? mx::ir::OpCode::FMUL_64 : mx::ir::OpCode::FMUL_32)
+                                            : SizedIntOp(IntOp::MUL, rmw_sz);
+            break;
+          case pasta::BinaryOperatorKind::kDivAssign:
+            if (lhs_is_float) {
+              inst.compound_op = is_f64 ? mx::ir::OpCode::FDIV_64 : mx::ir::OpCode::FDIV_32;
+            } else {
+              inst.compound_op = SizedIntOp(
+                  (lhs_type && lhs_type->IsUnsignedIntegerType()) ? IntOp::UDIV : IntOp::DIV, rmw_sz);
+            }
+            break;
+          case pasta::BinaryOperatorKind::kRemAssign:
+            if (lhs_is_float) {
+              inst.compound_op = is_f64 ? mx::ir::OpCode::FREM_64 : mx::ir::OpCode::FREM_32;
+            } else {
+              inst.compound_op = SizedIntOp(
+                  (lhs_type && lhs_type->IsUnsignedIntegerType()) ? IntOp::UREM : IntOp::REM, rmw_sz);
+            }
+            break;
           case pasta::BinaryOperatorKind::kAndAssign:
-            inst.compound_op = lhs_is_atomic ? mx::ir::OpCode::ATOMIC_AND
-                                             : mx::ir::OpCode::BIT_AND;
+            inst.compound_op = lhs_is_atomic ? SizedAtomicOp(AtomicOp::ATOMIC_AND, rmw_sz)
+                                             : SizedIntOp(IntOp::BIT_AND, rmw_sz);
             break;
           case pasta::BinaryOperatorKind::kOrAssign:
-            inst.compound_op = lhs_is_atomic ? mx::ir::OpCode::ATOMIC_OR
-                                             : mx::ir::OpCode::BIT_OR;
+            inst.compound_op = lhs_is_atomic ? SizedAtomicOp(AtomicOp::ATOMIC_OR, rmw_sz)
+                                             : SizedIntOp(IntOp::BIT_OR, rmw_sz);
             break;
           case pasta::BinaryOperatorKind::kXorAssign:
-            inst.compound_op = lhs_is_atomic ? mx::ir::OpCode::ATOMIC_XOR
-                                             : mx::ir::OpCode::BIT_XOR;
+            inst.compound_op = lhs_is_atomic ? SizedAtomicOp(AtomicOp::ATOMIC_XOR, rmw_sz)
+                                             : SizedIntOp(IntOp::BIT_XOR, rmw_sz);
             break;
-          case pasta::BinaryOperatorKind::kShlAssign: inst.compound_op = mx::ir::OpCode::SHL; break;
-          case pasta::BinaryOperatorKind::kShrAssign: inst.compound_op = mx::ir::OpCode::SHR; break;
-          default: inst.compound_op = mx::ir::OpCode::ADD; break;
+          case pasta::BinaryOperatorKind::kShlAssign: inst.compound_op = SizedIntOp(IntOp::SHL, rmw_sz); break;
+          case pasta::BinaryOperatorKind::kShrAssign:
+            inst.compound_op = SizedIntOp(
+                (lhs_type && lhs_type->IsUnsignedIntegerType()) ? IntOp::USHR : IntOp::SHR, rmw_sz);
+            break;
+          default: inst.compound_op = SizedIntOp(IntOp::ADD, rmw_sz); break;
         }
         // Compound assign always returns the new value.
         inst.flags = 1;
@@ -2575,26 +2731,46 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         }
         // Pick the right opcode family: FCMP for float, UCMP for unsigned, CMP for signed.
         // Float comparisons are width-specific (32/64).
+        // Integer comparisons use IntOp + SizedIntOp.
+        IntOp cmp_group = IntOp::CMP_EQ;  // placeholder for non-float
+        bool cmp_is_float = false;
 #define FCMP(base) (is_f64 ? mx::ir::OpCode::base ## _64 : mx::ir::OpCode::base ## _32)
         switch (oc) {
           case pasta::BinaryOperatorKind::kEQ:
-            cmp_op = is_float ? FCMP(FCMP_EQ) : mx::ir::OpCode::CMP_EQ; break;
+            if (is_float) { cmp_op = FCMP(FCMP_EQ); cmp_is_float = true; }
+            else { cmp_group = IntOp::CMP_EQ; }
+            break;
           case pasta::BinaryOperatorKind::kNE:
-            cmp_op = is_float ? FCMP(FCMP_NE) : mx::ir::OpCode::CMP_NE; break;
+            if (is_float) { cmp_op = FCMP(FCMP_NE); cmp_is_float = true; }
+            else { cmp_group = IntOp::CMP_NE; }
+            break;
           case pasta::BinaryOperatorKind::kLT:
-            cmp_op = is_float ? FCMP(FCMP_LT)
-                   : is_unsigned ? mx::ir::OpCode::UCMP_LT : mx::ir::OpCode::CMP_LT; break;
+            if (is_float) { cmp_op = FCMP(FCMP_LT); cmp_is_float = true; }
+            else { cmp_group = is_unsigned ? IntOp::UCMP_LT : IntOp::CMP_LT; }
+            break;
           case pasta::BinaryOperatorKind::kGT:
-            cmp_op = is_float ? FCMP(FCMP_GT)
-                   : is_unsigned ? mx::ir::OpCode::UCMP_GT : mx::ir::OpCode::CMP_GT; break;
+            if (is_float) { cmp_op = FCMP(FCMP_GT); cmp_is_float = true; }
+            else { cmp_group = is_unsigned ? IntOp::UCMP_GT : IntOp::CMP_GT; }
+            break;
           case pasta::BinaryOperatorKind::kLE:
-            cmp_op = is_float ? FCMP(FCMP_LE)
-                   : is_unsigned ? mx::ir::OpCode::UCMP_LE : mx::ir::OpCode::CMP_LE; break;
+            if (is_float) { cmp_op = FCMP(FCMP_LE); cmp_is_float = true; }
+            else { cmp_group = is_unsigned ? IntOp::UCMP_LE : IntOp::CMP_LE; }
+            break;
           case pasta::BinaryOperatorKind::kGE:
-            cmp_op = is_float ? FCMP(FCMP_GE)
-                   : is_unsigned ? mx::ir::OpCode::UCMP_GE : mx::ir::OpCode::CMP_GE; break;
+            if (is_float) { cmp_op = FCMP(FCMP_GE); cmp_is_float = true; }
+            else { cmp_group = is_unsigned ? IntOp::UCMP_GE : IntOp::CMP_GE; }
+            break;
 #undef FCMP
-          default: is_cmp = false; cmp_op = mx::ir::OpCode::CMP_EQ; break;
+          default: is_cmp = false; break;
+        }
+        // Apply width suffix for integer comparisons.
+        if (!cmp_is_float && is_cmp) {
+          unsigned sz = 8;  // default 64-bit
+          if (auto lhs_type = bo->LHS().Type()) {
+            auto canon = lhs_type->CanonicalType();
+            if (auto s = TypeSizeBytes(canon)) sz = *s;
+          }
+          cmp_op = SizedIntOp(cmp_group, sz);
         }
       }
       if (is_cmp) {
@@ -2608,18 +2784,20 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       }
 
       // Arithmetic / logic.
-      mx::ir::OpCode arith_op = mx::ir::OpCode::ADD;
+      IntOp arith_group = IntOp::ADD;
+      mx::ir::OpCode arith_op{};
+      bool is_float_op = false;
       switch (oc) {
-        case pasta::BinaryOperatorKind::kAdd: arith_op = mx::ir::OpCode::ADD; break;
-        case pasta::BinaryOperatorKind::kSub: arith_op = mx::ir::OpCode::SUB; break;
-        case pasta::BinaryOperatorKind::kMul: arith_op = mx::ir::OpCode::MUL; break;
-        case pasta::BinaryOperatorKind::kDiv: arith_op = mx::ir::OpCode::DIV; break;
-        case pasta::BinaryOperatorKind::kRem: arith_op = mx::ir::OpCode::REM; break;
-        case pasta::BinaryOperatorKind::kAnd: arith_op = mx::ir::OpCode::BIT_AND; break;
-        case pasta::BinaryOperatorKind::kOr: arith_op = mx::ir::OpCode::BIT_OR; break;
-        case pasta::BinaryOperatorKind::kXor: arith_op = mx::ir::OpCode::BIT_XOR; break;
-        case pasta::BinaryOperatorKind::kShl: arith_op = mx::ir::OpCode::SHL; break;
-        case pasta::BinaryOperatorKind::kShr: arith_op = mx::ir::OpCode::SHR; break;
+        case pasta::BinaryOperatorKind::kAdd: arith_group = IntOp::ADD; break;
+        case pasta::BinaryOperatorKind::kSub: arith_group = IntOp::SUB; break;
+        case pasta::BinaryOperatorKind::kMul: arith_group = IntOp::MUL; break;
+        case pasta::BinaryOperatorKind::kDiv: arith_group = IntOp::DIV; break;
+        case pasta::BinaryOperatorKind::kRem: arith_group = IntOp::REM; break;
+        case pasta::BinaryOperatorKind::kAnd: arith_group = IntOp::BIT_AND; break;
+        case pasta::BinaryOperatorKind::kOr: arith_group = IntOp::BIT_OR; break;
+        case pasta::BinaryOperatorKind::kXor: arith_group = IntOp::BIT_XOR; break;
+        case pasta::BinaryOperatorKind::kShl: arith_group = IntOp::SHL; break;
+        case pasta::BinaryOperatorKind::kShr: arith_group = IntOp::SHR; break;
         default: break;
       }
 
@@ -2629,22 +2807,23 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         bool is_float = op_type && op_type->IsFloatingType();
         bool is_unsigned = op_type && op_type->IsUnsignedIntegerType();
         if (is_float) {
+          is_float_op = true;
           bool is_f64 = !op_type || !TypeSizeBytes(*op_type) ||
                         *TypeSizeBytes(*op_type) > 4;
-          if (arith_op == mx::ir::OpCode::ADD)
+          if (arith_group == IntOp::ADD)
             arith_op = is_f64 ? mx::ir::OpCode::FADD_64 : mx::ir::OpCode::FADD_32;
-          else if (arith_op == mx::ir::OpCode::SUB)
+          else if (arith_group == IntOp::SUB)
             arith_op = is_f64 ? mx::ir::OpCode::FSUB_64 : mx::ir::OpCode::FSUB_32;
-          else if (arith_op == mx::ir::OpCode::MUL)
+          else if (arith_group == IntOp::MUL)
             arith_op = is_f64 ? mx::ir::OpCode::FMUL_64 : mx::ir::OpCode::FMUL_32;
-          else if (arith_op == mx::ir::OpCode::DIV)
+          else if (arith_group == IntOp::DIV)
             arith_op = is_f64 ? mx::ir::OpCode::FDIV_64 : mx::ir::OpCode::FDIV_32;
-          else if (arith_op == mx::ir::OpCode::REM)
+          else if (arith_group == IntOp::REM)
             arith_op = is_f64 ? mx::ir::OpCode::FREM_64 : mx::ir::OpCode::FREM_32;
         } else if (is_unsigned) {
-          if (arith_op == mx::ir::OpCode::DIV) arith_op = mx::ir::OpCode::UDIV;
-          else if (arith_op == mx::ir::OpCode::REM) arith_op = mx::ir::OpCode::UREM;
-          else if (arith_op == mx::ir::OpCode::SHR) arith_op = mx::ir::OpCode::USHR;
+          if (arith_group == IntOp::DIV) arith_group = IntOp::UDIV;
+          else if (arith_group == IntOp::REM) arith_group = IntOp::UREM;
+          else if (arith_group == IntOp::SHR) arith_group = IntOp::USHR;
         }
       }
 
@@ -2653,15 +2832,17 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       auto rhs_type = bo->RHS().Type();
       bool lhs_ptr = lhs_type && pasta::PointerType::From(*lhs_type);
       bool rhs_ptr = rhs_type && pasta::PointerType::From(*rhs_type);
+      unsigned ptr_bytes = static_cast<unsigned>(
+          ctx_.getTargetInfo().getPointerWidth(clang::LangAS::Default)) / 8;
 
-      if (arith_op == mx::ir::OpCode::ADD && (lhs_ptr || rhs_ptr)) {
+      if (arith_group == IntOp::ADD && (lhs_ptr || rhs_ptr)) {
         auto base_expr = lhs_ptr ? bo->LHS() : bo->RHS();
         auto idx_expr = lhs_ptr ? bo->RHS() : bo->LHS();
         auto &ptr_type = lhs_ptr ? lhs_type : rhs_type;
         uint32_t base_idx = EmitRValue(base_expr);
         uint32_t idx_idx = EmitRValue(idx_expr);
         InstructionIR inst;
-        inst.opcode = mx::ir::OpCode::PTR_ADD;
+        inst.opcode = SizedPtrOp(mx::ir::OpCode::PTR_ADD_32, ptr_bytes);
         inst.source_entity_id = eid;
         inst.operand_indices = {base_idx, idx_idx};
         if (auto pt = pasta::PointerType::From(*ptr_type)) {
@@ -2672,12 +2853,12 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         return emit_typed(std::move(inst));
       }
 
-      if (arith_op == mx::ir::OpCode::SUB && lhs_ptr && rhs_ptr) {
-        // ptr - ptr → PTR_DIFF (result in elements, not bytes)
+      if (arith_group == IntOp::SUB && lhs_ptr && rhs_ptr) {
+        // ptr - ptr -> PTR_DIFF (result in elements, not bytes)
         uint32_t lhs_idx = EmitRValue(bo->LHS());
         uint32_t rhs_idx = EmitRValue(bo->RHS());
         InstructionIR inst;
-        inst.opcode = mx::ir::OpCode::PTR_DIFF;
+        inst.opcode = SizedPtrOp(mx::ir::OpCode::PTR_DIFF_32, ptr_bytes);
         inst.source_entity_id = eid;
         inst.operand_indices = {lhs_idx, rhs_idx};
         // Element size needed to convert byte difference to element count.
@@ -2688,15 +2869,21 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         return emit_typed(std::move(inst));
       }
 
-      if (arith_op == mx::ir::OpCode::SUB && lhs_ptr) {
+      if (arith_group == IntOp::SUB && lhs_ptr) {
         uint32_t base_idx = EmitRValue(bo->LHS());
         uint32_t idx_idx = EmitRValue(bo->RHS());
         InstructionIR neg;
-        neg.opcode = mx::ir::OpCode::NEG;
+        {
+          unsigned sz = 8;
+          if (auto rhs_t = bo->RHS().Type()) {
+            if (auto s = TypeSizeBytes(*rhs_t)) sz = *s;
+          }
+          neg.opcode = SizedIntOp(IntOp::NEG, sz);
+        }
         neg.operand_indices = {idx_idx};
         uint32_t neg_idx = EmitInstruction(std::move(neg));
         InstructionIR inst;
-        inst.opcode = mx::ir::OpCode::PTR_ADD;
+        inst.opcode = SizedPtrOp(mx::ir::OpCode::PTR_ADD_32, ptr_bytes);
         inst.source_entity_id = eid;
         inst.operand_indices = {base_idx, neg_idx};
         if (auto pt = pasta::PointerType::From(*lhs_type)) {
@@ -2707,20 +2894,22 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         return emit_typed(std::move(inst));
       }
 
+      // Apply width suffix for integer/unsigned arithmetic.
+      if (!is_float_op) {
+        auto op_type = e.Type();
+        unsigned sz = 8;
+        if (op_type) {
+          if (auto s = TypeSizeBytes(*op_type)) sz = *s;
+        }
+        arith_op = SizedIntOp(arith_group, sz);
+      }
+
       uint32_t lhs_idx = EmitRValue(bo->LHS());
       uint32_t rhs_idx = EmitRValue(bo->RHS());
       InstructionIR inst;
       inst.opcode = arith_op;
       inst.source_entity_id = eid;
       inst.operand_indices = {lhs_idx, rhs_idx};
-      // For unsigned ops, store the operand width so the interpreter
-      // can mask to the correct bit width before operating.
-      if (arith_op >= mx::ir::OpCode::UDIV &&
-          arith_op <= mx::ir::OpCode::USHR) {
-        if (auto t = e.Type()) {
-          if (auto sz = TypeSizeBytes(*t)) inst.size_bytes = *sz;
-        }
-      }
       return emit_typed(std::move(inst));
     }
   }
@@ -2894,16 +3083,10 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         if (!args.empty()) return EmitRValue(args[0]);
       }
 
-      // __builtin_assume(x) → BITWISE(ASSUME, x).
+      // __builtin_assume(x) — optimization hint, no runtime effect.
+      // Emit the operand for side effects, discard.
       if (callee_name == "__builtin_assume") {
-        if (!args.empty()) {
-          InstructionIR inst;
-          inst.opcode = mx::ir::OpCode::BITWISE;
-          inst.source_entity_id = eid;
-          inst.bitwise_op = static_cast<uint8_t>(mx::ir::BitwiseOp::ASSUME);
-          inst.operand_indices.push_back(EmitRValue(args[0]));
-          return emit_typed(std::move(inst));
-        }
+        if (!args.empty()) return EmitRValue(args[0]);
       }
 
       // Overflow-checked arithmetic builtins →
@@ -2913,11 +3096,18 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
           callee_name == "__builtin_sub_overflow" ||
           callee_name == "__builtin_mul_overflow") {
         if (args.size() >= 3) {
-          mx::ir::OpCode overflow_op = mx::ir::OpCode::ADD_OVERFLOW;
+          // Determine width from the result pointer's pointee type.
+          unsigned overflow_width = 4;
+          if (auto arg_type = args[2].Type()) {
+            if (auto pt = arg_type->PointeeType()) {
+              if (auto sz = TypeSizeBytes(*pt)) overflow_width = *sz;
+            }
+          }
+          mx::ir::OpCode overflow_op = SizedOverflowOp(OverflowOp::ADD_OVERFLOW, overflow_width);
           if (callee_name == "__builtin_sub_overflow")
-            overflow_op = mx::ir::OpCode::SUB_OVERFLOW;
+            overflow_op = SizedOverflowOp(OverflowOp::SUB_OVERFLOW, overflow_width);
           else if (callee_name == "__builtin_mul_overflow")
-            overflow_op = mx::ir::OpCode::MUL_OVERFLOW;
+            overflow_op = SizedOverflowOp(OverflowOp::MUL_OVERFLOW, overflow_width);
 
           uint32_t a_idx = EmitRValue(args[0]);
           uint32_t b_idx = EmitRValue(args[1]);
@@ -2991,8 +3181,10 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
 
             if (bb.undef_for_zero) {
               // result = SELECT(val == 0, UNDEFINED, bw_result)
+              auto at = args[0].Type();
+              assert(at && "builtin argument must have a type");
               uint8_t arg_width = 32;
-              if (auto at = args[0].Type()) {
+              if (at) {
                 if (auto s = TypeSizeBytes(*at)) arg_width = static_cast<uint8_t>(*s * 8);
               }
               InstructionIR zero;
@@ -3005,7 +3197,7 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
               uint32_t zero_idx = EmitInstruction(std::move(zero));
 
               InstructionIR cmp;
-              cmp.opcode = mx::ir::OpCode::CMP_EQ;
+              cmp.opcode = SizedIntOp(IntOp::CMP_EQ, arg_width / 8);
               cmp.source_entity_id = eid;
               cmp.operand_indices = {val_idx, zero_idx};
               uint32_t cmp_idx = EmitInstruction(std::move(cmp));
@@ -3206,7 +3398,8 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       // Frame/return address intrinsics.
       if (callee_name == "__builtin_frame_address") {
         InstructionIR inst;
-        inst.opcode = mx::ir::OpCode::FRAME_PTR;
+        inst.opcode = SizedPtrOp(mx::ir::OpCode::FRAME_PTR_32,
+            static_cast<unsigned>(ctx_.getTargetInfo().getPointerWidth(clang::LangAS::Default)) / 8);
         inst.source_entity_id = eid;
         if (!args.empty()) {
           inst.operand_indices.push_back(EmitRValue(args[0]));
@@ -3225,7 +3418,8 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       }
       if (callee_name == "__builtin_return_address") {
         InstructionIR inst;
-        inst.opcode = mx::ir::OpCode::RETURN_ADDRESS;
+        inst.opcode = SizedPtrOp(mx::ir::OpCode::RETURN_ADDRESS_32,
+            static_cast<unsigned>(ctx_.getTargetInfo().getPointerWidth(clang::LangAS::Default)) / 8);
         inst.source_entity_id = eid;
         if (!args.empty()) {
           inst.operand_indices.push_back(EmitRValue(args[0]));
@@ -3315,47 +3509,49 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       {
         struct AtomicRMWBuiltin {
           const char *name;
-          mx::ir::OpCode underlying;
+          AtomicOp underlying;
           bool returns_new;  // true = returns new value, false = returns old
         };
         static const AtomicRMWBuiltin atomic_rmw_builtins[] = {
-          {"__atomic_fetch_add", mx::ir::OpCode::ATOMIC_ADD, false},
-          {"__atomic_add_fetch", mx::ir::OpCode::ATOMIC_ADD, true},
-          {"__sync_fetch_and_add", mx::ir::OpCode::ATOMIC_ADD, false},
-          {"__atomic_fetch_sub", mx::ir::OpCode::ATOMIC_SUB, false},
-          {"__atomic_sub_fetch", mx::ir::OpCode::ATOMIC_SUB, true},
-          {"__sync_fetch_and_sub", mx::ir::OpCode::ATOMIC_SUB, false},
-          {"__atomic_fetch_and", mx::ir::OpCode::ATOMIC_AND, false},
-          {"__atomic_and_fetch", mx::ir::OpCode::ATOMIC_AND, true},
-          {"__sync_fetch_and_and", mx::ir::OpCode::ATOMIC_AND, false},
-          {"__atomic_fetch_or", mx::ir::OpCode::ATOMIC_OR, false},
-          {"__atomic_or_fetch", mx::ir::OpCode::ATOMIC_OR, true},
-          {"__sync_fetch_and_or", mx::ir::OpCode::ATOMIC_OR, false},
-          {"__atomic_fetch_xor", mx::ir::OpCode::ATOMIC_XOR, false},
-          {"__atomic_xor_fetch", mx::ir::OpCode::ATOMIC_XOR, true},
-          {"__sync_fetch_and_xor", mx::ir::OpCode::ATOMIC_XOR, false},
-          {"__atomic_fetch_nand", mx::ir::OpCode::ATOMIC_NAND, false},
-          {"__atomic_nand_fetch", mx::ir::OpCode::ATOMIC_NAND, true},
-          {"__sync_fetch_and_nand", mx::ir::OpCode::ATOMIC_NAND, false},
-          {"__atomic_exchange_n", mx::ir::OpCode::ATOMIC_EXCHANGE, false},
-          {"__sync_lock_test_and_set", mx::ir::OpCode::ATOMIC_EXCHANGE, false},
+          {"__atomic_fetch_add", AtomicOp::ATOMIC_ADD, false},
+          {"__atomic_add_fetch", AtomicOp::ATOMIC_ADD, true},
+          {"__sync_fetch_and_add", AtomicOp::ATOMIC_ADD, false},
+          {"__atomic_fetch_sub", AtomicOp::ATOMIC_SUB, false},
+          {"__atomic_sub_fetch", AtomicOp::ATOMIC_SUB, true},
+          {"__sync_fetch_and_sub", AtomicOp::ATOMIC_SUB, false},
+          {"__atomic_fetch_and", AtomicOp::ATOMIC_AND, false},
+          {"__atomic_and_fetch", AtomicOp::ATOMIC_AND, true},
+          {"__sync_fetch_and_and", AtomicOp::ATOMIC_AND, false},
+          {"__atomic_fetch_or", AtomicOp::ATOMIC_OR, false},
+          {"__atomic_or_fetch", AtomicOp::ATOMIC_OR, true},
+          {"__sync_fetch_and_or", AtomicOp::ATOMIC_OR, false},
+          {"__atomic_fetch_xor", AtomicOp::ATOMIC_XOR, false},
+          {"__atomic_xor_fetch", AtomicOp::ATOMIC_XOR, true},
+          {"__sync_fetch_and_xor", AtomicOp::ATOMIC_XOR, false},
+          {"__atomic_fetch_nand", AtomicOp::ATOMIC_NAND, false},
+          {"__atomic_nand_fetch", AtomicOp::ATOMIC_NAND, true},
+          {"__sync_fetch_and_nand", AtomicOp::ATOMIC_NAND, false},
+          {"__atomic_exchange_n", AtomicOp::ATOMIC_EXCHANGE, false},
+          {"__sync_lock_test_and_set", AtomicOp::ATOMIC_EXCHANGE, false},
         };
         for (const auto &ab : atomic_rmw_builtins) {
           if (callee_name == ab.name && args.size() >= 2) {
+            // Determine width from the pointee type (args[0] is a pointer).
+            unsigned atomic_width = 4;
+            if (auto arg_type = args[0].Type()) {
+              if (auto pt = arg_type->PointeeType()) {
+                if (auto sz = TypeSizeBytes(*pt)) atomic_width = *sz;
+              }
+            }
             InstructionIR rmw;
             rmw.opcode = mx::ir::OpCode::READ_MODIFY_WRITE;
             rmw.source_entity_id = eid;
-            rmw.compound_op = ab.underlying;
+            rmw.compound_op = SizedAtomicOp(ab.underlying, atomic_width);
             rmw.flags = ab.returns_new ? 1u : 0u;
             rmw.operand_indices.push_back(EmitRValue(args[0]));
             rmw.operand_indices.push_back(EmitRValue(args[1]));
             rmw.is_big_endian = ctx_.getTargetInfo().isBigEndian();
-            // Set element size from the pointee type (args[0] is a pointer).
-            if (auto arg_type = args[0].Type()) {
-              if (auto pt = arg_type->PointeeType()) {
-                if (auto sz = TypeSizeBytes(*pt)) rmw.size_bytes = *sz;
-              }
-            }
+            rmw.size_bytes = atomic_width;
             return emit_typed(std::move(rmw));
           }
         }
@@ -3797,7 +3993,8 @@ uint32_t IRGenerator::EmitLValue(const pasta::Expr &e) {
     // Function reference → FUNC_PTR.
     if (auto fd = pasta::FunctionDecl::From(decl)) {
       InstructionIR inst;
-      inst.opcode = mx::ir::OpCode::FUNC_PTR;
+      inst.opcode = SizedPtrOp(mx::ir::OpCode::FUNC_PTR_32,
+          static_cast<unsigned>(ctx_.getTargetInfo().getPointerWidth(clang::LangAS::Default)) / 8);
       inst.source_entity_id = eid;
       inst.target_entity_id = EntityIdOf(fd->CanonicalDeclaration());
       return EmitInstruction(std::move(inst));
@@ -3811,9 +4008,11 @@ uint32_t IRGenerator::EmitLValue(const pasta::Expr &e) {
         inst.target_entity_id = EntityIdOf(decl);
         // Distinguish thread-local from regular global.
         if (vd->TLSKind() != pasta::VarDeclTLSKind::kNone) {
-          inst.opcode = mx::ir::OpCode::THREAD_LOCAL_PTR;
+          inst.opcode = SizedPtrOp(mx::ir::OpCode::THREAD_LOCAL_PTR_32,
+              static_cast<unsigned>(ctx_.getTargetInfo().getPointerWidth(clang::LangAS::Default)) / 8);
         } else {
-          inst.opcode = mx::ir::OpCode::GLOBAL_PTR;
+          inst.opcode = SizedPtrOp(mx::ir::OpCode::GLOBAL_PTR_32,
+              static_cast<unsigned>(ctx_.getTargetInfo().getPointerWidth(clang::LangAS::Default)) / 8);
         }
         return EmitInstruction(std::move(inst));
       }
@@ -3834,7 +4033,8 @@ uint32_t IRGenerator::EmitLValue(const pasta::Expr &e) {
     }
 
     InstructionIR inst;
-    inst.opcode = mx::ir::OpCode::GEP_FIELD;
+    inst.opcode = SizedPtrOp(mx::ir::OpCode::GEP_FIELD_32,
+        static_cast<unsigned>(ctx_.getTargetInfo().getPointerWidth(clang::LangAS::Default)) / 8);
     inst.source_entity_id = eid;
     inst.operand_indices = {base_idx};
 
@@ -3853,7 +4053,8 @@ uint32_t IRGenerator::EmitLValue(const pasta::Expr &e) {
     uint32_t base_idx = EmitRValue(ase->Base());
     uint32_t idx_idx = EmitRValue(ase->Index());
     InstructionIR inst;
-    inst.opcode = mx::ir::OpCode::PTR_ADD;
+    inst.opcode = SizedPtrOp(mx::ir::OpCode::PTR_ADD_32,
+        static_cast<unsigned>(ctx_.getTargetInfo().getPointerWidth(clang::LangAS::Default)) / 8);
     inst.source_entity_id = eid;
     inst.operand_indices = {base_idx, idx_idx};
     // Element type from the base pointer/array type.

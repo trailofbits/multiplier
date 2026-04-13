@@ -583,3 +583,4 @@ mx-workspace/
 .claude/
 .mcp.json
 *_PROMPT.md
+tests/InterpretIR/compile_commands.json

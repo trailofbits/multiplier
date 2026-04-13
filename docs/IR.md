@@ -125,7 +125,7 @@ Key methods: `kind()`, `parent_structure()`, `parent_function()`, `instructions(
 
 ## Instructions
 
-71 opcodes. Grouped opcodes use a sub-opcode enum in the int pool.
+~217 opcodes (uint8_t). Integer, pointer, and atomic opcodes are width-specific (e.g., `ADD_32`, `PTR_ADD_64`, `ATOMIC_ADD_32`). Grouped opcodes (MEMORY, CAST, BITWISE, FLOAT) use a sub-opcode enum in the int pool.
 
 Instructions are stored in post-order (children before parents). `block.instructions()` yields top-level roots; `block.all_instructions()` yields everything in evaluation order.
 
@@ -134,11 +134,17 @@ Instructions are stored in post-order (children before parents). `block.instruct
 | Opcode | Description |
 |--------|-------------|
 | `ALLOCA` | Pointer to an allocation. Sub-opcode `AllocaKind` in int_pool[0]: `LOCAL` (regular local), `ARG` (call argument in EXPRESSION_SCOPE), `RETURN` (return value in EXPRESSION_SCOPE), `DYNAMIC` (VLA/alloca()). `allocated_type()`, `object()`, `size_bytes()`, `align_bytes()`. Derived classes: `LocalAllocaInst`, `ArgAllocaInst`, `ReturnAllocaInst`, `DynamicAllocaInst`. |
-| `GLOBAL_PTR` | Pointer to a global/static variable. `variable()` → VarDecl. |
-| `THREAD_LOCAL_PTR` | Pointer to a thread-local variable. `variable()` → VarDecl. |
-| `FUNC_PTR` | Pointer to a function. `function()` → FunctionDecl. |
-| `GEP_FIELD` | Struct field pointer. `base()`, `field()` → FieldDecl, `byte_offset()`. |
-| `PTR_ADD` | Pointer arithmetic. `base()`, `index()`, `element_type()`, `element_size()`. |
+| `GLOBAL_PTR_32/64` | Pointer to a global/static variable. Width = pointer size. `variable()` → VarDecl. |
+| `THREAD_LOCAL_PTR_32/64` | Pointer to a thread-local variable. `variable()` → VarDecl. |
+| `FUNC_PTR_32/64` | Pointer to a function. `function()` → FunctionDecl. |
+| `STRING_PTR_32/64` | Pointer to a string literal. `source_entity_id` → StringLiteral. |
+| `GEP_FIELD_32/64` | Struct field pointer. `base()`, `field()` → FieldDecl, `byte_offset()`. |
+| `PTR_ADD_32/64` | Pointer arithmetic. `base()`, `index()`, `element_type()`, `element_size()`. |
+| `PTR_DIFF_32/64` | Pointer subtraction. Result is ptrdiff_t. `lhs()`, `rhs()`, `element_size()`. |
+| `PARAM_PTR_32/64` | Pointer to Nth function parameter. `parameter_index()`. |
+| `FRAME_PTR_32/64` | `__builtin_frame_address`. |
+| `RETURN_PTR_32/64` | Callee-side pointer to caller's return storage. |
+| `RETURN_ADDRESS_32/64` | `__builtin_return_address`. |
 
 ### Memory Access (MEMORY opcode)
 
@@ -199,11 +205,20 @@ Helpers: `IsSignExtend()`, `IsZeroExtend()`, `IsTruncate()`, `IsIntToFloat()`, `
 
 ### Arithmetic and Logic
 
+All integer/bitwise/comparison opcodes are width-specific (`_8`, `_16`, `_32`, `_64`). The width suffix indicates the operand width in bits. Float opcodes have `_32` (float) and `_64` (double) variants.
+
 | Opcodes | Class |
 |---------|-------|
-| `ADD`, `SUB`, `MUL`, `DIV`, `REM`, `BIT_AND`, `BIT_OR`, `BIT_XOR`, `SHL`, `SHR`, `LOGICAL_AND`, `LOGICAL_OR`, `PTR_DIFF` | `BinaryInst` |
-| `CMP_EQ`, `CMP_NE`, `CMP_LT`, `CMP_LE`, `CMP_GT`, `CMP_GE` | `ComparisonInst` |
-| `NEG`, `BIT_NOT`, `LOGICAL_NOT` | `UnaryInst` |
+| `ADD_8/16/32/64`, `SUB_*`, `MUL_*`, `DIV_*`, `REM_*` | `BinaryInst` (signed arithmetic) |
+| `UDIV_8/16/32/64`, `UREM_*`, `USHR_*` | `BinaryInst` (unsigned arithmetic) |
+| `BIT_AND_8/16/32/64`, `BIT_OR_*`, `BIT_XOR_*`, `SHL_*`, `SHR_*` | `BinaryInst` (bitwise) |
+| `FADD_32/64`, `FSUB_*`, `FMUL_*`, `FDIV_*`, `FREM_*` | `BinaryInst` (float arithmetic) |
+| `CMP_EQ_8/16/32/64`, `CMP_NE_*`, `CMP_LT_*`, `CMP_LE_*`, `CMP_GT_*`, `CMP_GE_*` | `ComparisonInst` (signed) |
+| `UCMP_LT_8/16/32/64`, `UCMP_LE_*`, `UCMP_GT_*`, `UCMP_GE_*` | `ComparisonInst` (unsigned) |
+| `FCMP_EQ_32/64`, `FCMP_NE_*`, `FCMP_LT_*`, `FCMP_LE_*`, `FCMP_GT_*`, `FCMP_GE_*` | `ComparisonInst` (float) |
+| `NEG_8/16/32/64`, `BIT_NOT_8/16/32/64` | `UnaryInst` (sized) |
+| `FNEG_32/64` | `UnaryInst` (float) |
+| `LOGICAL_AND`, `LOGICAL_OR`, `LOGICAL_NOT` | Unsized (produce 0 or 1) |
 
 ### Calls
 
@@ -217,7 +232,14 @@ With the EXPRESSION_SCOPE model, function calls are wrapped in an `EXPRESSION_SC
 
 int_pool layout: `[underlying_opcode, element_size, is_big_endian]`.
 
-Used for: `++i` (ADD), `i += 5` (ADD), `++ptr` (PTR_ADD), `--ptr` (PTR_ADD with -1), `ptr += n` (PTR_ADD), `_Atomic int a; a += 1` (ATOMIC_ADD), `__builtin_add_overflow` (ADD_OVERFLOW, returns bool), `__atomic_fetch_add` (ATOMIC_ADD).
+The underlying opcode is always a sized opcode:
+- Integer: `ADD_32`, `SUB_64`, `UDIV_32`, `USHR_32`, etc.
+- Float: `FADD_32`, `FSUB_64`, `FMUL_32`, `FDIV_64`, `FREM_32`
+- Pointer: `PTR_ADD_32`, `PTR_ADD_64`
+- Atomic: `ATOMIC_ADD_8/16/32/64`, `ATOMIC_SUB_*`, `ATOMIC_AND_*`, `ATOMIC_OR_*`, `ATOMIC_XOR_*`, `ATOMIC_NAND_*`, `ATOMIC_EXCHANGE_*`
+- Overflow: `ADD_OVERFLOW_8/16/32/64`, `SUB_OVERFLOW_*`, `MUL_OVERFLOW_*` (returns bool)
+
+Used for: `++i` (ADD_32), `i += 5` (ADD_32), `f += 1.0` (FADD_32), `++ptr` (PTR_ADD_64), `ptr += n` (PTR_ADD_64), `_Atomic int a; a += 1` (ATOMIC_ADD_32), `__builtin_add_overflow` (ADD_OVERFLOW_32), `__atomic_fetch_add` (ATOMIC_ADD_32).
 
 ### Misc
 

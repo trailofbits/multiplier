@@ -58,8 +58,11 @@
 12. **No call inlining** — Interpreter doesn't step into callees.
 13. **No external function modeling** — malloc/free/memcpy/printf etc. not modeled.
 
+### Codegen / Types
+14. **`__int128` / `_BitInt(N>64)`** — Sized integer opcodes only cover 8/16/32/64-bit widths. Wider types (e.g., `__int128`, `_BitInt(128)`) currently round down to `_64`. These could be decomposed into paired 64-bit operations.
+
 ### C23
-14. **`#embed` directive** — C23's `#embed` for embedding binary data. Not handled.
+15. **`#embed` directive** — C23's `#embed` for embedding binary data. Not handled.
 
 ### Documentation
 15. **IR_GAPS.md** — This file (kept up to date).

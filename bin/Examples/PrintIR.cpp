@@ -97,10 +97,8 @@ void PrintInstruction(std::ostream &os, const mx::IRInstruction &inst,
   } else if (auto ai = mx::AllocaInst::from(inst)) {
     os << "/" << mx::ir::EnumeratorName(ai->alloca_kind());
     os << " size=" << ai->size_bytes() << " align=" << ai->align_bytes();
-  } else if (op == mx::ir::OpCode::PARAM_PTR) {
-    if (auto pr = mx::ParamPtrInst::from(inst)) {
-      os << " idx=" << pr->parameter_index();
-    }
+  } else if (auto pr = mx::ParamPtrInst::from(inst)) {
+    os << " idx=" << pr->parameter_index();
   } else if (op == mx::ir::OpCode::ENTER_SCOPE ||
              op == mx::ir::OpCode::EXIT_SCOPE) {
     mx::IRStructure scope;
@@ -109,16 +107,12 @@ void PrintInstruction(std::ostream &os, const mx::IRInstruction &inst,
     if (scope.id() != mx::EntityId()) {
       os << " " << mx::ir::EnumeratorName(scope.kind());
     }
-  } else if (op == mx::ir::OpCode::GEP_FIELD) {
-    if (auto gi = mx::GEPFieldInst::from(inst)) {
-      os << " offset=" << gi->byte_offset();
-      auto fd = gi->field();
-      os << " ." << fd.name();
-    }
-  } else if (op == mx::ir::OpCode::PTR_ADD) {
-    if (auto pi = mx::PtrAddInst::from(inst)) {
-      os << " elem_size=" << pi->element_size();
-    }
+  } else if (auto gi = mx::GEPFieldInst::from(inst)) {
+    os << " offset=" << gi->byte_offset();
+    auto fd = gi->field();
+    os << " ." << fd.name();
+  } else if (auto pi = mx::PtrAddInst::from(inst)) {
+    os << " elem_size=" << pi->element_size();
   } else if (op == mx::ir::OpCode::CALL) {
     if (auto ci = mx::CallInst::from(inst)) {
       if (auto target = ci->target()) {
