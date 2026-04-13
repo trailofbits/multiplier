@@ -18,6 +18,10 @@
 - **Switch case compensation** — Compensation blocks for switch→case scope crossings.
 - **CFG predecessor fix** — Correct predecessor list updates in compensation.
 - **Database teardown** — Isolated try/catch per step, leaked statement detection.
+- **Sized opcodes** — All integer, pointer, atomic, overflow, and bitwise opcodes are width-specific (_8/_16/_32/_64). Float opcodes have _32/_64 variants. FloatOp and BitwiseOp sub-opcodes carry width. No unsized arithmetic/pointer opcodes remain in the enum. Interpreter is width-correct at all sizes. OpCode is uint8_t (251 values, gap-packed).
+- **ABS opcode** — Moved from BitwiseOp sub-opcode to sized top-level opcode (ABS_8/16/32/64).
+- **EXPECT/ASSUME removed** — Compiler hints with no runtime semantics; not emitted to IR.
+- **Interpreter precision** — Float _32 ops use float precision, _64 use double. All casts (SEXT, ZEXT, TRUNC, int↔float, float↔float, BITCAST) are width-correct. Unsigned operations use correct unsigned types at each width.
 - **Entity ID type safety** — Typed enums in IRBlockId, IRInstructionId, IRStructureId.
 - **IRSwitchCase → IRSwitchCaseStructure** — Switch cases are now IRStructure entities.
 - **ALLOCA sub-opcodes** — AllocaKind: LOCAL, ARG, RETURN, DYNAMIC. DynamicAllocaInst derived from AllocaInst.

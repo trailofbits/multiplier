@@ -216,9 +216,32 @@ All integer/bitwise/comparison opcodes are width-specific (`_8`, `_16`, `_32`, `
 | `CMP_EQ_8/16/32/64`, `CMP_NE_*`, `CMP_LT_*`, `CMP_LE_*`, `CMP_GT_*`, `CMP_GE_*` | `ComparisonInst` (signed) |
 | `UCMP_LT_8/16/32/64`, `UCMP_LE_*`, `UCMP_GT_*`, `UCMP_GE_*` | `ComparisonInst` (unsigned) |
 | `FCMP_EQ_32/64`, `FCMP_NE_*`, `FCMP_LT_*`, `FCMP_LE_*`, `FCMP_GT_*`, `FCMP_GE_*` | `ComparisonInst` (float) |
-| `NEG_8/16/32/64`, `BIT_NOT_8/16/32/64` | `UnaryInst` (sized) |
+| `NEG_8/16/32/64`, `BIT_NOT_8/16/32/64`, `ABS_8/16/32/64` | `UnaryInst` (sized) |
 | `FNEG_32/64` | `UnaryInst` (float) |
 | `LOGICAL_AND`, `LOGICAL_OR`, `LOGICAL_NOT` | Unsized (produce 0 or 1) |
+
+### Bitwise Intrinsics (BITWISE opcode)
+
+`BITWISE_8/16/32/64` — width-specific bitwise intrinsics. `BitwiseOp` sub-opcode in int_pool[0]:
+
+| Sub-opcode | Description |
+|------------|-------------|
+| `BSWAP_16/32/64` | Byte swap (width in sub-opcode name). |
+| `POPCOUNT` | Number of set bits. |
+| `CLZ` | Count leading zeros. UNDEFINED for 0. |
+| `CTZ` | Count trailing zeros. UNDEFINED for 0. |
+| `FFS` | Find first set bit (1-indexed). 0 for input 0. |
+| `PARITY` | 1 if odd number of set bits. |
+| `ROTL` | Rotate left. op[0]=value, op[1]=amount. |
+| `ROTR` | Rotate right. op[0]=value, op[1]=amount. |
+
+Width comes from the parent opcode. CLZ on `BITWISE_8` counts leading zeros in an 8-bit value.
+
+### Float Intrinsics (FLOAT opcode)
+
+`FLOAT` — float intrinsic operations. `FloatOp` sub-opcode in int_pool[0]. Every sub-opcode has `_32` (float) and `_64` (double) variants for precision-correct execution.
+
+Categories: classification (`ISNAN`, `ISINF`, `ISFINITE`, `SIGNBIT`), arithmetic (`FABS`, `COPYSIGN`, `FMIN`, `FMAX`), rounding (`CEIL`, `FLOOR`, `ROUND`, `TRUNC`), roots (`SQRT`), trigonometric (`SIN`, `COS`, `TAN`, `ASIN`, `ACOS`, `ATAN`, `ATAN2`), exponential (`EXP`, `EXP2`, `LOG`, `LOG2`, `LOG10`), power (`POW`, `FMOD`, `REMAINDER`, `FMA`), hyperbolic (`SINH`, `COSH`, `TANH`), other (`HYPOT`, `ERF`, `ERFC`, `TGAMMA`, `LGAMMA`, `FDIM`), constants (`INF`, `NAN`, `HUGE`).
 
 ### Calls
 
@@ -247,9 +270,9 @@ Used for: `++i` (ADD_32), `i += 5` (ADD_32), `f += 1.0` (FADD_32), `++ptr` (PTR_
 |--------|-------------|
 | `SELECT` | Ternary `a ? b : c`. Both branches marked conditionally executed. |
 | `LAST_VALUE` | Comma operator `a, b`. Evaluates all operands, returns last. |
-| `PARAM_PTR` | Pointer to Nth function parameter. Storage lives in caller's EXPRESSION_SCOPE. `parameter_index()`, `parameter_type()`. |
-| `FRAME_PTR` | `__builtin_frame_address(level)`. `level()`, `result_type()`. |
-| `RETURN_ADDRESS` | `__builtin_return_address(level)`. `level()`, `result_type()`. |
+| `PARAM_PTR_32/64` | Pointer to Nth function parameter. `parameter_index()`, `parameter_type()`. |
+| `FRAME_PTR_32/64` | `__builtin_frame_address(level)`. |
+| `RETURN_ADDRESS_32/64` | `__builtin_return_address(level)`. |
 | `UNDEFINED` | Poison value. Any use is UB. |
 
 ### Variadic Argument Handling
