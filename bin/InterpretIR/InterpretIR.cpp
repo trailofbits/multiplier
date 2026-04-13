@@ -2696,11 +2696,11 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
         using BO = mx::ir::BitwiseOp;
         auto sub = bw->sub_opcode();
         switch (sub) {
-          case BO::BSWAP16:
+          case BO::BSWAP_16:
             result = Value::Int(static_cast<int16_t>(__builtin_bswap16(static_cast<uint16_t>(v)))); break;
-          case BO::BSWAP32:
+          case BO::BSWAP_32:
             result = Value::Int(static_cast<int32_t>(__builtin_bswap32(static_cast<uint32_t>(v)))); break;
-          case BO::BSWAP64:
+          case BO::BSWAP_64:
             result = Value::Int(static_cast<int64_t>(__builtin_bswap64(static_cast<uint64_t>(v)))); break;
           case BO::POPCOUNT:
             switch (op) {

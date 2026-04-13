@@ -439,33 +439,20 @@ inline bool IsCmpxchg(MemOp op) { return op >= MemOp::CMPXCHG_LE_8 && op <= MemO
 inline bool IsBitRead(MemOp op) { return op == MemOp::BIT_READ_LE || op == MemOp::BIT_READ_BE; }
 inline bool IsBitWrite(MemOp op) { return op == MemOp::BIT_WRITE_LE || op == MemOp::BIT_WRITE_BE; }
 
-// Sub-opcodes for BITWISE. Stored in the int pool.
+// Sub-opcodes for BITWISE_8/16/32/64. Stored in the int pool.
+// Width comes from the parent opcode, not the sub-opcode (except BSWAP
+// which has its own width in the name since only 16/32/64 make sense).
 enum class BitwiseOp : uint8_t {
-  // Byte swap.
-  BSWAP16 = 0,            // Reverse bytes of 16-bit value.
-  BSWAP32 = 1,            // Reverse bytes of 32-bit value.
-  BSWAP64 = 2,            // Reverse bytes of 64-bit value.
-
-  // Population count: number of set bits.
-  POPCOUNT = 3,            // Result is defined for all inputs including 0.
-
-  // Count leading zeros. UNDEFINED for input == 0.
-  CLZ = 4,                 // __builtin_clz (32-bit), __builtin_clzl, __builtin_clzll
-  // Count trailing zeros. UNDEFINED for input == 0.
-  CTZ = 5,                 // __builtin_ctz, __builtin_ctzl, __builtin_ctzll
-
-  // Find first set bit (1-indexed from LSB). Returns 0 for input == 0.
-  FFS = 6,                 // __builtin_ffs, __builtin_ffsl, __builtin_ffsll
-
-  // Parity: 1 if odd number of set bits, 0 if even.
-  PARITY = 7,              // __builtin_parity
-
-  // Bit rotation.
-  ROTL = 8,                // Rotate left. op[0] = value, op[1] = amount.
-  ROTR = 9,                // Rotate right. op[0] = value, op[1] = amount.
-
-  // 10: removed (ABS is now a sized opcode, not a bitwise sub-opcode)
-  // 11, 12: removed (EXPECT/ASSUME were compiler hints, not operations)
+  BSWAP_16 = 0,           // Reverse bytes of 16-bit value.
+  BSWAP_32 = 1,           // Reverse bytes of 32-bit value.
+  BSWAP_64 = 2,           // Reverse bytes of 64-bit value.
+  POPCOUNT = 3,            // Number of set bits.
+  CLZ = 4,                 // Count leading zeros. UNDEFINED for 0.
+  CTZ = 5,                 // Count trailing zeros. UNDEFINED for 0.
+  FFS = 6,                 // Find first set (1-indexed). 0 for input 0.
+  PARITY = 7,              // 1 if odd number of set bits.
+  ROTL = 8,                // Rotate left. op[0]=value, op[1]=amount.
+  ROTR = 9,                // Rotate right. op[0]=value, op[1]=amount.
 };
 
 // Sub-opcodes for FLOAT. Stored in the int pool.

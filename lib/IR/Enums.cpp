@@ -427,9 +427,9 @@ const char *EnumeratorName(MemOp op) noexcept {
 
 const char *EnumeratorName(BitwiseOp op) noexcept {
   switch (op) {
-    case BitwiseOp::BSWAP16: return "BSWAP16";
-    case BitwiseOp::BSWAP32: return "BSWAP32";
-    case BitwiseOp::BSWAP64: return "BSWAP64";
+    case BitwiseOp::BSWAP_16: return "BSWAP_16";
+    case BitwiseOp::BSWAP_32: return "BSWAP_32";
+    case BitwiseOp::BSWAP_64: return "BSWAP_64";
     case BitwiseOp::POPCOUNT: return "POPCOUNT";
     case BitwiseOp::CLZ: return "CLZ";
     case BitwiseOp::CTZ: return "CTZ";

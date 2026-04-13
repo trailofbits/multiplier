@@ -3164,9 +3164,9 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
           bool undef_for_zero;  // CLZ/CTZ are undefined for input == 0
         };
         static const BitwiseBuiltin bitwise_builtins[] = {
-          {"__builtin_bswap16", BO::BSWAP16, false},
-          {"__builtin_bswap32", BO::BSWAP32, false},
-          {"__builtin_bswap64", BO::BSWAP64, false},
+          {"__builtin_bswap16", BO::BSWAP_16, false},
+          {"__builtin_bswap32", BO::BSWAP_32, false},
+          {"__builtin_bswap64", BO::BSWAP_64, false},
           {"__builtin_popcount", BO::POPCOUNT, false},
           {"__builtin_popcountl", BO::POPCOUNT, false},
           {"__builtin_popcountll", BO::POPCOUNT, false},
