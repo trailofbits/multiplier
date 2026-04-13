@@ -469,58 +469,50 @@ enum class BitwiseOp : uint8_t {
 };
 
 // Sub-opcodes for FLOAT. Stored in the int pool.
+// Each operation has _32 (float) and _64 (double) variants.
+// Laid out as pairs: _32 at even indices, _64 at odd.
 enum class FloatOp : uint8_t {
-  ISNAN = 0,       // op[0]=x. Returns bool.
-  ISINF = 1,       // op[0]=x. Returns bool.
-  ISFINITE = 2,    // op[0]=x. Returns bool.
-  FABS = 3,        // op[0]=x. Returns |x|.
-  COPYSIGN = 4,    // op[0]=x, op[1]=y. Returns x with sign of y.
-  FMIN = 5,        // op[0]=x, op[1]=y. Returns min.
-  FMAX = 6,        // op[0]=x, op[1]=y. Returns max.
-  CEIL = 7,        // op[0]=x. Returns ceil(x).
-  FLOOR = 8,       // op[0]=x. Returns floor(x).
-  ROUND = 9,       // op[0]=x. Returns round(x).
-  TRUNC = 10,      // op[0]=x. Returns trunc(x).
-  SQRT = 11,       // op[0]=x. Returns sqrt(x). UNDEFINED for negative.
-  INF = 12,        // No operands. Returns +infinity.
-  NAN_VAL = 13,    // No operands. Returns NaN.
-  FLOAT_HUGE = 14, // No operands. Returns HUGE_VAL (+inf).
-
-  // Trigonometric.
-  SIN = 15,        // op[0]=x. Returns sin(x).
-  COS = 16,        // op[0]=x. Returns cos(x).
-  TAN = 17,        // op[0]=x. Returns tan(x).
-  ASIN = 18,       // op[0]=x. Returns asin(x). UNDEFINED for |x|>1.
-  ACOS = 19,       // op[0]=x. Returns acos(x). UNDEFINED for |x|>1.
-  ATAN = 20,       // op[0]=x. Returns atan(x).
-  ATAN2 = 21,      // op[0]=y, op[1]=x. Returns atan2(y,x).
-
-  // Exponential/logarithmic.
-  EXP = 22,        // op[0]=x. Returns e^x.
-  EXP2 = 23,       // op[0]=x. Returns 2^x.
-  LOG = 24,        // op[0]=x. Returns ln(x). UNDEFINED for x<=0.
-  LOG2 = 25,       // op[0]=x. Returns log2(x). UNDEFINED for x<=0.
-  LOG10 = 26,      // op[0]=x. Returns log10(x). UNDEFINED for x<=0.
-
-  // Power/modular.
-  POW = 27,        // op[0]=base, op[1]=exp. Returns base^exp.
-  FMOD = 28,       // op[0]=x, op[1]=y. Returns fmod(x,y).
-  REMAINDER = 29,  // op[0]=x, op[1]=y. Returns IEEE remainder.
-  FMA = 30,        // op[0]=x, op[1]=y, op[2]=z. Returns x*y+z (fused).
-
-  // Hyperbolic.
-  SINH = 31,       // op[0]=x.
-  COSH = 32,       // op[0]=x.
-  TANH = 33,       // op[0]=x.
-
-  // Other.
-  HYPOT = 34,      // op[0]=x, op[1]=y. Returns sqrt(x^2+y^2).
-  ERF = 35,        // op[0]=x. Error function.
-  ERFC = 36,       // op[0]=x. Complementary error function.
-  TGAMMA = 37,     // op[0]=x. Gamma function.
-  LGAMMA = 38,     // op[0]=x. Log-gamma function.
-  FDIM = 39,       // op[0]=x, op[1]=y. Returns max(x-y, 0).
-  SIGNBIT = 40,    // op[0]=x. Returns bool (sign bit set).
+  ISNAN_32 = 0,    ISNAN_64 = 1,       // Returns bool.
+  ISINF_32 = 2,    ISINF_64 = 3,       // Returns bool.
+  ISFINITE_32 = 4, ISFINITE_64 = 5,    // Returns bool.
+  FABS_32 = 6,     FABS_64 = 7,        // Returns |x|.
+  COPYSIGN_32 = 8, COPYSIGN_64 = 9,    // op[0]=x, op[1]=y. Returns x with sign of y.
+  FMIN_32 = 10,    FMIN_64 = 11,       // Returns min.
+  FMAX_32 = 12,    FMAX_64 = 13,       // Returns max.
+  CEIL_32 = 14,    CEIL_64 = 15,       // Returns ceil(x).
+  FLOOR_32 = 16,   FLOOR_64 = 17,      // Returns floor(x).
+  ROUND_32 = 18,   ROUND_64 = 19,      // Returns round(x).
+  TRUNC_32 = 20,   TRUNC_64 = 21,      // Returns trunc(x).
+  SQRT_32 = 22,    SQRT_64 = 23,       // Returns sqrt(x). UNDEFINED for negative.
+  INF_32 = 24,     INF_64 = 25,        // No operands. Returns +infinity.
+  NAN_32 = 26,     NAN_64 = 27,        // No operands. Returns NaN.
+  HUGE_32 = 28,    HUGE_64 = 29,       // No operands. Returns HUGE_VAL.
+  SIN_32 = 30,     SIN_64 = 31,
+  COS_32 = 32,     COS_64 = 33,
+  TAN_32 = 34,     TAN_64 = 35,
+  ASIN_32 = 36,    ASIN_64 = 37,       // UNDEFINED for |x|>1.
+  ACOS_32 = 38,    ACOS_64 = 39,       // UNDEFINED for |x|>1.
+  ATAN_32 = 40,    ATAN_64 = 41,
+  ATAN2_32 = 42,   ATAN2_64 = 43,      // op[0]=y, op[1]=x.
+  EXP_32 = 44,     EXP_64 = 45,
+  EXP2_32 = 46,    EXP2_64 = 47,
+  LOG_32 = 48,     LOG_64 = 49,        // UNDEFINED for x<=0.
+  LOG2_32 = 50,    LOG2_64 = 51,
+  LOG10_32 = 52,   LOG10_64 = 53,
+  POW_32 = 54,     POW_64 = 55,        // op[0]=base, op[1]=exp.
+  FMOD_32 = 56,    FMOD_64 = 57,       // C fmod.
+  REMAINDER_32 = 58, REMAINDER_64 = 59, // IEEE remainder.
+  FMA_32 = 60,     FMA_64 = 61,        // op[0]=x, op[1]=y, op[2]=z. x*y+z.
+  SINH_32 = 62,    SINH_64 = 63,
+  COSH_32 = 64,    COSH_64 = 65,
+  TANH_32 = 66,    TANH_64 = 67,
+  HYPOT_32 = 68,   HYPOT_64 = 69,      // sqrt(x^2+y^2).
+  ERF_32 = 70,     ERF_64 = 71,
+  ERFC_32 = 72,    ERFC_64 = 73,
+  TGAMMA_32 = 74,  TGAMMA_64 = 75,
+  LGAMMA_32 = 76,  LGAMMA_64 = 77,
+  FDIM_32 = 78,    FDIM_64 = 79,       // max(x-y, 0).
+  SIGNBIT_32 = 80, SIGNBIT_64 = 81,    // Returns bool.
 };
 
 // Classification helpers.

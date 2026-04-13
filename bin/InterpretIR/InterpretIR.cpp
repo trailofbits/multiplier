@@ -2807,177 +2807,369 @@ void Interpreter::Eval(const mx::IRInstruction &inst) {
           ops.push_back(GetValue(op_inst));
         }
         using FO = mx::ir::FloatOp;
-        switch (fo->sub_opcode()) {
-          case FO::FABS:
+        auto sub = fo->sub_opcode();
+        switch (sub) {
+          // --- 1-arg float→float ops ---
+          case FO::FABS_32:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(fabsf(static_cast<float>(ops[0].as_float())));
+            break;
+          case FO::FABS_64:
             result = ops.empty() ? Value::Undef()
                 : Value::Float(std::fabs(ops[0].as_float()));
             break;
-          case FO::SQRT:
+          case FO::SQRT_32:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(sqrtf(static_cast<float>(ops[0].as_float())));
+            break;
+          case FO::SQRT_64:
             result = ops.empty() ? Value::Undef()
                 : Value::Float(std::sqrt(ops[0].as_float()));
             break;
-          case FO::CEIL:
+          case FO::CEIL_32:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(ceilf(static_cast<float>(ops[0].as_float())));
+            break;
+          case FO::CEIL_64:
             result = ops.empty() ? Value::Undef()
                 : Value::Float(std::ceil(ops[0].as_float()));
             break;
-          case FO::FLOOR:
+          case FO::FLOOR_32:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(floorf(static_cast<float>(ops[0].as_float())));
+            break;
+          case FO::FLOOR_64:
             result = ops.empty() ? Value::Undef()
                 : Value::Float(std::floor(ops[0].as_float()));
             break;
-          case FO::ROUND:
+          case FO::ROUND_32:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(roundf(static_cast<float>(ops[0].as_float())));
+            break;
+          case FO::ROUND_64:
             result = ops.empty() ? Value::Undef()
                 : Value::Float(std::round(ops[0].as_float()));
             break;
-          case FO::TRUNC:
+          case FO::TRUNC_32:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(truncf(static_cast<float>(ops[0].as_float())));
+            break;
+          case FO::TRUNC_64:
             result = ops.empty() ? Value::Undef()
                 : Value::Float(std::trunc(ops[0].as_float()));
             break;
-          case FO::FMIN:
+          case FO::SIN_32:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(sinf(static_cast<float>(ops[0].as_float())));
+            break;
+          case FO::SIN_64:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::sin(ops[0].as_float()));
+            break;
+          case FO::COS_32:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(cosf(static_cast<float>(ops[0].as_float())));
+            break;
+          case FO::COS_64:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::cos(ops[0].as_float()));
+            break;
+          case FO::TAN_32:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(tanf(static_cast<float>(ops[0].as_float())));
+            break;
+          case FO::TAN_64:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::tan(ops[0].as_float()));
+            break;
+          case FO::ASIN_32:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(asinf(static_cast<float>(ops[0].as_float())));
+            break;
+          case FO::ASIN_64:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::asin(ops[0].as_float()));
+            break;
+          case FO::ACOS_32:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(acosf(static_cast<float>(ops[0].as_float())));
+            break;
+          case FO::ACOS_64:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::acos(ops[0].as_float()));
+            break;
+          case FO::ATAN_32:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(atanf(static_cast<float>(ops[0].as_float())));
+            break;
+          case FO::ATAN_64:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::atan(ops[0].as_float()));
+            break;
+          case FO::EXP_32:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(expf(static_cast<float>(ops[0].as_float())));
+            break;
+          case FO::EXP_64:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::exp(ops[0].as_float()));
+            break;
+          case FO::EXP2_32:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(exp2f(static_cast<float>(ops[0].as_float())));
+            break;
+          case FO::EXP2_64:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::exp2(ops[0].as_float()));
+            break;
+          case FO::LOG_32:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(logf(static_cast<float>(ops[0].as_float())));
+            break;
+          case FO::LOG_64:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::log(ops[0].as_float()));
+            break;
+          case FO::LOG2_32:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(log2f(static_cast<float>(ops[0].as_float())));
+            break;
+          case FO::LOG2_64:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::log2(ops[0].as_float()));
+            break;
+          case FO::LOG10_32:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(log10f(static_cast<float>(ops[0].as_float())));
+            break;
+          case FO::LOG10_64:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::log10(ops[0].as_float()));
+            break;
+          case FO::SINH_32:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(sinhf(static_cast<float>(ops[0].as_float())));
+            break;
+          case FO::SINH_64:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::sinh(ops[0].as_float()));
+            break;
+          case FO::COSH_32:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(coshf(static_cast<float>(ops[0].as_float())));
+            break;
+          case FO::COSH_64:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::cosh(ops[0].as_float()));
+            break;
+          case FO::TANH_32:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(tanhf(static_cast<float>(ops[0].as_float())));
+            break;
+          case FO::TANH_64:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::tanh(ops[0].as_float()));
+            break;
+          case FO::ERF_32:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(erff(static_cast<float>(ops[0].as_float())));
+            break;
+          case FO::ERF_64:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::erf(ops[0].as_float()));
+            break;
+          case FO::ERFC_32:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(erfcf(static_cast<float>(ops[0].as_float())));
+            break;
+          case FO::ERFC_64:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::erfc(ops[0].as_float()));
+            break;
+          case FO::TGAMMA_32:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(tgammaf(static_cast<float>(ops[0].as_float())));
+            break;
+          case FO::TGAMMA_64:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::tgamma(ops[0].as_float()));
+            break;
+          case FO::LGAMMA_32:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(lgammaf(static_cast<float>(ops[0].as_float())));
+            break;
+          case FO::LGAMMA_64:
+            result = ops.empty() ? Value::Undef()
+                : Value::Float(std::lgamma(ops[0].as_float()));
+            break;
+
+          // --- 2-arg float→float ops ---
+          case FO::FMIN_32:
+            result = (ops.size() >= 2)
+                ? Value::Float(fminf(static_cast<float>(ops[0].as_float()),
+                                     static_cast<float>(ops[1].as_float())))
+                : Value::Undef();
+            break;
+          case FO::FMIN_64:
             result = (ops.size() >= 2)
                 ? Value::Float(std::fmin(ops[0].as_float(), ops[1].as_float()))
                 : Value::Undef();
             break;
-          case FO::FMAX:
+          case FO::FMAX_32:
+            result = (ops.size() >= 2)
+                ? Value::Float(fmaxf(static_cast<float>(ops[0].as_float()),
+                                     static_cast<float>(ops[1].as_float())))
+                : Value::Undef();
+            break;
+          case FO::FMAX_64:
             result = (ops.size() >= 2)
                 ? Value::Float(std::fmax(ops[0].as_float(), ops[1].as_float()))
                 : Value::Undef();
             break;
-          case FO::COPYSIGN:
+          case FO::COPYSIGN_32:
+            result = (ops.size() >= 2)
+                ? Value::Float(copysignf(static_cast<float>(ops[0].as_float()),
+                                         static_cast<float>(ops[1].as_float())))
+                : Value::Undef();
+            break;
+          case FO::COPYSIGN_64:
             result = (ops.size() >= 2)
                 ? Value::Float(std::copysign(ops[0].as_float(), ops[1].as_float()))
                 : Value::Undef();
             break;
-          case FO::ISNAN:
-            result = ops.empty() ? Value::Undef()
-                : Value::Int(std::isnan(ops[0].as_float()) ? 1 : 0);
+          case FO::ATAN2_32:
+            result = (ops.size() >= 2)
+                ? Value::Float(atan2f(static_cast<float>(ops[0].as_float()),
+                                      static_cast<float>(ops[1].as_float())))
+                : Value::Undef();
             break;
-          case FO::ISINF:
-            result = ops.empty() ? Value::Undef()
-                : Value::Int(std::isinf(ops[0].as_float()) ? 1 : 0);
-            break;
-          case FO::ISFINITE:
-            result = ops.empty() ? Value::Undef()
-                : Value::Int(std::isfinite(ops[0].as_float()) ? 1 : 0);
-            break;
-          case FO::INF:
-            result = Value::Float(std::numeric_limits<double>::infinity());
-            break;
-          case FO::NAN_VAL:
-            result = Value::Float(std::numeric_limits<double>::quiet_NaN());
-            break;
-          case FO::FLOAT_HUGE:
-            result = Value::Float(std::numeric_limits<double>::infinity());
-            break;
-          case FO::SIN:
-            result = ops.empty() ? Value::Undef()
-                : Value::Float(std::sin(ops[0].as_float()));
-            break;
-          case FO::COS:
-            result = ops.empty() ? Value::Undef()
-                : Value::Float(std::cos(ops[0].as_float()));
-            break;
-          case FO::TAN:
-            result = ops.empty() ? Value::Undef()
-                : Value::Float(std::tan(ops[0].as_float()));
-            break;
-          case FO::ASIN:
-            result = ops.empty() ? Value::Undef()
-                : Value::Float(std::asin(ops[0].as_float()));
-            break;
-          case FO::ACOS:
-            result = ops.empty() ? Value::Undef()
-                : Value::Float(std::acos(ops[0].as_float()));
-            break;
-          case FO::ATAN:
-            result = ops.empty() ? Value::Undef()
-                : Value::Float(std::atan(ops[0].as_float()));
-            break;
-          case FO::ATAN2:
+          case FO::ATAN2_64:
             result = (ops.size() >= 2)
                 ? Value::Float(std::atan2(ops[0].as_float(), ops[1].as_float()))
                 : Value::Undef();
             break;
-          case FO::EXP:
-            result = ops.empty() ? Value::Undef()
-                : Value::Float(std::exp(ops[0].as_float()));
+          case FO::POW_32:
+            result = (ops.size() >= 2)
+                ? Value::Float(powf(static_cast<float>(ops[0].as_float()),
+                                    static_cast<float>(ops[1].as_float())))
+                : Value::Undef();
             break;
-          case FO::EXP2:
-            result = ops.empty() ? Value::Undef()
-                : Value::Float(std::exp2(ops[0].as_float()));
-            break;
-          case FO::LOG:
-            result = ops.empty() ? Value::Undef()
-                : Value::Float(std::log(ops[0].as_float()));
-            break;
-          case FO::LOG2:
-            result = ops.empty() ? Value::Undef()
-                : Value::Float(std::log2(ops[0].as_float()));
-            break;
-          case FO::LOG10:
-            result = ops.empty() ? Value::Undef()
-                : Value::Float(std::log10(ops[0].as_float()));
-            break;
-          case FO::POW:
+          case FO::POW_64:
             result = (ops.size() >= 2)
                 ? Value::Float(std::pow(ops[0].as_float(), ops[1].as_float()))
                 : Value::Undef();
             break;
-          case FO::FMOD:
+          case FO::FMOD_32:
+            result = (ops.size() >= 2)
+                ? Value::Float(fmodf(static_cast<float>(ops[0].as_float()),
+                                     static_cast<float>(ops[1].as_float())))
+                : Value::Undef();
+            break;
+          case FO::FMOD_64:
             result = (ops.size() >= 2)
                 ? Value::Float(std::fmod(ops[0].as_float(), ops[1].as_float()))
                 : Value::Undef();
             break;
-          case FO::REMAINDER:
+          case FO::REMAINDER_32:
+            result = (ops.size() >= 2)
+                ? Value::Float(remainderf(static_cast<float>(ops[0].as_float()),
+                                          static_cast<float>(ops[1].as_float())))
+                : Value::Undef();
+            break;
+          case FO::REMAINDER_64:
             result = (ops.size() >= 2)
                 ? Value::Float(std::remainder(ops[0].as_float(), ops[1].as_float()))
                 : Value::Undef();
             break;
-          case FO::FMA:
-            result = (ops.size() >= 3)
-                ? Value::Float(std::fma(ops[0].as_float(), ops[1].as_float(), ops[2].as_float()))
+          case FO::HYPOT_32:
+            result = (ops.size() >= 2)
+                ? Value::Float(hypotf(static_cast<float>(ops[0].as_float()),
+                                      static_cast<float>(ops[1].as_float())))
                 : Value::Undef();
             break;
-          case FO::SINH:
-            result = ops.empty() ? Value::Undef()
-                : Value::Float(std::sinh(ops[0].as_float()));
-            break;
-          case FO::COSH:
-            result = ops.empty() ? Value::Undef()
-                : Value::Float(std::cosh(ops[0].as_float()));
-            break;
-          case FO::TANH:
-            result = ops.empty() ? Value::Undef()
-                : Value::Float(std::tanh(ops[0].as_float()));
-            break;
-          case FO::HYPOT:
+          case FO::HYPOT_64:
             result = (ops.size() >= 2)
                 ? Value::Float(std::hypot(ops[0].as_float(), ops[1].as_float()))
                 : Value::Undef();
             break;
-          case FO::ERF:
-            result = ops.empty() ? Value::Undef()
-                : Value::Float(std::erf(ops[0].as_float()));
+          case FO::FDIM_32:
+            result = (ops.size() >= 2)
+                ? Value::Float(fdimf(static_cast<float>(ops[0].as_float()),
+                                     static_cast<float>(ops[1].as_float())))
+                : Value::Undef();
             break;
-          case FO::ERFC:
-            result = ops.empty() ? Value::Undef()
-                : Value::Float(std::erfc(ops[0].as_float()));
-            break;
-          case FO::TGAMMA:
-            result = ops.empty() ? Value::Undef()
-                : Value::Float(std::tgamma(ops[0].as_float()));
-            break;
-          case FO::LGAMMA:
-            result = ops.empty() ? Value::Undef()
-                : Value::Float(std::lgamma(ops[0].as_float()));
-            break;
-          case FO::FDIM:
+          case FO::FDIM_64:
             result = (ops.size() >= 2)
                 ? Value::Float(std::fdim(ops[0].as_float(), ops[1].as_float()))
                 : Value::Undef();
             break;
-          case FO::SIGNBIT:
+
+          // --- 3-arg ops ---
+          case FO::FMA_32:
+            result = (ops.size() >= 3)
+                ? Value::Float(fmaf(static_cast<float>(ops[0].as_float()),
+                                    static_cast<float>(ops[1].as_float()),
+                                    static_cast<float>(ops[2].as_float())))
+                : Value::Undef();
+            break;
+          case FO::FMA_64:
+            result = (ops.size() >= 3)
+                ? Value::Float(std::fma(ops[0].as_float(), ops[1].as_float(), ops[2].as_float()))
+                : Value::Undef();
+            break;
+
+          // --- Classification ops (return int) ---
+          case FO::ISNAN_32:
+            result = ops.empty() ? Value::Undef()
+                : Value::Int(std::isnan(static_cast<float>(ops[0].as_float())) ? 1 : 0);
+            break;
+          case FO::ISNAN_64:
+            result = ops.empty() ? Value::Undef()
+                : Value::Int(std::isnan(ops[0].as_float()) ? 1 : 0);
+            break;
+          case FO::ISINF_32:
+            result = ops.empty() ? Value::Undef()
+                : Value::Int(std::isinf(static_cast<float>(ops[0].as_float())) ? 1 : 0);
+            break;
+          case FO::ISINF_64:
+            result = ops.empty() ? Value::Undef()
+                : Value::Int(std::isinf(ops[0].as_float()) ? 1 : 0);
+            break;
+          case FO::ISFINITE_32:
+            result = ops.empty() ? Value::Undef()
+                : Value::Int(std::isfinite(static_cast<float>(ops[0].as_float())) ? 1 : 0);
+            break;
+          case FO::ISFINITE_64:
+            result = ops.empty() ? Value::Undef()
+                : Value::Int(std::isfinite(ops[0].as_float()) ? 1 : 0);
+            break;
+          case FO::SIGNBIT_32:
+            result = ops.empty() ? Value::Undef()
+                : Value::Int(std::signbit(static_cast<float>(ops[0].as_float())) ? 1 : 0);
+            break;
+          case FO::SIGNBIT_64:
             result = ops.empty() ? Value::Undef()
                 : Value::Int(std::signbit(ops[0].as_float()) ? 1 : 0);
+            break;
+
+          // --- Zero-arg constants ---
+          case FO::INF_32:
+            result = Value::Float(std::numeric_limits<float>::infinity());
+            break;
+          case FO::INF_64:
+            result = Value::Float(std::numeric_limits<double>::infinity());
+            break;
+          case FO::NAN_32:
+            result = Value::Float(std::numeric_limits<float>::quiet_NaN());
+            break;
+          case FO::NAN_64:
+            result = Value::Float(std::numeric_limits<double>::quiet_NaN());
+            break;
+          case FO::HUGE_32:
+            result = Value::Float(static_cast<double>(HUGE_VALF));
+            break;
+          case FO::HUGE_64:
+            result = Value::Float(HUGE_VAL);
             break;
         }
       }

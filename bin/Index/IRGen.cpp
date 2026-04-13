@@ -3257,117 +3257,133 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
       // Float builtins → FLOAT with sub-opcode.
       {
         using FO = mx::ir::FloatOp;
+
+        // Given the _32 variant of a FloatOp (even index), return the _32 or
+        // _64 variant based on the byte width of the operand/result type.
+        auto SizedFloatSubOp = [](FO base_32, unsigned width_bytes) -> FO {
+          // _32 is even, _64 is odd.
+          return (width_bytes <= 4)
+              ? base_32
+              : static_cast<FO>(static_cast<unsigned>(base_32) + 1);
+        };
+
         struct FloatBuiltin {
           const char *name;
-          FO op;
+          FO op_32;  // The _32 variant; _64 = op_32 + 1.
           unsigned num_args;
         };
         static const FloatBuiltin float_builtins[] = {
-          {"__builtin_isnan", FO::ISNAN, 1},
-          {"__builtin_isinf", FO::ISINF, 1},
-          {"__builtin_isfinite", FO::ISFINITE, 1},
-          {"__builtin_fabs", FO::FABS, 1},
-          {"__builtin_fabsf", FO::FABS, 1},
-          {"__builtin_fabsl", FO::FABS, 1},
-          {"fabs", FO::FABS, 1},
-          {"fabsf", FO::FABS, 1},
-          {"fabsl", FO::FABS, 1},
-          {"__builtin_copysign", FO::COPYSIGN, 2},
-          {"__builtin_copysignf", FO::COPYSIGN, 2},
-          {"__builtin_copysignl", FO::COPYSIGN, 2},
-          {"copysign", FO::COPYSIGN, 2},
-          {"copysignf", FO::COPYSIGN, 2},
-          {"__builtin_fmin", FO::FMIN, 2},
-          {"__builtin_fminf", FO::FMIN, 2},
-          {"fmin", FO::FMIN, 2},
-          {"fminf", FO::FMIN, 2},
-          {"__builtin_fmax", FO::FMAX, 2},
-          {"__builtin_fmaxf", FO::FMAX, 2},
-          {"fmax", FO::FMAX, 2},
-          {"fmaxf", FO::FMAX, 2},
-          {"__builtin_ceil", FO::CEIL, 1},
-          {"__builtin_ceilf", FO::CEIL, 1},
-          {"ceil", FO::CEIL, 1},
-          {"ceilf", FO::CEIL, 1},
-          {"__builtin_floor", FO::FLOOR, 1},
-          {"__builtin_floorf", FO::FLOOR, 1},
-          {"floor", FO::FLOOR, 1},
-          {"floorf", FO::FLOOR, 1},
-          {"__builtin_round", FO::ROUND, 1},
-          {"__builtin_roundf", FO::ROUND, 1},
-          {"round", FO::ROUND, 1},
-          {"roundf", FO::ROUND, 1},
-          {"__builtin_trunc", FO::TRUNC, 1},
-          {"__builtin_truncf", FO::TRUNC, 1},
-          {"trunc", FO::TRUNC, 1},
-          {"truncf", FO::TRUNC, 1},
-          {"__builtin_sqrt", FO::SQRT, 1},
-          {"__builtin_sqrtf", FO::SQRT, 1},
-          {"sqrt", FO::SQRT, 1},
-          {"sqrtf", FO::SQRT, 1},
+          {"__builtin_isnan", FO::ISNAN_32, 1},
+          {"__builtin_isinf", FO::ISINF_32, 1},
+          {"__builtin_isfinite", FO::ISFINITE_32, 1},
+          {"__builtin_fabs", FO::FABS_32, 1},
+          {"__builtin_fabsf", FO::FABS_32, 1},
+          {"__builtin_fabsl", FO::FABS_32, 1},
+          {"fabs", FO::FABS_32, 1},
+          {"fabsf", FO::FABS_32, 1},
+          {"fabsl", FO::FABS_32, 1},
+          {"__builtin_copysign", FO::COPYSIGN_32, 2},
+          {"__builtin_copysignf", FO::COPYSIGN_32, 2},
+          {"__builtin_copysignl", FO::COPYSIGN_32, 2},
+          {"copysign", FO::COPYSIGN_32, 2},
+          {"copysignf", FO::COPYSIGN_32, 2},
+          {"__builtin_fmin", FO::FMIN_32, 2},
+          {"__builtin_fminf", FO::FMIN_32, 2},
+          {"fmin", FO::FMIN_32, 2},
+          {"fminf", FO::FMIN_32, 2},
+          {"__builtin_fmax", FO::FMAX_32, 2},
+          {"__builtin_fmaxf", FO::FMAX_32, 2},
+          {"fmax", FO::FMAX_32, 2},
+          {"fmaxf", FO::FMAX_32, 2},
+          {"__builtin_ceil", FO::CEIL_32, 1},
+          {"__builtin_ceilf", FO::CEIL_32, 1},
+          {"ceil", FO::CEIL_32, 1},
+          {"ceilf", FO::CEIL_32, 1},
+          {"__builtin_floor", FO::FLOOR_32, 1},
+          {"__builtin_floorf", FO::FLOOR_32, 1},
+          {"floor", FO::FLOOR_32, 1},
+          {"floorf", FO::FLOOR_32, 1},
+          {"__builtin_round", FO::ROUND_32, 1},
+          {"__builtin_roundf", FO::ROUND_32, 1},
+          {"round", FO::ROUND_32, 1},
+          {"roundf", FO::ROUND_32, 1},
+          {"__builtin_trunc", FO::TRUNC_32, 1},
+          {"__builtin_truncf", FO::TRUNC_32, 1},
+          {"trunc", FO::TRUNC_32, 1},
+          {"truncf", FO::TRUNC_32, 1},
+          {"__builtin_sqrt", FO::SQRT_32, 1},
+          {"__builtin_sqrtf", FO::SQRT_32, 1},
+          {"sqrt", FO::SQRT_32, 1},
+          {"sqrtf", FO::SQRT_32, 1},
           // Trigonometric.
-          {"sin", FO::SIN, 1}, {"sinf", FO::SIN, 1},
-          {"__builtin_sin", FO::SIN, 1}, {"__builtin_sinf", FO::SIN, 1},
-          {"cos", FO::COS, 1}, {"cosf", FO::COS, 1},
-          {"__builtin_cos", FO::COS, 1}, {"__builtin_cosf", FO::COS, 1},
-          {"tan", FO::TAN, 1}, {"tanf", FO::TAN, 1},
-          {"__builtin_tan", FO::TAN, 1}, {"__builtin_tanf", FO::TAN, 1},
-          {"asin", FO::ASIN, 1}, {"asinf", FO::ASIN, 1},
-          {"__builtin_asin", FO::ASIN, 1}, {"__builtin_asinf", FO::ASIN, 1},
-          {"acos", FO::ACOS, 1}, {"acosf", FO::ACOS, 1},
-          {"__builtin_acos", FO::ACOS, 1}, {"__builtin_acosf", FO::ACOS, 1},
-          {"atan", FO::ATAN, 1}, {"atanf", FO::ATAN, 1},
-          {"__builtin_atan", FO::ATAN, 1}, {"__builtin_atanf", FO::ATAN, 1},
-          {"atan2", FO::ATAN2, 2}, {"atan2f", FO::ATAN2, 2},
-          {"__builtin_atan2", FO::ATAN2, 2}, {"__builtin_atan2f", FO::ATAN2, 2},
+          {"sin", FO::SIN_32, 1}, {"sinf", FO::SIN_32, 1},
+          {"__builtin_sin", FO::SIN_32, 1}, {"__builtin_sinf", FO::SIN_32, 1},
+          {"cos", FO::COS_32, 1}, {"cosf", FO::COS_32, 1},
+          {"__builtin_cos", FO::COS_32, 1}, {"__builtin_cosf", FO::COS_32, 1},
+          {"tan", FO::TAN_32, 1}, {"tanf", FO::TAN_32, 1},
+          {"__builtin_tan", FO::TAN_32, 1}, {"__builtin_tanf", FO::TAN_32, 1},
+          {"asin", FO::ASIN_32, 1}, {"asinf", FO::ASIN_32, 1},
+          {"__builtin_asin", FO::ASIN_32, 1}, {"__builtin_asinf", FO::ASIN_32, 1},
+          {"acos", FO::ACOS_32, 1}, {"acosf", FO::ACOS_32, 1},
+          {"__builtin_acos", FO::ACOS_32, 1}, {"__builtin_acosf", FO::ACOS_32, 1},
+          {"atan", FO::ATAN_32, 1}, {"atanf", FO::ATAN_32, 1},
+          {"__builtin_atan", FO::ATAN_32, 1}, {"__builtin_atanf", FO::ATAN_32, 1},
+          {"atan2", FO::ATAN2_32, 2}, {"atan2f", FO::ATAN2_32, 2},
+          {"__builtin_atan2", FO::ATAN2_32, 2}, {"__builtin_atan2f", FO::ATAN2_32, 2},
           // Exponential/logarithmic.
-          {"exp", FO::EXP, 1}, {"expf", FO::EXP, 1},
-          {"__builtin_exp", FO::EXP, 1}, {"__builtin_expf", FO::EXP, 1},
-          {"exp2", FO::EXP2, 1}, {"exp2f", FO::EXP2, 1},
-          {"__builtin_exp2", FO::EXP2, 1}, {"__builtin_exp2f", FO::EXP2, 1},
-          {"log", FO::LOG, 1}, {"logf", FO::LOG, 1},
-          {"__builtin_log", FO::LOG, 1}, {"__builtin_logf", FO::LOG, 1},
-          {"log2", FO::LOG2, 1}, {"log2f", FO::LOG2, 1},
-          {"__builtin_log2", FO::LOG2, 1}, {"__builtin_log2f", FO::LOG2, 1},
-          {"log10", FO::LOG10, 1}, {"log10f", FO::LOG10, 1},
-          {"__builtin_log10", FO::LOG10, 1}, {"__builtin_log10f", FO::LOG10, 1},
+          {"exp", FO::EXP_32, 1}, {"expf", FO::EXP_32, 1},
+          {"__builtin_exp", FO::EXP_32, 1}, {"__builtin_expf", FO::EXP_32, 1},
+          {"exp2", FO::EXP2_32, 1}, {"exp2f", FO::EXP2_32, 1},
+          {"__builtin_exp2", FO::EXP2_32, 1}, {"__builtin_exp2f", FO::EXP2_32, 1},
+          {"log", FO::LOG_32, 1}, {"logf", FO::LOG_32, 1},
+          {"__builtin_log", FO::LOG_32, 1}, {"__builtin_logf", FO::LOG_32, 1},
+          {"log2", FO::LOG2_32, 1}, {"log2f", FO::LOG2_32, 1},
+          {"__builtin_log2", FO::LOG2_32, 1}, {"__builtin_log2f", FO::LOG2_32, 1},
+          {"log10", FO::LOG10_32, 1}, {"log10f", FO::LOG10_32, 1},
+          {"__builtin_log10", FO::LOG10_32, 1}, {"__builtin_log10f", FO::LOG10_32, 1},
           // Power/modular.
-          {"pow", FO::POW, 2}, {"powf", FO::POW, 2},
-          {"__builtin_pow", FO::POW, 2}, {"__builtin_powf", FO::POW, 2},
-          {"fmod", FO::FMOD, 2}, {"fmodf", FO::FMOD, 2},
-          {"__builtin_fmod", FO::FMOD, 2}, {"__builtin_fmodf", FO::FMOD, 2},
-          {"remainder", FO::REMAINDER, 2}, {"remainderf", FO::REMAINDER, 2},
-          {"__builtin_remainder", FO::REMAINDER, 2},
-          {"fma", FO::FMA, 3}, {"fmaf", FO::FMA, 3},
-          {"__builtin_fma", FO::FMA, 3}, {"__builtin_fmaf", FO::FMA, 3},
+          {"pow", FO::POW_32, 2}, {"powf", FO::POW_32, 2},
+          {"__builtin_pow", FO::POW_32, 2}, {"__builtin_powf", FO::POW_32, 2},
+          {"fmod", FO::FMOD_32, 2}, {"fmodf", FO::FMOD_32, 2},
+          {"__builtin_fmod", FO::FMOD_32, 2}, {"__builtin_fmodf", FO::FMOD_32, 2},
+          {"remainder", FO::REMAINDER_32, 2}, {"remainderf", FO::REMAINDER_32, 2},
+          {"__builtin_remainder", FO::REMAINDER_32, 2},
+          {"fma", FO::FMA_32, 3}, {"fmaf", FO::FMA_32, 3},
+          {"__builtin_fma", FO::FMA_32, 3}, {"__builtin_fmaf", FO::FMA_32, 3},
           // Hyperbolic.
-          {"sinh", FO::SINH, 1}, {"sinhf", FO::SINH, 1},
-          {"__builtin_sinh", FO::SINH, 1},
-          {"cosh", FO::COSH, 1}, {"coshf", FO::COSH, 1},
-          {"__builtin_cosh", FO::COSH, 1},
-          {"tanh", FO::TANH, 1}, {"tanhf", FO::TANH, 1},
-          {"__builtin_tanh", FO::TANH, 1},
+          {"sinh", FO::SINH_32, 1}, {"sinhf", FO::SINH_32, 1},
+          {"__builtin_sinh", FO::SINH_32, 1},
+          {"cosh", FO::COSH_32, 1}, {"coshf", FO::COSH_32, 1},
+          {"__builtin_cosh", FO::COSH_32, 1},
+          {"tanh", FO::TANH_32, 1}, {"tanhf", FO::TANH_32, 1},
+          {"__builtin_tanh", FO::TANH_32, 1},
           // Other.
-          {"hypot", FO::HYPOT, 2}, {"hypotf", FO::HYPOT, 2},
-          {"__builtin_hypot", FO::HYPOT, 2},
-          {"erf", FO::ERF, 1}, {"erff", FO::ERF, 1},
-          {"__builtin_erf", FO::ERF, 1},
-          {"erfc", FO::ERFC, 1}, {"erfcf", FO::ERFC, 1},
-          {"__builtin_erfc", FO::ERFC, 1},
-          {"tgamma", FO::TGAMMA, 1}, {"tgammaf", FO::TGAMMA, 1},
-          {"__builtin_tgamma", FO::TGAMMA, 1},
-          {"lgamma", FO::LGAMMA, 1}, {"lgammaf", FO::LGAMMA, 1},
-          {"__builtin_lgamma", FO::LGAMMA, 1},
-          {"fdim", FO::FDIM, 2}, {"fdimf", FO::FDIM, 2},
-          {"__builtin_fdim", FO::FDIM, 2},
-          {"__builtin_signbit", FO::SIGNBIT, 1},
-          {"signbit", FO::SIGNBIT, 1},
+          {"hypot", FO::HYPOT_32, 2}, {"hypotf", FO::HYPOT_32, 2},
+          {"__builtin_hypot", FO::HYPOT_32, 2},
+          {"erf", FO::ERF_32, 1}, {"erff", FO::ERF_32, 1},
+          {"__builtin_erf", FO::ERF_32, 1},
+          {"erfc", FO::ERFC_32, 1}, {"erfcf", FO::ERFC_32, 1},
+          {"__builtin_erfc", FO::ERFC_32, 1},
+          {"tgamma", FO::TGAMMA_32, 1}, {"tgammaf", FO::TGAMMA_32, 1},
+          {"__builtin_tgamma", FO::TGAMMA_32, 1},
+          {"lgamma", FO::LGAMMA_32, 1}, {"lgammaf", FO::LGAMMA_32, 1},
+          {"__builtin_lgamma", FO::LGAMMA_32, 1},
+          {"fdim", FO::FDIM_32, 2}, {"fdimf", FO::FDIM_32, 2},
+          {"__builtin_fdim", FO::FDIM_32, 2},
+          {"__builtin_signbit", FO::SIGNBIT_32, 1},
+          {"signbit", FO::SIGNBIT_32, 1},
         };
         for (const auto &fb : float_builtins) {
           if (callee_name == fb.name && args.size() >= fb.num_args) {
+            // Determine float width from the result type of the call.
+            unsigned float_sz = 8;  // Default to double (64-bit).
+            if (expr_type) {
+              if (auto s = TypeSizeBytes(*expr_type)) float_sz = *s;
+            }
             InstructionIR inst;
             inst.opcode = mx::ir::OpCode::FLOAT;
-            inst.float_op = static_cast<uint8_t>(fb.op);
+            inst.float_op = static_cast<uint8_t>(
+                SizedFloatSubOp(fb.op_32, float_sz));
             inst.source_entity_id = eid;
             for (unsigned i = 0; i < fb.num_args; ++i) {
               inst.operand_indices.push_back(EmitRValue(args[i]));
@@ -3379,26 +3395,41 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         // Zero-argument float constants.
         if (callee_name == "__builtin_inf" || callee_name == "__builtin_inff" ||
             callee_name == "__builtin_infl") {
+          unsigned float_sz = 8;
+          if (expr_type) {
+            if (auto s = TypeSizeBytes(*expr_type)) float_sz = *s;
+          }
           InstructionIR inst;
           inst.opcode = mx::ir::OpCode::FLOAT;
-          inst.float_op = static_cast<uint8_t>(FO::INF);
+          inst.float_op = static_cast<uint8_t>(
+              SizedFloatSubOp(FO::INF_32, float_sz));
           inst.source_entity_id = eid;
           return emit_typed(std::move(inst));
         }
         if (callee_name == "__builtin_nan" || callee_name == "__builtin_nanf" ||
             callee_name == "__builtin_nanl") {
+          unsigned float_sz = 8;
+          if (expr_type) {
+            if (auto s = TypeSizeBytes(*expr_type)) float_sz = *s;
+          }
           InstructionIR inst;
           inst.opcode = mx::ir::OpCode::FLOAT;
-          inst.float_op = static_cast<uint8_t>(FO::NAN_VAL);
+          inst.float_op = static_cast<uint8_t>(
+              SizedFloatSubOp(FO::NAN_32, float_sz));
           inst.source_entity_id = eid;
           return emit_typed(std::move(inst));
         }
         if (callee_name == "__builtin_huge_val" ||
             callee_name == "__builtin_huge_valf" ||
             callee_name == "__builtin_huge_vall") {
+          unsigned float_sz = 8;
+          if (expr_type) {
+            if (auto s = TypeSizeBytes(*expr_type)) float_sz = *s;
+          }
           InstructionIR inst;
           inst.opcode = mx::ir::OpCode::FLOAT;
-          inst.float_op = static_cast<uint8_t>(FO::FLOAT_HUGE);
+          inst.float_op = static_cast<uint8_t>(
+              SizedFloatSubOp(FO::HUGE_32, float_sz));
           inst.source_entity_id = eid;
           return emit_typed(std::move(inst));
         }
