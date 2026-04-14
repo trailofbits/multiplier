@@ -472,6 +472,12 @@ void SerializeIR(
 
       ib.setEntityOffset(ent_start);
       ib.setConstOffset(const_start);
+      // Operand count fits in uint8_t: most instructions have 0-3 operands.
+      // CALL has one per argument; 255 args is the practical limit. Variadic
+      // calls with more would need a wider field in the capnp schema.
+      DCHECK(src.operand_indices.size() <= 255)
+          << "Instruction has " << src.operand_indices.size()
+          << " operands, exceeding uint8_t capacity";
       ib.setNumOperands(static_cast<uint8_t>(src.operand_indices.size()));
       ib.setOpcode(static_cast<uint8_t>(src.opcode));
       ib.setConstWidth(src.width);
