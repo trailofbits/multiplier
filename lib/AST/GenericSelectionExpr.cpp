@@ -184,11 +184,11 @@ std::optional<GenericSelectionExpr> GenericSelectionExpr::from(const TokenContex
 }
 
 unsigned GenericSelectionExpr::num_association_expressions(void) const {
-  return impl->reader.getVal15().size();
+  return impl->reader.getVal16().size();
 }
 
 std::optional<Expr> GenericSelectionExpr::nth_association_expression(unsigned n) const {
-  auto list = impl->reader.getVal15();
+  auto list = impl->reader.getVal16();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -202,12 +202,12 @@ std::optional<Expr> GenericSelectionExpr::nth_association_expression(unsigned n)
 }
 
 gap::generator<Expr> GenericSelectionExpr::association_expressions(void) const & {
-  auto list = impl->reader.getVal15();
+  auto list = impl->reader.getVal16();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d15 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from_base(std::move(d15))) {
+    if (auto d16 = ep->StmtFor(ep, v)) {
+      if (auto e = Expr::from_base(std::move(d16))) {
         co_yield std::move(*e);
       }
     }
@@ -217,7 +217,7 @@ gap::generator<Expr> GenericSelectionExpr::association_expressions(void) const &
 
 std::optional<Expr> GenericSelectionExpr::controlling_expression(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal38();
+    RawEntityId eid = impl->reader.getVal39();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -230,7 +230,7 @@ std::optional<Expr> GenericSelectionExpr::controlling_expression(void) const {
 
 std::optional<Type> GenericSelectionExpr::controlling_type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal39();
+    RawEntityId eid = impl->reader.getVal40();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -242,20 +242,20 @@ std::optional<Type> GenericSelectionExpr::controlling_type(void) const {
 }
 
 Token GenericSelectionExpr::default_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
-}
-
-Token GenericSelectionExpr::generic_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
-Token GenericSelectionExpr::r_paren_token(void) const {
+Token GenericSelectionExpr::generic_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
+}
+
+Token GenericSelectionExpr::r_paren_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }
 
 std::optional<Expr> GenericSelectionExpr::result_expression(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal43();
+    RawEntityId eid = impl->reader.getVal44();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -267,19 +267,19 @@ std::optional<Expr> GenericSelectionExpr::result_expression(void) const {
 }
 
 uint32_t GenericSelectionExpr::result_index(void) const {
-  return impl->reader.getVal26();
+  return impl->reader.getVal27();
 }
 
 bool GenericSelectionExpr::is_expression_predicate(void) const {
-  return impl->reader.getVal84();
-}
-
-bool GenericSelectionExpr::is_result_dependent(void) const {
   return impl->reader.getVal85();
 }
 
-bool GenericSelectionExpr::is_type_predicate(void) const {
+bool GenericSelectionExpr::is_result_dependent(void) const {
   return impl->reader.getVal86();
+}
+
+bool GenericSelectionExpr::is_type_predicate(void) const {
+  return impl->reader.getVal87();
 }
 
 #pragma GCC diagnostic pop

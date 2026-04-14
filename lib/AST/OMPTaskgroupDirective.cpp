@@ -183,7 +183,7 @@ std::optional<OMPTaskgroupDirective> OMPTaskgroupDirective::from(const TokenCont
 }
 
 Expr OMPTaskgroupDirective::reduction_reference(void) const {
-  RawEntityId eid = impl->reader.getVal14();
+  RawEntityId eid = impl->reader.getVal15();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 

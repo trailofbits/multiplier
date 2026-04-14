@@ -26,6 +26,7 @@
 #include "Frontend/Macro.h"
 #include "Frontend/TokenKind.h"
 #include "Frontend/TokenCategory.h"
+#include "Entity.h"
 #include "Fragment.h"
 #include "Iterator.h"
 #include "Reference.h"
@@ -65,6 +66,7 @@ using VariantEntity = std::variant<
                                             MX_DECLARE_ENTITY_VARIANT,
                                             MX_DECLARE_ENTITY_VARIANT,
                                             MX_DECLARE_ENTITY_VARIANT,
+                                            MX_DECLARE_ENTITY_VARIANT,
                                             MX_DECLARE_ENTITY_VARIANT)>;
 #undef MX_DECLARE_ENTITY_VARIANT
 
@@ -99,6 +101,7 @@ class MX_EXPORT Index final {
                               MX_FRIEND,
                               MX_FRIEND,
                               MX_FRIEND,
+                              MX_FRIEND,
                               MX_FRIEND)
 #undef MX_FRIEND
 
@@ -127,6 +130,9 @@ class MX_EXPORT Index final {
   // Create an index that opens a database produced by Multiplier's indexer
   // by specifying the path to that database.
   static Index from_database(std::filesystem::path path);
+
+  // Get the index version (unique ID + version number).
+  IndexVersion version(void) const;
 
   static Index containing(const Compilation &entity);
   static Index containing(const CXXBaseSpecifier &entity);
@@ -167,6 +173,7 @@ class MX_EXPORT Index final {
   MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_GETTER, MX_IGNORE_ENTITY_CATEGORY,
                               MX_DECLARE_GETTER, MX_DECLARE_GETTER,
                               MX_DECLARE_GETTER, MX_DECLARE_GETTER,
+                              MX_DECLARE_GETTER,
                               MX_DECLARE_GETTER)
 #undef MX_DECLARE_GETTER
 
@@ -234,6 +241,7 @@ std::optional<T> Reference::as(void) const noexcept {
     }
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_REFERENCE_AS,
+                            MX_REFERENCE_AS,
                             MX_REFERENCE_AS,
                             MX_REFERENCE_AS,
                             MX_REFERENCE_AS,

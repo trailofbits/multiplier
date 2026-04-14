@@ -4,6 +4,11 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include <multiplier/Index.h>
+#include <multiplier/IR/Function.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Instruction.h>
+#include <multiplier/IR/Object.h>
+#include "IR/Impl.h"
 
 #include <algorithm>
 #include <cassert>
@@ -75,6 +80,10 @@ Index Index::in_memory_cache(Index next, unsigned timeout_s) {
 // by specifying the path to that database.
 Index Index::from_database(std::filesystem::path path) {
   return EntityProvider::CreateFromDatabase(std::move(path));
+}
+
+IndexVersion Index::version(void) const {
+  return impl->GetIndexVersion();
 }
 
 Index Index::containing(const Compilation &entity) {
@@ -192,11 +201,16 @@ gap::generator<File> Index::files(void) const & {
     return std::nullopt; \
   }
 
-MX_FOR_EACH_ENTITY_CATEGORY(MX_DEFINE_GETTER, MX_IGNORE_ENTITY_CATEGORY,
-                            MX_DEFINE_GETTER, MX_DEFINE_GETTER,
-                            MX_DEFINE_GETTER, MX_DEFINE_GETTER,
+MX_FOR_EACH_ENTITY_CATEGORY(MX_DEFINE_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DEFINE_GETTER,
+                            MX_DEFINE_GETTER,
+                            MX_DEFINE_GETTER,
+                            MX_DEFINE_GETTER,
+                            MX_DEFINE_GETTER,
                             MX_DEFINE_GETTER)
 #undef MX_DEFINE_GETTER
+
 
 // Download a fragment based off of an entity ID.
 std::optional<Fragment> Index::fragment_containing(EntityId eid) const {
@@ -272,10 +286,14 @@ VariantEntity Index::entity(EntityId eid) const {
       } \
       assert(false);
 
-    MX_FOR_EACH_ENTITY_CATEGORY(MX_DISPATCH_GETTER, MX_IGNORE_ENTITY_CATEGORY,
-                                MX_DISPATCH_GETTER, MX_DISPATCH_GETTER,
-                                MX_DISPATCH_GETTER, MX_DISPATCH_GETTER,
-                                MX_DISPATCH_GETTER)
+    MX_FOR_EACH_ENTITY_CATEGORY(MX_DISPATCH_GETTER,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DISPATCH_GETTER,
+                            MX_DISPATCH_GETTER,
+                            MX_DISPATCH_GETTER,
+                            MX_DISPATCH_GETTER,
+                            MX_DISPATCH_GETTER,
+                            MX_DISPATCH_GETTER)
 #undef MX_DISPATCH_GETTER
 
 

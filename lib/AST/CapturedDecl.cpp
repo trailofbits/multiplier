@@ -212,24 +212,24 @@ std::optional<CapturedDecl> CapturedDecl::from(const TokenContext &t) {
 }
 
 ImplicitParamDecl CapturedDecl::context_parameter(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal41();
   return ImplicitParamDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 uint32_t CapturedDecl::context_parameter_position(void) const {
-  return impl->reader.getVal41();
-}
-
-bool CapturedDecl::is_nothrow(void) const {
   return impl->reader.getVal42();
 }
 
+bool CapturedDecl::is_nothrow(void) const {
+  return impl->reader.getVal43();
+}
+
 unsigned CapturedDecl::num_parameters(void) const {
-  return impl->reader.getVal43().size();
+  return impl->reader.getVal44().size();
 }
 
 std::optional<ImplicitParamDecl> CapturedDecl::nth_parameter(unsigned n) const {
-  auto list = impl->reader.getVal43();
+  auto list = impl->reader.getVal44();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -243,12 +243,12 @@ std::optional<ImplicitParamDecl> CapturedDecl::nth_parameter(unsigned n) const {
 }
 
 gap::generator<ImplicitParamDecl> CapturedDecl::parameters(void) const & {
-  auto list = impl->reader.getVal43();
+  auto list = impl->reader.getVal44();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d43 = ep->DeclFor(ep, v)) {
-      if (auto e = ImplicitParamDecl::from_base(std::move(d43))) {
+    if (auto d44 = ep->DeclFor(ep, v)) {
+      if (auto e = ImplicitParamDecl::from_base(std::move(d44))) {
         co_yield std::move(*e);
       }
     }

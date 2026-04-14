@@ -213,11 +213,11 @@ std::optional<MSPropertyDecl> MSPropertyDecl::from(const TokenContext &t) {
 }
 
 bool MSPropertyDecl::has_getter(void) const {
-  return impl->reader.getVal68();
+  return impl->reader.getVal69();
 }
 
 bool MSPropertyDecl::has_setter(void) const {
-  return impl->reader.getVal69();
+  return impl->reader.getVal70();
 }
 
 #pragma GCC diagnostic pop

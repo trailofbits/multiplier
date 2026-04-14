@@ -34,6 +34,7 @@ class RegexQueryMatch;
                               MX_FORWARD_DECLARE,
                               MX_FORWARD_DECLARE,
                               MX_FORWARD_DECLARE,
+                              MX_FORWARD_DECLARE,
                               MX_FORWARD_DECLARE)
 #undef MX_FORWARD_DECLARE
 
@@ -60,6 +61,7 @@ class MX_EXPORT Fragment {
     friend class ns_path type_name;
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_FRIEND,
+                              MX_FRIEND,
                               MX_FRIEND,
                               MX_FRIEND,
                               MX_FRIEND,

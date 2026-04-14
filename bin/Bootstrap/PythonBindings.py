@@ -919,6 +919,13 @@ BINDING_CPP_HEADER = """// Copyright (c) 2023-present, Trail of Bits, Inc.
 #include <multiplier/Fragment.h>
 #include <multiplier/Frontend.h>
 #include <multiplier/Index.h>
+#include <multiplier/IR/Function.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Instruction.h>
+#include <multiplier/IR/Object.h>
+#include <multiplier/IR/OpCode.h>
+#include <multiplier/IR/ObjectKind.h>
+#include <multiplier/IR/BlockKind.h>
 #include <multiplier/Re2.h>
 #include <multiplier/Reference.h>
 
@@ -1794,6 +1801,11 @@ ENTITY_KINDS: Tuple[str] = (
   "TemplateParameterList",
   "Macro",
   "Operation",
+  "IRFunction",
+  "IRBlock",
+  "IRInstruction",
+  "IRObject",
+  "IRStructure",
 )
 
 VariantEntitySchema = make_schema_class("VariantEntity", "Entity", Schema)

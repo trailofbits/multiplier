@@ -184,20 +184,20 @@ std::optional<ObjCProtocolExpr> ObjCProtocolExpr::from(const TokenContext &t) {
 }
 
 Token ObjCProtocolExpr::at_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 ObjCProtocolDecl ObjCProtocolExpr::protocol(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal40();
   return ObjCProtocolDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Token ObjCProtocolExpr::protocol_id_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 Token ObjCProtocolExpr::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 #pragma GCC diagnostic pop

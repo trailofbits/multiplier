@@ -211,19 +211,19 @@ std::optional<HLSLBufferDecl> HLSLBufferDecl::from(const TokenContext &t) {
 }
 
 Token HLSLBufferDecl::l_brace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal48());
-}
-
-Token HLSLBufferDecl::token_start(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal49());
 }
 
-Token HLSLBufferDecl::r_brace_token(void) const {
+Token HLSLBufferDecl::token_start(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal50());
 }
 
+Token HLSLBufferDecl::r_brace_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal51());
+}
+
 bool HLSLBufferDecl::is_c_buffer(void) const {
-  return impl->reader.getVal66();
+  return impl->reader.getVal67();
 }
 
 #pragma GCC diagnostic pop

@@ -168,6 +168,10 @@ class FragmentBuilder final {
       } \
     }
 
+// IR entity IDs are populated separately in GenerateIR/SerializeIR.
+#undef MX_VISIT_ENTITY_ID
+#define MX_VISIT_ENTITY_ID(cls, api_method, storage)
+
 #define MX_VISIT_PSEUDO MX_VISIT_ENTITY
 #define MX_VISIT_PSEUDO_LIST MX_VISIT_ENTITY_LIST
 #define MX_VISIT_OPTIONAL_PSEUDO MX_VISIT_OPTIONAL_ENTITY

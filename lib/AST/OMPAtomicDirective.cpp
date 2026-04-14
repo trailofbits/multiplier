@@ -183,50 +183,50 @@ std::optional<OMPAtomicDirective> OMPAtomicDirective::from(const TokenContext &t
 }
 
 Expr OMPAtomicDirective::condition_expression(void) const {
-  RawEntityId eid = impl->reader.getVal14();
+  RawEntityId eid = impl->reader.getVal15();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Expr OMPAtomicDirective::d(void) const {
-  RawEntityId eid = impl->reader.getVal17();
-  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
-}
-
-Expr OMPAtomicDirective::expression(void) const {
   RawEntityId eid = impl->reader.getVal18();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
-Expr OMPAtomicDirective::r(void) const {
+Expr OMPAtomicDirective::expression(void) const {
   RawEntityId eid = impl->reader.getVal19();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
-Expr OMPAtomicDirective::update_expression(void) const {
+Expr OMPAtomicDirective::r(void) const {
   RawEntityId eid = impl->reader.getVal20();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
-Expr OMPAtomicDirective::v(void) const {
+Expr OMPAtomicDirective::update_expression(void) const {
   RawEntityId eid = impl->reader.getVal21();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
-Expr OMPAtomicDirective::x(void) const {
+Expr OMPAtomicDirective::v(void) const {
   RawEntityId eid = impl->reader.getVal22();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
-bool OMPAtomicDirective::is_fail_only(void) const {
-  return impl->reader.getVal23();
+Expr OMPAtomicDirective::x(void) const {
+  RawEntityId eid = impl->reader.getVal23();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
-bool OMPAtomicDirective::is_postfix_update(void) const {
+bool OMPAtomicDirective::is_fail_only(void) const {
   return impl->reader.getVal24();
 }
 
-bool OMPAtomicDirective::is_xlhs_in_rhs_part(void) const {
+bool OMPAtomicDirective::is_postfix_update(void) const {
   return impl->reader.getVal25();
+}
+
+bool OMPAtomicDirective::is_xlhs_in_rhs_part(void) const {
+  return impl->reader.getVal26();
 }
 
 #pragma GCC diagnostic pop

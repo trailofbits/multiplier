@@ -183,15 +183,15 @@ std::optional<AsTypeExpr> AsTypeExpr::from(const TokenContext &t) {
 }
 
 Token AsTypeExpr::builtin_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
-}
-
-Token AsTypeExpr::r_paren_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
+Token AsTypeExpr::r_paren_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+}
+
 Expr AsTypeExpr::src_expression(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal41();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 

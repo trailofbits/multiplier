@@ -183,26 +183,26 @@ std::optional<MatrixSubscriptExpr> MatrixSubscriptExpr::from(const TokenContext 
 }
 
 Expr MatrixSubscriptExpr::base(void) const {
-  RawEntityId eid = impl->reader.getVal38();
-  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
-}
-
-Expr MatrixSubscriptExpr::column_index(void) const {
   RawEntityId eid = impl->reader.getVal39();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
+Expr MatrixSubscriptExpr::column_index(void) const {
+  RawEntityId eid = impl->reader.getVal40();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
+}
+
 Token MatrixSubscriptExpr::r_bracket_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 Expr MatrixSubscriptExpr::row_index(void) const {
-  RawEntityId eid = impl->reader.getVal41();
+  RawEntityId eid = impl->reader.getVal42();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 bool MatrixSubscriptExpr::is_incomplete(void) const {
-  return impl->reader.getVal84();
+  return impl->reader.getVal85();
 }
 
 #pragma GCC diagnostic pop

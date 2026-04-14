@@ -35,6 +35,7 @@ class TokenTree;
                               MX_FORWARD_DECLARE,
                               MX_FORWARD_DECLARE,
                               MX_FORWARD_DECLARE,
+                              MX_FORWARD_DECLARE,
                               MX_FORWARD_DECLARE)
 #undef MX_FORWARD_DECLARE
 
@@ -104,6 +105,7 @@ class MX_EXPORT File {
                               MX_FRIEND,
                               MX_FRIEND,
                               MX_FRIEND,
+                              MX_FRIEND,
                               MX_FRIEND)
 #undef MX_FRIEND
 
@@ -131,6 +133,7 @@ class MX_EXPORT File {
                               MX_DECLARE_CONTAINING,
                               MX_DECLARE_CONTAINING,
                               MX_DECLARE_CONTAINING,
+                              MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_CONTAINING
 

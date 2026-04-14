@@ -184,21 +184,21 @@ std::optional<SubstNonTypeTemplateParmPackExpr> SubstNonTypeTemplateParmPackExpr
 }
 
 Decl SubstNonTypeTemplateParmPackExpr::associated_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal39();
   return Decl(impl->ep->DeclFor(impl->ep, eid));
 }
 
 uint32_t SubstNonTypeTemplateParmPackExpr::index(void) const {
-  return impl->reader.getVal26();
+  return impl->reader.getVal27();
 }
 
 NonTypeTemplateParmDecl SubstNonTypeTemplateParmPackExpr::parameter_pack(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal40();
   return NonTypeTemplateParmDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Token SubstNonTypeTemplateParmPackExpr::parameter_pack_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 #pragma GCC diagnostic pop

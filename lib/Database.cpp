@@ -10,6 +10,7 @@
 #include <cassert>
 #include <chrono>
 #include <deque>
+#include <random>
 #include <multiplier/AST/AttrKind.h>
 #include <multiplier/AST/DeclKind.h>
 #include <multiplier/AST/StmtKind.h>
@@ -165,13 +166,13 @@ class BulkInserterState {
         EncodeCategoryKind(mx::EntityCategory::enum_, -1), \
         CreateEntityIndexInsertQuery(mx::EntityCategory::enum_)); \
 
-  MX_FOR_EACH_ENTITY_CATEGORY(
-      MX_IGNORE_ENTITY_CATEGORY,
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
       MX_IGNORE_ENTITY_CATEGORY,
       MX_IGNORE_ENTITY_CATEGORY,
       MX_IGNORE_ENTITY_CATEGORY,
       CREATE_FRAG_OFFSET_INDEX,
       CREATE_PSEUDO_INDEX,
+      MX_IGNORE_ENTITY_CATEGORY,
       MX_IGNORE_ENTITY_CATEGORY)
 
 #undef CREATE_FRAG_OFFSET_INDEX
@@ -616,10 +617,26 @@ void DatabaseWriterImpl::ExitDictionaries(void) {
   }
 }
 
-// Initialize the metadata table. It only stores one row of data.
+// Initialize the metadata table and generate a unique index ID.
 void DatabaseWriterImpl::InitMetadata(void) {
   add_version.BindValues(1u);
   add_version.Execute();
+
+  // Generate and store a unique index ID if not already present.
+  auto check = db.Prepare("SELECT COUNT(*) FROM index_id");
+  check.ExecuteStep();
+  int64_t count = 0;
+  check.Row().Columns(count);
+  check.Reset();
+
+  if (count == 0) {
+    std::random_device rd;
+    std::mt19937_64 gen(rd());
+    uint64_t id = gen();
+    auto insert = db.Prepare("INSERT INTO index_id (id) VALUES (?1)");
+    insert.BindValues(id);
+    insert.Execute();
+  }
 }
 
 void DatabaseWriterImpl::BulkInserter(void) {
@@ -759,13 +776,13 @@ std::filesystem::path CreateDatabase(const std::filesystem::path &db_path_) {
       db.Execute(query); \
     } while (false);
 
-  MX_FOR_EACH_ENTITY_CATEGORY(
-      MX_IGNORE_ENTITY_CATEGORY,
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
       MX_IGNORE_ENTITY_CATEGORY,
       MX_IGNORE_ENTITY_CATEGORY,
       MX_IGNORE_ENTITY_CATEGORY,
       CREATE_FRAG_OFFSET_INDEX,
       CREATE_PSEUDO_INDEX,
+      MX_IGNORE_ENTITY_CATEGORY,
       MX_IGNORE_ENTITY_CATEGORY)
 
 #undef CREATE_FRAG_OFFSET_INDEX
@@ -779,16 +796,17 @@ std::filesystem::path CreateDatabase(const std::filesystem::path &db_path_) {
 }  // namespace
 
 DatabaseWriterImpl::~DatabaseWriterImpl(void) {
-
+  // Join the bulk insertion thread FIRST so its database connection is closed
+  // before we run any cleanup SQL on the main connection. Otherwise SQLite
+  // can return "database is locked" due to concurrent writers.
   ExitDictionaries();
 
   insertion_queue.enqueue(ExitSignal{});
   bulk_insertion_thread.join();
 
-//  for (const char *stmt : DatabaseWriter::kExitStatments) {
-//    db.Execute(stmt);
-//  }
-
+  // These may fail with "database is locked" if the async writer's
+  // SQLite connection hasn't fully released its WAL lock.
+  // Each step is isolated so failures don't cascade.
   ExitRecords();
   ExitMetadata();
   db.Execute("PRAGMA wal_checkpoint(FULL)");
@@ -1010,9 +1028,12 @@ void DatabaseWriterImpl::InitRecords(void) {
 void DatabaseWriterImpl::ExitRecords(void) {
 #ifndef __CDT_PARSER__
 #define MX_EXEC_TEARDOWNS(record) \
-  for (const char *stmt : record::kExitStatements) { \
-    if (stmt) { \
-      db.Execute(stmt); \
+  { \
+    sqlite::ExclusiveTransaction transaction(db); \
+    for (const char *stmt : record::kExitStatements) { \
+      if (stmt) { \
+        db.Execute(stmt); \
+      } \
     } \
   }
 

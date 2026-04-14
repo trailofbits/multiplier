@@ -185,17 +185,17 @@ std::optional<CXXDeleteExpr> CXXDeleteExpr::from(const TokenContext &t) {
 }
 
 bool CXXDeleteExpr::does_usual_array_delete_want_size(void) const {
-  return impl->reader.getVal84();
+  return impl->reader.getVal85();
 }
 
 Expr CXXDeleteExpr::argument(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal39();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 std::optional<Type> CXXDeleteExpr::destroyed_type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal39();
+    RawEntityId eid = impl->reader.getVal40();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -208,7 +208,7 @@ std::optional<Type> CXXDeleteExpr::destroyed_type(void) const {
 
 std::optional<FunctionDecl> CXXDeleteExpr::operator_delete(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal40();
+    RawEntityId eid = impl->reader.getVal41();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -220,15 +220,15 @@ std::optional<FunctionDecl> CXXDeleteExpr::operator_delete(void) const {
 }
 
 bool CXXDeleteExpr::is_array_form(void) const {
-  return impl->reader.getVal85();
-}
-
-bool CXXDeleteExpr::is_array_form_as_written(void) const {
   return impl->reader.getVal86();
 }
 
-bool CXXDeleteExpr::is_global_delete(void) const {
+bool CXXDeleteExpr::is_array_form_as_written(void) const {
   return impl->reader.getVal87();
+}
+
+bool CXXDeleteExpr::is_global_delete(void) const {
+  return impl->reader.getVal88();
 }
 
 #pragma GCC diagnostic pop

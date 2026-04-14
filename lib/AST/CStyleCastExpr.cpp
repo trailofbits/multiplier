@@ -185,11 +185,11 @@ std::optional<CStyleCastExpr> CStyleCastExpr::from(const TokenContext &t) {
 }
 
 Token CStyleCastExpr::l_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
 }
 
 Token CStyleCastExpr::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
 }
 
 #pragma GCC diagnostic pop

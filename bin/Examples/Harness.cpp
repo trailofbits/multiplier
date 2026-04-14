@@ -15,6 +15,7 @@
 
 DEFINE_uint64(entity_id, mx::kInvalidEntityId, "ID of the entity to harness");
 DEFINE_string(entity_name, "", "Name of the entity to harness");
+DEFINE_bool(deduplicate, true, "Deduplicate like names");
 
 using SeenSet = std::set<mx::PackedFragmentId>;
 using WorkList = std::vector<mx::PackedFragmentId>;
@@ -566,33 +567,35 @@ int main(int argc, char *argv[]) {
   std::unordered_map<std::string, mx::RawEntityId> canon_id;
 
   // Figure out what top-level entities need to be renamed.
-  for (mx::PackedFragmentId frag_id : frags) {
-    for (mx::Decl tld : index.fragment(frag_id)->top_level_declarations()) {
-      tld = tld.canonical_declaration();
-      std::optional<mx::NamedDecl> nd = mx::NamedDecl::from(tld);
-      if (!nd) {
-        continue;
-      }
+  if (FLAGS_deduplicate) {
+    for (mx::PackedFragmentId frag_id : frags) {
+      for (mx::Decl tld : index.fragment(frag_id)->top_level_declarations()) {
+        tld = tld.canonical_declaration();
+        std::optional<mx::NamedDecl> nd = mx::NamedDecl::from(tld);
+        if (!nd) {
+          continue;
+        }
 
-      std::string_view name_view = nd->name();
-      if (name_view.empty()) {
-        continue;
-      }
+        std::string_view name_view = nd->name();
+        if (name_view.empty()) {
+          continue;
+        }
 
-      std::string name(name_view.data(), name_view.size());
-      mx::RawEntityId eid = nd->id().Pack();
-      mx::RawEntityId stored_eid = canon_id.emplace(name, eid).first->second;
-      if (eid != stored_eid) {
-        std::cout << "// Renaming " << name_view << '\n';
-        needs_rename.insert(eid);
-        needs_rename.insert(stored_eid);
+        std::string name(name_view.data(), name_view.size());
+        mx::RawEntityId eid = nd->id().Pack();
+        mx::RawEntityId stored_eid = canon_id.emplace(name, eid).first->second;
+        if (eid != stored_eid) {
+          std::cout << "// Renaming " << name_view << '\n';
+          needs_rename.insert(eid);
+          needs_rename.insert(stored_eid);
+        }
       }
     }
-  }
 
-  // Make sure our original entity isn't subject to renaming.
-  for (mx::Decl redecl : entity->redeclarations()) {
-    needs_rename.erase(redecl.id().Pack());
+    // Make sure our original entity isn't subject to renaming.
+    for (mx::Decl redecl : entity->redeclarations()) {
+      needs_rename.erase(redecl.id().Pack());
+    }
   }
 
   std::cerr
@@ -642,9 +645,11 @@ int main(int argc, char *argv[]) {
         }
 
         std::cout << tag->name();
-        if (mx::RawEntityId eid = tld.canonical_declaration().id().Pack();
-            needs_rename.contains(eid)) {
-          std::cout << '_' << eid;
+        if (FLAGS_deduplicate) {
+          if (mx::RawEntityId eid = tld.canonical_declaration().id().Pack();
+              needs_rename.contains(eid)) {
+            std::cout << '_' << eid;
+          }
         }
         std::cout << ";\n";
       }
@@ -685,7 +690,7 @@ int main(int argc, char *argv[]) {
 
       mx::Decl decl = std::get<mx::Decl>(ent).canonical_declaration();
       mx::RawEntityId eid = decl.id().Pack();
-      if (needs_rename.contains(eid)) {
+      if (FLAGS_deduplicate && needs_rename.contains(eid)) {
         std::cout << '_' << eid;
       }
     }

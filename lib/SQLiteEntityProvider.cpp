@@ -4,6 +4,11 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include "SQLiteEntityProvider.h"
+#include <multiplier/IR/Function.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Instruction.h>
+#include <multiplier/IR/Object.h>
+#include "IR/Impl.h"
 
 #include <algorithm>
 #include <array>
@@ -410,6 +415,17 @@ unsigned SQLiteEntityProvider::VersionNumber(void) {
 
 unsigned SQLiteEntityProvider::VersionNumber(const Ptr &) {
   return VersionNumber();
+}
+
+IndexVersion SQLiteEntityProvider::GetIndexVersion(void) {
+  IndexVersion iv;
+  iv.version = VersionNumber();
+  ImplPtr context = impl.Lock();
+  auto stmt = context->db.Prepare("SELECT id FROM index_id LIMIT 1");
+  if (stmt.ExecuteStep()) {
+    stmt.Row().Columns(iv.index_id);
+  }
+  return iv;
 }
 
 void SQLiteEntityProvider::VersionNumberChanged(unsigned) {
@@ -1073,15 +1089,68 @@ gap::generator<RawEntityId> SQLiteEntityProvider::FindSymbol(
 // Go make things like `EntityFor(ep, entity_id)`. E.g. go find a specific
 // declaration by its unique ID in the index.
 MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
-                            MX_IGNORE_ENTITY_CATEGORY,
-                            MX_DECLARE_ENTITY_GETTER,
-                            MX_DECLARE_ENTITY_GETTER,
-                            MX_DECLARE_FRAGMENT_OFFSET_GETTER,
-                            MX_DECLARE_FRAGMENT_PSEUDO_GETTER,
-                            MX_DECLARE_ENTITY_GETTER)
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_DECLARE_ENTITY_GETTER,
+                              MX_DECLARE_ENTITY_GETTER,
+                              MX_DECLARE_FRAGMENT_OFFSET_GETTER,
+                              MX_DECLARE_FRAGMENT_PSEUDO_GETTER,
+                              MX_DECLARE_ENTITY_GETTER,
+                              MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_ENTITY_GETTER
 #undef MX_DECLARE_FRAGMENT_OFFSET_GETTER
 #undef MX_DECLARE_FRAGMENT_PSEUDO_GETTER
+
+// IR entities are stored inside fragments. Extract the fragment_id from the
+// entity ID, load the fragment, and create an impl with the offset.
+IRFunctionImplPtr SQLiteEntityProvider::IRFunctionFor(
+    const Ptr &self, RawEntityId raw_id) {
+  auto eid = EntityId(raw_id).Extract<IRFunctionId>();
+  if (!eid) return {};
+  auto frag = self->FragmentFor(self, PackedFragmentId(FragmentId(eid->fragment_id)));
+  if (!frag) return {};
+  return std::make_shared<IRFunctionImpl>(
+      std::move(frag), eid->offset, eid->fragment_id);
+}
+
+IRBlockImplPtr SQLiteEntityProvider::IRBlockFor(
+    const Ptr &self, RawEntityId raw_id) {
+  auto eid = EntityId(raw_id).Extract<IRBlockId>();
+  if (!eid) return {};
+  auto frag = self->FragmentFor(self, PackedFragmentId(FragmentId(eid->fragment_id)));
+  if (!frag) return {};
+  return std::make_shared<IRBlockImpl>(
+      std::move(frag), eid->offset, eid->fragment_id);
+}
+
+IRInstructionImplPtr SQLiteEntityProvider::IRInstructionFor(
+    const Ptr &self, RawEntityId raw_id) {
+  auto eid = EntityId(raw_id).Extract<IRInstructionId>();
+  if (!eid) return {};
+  auto frag = self->FragmentFor(self, PackedFragmentId(FragmentId(eid->fragment_id)));
+  if (!frag) return {};
+  return std::make_shared<IRInstructionImpl>(
+      std::move(frag), eid->offset, eid->fragment_id);
+}
+
+IRObjectImplPtr SQLiteEntityProvider::IRObjectFor(
+    const Ptr &self, RawEntityId raw_id) {
+  auto eid = EntityId(raw_id).Extract<IRObjectId>();
+  if (!eid) return {};
+  auto frag = self->FragmentFor(self, PackedFragmentId(FragmentId(eid->fragment_id)));
+  if (!frag) return {};
+  return std::make_shared<IRObjectImpl>(
+      std::move(frag), eid->offset, eid->fragment_id);
+}
+
+IRStructureImplPtr SQLiteEntityProvider::IRStructureFor(
+    const Ptr &self, RawEntityId raw_id) {
+  auto eid = EntityId(raw_id).Extract<IRStructureId>();
+  if (!eid) return {};
+  auto frag = self->FragmentFor(self, PackedFragmentId(FragmentId(eid->fragment_id)));
+  if (!frag) return {};
+  return std::make_shared<IRStructureImpl>(
+      std::move(frag), eid->offset, eid->fragment_id);
+}
 
 // Get a list of `Decl`, `Stmt`, `Attr`, `Designator`, etc.
 #define MX_DECLARE_FRAGMENT_OFFSET_LIST_GETTER(ns_path, type_name, lower_name, enum_name, category) \
@@ -1255,16 +1324,24 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
 // Go make things like `EntitysFor(ep)`. E.g. find all declarations in the
 // index.
 MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_LIST_GETTER,
-                            MX_IGNORE_ENTITY_CATEGORY,
-                            MX_DECLARE_ENTITY_LIST_GETTER,
-                            MX_DECLARE_ENTITY_LIST_GETTER,
-                            MX_DECLARE_FRAGMENT_OFFSET_LIST_GETTER,
-                            MX_DECLARE_FRAGMENT_PSEUDO_LIST_GETTER,
-                            MX_DECLARE_ENTITY_LIST_GETTER)
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_DECLARE_ENTITY_LIST_GETTER,
+                              MX_DECLARE_ENTITY_LIST_GETTER,
+                              MX_DECLARE_FRAGMENT_OFFSET_LIST_GETTER,
+                              MX_DECLARE_FRAGMENT_PSEUDO_LIST_GETTER,
+                              MX_DECLARE_ENTITY_LIST_GETTER,
+                              MX_IGNORE_ENTITY_CATEGORY)
 
 #undef MX_DECLARE_ENTITY_LIST_GETTER
 #undef MX_DECLARE_FRAGMENT_OFFSET_LIST_GETTER
 #undef MX_DECLARE_FRAGMENT_PSEUDO_LIST_GETTER
+
+// IR entity list stubs.
+gap::generator<IRFunctionImplPtr> SQLiteEntityProvider::IRFunctionsFor(const Ptr &) & { co_return; }
+gap::generator<IRBlockImplPtr> SQLiteEntityProvider::IRBlocksFor(const Ptr &) & { co_return; }
+gap::generator<IRInstructionImplPtr> SQLiteEntityProvider::IRInstructionsFor(const Ptr &) & { co_return; }
+gap::generator<IRObjectImplPtr> SQLiteEntityProvider::IRObjectsFor(const Ptr &) & { co_return; }
+gap::generator<IRStructureImplPtr> SQLiteEntityProvider::IRStructuresFor(const Ptr &) & { co_return; }
 
 // Get all types of a specific kind.
 gap::generator<TypeImplPtr> SQLiteEntityProvider::TypesFor(
@@ -1377,12 +1454,13 @@ gap::generator<TypeImplPtr> SQLiteEntityProvider::TypesFor(
     }
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
-                            MX_IGNORE_ENTITY_CATEGORY,
-                            MX_IGNORE_ENTITY_CATEGORY,
-                            MX_IGNORE_ENTITY_CATEGORY,
-                            MX_DECLARE_FRAGMENT_OFFSET_LISTERS,
-                            MX_IGNORE_ENTITY_CATEGORY,
-                            MX_IGNORE_ENTITY_CATEGORY)
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_DECLARE_FRAGMENT_OFFSET_LISTERS,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_FRAGMENT_OFFSET_LISTERS
 
 EntityProviderPtr EntityProvider::CreateFromDatabase(std::filesystem::path path) {

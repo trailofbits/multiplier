@@ -12,6 +12,7 @@ from enum import IntEnum
 from typing import Generator, Iterable, Mapping, Optional, overload, Sequence, Tuple
 import pathlib
 import multiplier
+import multiplier.ir
 import multiplier.ast
 import multiplier.frontend
 
@@ -5550,7 +5551,7 @@ class CXXCtorInitializer(multiplier.Entity):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXCtorInitializer]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXCtorInitializer]:
     ...
 
   @overload
@@ -5619,7 +5620,7 @@ class Designator(multiplier.Entity):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.Designator]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.Designator]:
     ...
 
   @overload
@@ -5689,7 +5690,7 @@ class CXXBaseSpecifier(multiplier.Entity):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXBaseSpecifier]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXBaseSpecifier]:
     ...
 
   @overload
@@ -5757,7 +5758,7 @@ class TemplateParameterList(multiplier.Entity):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TemplateParameterList]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TemplateParameterList]:
     ...
 
   @overload
@@ -5832,7 +5833,7 @@ class TemplateArgument(multiplier.Entity):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TemplateArgument]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TemplateArgument]:
     ...
 
   @overload
@@ -5916,7 +5917,7 @@ class Attr(multiplier.Entity):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.Attr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.Attr]:
     ...
 
   @overload
@@ -5978,7 +5979,7 @@ class AlignValueAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AlignValueAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AlignValueAttr]:
     ...
 
   @overload
@@ -6041,7 +6042,7 @@ class AliasAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AliasAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AliasAttr]:
     ...
 
   @overload
@@ -6102,7 +6103,7 @@ class AbiTagAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AbiTagAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AbiTagAttr]:
     ...
 
   @overload
@@ -6159,7 +6160,7 @@ class TypeAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TypeAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TypeAttr]:
     ...
 
   @overload
@@ -6220,7 +6221,7 @@ class SPtrAttr(multiplier.ast.TypeAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SPtrAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SPtrAttr]:
     ...
 
   @overload
@@ -6281,7 +6282,7 @@ class Ptr64Attr(multiplier.ast.TypeAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.Ptr64Attr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.Ptr64Attr]:
     ...
 
   @overload
@@ -6342,7 +6343,7 @@ class Ptr32Attr(multiplier.ast.TypeAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.Ptr32Attr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.Ptr32Attr]:
     ...
 
   @overload
@@ -6404,7 +6405,7 @@ class OpenCLPrivateAddressSpaceAttr(multiplier.ast.TypeAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OpenCLPrivateAddressSpaceAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OpenCLPrivateAddressSpaceAttr]:
     ...
 
   @overload
@@ -6466,7 +6467,7 @@ class OpenCLLocalAddressSpaceAttr(multiplier.ast.TypeAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OpenCLLocalAddressSpaceAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OpenCLLocalAddressSpaceAttr]:
     ...
 
   @overload
@@ -6527,7 +6528,7 @@ class OpenCLGlobalHostAddressSpaceAttr(multiplier.ast.TypeAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OpenCLGlobalHostAddressSpaceAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OpenCLGlobalHostAddressSpaceAttr]:
     ...
 
   @overload
@@ -6588,7 +6589,7 @@ class OpenCLGlobalDeviceAddressSpaceAttr(multiplier.ast.TypeAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OpenCLGlobalDeviceAddressSpaceAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OpenCLGlobalDeviceAddressSpaceAttr]:
     ...
 
   @overload
@@ -6650,7 +6651,7 @@ class OpenCLGlobalAddressSpaceAttr(multiplier.ast.TypeAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OpenCLGlobalAddressSpaceAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OpenCLGlobalAddressSpaceAttr]:
     ...
 
   @overload
@@ -6712,7 +6713,7 @@ class OpenCLGenericAddressSpaceAttr(multiplier.ast.TypeAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OpenCLGenericAddressSpaceAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OpenCLGenericAddressSpaceAttr]:
     ...
 
   @overload
@@ -6774,7 +6775,7 @@ class OpenCLConstantAddressSpaceAttr(multiplier.ast.TypeAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OpenCLConstantAddressSpaceAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OpenCLConstantAddressSpaceAttr]:
     ...
 
   @overload
@@ -6835,7 +6836,7 @@ class ObjCKindOfAttr(multiplier.ast.TypeAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCKindOfAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCKindOfAttr]:
     ...
 
   @overload
@@ -6896,7 +6897,7 @@ class ObjCInertUnsafeUnretainedAttr(multiplier.ast.TypeAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCInertUnsafeUnretainedAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCInertUnsafeUnretainedAttr]:
     ...
 
   @overload
@@ -6957,7 +6958,7 @@ class ObjCGCAttr(multiplier.ast.TypeAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCGCAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCGCAttr]:
     ...
 
   @overload
@@ -7018,7 +7019,7 @@ class NoDerefAttr(multiplier.ast.TypeAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NoDerefAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NoDerefAttr]:
     ...
 
   @overload
@@ -7086,7 +7087,7 @@ class HLSLParamModifierAttr(multiplier.ast.TypeAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.HLSLParamModifierAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.HLSLParamModifierAttr]:
     ...
 
   @overload
@@ -7147,7 +7148,7 @@ class HLSLGroupSharedAddressSpaceAttr(multiplier.ast.TypeAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.HLSLGroupSharedAddressSpaceAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.HLSLGroupSharedAddressSpaceAttr]:
     ...
 
   @overload
@@ -7208,7 +7209,7 @@ class CmseNSCallAttr(multiplier.ast.TypeAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CmseNSCallAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CmseNSCallAttr]:
     ...
 
   @overload
@@ -7271,7 +7272,7 @@ class BTFTypeTagAttr(multiplier.ast.TypeAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.BTFTypeTagAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.BTFTypeTagAttr]:
     ...
 
   @overload
@@ -7332,7 +7333,7 @@ class ArmStreamingCompatibleAttr(multiplier.ast.TypeAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ArmStreamingCompatibleAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ArmStreamingCompatibleAttr]:
     ...
 
   @overload
@@ -7393,7 +7394,7 @@ class ArmStreamingAttr(multiplier.ast.TypeAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ArmStreamingAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ArmStreamingAttr]:
     ...
 
   @overload
@@ -7454,7 +7455,7 @@ class ArmPreservesAttr(multiplier.ast.TypeAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ArmPreservesAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ArmPreservesAttr]:
     ...
 
   @overload
@@ -7515,7 +7516,7 @@ class ArmOutAttr(multiplier.ast.TypeAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ArmOutAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ArmOutAttr]:
     ...
 
   @overload
@@ -7576,7 +7577,7 @@ class ArmMveStrictPolymorphismAttr(multiplier.ast.TypeAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ArmMveStrictPolymorphismAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ArmMveStrictPolymorphismAttr]:
     ...
 
   @overload
@@ -7637,7 +7638,7 @@ class ArmInOutAttr(multiplier.ast.TypeAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ArmInOutAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ArmInOutAttr]:
     ...
 
   @overload
@@ -7698,7 +7699,7 @@ class ArmInAttr(multiplier.ast.TypeAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ArmInAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ArmInAttr]:
     ...
 
   @overload
@@ -7761,7 +7762,7 @@ class AnnotateTypeAttr(multiplier.ast.TypeAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AnnotateTypeAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AnnotateTypeAttr]:
     ...
 
   @overload
@@ -7822,7 +7823,7 @@ class AddressSpaceAttr(multiplier.ast.TypeAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AddressSpaceAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AddressSpaceAttr]:
     ...
 
   @overload
@@ -7883,7 +7884,7 @@ class WebAssemblyFuncrefAttr(multiplier.ast.TypeAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.WebAssemblyFuncrefAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.WebAssemblyFuncrefAttr]:
     ...
 
   @overload
@@ -7944,7 +7945,7 @@ class UPtrAttr(multiplier.ast.TypeAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.UPtrAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.UPtrAttr]:
     ...
 
   @overload
@@ -8005,7 +8006,7 @@ class TypeNullableResultAttr(multiplier.ast.TypeAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TypeNullableResultAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TypeNullableResultAttr]:
     ...
 
   @overload
@@ -8066,7 +8067,7 @@ class TypeNullableAttr(multiplier.ast.TypeAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TypeNullableAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TypeNullableAttr]:
     ...
 
   @overload
@@ -8127,7 +8128,7 @@ class TypeNullUnspecifiedAttr(multiplier.ast.TypeAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TypeNullUnspecifiedAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TypeNullUnspecifiedAttr]:
     ...
 
   @overload
@@ -8188,7 +8189,7 @@ class TypeNonNullAttr(multiplier.ast.TypeAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TypeNonNullAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TypeNonNullAttr]:
     ...
 
   @overload
@@ -8249,7 +8250,7 @@ class ThreadAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ThreadAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ThreadAttr]:
     ...
 
   @overload
@@ -8313,7 +8314,7 @@ class SwiftVersionedRemovalAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SwiftVersionedRemovalAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SwiftVersionedRemovalAttr]:
     ...
 
   @overload
@@ -8376,7 +8377,7 @@ class SwiftVersionedAdditionAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SwiftVersionedAdditionAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SwiftVersionedAdditionAttr]:
     ...
 
   @overload
@@ -8437,7 +8438,7 @@ class SwiftObjCMembersAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SwiftObjCMembersAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SwiftObjCMembersAttr]:
     ...
 
   @overload
@@ -8494,7 +8495,7 @@ class StmtAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.StmtAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.StmtAttr]:
     ...
 
   @overload
@@ -8556,7 +8557,7 @@ class OpenCLUnrollHintAttr(multiplier.ast.StmtAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OpenCLUnrollHintAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OpenCLUnrollHintAttr]:
     ...
 
   @overload
@@ -8617,7 +8618,7 @@ class MustTailAttr(multiplier.ast.StmtAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.MustTailAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.MustTailAttr]:
     ...
 
   @overload
@@ -8678,7 +8679,7 @@ class LikelyAttr(multiplier.ast.StmtAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.LikelyAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.LikelyAttr]:
     ...
 
   @overload
@@ -8739,7 +8740,7 @@ class FallThroughAttr(multiplier.ast.StmtAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.FallThroughAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.FallThroughAttr]:
     ...
 
   @overload
@@ -8801,7 +8802,7 @@ class CodeAlignAttr(multiplier.ast.StmtAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CodeAlignAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CodeAlignAttr]:
     ...
 
   @overload
@@ -8862,7 +8863,7 @@ class UnlikelyAttr(multiplier.ast.StmtAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.UnlikelyAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.UnlikelyAttr]:
     ...
 
   @overload
@@ -8923,7 +8924,7 @@ class RenderScriptKernelAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.RenderScriptKernelAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.RenderScriptKernelAttr]:
     ...
 
   @overload
@@ -8984,7 +8985,7 @@ class OverloadableAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OverloadableAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OverloadableAttr]:
     ...
 
   @overload
@@ -9049,7 +9050,7 @@ class OpenCLAccessAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OpenCLAccessAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OpenCLAccessAttr]:
     ...
 
   @overload
@@ -9110,7 +9111,7 @@ class ObjCRuntimeVisibleAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCRuntimeVisibleAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCRuntimeVisibleAttr]:
     ...
 
   @overload
@@ -9173,7 +9174,7 @@ class ObjCRuntimeNameAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCRuntimeNameAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCRuntimeNameAttr]:
     ...
 
   @overload
@@ -9234,7 +9235,7 @@ class ObjCNonRuntimeProtocolAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCNonRuntimeProtocolAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCNonRuntimeProtocolAttr]:
     ...
 
   @overload
@@ -9295,7 +9296,7 @@ class ObjCNonLazyClassAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCNonLazyClassAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCNonLazyClassAttr]:
     ...
 
   @overload
@@ -9356,7 +9357,7 @@ class ObjCDirectMembersAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCDirectMembersAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCDirectMembersAttr]:
     ...
 
   @overload
@@ -9417,7 +9418,7 @@ class ObjCDirectAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCDirectAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCDirectAttr]:
     ...
 
   @overload
@@ -9478,7 +9479,7 @@ class ObjCDesignatedInitializerAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCDesignatedInitializerAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCDesignatedInitializerAttr]:
     ...
 
   @overload
@@ -9539,7 +9540,7 @@ class ObjCClassStubAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCClassStubAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCClassStubAttr]:
     ...
 
   @overload
@@ -9600,7 +9601,7 @@ class ObjCBoxableAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCBoxableAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCBoxableAttr]:
     ...
 
   @overload
@@ -9662,7 +9663,7 @@ class OMPReferencedVarAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPReferencedVarAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPReferencedVarAttr]:
     ...
 
   @overload
@@ -9725,7 +9726,7 @@ class OMPDeclareSimdDeclAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPDeclareSimdDeclAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPDeclareSimdDeclAttr]:
     ...
 
   @overload
@@ -9787,7 +9788,7 @@ class OMPCaptureKindAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPCaptureKindAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPCaptureKindAttr]:
     ...
 
   @overload
@@ -9848,7 +9849,7 @@ class NoEscapeAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NoEscapeAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NoEscapeAttr]:
     ...
 
   @overload
@@ -9909,7 +9910,7 @@ class NoBuiltinAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NoBuiltinAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NoBuiltinAttr]:
     ...
 
   @overload
@@ -9970,7 +9971,7 @@ class ModeAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ModeAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ModeAttr]:
     ...
 
   @overload
@@ -10035,7 +10036,7 @@ class LoopHintAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.LoopHintAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.LoopHintAttr]:
     ...
 
   @overload
@@ -10096,7 +10097,7 @@ class LoaderUninitializedAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.LoaderUninitializedAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.LoaderUninitializedAttr]:
     ...
 
   @overload
@@ -10159,7 +10160,7 @@ class InitSegAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.InitSegAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.InitSegAttr]:
     ...
 
   @overload
@@ -10217,7 +10218,7 @@ class InheritableAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.InheritableAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.InheritableAttr]:
     ...
 
   @overload
@@ -10280,7 +10281,7 @@ class IBOutletCollectionAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.IBOutletCollectionAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.IBOutletCollectionAttr]:
     ...
 
   @overload
@@ -10341,7 +10342,7 @@ class IBOutletAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.IBOutletAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.IBOutletAttr]:
     ...
 
   @overload
@@ -10402,7 +10403,7 @@ class IBActionAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.IBActionAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.IBActionAttr]:
     ...
 
   @overload
@@ -10463,7 +10464,7 @@ class HotAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.HotAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.HotAttr]:
     ...
 
   @overload
@@ -10525,7 +10526,7 @@ class HLSLShaderAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.HLSLShaderAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.HLSLShaderAttr]:
     ...
 
   @overload
@@ -10590,7 +10591,7 @@ class HLSLResourceBindingAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.HLSLResourceBindingAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.HLSLResourceBindingAttr]:
     ...
 
   @overload
@@ -10652,7 +10653,7 @@ class HLSLResourceAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.HLSLResourceAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.HLSLResourceAttr]:
     ...
 
   @overload
@@ -10713,7 +10714,7 @@ class HLSLNumThreadsAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.HLSLNumThreadsAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.HLSLNumThreadsAttr]:
     ...
 
   @overload
@@ -10770,7 +10771,7 @@ class HLSLAnnotationAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.HLSLAnnotationAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.HLSLAnnotationAttr]:
     ...
 
   @overload
@@ -10831,7 +10832,7 @@ class HLSLSV_GroupIndexAttr(multiplier.ast.HLSLAnnotationAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.HLSLSV_GroupIndexAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.HLSLSV_GroupIndexAttr]:
     ...
 
   @overload
@@ -10892,7 +10893,7 @@ class HLSLSV_DispatchThreadIDAttr(multiplier.ast.HLSLAnnotationAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.HLSLSV_DispatchThreadIDAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.HLSLSV_DispatchThreadIDAttr]:
     ...
 
   @overload
@@ -10953,7 +10954,7 @@ class HIPManagedAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.HIPManagedAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.HIPManagedAttr]:
     ...
 
   @overload
@@ -11014,7 +11015,7 @@ class GuardedVarAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.GuardedVarAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.GuardedVarAttr]:
     ...
 
   @overload
@@ -11076,7 +11077,7 @@ class GuardedByAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.GuardedByAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.GuardedByAttr]:
     ...
 
   @overload
@@ -11137,7 +11138,7 @@ class GNUInlineAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.GNUInlineAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.GNUInlineAttr]:
     ...
 
   @overload
@@ -11199,7 +11200,7 @@ class FunctionReturnThunksAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.FunctionReturnThunksAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.FunctionReturnThunksAttr]:
     ...
 
   @overload
@@ -11260,7 +11261,7 @@ class FormatAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.FormatAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.FormatAttr]:
     ...
 
   @overload
@@ -11321,7 +11322,7 @@ class FormatArgAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.FormatArgAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.FormatArgAttr]:
     ...
 
   @overload
@@ -11382,7 +11383,7 @@ class FlattenAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.FlattenAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.FlattenAttr]:
     ...
 
   @overload
@@ -11443,7 +11444,7 @@ class FlagEnumAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.FlagEnumAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.FlagEnumAttr]:
     ...
 
   @overload
@@ -11506,7 +11507,7 @@ class FinalAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.FinalAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.FinalAttr]:
     ...
 
   @overload
@@ -11567,7 +11568,7 @@ class FastCallAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.FastCallAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.FastCallAttr]:
     ...
 
   @overload
@@ -11635,7 +11636,7 @@ class ExternalSourceSymbolAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ExternalSourceSymbolAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ExternalSourceSymbolAttr]:
     ...
 
   @overload
@@ -11697,7 +11698,7 @@ class ExclusiveTrylockFunctionAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ExclusiveTrylockFunctionAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ExclusiveTrylockFunctionAttr]:
     ...
 
   @overload
@@ -11758,7 +11759,7 @@ class ExcludeFromExplicitInstantiationAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ExcludeFromExplicitInstantiationAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ExcludeFromExplicitInstantiationAttr]:
     ...
 
   @overload
@@ -11824,7 +11825,7 @@ class ErrorAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ErrorAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ErrorAttr]:
     ...
 
   @overload
@@ -11886,7 +11887,7 @@ class EnumExtensibilityAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.EnumExtensibilityAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.EnumExtensibilityAttr]:
     ...
 
   @overload
@@ -11949,7 +11950,7 @@ class EnforceTCBLeafAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.EnforceTCBLeafAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.EnforceTCBLeafAttr]:
     ...
 
   @overload
@@ -12012,7 +12013,7 @@ class EnforceTCBAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.EnforceTCBAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.EnforceTCBAttr]:
     ...
 
   @overload
@@ -12076,7 +12077,7 @@ class EnableIfAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.EnableIfAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.EnableIfAttr]:
     ...
 
   @overload
@@ -12137,7 +12138,7 @@ class EmptyBasesAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.EmptyBasesAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.EmptyBasesAttr]:
     ...
 
   @overload
@@ -12198,7 +12199,7 @@ class DisableTailCallsAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.DisableTailCallsAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.DisableTailCallsAttr]:
     ...
 
   @overload
@@ -12259,7 +12260,7 @@ class DisableSanitizerInstrumentationAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.DisableSanitizerInstrumentationAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.DisableSanitizerInstrumentationAttr]:
     ...
 
   @overload
@@ -12328,7 +12329,7 @@ class DiagnoseIfAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.DiagnoseIfAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.DiagnoseIfAttr]:
     ...
 
   @overload
@@ -12390,7 +12391,7 @@ class DiagnoseAsBuiltinAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.DiagnoseAsBuiltinAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.DiagnoseAsBuiltinAttr]:
     ...
 
   @overload
@@ -12451,7 +12452,7 @@ class DestructorAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.DestructorAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.DestructorAttr]:
     ...
 
   @overload
@@ -12516,7 +12517,7 @@ class DeprecatedAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.DeprecatedAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.DeprecatedAttr]:
     ...
 
   @overload
@@ -12573,7 +12574,7 @@ class DeclOrStmtAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.DeclOrStmtAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.DeclOrStmtAttr]:
     ...
 
   @overload
@@ -12636,7 +12637,7 @@ class AlwaysInlineAttr(multiplier.ast.DeclOrStmtAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AlwaysInlineAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AlwaysInlineAttr]:
     ...
 
   @overload
@@ -12698,7 +12699,7 @@ class SuppressAttr(multiplier.ast.DeclOrStmtAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SuppressAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SuppressAttr]:
     ...
 
   @overload
@@ -12759,7 +12760,7 @@ class NoMergeAttr(multiplier.ast.DeclOrStmtAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NoMergeAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NoMergeAttr]:
     ...
 
   @overload
@@ -12821,7 +12822,7 @@ class NoInlineAttr(multiplier.ast.DeclOrStmtAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NoInlineAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NoInlineAttr]:
     ...
 
   @overload
@@ -12882,7 +12883,7 @@ class DLLImportStaticLocalAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.DLLImportStaticLocalAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.DLLImportStaticLocalAttr]:
     ...
 
   @overload
@@ -12943,7 +12944,7 @@ class DLLImportAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.DLLImportAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.DLLImportAttr]:
     ...
 
   @overload
@@ -13004,7 +13005,7 @@ class DLLExportStaticLocalAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.DLLExportStaticLocalAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.DLLExportStaticLocalAttr]:
     ...
 
   @overload
@@ -13065,7 +13066,7 @@ class DLLExportAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.DLLExportAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.DLLExportAttr]:
     ...
 
   @overload
@@ -13127,7 +13128,7 @@ class CountedByAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CountedByAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CountedByAttr]:
     ...
 
   @overload
@@ -13188,7 +13189,7 @@ class CoroWrapperAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CoroWrapperAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CoroWrapperAttr]:
     ...
 
   @overload
@@ -13249,7 +13250,7 @@ class CoroReturnTypeAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CoroReturnTypeAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CoroReturnTypeAttr]:
     ...
 
   @overload
@@ -13310,7 +13311,7 @@ class CoroOnlyDestroyWhenCompleteAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CoroOnlyDestroyWhenCompleteAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CoroOnlyDestroyWhenCompleteAttr]:
     ...
 
   @overload
@@ -13371,7 +13372,7 @@ class CoroLifetimeBoundAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CoroLifetimeBoundAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CoroLifetimeBoundAttr]:
     ...
 
   @overload
@@ -13432,7 +13433,7 @@ class CoroDisableLifetimeBoundAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CoroDisableLifetimeBoundAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CoroDisableLifetimeBoundAttr]:
     ...
 
   @overload
@@ -13493,7 +13494,7 @@ class ConvergentAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ConvergentAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ConvergentAttr]:
     ...
 
   @overload
@@ -13554,7 +13555,7 @@ class ConsumableSetOnReadAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ConsumableSetOnReadAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ConsumableSetOnReadAttr]:
     ...
 
   @overload
@@ -13615,7 +13616,7 @@ class ConsumableAutoCastAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ConsumableAutoCastAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ConsumableAutoCastAttr]:
     ...
 
   @overload
@@ -13677,7 +13678,7 @@ class ConsumableAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ConsumableAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ConsumableAttr]:
     ...
 
   @overload
@@ -13738,7 +13739,7 @@ class ConstructorAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ConstructorAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ConstructorAttr]:
     ...
 
   @overload
@@ -13801,7 +13802,7 @@ class ConstInitAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ConstInitAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ConstInitAttr]:
     ...
 
   @overload
@@ -13862,7 +13863,7 @@ class ConstAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ConstAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ConstAttr]:
     ...
 
   @overload
@@ -13923,7 +13924,7 @@ class CommonAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CommonAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CommonAttr]:
     ...
 
   @overload
@@ -13984,7 +13985,7 @@ class ColdAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ColdAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ColdAttr]:
     ...
 
   @overload
@@ -14047,7 +14048,7 @@ class CodeSegAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CodeSegAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CodeSegAttr]:
     ...
 
   @overload
@@ -14108,7 +14109,7 @@ class CodeModelAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CodeModelAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CodeModelAttr]:
     ...
 
   @overload
@@ -14169,7 +14170,7 @@ class CmseNSEntryAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CmseNSEntryAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CmseNSEntryAttr]:
     ...
 
   @overload
@@ -14231,7 +14232,7 @@ class CleanupAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CleanupAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CleanupAttr]:
     ...
 
   @overload
@@ -14292,7 +14293,7 @@ class CapturedRecordAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CapturedRecordAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CapturedRecordAttr]:
     ...
 
   @overload
@@ -14357,7 +14358,7 @@ class CapabilityAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CapabilityAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CapabilityAttr]:
     ...
 
   @overload
@@ -14418,7 +14419,7 @@ class CallbackAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CallbackAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CallbackAttr]:
     ...
 
   @overload
@@ -14479,7 +14480,7 @@ class CallableWhenAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CallableWhenAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CallableWhenAttr]:
     ...
 
   @overload
@@ -14541,7 +14542,7 @@ class CXX11NoReturnAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXX11NoReturnAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXX11NoReturnAttr]:
     ...
 
   @overload
@@ -14602,7 +14603,7 @@ class CUDASharedAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CUDASharedAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CUDASharedAttr]:
     ...
 
   @overload
@@ -14666,7 +14667,7 @@ class CUDALaunchBoundsAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CUDALaunchBoundsAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CUDALaunchBoundsAttr]:
     ...
 
   @overload
@@ -14727,7 +14728,7 @@ class CUDAInvalidTargetAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CUDAInvalidTargetAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CUDAInvalidTargetAttr]:
     ...
 
   @overload
@@ -14788,7 +14789,7 @@ class CUDAHostAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CUDAHostAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CUDAHostAttr]:
     ...
 
   @overload
@@ -14849,7 +14850,7 @@ class CUDAGlobalAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CUDAGlobalAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CUDAGlobalAttr]:
     ...
 
   @overload
@@ -14910,7 +14911,7 @@ class CUDADeviceBuiltinTextureTypeAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CUDADeviceBuiltinTextureTypeAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CUDADeviceBuiltinTextureTypeAttr]:
     ...
 
   @overload
@@ -14971,7 +14972,7 @@ class CUDADeviceBuiltinSurfaceTypeAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CUDADeviceBuiltinSurfaceTypeAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CUDADeviceBuiltinSurfaceTypeAttr]:
     ...
 
   @overload
@@ -15032,7 +15033,7 @@ class CUDADeviceAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CUDADeviceAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CUDADeviceAttr]:
     ...
 
   @overload
@@ -15093,7 +15094,7 @@ class CUDAConstantAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CUDAConstantAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CUDAConstantAttr]:
     ...
 
   @overload
@@ -15154,7 +15155,7 @@ class CPUSpecificAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CPUSpecificAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CPUSpecificAttr]:
     ...
 
   @overload
@@ -15215,7 +15216,7 @@ class CPUDispatchAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CPUDispatchAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CPUDispatchAttr]:
     ...
 
   @overload
@@ -15276,7 +15277,7 @@ class CFUnknownTransferAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CFUnknownTransferAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CFUnknownTransferAttr]:
     ...
 
   @overload
@@ -15337,7 +15338,7 @@ class CFReturnsRetainedAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CFReturnsRetainedAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CFReturnsRetainedAttr]:
     ...
 
   @overload
@@ -15398,7 +15399,7 @@ class CFReturnsNotRetainedAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CFReturnsNotRetainedAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CFReturnsNotRetainedAttr]:
     ...
 
   @overload
@@ -15459,7 +15460,7 @@ class CFICanonicalJumpTableAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CFICanonicalJumpTableAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CFICanonicalJumpTableAttr]:
     ...
 
   @overload
@@ -15521,7 +15522,7 @@ class CFGuardAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CFGuardAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CFGuardAttr]:
     ...
 
   @overload
@@ -15582,7 +15583,7 @@ class CFAuditedTransferAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CFAuditedTransferAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CFAuditedTransferAttr]:
     ...
 
   @overload
@@ -15643,7 +15644,7 @@ class CDeclAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CDeclAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CDeclAttr]:
     ...
 
   @overload
@@ -15704,7 +15705,7 @@ class C11NoReturnAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.C11NoReturnAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.C11NoReturnAttr]:
     ...
 
   @overload
@@ -15765,7 +15766,7 @@ class BuiltinAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.BuiltinAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.BuiltinAttr]:
     ...
 
   @overload
@@ -15827,7 +15828,7 @@ class BlocksAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.BlocksAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.BlocksAttr]:
     ...
 
   @overload
@@ -15890,7 +15891,7 @@ class BTFDeclTagAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.BTFDeclTagAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.BTFDeclTagAttr]:
     ...
 
   @overload
@@ -15951,7 +15952,7 @@ class BPFPreserveStaticOffsetAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.BPFPreserveStaticOffsetAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.BPFPreserveStaticOffsetAttr]:
     ...
 
   @overload
@@ -16012,7 +16013,7 @@ class BPFPreserveAccessIndexAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.BPFPreserveAccessIndexAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.BPFPreserveAccessIndexAttr]:
     ...
 
   @overload
@@ -16073,7 +16074,7 @@ class AvailableOnlyInDefaultEvalMethodAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AvailableOnlyInDefaultEvalMethodAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AvailableOnlyInDefaultEvalMethodAttr]:
     ...
 
   @overload
@@ -16140,7 +16141,7 @@ class AvailabilityAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AvailabilityAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AvailabilityAttr]:
     ...
 
   @overload
@@ -16203,7 +16204,7 @@ class AssumptionAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AssumptionAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AssumptionAttr]:
     ...
 
   @overload
@@ -16266,7 +16267,7 @@ class AssumeAlignedAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AssumeAlignedAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AssumeAlignedAttr]:
     ...
 
   @overload
@@ -16327,7 +16328,7 @@ class AssertSharedLockAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AssertSharedLockAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AssertSharedLockAttr]:
     ...
 
   @overload
@@ -16388,7 +16389,7 @@ class AssertExclusiveLockAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AssertExclusiveLockAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AssertExclusiveLockAttr]:
     ...
 
   @overload
@@ -16451,7 +16452,7 @@ class AssertCapabilityAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AssertCapabilityAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AssertCapabilityAttr]:
     ...
 
   @overload
@@ -16515,7 +16516,7 @@ class AsmLabelAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AsmLabelAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AsmLabelAttr]:
     ...
 
   @overload
@@ -16576,7 +16577,7 @@ class ArtificialAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ArtificialAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ArtificialAttr]:
     ...
 
   @overload
@@ -16639,7 +16640,7 @@ class ArmNewAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ArmNewAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ArmNewAttr]:
     ...
 
   @overload
@@ -16700,7 +16701,7 @@ class ArmLocallyStreamingAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ArmLocallyStreamingAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ArmLocallyStreamingAttr]:
     ...
 
   @overload
@@ -16761,7 +16762,7 @@ class ArmBuiltinAliasAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ArmBuiltinAliasAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ArmBuiltinAliasAttr]:
     ...
 
   @overload
@@ -16824,7 +16825,7 @@ class ArgumentWithTypeTagAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ArgumentWithTypeTagAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ArgumentWithTypeTagAttr]:
     ...
 
   @overload
@@ -16885,7 +16886,7 @@ class ArcWeakrefUnavailableAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ArcWeakrefUnavailableAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ArcWeakrefUnavailableAttr]:
     ...
 
   @overload
@@ -16946,7 +16947,7 @@ class AnyX86NoCfCheckAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AnyX86NoCfCheckAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AnyX86NoCfCheckAttr]:
     ...
 
   @overload
@@ -17007,7 +17008,7 @@ class AnyX86NoCallerSavedRegistersAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AnyX86NoCallerSavedRegistersAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AnyX86NoCallerSavedRegistersAttr]:
     ...
 
   @overload
@@ -17068,7 +17069,7 @@ class AnyX86InterruptAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AnyX86InterruptAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AnyX86InterruptAttr]:
     ...
 
   @overload
@@ -17129,7 +17130,7 @@ class AnalyzerNoReturnAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AnalyzerNoReturnAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AnalyzerNoReturnAttr]:
     ...
 
   @overload
@@ -17190,7 +17191,7 @@ class AlwaysDestroyAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AlwaysDestroyAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AlwaysDestroyAttr]:
     ...
 
   @overload
@@ -17251,7 +17252,7 @@ class AllocSizeAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AllocSizeAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AllocSizeAttr]:
     ...
 
   @overload
@@ -17312,7 +17313,7 @@ class AllocAlignAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AllocAlignAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AllocAlignAttr]:
     ...
 
   @overload
@@ -17385,7 +17386,7 @@ class AlignedAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AlignedAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AlignedAttr]:
     ...
 
   @overload
@@ -17446,7 +17447,7 @@ class AlignNaturalAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AlignNaturalAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AlignNaturalAttr]:
     ...
 
   @overload
@@ -17507,7 +17508,7 @@ class AlignMac68kAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AlignMac68kAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AlignMac68kAttr]:
     ...
 
   @overload
@@ -17568,7 +17569,7 @@ class AcquiredBeforeAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AcquiredBeforeAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AcquiredBeforeAttr]:
     ...
 
   @overload
@@ -17629,7 +17630,7 @@ class AcquiredAfterAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AcquiredAfterAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AcquiredAfterAttr]:
     ...
 
   @overload
@@ -17692,7 +17693,7 @@ class AcquireHandleAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AcquireHandleAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AcquireHandleAttr]:
     ...
 
   @overload
@@ -17755,7 +17756,7 @@ class AcquireCapabilityAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AcquireCapabilityAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AcquireCapabilityAttr]:
     ...
 
   @overload
@@ -17816,7 +17817,7 @@ class AVRSignalAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AVRSignalAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AVRSignalAttr]:
     ...
 
   @overload
@@ -17877,7 +17878,7 @@ class AVRInterruptAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AVRInterruptAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AVRInterruptAttr]:
     ...
 
   @overload
@@ -17939,7 +17940,7 @@ class ARMInterruptAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ARMInterruptAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ARMInterruptAttr]:
     ...
 
   @overload
@@ -18002,7 +18003,7 @@ class AMDGPUWavesPerEUAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AMDGPUWavesPerEUAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AMDGPUWavesPerEUAttr]:
     ...
 
   @overload
@@ -18064,7 +18065,7 @@ class AMDGPUNumVGPRAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AMDGPUNumVGPRAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AMDGPUNumVGPRAttr]:
     ...
 
   @overload
@@ -18126,7 +18127,7 @@ class AMDGPUNumSGPRAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AMDGPUNumSGPRAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AMDGPUNumSGPRAttr]:
     ...
 
   @overload
@@ -18187,7 +18188,7 @@ class AMDGPUKernelCallAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AMDGPUKernelCallAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AMDGPUKernelCallAttr]:
     ...
 
   @overload
@@ -18250,7 +18251,7 @@ class AMDGPUFlatWorkGroupSizeAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AMDGPUFlatWorkGroupSizeAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AMDGPUFlatWorkGroupSizeAttr]:
     ...
 
   @overload
@@ -18311,7 +18312,7 @@ class AArch64VectorPcsAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AArch64VectorPcsAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AArch64VectorPcsAttr]:
     ...
 
   @overload
@@ -18372,7 +18373,7 @@ class AArch64SVEPcsAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AArch64SVEPcsAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AArch64SVEPcsAttr]:
     ...
 
   @overload
@@ -18434,7 +18435,7 @@ class ZeroCallUsedRegsAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ZeroCallUsedRegsAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ZeroCallUsedRegsAttr]:
     ...
 
   @overload
@@ -18496,7 +18497,7 @@ class XRayLogArgsAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.XRayLogArgsAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.XRayLogArgsAttr]:
     ...
 
   @overload
@@ -18560,7 +18561,7 @@ class XRayInstrumentAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.XRayInstrumentAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.XRayInstrumentAttr]:
     ...
 
   @overload
@@ -18621,7 +18622,7 @@ class X86ForceAlignArgPointerAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.X86ForceAlignArgPointerAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.X86ForceAlignArgPointerAttr]:
     ...
 
   @overload
@@ -18685,7 +18686,7 @@ class WorkGroupSizeHintAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.WorkGroupSizeHintAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.WorkGroupSizeHintAttr]:
     ...
 
   @overload
@@ -18748,7 +18749,7 @@ class WebAssemblyImportNameAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.WebAssemblyImportNameAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.WebAssemblyImportNameAttr]:
     ...
 
   @overload
@@ -18811,7 +18812,7 @@ class WebAssemblyImportModuleAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.WebAssemblyImportModuleAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.WebAssemblyImportModuleAttr]:
     ...
 
   @overload
@@ -18874,7 +18875,7 @@ class WebAssemblyExportNameAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.WebAssemblyExportNameAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.WebAssemblyExportNameAttr]:
     ...
 
   @overload
@@ -18937,7 +18938,7 @@ class WeakRefAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.WeakRefAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.WeakRefAttr]:
     ...
 
   @overload
@@ -18998,7 +18999,7 @@ class WeakImportAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.WeakImportAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.WeakImportAttr]:
     ...
 
   @overload
@@ -19059,7 +19060,7 @@ class WeakAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.WeakAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.WeakAttr]:
     ...
 
   @overload
@@ -19124,7 +19125,7 @@ class WarnUnusedResultAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.WarnUnusedResultAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.WarnUnusedResultAttr]:
     ...
 
   @overload
@@ -19185,7 +19186,7 @@ class WarnUnusedAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.WarnUnusedAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.WarnUnusedAttr]:
     ...
 
   @overload
@@ -19247,7 +19248,7 @@ class VisibilityAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.VisibilityAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.VisibilityAttr]:
     ...
 
   @overload
@@ -19308,7 +19309,7 @@ class VectorCallAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.VectorCallAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.VectorCallAttr]:
     ...
 
   @overload
@@ -19371,7 +19372,7 @@ class VecTypeHintAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.VecTypeHintAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.VecTypeHintAttr]:
     ...
 
   @overload
@@ -19432,7 +19433,7 @@ class VecReturnAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.VecReturnAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.VecReturnAttr]:
     ...
 
   @overload
@@ -19496,7 +19497,7 @@ class UuidAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.UuidAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.UuidAttr]:
     ...
 
   @overload
@@ -19557,7 +19558,7 @@ class UsingIfExistsAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.UsingIfExistsAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.UsingIfExistsAttr]:
     ...
 
   @overload
@@ -19618,7 +19619,7 @@ class UsedAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.UsedAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.UsedAttr]:
     ...
 
   @overload
@@ -19680,7 +19681,7 @@ class UnusedAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.UnusedAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.UnusedAttr]:
     ...
 
   @overload
@@ -19741,7 +19742,7 @@ class UnsafeBufferUsageAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.UnsafeBufferUsageAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.UnsafeBufferUsageAttr]:
     ...
 
   @overload
@@ -19802,7 +19803,7 @@ class UninitializedAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.UninitializedAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.UninitializedAttr]:
     ...
 
   @overload
@@ -19866,7 +19867,7 @@ class UnavailableAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.UnavailableAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.UnavailableAttr]:
     ...
 
   @overload
@@ -19928,7 +19929,7 @@ class TypeVisibilityAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TypeVisibilityAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TypeVisibilityAttr]:
     ...
 
   @overload
@@ -19993,7 +19994,7 @@ class TypeTagForDatatypeAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TypeTagForDatatypeAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TypeTagForDatatypeAttr]:
     ...
 
   @overload
@@ -20057,7 +20058,7 @@ class TryAcquireCapabilityAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TryAcquireCapabilityAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TryAcquireCapabilityAttr]:
     ...
 
   @overload
@@ -20118,7 +20119,7 @@ class TrivialABIAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TrivialABIAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TrivialABIAttr]:
     ...
 
   @overload
@@ -20179,7 +20180,7 @@ class TransparentUnionAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TransparentUnionAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TransparentUnionAttr]:
     ...
 
   @overload
@@ -20240,7 +20241,7 @@ class ThisCallAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ThisCallAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ThisCallAttr]:
     ...
 
   @overload
@@ -20302,7 +20303,7 @@ class TestTypestateAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TestTypestateAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TestTypestateAttr]:
     ...
 
   @overload
@@ -20367,7 +20368,7 @@ class TargetVersionAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TargetVersionAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TargetVersionAttr]:
     ...
 
   @overload
@@ -20428,7 +20429,7 @@ class TargetClonesAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TargetClonesAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TargetClonesAttr]:
     ...
 
   @overload
@@ -20493,7 +20494,7 @@ class TargetAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TargetAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TargetAttr]:
     ...
 
   @overload
@@ -20556,7 +20557,7 @@ class TLSModelAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TLSModelAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TLSModelAttr]:
     ...
 
   @overload
@@ -20617,7 +20618,7 @@ class SysVABIAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SysVABIAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SysVABIAttr]:
     ...
 
   @overload
@@ -20678,7 +20679,7 @@ class SwiftPrivateAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SwiftPrivateAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SwiftPrivateAttr]:
     ...
 
   @overload
@@ -20741,7 +20742,7 @@ class SwiftNewTypeAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SwiftNewTypeAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SwiftNewTypeAttr]:
     ...
 
   @overload
@@ -20804,7 +20805,7 @@ class SwiftNameAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SwiftNameAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SwiftNameAttr]:
     ...
 
   @overload
@@ -20865,7 +20866,7 @@ class SwiftImportPropertyAsAccessorsAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SwiftImportPropertyAsAccessorsAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SwiftImportPropertyAsAccessorsAttr]:
     ...
 
   @overload
@@ -20926,7 +20927,7 @@ class SwiftImportAsNonGenericAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SwiftImportAsNonGenericAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SwiftImportAsNonGenericAttr]:
     ...
 
   @overload
@@ -20988,7 +20989,7 @@ class SwiftErrorAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SwiftErrorAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SwiftErrorAttr]:
     ...
 
   @overload
@@ -21049,7 +21050,7 @@ class SwiftCallAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SwiftCallAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SwiftCallAttr]:
     ...
 
   @overload
@@ -21110,7 +21111,7 @@ class SwiftBridgedTypedefAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SwiftBridgedTypedefAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SwiftBridgedTypedefAttr]:
     ...
 
   @overload
@@ -21173,7 +21174,7 @@ class SwiftBridgeAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SwiftBridgeAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SwiftBridgeAttr]:
     ...
 
   @overload
@@ -21236,7 +21237,7 @@ class SwiftAttrAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SwiftAttrAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SwiftAttrAttr]:
     ...
 
   @overload
@@ -21299,7 +21300,7 @@ class SwiftAsyncNameAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SwiftAsyncNameAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SwiftAsyncNameAttr]:
     ...
 
   @overload
@@ -21362,7 +21363,7 @@ class SwiftAsyncErrorAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SwiftAsyncErrorAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SwiftAsyncErrorAttr]:
     ...
 
   @overload
@@ -21423,7 +21424,7 @@ class SwiftAsyncCallAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SwiftAsyncCallAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SwiftAsyncCallAttr]:
     ...
 
   @overload
@@ -21485,7 +21486,7 @@ class SwiftAsyncAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SwiftAsyncAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SwiftAsyncAttr]:
     ...
 
   @overload
@@ -21546,7 +21547,7 @@ class StrictGuardStackCheckAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.StrictGuardStackCheckAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.StrictGuardStackCheckAttr]:
     ...
 
   @overload
@@ -21607,7 +21608,7 @@ class StrictFPAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.StrictFPAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.StrictFPAttr]:
     ...
 
   @overload
@@ -21668,7 +21669,7 @@ class StdCallAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.StdCallAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.StdCallAttr]:
     ...
 
   @overload
@@ -21729,7 +21730,7 @@ class StandaloneDebugAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.StandaloneDebugAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.StandaloneDebugAttr]:
     ...
 
   @overload
@@ -21790,7 +21791,7 @@ class SpeculativeLoadHardeningAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SpeculativeLoadHardeningAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SpeculativeLoadHardeningAttr]:
     ...
 
   @overload
@@ -21852,7 +21853,7 @@ class SharedTrylockFunctionAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SharedTrylockFunctionAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SharedTrylockFunctionAttr]:
     ...
 
   @overload
@@ -21914,7 +21915,7 @@ class SetTypestateAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SetTypestateAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SetTypestateAttr]:
     ...
 
   @overload
@@ -21975,7 +21976,7 @@ class SentinelAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SentinelAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SentinelAttr]:
     ...
 
   @overload
@@ -22036,7 +22037,7 @@ class SelectAnyAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SelectAnyAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SelectAnyAttr]:
     ...
 
   @overload
@@ -22100,7 +22101,7 @@ class SectionAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SectionAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SectionAttr]:
     ...
 
   @overload
@@ -22161,7 +22162,7 @@ class ScopedLockableAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ScopedLockableAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ScopedLockableAttr]:
     ...
 
   @overload
@@ -22222,7 +22223,7 @@ class SYCLSpecialClassAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SYCLSpecialClassAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SYCLSpecialClassAttr]:
     ...
 
   @overload
@@ -22283,7 +22284,7 @@ class SYCLKernelAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SYCLKernelAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SYCLKernelAttr]:
     ...
 
   @overload
@@ -22344,7 +22345,7 @@ class ReturnsTwiceAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ReturnsTwiceAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ReturnsTwiceAttr]:
     ...
 
   @overload
@@ -22405,7 +22406,7 @@ class ReturnsNonNullAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ReturnsNonNullAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ReturnsNonNullAttr]:
     ...
 
   @overload
@@ -22467,7 +22468,7 @@ class ReturnTypestateAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ReturnTypestateAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ReturnTypestateAttr]:
     ...
 
   @overload
@@ -22528,7 +22529,7 @@ class RetainAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.RetainAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.RetainAttr]:
     ...
 
   @overload
@@ -22590,7 +22591,7 @@ class RestrictAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.RestrictAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.RestrictAttr]:
     ...
 
   @overload
@@ -22653,7 +22654,7 @@ class RequiresCapabilityAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.RequiresCapabilityAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.RequiresCapabilityAttr]:
     ...
 
   @overload
@@ -22717,7 +22718,7 @@ class ReqdWorkGroupSizeAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ReqdWorkGroupSizeAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ReqdWorkGroupSizeAttr]:
     ...
 
   @overload
@@ -22781,7 +22782,7 @@ class ReleaseCapabilityAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ReleaseCapabilityAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ReleaseCapabilityAttr]:
     ...
 
   @overload
@@ -22842,7 +22843,7 @@ class ReinitializesAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ReinitializesAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ReinitializesAttr]:
     ...
 
   @overload
@@ -22903,7 +22904,7 @@ class RegCallAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.RegCallAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.RegCallAttr]:
     ...
 
   @overload
@@ -22964,7 +22965,7 @@ class ReadOnlyPlacementAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ReadOnlyPlacementAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ReadOnlyPlacementAttr]:
     ...
 
   @overload
@@ -23025,7 +23026,7 @@ class RandomizeLayoutAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.RandomizeLayoutAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.RandomizeLayoutAttr]:
     ...
 
   @overload
@@ -23087,7 +23088,7 @@ class RISCVInterruptAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.RISCVInterruptAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.RISCVInterruptAttr]:
     ...
 
   @overload
@@ -23148,7 +23149,7 @@ class PureAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.PureAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.PureAttr]:
     ...
 
   @overload
@@ -23209,7 +23210,7 @@ class PtGuardedVarAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.PtGuardedVarAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.PtGuardedVarAttr]:
     ...
 
   @overload
@@ -23271,7 +23272,7 @@ class PtGuardedByAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.PtGuardedByAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.PtGuardedByAttr]:
     ...
 
   @overload
@@ -23332,7 +23333,7 @@ class PreserveMostAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.PreserveMostAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.PreserveMostAttr]:
     ...
 
   @overload
@@ -23393,7 +23394,7 @@ class PreserveAllAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.PreserveAllAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.PreserveAllAttr]:
     ...
 
   @overload
@@ -23456,7 +23457,7 @@ class PreferredTypeAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.PreferredTypeAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.PreferredTypeAttr]:
     ...
 
   @overload
@@ -23519,7 +23520,7 @@ class PreferredNameAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.PreferredNameAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.PreferredNameAttr]:
     ...
 
   @overload
@@ -23582,7 +23583,7 @@ class PragmaClangTextSectionAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.PragmaClangTextSectionAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.PragmaClangTextSectionAttr]:
     ...
 
   @overload
@@ -23645,7 +23646,7 @@ class PragmaClangRodataSectionAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.PragmaClangRodataSectionAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.PragmaClangRodataSectionAttr]:
     ...
 
   @overload
@@ -23708,7 +23709,7 @@ class PragmaClangRelroSectionAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.PragmaClangRelroSectionAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.PragmaClangRelroSectionAttr]:
     ...
 
   @overload
@@ -23771,7 +23772,7 @@ class PragmaClangDataSectionAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.PragmaClangDataSectionAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.PragmaClangDataSectionAttr]:
     ...
 
   @overload
@@ -23834,7 +23835,7 @@ class PragmaClangBSSSectionAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.PragmaClangBSSSectionAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.PragmaClangBSSSectionAttr]:
     ...
 
   @overload
@@ -23897,7 +23898,7 @@ class PointerAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.PointerAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.PointerAttr]:
     ...
 
   @overload
@@ -23959,7 +23960,7 @@ class PcsAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.PcsAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.PcsAttr]:
     ...
 
   @overload
@@ -24021,7 +24022,7 @@ class PatchableFunctionEntryAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.PatchableFunctionEntryAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.PatchableFunctionEntryAttr]:
     ...
 
   @overload
@@ -24082,7 +24083,7 @@ class PascalAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.PascalAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.PascalAttr]:
     ...
 
   @overload
@@ -24144,7 +24145,7 @@ class ParamTypestateAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ParamTypestateAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ParamTypestateAttr]:
     ...
 
   @overload
@@ -24205,7 +24206,7 @@ class PackedAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.PackedAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.PackedAttr]:
     ...
 
   @overload
@@ -24271,7 +24272,7 @@ class OwnershipAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OwnershipAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OwnershipAttr]:
     ...
 
   @overload
@@ -24334,7 +24335,7 @@ class OwnerAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OwnerAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OwnerAttr]:
     ...
 
   @overload
@@ -24395,7 +24396,7 @@ class OverrideAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OverrideAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OverrideAttr]:
     ...
 
   @overload
@@ -24456,7 +24457,7 @@ class OptimizeNoneAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OptimizeNoneAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OptimizeNoneAttr]:
     ...
 
   @overload
@@ -24517,7 +24518,7 @@ class OpenCLKernelAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OpenCLKernelAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OpenCLKernelAttr]:
     ...
 
   @overload
@@ -24579,7 +24580,7 @@ class OpenCLIntelReqdSubGroupSizeAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OpenCLIntelReqdSubGroupSizeAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OpenCLIntelReqdSubGroupSizeAttr]:
     ...
 
   @overload
@@ -24640,7 +24641,7 @@ class ObjCSubclassingRestrictedAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCSubclassingRestrictedAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCSubclassingRestrictedAttr]:
     ...
 
   @overload
@@ -24701,7 +24702,7 @@ class ObjCRootClassAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCRootClassAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCRootClassAttr]:
     ...
 
   @overload
@@ -24762,7 +24763,7 @@ class ObjCReturnsInnerPointerAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCReturnsInnerPointerAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCReturnsInnerPointerAttr]:
     ...
 
   @overload
@@ -24823,7 +24824,7 @@ class ObjCRequiresSuperAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCRequiresSuperAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCRequiresSuperAttr]:
     ...
 
   @overload
@@ -24884,7 +24885,7 @@ class ObjCRequiresPropertyDefsAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCRequiresPropertyDefsAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCRequiresPropertyDefsAttr]:
     ...
 
   @overload
@@ -24945,7 +24946,7 @@ class ObjCPreciseLifetimeAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCPreciseLifetimeAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCPreciseLifetimeAttr]:
     ...
 
   @overload
@@ -25006,7 +25007,7 @@ class ObjCOwnershipAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCOwnershipAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCOwnershipAttr]:
     ...
 
   @overload
@@ -25067,7 +25068,7 @@ class ObjCNSObjectAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCNSObjectAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCNSObjectAttr]:
     ...
 
   @overload
@@ -25129,7 +25130,7 @@ class ObjCMethodFamilyAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCMethodFamilyAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCMethodFamilyAttr]:
     ...
 
   @overload
@@ -25190,7 +25191,7 @@ class ObjCIndependentClassAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCIndependentClassAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCIndependentClassAttr]:
     ...
 
   @overload
@@ -25251,7 +25252,7 @@ class ObjCExternallyRetainedAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCExternallyRetainedAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCExternallyRetainedAttr]:
     ...
 
   @overload
@@ -25312,7 +25313,7 @@ class ObjCExplicitProtocolImplAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCExplicitProtocolImplAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCExplicitProtocolImplAttr]:
     ...
 
   @overload
@@ -25373,7 +25374,7 @@ class ObjCExceptionAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCExceptionAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCExceptionAttr]:
     ...
 
   @overload
@@ -25434,7 +25435,7 @@ class ObjCBridgeRelatedAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCBridgeRelatedAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCBridgeRelatedAttr]:
     ...
 
   @overload
@@ -25495,7 +25496,7 @@ class ObjCBridgeMutableAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCBridgeMutableAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCBridgeMutableAttr]:
     ...
 
   @overload
@@ -25556,7 +25557,7 @@ class ObjCBridgeAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCBridgeAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCBridgeAttr]:
     ...
 
   @overload
@@ -25617,7 +25618,7 @@ class OSReturnsRetainedOnZeroAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OSReturnsRetainedOnZeroAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OSReturnsRetainedOnZeroAttr]:
     ...
 
   @overload
@@ -25678,7 +25679,7 @@ class OSReturnsRetainedOnNonZeroAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OSReturnsRetainedOnNonZeroAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OSReturnsRetainedOnNonZeroAttr]:
     ...
 
   @overload
@@ -25739,7 +25740,7 @@ class OSReturnsRetainedAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OSReturnsRetainedAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OSReturnsRetainedAttr]:
     ...
 
   @overload
@@ -25800,7 +25801,7 @@ class OSReturnsNotRetainedAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OSReturnsNotRetainedAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OSReturnsNotRetainedAttr]:
     ...
 
   @overload
@@ -25861,7 +25862,7 @@ class OSConsumesThisAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OSConsumesThisAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OSConsumesThisAttr]:
     ...
 
   @overload
@@ -25922,7 +25923,7 @@ class OMPThreadPrivateDeclAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPThreadPrivateDeclAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPThreadPrivateDeclAttr]:
     ...
 
   @overload
@@ -25984,7 +25985,7 @@ class OMPDeclareVariantAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPDeclareVariantAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPDeclareVariantAttr]:
     ...
 
   @overload
@@ -26050,7 +26051,7 @@ class OMPDeclareTargetDeclAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPDeclareTargetDeclAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPDeclareTargetDeclAttr]:
     ...
 
   @overload
@@ -26111,7 +26112,7 @@ class OMPCaptureNoInitAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPCaptureNoInitAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPCaptureNoInitAttr]:
     ...
 
   @overload
@@ -26175,7 +26176,7 @@ class OMPAllocateDeclAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPAllocateDeclAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPAllocateDeclAttr]:
     ...
 
   @overload
@@ -26236,7 +26237,7 @@ class NotTailCalledAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NotTailCalledAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NotTailCalledAttr]:
     ...
 
   @overload
@@ -26297,7 +26298,7 @@ class NoUwtableAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NoUwtableAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NoUwtableAttr]:
     ...
 
   @overload
@@ -26358,7 +26359,7 @@ class NoUniqueAddressAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NoUniqueAddressAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NoUniqueAddressAttr]:
     ...
 
   @overload
@@ -26419,7 +26420,7 @@ class NoThrowAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NoThrowAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NoThrowAttr]:
     ...
 
   @overload
@@ -26480,7 +26481,7 @@ class NoThreadSafetyAnalysisAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NoThreadSafetyAnalysisAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NoThreadSafetyAnalysisAttr]:
     ...
 
   @overload
@@ -26542,7 +26543,7 @@ class NoStackProtectorAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NoStackProtectorAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NoStackProtectorAttr]:
     ...
 
   @overload
@@ -26603,7 +26604,7 @@ class NoSplitStackAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NoSplitStackAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NoSplitStackAttr]:
     ...
 
   @overload
@@ -26664,7 +26665,7 @@ class NoSpeculativeLoadHardeningAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NoSpeculativeLoadHardeningAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NoSpeculativeLoadHardeningAttr]:
     ...
 
   @overload
@@ -26726,7 +26727,7 @@ class NoSanitizeAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NoSanitizeAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NoSanitizeAttr]:
     ...
 
   @overload
@@ -26787,7 +26788,7 @@ class NoReturnAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NoReturnAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NoReturnAttr]:
     ...
 
   @overload
@@ -26848,7 +26849,7 @@ class NoRandomizeLayoutAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NoRandomizeLayoutAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NoRandomizeLayoutAttr]:
     ...
 
   @overload
@@ -26909,7 +26910,7 @@ class NoProfileFunctionAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NoProfileFunctionAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NoProfileFunctionAttr]:
     ...
 
   @overload
@@ -26970,7 +26971,7 @@ class NoMips16Attr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NoMips16Attr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NoMips16Attr]:
     ...
 
   @overload
@@ -27031,7 +27032,7 @@ class NoMicroMipsAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NoMicroMipsAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NoMicroMipsAttr]:
     ...
 
   @overload
@@ -27092,7 +27093,7 @@ class NoInstrumentFunctionAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NoInstrumentFunctionAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NoInstrumentFunctionAttr]:
     ...
 
   @overload
@@ -27153,7 +27154,7 @@ class NoDuplicateAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NoDuplicateAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NoDuplicateAttr]:
     ...
 
   @overload
@@ -27214,7 +27215,7 @@ class NoDestroyAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NoDestroyAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NoDestroyAttr]:
     ...
 
   @overload
@@ -27275,7 +27276,7 @@ class NoDebugAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NoDebugAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NoDebugAttr]:
     ...
 
   @overload
@@ -27336,7 +27337,7 @@ class NoCommonAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NoCommonAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NoCommonAttr]:
     ...
 
   @overload
@@ -27397,7 +27398,7 @@ class NoAliasAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NoAliasAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NoAliasAttr]:
     ...
 
   @overload
@@ -27458,7 +27459,7 @@ class NakedAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NakedAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NakedAttr]:
     ...
 
   @overload
@@ -27519,7 +27520,7 @@ class NVPTXKernelAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NVPTXKernelAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NVPTXKernelAttr]:
     ...
 
   @overload
@@ -27580,7 +27581,7 @@ class NSReturnsRetainedAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NSReturnsRetainedAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NSReturnsRetainedAttr]:
     ...
 
   @overload
@@ -27641,7 +27642,7 @@ class NSReturnsNotRetainedAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NSReturnsNotRetainedAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NSReturnsNotRetainedAttr]:
     ...
 
   @overload
@@ -27702,7 +27703,7 @@ class NSReturnsAutoreleasedAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NSReturnsAutoreleasedAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NSReturnsAutoreleasedAttr]:
     ...
 
   @overload
@@ -27763,7 +27764,7 @@ class NSErrorDomainAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NSErrorDomainAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NSErrorDomainAttr]:
     ...
 
   @overload
@@ -27824,7 +27825,7 @@ class NSConsumesSelfAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NSConsumesSelfAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NSConsumesSelfAttr]:
     ...
 
   @overload
@@ -27886,7 +27887,7 @@ class MipsShortCallAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.MipsShortCallAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.MipsShortCallAttr]:
     ...
 
   @overload
@@ -27948,7 +27949,7 @@ class MipsLongCallAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.MipsLongCallAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.MipsLongCallAttr]:
     ...
 
   @overload
@@ -28010,7 +28011,7 @@ class MipsInterruptAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.MipsInterruptAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.MipsInterruptAttr]:
     ...
 
   @overload
@@ -28071,7 +28072,7 @@ class Mips16Attr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.Mips16Attr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.Mips16Attr]:
     ...
 
   @overload
@@ -28133,7 +28134,7 @@ class MinVectorWidthAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.MinVectorWidthAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.MinVectorWidthAttr]:
     ...
 
   @overload
@@ -28194,7 +28195,7 @@ class MinSizeAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.MinSizeAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.MinSizeAttr]:
     ...
 
   @overload
@@ -28255,7 +28256,7 @@ class MicroMipsAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.MicroMipsAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.MicroMipsAttr]:
     ...
 
   @overload
@@ -28316,7 +28317,7 @@ class MaybeUndefAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.MaybeUndefAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.MaybeUndefAttr]:
     ...
 
   @overload
@@ -28377,7 +28378,7 @@ class MayAliasAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.MayAliasAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.MayAliasAttr]:
     ...
 
   @overload
@@ -28439,7 +28440,7 @@ class MaxFieldAlignmentAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.MaxFieldAlignmentAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.MaxFieldAlignmentAttr]:
     ...
 
   @overload
@@ -28502,7 +28503,7 @@ class MSVtorDispAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.MSVtorDispAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.MSVtorDispAttr]:
     ...
 
   @overload
@@ -28563,7 +28564,7 @@ class MSStructAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.MSStructAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.MSStructAttr]:
     ...
 
   @overload
@@ -28625,7 +28626,7 @@ class MSP430InterruptAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.MSP430InterruptAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.MSP430InterruptAttr]:
     ...
 
   @overload
@@ -28686,7 +28687,7 @@ class MSNoVTableAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.MSNoVTableAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.MSNoVTableAttr]:
     ...
 
   @overload
@@ -28750,7 +28751,7 @@ class MSInheritanceAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.MSInheritanceAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.MSInheritanceAttr]:
     ...
 
   @overload
@@ -28811,7 +28812,7 @@ class MSConstexprAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.MSConstexprAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.MSConstexprAttr]:
     ...
 
   @overload
@@ -28872,7 +28873,7 @@ class MSAllocatorAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.MSAllocatorAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.MSAllocatorAttr]:
     ...
 
   @overload
@@ -28933,7 +28934,7 @@ class MSABIAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.MSABIAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.MSABIAttr]:
     ...
 
   @overload
@@ -28994,7 +28995,7 @@ class MIGServerRoutineAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.MIGServerRoutineAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.MIGServerRoutineAttr]:
     ...
 
   @overload
@@ -29055,7 +29056,7 @@ class M68kRTDAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.M68kRTDAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.M68kRTDAttr]:
     ...
 
   @overload
@@ -29117,7 +29118,7 @@ class M68kInterruptAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.M68kInterruptAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.M68kInterruptAttr]:
     ...
 
   @overload
@@ -29178,7 +29179,7 @@ class LocksExcludedAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.LocksExcludedAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.LocksExcludedAttr]:
     ...
 
   @overload
@@ -29240,7 +29241,7 @@ class LockReturnedAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.LockReturnedAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.LockReturnedAttr]:
     ...
 
   @overload
@@ -29301,7 +29302,7 @@ class LifetimeBoundAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.LifetimeBoundAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.LifetimeBoundAttr]:
     ...
 
   @overload
@@ -29362,7 +29363,7 @@ class LeafAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.LeafAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.LeafAttr]:
     ...
 
   @overload
@@ -29424,7 +29425,7 @@ class LayoutVersionAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.LayoutVersionAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.LayoutVersionAttr]:
     ...
 
   @overload
@@ -29485,7 +29486,7 @@ class LTOVisibilityPublicAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.LTOVisibilityPublicAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.LTOVisibilityPublicAttr]:
     ...
 
   @overload
@@ -29546,7 +29547,7 @@ class InternalLinkageAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.InternalLinkageAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.InternalLinkageAttr]:
     ...
 
   @overload
@@ -29607,7 +29608,7 @@ class IntelOclBiccAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.IntelOclBiccAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.IntelOclBiccAttr]:
     ...
 
   @overload
@@ -29669,7 +29670,7 @@ class InitPriorityAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.InitPriorityAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.InitPriorityAttr]:
     ...
 
   @overload
@@ -29726,7 +29727,7 @@ class InheritableParamAttr(multiplier.ast.InheritableAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.InheritableParamAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.InheritableParamAttr]:
     ...
 
   @overload
@@ -29787,7 +29788,7 @@ class CarriesDependencyAttr(multiplier.ast.InheritableParamAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CarriesDependencyAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CarriesDependencyAttr]:
     ...
 
   @overload
@@ -29848,7 +29849,7 @@ class CFConsumedAttr(multiplier.ast.InheritableParamAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CFConsumedAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CFConsumedAttr]:
     ...
 
   @overload
@@ -29911,7 +29912,7 @@ class AnnotateAttr(multiplier.ast.InheritableParamAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AnnotateAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AnnotateAttr]:
     ...
 
   @overload
@@ -29974,7 +29975,7 @@ class UseHandleAttr(multiplier.ast.InheritableParamAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.UseHandleAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.UseHandleAttr]:
     ...
 
   @overload
@@ -30037,7 +30038,7 @@ class ReleaseHandleAttr(multiplier.ast.InheritableParamAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ReleaseHandleAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ReleaseHandleAttr]:
     ...
 
   @overload
@@ -30100,7 +30101,7 @@ class PassObjectSizeAttr(multiplier.ast.InheritableParamAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.PassObjectSizeAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.PassObjectSizeAttr]:
     ...
 
   @overload
@@ -30158,7 +30159,7 @@ class ParameterABIAttr(multiplier.ast.InheritableParamAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ParameterABIAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ParameterABIAttr]:
     ...
 
   @overload
@@ -30219,7 +30220,7 @@ class SwiftIndirectResultAttr(multiplier.ast.ParameterABIAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SwiftIndirectResultAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SwiftIndirectResultAttr]:
     ...
 
   @overload
@@ -30280,7 +30281,7 @@ class SwiftErrorResultAttr(multiplier.ast.ParameterABIAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SwiftErrorResultAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SwiftErrorResultAttr]:
     ...
 
   @overload
@@ -30341,7 +30342,7 @@ class SwiftContextAttr(multiplier.ast.ParameterABIAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SwiftContextAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SwiftContextAttr]:
     ...
 
   @overload
@@ -30402,7 +30403,7 @@ class SwiftAsyncContextAttr(multiplier.ast.ParameterABIAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SwiftAsyncContextAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SwiftAsyncContextAttr]:
     ...
 
   @overload
@@ -30463,7 +30464,7 @@ class OSConsumedAttr(multiplier.ast.InheritableParamAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OSConsumedAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OSConsumedAttr]:
     ...
 
   @overload
@@ -30524,7 +30525,7 @@ class NonNullAttr(multiplier.ast.InheritableParamAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NonNullAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NonNullAttr]:
     ...
 
   @overload
@@ -30585,7 +30586,7 @@ class NSConsumedAttr(multiplier.ast.InheritableParamAttr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NSConsumedAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NSConsumedAttr]:
     ...
 
   @overload
@@ -30648,7 +30649,7 @@ class IFuncAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.IFuncAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.IFuncAttr]:
     ...
 
   @overload
@@ -30709,7 +30710,7 @@ class CalledOnceAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CalledOnceAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CalledOnceAttr]:
     ...
 
   @overload
@@ -30771,7 +30772,7 @@ class BuiltinAliasAttr(multiplier.ast.Attr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.BuiltinAliasAttr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.BuiltinAliasAttr]:
     ...
 
   @overload
@@ -30842,7 +30843,7 @@ class Type(multiplier.Entity):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.Type]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.Type]:
     ...
 
   @overload
@@ -30897,7 +30898,7 @@ class TemplateTypeParmType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TemplateTypeParmType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TemplateTypeParmType]:
     ...
 
   @overload
@@ -30953,7 +30954,7 @@ class TemplateSpecializationType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TemplateSpecializationType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TemplateSpecializationType]:
     ...
 
   @overload
@@ -31004,7 +31005,7 @@ class TagType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TagType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TagType]:
     ...
 
   @overload
@@ -31056,7 +31057,7 @@ class RecordType(multiplier.ast.TagType):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.RecordType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.RecordType]:
     ...
 
   @overload
@@ -31107,7 +31108,7 @@ class EnumType(multiplier.ast.TagType):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.EnumType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.EnumType]:
     ...
 
   @overload
@@ -31163,7 +31164,7 @@ class SubstTemplateTypeParmType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SubstTemplateTypeParmType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SubstTemplateTypeParmType]:
     ...
 
   @overload
@@ -31218,7 +31219,7 @@ class SubstTemplateTypeParmPackType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SubstTemplateTypeParmPackType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SubstTemplateTypeParmPackType]:
     ...
 
   @overload
@@ -31268,7 +31269,7 @@ class ReferenceType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ReferenceType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ReferenceType]:
     ...
 
   @overload
@@ -31319,7 +31320,7 @@ class RValueReferenceType(multiplier.ast.ReferenceType):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.RValueReferenceType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.RValueReferenceType]:
     ...
 
   @overload
@@ -31370,7 +31371,7 @@ class LValueReferenceType(multiplier.ast.ReferenceType):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.LValueReferenceType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.LValueReferenceType]:
     ...
 
   @overload
@@ -31456,7 +31457,7 @@ class QualifiedType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.QualifiedType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.QualifiedType]:
     ...
 
   @overload
@@ -31508,7 +31509,7 @@ class PointerType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.PointerType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.PointerType]:
     ...
 
   @overload
@@ -31561,7 +31562,7 @@ class PipeType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.PipeType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.PipeType]:
     ...
 
   @overload
@@ -31613,7 +31614,7 @@ class ParenType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ParenType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ParenType]:
     ...
 
   @overload
@@ -31665,7 +31666,7 @@ class PackExpansionType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.PackExpansionType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.PackExpansionType]:
     ...
 
   @overload
@@ -31717,7 +31718,7 @@ class ObjCTypeParamType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCTypeParamType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCTypeParamType]:
     ...
 
   @overload
@@ -31788,7 +31789,7 @@ class ObjCObjectType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCObjectType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCObjectType]:
     ...
 
   @overload
@@ -31842,7 +31843,7 @@ class ObjCInterfaceType(multiplier.ast.ObjCObjectType):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCInterfaceType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCInterfaceType]:
     ...
 
   @overload
@@ -31912,7 +31913,7 @@ class ObjCObjectPointerType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCObjectPointerType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCObjectPointerType]:
     ...
 
   @overload
@@ -31976,7 +31977,7 @@ class MemberPointerType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.MemberPointerType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.MemberPointerType]:
     ...
 
   @overload
@@ -32024,7 +32025,7 @@ class MatrixType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.MatrixType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.MatrixType]:
     ...
 
   @overload
@@ -32077,7 +32078,7 @@ class DependentSizedMatrixType(multiplier.ast.MatrixType):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.DependentSizedMatrixType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.DependentSizedMatrixType]:
     ...
 
   @overload
@@ -32128,7 +32129,7 @@ class ConstantMatrixType(multiplier.ast.MatrixType):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ConstantMatrixType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ConstantMatrixType]:
     ...
 
   @overload
@@ -32181,7 +32182,7 @@ class MacroQualifiedType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.MacroQualifiedType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.MacroQualifiedType]:
     ...
 
   @overload
@@ -32235,7 +32236,7 @@ class InjectedClassNameType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.InjectedClassNameType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.InjectedClassNameType]:
     ...
 
   @overload
@@ -32291,7 +32292,7 @@ class FunctionType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.FunctionType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.FunctionType]:
     ...
 
   @overload
@@ -32364,7 +32365,7 @@ class FunctionProtoType(multiplier.ast.FunctionType):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.FunctionProtoType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.FunctionProtoType]:
     ...
 
   @overload
@@ -32421,7 +32422,7 @@ class FunctionNoProtoType(multiplier.ast.FunctionType):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.FunctionNoProtoType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.FunctionNoProtoType]:
     ...
 
   @overload
@@ -32476,7 +32477,7 @@ class DependentVectorType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.DependentVectorType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.DependentVectorType]:
     ...
 
   @overload
@@ -32530,7 +32531,7 @@ class DependentSizedExtVectorType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.DependentSizedExtVectorType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.DependentSizedExtVectorType]:
     ...
 
   @overload
@@ -32584,7 +32585,7 @@ class DependentBitIntType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.DependentBitIntType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.DependentBitIntType]:
     ...
 
   @overload
@@ -32638,7 +32639,7 @@ class DependentAddressSpaceType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.DependentAddressSpaceType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.DependentAddressSpaceType]:
     ...
 
   @overload
@@ -32687,7 +32688,7 @@ class DeducedType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.DeducedType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.DeducedType]:
     ...
 
   @overload
@@ -32737,7 +32738,7 @@ class DeducedTemplateSpecializationType(multiplier.ast.DeducedType):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.DeducedTemplateSpecializationType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.DeducedTemplateSpecializationType]:
     ...
 
   @overload
@@ -32794,7 +32795,7 @@ class AutoType(multiplier.ast.DeducedType):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AutoType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AutoType]:
     ...
 
   @overload
@@ -32850,7 +32851,7 @@ class DecltypeType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.DecltypeType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.DecltypeType]:
     ...
 
   @overload
@@ -32902,7 +32903,7 @@ class ComplexType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ComplexType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ComplexType]:
     ...
 
   @overload
@@ -32960,7 +32961,7 @@ class BuiltinType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.BuiltinType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.BuiltinType]:
     ...
 
   @overload
@@ -33012,7 +33013,7 @@ class BlockPointerType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.BlockPointerType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.BlockPointerType]:
     ...
 
   @overload
@@ -33065,7 +33066,7 @@ class BitIntType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.BitIntType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.BitIntType]:
     ...
 
   @overload
@@ -33118,7 +33119,7 @@ class BTFTagAttributedType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.BTFTagAttributedType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.BTFTagAttributedType]:
     ...
 
   @overload
@@ -33179,7 +33180,7 @@ class AttributedType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AttributedType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AttributedType]:
     ...
 
   @overload
@@ -33231,7 +33232,7 @@ class AtomicType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AtomicType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AtomicType]:
     ...
 
   @overload
@@ -33280,7 +33281,7 @@ class ArrayType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ArrayType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ArrayType]:
     ...
 
   @overload
@@ -33335,7 +33336,7 @@ class VariableArrayType(multiplier.ast.ArrayType):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.VariableArrayType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.VariableArrayType]:
     ...
 
   @overload
@@ -33386,7 +33387,7 @@ class IncompleteArrayType(multiplier.ast.ArrayType):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.IncompleteArrayType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.IncompleteArrayType]:
     ...
 
   @overload
@@ -33441,7 +33442,7 @@ class DependentSizedArrayType(multiplier.ast.ArrayType):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.DependentSizedArrayType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.DependentSizedArrayType]:
     ...
 
   @overload
@@ -33493,7 +33494,7 @@ class ConstantArrayType(multiplier.ast.ArrayType):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ConstantArrayType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ConstantArrayType]:
     ...
 
   @overload
@@ -33546,7 +33547,7 @@ class AdjustedType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AdjustedType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AdjustedType]:
     ...
 
   @overload
@@ -33597,7 +33598,7 @@ class DecayedType(multiplier.ast.AdjustedType):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.DecayedType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.DecayedType]:
     ...
 
   @overload
@@ -33644,7 +33645,7 @@ class TypeWithKeyword(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TypeWithKeyword]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TypeWithKeyword]:
     ...
 
   @overload
@@ -33697,7 +33698,7 @@ class ElaboratedType(multiplier.ast.TypeWithKeyword):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ElaboratedType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ElaboratedType]:
     ...
 
   @overload
@@ -33750,7 +33751,7 @@ class DependentTemplateSpecializationType(multiplier.ast.TypeWithKeyword):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.DependentTemplateSpecializationType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.DependentTemplateSpecializationType]:
     ...
 
   @overload
@@ -33804,7 +33805,7 @@ class DependentNameType(multiplier.ast.TypeWithKeyword):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.DependentNameType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.DependentNameType]:
     ...
 
   @overload
@@ -33857,7 +33858,7 @@ class VectorType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.VectorType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.VectorType]:
     ...
 
   @overload
@@ -33907,7 +33908,7 @@ class ExtVectorType(multiplier.ast.VectorType):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ExtVectorType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ExtVectorType]:
     ...
 
   @overload
@@ -33961,7 +33962,7 @@ class UsingType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.UsingType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.UsingType]:
     ...
 
   @overload
@@ -34013,7 +34014,7 @@ class UnresolvedUsingType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.UnresolvedUsingType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.UnresolvedUsingType]:
     ...
 
   @overload
@@ -34067,7 +34068,7 @@ class UnaryTransformType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.UnaryTransformType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.UnaryTransformType]:
     ...
 
   @overload
@@ -34120,7 +34121,7 @@ class TypedefType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TypedefType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TypedefType]:
     ...
 
   @overload
@@ -34173,7 +34174,7 @@ class TypeOfType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TypeOfType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TypeOfType]:
     ...
 
   @overload
@@ -34226,7 +34227,7 @@ class TypeOfExprType(multiplier.ast.Type):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TypeOfExprType]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TypeOfExprType]:
     ...
 
   @overload
@@ -34338,7 +34339,7 @@ class Stmt(multiplier.Entity):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.Stmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.Stmt]:
     ...
 
   @overload
@@ -34428,7 +34429,7 @@ class SEHTryStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SEHTryStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SEHTryStmt]:
     ...
 
   @overload
@@ -34513,7 +34514,7 @@ class SEHLeaveStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SEHLeaveStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SEHLeaveStmt]:
     ...
 
   @overload
@@ -34599,7 +34600,7 @@ class SEHFinallyStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SEHFinallyStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SEHFinallyStmt]:
     ...
 
   @overload
@@ -34686,7 +34687,7 @@ class SEHExceptStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SEHExceptStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SEHExceptStmt]:
     ...
 
   @overload
@@ -34773,7 +34774,7 @@ class ReturnStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ReturnStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ReturnStmt]:
     ...
 
   @overload
@@ -34862,7 +34863,7 @@ class ObjCForCollectionStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCForCollectionStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCForCollectionStmt]:
     ...
 
   @overload
@@ -34948,7 +34949,7 @@ class ObjCAutoreleasePoolStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCAutoreleasePoolStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCAutoreleasePoolStmt]:
     ...
 
   @overload
@@ -35037,7 +35038,7 @@ class ObjCAtTryStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCAtTryStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCAtTryStmt]:
     ...
 
   @overload
@@ -35126,7 +35127,7 @@ class ObjCAtThrowStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCAtThrowStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCAtThrowStmt]:
     ...
 
   @overload
@@ -35213,7 +35214,7 @@ class ObjCAtSynchronizedStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCAtSynchronizedStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCAtSynchronizedStmt]:
     ...
 
   @overload
@@ -35299,7 +35300,7 @@ class ObjCAtFinallyStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCAtFinallyStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCAtFinallyStmt]:
     ...
 
   @overload
@@ -35388,7 +35389,7 @@ class ObjCAtCatchStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCAtCatchStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCAtCatchStmt]:
     ...
 
   @overload
@@ -35474,7 +35475,7 @@ class OMPExecutableDirective(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPExecutableDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPExecutableDirective]:
     ...
 
   @overload
@@ -35558,7 +35559,7 @@ class OMPErrorDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPErrorDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPErrorDirective]:
     ...
 
   @overload
@@ -35643,7 +35644,7 @@ class OMPDispatchDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPDispatchDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPDispatchDirective]:
     ...
 
   @overload
@@ -35727,7 +35728,7 @@ class OMPDepobjDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPDepobjDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPDepobjDirective]:
     ...
 
   @overload
@@ -35811,7 +35812,7 @@ class OMPCriticalDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPCriticalDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPCriticalDirective]:
     ...
 
   @overload
@@ -35895,7 +35896,7 @@ class OMPCancellationPointDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPCancellationPointDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPCancellationPointDirective]:
     ...
 
   @overload
@@ -35979,7 +35980,7 @@ class OMPCancelDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPCancelDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPCancelDirective]:
     ...
 
   @overload
@@ -36063,7 +36064,7 @@ class OMPBarrierDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPBarrierDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPBarrierDirective]:
     ...
 
   @overload
@@ -36157,7 +36158,7 @@ class OMPAtomicDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPAtomicDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPAtomicDirective]:
     ...
 
   @overload
@@ -36241,7 +36242,7 @@ class OMPTeamsDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPTeamsDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPTeamsDirective]:
     ...
 
   @overload
@@ -36325,7 +36326,7 @@ class OMPTaskyieldDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPTaskyieldDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPTaskyieldDirective]:
     ...
 
   @overload
@@ -36409,7 +36410,7 @@ class OMPTaskwaitDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPTaskwaitDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPTaskwaitDirective]:
     ...
 
   @overload
@@ -36494,7 +36495,7 @@ class OMPTaskgroupDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPTaskgroupDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPTaskgroupDirective]:
     ...
 
   @overload
@@ -36579,7 +36580,7 @@ class OMPTaskDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPTaskDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPTaskDirective]:
     ...
 
   @overload
@@ -36663,7 +36664,7 @@ class OMPTargetUpdateDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPTargetUpdateDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPTargetUpdateDirective]:
     ...
 
   @overload
@@ -36747,7 +36748,7 @@ class OMPTargetTeamsDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPTargetTeamsDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPTargetTeamsDirective]:
     ...
 
   @overload
@@ -36833,7 +36834,7 @@ class OMPTargetParallelDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPTargetParallelDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPTargetParallelDirective]:
     ...
 
   @overload
@@ -36917,7 +36918,7 @@ class OMPTargetExitDataDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPTargetExitDataDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPTargetExitDataDirective]:
     ...
 
   @overload
@@ -37001,7 +37002,7 @@ class OMPTargetEnterDataDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPTargetEnterDataDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPTargetEnterDataDirective]:
     ...
 
   @overload
@@ -37085,7 +37086,7 @@ class OMPTargetDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPTargetDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPTargetDirective]:
     ...
 
   @overload
@@ -37169,7 +37170,7 @@ class OMPTargetDataDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPTargetDataDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPTargetDataDirective]:
     ...
 
   @overload
@@ -37253,7 +37254,7 @@ class OMPSingleDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPSingleDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPSingleDirective]:
     ...
 
   @overload
@@ -37339,7 +37340,7 @@ class OMPSectionsDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPSectionsDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPSectionsDirective]:
     ...
 
   @overload
@@ -37424,7 +37425,7 @@ class OMPSectionDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPSectionDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPSectionDirective]:
     ...
 
   @overload
@@ -37508,7 +37509,7 @@ class OMPScopeDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPScopeDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPScopeDirective]:
     ...
 
   @overload
@@ -37592,7 +37593,7 @@ class OMPScanDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPScanDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPScanDirective]:
     ...
 
   @overload
@@ -37678,7 +37679,7 @@ class OMPParallelSectionsDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPParallelSectionsDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPParallelSectionsDirective]:
     ...
 
   @overload
@@ -37763,7 +37764,7 @@ class OMPParallelMasterDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPParallelMasterDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPParallelMasterDirective]:
     ...
 
   @overload
@@ -37848,7 +37849,7 @@ class OMPParallelMaskedDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPParallelMaskedDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPParallelMaskedDirective]:
     ...
 
   @overload
@@ -37934,7 +37935,7 @@ class OMPParallelDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPParallelDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPParallelDirective]:
     ...
 
   @overload
@@ -38018,7 +38019,7 @@ class OMPOrderedDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPOrderedDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPOrderedDirective]:
     ...
 
   @overload
@@ -38103,7 +38104,7 @@ class OMPMetaDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPMetaDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPMetaDirective]:
     ...
 
   @overload
@@ -38187,7 +38188,7 @@ class OMPMasterDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPMasterDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPMasterDirective]:
     ...
 
   @overload
@@ -38271,7 +38272,7 @@ class OMPMaskedDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPMaskedDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPMaskedDirective]:
     ...
 
   @overload
@@ -38352,7 +38353,7 @@ class OMPLoopBasedDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPLoopBasedDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPLoopBasedDirective]:
     ...
 
   @overload
@@ -38434,7 +38435,7 @@ class OMPLoopTransformationDirective(multiplier.ast.OMPLoopBasedDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPLoopTransformationDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPLoopTransformationDirective]:
     ...
 
   @overload
@@ -38518,7 +38519,7 @@ class OMPUnrollDirective(multiplier.ast.OMPLoopTransformationDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPUnrollDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPUnrollDirective]:
     ...
 
   @overload
@@ -38602,7 +38603,7 @@ class OMPTileDirective(multiplier.ast.OMPLoopTransformationDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPTileDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPTileDirective]:
     ...
 
   @overload
@@ -38727,7 +38728,7 @@ class OMPLoopDirective(multiplier.ast.OMPLoopBasedDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPLoopDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPLoopDirective]:
     ...
 
   @overload
@@ -38835,7 +38836,7 @@ class OMPGenericLoopDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPGenericLoopDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPGenericLoopDirective]:
     ...
 
   @overload
@@ -38919,7 +38920,7 @@ class OMPForSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPForSimdDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPForSimdDirective]:
     ...
 
   @overload
@@ -39005,7 +39006,7 @@ class OMPForDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPForDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPForDirective]:
     ...
 
   @overload
@@ -39089,7 +39090,7 @@ class OMPDistributeSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPDistributeSimdDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPDistributeSimdDirective]:
     ...
 
   @overload
@@ -39173,7 +39174,7 @@ class OMPDistributeParallelForSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPDistributeParallelForSimdDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPDistributeParallelForSimdDirective]:
     ...
 
   @overload
@@ -39259,7 +39260,7 @@ class OMPDistributeParallelForDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPDistributeParallelForDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPDistributeParallelForDirective]:
     ...
 
   @overload
@@ -39343,7 +39344,7 @@ class OMPDistributeDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPDistributeDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPDistributeDirective]:
     ...
 
   @overload
@@ -39427,7 +39428,7 @@ class OMPTeamsGenericLoopDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPTeamsGenericLoopDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPTeamsGenericLoopDirective]:
     ...
 
   @overload
@@ -39511,7 +39512,7 @@ class OMPTeamsDistributeSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPTeamsDistributeSimdDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPTeamsDistributeSimdDirective]:
     ...
 
   @overload
@@ -39595,7 +39596,7 @@ class OMPTeamsDistributeParallelForSimdDirective(multiplier.ast.OMPLoopDirective
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPTeamsDistributeParallelForSimdDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPTeamsDistributeParallelForSimdDirective]:
     ...
 
   @overload
@@ -39681,7 +39682,7 @@ class OMPTeamsDistributeParallelForDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPTeamsDistributeParallelForDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPTeamsDistributeParallelForDirective]:
     ...
 
   @overload
@@ -39765,7 +39766,7 @@ class OMPTeamsDistributeDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPTeamsDistributeDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPTeamsDistributeDirective]:
     ...
 
   @overload
@@ -39849,7 +39850,7 @@ class OMPTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPTaskLoopSimdDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPTaskLoopSimdDirective]:
     ...
 
   @overload
@@ -39934,7 +39935,7 @@ class OMPTaskLoopDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPTaskLoopDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPTaskLoopDirective]:
     ...
 
   @overload
@@ -40018,7 +40019,7 @@ class OMPTargetTeamsGenericLoopDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPTargetTeamsGenericLoopDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPTargetTeamsGenericLoopDirective]:
     ...
 
   @overload
@@ -40102,7 +40103,7 @@ class OMPTargetTeamsDistributeSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPTargetTeamsDistributeSimdDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPTargetTeamsDistributeSimdDirective]:
     ...
 
   @overload
@@ -40186,7 +40187,7 @@ class OMPTargetTeamsDistributeParallelForSimdDirective(multiplier.ast.OMPLoopDir
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPTargetTeamsDistributeParallelForSimdDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPTargetTeamsDistributeParallelForSimdDirective]:
     ...
 
   @overload
@@ -40272,7 +40273,7 @@ class OMPTargetTeamsDistributeParallelForDirective(multiplier.ast.OMPLoopDirecti
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPTargetTeamsDistributeParallelForDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPTargetTeamsDistributeParallelForDirective]:
     ...
 
   @overload
@@ -40356,7 +40357,7 @@ class OMPTargetTeamsDistributeDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPTargetTeamsDistributeDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPTargetTeamsDistributeDirective]:
     ...
 
   @overload
@@ -40440,7 +40441,7 @@ class OMPTargetSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPTargetSimdDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPTargetSimdDirective]:
     ...
 
   @overload
@@ -40524,7 +40525,7 @@ class OMPTargetParallelGenericLoopDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPTargetParallelGenericLoopDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPTargetParallelGenericLoopDirective]:
     ...
 
   @overload
@@ -40608,7 +40609,7 @@ class OMPTargetParallelForSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPTargetParallelForSimdDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPTargetParallelForSimdDirective]:
     ...
 
   @overload
@@ -40694,7 +40695,7 @@ class OMPTargetParallelForDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPTargetParallelForDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPTargetParallelForDirective]:
     ...
 
   @overload
@@ -40778,7 +40779,7 @@ class OMPSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPSimdDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPSimdDirective]:
     ...
 
   @overload
@@ -40862,7 +40863,7 @@ class OMPParallelMasterTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPParallelMasterTaskLoopSimdDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPParallelMasterTaskLoopSimdDirective]:
     ...
 
   @overload
@@ -40947,7 +40948,7 @@ class OMPParallelMasterTaskLoopDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPParallelMasterTaskLoopDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPParallelMasterTaskLoopDirective]:
     ...
 
   @overload
@@ -41031,7 +41032,7 @@ class OMPParallelMaskedTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPParallelMaskedTaskLoopSimdDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPParallelMaskedTaskLoopSimdDirective]:
     ...
 
   @overload
@@ -41116,7 +41117,7 @@ class OMPParallelMaskedTaskLoopDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPParallelMaskedTaskLoopDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPParallelMaskedTaskLoopDirective]:
     ...
 
   @overload
@@ -41200,7 +41201,7 @@ class OMPParallelGenericLoopDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPParallelGenericLoopDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPParallelGenericLoopDirective]:
     ...
 
   @overload
@@ -41284,7 +41285,7 @@ class OMPParallelForSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPParallelForSimdDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPParallelForSimdDirective]:
     ...
 
   @overload
@@ -41370,7 +41371,7 @@ class OMPParallelForDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPParallelForDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPParallelForDirective]:
     ...
 
   @overload
@@ -41454,7 +41455,7 @@ class OMPMasterTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPMasterTaskLoopSimdDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPMasterTaskLoopSimdDirective]:
     ...
 
   @overload
@@ -41539,7 +41540,7 @@ class OMPMasterTaskLoopDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPMasterTaskLoopDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPMasterTaskLoopDirective]:
     ...
 
   @overload
@@ -41623,7 +41624,7 @@ class OMPMaskedTaskLoopSimdDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPMaskedTaskLoopSimdDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPMaskedTaskLoopSimdDirective]:
     ...
 
   @overload
@@ -41708,7 +41709,7 @@ class OMPMaskedTaskLoopDirective(multiplier.ast.OMPLoopDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPMaskedTaskLoopDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPMaskedTaskLoopDirective]:
     ...
 
   @overload
@@ -41792,7 +41793,7 @@ class OMPInteropDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPInteropDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPInteropDirective]:
     ...
 
   @overload
@@ -41876,7 +41877,7 @@ class OMPFlushDirective(multiplier.ast.OMPExecutableDirective):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPFlushDirective]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPFlushDirective]:
     ...
 
   @overload
@@ -41964,7 +41965,7 @@ class OMPCanonicalLoop(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPCanonicalLoop]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPCanonicalLoop]:
     ...
 
   @overload
@@ -42050,7 +42051,7 @@ class NullStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NullStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NullStmt]:
     ...
 
   @overload
@@ -42138,7 +42139,7 @@ class MSDependentExistsStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.MSDependentExistsStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.MSDependentExistsStmt]:
     ...
 
   @overload
@@ -42226,7 +42227,7 @@ class IndirectGotoStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.IndirectGotoStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.IndirectGotoStmt]:
     ...
 
   @overload
@@ -42330,7 +42331,7 @@ class IfStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.IfStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.IfStmt]:
     ...
 
   @overload
@@ -42417,7 +42418,7 @@ class GotoStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.GotoStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.GotoStmt]:
     ...
 
   @overload
@@ -42510,7 +42511,7 @@ class ForStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ForStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ForStmt]:
     ...
 
   @overload
@@ -42599,7 +42600,7 @@ class DoStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.DoStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.DoStmt]:
     ...
 
   @overload
@@ -42687,7 +42688,7 @@ class DeclStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.DeclStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.DeclStmt]:
     ...
 
   @overload
@@ -42792,7 +42793,7 @@ class CoroutineBodyStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CoroutineBodyStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CoroutineBodyStmt]:
     ...
 
   @overload
@@ -42883,7 +42884,7 @@ class CoreturnStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CoreturnStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CoreturnStmt]:
     ...
 
   @overload
@@ -42968,7 +42969,7 @@ class ContinueStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ContinueStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ContinueStmt]:
     ...
 
   @overload
@@ -43057,7 +43058,7 @@ class CompoundStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CompoundStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CompoundStmt]:
     ...
 
   @overload
@@ -43145,7 +43146,7 @@ class CapturedStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CapturedStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CapturedStmt]:
     ...
 
   @overload
@@ -43233,7 +43234,7 @@ class CXXTryStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXTryStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXTryStmt]:
     ...
 
   @overload
@@ -43334,7 +43335,7 @@ class CXXForRangeStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXForRangeStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXForRangeStmt]:
     ...
 
   @overload
@@ -43422,7 +43423,7 @@ class CXXCatchStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXCatchStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXCatchStmt]:
     ...
 
   @overload
@@ -43507,7 +43508,7 @@ class BreakStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.BreakStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.BreakStmt]:
     ...
 
   @overload
@@ -43602,7 +43603,7 @@ class AsmStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AsmStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AsmStmt]:
     ...
 
   @overload
@@ -43704,7 +43705,7 @@ class MSAsmStmt(multiplier.ast.AsmStmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.MSAsmStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.MSAsmStmt]:
     ...
 
   @overload
@@ -43807,7 +43808,7 @@ class GCCAsmStmt(multiplier.ast.AsmStmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.GCCAsmStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.GCCAsmStmt]:
     ...
 
   @overload
@@ -43914,7 +43915,7 @@ class WhileStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.WhileStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.WhileStmt]:
     ...
 
   @overload
@@ -43995,7 +43996,7 @@ class ValueStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ValueStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ValueStmt]:
     ...
 
   @overload
@@ -44084,7 +44085,7 @@ class LabelStmt(multiplier.ast.ValueStmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.LabelStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.LabelStmt]:
     ...
 
   @overload
@@ -44203,7 +44204,7 @@ class Expr(multiplier.ast.ValueStmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.Expr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.Expr]:
     ...
 
   @overload
@@ -44289,7 +44290,7 @@ class DesignatedInitUpdateExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.DesignatedInitUpdateExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.DesignatedInitUpdateExpr]:
     ...
 
   @overload
@@ -44383,7 +44384,7 @@ class DesignatedInitExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.DesignatedInitExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.DesignatedInitExpr]:
     ...
 
   @overload
@@ -44478,7 +44479,7 @@ class DependentScopeDeclRefExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.DependentScopeDeclRefExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.DependentScopeDeclRefExpr]:
     ...
 
   @overload
@@ -44565,7 +44566,7 @@ class DependentCoawaitExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.DependentCoawaitExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.DependentCoawaitExpr]:
     ...
 
   @overload
@@ -44660,7 +44661,7 @@ class DeclRefExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.DeclRefExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.DeclRefExpr]:
     ...
 
   @overload
@@ -44747,7 +44748,7 @@ class CoroutineSuspendExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CoroutineSuspendExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CoroutineSuspendExpr]:
     ...
 
   @overload
@@ -44832,7 +44833,7 @@ class CoawaitExpr(multiplier.ast.CoroutineSuspendExpr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CoawaitExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CoawaitExpr]:
     ...
 
   @overload
@@ -44916,7 +44917,7 @@ class CoyieldExpr(multiplier.ast.CoroutineSuspendExpr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CoyieldExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CoyieldExpr]:
     ...
 
   @overload
@@ -45003,7 +45004,7 @@ class ConvertVectorExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ConvertVectorExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ConvertVectorExpr]:
     ...
 
   @overload
@@ -45095,7 +45096,7 @@ class ConceptSpecializationExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ConceptSpecializationExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ConceptSpecializationExpr]:
     ...
 
   @overload
@@ -45185,7 +45186,7 @@ class CompoundLiteralExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CompoundLiteralExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CompoundLiteralExpr]:
     ...
 
   @overload
@@ -45277,7 +45278,7 @@ class ChooseExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ChooseExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ChooseExpr]:
     ...
 
   @overload
@@ -45364,7 +45365,7 @@ class CharacterLiteral(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CharacterLiteral]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CharacterLiteral]:
     ...
 
   @overload
@@ -45452,7 +45453,7 @@ class CastExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CastExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CastExpr]:
     ...
 
   @overload
@@ -45537,7 +45538,7 @@ class ImplicitCastExpr(multiplier.ast.CastExpr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ImplicitCastExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ImplicitCastExpr]:
     ...
 
   @overload
@@ -45618,7 +45619,7 @@ class ExplicitCastExpr(multiplier.ast.CastExpr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ExplicitCastExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ExplicitCastExpr]:
     ...
 
   @overload
@@ -45702,7 +45703,7 @@ class CXXNamedCastExpr(multiplier.ast.ExplicitCastExpr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXNamedCastExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXNamedCastExpr]:
     ...
 
   @overload
@@ -45787,7 +45788,7 @@ class CXXDynamicCastExpr(multiplier.ast.CXXNamedCastExpr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXDynamicCastExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXDynamicCastExpr]:
     ...
 
   @overload
@@ -45871,7 +45872,7 @@ class CXXConstCastExpr(multiplier.ast.CXXNamedCastExpr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXConstCastExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXConstCastExpr]:
     ...
 
   @overload
@@ -45955,7 +45956,7 @@ class CXXAddrspaceCastExpr(multiplier.ast.CXXNamedCastExpr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXAddrspaceCastExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXAddrspaceCastExpr]:
     ...
 
   @overload
@@ -46039,7 +46040,7 @@ class CXXStaticCastExpr(multiplier.ast.CXXNamedCastExpr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXStaticCastExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXStaticCastExpr]:
     ...
 
   @overload
@@ -46123,7 +46124,7 @@ class CXXReinterpretCastExpr(multiplier.ast.CXXNamedCastExpr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXReinterpretCastExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXReinterpretCastExpr]:
     ...
 
   @overload
@@ -46210,7 +46211,7 @@ class CXXFunctionalCastExpr(multiplier.ast.ExplicitCastExpr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXFunctionalCastExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXFunctionalCastExpr]:
     ...
 
   @overload
@@ -46296,7 +46297,7 @@ class CStyleCastExpr(multiplier.ast.ExplicitCastExpr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CStyleCastExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CStyleCastExpr]:
     ...
 
   @overload
@@ -46380,7 +46381,7 @@ class BuiltinBitCastExpr(multiplier.ast.ExplicitCastExpr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.BuiltinBitCastExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.BuiltinBitCastExpr]:
     ...
 
   @overload
@@ -46468,7 +46469,7 @@ class ObjCBridgedCastExpr(multiplier.ast.ExplicitCastExpr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCBridgedCastExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCBridgedCastExpr]:
     ...
 
   @overload
@@ -46569,7 +46570,7 @@ class CallExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CallExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CallExpr]:
     ...
 
   @overload
@@ -46661,7 +46662,7 @@ class CXXOperatorCallExpr(multiplier.ast.CallExpr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXOperatorCallExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXOperatorCallExpr]:
     ...
 
   @overload
@@ -46749,7 +46750,7 @@ class CXXMemberCallExpr(multiplier.ast.CallExpr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXMemberCallExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXMemberCallExpr]:
     ...
 
   @overload
@@ -46834,7 +46835,7 @@ class CUDAKernelCallExpr(multiplier.ast.CallExpr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CUDAKernelCallExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CUDAKernelCallExpr]:
     ...
 
   @overload
@@ -46921,7 +46922,7 @@ class UserDefinedLiteral(multiplier.ast.CallExpr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.UserDefinedLiteral]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.UserDefinedLiteral]:
     ...
 
   @overload
@@ -47010,7 +47011,7 @@ class CXXUuidofExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXUuidofExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXUuidofExpr]:
     ...
 
   @overload
@@ -47100,7 +47101,7 @@ class CXXUnresolvedConstructExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXUnresolvedConstructExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXUnresolvedConstructExpr]:
     ...
 
   @overload
@@ -47193,7 +47194,7 @@ class CXXTypeidExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXTypeidExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXTypeidExpr]:
     ...
 
   @overload
@@ -47280,7 +47281,7 @@ class CXXThrowExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXThrowExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXThrowExpr]:
     ...
 
   @overload
@@ -47366,7 +47367,7 @@ class CXXThisExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXThisExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXThisExpr]:
     ...
 
   @overload
@@ -47451,7 +47452,7 @@ class CXXStdInitializerListExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXStdInitializerListExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXStdInitializerListExpr]:
     ...
 
   @overload
@@ -47536,7 +47537,7 @@ class CXXScalarValueInitExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXScalarValueInitExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXScalarValueInitExpr]:
     ...
 
   @overload
@@ -47630,7 +47631,7 @@ class CXXRewrittenBinaryOperator(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXRewrittenBinaryOperator]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXRewrittenBinaryOperator]:
     ...
 
   @overload
@@ -47722,7 +47723,7 @@ class CXXPseudoDestructorExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXPseudoDestructorExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXPseudoDestructorExpr]:
     ...
 
   @overload
@@ -47809,7 +47810,7 @@ class CXXParenListInitExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXParenListInitExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXParenListInitExpr]:
     ...
 
   @overload
@@ -47894,7 +47895,7 @@ class CXXNullPtrLiteralExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXNullPtrLiteralExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXNullPtrLiteralExpr]:
     ...
 
   @overload
@@ -47980,7 +47981,7 @@ class CXXNoexceptExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXNoexceptExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXNoexceptExpr]:
     ...
 
   @overload
@@ -48081,7 +48082,7 @@ class CXXNewExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXNewExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXNewExpr]:
     ...
 
   @overload
@@ -48173,7 +48174,7 @@ class CXXInheritedCtorInitExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXInheritedCtorInitExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXInheritedCtorInitExpr]:
     ...
 
   @overload
@@ -48268,7 +48269,7 @@ class CXXFoldExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXFoldExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXFoldExpr]:
     ...
 
   @overload
@@ -48364,7 +48365,7 @@ class CXXDependentScopeMemberExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXDependentScopeMemberExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXDependentScopeMemberExpr]:
     ...
 
   @overload
@@ -48455,7 +48456,7 @@ class CXXDeleteExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXDeleteExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXDeleteExpr]:
     ...
 
   @overload
@@ -48544,7 +48545,7 @@ class CXXDefaultInitExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXDefaultInitExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXDefaultInitExpr]:
     ...
 
   @overload
@@ -48633,7 +48634,7 @@ class CXXDefaultArgExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXDefaultArgExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXDefaultArgExpr]:
     ...
 
   @overload
@@ -48729,7 +48730,7 @@ class CXXConstructExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXConstructExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXConstructExpr]:
     ...
 
   @overload
@@ -48816,7 +48817,7 @@ class CXXTemporaryObjectExpr(multiplier.ast.CXXConstructExpr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXTemporaryObjectExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXTemporaryObjectExpr]:
     ...
 
   @overload
@@ -48902,7 +48903,7 @@ class CXXBoolLiteralExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXBoolLiteralExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXBoolLiteralExpr]:
     ...
 
   @overload
@@ -48987,7 +48988,7 @@ class CXXBindTemporaryExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXBindTemporaryExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXBindTemporaryExpr]:
     ...
 
   @overload
@@ -49075,7 +49076,7 @@ class BlockExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.BlockExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.BlockExpr]:
     ...
 
   @overload
@@ -49178,7 +49179,7 @@ class BinaryOperator(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.BinaryOperator]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.BinaryOperator]:
     ...
 
   @overload
@@ -49264,7 +49265,7 @@ class CompoundAssignOperator(multiplier.ast.BinaryOperator):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CompoundAssignOperator]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CompoundAssignOperator]:
     ...
 
   @overload
@@ -49365,7 +49366,7 @@ class AtomicExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AtomicExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AtomicExpr]:
     ...
 
   @overload
@@ -49455,7 +49456,7 @@ class AsTypeExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AsTypeExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AsTypeExpr]:
     ...
 
   @overload
@@ -49543,7 +49544,7 @@ class ArrayTypeTraitExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ArrayTypeTraitExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ArrayTypeTraitExpr]:
     ...
 
   @overload
@@ -49632,7 +49633,7 @@ class ArraySubscriptExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ArraySubscriptExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ArraySubscriptExpr]:
     ...
 
   @overload
@@ -49718,7 +49719,7 @@ class ArrayInitLoopExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ArrayInitLoopExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ArrayInitLoopExpr]:
     ...
 
   @overload
@@ -49802,7 +49803,7 @@ class ArrayInitIndexExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ArrayInitIndexExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ArrayInitIndexExpr]:
     ...
 
   @overload
@@ -49889,7 +49890,7 @@ class AddrLabelExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AddrLabelExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AddrLabelExpr]:
     ...
 
   @overload
@@ -49974,7 +49975,7 @@ class AbstractConditionalOperator(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AbstractConditionalOperator]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AbstractConditionalOperator]:
     ...
 
   @overload
@@ -50060,7 +50061,7 @@ class ConditionalOperator(multiplier.ast.AbstractConditionalOperator):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ConditionalOperator]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ConditionalOperator]:
     ...
 
   @overload
@@ -50146,7 +50147,7 @@ class BinaryConditionalOperator(multiplier.ast.AbstractConditionalOperator):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.BinaryConditionalOperator]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.BinaryConditionalOperator]:
     ...
 
   @overload
@@ -50234,7 +50235,7 @@ class VAArgExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.VAArgExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.VAArgExpr]:
     ...
 
   @overload
@@ -50329,7 +50330,7 @@ class UnaryOperator(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.UnaryOperator]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.UnaryOperator]:
     ...
 
   @overload
@@ -50420,7 +50421,7 @@ class UnaryExprOrTypeTraitExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.UnaryExprOrTypeTraitExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.UnaryExprOrTypeTraitExpr]:
     ...
 
   @overload
@@ -50504,7 +50505,7 @@ class TypoExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TypoExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TypoExpr]:
     ...
 
   @overload
@@ -50592,7 +50593,7 @@ class TypeTraitExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TypeTraitExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TypeTraitExpr]:
     ...
 
   @overload
@@ -50683,7 +50684,7 @@ class SubstNonTypeTemplateParmPackExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SubstNonTypeTemplateParmPackExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SubstNonTypeTemplateParmPackExpr]:
     ...
 
   @overload
@@ -50775,7 +50776,7 @@ class SubstNonTypeTemplateParmExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SubstNonTypeTemplateParmExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SubstNonTypeTemplateParmExpr]:
     ...
 
   @overload
@@ -50875,7 +50876,7 @@ class StringLiteral(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.StringLiteral]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.StringLiteral]:
     ...
 
   @overload
@@ -50963,7 +50964,7 @@ class StmtExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.StmtExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.StmtExpr]:
     ...
 
   @overload
@@ -51051,7 +51052,7 @@ class SourceLocExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SourceLocExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SourceLocExpr]:
     ...
 
   @overload
@@ -51142,7 +51143,7 @@ class SizeOfPackExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SizeOfPackExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SizeOfPackExpr]:
     ...
 
   @overload
@@ -51228,7 +51229,7 @@ class ShuffleVectorExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ShuffleVectorExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ShuffleVectorExpr]:
     ...
 
   @overload
@@ -51316,7 +51317,7 @@ class SYCLUniqueStableNameExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SYCLUniqueStableNameExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SYCLUniqueStableNameExpr]:
     ...
 
   @overload
@@ -51407,7 +51408,7 @@ class RequiresExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.RequiresExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.RequiresExpr]:
     ...
 
   @overload
@@ -51496,7 +51497,7 @@ class RecoveryExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.RecoveryExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.RecoveryExpr]:
     ...
 
   @overload
@@ -51590,7 +51591,7 @@ class PseudoObjectExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.PseudoObjectExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.PseudoObjectExpr]:
     ...
 
   @overload
@@ -51685,7 +51686,7 @@ class PredefinedExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.PredefinedExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.PredefinedExpr]:
     ...
 
   @overload
@@ -51773,7 +51774,7 @@ class ParenListExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ParenListExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ParenListExpr]:
     ...
 
   @overload
@@ -51863,7 +51864,7 @@ class ParenExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ParenExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ParenExpr]:
     ...
 
   @overload
@@ -51949,7 +51950,7 @@ class PackExpansionExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.PackExpansionExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.PackExpansionExpr]:
     ...
 
   @overload
@@ -52038,7 +52039,7 @@ class OverloadExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OverloadExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OverloadExpr]:
     ...
 
   @overload
@@ -52131,7 +52132,7 @@ class UnresolvedMemberExpr(multiplier.ast.OverloadExpr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.UnresolvedMemberExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.UnresolvedMemberExpr]:
     ...
 
   @overload
@@ -52217,7 +52218,7 @@ class UnresolvedLookupExpr(multiplier.ast.OverloadExpr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.UnresolvedLookupExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.UnresolvedLookupExpr]:
     ...
 
   @overload
@@ -52304,7 +52305,7 @@ class OpaqueValueExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OpaqueValueExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OpaqueValueExpr]:
     ...
 
   @overload
@@ -52390,7 +52391,7 @@ class OffsetOfExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OffsetOfExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OffsetOfExpr]:
     ...
 
   @overload
@@ -52479,7 +52480,7 @@ class ObjCSubscriptRefExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCSubscriptRefExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCSubscriptRefExpr]:
     ...
 
   @overload
@@ -52565,7 +52566,7 @@ class ObjCStringLiteral(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCStringLiteral]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCStringLiteral]:
     ...
 
   @overload
@@ -52651,7 +52652,7 @@ class ObjCSelectorExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCSelectorExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCSelectorExpr]:
     ...
 
   @overload
@@ -52739,7 +52740,7 @@ class ObjCProtocolExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCProtocolExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCProtocolExpr]:
     ...
 
   @overload
@@ -52839,7 +52840,7 @@ class ObjCPropertyRefExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCPropertyRefExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCPropertyRefExpr]:
     ...
 
   @overload
@@ -52945,7 +52946,7 @@ class ObjCMessageExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCMessageExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCMessageExpr]:
     ...
 
   @overload
@@ -53041,7 +53042,7 @@ class ObjCIvarRefExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCIvarRefExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCIvarRefExpr]:
     ...
 
   @overload
@@ -53130,7 +53131,7 @@ class ObjCIsaExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCIsaExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCIsaExpr]:
     ...
 
   @overload
@@ -53216,7 +53217,7 @@ class ObjCIndirectCopyRestoreExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCIndirectCopyRestoreExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCIndirectCopyRestoreExpr]:
     ...
 
   @overload
@@ -53303,7 +53304,7 @@ class ObjCEncodeExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCEncodeExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCEncodeExpr]:
     ...
 
   @overload
@@ -53388,7 +53389,7 @@ class ObjCDictionaryLiteral(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCDictionaryLiteral]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCDictionaryLiteral]:
     ...
 
   @overload
@@ -53476,7 +53477,7 @@ class ObjCBoxedExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCBoxedExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCBoxedExpr]:
     ...
 
   @overload
@@ -53562,7 +53563,7 @@ class ObjCBoolLiteralExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCBoolLiteralExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCBoolLiteralExpr]:
     ...
 
   @overload
@@ -53647,7 +53648,7 @@ class ObjCAvailabilityCheckExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCAvailabilityCheckExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCAvailabilityCheckExpr]:
     ...
 
   @overload
@@ -53734,7 +53735,7 @@ class ObjCArrayLiteral(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCArrayLiteral]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCArrayLiteral]:
     ...
 
   @overload
@@ -53824,7 +53825,7 @@ class OMPIteratorExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPIteratorExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPIteratorExpr]:
     ...
 
   @overload
@@ -53913,7 +53914,7 @@ class OMPArrayShapingExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPArrayShapingExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPArrayShapingExpr]:
     ...
 
   @overload
@@ -54007,7 +54008,7 @@ class OMPArraySectionExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPArraySectionExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPArraySectionExpr]:
     ...
 
   @overload
@@ -54091,7 +54092,7 @@ class NoInitExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NoInitExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NoInitExpr]:
     ...
 
   @overload
@@ -54189,7 +54190,7 @@ class MemberExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.MemberExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.MemberExpr]:
     ...
 
   @overload
@@ -54278,7 +54279,7 @@ class MatrixSubscriptExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.MatrixSubscriptExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.MatrixSubscriptExpr]:
     ...
 
   @overload
@@ -54369,7 +54370,7 @@ class MaterializeTemporaryExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.MaterializeTemporaryExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.MaterializeTemporaryExpr]:
     ...
 
   @overload
@@ -54456,7 +54457,7 @@ class MSPropertySubscriptExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.MSPropertySubscriptExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.MSPropertySubscriptExpr]:
     ...
 
   @overload
@@ -54545,7 +54546,7 @@ class MSPropertyRefExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.MSPropertyRefExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.MSPropertyRefExpr]:
     ...
 
   @overload
@@ -54645,7 +54646,7 @@ class LambdaExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.LambdaExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.LambdaExpr]:
     ...
 
   @overload
@@ -54733,7 +54734,7 @@ class IntegerLiteral(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.IntegerLiteral]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.IntegerLiteral]:
     ...
 
   @overload
@@ -54833,7 +54834,7 @@ class InitListExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.InitListExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.InitListExpr]:
     ...
 
   @overload
@@ -54920,7 +54921,7 @@ class ImplicitValueInitExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ImplicitValueInitExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ImplicitValueInitExpr]:
     ...
 
   @overload
@@ -55005,7 +55006,7 @@ class ImaginaryLiteral(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ImaginaryLiteral]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ImaginaryLiteral]:
     ...
 
   @overload
@@ -55101,7 +55102,7 @@ class GenericSelectionExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.GenericSelectionExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.GenericSelectionExpr]:
     ...
 
   @overload
@@ -55189,7 +55190,7 @@ class GNUNullExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.GNUNullExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.GNUNullExpr]:
     ...
 
   @overload
@@ -55277,7 +55278,7 @@ class FunctionParmPackExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.FunctionParmPackExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.FunctionParmPackExpr]:
     ...
 
   @overload
@@ -55361,7 +55362,7 @@ class FullExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.FullExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.FullExpr]:
     ...
 
   @overload
@@ -55446,7 +55447,7 @@ class ExprWithCleanups(multiplier.ast.FullExpr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ExprWithCleanups]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ExprWithCleanups]:
     ...
 
   @overload
@@ -55533,7 +55534,7 @@ class ConstantExpr(multiplier.ast.FullExpr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ConstantExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ConstantExpr]:
     ...
 
   @overload
@@ -55619,7 +55620,7 @@ class FloatingLiteral(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.FloatingLiteral]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.FloatingLiteral]:
     ...
 
   @overload
@@ -55705,7 +55706,7 @@ class FixedPointLiteral(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.FixedPointLiteral]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.FixedPointLiteral]:
     ...
 
   @overload
@@ -55793,7 +55794,7 @@ class ExtVectorElementExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ExtVectorElementExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ExtVectorElementExpr]:
     ...
 
   @overload
@@ -55880,7 +55881,7 @@ class ExpressionTraitExpr(multiplier.ast.Expr):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ExpressionTraitExpr]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ExpressionTraitExpr]:
     ...
 
   @overload
@@ -55968,7 +55969,7 @@ class AttributedStmt(multiplier.ast.ValueStmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AttributedStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AttributedStmt]:
     ...
 
   @overload
@@ -56067,7 +56068,7 @@ class SwitchStmt(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SwitchStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SwitchStmt]:
     ...
 
   @overload
@@ -56151,7 +56152,7 @@ class SwitchCase(multiplier.ast.Stmt):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.SwitchCase]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.SwitchCase]:
     ...
 
   @overload
@@ -56236,7 +56237,7 @@ class DefaultStmt(multiplier.ast.SwitchCase):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.DefaultStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.DefaultStmt]:
     ...
 
   @overload
@@ -56325,7 +56326,7 @@ class CaseStmt(multiplier.ast.SwitchCase):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CaseStmt]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CaseStmt]:
     ...
 
   @overload
@@ -56468,7 +56469,7 @@ class Decl(multiplier.Entity):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.Decl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.Decl]:
     ...
 
   @overload
@@ -56564,7 +56565,7 @@ class CapturedDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CapturedDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CapturedDecl]:
     ...
 
   @overload
@@ -56671,7 +56672,7 @@ class BlockDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.BlockDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.BlockDecl]:
     ...
 
   @overload
@@ -56766,7 +56767,7 @@ class AccessSpecDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.AccessSpecDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.AccessSpecDecl]:
     ...
 
   @overload
@@ -56849,7 +56850,7 @@ class OMPDeclarativeDirectiveDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPDeclarativeDirectiveDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPDeclarativeDirectiveDecl]:
     ...
 
   @overload
@@ -56938,7 +56939,7 @@ class OMPThreadPrivateDecl(multiplier.ast.OMPDeclarativeDirectiveDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPThreadPrivateDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPThreadPrivateDecl]:
     ...
 
   @overload
@@ -57028,7 +57029,7 @@ class OMPRequiresDecl(multiplier.ast.OMPDeclarativeDirectiveDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPRequiresDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPRequiresDecl]:
     ...
 
   @overload
@@ -57117,7 +57118,7 @@ class OMPAllocateDecl(multiplier.ast.OMPDeclarativeDirectiveDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPAllocateDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPAllocateDecl]:
     ...
 
   @overload
@@ -57208,7 +57209,7 @@ class TranslationUnitDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TranslationUnitDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TranslationUnitDecl]:
     ...
 
   @overload
@@ -57297,7 +57298,7 @@ class TopLevelStmtDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TopLevelStmtDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TopLevelStmtDecl]:
     ...
 
   @overload
@@ -57388,7 +57389,7 @@ class StaticAssertDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.StaticAssertDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.StaticAssertDecl]:
     ...
 
   @overload
@@ -57476,7 +57477,7 @@ class RequiresExprBodyDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.RequiresExprBodyDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.RequiresExprBodyDecl]:
     ...
 
   @overload
@@ -57565,7 +57566,7 @@ class PragmaDetectMismatchDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.PragmaDetectMismatchDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.PragmaDetectMismatchDecl]:
     ...
 
   @overload
@@ -57654,7 +57655,7 @@ class PragmaCommentDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.PragmaCommentDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.PragmaCommentDecl]:
     ...
 
   @overload
@@ -57750,7 +57751,7 @@ class ObjCPropertyImplDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCPropertyImplDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCPropertyImplDecl]:
     ...
 
   @overload
@@ -57846,7 +57847,7 @@ class NamedDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NamedDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NamedDecl]:
     ...
 
   @overload
@@ -57941,7 +57942,7 @@ class LabelDecl(multiplier.ast.NamedDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.LabelDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.LabelDecl]:
     ...
 
   @overload
@@ -58032,7 +58033,7 @@ class HLSLBufferDecl(multiplier.ast.NamedDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.HLSLBufferDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.HLSLBufferDecl]:
     ...
 
   @overload
@@ -58117,7 +58118,7 @@ class BaseUsingDecl(multiplier.ast.NamedDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.BaseUsingDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.BaseUsingDecl]:
     ...
 
   @overload
@@ -58211,7 +58212,7 @@ class UsingEnumDecl(multiplier.ast.BaseUsingDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.UsingEnumDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.UsingEnumDecl]:
     ...
 
   @overload
@@ -58301,7 +58302,7 @@ class UsingDecl(multiplier.ast.BaseUsingDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.UsingDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.UsingDecl]:
     ...
 
   @overload
@@ -58388,7 +58389,7 @@ class ValueDecl(multiplier.ast.NamedDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ValueDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ValueDecl]:
     ...
 
   @overload
@@ -58479,7 +58480,7 @@ class UnresolvedUsingValueDecl(multiplier.ast.ValueDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.UnresolvedUsingValueDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.UnresolvedUsingValueDecl]:
     ...
 
   @overload
@@ -58566,7 +58567,7 @@ class UnnamedGlobalConstantDecl(multiplier.ast.ValueDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.UnnamedGlobalConstantDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.UnnamedGlobalConstantDecl]:
     ...
 
   @overload
@@ -58653,7 +58654,7 @@ class TemplateParamObjectDecl(multiplier.ast.ValueDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TemplateParamObjectDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TemplateParamObjectDecl]:
     ...
 
   @overload
@@ -58748,7 +58749,7 @@ class OMPDeclareReductionDecl(multiplier.ast.ValueDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPDeclareReductionDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPDeclareReductionDecl]:
     ...
 
   @overload
@@ -58835,7 +58836,7 @@ class MSGuidDecl(multiplier.ast.ValueDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.MSGuidDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.MSGuidDecl]:
     ...
 
   @overload
@@ -58926,7 +58927,7 @@ class IndirectFieldDecl(multiplier.ast.ValueDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.IndirectFieldDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.IndirectFieldDecl]:
     ...
 
   @overload
@@ -59014,7 +59015,7 @@ class EnumConstantDecl(multiplier.ast.ValueDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.EnumConstantDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.EnumConstantDecl]:
     ...
 
   @overload
@@ -59104,7 +59105,7 @@ class DeclaratorDecl(multiplier.ast.ValueDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.DeclaratorDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.DeclaratorDecl]:
     ...
 
   @overload
@@ -59237,7 +59238,7 @@ class VarDecl(multiplier.ast.DeclaratorDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.VarDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.VarDecl]:
     ...
 
   @overload
@@ -59340,7 +59341,7 @@ class ParmVarDecl(multiplier.ast.VarDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ParmVarDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ParmVarDecl]:
     ...
 
   @overload
@@ -59427,7 +59428,7 @@ class OMPCapturedExprDecl(multiplier.ast.VarDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPCapturedExprDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPCapturedExprDecl]:
     ...
 
   @overload
@@ -59515,7 +59516,7 @@ class ImplicitParamDecl(multiplier.ast.VarDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ImplicitParamDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ImplicitParamDecl]:
     ...
 
   @overload
@@ -59604,7 +59605,7 @@ class DecompositionDecl(multiplier.ast.VarDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.DecompositionDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.DecompositionDecl]:
     ...
 
   @overload
@@ -59703,7 +59704,7 @@ class VarTemplateSpecializationDecl(multiplier.ast.VarDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.VarTemplateSpecializationDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.VarTemplateSpecializationDecl]:
     ...
 
   @overload
@@ -59795,7 +59796,7 @@ class VarTemplatePartialSpecializationDecl(multiplier.ast.VarTemplateSpecializat
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.VarTemplatePartialSpecializationDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.VarTemplatePartialSpecializationDecl]:
     ...
 
   @overload
@@ -59892,7 +59893,7 @@ class NonTypeTemplateParmDecl(multiplier.ast.DeclaratorDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NonTypeTemplateParmDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NonTypeTemplateParmDecl]:
     ...
 
   @overload
@@ -59984,7 +59985,7 @@ class MSPropertyDecl(multiplier.ast.DeclaratorDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.MSPropertyDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.MSPropertyDecl]:
     ...
 
   @overload
@@ -60156,7 +60157,7 @@ class FunctionDecl(multiplier.ast.DeclaratorDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.FunctionDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.FunctionDecl]:
     ...
 
   @overload
@@ -60268,7 +60269,7 @@ class CXXMethodDecl(multiplier.ast.FunctionDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXMethodDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXMethodDecl]:
     ...
 
   @overload
@@ -60360,7 +60361,7 @@ class CXXDestructorDecl(multiplier.ast.CXXMethodDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXDestructorDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXDestructorDecl]:
     ...
 
   @overload
@@ -60450,7 +60451,7 @@ class CXXConversionDecl(multiplier.ast.CXXMethodDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXConversionDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXConversionDecl]:
     ...
 
   @overload
@@ -60545,7 +60546,7 @@ class CXXConstructorDecl(multiplier.ast.CXXMethodDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXConstructorDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXConstructorDecl]:
     ...
 
   @overload
@@ -60639,7 +60640,7 @@ class CXXDeductionGuideDecl(multiplier.ast.FunctionDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXDeductionGuideDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXDeductionGuideDecl]:
     ...
 
   @overload
@@ -60742,7 +60743,7 @@ class FieldDecl(multiplier.ast.DeclaratorDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.FieldDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.FieldDecl]:
     ...
 
   @overload
@@ -60834,7 +60835,7 @@ class ObjCIvarDecl(multiplier.ast.FieldDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCIvarDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCIvarDecl]:
     ...
 
   @overload
@@ -60921,7 +60922,7 @@ class ObjCAtDefsFieldDecl(multiplier.ast.FieldDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCAtDefsFieldDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCAtDefsFieldDecl]:
     ...
 
   @overload
@@ -61011,7 +61012,7 @@ class BindingDecl(multiplier.ast.ValueDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.BindingDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.BindingDecl]:
     ...
 
   @overload
@@ -61094,7 +61095,7 @@ class OMPDeclarativeDirectiveValueDecl(multiplier.ast.ValueDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPDeclarativeDirectiveValueDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPDeclarativeDirectiveValueDecl]:
     ...
 
   @overload
@@ -61183,7 +61184,7 @@ class OMPDeclareMapperDecl(multiplier.ast.OMPDeclarativeDirectiveValueDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.OMPDeclareMapperDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.OMPDeclareMapperDecl]:
     ...
 
   @overload
@@ -61273,7 +61274,7 @@ class UsingShadowDecl(multiplier.ast.NamedDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.UsingShadowDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.UsingShadowDecl]:
     ...
 
   @overload
@@ -61365,7 +61366,7 @@ class ConstructorUsingShadowDecl(multiplier.ast.UsingShadowDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ConstructorUsingShadowDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ConstructorUsingShadowDecl]:
     ...
 
   @overload
@@ -61454,7 +61455,7 @@ class UsingPackDecl(multiplier.ast.NamedDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.UsingPackDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.UsingPackDecl]:
     ...
 
   @overload
@@ -61549,7 +61550,7 @@ class UsingDirectiveDecl(multiplier.ast.NamedDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.UsingDirectiveDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.UsingDirectiveDecl]:
     ...
 
   @overload
@@ -61636,7 +61637,7 @@ class UnresolvedUsingIfExistsDecl(multiplier.ast.NamedDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.UnresolvedUsingIfExistsDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.UnresolvedUsingIfExistsDecl]:
     ...
 
   @overload
@@ -61720,7 +61721,7 @@ class TypeDecl(multiplier.ast.NamedDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TypeDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TypeDecl]:
     ...
 
   @overload
@@ -61818,7 +61819,7 @@ class TemplateTypeParmDecl(multiplier.ast.TypeDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TemplateTypeParmDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TemplateTypeParmDecl]:
     ...
 
   @overload
@@ -61923,7 +61924,7 @@ class TagDecl(multiplier.ast.TypeDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TagDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TagDecl]:
     ...
 
   @overload
@@ -62039,7 +62040,7 @@ class RecordDecl(multiplier.ast.TagDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.RecordDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.RecordDecl]:
     ...
 
   @overload
@@ -62254,7 +62255,7 @@ class CXXRecordDecl(multiplier.ast.RecordDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.CXXRecordDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.CXXRecordDecl]:
     ...
 
   @overload
@@ -62353,7 +62354,7 @@ class ClassTemplateSpecializationDecl(multiplier.ast.CXXRecordDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ClassTemplateSpecializationDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ClassTemplateSpecializationDecl]:
     ...
 
   @overload
@@ -62446,7 +62447,7 @@ class ClassTemplatePartialSpecializationDecl(multiplier.ast.ClassTemplateSpecial
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ClassTemplatePartialSpecializationDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ClassTemplatePartialSpecializationDecl]:
     ...
 
   @overload
@@ -62545,7 +62546,7 @@ class EnumDecl(multiplier.ast.TagDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.EnumDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.EnumDecl]:
     ...
 
   @overload
@@ -62639,7 +62640,7 @@ class UnresolvedUsingTypenameDecl(multiplier.ast.TypeDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.UnresolvedUsingTypenameDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.UnresolvedUsingTypenameDecl]:
     ...
 
   @overload
@@ -62726,7 +62727,7 @@ class TypedefNameDecl(multiplier.ast.TypeDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TypedefNameDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TypedefNameDecl]:
     ...
 
   @overload
@@ -62813,7 +62814,7 @@ class TypedefDecl(multiplier.ast.TypedefNameDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TypedefDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TypedefDecl]:
     ...
 
   @overload
@@ -62901,7 +62902,7 @@ class TypeAliasDecl(multiplier.ast.TypedefNameDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TypeAliasDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TypeAliasDecl]:
     ...
 
   @overload
@@ -62993,7 +62994,7 @@ class ObjCTypeParamDecl(multiplier.ast.TypedefNameDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCTypeParamDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCTypeParamDecl]:
     ...
 
   @overload
@@ -63080,7 +63081,7 @@ class TemplateDecl(multiplier.ast.NamedDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TemplateDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TemplateDecl]:
     ...
 
   @overload
@@ -63164,7 +63165,7 @@ class RedeclarableTemplateDecl(multiplier.ast.TemplateDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.RedeclarableTemplateDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.RedeclarableTemplateDecl]:
     ...
 
   @overload
@@ -63253,7 +63254,7 @@ class FunctionTemplateDecl(multiplier.ast.RedeclarableTemplateDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.FunctionTemplateDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.FunctionTemplateDecl]:
     ...
 
   @overload
@@ -63341,7 +63342,7 @@ class ClassTemplateDecl(multiplier.ast.RedeclarableTemplateDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ClassTemplateDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ClassTemplateDecl]:
     ...
 
   @overload
@@ -63429,7 +63430,7 @@ class VarTemplateDecl(multiplier.ast.RedeclarableTemplateDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.VarTemplateDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.VarTemplateDecl]:
     ...
 
   @overload
@@ -63516,7 +63517,7 @@ class TypeAliasTemplateDecl(multiplier.ast.RedeclarableTemplateDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TypeAliasTemplateDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TypeAliasTemplateDecl]:
     ...
 
   @overload
@@ -63605,7 +63606,7 @@ class ConceptDecl(multiplier.ast.TemplateDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ConceptDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ConceptDecl]:
     ...
 
   @overload
@@ -63692,7 +63693,7 @@ class BuiltinTemplateDecl(multiplier.ast.TemplateDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.BuiltinTemplateDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.BuiltinTemplateDecl]:
     ...
 
   @overload
@@ -63784,7 +63785,7 @@ class TemplateTemplateParmDecl(multiplier.ast.TemplateDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.TemplateTemplateParmDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.TemplateTemplateParmDecl]:
     ...
 
   @overload
@@ -63889,7 +63890,7 @@ class ObjCPropertyDecl(multiplier.ast.NamedDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCPropertyDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCPropertyDecl]:
     ...
 
   @overload
@@ -64010,7 +64011,7 @@ class ObjCMethodDecl(multiplier.ast.NamedDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCMethodDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCMethodDecl]:
     ...
 
   @overload
@@ -64114,7 +64115,7 @@ class ObjCContainerDecl(multiplier.ast.NamedDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCContainerDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCContainerDecl]:
     ...
 
   @overload
@@ -64232,7 +64233,7 @@ class ObjCCategoryDecl(multiplier.ast.ObjCContainerDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCCategoryDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCCategoryDecl]:
     ...
 
   @overload
@@ -64336,7 +64337,7 @@ class ObjCProtocolDecl(multiplier.ast.ObjCContainerDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCProtocolDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCProtocolDecl]:
     ...
 
   @overload
@@ -64459,7 +64460,7 @@ class ObjCInterfaceDecl(multiplier.ast.ObjCContainerDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCInterfaceDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCInterfaceDecl]:
     ...
 
   @overload
@@ -64569,7 +64570,7 @@ class ObjCImplDecl(multiplier.ast.ObjCContainerDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCImplDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCImplDecl]:
     ...
 
   @overload
@@ -64661,7 +64662,7 @@ class ObjCCategoryImplDecl(multiplier.ast.ObjCImplDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCCategoryImplDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCCategoryImplDecl]:
     ...
 
   @overload
@@ -64759,7 +64760,7 @@ class ObjCImplementationDecl(multiplier.ast.ObjCImplDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCImplementationDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCImplementationDecl]:
     ...
 
   @overload
@@ -64853,7 +64854,7 @@ class ObjCCompatibleAliasDecl(multiplier.ast.NamedDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ObjCCompatibleAliasDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ObjCCompatibleAliasDecl]:
     ...
 
   @overload
@@ -64945,7 +64946,7 @@ class NamespaceDecl(multiplier.ast.NamedDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NamespaceDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NamespaceDecl]:
     ...
 
   @overload
@@ -65037,7 +65038,7 @@ class NamespaceAliasDecl(multiplier.ast.NamedDecl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.NamespaceAliasDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.NamespaceAliasDecl]:
     ...
 
   @overload
@@ -65129,7 +65130,7 @@ class LinkageSpecDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.LinkageSpecDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.LinkageSpecDecl]:
     ...
 
   @overload
@@ -65221,7 +65222,7 @@ class LifetimeExtendedTemporaryDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.LifetimeExtendedTemporaryDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.LifetimeExtendedTemporaryDecl]:
     ...
 
   @overload
@@ -65310,7 +65311,7 @@ class ImportDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ImportDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ImportDecl]:
     ...
 
   @overload
@@ -65402,7 +65403,7 @@ class ImplicitConceptSpecializationDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ImplicitConceptSpecializationDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ImplicitConceptSpecializationDecl]:
     ...
 
   @overload
@@ -65497,7 +65498,7 @@ class FriendTemplateDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.FriendTemplateDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.FriendTemplateDecl]:
     ...
 
   @overload
@@ -65594,7 +65595,7 @@ class FriendDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.FriendDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.FriendDecl]:
     ...
 
   @overload
@@ -65687,7 +65688,7 @@ class FileScopeAsmDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.FileScopeAsmDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.FileScopeAsmDecl]:
     ...
 
   @overload
@@ -65775,7 +65776,7 @@ class ExternCContextDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ExternCContextDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ExternCContextDecl]:
     ...
 
   @overload
@@ -65866,7 +65867,7 @@ class ExportDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.ExportDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.ExportDecl]:
     ...
 
   @overload
@@ -65953,7 +65954,7 @@ class EmptyDecl(multiplier.ast.Decl):
 
   @overload
   @staticmethod
-  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation]) -> Optional[multiplier.ast.EmptyDecl]:
+  def FROM(e: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.ast.EmptyDecl]:
     ...
 
   @overload

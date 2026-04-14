@@ -212,32 +212,32 @@ std::optional<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::from
 }
 
 gap::generator<Stmt> LifetimeExtendedTemporaryDecl::children(void) const & {
-  auto list = impl->reader.getVal43();
+  auto list = impl->reader.getVal44();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d43 = ep->StmtFor(ep, v)) {
-      co_yield Stmt(std::move(d43));
+    if (auto d44 = ep->StmtFor(ep, v)) {
+      co_yield Stmt(std::move(d44));
     }
   }
   co_return;
 }
 
 ValueDecl LifetimeExtendedTemporaryDecl::extending_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal41();
   return ValueDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 uint32_t LifetimeExtendedTemporaryDecl::mangling_number(void) const {
-  return impl->reader.getVal41();
+  return impl->reader.getVal42();
 }
 
 StorageDuration LifetimeExtendedTemporaryDecl::storage_duration(void) const {
-  return static_cast<StorageDuration>(impl->reader.getVal57());
+  return static_cast<StorageDuration>(impl->reader.getVal58());
 }
 
 Expr LifetimeExtendedTemporaryDecl::temporary_expression(void) const {
-  RawEntityId eid = impl->reader.getVal48();
+  RawEntityId eid = impl->reader.getVal49();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 

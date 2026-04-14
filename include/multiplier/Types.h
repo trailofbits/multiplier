@@ -21,6 +21,25 @@ namespace mx {
 
 class Token;
 
+// Identifies a specific index and its version state.
+struct MX_EXPORT IndexVersion {
+  uint64_t index_id{0};     // Unique random ID for this index
+  unsigned version{0};       // Monotonically increasing version number
+
+  bool operator==(const IndexVersion &other) const noexcept {
+    return index_id == other.index_id && version == other.version;
+  }
+
+  bool operator!=(const IndexVersion &other) const noexcept {
+    return !(*this == other);
+  }
+
+  // Same index, possibly different version.
+  bool same_index(const IndexVersion &other) const noexcept {
+    return index_id == other.index_id;
+  }
+};
+
 enum class AttrKind : unsigned short;
 enum class DeclKind : unsigned char;
 enum class MacroKind : unsigned char;
@@ -28,8 +47,14 @@ enum class StmtKind : unsigned char;
 enum class TokenKind : unsigned short;
 enum class TypeKind : unsigned char;
 
+namespace ir {
+enum class BlockKind : uint8_t;
+enum class OpCode : uint8_t;
+enum class StructureKind : uint8_t;
+}  // namespace ir
+
 #define MX_IGNORE_ENTITY_CATEGORY(ns_path, type_name, lower_name, enum_name, category)
-#define MX_FOR_EACH_ENTITY_CATEGORY(file_, token_, type_, frag_, frag_offset_, pseudo_, tu_) \
+#define MX_FOR_EACH_ENTITY_CATEGORY(file_, token_, type_, frag_, frag_offset_, pseudo_, tu_, ir_) \
     frag_(::mx::, Fragment, fragment, FRAGMENT, 1) \
     frag_offset_(::mx::, Decl, declaration, DECLARATION, 2) \
     frag_offset_(::mx::, Stmt, statement, STATEMENT, 3) \
@@ -43,7 +68,12 @@ enum class TypeKind : unsigned char;
     pseudo_(::mx::, CXXBaseSpecifier, cxx_base_specifier, CXX_BASE_SPECIFIER, 11) \
     pseudo_(::mx::, Designator, designator, DESIGNATOR, 12) \
     pseudo_(::mx::, CXXCtorInitializer, cxx_ctor_initializer, CXX_CTOR_INITIALIZER, 13) \
-    tu_(::mx::, Compilation, compilation, COMPILATION, 14)
+    tu_(::mx::, Compilation, compilation, COMPILATION, 14) \
+    ir_(::mx::, IRFunction, ir_function, IR_FUNCTION, 15) \
+    ir_(::mx::, IRBlock, ir_block, IR_BLOCK, 16) \
+    ir_(::mx::, IRInstruction, ir_instruction, IR_INSTRUCTION, 17) \
+    ir_(::mx::, IRObject, ir_object, IR_OBJECT, 18) \
+    ir_(::mx::, IRStructure, ir_structure, IR_STRUCTURE, 19)
 
 #define MX_DECLARE_ENTITY_CLASS(ns_path, type, lower, enum_, val) \
     class type;\
@@ -51,6 +81,7 @@ enum class TypeKind : unsigned char;
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_CLASS,
                             MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DECLARE_ENTITY_CLASS,
                             MX_DECLARE_ENTITY_CLASS,
                             MX_DECLARE_ENTITY_CLASS,
                             MX_DECLARE_ENTITY_CLASS,
@@ -64,6 +95,7 @@ enum class EntityCategory : int {
   NOT_AN_ENTITY,
 #define MX_DECLARE_ENTITY_CATEGORY_ENUM(ns_path, type, lower, enum_, val) enum_ = val,
   MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_CATEGORY_ENUM,
+                              MX_DECLARE_ENTITY_CATEGORY_ENUM,
                               MX_DECLARE_ENTITY_CATEGORY_ENUM,
                               MX_DECLARE_ENTITY_CATEGORY_ENUM,
                               MX_DECLARE_ENTITY_CATEGORY_ENUM,
@@ -96,12 +128,22 @@ struct DesignatorId;
 struct CXXCtorInitializerId;
 struct CompilationId;
 
+// IR entities.
+struct IRFunctionId;
+struct IRBlockId;
+struct IRInstructionId;
+struct IRObjectId;
+struct IRStructureId;
+// NOTE: IRSwitchCaseId has been removed; switch cases are now IRStructureId
+// with StructureKind::SWITCH_CASE.
+
 using EntityOffset = uint32_t;
 using SignedEntityOffset = int32_t;
 
 inline static constexpr unsigned NumEnumerators(EntityCategory) {
 #define MX_COUNT_ENTITY_CATEGORIES(...) + 1u
   return 1 MX_FOR_EACH_ENTITY_CATEGORY(MX_COUNT_ENTITY_CATEGORIES,
+                                       MX_COUNT_ENTITY_CATEGORIES,
                                        MX_COUNT_ENTITY_CATEGORIES,
                                        MX_COUNT_ENTITY_CATEGORIES,
                                        MX_COUNT_ENTITY_CATEGORIES,
@@ -337,6 +379,70 @@ struct MX_EXPORT CXXCtorInitializerId final {
   auto operator<=>(const CXXCtorInitializerId &) const noexcept = default;
 };
 
+// IR entity IDs. These follow the same packing scheme as pseudo entities:
+// (fragment_id, sub_kind, offset) where sub_kind is in the IR range.
+
+enum class IREntityKind : uint8_t {
+  IR_FUNCTION = 0,
+  IR_BLOCK = 1,
+  IR_INSTRUCTION = 2,
+  IR_OBJECT = 3,
+  IR_STRUCTURE = 4,
+};
+
+inline static const char *EnumerationName(IREntityKind) {
+  return "IREntityKind";
+}
+
+MX_EXPORT const char *EnumeratorName(IREntityKind) noexcept;
+
+inline static constexpr unsigned NumEnumerators(IREntityKind) {
+  return 5u;
+}
+
+struct MX_EXPORT IRFunctionId final {
+  RawEntityId fragment_id;
+  EntityOffset offset;
+  static constexpr IREntityKind kind = IREntityKind::IR_FUNCTION;
+  bool operator==(const IRFunctionId &) const noexcept = default;
+  auto operator<=>(const IRFunctionId &) const noexcept = default;
+};
+
+struct MX_EXPORT IRBlockId final {
+  RawEntityId fragment_id;
+  EntityOffset offset;
+  ir::BlockKind block_kind;
+  static constexpr IREntityKind kind = IREntityKind::IR_BLOCK;
+  bool operator==(const IRBlockId &) const noexcept = default;
+  auto operator<=>(const IRBlockId &) const noexcept = default;
+};
+
+struct MX_EXPORT IRInstructionId final {
+  RawEntityId fragment_id;
+  EntityOffset offset;
+  ir::OpCode opcode;
+  static constexpr IREntityKind kind = IREntityKind::IR_INSTRUCTION;
+  bool operator==(const IRInstructionId &) const noexcept = default;
+  auto operator<=>(const IRInstructionId &) const noexcept = default;
+};
+
+struct MX_EXPORT IRObjectId final {
+  RawEntityId fragment_id;
+  EntityOffset offset;
+  static constexpr IREntityKind kind = IREntityKind::IR_OBJECT;
+  bool operator==(const IRObjectId &) const noexcept = default;
+  auto operator<=>(const IRObjectId &) const noexcept = default;
+};
+
+struct MX_EXPORT IRStructureId final {
+  RawEntityId fragment_id;
+  EntityOffset offset;
+  ir::StructureKind structure_kind;
+  static constexpr IREntityKind kind = IREntityKind::IR_STRUCTURE;
+  bool operator==(const IRStructureId &) const noexcept = default;
+  auto operator<=>(const IRStructureId &) const noexcept = default;
+};
+
 // Translation units represent a compilation. From a translation unit we can
 // get the compile command, etc.
 struct MX_EXPORT CompilationId {
@@ -383,6 +489,16 @@ struct MX_EXPORT FragmentId final {
       : fragment_id(id_.fragment_id) {}
   inline /* implicit */ FragmentId(const CXXCtorInitializerId &id_)
       : fragment_id(id_.fragment_id) {}
+  inline /* implicit */ FragmentId(const IRFunctionId &id_)
+      : fragment_id(id_.fragment_id) {}
+  inline /* implicit */ FragmentId(const IRBlockId &id_)
+      : fragment_id(id_.fragment_id) {}
+  inline /* implicit */ FragmentId(const IRInstructionId &id_)
+      : fragment_id(id_.fragment_id) {}
+  inline /* implicit */ FragmentId(const IRObjectId &id_)
+      : fragment_id(id_.fragment_id) {}
+  inline /* implicit */ FragmentId(const IRStructureId &id_)
+      : fragment_id(id_.fragment_id) {}
 
   static std::optional<FragmentId> from(const EntityId &);
 };
@@ -406,6 +522,7 @@ using VariantId = std::variant<
     InvalidId,
     MX_FOR_EACH_ENTITY_CATEGORY(MX_ENTITY_ID_VARIANT,
                                 MX_IGNORE_ENTITY_CATEGORY,
+                                MX_ENTITY_ID_VARIANT,
                                 MX_ENTITY_ID_VARIANT,
                                 MX_ENTITY_ID_VARIANT,
                                 MX_ENTITY_ID_VARIANT,
@@ -448,6 +565,11 @@ class MX_EXPORT EntityId final {
   /* implicit */ EntityId(DesignatorId id);
   /* implicit */ EntityId(CXXCtorInitializerId id);
   /* implicit */ EntityId(CompilationId id);
+  /* implicit */ EntityId(IRFunctionId id);
+  /* implicit */ EntityId(IRBlockId id);
+  /* implicit */ EntityId(IRInstructionId id);
+  /* implicit */ EntityId(IRObjectId id);
+  /* implicit */ EntityId(IRStructureId id);
 
   template <typename T>
   /* implicit */ inline EntityId(SpecificEntityId<T>);
@@ -612,6 +734,7 @@ struct EntityTypeImpl;
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_MAP_ENTITY_TYPE,
                             MX_IGNORE_ENTITY_CATEGORY,
+                            MX_MAP_ENTITY_TYPE,
                             MX_MAP_ENTITY_TYPE,
                             MX_MAP_ENTITY_TYPE,
                             MX_MAP_ENTITY_TYPE,

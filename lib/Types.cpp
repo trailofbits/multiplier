@@ -50,12 +50,28 @@ static constexpr uint64_t kNumMacroKinds = NumEnumerators(MacroKind{});
 // NOTE(pag): Keep up-to-date with `IdentifiedPseudo`.
 static constexpr uint64_t kNumPseudoKinds = 5u;
 
-static constexpr unsigned kSubKindNumBits = 11u;
+// IR sub_kind layout within kIRSubKindBase:
+//   0                          → IRFunctionId
+//   1..kNumBlockKinds          → IRBlockId (1 per BlockKind)
+//   1+kNumBlockKinds..+kNumOpCodes → IRInstructionId (1 per OpCode)
+//   last                       → IRObjectId
+static constexpr uint64_t kNumBlockKinds = 17u;         // BlockKind enum count
+static constexpr uint64_t kNumOpCodes = 251u;            // OpCode enum count (ATOMIC_EXCHANGE_64=250)
+static constexpr uint64_t kNumStructureKinds = 19u;      // StructureKind enum count (EXPRESSION_SCOPE=18)
+static constexpr uint64_t kIRFunctionOffset = 0u;
+static constexpr uint64_t kIRBlockOffset = 1u;
+static constexpr uint64_t kIRInstructionOffset = kIRBlockOffset + kNumBlockKinds;
+static constexpr uint64_t kIRObjectOffset = kIRInstructionOffset + kNumOpCodes;
+static constexpr uint64_t kIRStructureOffset = kIRObjectOffset + 1u;
+static constexpr uint64_t kNumIREntityKinds = kIRStructureOffset + kNumStructureKinds;
+
+static constexpr unsigned kSubKindNumBits = 12u;
 static_assert((kNumDeclKinds + kNumStmtKinds + kNumAttrKinds +
                kNumTokenKinds /* fragment tokens */ +
                kNumTokenKinds /* macro tokens */ +
                kNumMacroKinds +
-               kNumPseudoKinds) <=
+               kNumPseudoKinds +
+               kNumIREntityKinds) <=
               (1u << kSubKindNumBits));
 
 static constexpr unsigned kOtherKindBits = 3u;
@@ -187,6 +203,7 @@ const char *EnumeratorName(EntityCategory e) noexcept {
     case EntityCategory::enum_name: return #enum_name;
 
     MX_FOR_EACH_ENTITY_CATEGORY(MX_ENTITY_CASE_NAME,
+                                MX_ENTITY_CASE_NAME,
                                 MX_ENTITY_CASE_NAME,
                                 MX_ENTITY_CASE_NAME,
                                 MX_ENTITY_CASE_NAME,
@@ -693,6 +710,65 @@ EntityId::EntityId(CXXCtorInitializerId id) {
   }
 }
 
+// IR entity IDs follow the same sub_kind pattern as pseudo entities.
+static constexpr uint64_t kIRSubKindBase =
+    kNumDeclKinds + kNumStmtKinds + kNumAttrKinds +
+    kNumTokenKinds + kNumTokenKinds + kNumMacroKinds + kNumPseudoKinds;
+
+static void PackIREntity(uint64_t &opaque, uint64_t fragment_id,
+                          uint64_t sub_kind_offset, uint32_t offset) {
+  PackedEntityId packed = {};
+  if (fragment_id >= kMaxBigFragmentId) {
+    packed.small_entity.fragment_id = fragment_id - kMaxBigFragmentId;
+    packed.small_entity.is_big = 0u;
+    packed.small_entity.is_fragment_entity = 1u;
+    packed.small_entity.sub_kind = kIRSubKindBase + sub_kind_offset;
+    packed.small_entity.offset = offset;
+    RETURN_EARLY_IF_NOT(packed.small_entity.offset == offset);
+  } else {
+    packed.big_entity.fragment_id = fragment_id;
+    packed.big_entity.is_big = 1u;
+    packed.big_entity.is_fragment_entity = 1u;
+    packed.big_entity.sub_kind = kIRSubKindBase + sub_kind_offset;
+    packed.big_entity.offset = offset;
+    RETURN_EARLY_IF_NOT(packed.big_entity.offset == offset);
+  }
+  opaque = packed.opaque;
+}
+
+EntityId::EntityId(IRFunctionId id) {
+  if (id.fragment_id) {
+    PackIREntity(opaque, id.fragment_id, kIRFunctionOffset, id.offset);
+  }
+}
+
+EntityId::EntityId(IRBlockId id) {
+  if (id.fragment_id) {
+    PackIREntity(opaque, id.fragment_id,
+                  kIRBlockOffset + static_cast<uint8_t>(id.block_kind), id.offset);
+  }
+}
+
+EntityId::EntityId(IRInstructionId id) {
+  if (id.fragment_id) {
+    PackIREntity(opaque, id.fragment_id,
+                  kIRInstructionOffset + static_cast<uint8_t>(id.opcode), id.offset);
+  }
+}
+
+EntityId::EntityId(IRObjectId id) {
+  if (id.fragment_id) {
+    PackIREntity(opaque, id.fragment_id, kIRObjectOffset, id.offset);
+  }
+}
+
+EntityId::EntityId(IRStructureId id) {
+  if (id.fragment_id) {
+    PackIREntity(opaque, id.fragment_id,
+                  kIRStructureOffset + static_cast<uint8_t>(id.structure_kind), id.offset);
+  }
+}
+
 EntityId::EntityId(CompilationId id) {
   if (id.compilation_id) {
     PackedEntityId packed = {};
@@ -1029,7 +1105,30 @@ VariantId EntityId::Unpack(void) const noexcept {
             id.offset = static_cast<EntityOffset>(packed.big_entity.offset);
             return id;
           }
-        } 
+        }
+      }
+
+      sub_kind -= kNumPseudoKinds;
+      if (sub_kind < kNumIREntityKinds) {
+        auto fid = packed.big_entity.fragment_id;
+        auto off = static_cast<EntityOffset>(packed.big_entity.offset);
+        if (sub_kind == kIRFunctionOffset) {
+          return IRFunctionId{fid, off};
+        } else if (sub_kind >= kIRBlockOffset &&
+                   sub_kind < kIRBlockOffset + kNumBlockKinds) {
+          return IRBlockId{fid, off,
+                           static_cast<ir::BlockKind>(sub_kind - kIRBlockOffset)};
+        } else if (sub_kind >= kIRInstructionOffset &&
+                   sub_kind < kIRInstructionOffset + kNumOpCodes) {
+          return IRInstructionId{fid, off,
+                                 static_cast<ir::OpCode>(sub_kind - kIRInstructionOffset)};
+        } else if (sub_kind == kIRObjectOffset) {
+          return IRObjectId{fid, off};
+        } else if (sub_kind >= kIRStructureOffset &&
+                   sub_kind < kIRStructureOffset + kNumStructureKinds) {
+          return IRStructureId{fid, off,
+                               static_cast<ir::StructureKind>(sub_kind - kIRStructureOffset)};
+        }
       }
 
       return InvalidId{};
@@ -1131,7 +1230,30 @@ VariantId EntityId::Unpack(void) const noexcept {
             id.offset = static_cast<EntityOffset>(packed.small_entity.offset);
             return id;
           }
-        } 
+        }
+      }
+
+      sub_kind -= kNumPseudoKinds;
+      if (sub_kind < kNumIREntityKinds) {
+        auto fid = packed.small_entity.fragment_id + kMaxBigFragmentId;
+        auto off = static_cast<EntityOffset>(packed.small_entity.offset);
+        if (sub_kind == kIRFunctionOffset) {
+          return IRFunctionId{fid, off};
+        } else if (sub_kind >= kIRBlockOffset &&
+                   sub_kind < kIRBlockOffset + kNumBlockKinds) {
+          return IRBlockId{fid, off,
+                           static_cast<ir::BlockKind>(sub_kind - kIRBlockOffset)};
+        } else if (sub_kind >= kIRInstructionOffset &&
+                   sub_kind < kIRInstructionOffset + kNumOpCodes) {
+          return IRInstructionId{fid, off,
+                                 static_cast<ir::OpCode>(sub_kind - kIRInstructionOffset)};
+        } else if (sub_kind == kIRObjectOffset) {
+          return IRObjectId{fid, off};
+        } else if (sub_kind >= kIRStructureOffset &&
+                   sub_kind < kIRStructureOffset + kNumStructureKinds) {
+          return IRStructureId{fid, off,
+                               static_cast<ir::StructureKind>(sub_kind - kIRStructureOffset)};
+        }
       }
 
       return InvalidId{};

@@ -578,6 +578,12 @@ enum class AttributeSyntax : uint8_t;
 enum class DeclCategory : uint8_t;
 enum class PseudoKind : uint8_t;
 enum class EntityCategory : int32_t;
+enum class IREntityKind : uint8_t;
+class IRFunction;
+class IRBlock;
+class IRInstruction;
+class IRObject;
+class IRStructure;
 class TokenContext;
 class CXXCtorInitializer;
 class Designator;
@@ -1458,4 +1464,9 @@ class IncludeMacroDirective;
 enum class IndexStatus : uint32_t;
 class Index;
 class RegexQuery;
+namespace ir {
+enum class OpCode : uint8_t;
+enum class ObjectKind : uint8_t;
+enum class BlockKind : uint8_t;
+}  // namespace ir
 }  // namespace mx

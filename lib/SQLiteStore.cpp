@@ -5,6 +5,8 @@
 
 #include "SQLiteStore.h"
 
+#include <cassert>
+#include <cstdio>
 #include <cstring>
 #include <iostream>
 #include <thread>
@@ -147,7 +149,20 @@ ConnectionImpl::~ConnectionImpl(void) {
 
   stmts.clear();
 
-  sqlite3_close(db);
+  int close_result = sqlite3_close(db);
+  if (close_result == SQLITE_OK) {
+    return;
+  }
+
+  assert(close_result == SQLITE_BUSY);
+  sqlite3_stmt *leaked = nullptr;
+  while ((leaked = sqlite3_next_stmt(db, leaked)) != nullptr) {
+    const char *sql = sqlite3_sql(leaked);
+    fprintf(stderr, "LEAKED STATEMENT on conn %p: %s\n",
+            static_cast<void *>(db), sql ? sql : "(unknown)");
+  }
+
+  assert(false);  // Good to know if we ever hit it.
 }
 
 Error::Error(const std::string &msg, sqlite3 *db)

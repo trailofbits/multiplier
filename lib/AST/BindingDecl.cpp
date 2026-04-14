@@ -215,7 +215,7 @@ std::optional<BindingDecl> BindingDecl::from(const TokenContext &t) {
 
 std::optional<Expr> BindingDecl::binding(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal50();
+    RawEntityId eid = impl->reader.getVal51();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -227,13 +227,13 @@ std::optional<Expr> BindingDecl::binding(void) const {
 }
 
 ValueDecl BindingDecl::decomposed_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal58();
+  RawEntityId eid = impl->reader.getVal59();
   return ValueDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 std::optional<VarDecl> BindingDecl::holding_variable(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal59();
+    RawEntityId eid = impl->reader.getVal60();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }

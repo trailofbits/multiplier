@@ -51,6 +51,7 @@ class SQLiteEntityProvider final : public EntityProvider {
   unsigned VersionNumber(void) final;
   unsigned VersionNumber(const Ptr &) final;
 
+  IndexVersion GetIndexVersion(void) final;
   void VersionNumberChanged(unsigned) final;
 
   FilePathMap ListFiles(const Ptr &) final;
@@ -105,6 +106,7 @@ class SQLiteEntityProvider final : public EntityProvider {
                               MX_DECLARE_ENTITY_GETTER,
                               MX_DECLARE_ENTITY_GETTER,
                               MX_DECLARE_ENTITY_GETTER,
+                              MX_DECLARE_ENTITY_GETTER,
                               MX_DECLARE_ENTITY_GETTER)
 #undef MX_DECLARE_ENTITY_GETTER
 
@@ -117,6 +119,7 @@ class SQLiteEntityProvider final : public EntityProvider {
                               MX_DECLARE_ENTITY_LISTERS,
                               MX_IGNORE_ENTITY_CATEGORY,
                               MX_DECLARE_ENTITY_LISTERS,
+                              MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_ENTITY_LISTERS

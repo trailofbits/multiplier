@@ -4,6 +4,7 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include "Context.h"
+#include "SerializeIR.h"
 
 #include <algorithm>
 #include <capnp/common.h>
@@ -965,7 +966,15 @@ void GlobalIndexingState::PersistFragment(
   //             filling `pf.macros_to_serialize`, so in order to serialize the
   //             index information about macros, we need to do it after calling
   //             `PersistTokenTree`.
+  // Generate IR BEFORE serializing ASTs so the reverse map (AST entity →
+  // IR instruction entity) is available during AST serialization.
+  auto ir_functions = GenerateIR(ast, pf, pf.em, ir_progress);
+
+  // Serialize AST entities (now with IR instruction references).
   SerializePendingFragment(fb, database, pf);
+
+  // Serialize the IR into the fragment.
+  SerializeIR(ir_functions, pf, em, fb);
 
   PersistTokenContexts(pf, fb);
   LinkEntitiesAcrossFragments(database, pf, mangler);

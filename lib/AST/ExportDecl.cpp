@@ -211,15 +211,15 @@ std::optional<ExportDecl> ExportDecl::from(const TokenContext &t) {
 }
 
 Token ExportDecl::export_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 Token ExportDecl::r_brace_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal48());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal49());
 }
 
 bool ExportDecl::has_braces(void) const {
-  return impl->reader.getVal42();
+  return impl->reader.getVal43();
 }
 
 gap::generator<Decl> ExportDecl::contained_declarations(void) const & {

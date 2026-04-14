@@ -184,7 +184,7 @@ std::optional<IndirectGotoStmt> IndirectGotoStmt::from(const TokenContext &t) {
 
 std::optional<LabelDecl> IndirectGotoStmt::constant_target(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal9();
+    RawEntityId eid = impl->reader.getVal10();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -196,15 +196,15 @@ std::optional<LabelDecl> IndirectGotoStmt::constant_target(void) const {
 }
 
 Token IndirectGotoStmt::goto_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
-}
-
-Token IndirectGotoStmt::star_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal11());
 }
 
+Token IndirectGotoStmt::star_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal12());
+}
+
 Expr IndirectGotoStmt::target(void) const {
-  RawEntityId eid = impl->reader.getVal13();
+  RawEntityId eid = impl->reader.getVal14();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 

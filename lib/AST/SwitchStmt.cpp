@@ -185,18 +185,18 @@ std::optional<SwitchStmt> SwitchStmt::from(const TokenContext &t) {
 }
 
 Stmt SwitchStmt::body(void) const {
-  RawEntityId eid = impl->reader.getVal9();
+  RawEntityId eid = impl->reader.getVal10();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Expr SwitchStmt::condition(void) const {
-  RawEntityId eid = impl->reader.getVal10();
+  RawEntityId eid = impl->reader.getVal11();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 std::optional<VarDecl> SwitchStmt::condition_variable(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal11();
+    RawEntityId eid = impl->reader.getVal12();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -209,7 +209,7 @@ std::optional<VarDecl> SwitchStmt::condition_variable(void) const {
 
 std::optional<DeclStmt> SwitchStmt::condition_variable_declaration_statement(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal13();
+    RawEntityId eid = impl->reader.getVal14();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -222,7 +222,7 @@ std::optional<DeclStmt> SwitchStmt::condition_variable_declaration_statement(voi
 
 std::optional<Stmt> SwitchStmt::initializer(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal14();
+    RawEntityId eid = impl->reader.getVal15();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -234,16 +234,16 @@ std::optional<Stmt> SwitchStmt::initializer(void) const {
 }
 
 Token SwitchStmt::l_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal17());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal18());
 }
 
 Token SwitchStmt::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal18());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal19());
 }
 
 std::optional<SwitchCase> SwitchStmt::first_switch_case(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal19();
+    RawEntityId eid = impl->reader.getVal20();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -255,19 +255,19 @@ std::optional<SwitchCase> SwitchStmt::first_switch_case(void) const {
 }
 
 Token SwitchStmt::switch_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal20());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal21());
 }
 
 bool SwitchStmt::has_initializer_storage(void) const {
-  return impl->reader.getVal12();
+  return impl->reader.getVal13();
 }
 
 bool SwitchStmt::has_variable_storage(void) const {
-  return impl->reader.getVal16();
+  return impl->reader.getVal17();
 }
 
 bool SwitchStmt::is_all_enum_cases_covered(void) const {
-  return impl->reader.getVal23();
+  return impl->reader.getVal24();
 }
 
 #pragma GCC diagnostic pop

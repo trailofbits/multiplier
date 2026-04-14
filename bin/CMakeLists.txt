@@ -7,3 +7,4 @@
 
 add_subdirectory("Examples")
 add_subdirectory("Index")
+add_subdirectory("InterpretIR")

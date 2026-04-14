@@ -211,16 +211,16 @@ std::optional<FileScopeAsmDecl> FileScopeAsmDecl::from(const TokenContext &t) {
 }
 
 Token FileScopeAsmDecl::assembly_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 StringLiteral FileScopeAsmDecl::assembly_string(void) const {
-  RawEntityId eid = impl->reader.getVal48();
+  RawEntityId eid = impl->reader.getVal49();
   return StringLiteral::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 Token FileScopeAsmDecl::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal49());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal50());
 }
 
 #pragma GCC diagnostic pop

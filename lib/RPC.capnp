@@ -3,6 +3,9 @@
 # Include the auto-generated AST schema.
 using AST = import "AST.capnp";
 
+# Include the hand-written IR schema.
+using IR = import "IR.capnp";
+
 using Cxx = import "/capnp/c++.capnp";
 $Cxx.namespace("mx::rpc");
 
@@ -177,6 +180,18 @@ struct Fragment @0xe5f27760091f9a3a {
   # them in here.
   textLists @25 :List(Text);
   uInt64Lists @26 :List(UInt64);
+
+  # IR for function bodies in this fragment. All IR entities are flat lists,
+  # mirroring how decls/stmts work. Fragments without function bodies have
+  # empty lists (zero capnp overhead).
+  irFunctions @27 :List(IR.Function);
+  irBlocks @28 :List(IR.Block);
+  irInstructions @29 :List(IR.Instruction);
+  irObjects @30 :List(IR.Object);
+  irSwitchCasesRemoved @31 :Void;  # Removed: switch cases are now IRStructure entities
+  irStructures @34 :List(IR.Structure);
+  irEntityPool @32 :List(UInt64);  # Shared entity ID pool for all IR entities
+  irIntPool @33 :List(Int64);      # Shared integer/constant pool
 }
 
 struct Compilation @0xc8b5fa5dd0739e82 {

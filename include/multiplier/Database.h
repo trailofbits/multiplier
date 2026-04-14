@@ -502,6 +502,10 @@ class DatabaseWriter final {
            next_compilation_index INTEGER NOT NULL
          ))",
 
+      R"(CREATE TABLE IF NOT EXISTS index_id (
+           id INTEGER PRIMARY KEY NOT NULL
+         ))",
+
       R"(CREATE TABLE IF NOT EXISTS version (
            action INTEGER NOT NULL
          ))",

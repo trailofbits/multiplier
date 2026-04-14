@@ -66,6 +66,10 @@ class EntityMapper final {
   EntityIdMap parent_decl_ids;
   EntityIdMap parent_stmt_ids;
 
+  // Reverse map: AST entity ID → IR instruction entity ID.
+  // Populated during IR generation, consumed during AST serialization.
+  std::unordered_map<mx::RawEntityId, mx::RawEntityId> ir_for_entity;
+
   // Entities map for tracking parent pointers
   EntityParentMap parent_decls;
   EntityParentMap parent_stmts;
@@ -85,6 +89,27 @@ class EntityMapper final {
   template <typename Entity>
   inline mx::RawEntityId ParentStmtId(const Entity &entity) const {
     return ParentStmtId(RawEntity(entity));
+  }
+
+  // Look up the IR entity ID for a given AST entity.
+  // Returns kInvalidEntityId if no IR entity maps to this entity.
+  // The returned ID may be an IRInstructionId, IRFunctionId, etc.
+  mx::RawEntityId IREntityId(const void *entity) const;
+
+  template <typename Entity>
+  inline mx::RawEntityId IREntityId(const Entity &entity) const {
+    return IREntityId(RawEntity(entity));
+  }
+
+  // Convenience aliases.
+  template <typename Entity>
+  inline mx::RawEntityId IRInstructionId(const Entity &entity) const {
+    return IREntityId(entity);
+  }
+
+  template <typename Entity>
+  inline mx::RawEntityId IRFunctionId(const Entity &entity) const {
+    return IREntityId(entity);
   }
 
   inline mx::RawEntityId EntityId(std::nullptr_t entity) const noexcept {

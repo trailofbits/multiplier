@@ -198,11 +198,11 @@ std::optional<CallExpr> CallExpr::from(const TokenContext &t) {
 }
 
 unsigned CallExpr::num_arguments(void) const {
-  return impl->reader.getVal15().size();
+  return impl->reader.getVal16().size();
 }
 
 std::optional<Expr> CallExpr::nth_argument(unsigned n) const {
-  auto list = impl->reader.getVal15();
+  auto list = impl->reader.getVal16();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -216,12 +216,12 @@ std::optional<Expr> CallExpr::nth_argument(unsigned n) const {
 }
 
 gap::generator<Expr> CallExpr::arguments(void) const & {
-  auto list = impl->reader.getVal15();
+  auto list = impl->reader.getVal16();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d15 = ep->StmtFor(ep, v)) {
-      if (auto e = Expr::from_base(std::move(d15))) {
+    if (auto d16 = ep->StmtFor(ep, v)) {
+      if (auto e = Expr::from_base(std::move(d16))) {
         co_yield std::move(*e);
       }
     }
@@ -230,26 +230,26 @@ gap::generator<Expr> CallExpr::arguments(void) const & {
 }
 
 CallExprADLCallKind CallExpr::adl_call_kind(void) const {
-  return static_cast<CallExprADLCallKind>(impl->reader.getVal89());
+  return static_cast<CallExprADLCallKind>(impl->reader.getVal90());
 }
 
 uint32_t CallExpr::builtin_callee(void) const {
-  return impl->reader.getVal26();
+  return impl->reader.getVal27();
 }
 
 Type CallExpr::call_return_type(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal39();
   return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Expr CallExpr::callee(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal40();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 std::optional<Decl> CallExpr::callee_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal40();
+    RawEntityId eid = impl->reader.getVal41();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -262,7 +262,7 @@ std::optional<Decl> CallExpr::callee_declaration(void) const {
 
 std::optional<FunctionDecl> CallExpr::direct_callee(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal41();
+    RawEntityId eid = impl->reader.getVal42();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -274,31 +274,31 @@ std::optional<FunctionDecl> CallExpr::direct_callee(void) const {
 }
 
 Token CallExpr::r_paren_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }
 
 bool CallExpr::has_stored_fp_features(void) const {
-  return impl->reader.getVal84();
-}
-
-bool CallExpr::has_unused_result_attribute(void) const {
   return impl->reader.getVal85();
 }
 
-bool CallExpr::is_builtin_assume_false(void) const {
+bool CallExpr::has_unused_result_attribute(void) const {
   return impl->reader.getVal86();
 }
 
-bool CallExpr::is_call_to_std_move(void) const {
+bool CallExpr::is_builtin_assume_false(void) const {
   return impl->reader.getVal87();
 }
 
-bool CallExpr::is_unevaluated_builtin_call(void) const {
+bool CallExpr::is_call_to_std_move(void) const {
   return impl->reader.getVal88();
 }
 
+bool CallExpr::is_unevaluated_builtin_call(void) const {
+  return impl->reader.getVal89();
+}
+
 bool CallExpr::uses_adl(void) const {
-  return impl->reader.getVal90();
+  return impl->reader.getVal91();
 }
 
 #pragma GCC diagnostic pop

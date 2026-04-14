@@ -210,12 +210,12 @@ std::optional<TopLevelStmtDecl> TopLevelStmtDecl::from(const TokenContext &t) {
 }
 
 Stmt TopLevelStmtDecl::statement(void) const {
-  RawEntityId eid = impl->reader.getVal40();
+  RawEntityId eid = impl->reader.getVal41();
   return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 bool TopLevelStmtDecl::is_semi_missing(void) const {
-  return impl->reader.getVal42();
+  return impl->reader.getVal43();
 }
 
 #pragma GCC diagnostic pop

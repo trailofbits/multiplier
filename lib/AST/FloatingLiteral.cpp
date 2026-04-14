@@ -183,11 +183,11 @@ std::optional<FloatingLiteral> FloatingLiteral::from(const TokenContext &t) {
 }
 
 Token FloatingLiteral::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 bool FloatingLiteral::is_exact(void) const {
-  return impl->reader.getVal84();
+  return impl->reader.getVal85();
 }
 
 #pragma GCC diagnostic pop

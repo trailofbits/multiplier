@@ -39,6 +39,7 @@ static PyModuleDef gModule = {
 
 static LoaderFunc * const gLoaders[] = {
   PythonBinding<mx::EntityCategory>::load,
+  PythonBinding<mx::IREntityKind>::load,
   PythonBinding<mx::BuiltinReferenceKind>::load,
   PythonBinding<mx::ReferenceKind>::load,
   PythonBinding<mx::Reference>::load,
@@ -46,6 +47,28 @@ static LoaderFunc * const gLoaders[] = {
   PythonBinding<mx::IndexStatus>::load,
   PythonBinding<mx::Index>::load,
   PythonBinding<mx::RegexQuery>::load,
+};
+
+// multiplier.ir
+static PyModuleDef gIRModule = {
+  .m_name = "ir",
+  .m_doc = PyDoc_STR("Wrapper of IR"),
+  .m_size = 0,
+  .m_methods = gEmptyMethods,
+  .m_slots = {},
+  .m_traverse = {},
+  .m_clear = {},
+  .m_free = {},
+};
+
+static LoaderFunc * const gIRLoaders[] = {
+  PythonBinding<mx::IRFunction>::load,
+  PythonBinding<mx::IRBlock>::load,
+  PythonBinding<mx::IRInstruction>::load,
+  PythonBinding<mx::IRObject>::load,
+  PythonBinding<mx::ir::OpCode>::load,
+  PythonBinding<mx::ir::ObjectKind>::load,
+  PythonBinding<mx::ir::BlockKind>::load,
 };
 
 // multiplier.ast
@@ -1545,6 +1568,26 @@ PyMODINIT_FUNC PyInit_multiplier(void) {
   if (dummym) {
     if (0 != PyModule_AddObjectRef(dummym, "", m)) {
       Py_DECREF(m);
+      Py_DECREF(m);
+      return nullptr;
+    }
+  }
+
+  auto irm = PyModule_Create(&mx::gIRModule);
+  if (!irm) {
+    return nullptr;
+  }
+
+  for (auto loader : mx::gIRLoaders) {
+    if (!loader(irm)) {
+      Py_DECREF(m);
+      return nullptr;
+    }
+  }
+
+  if (m) {
+    if (0 != PyModule_AddObjectRef(m, "ir", irm)) {
+      Py_DECREF(irm);
       Py_DECREF(m);
       return nullptr;
     }

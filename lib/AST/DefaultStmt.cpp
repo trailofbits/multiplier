@@ -182,7 +182,7 @@ std::optional<DefaultStmt> DefaultStmt::from(const TokenContext &t) {
 }
 
 Token DefaultStmt::default_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal15());
 }
 
 #pragma GCC diagnostic pop

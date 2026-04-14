@@ -211,11 +211,11 @@ std::optional<UsingPackDecl> UsingPackDecl::from(const TokenContext &t) {
 }
 
 unsigned UsingPackDecl::num_expansions(void) const {
-  return impl->reader.getVal43().size();
+  return impl->reader.getVal44().size();
 }
 
 std::optional<NamedDecl> UsingPackDecl::nth_expansion(unsigned n) const {
-  auto list = impl->reader.getVal43();
+  auto list = impl->reader.getVal44();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -229,12 +229,12 @@ std::optional<NamedDecl> UsingPackDecl::nth_expansion(unsigned n) const {
 }
 
 gap::generator<NamedDecl> UsingPackDecl::expansions(void) const & {
-  auto list = impl->reader.getVal43();
+  auto list = impl->reader.getVal44();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d43 = ep->DeclFor(ep, v)) {
-      if (auto e = NamedDecl::from_base(std::move(d43))) {
+    if (auto d44 = ep->DeclFor(ep, v)) {
+      if (auto e = NamedDecl::from_base(std::move(d44))) {
         co_yield std::move(*e);
       }
     }

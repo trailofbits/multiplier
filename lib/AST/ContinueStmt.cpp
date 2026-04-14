@@ -181,7 +181,7 @@ std::optional<ContinueStmt> ContinueStmt::from(const TokenContext &t) {
 }
 
 Token ContinueStmt::continue_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
 }
 
 #pragma GCC diagnostic pop

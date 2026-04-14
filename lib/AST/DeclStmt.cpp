@@ -181,11 +181,11 @@ std::optional<DeclStmt> DeclStmt::from(const TokenContext &t) {
 }
 
 unsigned DeclStmt::num_declarations(void) const {
-  return impl->reader.getVal15().size();
+  return impl->reader.getVal16().size();
 }
 
 std::optional<Decl> DeclStmt::nth_declaration(unsigned n) const {
-  auto list = impl->reader.getVal15();
+  auto list = impl->reader.getVal16();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -199,12 +199,12 @@ std::optional<Decl> DeclStmt::nth_declaration(unsigned n) const {
 }
 
 gap::generator<Decl> DeclStmt::declarations(void) const & {
-  auto list = impl->reader.getVal15();
+  auto list = impl->reader.getVal16();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d15 = ep->DeclFor(ep, v)) {
-      co_yield Decl(std::move(d15));
+    if (auto d16 = ep->DeclFor(ep, v)) {
+      co_yield Decl(std::move(d16));
     }
   }
   co_return;
@@ -212,7 +212,7 @@ gap::generator<Decl> DeclStmt::declarations(void) const & {
 
 std::optional<Decl> DeclStmt::single_declaration(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal9();
+    RawEntityId eid = impl->reader.getVal10();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -224,7 +224,7 @@ std::optional<Decl> DeclStmt::single_declaration(void) const {
 }
 
 bool DeclStmt::is_single_declaration(void) const {
-  return impl->reader.getVal12();
+  return impl->reader.getVal13();
 }
 
 #pragma GCC diagnostic pop

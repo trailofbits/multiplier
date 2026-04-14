@@ -65,6 +65,9 @@ class GlobalIndexingState {
   // Tracks progress in saving tokenized files.
   std::unique_ptr<ProgressBar> file_progress;
 
+  // Tracks progress in IR generation.
+  std::unique_ptr<ProgressBar> ir_progress;
+
   const unsigned num_workers;
 
   // Worker pool.

@@ -221,24 +221,24 @@ std::optional<ClassTemplateSpecializationDecl> ClassTemplateSpecializationDecl::
 }
 
 Token ClassTemplateSpecializationDecl::extern_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal157());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal158());
 }
 
 TemplateSpecializationKind ClassTemplateSpecializationDecl::specialization_kind(void) const {
-  return static_cast<TemplateSpecializationKind>(impl->reader.getVal118());
+  return static_cast<TemplateSpecializationKind>(impl->reader.getVal119());
 }
 
 ClassTemplateDecl ClassTemplateSpecializationDecl::specialized_template(void) const {
-  RawEntityId eid = impl->reader.getVal170();
+  RawEntityId eid = impl->reader.getVal171();
   return ClassTemplateDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 unsigned ClassTemplateSpecializationDecl::num_template_arguments(void) const {
-  return impl->reader.getVal340().size();
+  return impl->reader.getVal341().size();
 }
 
 std::optional<TemplateArgument> ClassTemplateSpecializationDecl::nth_template_argument(unsigned n) const {
-  auto list = impl->reader.getVal340();
+  auto list = impl->reader.getVal341();
   if (n >= list.size()) {
     return std::nullopt;
   }
@@ -252,31 +252,31 @@ std::optional<TemplateArgument> ClassTemplateSpecializationDecl::nth_template_ar
 }
 
 gap::generator<TemplateArgument> ClassTemplateSpecializationDecl::template_arguments(void) const & {
-  auto list = impl->reader.getVal340();
+  auto list = impl->reader.getVal341();
   EntityProviderPtr ep = impl->ep;
   for (auto v : list) {
     EntityId id(v);
-    if (auto d340 = ep->TemplateArgumentFor(ep, v)) {
-      co_yield TemplateArgument(std::move(d340));
+    if (auto d341 = ep->TemplateArgumentFor(ep, v)) {
+      co_yield TemplateArgument(std::move(d341));
     }
   }
   co_return;
 }
 
 Token ClassTemplateSpecializationDecl::template_keyword_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal171());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal172());
 }
 
 bool ClassTemplateSpecializationDecl::is_class_scope_explicit_specialization(void) const {
-  return impl->reader.getVal341();
-}
-
-bool ClassTemplateSpecializationDecl::is_explicit_instantiation_or_specialization(void) const {
   return impl->reader.getVal342();
 }
 
-bool ClassTemplateSpecializationDecl::is_explicit_specialization(void) const {
+bool ClassTemplateSpecializationDecl::is_explicit_instantiation_or_specialization(void) const {
   return impl->reader.getVal343();
+}
+
+bool ClassTemplateSpecializationDecl::is_explicit_specialization(void) const {
+  return impl->reader.getVal344();
 }
 
 #pragma GCC diagnostic pop

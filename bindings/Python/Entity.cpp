@@ -87,6 +87,7 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_CONVERT_FROM_PYTHON,
                             MX_CONVERT_FROM_PYTHON,
                             MX_CONVERT_FROM_PYTHON,
                             MX_CONVERT_FROM_PYTHON,
+                            MX_CONVERT_FROM_PYTHON,
                             MX_CONVERT_FROM_PYTHON)
 #undef MX_CONVERT_FROM_PYTHON
 
@@ -102,6 +103,7 @@ SharedPyObject *PythonBinding<VariantEntity>::to_python(
     }
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_CONVERT_TO_PYTHON,
+                            MX_CONVERT_TO_PYTHON,
                             MX_CONVERT_TO_PYTHON,
                             MX_CONVERT_TO_PYTHON,
                             MX_CONVERT_TO_PYTHON,

@@ -45,6 +45,7 @@ class CachingEntityProvider final : public EntityProvider {
                               DECLARE_ENTITY_CACHE,
                               DECLARE_ENTITY_CACHE,
                               DECLARE_ENTITY_CACHE,
+                              DECLARE_ENTITY_CACHE,
                               DECLARE_ENTITY_CACHE)
 #undef DECLARE_ENTITY_CACHE
 
@@ -72,6 +73,7 @@ class CachingEntityProvider final : public EntityProvider {
   unsigned VersionNumber(void) final;
   unsigned VersionNumber(const Ptr &) final;
 
+  IndexVersion GetIndexVersion(void) final;
   void VersionNumberChanged(unsigned) final;
 
   FilePathMap ListFiles(const Ptr &) final;
@@ -121,12 +123,13 @@ class CachingEntityProvider final : public EntityProvider {
         const Ptr &ep) & final;
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
-                            MX_IGNORE_ENTITY_CATEGORY,
-                            MX_DECLARE_ENTITY_GETTER,
-                            MX_DECLARE_ENTITY_GETTER,
-                            MX_DECLARE_ENTITY_GETTER,
-                            MX_DECLARE_ENTITY_GETTER,
-                            MX_DECLARE_ENTITY_GETTER)
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_DECLARE_ENTITY_GETTER,
+                              MX_DECLARE_ENTITY_GETTER,
+                              MX_DECLARE_ENTITY_GETTER,
+                              MX_DECLARE_ENTITY_GETTER,
+                              MX_DECLARE_ENTITY_GETTER,
+                              MX_DECLARE_ENTITY_GETTER)
 #undef MX_DECLARE_ENTITY_GETTER
 
 #define MX_DECLARE_ENTITY_LISTERS(ns_path, type_name, lower_name, enum_name, category) \
@@ -134,12 +137,13 @@ MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_GETTER,
         const Ptr &, type_name ## Kind) & final;
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
-                            MX_IGNORE_ENTITY_CATEGORY,
-                            MX_DECLARE_ENTITY_LISTERS,
-                            MX_IGNORE_ENTITY_CATEGORY,
-                            MX_DECLARE_ENTITY_LISTERS,
-                            MX_IGNORE_ENTITY_CATEGORY,
-                            MX_IGNORE_ENTITY_CATEGORY)
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_DECLARE_ENTITY_LISTERS,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_DECLARE_ENTITY_LISTERS,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_ENTITY_LISTERS
 };
 

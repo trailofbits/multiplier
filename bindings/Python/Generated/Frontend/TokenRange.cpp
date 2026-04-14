@@ -71,7 +71,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[827]) || tp >= &(gTypes[829])) {
+  if (tp < &(gTypes[831]) || tp >= &(gTypes[833])) {
     return std::nullopt;
   }
 
@@ -343,7 +343,7 @@ static PySequenceMethods gSequenceMethods = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[827]);
+  PyTypeObject * const tp = &(gTypes[831]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

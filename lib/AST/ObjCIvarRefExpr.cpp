@@ -184,29 +184,29 @@ std::optional<ObjCIvarRefExpr> ObjCIvarRefExpr::from(const TokenContext &t) {
 }
 
 Expr ObjCIvarRefExpr::base(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal39();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
 ObjCIvarDecl ObjCIvarRefExpr::declaration(void) const {
-  RawEntityId eid = impl->reader.getVal39();
+  RawEntityId eid = impl->reader.getVal40();
   return ObjCIvarDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Token ObjCIvarRefExpr::token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
-}
-
-Token ObjCIvarRefExpr::operation_token(void) const {
   return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
+Token ObjCIvarRefExpr::operation_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
+}
+
 bool ObjCIvarRefExpr::is_arrow(void) const {
-  return impl->reader.getVal84();
+  return impl->reader.getVal85();
 }
 
 bool ObjCIvarRefExpr::is_free_instance_variable(void) const {
-  return impl->reader.getVal85();
+  return impl->reader.getVal86();
 }
 
 #pragma GCC diagnostic pop

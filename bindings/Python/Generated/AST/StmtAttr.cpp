@@ -71,7 +71,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[48]) || tp >= &(gTypes[55])) {
+  if (tp < &(gTypes[52]) || tp >= &(gTypes[59])) {
     return std::nullopt;
   }
 
@@ -88,27 +88,27 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::OpenCLUnrollHintAttr::static_kind():
-      tp = &(gTypes[49]);
-      break;
-
-    case mx::MustTailAttr::static_kind():
-      tp = &(gTypes[50]);
-      break;
-
-    case mx::LikelyAttr::static_kind():
-      tp = &(gTypes[51]);
-      break;
-
-    case mx::FallThroughAttr::static_kind():
-      tp = &(gTypes[52]);
-      break;
-
-    case mx::CodeAlignAttr::static_kind():
       tp = &(gTypes[53]);
       break;
 
-    case mx::UnlikelyAttr::static_kind():
+    case mx::MustTailAttr::static_kind():
       tp = &(gTypes[54]);
+      break;
+
+    case mx::LikelyAttr::static_kind():
+      tp = &(gTypes[55]);
+      break;
+
+    case mx::FallThroughAttr::static_kind():
+      tp = &(gTypes[56]);
+      break;
+
+    case mx::CodeAlignAttr::static_kind():
+      tp = &(gTypes[57]);
+      break;
+
+    case mx::UnlikelyAttr::static_kind():
+      tp = &(gTypes[58]);
       break;
 
   }
@@ -282,7 +282,7 @@ static PyMethodDef gMethods[] = {
             return ::mx::to_python(T::from(arg_0.value()));
           }
           while (num_args == 1) {
-            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::CXXCtorInitializer, mx::Compilation>>(args[0]);
+            auto arg_0 = ::mx::from_python<std::variant<std::monostate, mx::Fragment, mx::Decl, mx::Stmt, mx::Attr, mx::Macro, mx::Type, mx::File, mx::Token, mx::TemplateArgument, mx::TemplateParameterList, mx::CXXBaseSpecifier, mx::Designator, mx::CXXCtorInitializer, mx::Compilation, mx::IRFunction, mx::IRBlock, mx::IRInstruction, mx::IRObject, mx::IRStructure>>(args[0]);
             if (!arg_0.has_value()) {
               break;
             }
@@ -334,7 +334,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[48]);
+  PyTypeObject * const tp = &(gTypes[52]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -349,12 +349,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[6].tp_hash;
-  tp->tp_richcompare = gTypes[6].tp_richcompare;
+  tp->tp_hash = gTypes[10].tp_hash;
+  tp->tp_richcompare = gTypes[10].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[6]);
+  tp->tp_base = &(gTypes[10]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

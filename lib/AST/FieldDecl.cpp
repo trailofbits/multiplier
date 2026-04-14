@@ -222,7 +222,7 @@ std::optional<FieldDecl> FieldDecl::from(const TokenContext &t) {
 
 std::optional<Expr> FieldDecl::bit_width(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal71();
+    RawEntityId eid = impl->reader.getVal72();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -235,7 +235,7 @@ std::optional<Expr> FieldDecl::bit_width(void) const {
 
 std::optional<VariableArrayType> FieldDecl::captured_vla_type(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal73();
+    RawEntityId eid = impl->reader.getVal74();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -247,16 +247,16 @@ std::optional<VariableArrayType> FieldDecl::captured_vla_type(void) const {
 }
 
 uint32_t FieldDecl::field_index(void) const {
-  return impl->reader.getVal41();
+  return impl->reader.getVal42();
 }
 
 InClassInitStyle FieldDecl::in_class_initializer_style(void) const {
-  return static_cast<InClassInitStyle>(impl->reader.getVal72());
+  return static_cast<InClassInitStyle>(impl->reader.getVal73());
 }
 
 std::optional<Expr> FieldDecl::in_class_initializer(void) const {
   if (true) {
-    RawEntityId eid = impl->reader.getVal74();
+    RawEntityId eid = impl->reader.getVal75();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
@@ -268,50 +268,50 @@ std::optional<Expr> FieldDecl::in_class_initializer(void) const {
 }
 
 bool FieldDecl::has_captured_vla_type(void) const {
-  return impl->reader.getVal68();
-}
-
-bool FieldDecl::has_in_class_initializer(void) const {
   return impl->reader.getVal69();
 }
 
-bool FieldDecl::has_non_null_in_class_initializer(void) const {
-  return impl->reader.getVal81();
+bool FieldDecl::has_in_class_initializer(void) const {
+  return impl->reader.getVal70();
 }
 
-bool FieldDecl::is_anonymous_struct_or_union(void) const {
+bool FieldDecl::has_non_null_in_class_initializer(void) const {
   return impl->reader.getVal82();
 }
 
-bool FieldDecl::is_bit_field(void) const {
+bool FieldDecl::is_anonymous_struct_or_union(void) const {
   return impl->reader.getVal83();
 }
 
-bool FieldDecl::is_mutable(void) const {
+bool FieldDecl::is_bit_field(void) const {
   return impl->reader.getVal84();
 }
 
-bool FieldDecl::is_potentially_overlapping(void) const {
+bool FieldDecl::is_mutable(void) const {
   return impl->reader.getVal85();
 }
 
-bool FieldDecl::is_unnamed_bitfield(void) const {
+bool FieldDecl::is_potentially_overlapping(void) const {
   return impl->reader.getVal86();
 }
 
-bool FieldDecl::is_zero_length_bit_field(void) const {
+bool FieldDecl::is_unnamed_bitfield(void) const {
   return impl->reader.getVal87();
 }
 
-bool FieldDecl::is_zero_size(void) const {
+bool FieldDecl::is_zero_length_bit_field(void) const {
   return impl->reader.getVal88();
 }
 
+bool FieldDecl::is_zero_size(void) const {
+  return impl->reader.getVal89();
+}
+
 std::optional<uint64_t> FieldDecl::offset_in_bits(void) const {
-  if (!impl->reader.getVal89()) {
+  if (!impl->reader.getVal90()) {
     return std::nullopt;
   } else {
-    return static_cast<uint64_t>(impl->reader.getVal75());
+    return static_cast<uint64_t>(impl->reader.getVal76());
   }
   return std::nullopt;
 }

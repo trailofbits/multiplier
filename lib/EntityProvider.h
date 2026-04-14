@@ -9,10 +9,15 @@
 #include <multiplier/AST.capnp.h>
 #include <multiplier/Index.h>
 #include <multiplier/RPC.capnp.h>
+#include <multiplier/IR/Function.h>
+#include <multiplier/IR/Block.h>
+#include <multiplier/IR/Instruction.h>
+#include <multiplier/IR/Object.h>
 #include <optional>
 #include <string>
 
 #include "Entity.h"
+#include "IR/Impl.h"
 
 namespace mx {
 
@@ -67,6 +72,9 @@ class EntityProvider {
   // Update the version number. This is basically a signal to invalidate any
   // caches.
   virtual void VersionNumberChanged(unsigned new_version_number) = 0;
+
+  // Get the index version (unique ID + version number).
+  virtual IndexVersion GetIndexVersion(void) = 0;
 
   // Clear the cache.
   virtual void ClearCache(void) = 0;
@@ -127,6 +135,7 @@ class EntityProvider {
                               MX_DECLARE_ENTITY_GETTER,
                               MX_DECLARE_ENTITY_GETTER,
                               MX_DECLARE_ENTITY_GETTER,
+                              MX_DECLARE_ENTITY_GETTER,
                               MX_DECLARE_ENTITY_GETTER)
 #undef MX_DECLARE_ENTITY_GETTER
 
@@ -139,6 +148,7 @@ class EntityProvider {
                               MX_DECLARE_ENTITY_LISTERS,
                               MX_IGNORE_ENTITY_CATEGORY,
                               MX_DECLARE_ENTITY_LISTERS,
+                              MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_ENTITY_LISTERS
@@ -153,6 +163,7 @@ class EntityProvider {
                               MX_IGNORE_ENTITY_CATEGORY,
                               MX_DECLARE_ENTITY_LISTERS,
                               MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_ENTITY_LISTERS
 
@@ -166,6 +177,7 @@ class EntityProvider {
                               MX_IGNORE_ENTITY_CATEGORY,
                               MX_DECLARE_ENTITY_LISTERS,
                               MX_DECLARE_ENTITY_LISTERS,
+                              MX_IGNORE_ENTITY_CATEGORY,
                               MX_IGNORE_ENTITY_CATEGORY)
 #undef MX_DECLARE_ENTITY_LISTERS
 

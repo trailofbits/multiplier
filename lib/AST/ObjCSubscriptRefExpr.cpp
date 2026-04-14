@@ -184,26 +184,26 @@ std::optional<ObjCSubscriptRefExpr> ObjCSubscriptRefExpr::from(const TokenContex
 }
 
 ObjCMethodDecl ObjCSubscriptRefExpr::at_index_method_declaration(void) const {
-  RawEntityId eid = impl->reader.getVal38();
+  RawEntityId eid = impl->reader.getVal39();
   return ObjCMethodDecl::from_base(impl->ep->DeclFor(impl->ep, eid)).value();
 }
 
 Expr ObjCSubscriptRefExpr::base_expression(void) const {
-  RawEntityId eid = impl->reader.getVal39();
-  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
-}
-
-Expr ObjCSubscriptRefExpr::key_expression(void) const {
   RawEntityId eid = impl->reader.getVal40();
   return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
 }
 
+Expr ObjCSubscriptRefExpr::key_expression(void) const {
+  RawEntityId eid = impl->reader.getVal41();
+  return Expr::from_base(impl->ep->StmtFor(impl->ep, eid)).value();
+}
+
 Token ObjCSubscriptRefExpr::r_bracket_token(void) const {
-  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 bool ObjCSubscriptRefExpr::is_array_subscript_reference_expression(void) const {
-  return impl->reader.getVal84();
+  return impl->reader.getVal85();
 }
 
 #pragma GCC diagnostic pop
