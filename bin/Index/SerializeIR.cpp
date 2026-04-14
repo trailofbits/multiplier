@@ -479,6 +479,12 @@ void SerializeIR(
           << "Instruction has " << src.operand_indices.size()
           << " operands, exceeding uint8_t capacity";
       ib.setNumOperands(static_cast<uint8_t>(src.operand_indices.size()));
+      // OpCode is uint8_t (max value 250 = ATOMIC_EXCHANGE_64). If we
+      // ever exceed 255 opcodes, the capnp schema and this cast must
+      // be widened to UInt16.
+      DCHECK(static_cast<unsigned>(src.opcode) <= 255)
+          << "OpCode " << static_cast<unsigned>(src.opcode)
+          << " exceeds uint8_t capacity";
       ib.setOpcode(static_cast<uint8_t>(src.opcode));
       ib.setConstWidth(src.width);
       ib.setFlags(src.flags);
