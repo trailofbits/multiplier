@@ -75,6 +75,7 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         -DFAIL_ON_WARNINGS:BOOL=OFF
                         -DWITH_DYNAMIC_EXTENSION:BOOL=OFF
                         -DROCKSDB_BUILD_SHARED:BOOL=OFF
+                        -DPORTABLE:BOOL=ON
                         -DBUILD_TESTING:BOOL=OFF
                         -DUSE_RTTI:BOOL=ON
                         "${src_dir}"
