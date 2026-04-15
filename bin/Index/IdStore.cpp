@@ -241,8 +241,8 @@ struct IdConfig {
 
 class IdStoreImpl {
  public:
-  const std::unique_ptr<rocksdb::DB> rocks_db;
-  rocksdb::ColumnFamilyHandle * const cf_handle;
+  std::unique_ptr<rocksdb::DB> rocks_db;
+  rocksdb::ColumnFamilyHandle *cf_handle;
 
   std::deque<IdConfig> configs;
 
@@ -289,8 +289,8 @@ class IdStoreImpl {
     ExitRocksDB();
   }
 
-  IdStoreImpl(rocksdb::DB *rocks_db_)
-      : rocks_db(rocks_db_),
+  IdStoreImpl(std::unique_ptr<rocksdb::DB> rocks_db_)
+      : rocks_db(std::move(rocks_db_)),
         cf_handle(rocks_db->DefaultColumnFamily()),
         next_file_index(configs.emplace_back(
             "META:NEXT_FILE_INDEX", "FID", 1u, mx::kMaxFileId)),
@@ -404,14 +404,14 @@ std::shared_ptr<IdStoreImpl> IdStoreImpl::Open(std::filesystem::path path) {
     return already_open_db;
   }
 
-  rocksdb::DB *rocks_db_ptr = nullptr;
+  std::unique_ptr<rocksdb::DB> rocks_db_ptr;
   auto status = rocksdb::DB::Open(DBOptions(), name, &rocks_db_ptr);
 
   CHECK(status.ok())
       << "Unable to open RocksDB database at " << abs_kvdir << ": "
       << status.ToString();
 
-  auto db_ptr = std::make_shared<IdStoreImpl>(rocks_db_ptr);
+  auto db_ptr = std::make_shared<IdStoreImpl>(std::move(rocks_db_ptr));
   db_ptr_ref = db_ptr;
   return db_ptr;
 }

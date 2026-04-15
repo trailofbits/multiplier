@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <fcntl.h>
+#include <unistd.h>
 #include <filesystem>
 #include <gflags/gflags.h>
 #include <glog/logging.h>
