@@ -241,8 +241,8 @@ struct IdConfig {
 
 class IdStoreImpl {
  public:
-  const std::unique_ptr<rocksdb::DB> rocks_db;
-  rocksdb::ColumnFamilyHandle * const cf_handle;
+  std::unique_ptr<rocksdb::DB> rocks_db;
+  rocksdb::ColumnFamilyHandle *cf_handle;
 
   std::deque<IdConfig> configs;
 
