@@ -9,6 +9,8 @@ struct Object @0xa7625c6bfddc036b {
   sizeBytes @2 :UInt32;
   alignBytes @3 :UInt32;
   kind @4 :UInt8;
+  frameOffset @5 :UInt32;     # Offset within the function's stack frame.
+                               # Only meaningful for stack-allocated objects.
 }
 
 struct Instruction @0xc6bb311936d9962b {
@@ -52,4 +54,6 @@ struct Function @0xe6be31a259218610 {
   entityOffset @4 :UInt32;
   kind @5 :UInt8;             # FunctionKind enum (0 = NORMAL)
   bodyScopeId @6 :UInt64;    # IRStructureId of FUNCTION_SCOPE (root of structure tree)
+  frameSizeBytes @7 :UInt32;  # Total size of the fixed stack frame (non-dynamic allocas).
+  hasDynamicAllocas @8 :Bool; # True if the function has VLAs or alloca().
 }

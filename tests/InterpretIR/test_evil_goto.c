@@ -502,6 +502,54 @@ merge:
     return result;
 }
 
+// Goto target after a return, inside a nested scope.
+static int goto_after_return(void) {
+    int result = 0;
+    goto target;
+    result = 999;  // skipped
+    return result;  // skipped
+    {
+        int x = 10;  // skipped
+target:
+        result = x + 42;  // x is uninit, but we only care about reaching here
+        result = 42;
+    }
+    return result;
+}
+
+// Goto into a scope inside an if-else where both branches return.
+static int goto_past_if_return(int path) {
+    int result = 0;
+    if (path == 1) {
+        goto after_if;
+    }
+    if (path == 2) {
+        result = 20;
+        return result;
+    }
+    result = 30;
+    return result;
+after_if:
+    result = 10;
+    return result;
+}
+
+// Goto target inside deeply nested compound statements after dead code.
+static int goto_deep_compound(void) {
+    int result = 0;
+    goto deep;
+    result = 999;  // skipped
+    {
+        result = 888;  // skipped
+        {
+            result = 777;  // skipped
+deep:
+            result = 42;
+        }
+    }
+    return result;
+}
+
 int test_evil_goto(void) {
     // Duff's device.
     {
@@ -542,6 +590,17 @@ int test_evil_goto(void) {
     if (multi_source_goto(1) != 10) return 13;
     if (multi_source_goto(2) != 20) return 14;
     if (multi_source_goto(0) != 30) return 15;
+
+    // Goto target after return, inside nested scope.
+    if (goto_after_return() != 42) return 16;
+
+    // Goto past if/return.
+    if (goto_past_if_return(1) != 10) return 17;
+    if (goto_past_if_return(2) != 20) return 18;
+    if (goto_past_if_return(0) != 30) return 19;
+
+    // Goto into deeply nested compound after dead code.
+    if (goto_deep_compound() != 42) return 20;
 
     return 0;
 }

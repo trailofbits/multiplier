@@ -239,7 +239,7 @@ const char *EnumeratorName(OpCode op) noexcept {
     case OpCode::RETURN_ADDRESS_32: return "RETURN_ADDRESS_32";
     case OpCode::RETURN_ADDRESS_64: return "RETURN_ADDRESS_64";
   }
-  return "UNKNOWN";
+  return nullptr;
 }
 
 const char *EnumeratorName(ConstOp op) noexcept {
@@ -264,7 +264,7 @@ const char *EnumeratorName(ConstOp op) noexcept {
     case ConstOp::WCHAR32: return "WCHAR32";
     case ConstOp::BOOL: return "BOOL";
   }
-  return "UNKNOWN";
+  return nullptr;
 }
 
 const char *EnumeratorName(AllocaKind op) noexcept {
@@ -274,7 +274,7 @@ const char *EnumeratorName(AllocaKind op) noexcept {
     case AllocaKind::RETURN: return "RETURN";
     case AllocaKind::DYNAMIC: return "DYNAMIC";
   }
-  return "UNKNOWN";
+  return nullptr;
 }
 
 const char *EnumeratorName(CastOp op) noexcept {
@@ -338,7 +338,7 @@ const char *EnumeratorName(CastOp op) noexcept {
     case CastOp::BITCAST: return "BITCAST";
     case CastOp::IDENTITY: return "IDENTITY";
   }
-  return "UNKNOWN";
+  return nullptr;
 }
 
 const char *EnumeratorName(MemOp op) noexcept {
@@ -422,7 +422,7 @@ const char *EnumeratorName(MemOp op) noexcept {
     case MemOp::STORE_F32_BE: return "STORE_F32_BE";
     case MemOp::STORE_F64_BE: return "STORE_F64_BE";
   }
-  return "UNKNOWN";
+  return nullptr;
 }
 
 const char *EnumeratorName(BitwiseOp op) noexcept {
@@ -439,7 +439,7 @@ const char *EnumeratorName(BitwiseOp op) noexcept {
     case BitwiseOp::ROTR: return "ROTR";
     // (ABS moved to sized opcode)
   }
-  return "UNKNOWN";
+  return nullptr;
 }
 
 const char *EnumeratorName(FloatOp op) noexcept {
@@ -527,7 +527,7 @@ const char *EnumeratorName(FloatOp op) noexcept {
     case FloatOp::SIGNBIT_32: return "SIGNBIT_32";
     case FloatOp::SIGNBIT_64: return "SIGNBIT_64";
   }
-  return "UNKNOWN";
+  return nullptr;
 }
 
 const char *EnumeratorName(FunctionKind kind) noexcept {
@@ -536,7 +536,7 @@ const char *EnumeratorName(FunctionKind kind) noexcept {
     case FunctionKind::GLOBAL_INITIALIZER: return "GLOBAL_INITIALIZER";
     case FunctionKind::THREAD_LOCAL_INITIALIZER: return "THREAD_LOCAL_INITIALIZER";
   }
-  return "UNKNOWN";
+  return nullptr;
 }
 
 const char *EnumeratorName(ObjectKind kind) noexcept {
@@ -553,7 +553,7 @@ const char *EnumeratorName(ObjectKind kind) noexcept {
     case ObjectKind::ALLOCA: return "ALLOCA";
     case ObjectKind::HEAP: return "HEAP";
   }
-  return "UNKNOWN";
+  return nullptr;
 }
 
 const char *EnumeratorName(StructureKind kind) noexcept {
@@ -578,7 +578,7 @@ const char *EnumeratorName(StructureKind kind) noexcept {
     case StructureKind::SWITCH_CASE: return "SWITCH_CASE";
     case StructureKind::EXPRESSION_SCOPE: return "EXPRESSION_SCOPE";
   }
-  return "UNKNOWN";
+  return nullptr;
 }
 
 const char *EnumeratorName(BlockKind kind) noexcept {
@@ -601,7 +601,7 @@ const char *EnumeratorName(BlockKind kind) noexcept {
     case BlockKind::COMPENSATION: return "COMPENSATION";
     case BlockKind::LOOP_PREHEADER: return "LOOP_PREHEADER";
   }
-  return "UNKNOWN";
+  return nullptr;
 }
 
 }  // namespace mx::ir
@@ -616,7 +616,7 @@ const char *EnumeratorName(IREntityKind kind) noexcept {
     case IREntityKind::IR_OBJECT: return "IR_OBJECT";
     case IREntityKind::IR_STRUCTURE: return "IR_STRUCTURE";
   }
-  return "UNKNOWN";
+  return nullptr;
 }
 
 }  // namespace mx

@@ -404,11 +404,15 @@ std::optional<FunctionIR> IRGenerator::Generate(
     // Verify block structure.
     VerifyBlocks();
 
+    // Compute stack frame layout: assign offsets to non-dynamic objects.
+    ComputeFrameLayout();
+
     LOG(INFO) << "Generated IR for function entity "
               << func_.func_decl_entity_id
               << ": " << func_.blocks.size() << " blocks, "
               << func_.instructions.size() << " instructions, "
-              << func_.objects.size() << " objects";
+              << func_.objects.size() << " objects"
+              << ", frame=" << func_.frame_size_bytes << " bytes";
 
     return std::move(func_);
 
@@ -523,10 +527,12 @@ std::optional<FunctionIR> IRGenerator::GenerateGlobalInit(
     ComputeDominators();
     ComputeRPO();
     VerifyBlocks();
+    ComputeFrameLayout();
 
     LOG(INFO) << "Generated global init IR for var entity "
               << func_.func_decl_entity_id
-              << ": " << func_.instructions.size() << " instructions";
+              << ": " << func_.instructions.size() << " instructions"
+              << ", frame=" << func_.frame_size_bytes << " bytes";
 
     return std::move(func_);
 
@@ -997,22 +1003,27 @@ void IRGenerator::EmitBody(const pasta::Stmt &body) {
     if (!is_function_body) {
       PushStructure(mx::ir::StructureKind::SCOPE, EntityIdOf(body));
 
-      // Emit ENTER_SCOPE instruction.
-      InstructionIR enter;
-      enter.opcode = mx::ir::OpCode::ENTER_SCOPE;
-      enter.source_entity_id = EntityIdOf(body);
-      enter.structure_index = current_structure_index_;
-      EmitTopLevel(std::move(enter));
+      // Emit ENTER_SCOPE — but only if the block isn't already terminated.
+      // If it is (e.g., after a goto), the scope is only reachable via a
+      // label inside; goto compensation blocks handle the scope entry.
+      if (!CurrentBlockTerminated()) {
+        InstructionIR enter;
+        enter.opcode = mx::ir::OpCode::ENTER_SCOPE;
+        enter.source_entity_id = EntityIdOf(body);
+        enter.structure_index = current_structure_index_;
+        EmitTopLevel(std::move(enter));
+      }
     }
 
     for (const auto &child : cs->Children()) {
       // Skip dead code after a terminator (goto/return/break/continue),
-      // but always process labels and case/default — they start new
-      // reachable blocks.
+      // but always process labels, case/default, and compound statements —
+      // they may contain labels that start new reachable blocks.
       if (CurrentBlockTerminated() &&
           !pasta::LabelStmt::From(child) &&
           !pasta::CaseStmt::From(child) &&
-          !pasta::DefaultStmt::From(child)) continue;
+          !pasta::DefaultStmt::From(child) &&
+          !pasta::CompoundStmt::From(child)) continue;
       EmitStmt(child);
     }
 
@@ -1406,6 +1417,8 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
   auto body = sw->Body();
   std::function<void(const pasta::Stmt &)> collect_cases;
   collect_cases = [&](const pasta::Stmt &stmt) {
+    // Don't descend into nested switch statements.
+    if (pasta::SwitchStmt::From(stmt)) return;
     if (auto cs = pasta::CaseStmt::From(stmt)) {
       int64_t low = 0, high = 0;
       auto *raw_lhs = reinterpret_cast<const clang::Expr *>(
@@ -1433,21 +1446,17 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
       uint32_t block = NewBlock(mx::ir::BlockKind::SWITCH_CASE);
       cases.push_back({low, high, false, block, EntityIdOf(stmt)});
       case_blocks_[EntityIdOf(stmt)] = block;
-      // Recurse into SubStatement to find nested cases (case 1: case 2: ...).
-      auto sub = cs->SubStatement();
-      if (pasta::CaseStmt::From(sub) || pasta::DefaultStmt::From(sub)) {
-        collect_cases(sub);
-      }
+      // Always recurse into SubStatement to find nested cases.
+      // Handles both direct nesting (case 1: case 2: ...) and
+      // Duff's device (case 0: do { case 7: ... } while(...);).
+      collect_cases(cs->SubStatement());
       return;
     }
     if (auto ds = pasta::DefaultStmt::From(stmt)) {
       uint32_t block = NewBlock(mx::ir::BlockKind::SWITCH_DEFAULT);
       cases.push_back({0, 0, true, block, EntityIdOf(stmt)});
       case_blocks_[EntityIdOf(stmt)] = block;
-      auto sub = ds->SubStatement();
-      if (pasta::CaseStmt::From(sub) || pasta::DefaultStmt::From(sub)) {
-        collect_cases(sub);
-      }
+      collect_cases(ds->SubStatement());
       return;
     }
     // Recurse into children, but stop at nested switch statements —
@@ -1472,6 +1481,7 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
   if (cond_type) term.type_entity_id = TypeEntityIdOf(*cond_type);
 
   // Build switch cases with full provenance.
+  bool has_default = false;
   for (const auto &ci : cases) {
     InstructionIR::SwitchCaseIR sc;
     sc.low = ci.low;
@@ -1479,8 +1489,28 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
     sc.block_index = ci.block_index;
     sc.source_entity_id = ci.source_entity_id;
     sc.is_default = ci.is_default;
+    if (ci.is_default) has_default = true;
     term.switch_cases.push_back(sc);
     AddEdge(current_block_index_, ci.block_index);
+  }
+
+  // If no explicit default, add an implicit default that branches to the
+  // switch exit block. Without this, the interpreter errors when no case
+  // matches (e.g., a switch with gaps in its case values).
+  if (!has_default) {
+    // Create a structure for the implicit default so serialization succeeds.
+    uint32_t impl_struct = PushStructure(
+        mx::ir::StructureKind::SWITCH_CASE, EntityIdOf(s));
+    auto &sc_struct = func_.structures[impl_struct];
+    sc_struct.is_default = true;
+    PopStructure();
+
+    InstructionIR::SwitchCaseIR implicit_default;
+    implicit_default.is_default = true;
+    implicit_default.block_index = exit_block;
+    implicit_default.structure_index = impl_struct;
+    term.switch_cases.push_back(implicit_default);
+    AddEdge(current_block_index_, exit_block);
   }
 
   uint32_t term_idx = EmitTopLevel(std::move(term));
@@ -1532,13 +1562,14 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
         // Record case block structure for Duff's device (external goto into case).
         label_structure_[cases[ci].block_index] = current_structure_index_;
         ci++;
-        // If SubStatement is another case/default, handle it via recursion
-        // (empty case fallthrough: case 1: case 2: case 3: body).
+        // Recurse into SubStatement. Handles direct nesting (case 1: case 2:)
+        // and Duff's device (case inside do-while). But if the sub IS a nested
+        // switch, emit it as code — its cases belong to the inner switch.
         auto sub = cs->SubStatement();
-        if (pasta::CaseStmt::From(sub) || pasta::DefaultStmt::From(sub)) {
-          emit_case_bodies(sub);
+        if (pasta::SwitchStmt::From(sub)) {
+          EmitStmt(sub);
         } else {
-          EmitBody(sub);
+          emit_case_bodies(sub);
         }
         PopStructure();  // SWITCH_CASE
       }
@@ -1558,34 +1589,60 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
         label_structure_[cases[ci].block_index] = current_structure_index_;
         ci++;
         auto sub = ds->SubStatement();
-        if (pasta::CaseStmt::From(sub) || pasta::DefaultStmt::From(sub)) {
-          emit_case_bodies(sub);
+        if (pasta::SwitchStmt::From(sub)) {
+          EmitStmt(sub);
         } else {
-          EmitBody(sub);
+          emit_case_bodies(sub);
         }
         PopStructure();  // SWITCH_CASE (default)
       }
       return;
     }
-    // For CompoundStmt or other container, process children.
-    // Non-case/default statements (like break, assignments between cases)
-    // are emitted directly.
     if (pasta::CompoundStmt::From(stmt)) {
+      // CompoundStmt: recurse into children (normal switch body).
       for (const auto &child : stmt.Children()) {
-        // Skip dead code after a terminator, but always process case/default.
         if (CurrentBlockTerminated() &&
             !pasta::CaseStmt::From(child) &&
             !pasta::DefaultStmt::From(child)) continue;
-        // Don't descend into nested switch statements — their cases
-        // belong to the inner switch, not this one.
         if (pasta::SwitchStmt::From(child)) {
           EmitStmt(child);
         } else {
           emit_case_bodies(child);
         }
       }
+    } else if (auto do_stmt = pasta::DoStmt::From(stmt)) {
+      // Duff's device: do-while loop interleaved with switch cases.
+      // Process the body (which contains case statements), then emit
+      // the loop condition and back-edge.
+      // The loop body starts at the case containing this do-while
+      // (already processed, so ci-1), not the first nested case.
+      auto loop_top_ci = (ci > 0) ? ci - 1 : ci;
+
+      // Process the body's case statements.
+      emit_case_bodies(do_stmt->Body());
+
+      // Emit the loop condition and back-edge.
+      // After the last case in the body, branch to the condition block.
+      uint32_t cond_block = NewBlock(mx::ir::BlockKind::LOOP_CONDITION);
+      EmitBranch(cond_block);
+      SwitchToBlock(cond_block);
+
+      uint32_t cond_val = EmitRValue(do_stmt->Condition());
+      PopExpressionScope();
+
+      // Back-edge: condition true → first case block in the loop body.
+      // Exit: condition false → fall through after the loop.
+      uint32_t loop_body_block = (loop_top_ci < cases.size())
+          ? cases[loop_top_ci].block_index
+          : exit_block;
+      uint32_t loop_exit = NewBlock(mx::ir::BlockKind::LOOP_EXIT);
+      EmitCondBranch(cond_val, loop_body_block, loop_exit, EntityIdOf(stmt));
+      SwitchToBlock(loop_exit);
+    } else if (pasta::WhileStmt::From(stmt) || pasta::ForStmt::From(stmt)) {
+      // Other loops with nested cases — emit as regular code.
+      EmitStmt(stmt);
     } else {
-      // Regular statement between cases (e.g., break, goto, assignment).
+      // Regular statement: emit as code.
       EmitStmt(stmt);
     }
   };
@@ -3932,15 +3989,44 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
   }
 
   // VAArgExpr -- va_arg(ap, type).
+  // CONSUME_VA_PARAM returns a pointer to the next variadic arg's storage.
+  // Wrap it in a LOAD of the appropriate width (like EmitLoadFromLValue).
   if (auto va = pasta::VAArgExpr::From(e)) {
     uint32_t sub_idx = EmitRValue(va->SubExpression());
-    InstructionIR inst;
-    inst.opcode = mx::ir::OpCode::MEMORY;
-    inst.mem_op = static_cast<uint8_t>(mx::ir::MemOp::CONSUME_VA_PARAM);
-    inst.source_entity_id = eid;
-    if (auto t = e.Type()) inst.type_entity_id = TypeEntityIdOf(*t);
-    inst.operand_indices = {sub_idx};
-    return emit_typed(std::move(inst));
+    InstructionIR cvp;
+    cvp.opcode = mx::ir::OpCode::MEMORY;
+    cvp.mem_op = static_cast<uint8_t>(mx::ir::MemOp::CONSUME_VA_PARAM);
+    cvp.source_entity_id = eid;
+    if (auto t = e.Type()) cvp.type_entity_id = TypeEntityIdOf(*t);
+    cvp.operand_indices = {sub_idx};
+    uint32_t ptr_idx = EmitInstruction(std::move(cvp));
+
+    // For large types (>8 bytes), return the pointer directly — the caller
+    // will MEMCPY from it, like other aggregate lvalues.
+    if (auto t = e.Type()) {
+      if (auto sz = TypeSizeBytes(*t)) {
+        if (!IsScalarSize(*sz)) {
+          return ptr_idx;
+        }
+      }
+    }
+
+    // Wrap in a LOAD for scalar types.
+    InstructionIR load;
+    load.opcode = mx::ir::OpCode::MEMORY;
+    load.source_entity_id = eid;
+    if (auto t = e.Type()) {
+      load.type_entity_id = TypeEntityIdOf(*t);
+      unsigned sz = 8;
+      if (auto s = TypeSizeBytes(*t)) sz = *s;
+      load.mem_op = static_cast<uint8_t>(
+          DetermineMemOp(false, false, sz, t->IsFloatingType()));
+    } else {
+      load.mem_op = static_cast<uint8_t>(
+          DetermineMemOp(false, false, 8));
+    }
+    load.operand_indices = {ptr_idx};
+    return emit_typed(std::move(load));
   }
 
 
@@ -4640,6 +4726,43 @@ void IRGenerator::VerifyBlocks() {
           << " predecessor edge has no matching successor";
     }
   }
+}
+
+void IRGenerator::ComputeFrameLayout() {
+  uint32_t offset = 0;
+  func_.has_dynamic_allocas = false;
+
+  for (auto &obj : func_.objects) {
+    // Dynamic allocas (VLA, alloca()) are not part of the fixed frame.
+    if (obj.kind == mx::ir::ObjectKind::ALLOCA) {
+      func_.has_dynamic_allocas = true;
+      obj.frame_offset = 0;
+      continue;
+    }
+
+    // Global, thread-local, heap, and string literals live outside the frame.
+    if (obj.kind == mx::ir::ObjectKind::GLOBAL ||
+        obj.kind == mx::ir::ObjectKind::THREAD_LOCAL ||
+        obj.kind == mx::ir::ObjectKind::HEAP ||
+        obj.kind == mx::ir::ObjectKind::STRING_LITERAL) {
+      obj.frame_offset = 0;
+      continue;
+    }
+
+    // Stack-allocated object: assign an aligned offset within the frame.
+    uint32_t align = obj.align_bytes;
+    if (align == 0) align = 1;
+    uint32_t sz = obj.size_bytes;
+    if (sz == 0) sz = 1;
+
+    // Align the current offset.
+    offset = (offset + align - 1) & ~(align - 1);
+    obj.frame_offset = offset;
+    offset += sz;
+  }
+
+  // Final frame size, rounded up to 8-byte alignment.
+  func_.frame_size_bytes = (offset + 7) & ~7u;
 }
 
 }  // namespace ir

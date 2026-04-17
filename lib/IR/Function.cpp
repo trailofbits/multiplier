@@ -11,6 +11,7 @@
 #include <multiplier/AST/Decl.h>
 #include <multiplier/AST/Stmt.h>
 #include <multiplier/AST/FunctionDecl.h>
+#include <multiplier/AST/VarDecl.h>
 #include <multiplier/Fragment.h>
 
 #include "Impl.h"
@@ -108,6 +109,16 @@ std::optional<IRStructure> IRFunction::body_scope(void) const {
   return std::nullopt;
 }
 
+uint32_t IRFunction::frame_size_bytes(void) const {
+  if (!impl) return 0;
+  return impl->reader().getFrameSizeBytes();
+}
+
+bool IRFunction::has_dynamic_allocas(void) const {
+  if (!impl) return false;
+  return impl->reader().getHasDynamicAllocas();
+}
+
 std::optional<IRFunction> IRFunction::from(const FunctionDecl &decl) {
   // Try this specific declaration first.
   auto try_decl = [](const FunctionDecl &d) -> std::optional<IRFunction> {
@@ -142,6 +153,23 @@ std::optional<IRFunction> IRFunction::from(const FunctionDecl &decl) {
     }
   }
 
+  return std::nullopt;
+}
+
+std::optional<IRFunction> IRFunction::from(const VarDecl &decl) {
+  auto frag = Fragment::containing(decl);
+  if (!frag.impl) return std::nullopt;
+
+  auto decl_eid = decl.id().Pack();
+  auto ir_funcs = frag.impl->reader.getIrFunctions();
+  auto frag_id = frag.impl->fragment_id;
+
+  for (unsigned i = 0; i < ir_funcs.size(); ++i) {
+    if (ir_funcs[i].getSourceDeclEntityId() == decl_eid) {
+      return IRFunction(std::make_shared<IRFunctionImpl>(
+          frag.impl, i, frag_id));
+    }
+  }
   return std::nullopt;
 }
 

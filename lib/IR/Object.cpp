@@ -37,6 +37,11 @@ uint32_t IRObject::align_bytes(void) const {
   return impl->reader().getAlignBytes();
 }
 
+uint32_t IRObject::frame_offset(void) const {
+  if (!impl) return 0;
+  return impl->reader().getFrameOffset();
+}
+
 std::optional<VarDecl> IRObject::source_declaration(void) const {
   if (!impl) return std::nullopt;
   auto eid = impl->reader().getSourceDeclId();

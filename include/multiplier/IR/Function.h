@@ -16,6 +16,7 @@ namespace mx {
 
 class Decl;
 class Stmt;
+class VarDecl;
 class IRBlock;
 class IRInstruction;
 class IRObject;
@@ -58,8 +59,15 @@ class MX_EXPORT IRFunction {
   // Root of the structure tree (FUNCTION_SCOPE).
   std::optional<IRStructure> body_scope(void) const;
 
+  // Stack frame layout.
+  uint32_t frame_size_bytes(void) const;   // Total fixed frame size.
+  bool has_dynamic_allocas(void) const;    // True if frame can grow at runtime.
+
   // Find the IR for a FunctionDecl (follows redeclarations).
   static std::optional<IRFunction> from(const FunctionDecl &decl);
+
+  // Find the GLOBAL_INITIALIZER IR for a VarDecl.
+  static std::optional<IRFunction> from(const VarDecl &decl);
 
   // Find the containing IR function for any Decl, Stmt, Block, or Instruction.
   static std::optional<IRFunction> containing(const Decl &decl);
