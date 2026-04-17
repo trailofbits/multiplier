@@ -8,6 +8,7 @@
 #include "Value.h"
 #include <multiplier/IR/OpCode.h>
 #include <optional>
+#include <vector>
 
 namespace mx::ir::interpret {
 
@@ -47,6 +48,16 @@ class ValueFactory {
   // Select (ternary).
   virtual Value Select(const Value &cond, const Value &if_true,
                        const Value &if_false) = 0;
+
+  // Bitwise intrinsics (BSWAP, POPCOUNT, CLZ, CTZ, FFS, PARITY, ROTL, ROTR).
+  // The width opcode (BITWISE_8/16/32/64) determines operand width.
+  virtual Value BitwiseIntrinsic(OpCode width_op, BitwiseOp sub,
+                                 const Value &val,
+                                 const Value &val2) = 0;
+
+  // Float intrinsics (math functions, special values, classification).
+  virtual Value FloatIntrinsic(FloatOp sub,
+                               const std::vector<Value> &operands) = 0;
 };
 
 }  // namespace mx::ir::interpret

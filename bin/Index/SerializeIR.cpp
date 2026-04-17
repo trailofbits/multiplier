@@ -417,6 +417,7 @@ void SerializeIR(
       ob.setSizeBytes(src.size_bytes);
       ob.setAlignBytes(src.align_bytes);
       ob.setKind(static_cast<uint8_t>(src.kind));
+      ob.setFrameOffset(src.frame_offset);
     }
 
     // No reverse map needed: each instruction stores parent_block_index.
@@ -568,6 +569,8 @@ void SerializeIR(
         ffb.setBodyScopeId(MakeStructureEid(func, fragment_id, struct_offset,
                                              func.body_scope_index));
       }
+      ffb.setFrameSizeBytes(func.frame_size_bytes);
+      ffb.setHasDynamicAllocas(func.has_dynamic_allocas);
 
       // Function's block and object lists go into the entity pool.
       uint32_t func_ent_start = pool.EntitySize();

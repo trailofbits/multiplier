@@ -38,6 +38,7 @@ class MX_EXPORT IRObject {
   std::optional<Type> type(void) const;
   uint32_t size_bytes(void) const;
   uint32_t align_bytes(void) const;
+  uint32_t frame_offset(void) const;  // Offset within the function's stack frame.
   bool needs_memory(void) const;
 
 };

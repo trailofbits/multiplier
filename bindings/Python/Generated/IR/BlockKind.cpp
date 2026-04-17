@@ -94,7 +94,9 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
     for (T val : EnumerationRange<T>()) {
       auto ival = PyLong_FromUnsignedLongLong(static_cast<uint64_t>(val));
       if (ival) {
-        auto iname = PyUnicode_FromString(EnumeratorName(val));
+        auto name = EnumeratorName(val);
+        if (!name) continue;  // Skip gap values.
+        auto iname = PyUnicode_FromString(name);
         if (!PyObject_SetItem(ns_dict, iname, ival)) {
           continue;
         }

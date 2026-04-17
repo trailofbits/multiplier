@@ -131,6 +131,7 @@ struct ObjectIR {
   mx::RawEntityId type_entity_id{mx::kInvalidEntityId};
   uint32_t size_bytes{0};
   uint32_t align_bytes{1};
+  uint32_t frame_offset{0};  // Offset within the stack frame.
   mx::ir::ObjectKind kind{mx::ir::ObjectKind::LOCAL};
 };
 
@@ -168,6 +169,10 @@ struct FunctionIR {
   uint32_t entry_block_index{0};
   uint32_t body_scope_index{UINT32_MAX};  // FUNCTION_SCOPE structure
   std::vector<uint32_t> rpo_block_order;
+
+  // Stack frame layout (computed after all objects are collected).
+  uint32_t frame_size_bytes{0};   // Total fixed frame size.
+  bool has_dynamic_allocas{false}; // True if frame needs to grow at runtime.
 };
 
 // ---------------------------------------------------------------------------
@@ -350,6 +355,7 @@ class IRGenerator {
   void ComputeDominators();
   void ComputeRPO();
   void VerifyBlocks();
+  void ComputeFrameLayout();
 };
 
 }  // namespace ir

@@ -7,96 +7,104 @@
 
 #include "Value.h"
 #include <multiplier/IR/Block.h>
+#include <multiplier/IR/Function.h>
 #include <multiplier/IR/Instruction.h>
+#include <multiplier/Types.h>
 #include <variant>
 #include <vector>
 
-namespace mx {
-class FunctionDecl;
-}
-
 namespace mx::ir::interpret {
 
-// The interpreter yields Suspensions at decision points.
-// A Driver returns Resolutions to continue execution.
+// ---------------------------------------------------------------------------
+// Suspensions — what the interpreter needs before it can continue
+// ---------------------------------------------------------------------------
 
-// Branch with unknown (symbolic) condition.
-struct BranchSuspension {
+// The interpreter can't resolve a branch condition.
+// The driver must decide which path(s) to take.
+struct NeedBranchDecision {
   Value condition;
   IRBlock true_block;
   IRBlock false_block;
 };
 
-struct BranchResolution {
-  bool take_true{true};
-  bool take_false{false};  // true = fork both paths
-};
-
-// Function call — driver decides: inline, skip, or model.
-struct CallSuspension {
+// The interpreter encountered a CALL but doesn't have the callee's IR.
+// The driver must provide the IRFunction (inline), a modeled return value,
+// or indicate the call should be skipped.
+struct NeedCallResolution {
   IRInstruction call_inst;
-  std::optional<FunctionDecl> target;
+  RawEntityId target_eid{kInvalidEntityId};
+  RawEntityId indirect_target_eid{kInvalidEntityId};
   std::vector<Value> arguments;
   bool is_indirect{false};
 };
 
+// The interpreter encountered a GLOBAL_PTR for an unresolved global.
+// The driver must provide the global's size, alignment, and optional
+// initializer function.
+struct NeedGlobalResolution {
+  RawEntityId entity_id{kInvalidEntityId};
+};
+
+// A pointer operand needed to be concrete but wasn't.
+// The driver must concretize or provide the concrete address.
+struct NeedConcretePointer {
+  IRInstruction inst;
+  Value symbolic_pointer;
+};
+
+// ---------------------------------------------------------------------------
+// Resolutions — what the driver provides to resume
+// ---------------------------------------------------------------------------
+
+struct BranchDecision {
+  bool take_true{true};
+  bool take_false{false};  // true = fork both paths.
+};
+
 enum class CallAction {
-  INLINE,    // Step into the callee's IR.
-  SKIP,      // Return a default/symbolic value.
-  MODEL,     // Driver provides the return value.
+  INLINE,
+  SKIP,
+  MODEL,
 };
 
 struct CallResolution {
   CallAction action{CallAction::SKIP};
-  Value return_value;  // For SKIP/MODEL.
+  Value return_value;
+  IRFunction callee_ir;  // For INLINE.
 };
 
-// Load from a symbolic or unknown address.
-struct LoadSuspension {
-  Value address;
-  uint32_t size_bytes{0};
+// Info about a global variable needed for lazy initialization.
+struct GlobalInfo {
+  RawEntityId canonical_eid{kInvalidEntityId};
+  uint32_t size{0};
+  uint32_t align{8};
+  std::optional<IRFunction> initializer;
 };
 
-struct LoadResolution {
-  Value value;
+struct GlobalResolution {
+  GlobalInfo info;
 };
 
-// Store to a symbolic or unknown address.
-struct StoreSuspension {
-  Value address;
-  Value value;
-  uint32_t size_bytes{0};
+struct ConcretePointerResolution {
+  uint64_t address{0};
 };
 
-struct StoreResolution {
-  bool proceed{true};
-};
+// ---------------------------------------------------------------------------
+// Variant unions
+// ---------------------------------------------------------------------------
 
-// Need to concretize a symbolic value.
-struct ConcretizeSuspension {
-  Value symbolic_value;
-};
-
-struct ConcretizeResolution {
-  Value concrete_value;
-};
-
-// Union of all suspension types.
 using Suspension = std::variant<
-    BranchSuspension,
-    CallSuspension,
-    LoadSuspension,
-    StoreSuspension,
-    ConcretizeSuspension
+    NeedBranchDecision,
+    NeedCallResolution,
+    NeedGlobalResolution,
+    NeedConcretePointer
 >;
 
-// Union of all resolution types.
 using Resolution = std::variant<
-    BranchResolution,
+    BranchDecision,
     CallResolution,
-    LoadResolution,
-    StoreResolution,
-    ConcretizeResolution
+    GlobalResolution,
+    ConcretePointerResolution
 >;
 
 }  // namespace mx::ir::interpret
