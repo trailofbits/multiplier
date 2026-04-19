@@ -134,15 +134,21 @@ find_and_link_llvm_dependencies("${exe_name}")
 # <build>/<bin_dir>/, and it looks for ../<share_dir>/multiplier/).
 set(MX_ARG_FILTER_SRC "${PROJECT_SOURCE_DIR}/share/multiplier/unsupported_args.cfg")
 set(MX_ARG_FILTER_DST "${PROJECT_BINARY_DIR}/${MX_INSTALL_SHARE_DIR}/multiplier/unsupported_args.cfg")
-add_custom_command(
-  OUTPUT "${MX_ARG_FILTER_DST}"
-  COMMAND "${CMAKE_COMMAND}" -E copy_if_different
-          "${MX_ARG_FILTER_SRC}" "${MX_ARG_FILTER_DST}"
-  DEPENDS "${MX_ARG_FILTER_SRC}"
-  COMMENT "Copying unsupported_args.cfg to build tree"
-)
-add_custom_target("${exe_name}-arg-filter" ALL DEPENDS "${MX_ARG_FILTER_DST}")
-add_dependencies("${exe_name}" "${exe_name}-arg-filter")
+
+# Skip the copy when source and build trees overlap (avoids a dependency cycle).
+cmake_path(ABSOLUTE_PATH MX_ARG_FILTER_SRC NORMALIZE OUTPUT_VARIABLE _src_abs)
+cmake_path(ABSOLUTE_PATH MX_ARG_FILTER_DST NORMALIZE OUTPUT_VARIABLE _dst_abs)
+if(NOT _src_abs STREQUAL _dst_abs)
+  add_custom_command(
+    OUTPUT "${MX_ARG_FILTER_DST}"
+    COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+            "${MX_ARG_FILTER_SRC}" "${MX_ARG_FILTER_DST}"
+    DEPENDS "${MX_ARG_FILTER_SRC}"
+    COMMENT "Copying unsupported_args.cfg to build tree"
+  )
+  add_custom_target("${exe_name}-arg-filter" ALL DEPENDS "${MX_ARG_FILTER_DST}")
+  add_dependencies("${exe_name}" "${exe_name}-arg-filter")
+endif()
 
 if(MX_ENABLE_INSTALL AND NOT MX_ENABLE_BOOTSTRAP)
   install(
