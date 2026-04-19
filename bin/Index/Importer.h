@@ -18,6 +18,7 @@ class FileManager;
 }
 namespace indexer {
 
+class ArgumentFilter;
 class GlobalIndexingState;
 class EnvVariableMap : public std::unordered_map<std::string, std::string> {};
 struct ExecutorOptions;
@@ -35,7 +36,8 @@ class Importer {
 
   explicit Importer(std::filesystem::path cwd_,
                     const pasta::FileManager &fm,
-                    GlobalIndexingState &context);
+                    GlobalIndexingState &context,
+                    const ArgumentFilter &arg_filter);
 
   bool ImportBlightCompileCommand(llvm::json::Object &o);
   bool ImportCMakeCompileCommand(llvm::json::Object &o,

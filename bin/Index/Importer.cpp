@@ -46,6 +46,7 @@
 #pragma clang diagnostic pop
 
 #include "Action.h"
+#include "ArgumentFilter.h"
 #include "Context.h"
 #include "Executor.h"
 #include "IndexCompileJob.h"
@@ -208,6 +209,7 @@ class BuildCommandAction final : public Action {
   std::shared_ptr<pasta::FileSystem> fs;
   const Command &command;
   GlobalIndexingState &ctx;
+  const ArgumentFilter &arg_filter;
 
   void RunWithCompiler(pasta::CompileCommand cmd, pasta::Compiler cc);
 
@@ -219,11 +221,13 @@ class BuildCommandAction final : public Action {
   virtual ~BuildCommandAction(void) = default;
 
   inline BuildCommandAction(pasta::FileManager &fm_, const Command &command_,
-                            GlobalIndexingState &ctx_)
+                            GlobalIndexingState &ctx_,
+                            const ArgumentFilter &arg_filter_)
       : fm(fm_),
         fs(fm.FileSystem()),
         command(command_),
-        ctx(ctx_) {}
+        ctx(ctx_),
+        arg_filter(arg_filter_) {}
 
   void Run(void) final;
 };
@@ -233,13 +237,16 @@ class BuildCommandAction final : public Action {
 std::variant<CompilerPathInfo, std::string>
 BuildCommandAction::GetCompilerInfo(void) {
   std::vector<std::string> new_args;
-  bool skip = false;
-  bool skip_internal_option = false;
   bool has_output = false;
   bool next_is_language = false;
   std::string_view inferred_lang = "c";
   std::string_view specified_lang = "c";
   bool specifies_language = false;
+
+  // Number of following arguments to skip. Positive means unconditional;
+  // negative means skip only if the argument doesn't look like a flag.
+  int skip_following = 0;
+
   for (const char *arg_ : command.vec) {
 
     std::string_view arg(arg_);
@@ -258,16 +265,22 @@ BuildCommandAction::GetCompilerInfo(void) {
       continue;
     }
 
-    if (skip) {
-      skip = false;
+    // Handle skipping of following arguments from a previous match.
+    if (skip_following > 0) {
+      --skip_following;
+      continue;
+    } else if (skip_following < 0) {
+      ++skip_following;
 
       // NOTE(pag): Have observed things like the following in the Linux kernel:
       //
       //      ... -main-file-name -mrelocation-model ...
       //
+      // In lenient mode, only skip if the argument doesn't look like a flag.
       if (arg.front() != '-' && 1u < arg.size()) {
         continue;
       }
+      // Looks like a flag; fall through to process it normally.
     }
 
     // Try to detect C++ code.
@@ -298,7 +311,7 @@ BuildCommandAction::GetCompilerInfo(void) {
 
         } else if (arg_str.ends_with(".s")) {
           inferred_lang = "asm";
-        
+
         } else if (arg_str.ends_with(".ll") || arg_str.ends_with(".ir")) {
           inferred_lang = "ir";
 
@@ -308,71 +321,16 @@ BuildCommandAction::GetCompilerInfo(void) {
       }
     }
 
-    if (skip_internal_option) {
-      skip_internal_option = false;
+    // Check the argument filter for patterns to elide.
+    if (auto n = arg_filter.ShouldSkip(arg)) {
+      skip_following = *n;
       continue;
     }
 
-    // Drop things like `-Wall`, `-Werror, `-fsanitize=..`, etc.
-    if (arg.starts_with("-W") ||
-        arg.starts_with("-pedantic") ||
-        arg.starts_with("-ftrivial-auto-var-init=") ||
-        arg.starts_with("-fpatchable-function-entry=") ||
-        arg.starts_with("-fpatchable-function-entry-offset=") ||
-        arg.starts_with("-fstrict-flex-arrays=") ||
-        arg.starts_with("-mfunction-return=") ||
-        arg.starts_with("-fsanitize=") ||
-        arg.starts_with("-fcoverage-compilation-dir=") ||
-        arg.starts_with("-fcrash-diagnostics-dir=") ||
-        arg == "-fskip-odr-check-in-gmf" ||
-        arg == "-pic-is-pie" ||
-        arg == "-mindirect-branch-cs-prefix" ||
-        arg == "-Wno-cast-function-type-strict" ||
-        arg == "-Wno-c++11-narrowing-const-reference" ||
-        arg == "-Wno-thread-safety-reference-return") {
-      continue;  // Skip the argument.
-
-    // Keep the argument.
-    } else if (arg.starts_with("-Wno-")) {
-
-    // Drop these, and the following argument.
-    } else if (arg == "-Xclang" || arg == "-mllvm") {
-      skip_internal_option = true;
-      continue;
-
-    // Drop these, and the following argument.
-    } else if (arg == "-dependency-file" ||
-               arg == "-diagnostic-log-file" ||
-               arg == "-header-include-file" ||
-               arg == "-stack-usage-file" ||
-               arg == "-mrelocation-model" ||
-               arg == "-pic-level" ||
-               arg == "-main-file-name" ||
-               arg == "-MT" ||
-               arg == "-MQ") {
-      skip = true;
-      continue;
-
-    // If it specifies some file, e.g. `-frandomize-layout-seed-file=...` or
-    // `-fprofile-remapping-file=`, or ..., then drop it.
-    } else if (strstr(arg_, "-file=") /* NOTE(pag): find anywhere */ ||
-               arg.starts_with("-dependent-lib=") ||
-               arg.starts_with("-stats-file=") ||
-               arg.starts_with("-fprofile-list=") ||
-               arg.starts_with("-fxray-always-instrument=") ||
-               arg.starts_with("-fxray-never-instrument=") ||
-               arg.starts_with("-fxray-attr-list=") ||
-               arg.starts_with("-tsan-compound-read-before-write=") ||
-               arg.starts_with("-tsan-distinguish-volatile=") ||
-               arg.starts_with("-treat") ||
-               arg.starts_with("-split-threshold-for-reg-with-hint=") ||
-               arg.starts_with("-instcombine-lower-dbg-declare=")) {
-      continue;
-
     // Output file, `-o <file>`, `--output <arg>`.
-    } else if (arg == "-o" || arg == "--output") {
+    if (arg == "-o" || arg == "--output") {
       has_output = true;
-      skip = true;
+      skip_following = 1;
       continue;
 
     // `--output=<arg>`
@@ -410,8 +368,9 @@ BuildCommandAction::GetCompilerInfo(void) {
       continue;
 
     // Something like `"-DFOO=bar"` or `'-DFOO=bar'`.
-    } else if ((arg.front() == '\'' || arg.front() == '"') && arg[1] == '-' &&
-               arg.back() == arg.front()) {
+    } else if (arg.size() >= 3 &&
+               (arg.front() == '\'' || arg.front() == '"') &&
+               arg[1] == '-' && arg.back() == arg.front()) {
       continue;
     }
 
@@ -730,22 +689,26 @@ struct Importer::PrivateData {
   std::filesystem::path cwd;
   pasta::FileManager fm;
   GlobalIndexingState &ctx;
+  const ArgumentFilter &arg_filter;
 
   inline PrivateData(std::filesystem::path cwd_,
                      const pasta::FileManager &fm_,
-                     GlobalIndexingState &ctx_)
+                     GlobalIndexingState &ctx_,
+                     const ArgumentFilter &arg_filter_)
       : cwd(std::move(cwd_)),
         fm(fm_),
-        ctx(ctx_) {}
+        ctx(ctx_),
+        arg_filter(arg_filter_) {}
 };
 
 Importer::~Importer(void) {}
 
 Importer::Importer(std::filesystem::path cwd_,
                    const pasta::FileManager &fm,
-                   GlobalIndexingState &ctx)
+                   GlobalIndexingState &ctx,
+                   const ArgumentFilter &arg_filter)
     : d(std::make_unique<Importer::PrivateData>(
-            std::move(cwd_), fm, ctx)) {}
+            std::move(cwd_), fm, ctx, arg_filter)) {}
 
 bool Importer::ImportBlightCompileCommand(llvm::json::Object &o) {
   ProgressBarWork progress_tracker(d->ctx.command_progress);
@@ -986,7 +949,8 @@ void Importer::Import(const ExecutorOptions &options) {
     }
 
     for (const Command &cmd : commands) {
-      per_path_exe.EmplaceAction<BuildCommandAction>(d->fm, cmd, d->ctx);
+      per_path_exe.EmplaceAction<BuildCommandAction>(d->fm, cmd, d->ctx,
+                                                      d->arg_filter);
     }
 
     per_path_exe.Start();

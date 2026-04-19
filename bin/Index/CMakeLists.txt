@@ -10,6 +10,8 @@ set(exe_name "mx-index")
 add_executable("${exe_name}"
   "Action.cpp"
   "Action.h"
+  "ArgumentFilter.cpp"
+  "ArgumentFilter.h"
   "BuildPendingFragment.cpp"
   "Context.cpp"
   "Context.h"
@@ -96,6 +98,11 @@ target_include_directories("${exe_name}"
     "$<BUILD_INTERFACE:${LLVM_INCLUDE_DIRS};${LLVM_INCLUDE_DIR};${CLANG_INCLUDE_DIRS}>"
 )
 
+target_compile_definitions("${exe_name}"
+  PRIVATE
+    "MX_SHARE_DIR=\"${MX_INSTALL_SHARE_DIR}\""
+)
+
 target_compile_options("${exe_name}"
   PRIVATE
     "-Wno-unknown-warning-option"
@@ -122,6 +129,21 @@ set_target_properties("${exe_name}"
 
 find_and_link_llvm_dependencies("${exe_name}")
 
+# Copy the default argument filter config into the build tree so that mx-index
+# can find it when run from the build directory (the binary sits in
+# <build>/<bin_dir>/, and it looks for ../<share_dir>/multiplier/).
+set(MX_ARG_FILTER_SRC "${PROJECT_SOURCE_DIR}/share/multiplier/unsupported_args.cfg")
+set(MX_ARG_FILTER_DST "${PROJECT_BINARY_DIR}/${MX_INSTALL_SHARE_DIR}/multiplier/unsupported_args.cfg")
+add_custom_command(
+  OUTPUT "${MX_ARG_FILTER_DST}"
+  COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+          "${MX_ARG_FILTER_SRC}" "${MX_ARG_FILTER_DST}"
+  DEPENDS "${MX_ARG_FILTER_SRC}"
+  COMMENT "Copying unsupported_args.cfg to build tree"
+)
+add_custom_target("${exe_name}-arg-filter" ALL DEPENDS "${MX_ARG_FILTER_DST}")
+add_dependencies("${exe_name}" "${exe_name}-arg-filter")
+
 if(MX_ENABLE_INSTALL AND NOT MX_ENABLE_BOOTSTRAP)
   install(
     TARGETS
@@ -131,5 +153,12 @@ if(MX_ENABLE_INSTALL AND NOT MX_ENABLE_BOOTSTRAP)
     RUNTIME
       DESTINATION
         "${CMAKE_INSTALL_BINDIR}"
+  )
+
+  install(
+    FILES
+      "${MX_ARG_FILTER_SRC}"
+    DESTINATION
+      "${MX_INSTALL_SHARE_DIR}/multiplier"
   )
 endif()
