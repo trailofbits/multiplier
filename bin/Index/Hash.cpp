@@ -379,8 +379,14 @@ void HashVisitor::VisitDecl(const pasta::Decl &decl) {
     AccumulateTokenData(ss, pasta::PrintedTokenRange::Create(vd->Type(), pp));
 
   } else if (auto td = pasta::TypeDecl::From(decl)) {
-    if (auto ty = td->TypeForDeclaration()) {
-      AccumulateTokenData(ss, pasta::PrintedTokenRange::Create(ty.value(), pp));
+    // Skip TypeForDeclaration() for TypedefNameDecls: the typedef body tokens
+    // are already in the fragment's token range, and the type printer can
+    // produce different output across TUs depending on how much type sugar
+    // Clang preserved, causing hash instability.
+    if (!pasta::TypedefNameDecl::From(decl)) {
+      if (auto ty = td->TypeForDeclaration()) {
+        AccumulateTokenData(ss, pasta::PrintedTokenRange::Create(ty.value(), pp));
+      }
     }
   }
 
@@ -402,10 +408,6 @@ static std::string HashNestedFragment(
 
   HashVisitor visitor(ss, em, true);
   visitor.Accept(decl);
-
-  // std::cerr << "\n-----------------\n";
-  // std::cerr << ss.str() << '\n';
-  // Dump(decl);
 
   return ss.str();
 }

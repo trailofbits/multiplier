@@ -28,12 +28,13 @@
 #pragma clang diagnostic ignored "-Wshadow"
 #pragma clang diagnostic ignored "-Wcast-align"
 #include <llvm/IR/LLVMContext.h>
-//#include <llvm/Support/Host.h>
+#include <llvm/Support/FileSystem.h>
 #include <llvm/Support/InitLLVM.h>
 #include <llvm/Support/JSON.h>
 #include <llvm/Support/MemoryBuffer.h>
 #pragma clang diagnostic pop
 
+#include "ArgumentFilter.h"
 #include "Context.h"
 #include "IdStore.h"
 #include "Importer.h"
@@ -73,7 +74,15 @@ DEFINE_string(workspace, "mx-workspace",
 DEFINE_bool(fork_mode, false, "Use --fork_mode if running inside docker");
 DEFINE_bool(reproc_mode, false, "Use --reproc_mode to use reproc library");
 
+DEFINE_string(extra_arg_patterns, "",
+              "Path to an additional argument filter config file. Patterns in "
+              "this file augment the default unsupported_args.cfg that ships "
+              "with mx-index. See that file for the format.");
+
 namespace {
+
+// Used as an address anchor for llvm::sys::fs::getMainExecutable.
+static int gExeAnchor = 0;
 
 std::unique_ptr<llvm::MemoryBuffer>
 ReadFileBuffer(const std::string file_name) {
@@ -165,6 +174,7 @@ int main(int argc, char *argv[], char *envp[]) {
      << " [--num_indexer_workers N]\n"
      << " [--num_command_workers N]\n"
      << " [--env PATH_TO_COPIED_ENV_VARS]\n"
+     << " [--extra_arg_patterns PATH_TO_EXTRA_PATTERNS]\n"
      << " [--show_progress]\n"
      << " --fork_mode\n"
      << " --reproc_mode\n"
@@ -280,8 +290,47 @@ int main(int argc, char *argv[], char *envp[]) {
     return EXIT_FAILURE;
   }
 
+  // Load the argument filter from the default config file that ships alongside
+  // the mx-index binary, then optionally augment with a user-provided file.
+  indexer::ArgumentFilter arg_filter;
+
+  {
+    // Locate the default config relative to the executable:
+    //   <prefix>/bin/mx-index  ->  <prefix>/<share_dir>/multiplier/unsupported_args.cfg
+    auto exe_path = llvm::sys::fs::getMainExecutable(
+        argv[0], &gExeAnchor);
+    if (!exe_path.empty()) {
+      auto default_cfg = std::filesystem::path(exe_path).parent_path()
+                         / ".." / MX_SHARE_DIR / "multiplier"
+                         / "unsupported_args.cfg";
+      std::error_code ec;
+      default_cfg = std::filesystem::canonical(default_cfg, ec);
+      if (!ec) {
+        if (auto err = arg_filter.LoadFromFile(default_cfg)) {
+          LOG(WARNING) << *err;
+        }
+      } else {
+        LOG(WARNING)
+            << "Could not find default argument filter config at "
+            << default_cfg.string() << ": " << ec.message();
+      }
+    }
+
+    if (!FLAGS_extra_arg_patterns.empty()) {
+      if (auto err = arg_filter.LoadFromFile(FLAGS_extra_arg_patterns)) {
+        std::cerr << *err << "\n";
+        return EXIT_FAILURE;
+      }
+    }
+
+    if (arg_filter.Empty()) {
+      LOG(WARNING) << "No argument filter patterns loaded; unsupported "
+                      "compiler arguments will not be stripped";
+    }
+  }
+
   llvm::LLVMContext llvm_context;
-  indexer::Importer importer(path.parent_path(), fm, context);
+  indexer::Importer importer(path.parent_path(), fm, context, arg_filter);
 
   // Parse the target, be it a compile commands JSON database or a binary
   // with embedded commands.
