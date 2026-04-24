@@ -16,11 +16,8 @@
 #include <multiplier/IR/Interpret/Value.h>
 #include <multiplier/IR/Function.h>
 
-#include <algorithm>
 #include <cassert>
-#include <cstdlib>
 #include <cstring>
-#include <string>
 
 #include "Binding.h"
 
@@ -146,69 +143,6 @@ PyObject *PythonPolicy::lookup_method(PyObject *&cache, const char *name) {
     }
   }
   return (cache != Py_None) ? cache : nullptr;
-}
-
-// ===========================================================================
-// Concrete-only helpers (duplicated from ConcretePolicy — private static)
-// ===========================================================================
-
-uint64_t PythonPolicy::extract_address(const Value &val) {
-  if (auto *p = as_pointer(val)) {
-    return concrete_address(*p);
-  }
-  if (auto *s = std::get_if<ScalarValue>(&val)) {
-    return s->bits;
-  }
-  return 0;
-}
-
-bool PythonPolicy::has_concrete_address(const Value &val) {
-  if (auto *p = as_pointer(val)) {
-    return is_concrete(*p);
-  }
-  return std::holds_alternative<ScalarValue>(val);
-}
-
-void PythonPolicy::write_value_to_mem(uint64_t address, const Value &val,
-                                      size_t size) {
-  // Pointers are just integers — extract raw bits from any Value variant.
-  uint64_t bits = 0;
-  if (auto *ptr = as_pointer(val)) {
-    bits = concrete_address(*ptr);
-  } else if (auto *s = std::get_if<ScalarValue>(&val)) {
-    bits = s->bits;
-    if (s->width == 4) {
-      // float32 stored in low 32 bits
-      size = std::min(size, size_t{4});
-    }
-  }
-  // NullPtr and Undefined both write zero.
-  memory_.write(address, &bits,
-                static_cast<uint32_t>(std::min(size, sizeof(bits))));
-}
-
-Value PythonPolicy::read_value_from_mem(uint64_t address, size_t size,
-                                        bool is_float) {
-  if (is_float) {
-    if (size == 4) {
-      float f = 0;
-      memory_.read(address, &f, 4);
-      return make_float32(f);
-    }
-    double d = 0;
-    memory_.read(address, &d, 8);
-    return make_float(d);
-  }
-  int64_t v = 0;
-  memory_.read(address, &v,
-               static_cast<uint32_t>(std::min(size, sizeof(v))));
-  switch (size) {
-    case 1: v = static_cast<int64_t>(static_cast<int8_t>(v)); break;
-    case 2: v = static_cast<int64_t>(static_cast<int16_t>(v)); break;
-    case 4: v = static_cast<int64_t>(static_cast<int32_t>(v)); break;
-    default: break;
-  }
-  return make_int(v);
 }
 
 // ===========================================================================
@@ -361,519 +295,45 @@ Value PythonPolicy::mem_allocate(PythonScheduler &, uint64_t size_bytes,
 }
 
 void PythonPolicy::mem_free(PythonScheduler &, const Value &address) {
-  if (has_concrete_address(address)) {
-    memory_.free(extract_address(address));
+  if (concrete_has_address(address)) {
+    memory_.free(concrete_extract_address(address));
   }
 }
 
 bool PythonPolicy::mem_read(PythonScheduler &, const Value &addr,
                             const MemAccessHint &hint, Value &result) {
-  if (!has_concrete_address(addr)) {
+  if (!concrete_has_address(addr)) {
     result = Undefined{};
     return true;
   }
-  result = read_value_from_mem(extract_address(addr), hint.size_bytes,
-                               hint.is_float);
+  result = concrete_read_from_mem(memory_, concrete_extract_address(addr),
+                                  hint.size_bytes, hint.is_float);
   return true;
 }
 
 bool PythonPolicy::mem_write(PythonScheduler &, const Value &addr,
                              const Value &val, const MemAccessHint &hint) {
-  if (!has_concrete_address(addr)) return true;
-  write_value_to_mem(extract_address(addr), val, hint.size_bytes);
+  if (!concrete_has_address(addr)) return true;
+  concrete_write_to_mem(memory_, concrete_extract_address(addr), val,
+                        hint.size_bytes);
   return true;
 }
 
 bool PythonPolicy::mem_bulk_op(PythonScheduler &, MemOp sub,
                                const std::vector<Value> &ops,
                                const MemoryInst &mi, Value &result) {
-  result = make_undef();
-  using MO = ir::MemOp;
-
-  switch (sub) {
-    case MO::MEMSET: {
-      if (ops.size() >= 3) {
-        auto *p = as_pointer(ops[0]);
-        if (p && is_concrete(*p) && as_int(ops[2]) > 0) {
-          memory_.memset(concrete_address(*p),
-                         static_cast<uint8_t>(as_int(ops[1])),
-                         static_cast<uint32_t>(as_int(ops[2])));
-        }
-      }
-      result = ops.empty() ? make_undef() : ops[0];
-      break;
-    }
-    case MO::MEMCPY:
-    case MO::MEMMOVE: {
-      if (ops.size() >= 3) {
-        auto *dp = as_pointer(ops[0]);
-        int64_t len = as_int(ops[2]);
-        if (dp && is_concrete(*dp) && len > 0) {
-          auto *sp = as_pointer(ops[1]);
-          if (sp && is_concrete(*sp)) {
-            memory_.memcpy(concrete_address(*dp), concrete_address(*sp),
-                           static_cast<uint32_t>(len));
-          } else if (auto *sv = std::get_if<ScalarValue>(&ops[1])) {
-            memory_.write(concrete_address(*dp), &sv->bits,
-                          static_cast<uint32_t>(
-                              std::min(static_cast<size_t>(len),
-                                       sizeof(sv->bits))));
-          }
-        }
-      }
-      result = ops.empty() ? make_undef() : ops[0];
-      break;
-    }
-    case MO::BZERO: {
-      if (ops.size() >= 2) {
-        auto *p = as_pointer(ops[0]);
-        if (p && is_concrete(*p) && as_int(ops[1]) > 0) {
-          memory_.memset(concrete_address(*p), 0,
-                         static_cast<uint32_t>(as_int(ops[1])));
-        }
-      }
-      result = ops.empty() ? make_undef() : ops[0];
-      break;
-    }
-    case MO::STRLEN: {
-      if (ops.size() >= 1) {
-        auto *p = as_pointer(ops[0]);
-        if (p && is_concrete(*p)) {
-          uint64_t addr = concrete_address(*p);
-          size_t len = 0;
-          uint8_t byte = 0;
-          while (true) {
-            memory_.read(addr + len, &byte, 1);
-            if (byte == 0) break;
-            ++len;
-          }
-          result = make_int(static_cast<int64_t>(len));
-        }
-      }
-      break;
-    }
-    case MO::STRNLEN: {
-      if (ops.size() >= 2) {
-        auto *p = as_pointer(ops[0]);
-        if (p && is_concrete(*p)) {
-          uint64_t addr = concrete_address(*p);
-          size_t maxlen = static_cast<size_t>(as_int(ops[1]));
-          size_t len = 0;
-          uint8_t byte = 0;
-          while (len < maxlen) {
-            memory_.read(addr + len, &byte, 1);
-            if (byte == 0) break;
-            ++len;
-          }
-          result = make_int(static_cast<int64_t>(len));
-        }
-      }
-      break;
-    }
-    case MO::STRCMP: {
-      if (ops.size() >= 2) {
-        auto *p0 = as_pointer(ops[0]);
-        auto *p1 = as_pointer(ops[1]);
-        if (p0 && p1 && is_concrete(*p0) && is_concrete(*p1)) {
-          uint64_t a0 = concrete_address(*p0);
-          uint64_t a1 = concrete_address(*p1);
-          int cmp = 0;
-          for (size_t i = 0; ; ++i) {
-            uint8_t c0 = 0, c1 = 0;
-            memory_.read(a0 + i, &c0, 1);
-            memory_.read(a1 + i, &c1, 1);
-            if (c0 != c1) { cmp = (c0 < c1) ? -1 : 1; break; }
-            if (c0 == 0) break;
-          }
-          result = make_int(cmp);
-        }
-      }
-      break;
-    }
-    case MO::STRNCMP: {
-      if (ops.size() >= 3) {
-        auto *p0 = as_pointer(ops[0]);
-        auto *p1 = as_pointer(ops[1]);
-        if (p0 && p1 && is_concrete(*p0) && is_concrete(*p1)) {
-          uint64_t a0 = concrete_address(*p0);
-          uint64_t a1 = concrete_address(*p1);
-          size_t n = static_cast<size_t>(as_int(ops[2]));
-          int cmp = 0;
-          for (size_t i = 0; i < n; ++i) {
-            uint8_t c0 = 0, c1 = 0;
-            memory_.read(a0 + i, &c0, 1);
-            memory_.read(a1 + i, &c1, 1);
-            if (c0 != c1) { cmp = (c0 < c1) ? -1 : 1; break; }
-            if (c0 == 0) break;
-          }
-          result = make_int(cmp);
-        }
-      }
-      break;
-    }
-    case MO::MEMCMP: {
-      if (ops.size() >= 3) {
-        auto *p0 = as_pointer(ops[0]);
-        auto *p1 = as_pointer(ops[1]);
-        if (p0 && p1 && is_concrete(*p0) && is_concrete(*p1)) {
-          size_t len = static_cast<size_t>(as_int(ops[2]));
-          std::vector<uint8_t> buf0(len, 0), buf1(len, 0);
-          memory_.read(concrete_address(*p0), buf0.data(),
-                       static_cast<uint32_t>(len));
-          memory_.read(concrete_address(*p1), buf1.data(),
-                       static_cast<uint32_t>(len));
-          result = make_int(std::memcmp(buf0.data(), buf1.data(), len));
-        }
-      }
-      break;
-    }
-    case MO::MEMCHR: {
-      if (ops.size() >= 3) {
-        auto *p = as_pointer(ops[0]);
-        if (p && is_concrete(*p)) {
-          uint64_t addr = concrete_address(*p);
-          size_t len = static_cast<size_t>(as_int(ops[2]));
-          uint8_t needle = static_cast<uint8_t>(as_int(ops[1]));
-          for (size_t i = 0; i < len; ++i) {
-            uint8_t byte = 0;
-            memory_.read(addr + i, &byte, 1);
-            if (byte == needle) {
-              result = make_ptr(addr + i);
-              break;
-            }
-          }
-        }
-      }
-      break;
-    }
-    case MO::STRCHR: {
-      if (ops.size() >= 2) {
-        auto *p = as_pointer(ops[0]);
-        if (p && is_concrete(*p)) {
-          uint64_t addr = concrete_address(*p);
-          uint8_t needle = static_cast<uint8_t>(as_int(ops[1]));
-          bool found = false;
-          for (size_t i = 0; ; ++i) {
-            uint8_t byte = 0;
-            memory_.read(addr + i, &byte, 1);
-            if (byte == needle) {
-              result = make_ptr(addr + i);
-              found = true;
-              break;
-            }
-            if (byte == 0) break;
-          }
-          if (!found) {
-            if (needle == 0) {
-              for (size_t i = 0; ; ++i) {
-                uint8_t byte = 0;
-                memory_.read(addr + i, &byte, 1);
-                if (byte == 0) {
-                  result = make_ptr(addr + i);
-                  found = true;
-                  break;
-                }
-              }
-            }
-            if (!found) result = make_null();
-          }
-        }
-      }
-      break;
-    }
-    case MO::STRRCHR: {
-      if (ops.size() >= 2) {
-        auto *p = as_pointer(ops[0]);
-        if (p && is_concrete(*p)) {
-          uint64_t addr = concrete_address(*p);
-          uint8_t needle = static_cast<uint8_t>(as_int(ops[1]));
-          int64_t last_pos = -1;
-          for (size_t i = 0; ; ++i) {
-            uint8_t byte = 0;
-            memory_.read(addr + i, &byte, 1);
-            if (byte == needle) last_pos = static_cast<int64_t>(i);
-            if (byte == 0) break;
-          }
-          result = (last_pos >= 0)
-              ? make_ptr(addr + static_cast<uint64_t>(last_pos))
-              : make_null();
-        }
-      }
-      break;
-    }
-    case MO::STRSTR: {
-      if (ops.size() >= 2) {
-        auto *p0 = as_pointer(ops[0]);
-        auto *p1 = as_pointer(ops[1]);
-        if (p0 && p1 && is_concrete(*p0) && is_concrete(*p1)) {
-          uint64_t ha = concrete_address(*p0);
-          uint64_t na = concrete_address(*p1);
-          std::string haystack, needle_str;
-          for (size_t i = 0; ; ++i) {
-            uint8_t b = 0; memory_.read(ha + i, &b, 1);
-            if (b == 0) break;
-            haystack.push_back(static_cast<char>(b));
-          }
-          for (size_t i = 0; ; ++i) {
-            uint8_t b = 0; memory_.read(na + i, &b, 1);
-            if (b == 0) break;
-            needle_str.push_back(static_cast<char>(b));
-          }
-          if (needle_str.empty()) {
-            result = ops[0];
-          } else {
-            auto pos = haystack.find(needle_str);
-            result = (pos != std::string::npos)
-                ? make_ptr(ha + pos) : make_null();
-          }
-        }
-      }
-      break;
-    }
-    case MO::STRCPY: {
-      if (ops.size() >= 2) {
-        auto *dp = as_pointer(ops[0]);
-        auto *sp = as_pointer(ops[1]);
-        if (dp && sp && is_concrete(*dp) && is_concrete(*sp)) {
-          uint64_t da = concrete_address(*dp), sa = concrete_address(*sp);
-          for (size_t i = 0; ; ++i) {
-            uint8_t c = 0; memory_.read(sa + i, &c, 1);
-            memory_.write(da + i, &c, 1);
-            if (c == 0) break;
-          }
-        }
-      }
-      result = ops.empty() ? make_undef() : ops[0];
-      break;
-    }
-    case MO::STRNCPY: {
-      if (ops.size() >= 3) {
-        auto *dp = as_pointer(ops[0]);
-        auto *sp = as_pointer(ops[1]);
-        if (dp && sp && is_concrete(*dp) && is_concrete(*sp)) {
-          uint64_t da = concrete_address(*dp), sa = concrete_address(*sp);
-          size_t n = static_cast<size_t>(as_int(ops[2]));
-          bool hit_null = false;
-          for (size_t i = 0; i < n; ++i) {
-            uint8_t c = 0;
-            if (!hit_null) {
-              memory_.read(sa + i, &c, 1);
-              if (c == 0) hit_null = true;
-            }
-            memory_.write(da + i, &c, 1);
-          }
-        }
-      }
-      result = ops.empty() ? make_undef() : ops[0];
-      break;
-    }
-    case MO::STRCAT: {
-      if (ops.size() >= 2) {
-        auto *dp = as_pointer(ops[0]);
-        auto *sp = as_pointer(ops[1]);
-        if (dp && sp && is_concrete(*dp) && is_concrete(*sp)) {
-          uint64_t da = concrete_address(*dp), sa = concrete_address(*sp);
-          size_t dlen = 0;
-          uint8_t byte = 0;
-          while (true) {
-            memory_.read(da + dlen, &byte, 1);
-            if (byte == 0) break;
-            ++dlen;
-          }
-          for (size_t i = 0; ; ++i) {
-            uint8_t c = 0; memory_.read(sa + i, &c, 1);
-            memory_.write(da + dlen + i, &c, 1);
-            if (c == 0) break;
-          }
-        }
-      }
-      result = ops.empty() ? make_undef() : ops[0];
-      break;
-    }
-    case MO::STRNCAT: {
-      if (ops.size() >= 3) {
-        auto *dp = as_pointer(ops[0]);
-        auto *sp = as_pointer(ops[1]);
-        if (dp && sp && is_concrete(*dp) && is_concrete(*sp)) {
-          uint64_t da = concrete_address(*dp), sa = concrete_address(*sp);
-          size_t n = static_cast<size_t>(as_int(ops[2]));
-          size_t dlen = 0;
-          uint8_t byte = 0;
-          while (true) {
-            memory_.read(da + dlen, &byte, 1);
-            if (byte == 0) break;
-            ++dlen;
-          }
-          size_t i = 0;
-          for (; i < n; ++i) {
-            uint8_t c = 0; memory_.read(sa + i, &c, 1);
-            if (c == 0) break;
-            memory_.write(da + dlen + i, &c, 1);
-          }
-          uint8_t nul = 0; memory_.write(da + dlen + i, &nul, 1);
-        }
-      }
-      result = ops.empty() ? make_undef() : ops[0];
-      break;
-    }
-    case MO::STPCPY: {
-      if (ops.size() >= 2) {
-        auto *dp = as_pointer(ops[0]);
-        auto *sp = as_pointer(ops[1]);
-        if (dp && sp && is_concrete(*dp) && is_concrete(*sp)) {
-          uint64_t da = concrete_address(*dp), sa = concrete_address(*sp);
-          size_t i = 0;
-          for (; ; ++i) {
-            uint8_t c = 0; memory_.read(sa + i, &c, 1);
-            memory_.write(da + i, &c, 1);
-            if (c == 0) break;
-          }
-          result = make_ptr(da + i);
-        }
-      }
-      break;
-    }
-    case MO::STPNCPY: {
-      if (ops.size() >= 3) {
-        auto *dp = as_pointer(ops[0]);
-        auto *sp = as_pointer(ops[1]);
-        if (dp && sp && is_concrete(*dp) && is_concrete(*sp)) {
-          uint64_t da = concrete_address(*dp), sa = concrete_address(*sp);
-          size_t n = static_cast<size_t>(as_int(ops[2]));
-          bool hit_null = false;
-          size_t null_pos = n;
-          for (size_t i = 0; i < n; ++i) {
-            uint8_t c = 0;
-            if (!hit_null) {
-              memory_.read(sa + i, &c, 1);
-              if (c == 0) { hit_null = true; null_pos = i; }
-            }
-            memory_.write(da + i, &c, 1);
-          }
-          result = make_ptr(da + null_pos);
-        }
-      }
-      break;
-    }
-    case MO::STRTOI32: case MO::STRTOI64:
-    case MO::STRTOU32: case MO::STRTOU64:
-    case MO::STRTOF32: case MO::STRTOF64: {
-      if (ops.size() >= 1) {
-        auto *p = as_pointer(ops[0]);
-        if (p && is_concrete(*p)) {
-          uint64_t addr = concrete_address(*p);
-          std::string str;
-          for (size_t i = 0; ; ++i) {
-            uint8_t b = 0; memory_.read(addr + i, &b, 1);
-            if (b == 0) break;
-            str.push_back(static_cast<char>(b));
-          }
-          switch (sub) {
-            case MO::STRTOI32: result = make_int(static_cast<int64_t>(std::strtol(str.c_str(), nullptr, 10))); break;
-            case MO::STRTOI64: result = make_int(static_cast<int64_t>(std::strtoll(str.c_str(), nullptr, 10))); break;
-            case MO::STRTOU32: result = make_int(static_cast<int64_t>(std::strtoul(str.c_str(), nullptr, 10))); break;
-            case MO::STRTOU64: result = make_int(static_cast<int64_t>(std::strtoull(str.c_str(), nullptr, 10))); break;
-            case MO::STRTOF32: result = make_float(static_cast<double>(std::strtof(str.c_str(), nullptr))); break;
-            case MO::STRTOF64: result = make_float(std::strtod(str.c_str(), nullptr)); break;
-            default: break;
-          }
-        }
-      }
-      break;
-    }
-    case MO::BIT_READ_LE: case MO::BIT_READ_BE: {
-      if (ops.size() >= 1) {
-        auto *p = as_pointer(ops[0]);
-        if (p && is_concrete(*p)) {
-          uint64_t addr = concrete_address(*p);
-          uint32_t bo = mi.bit_offset();
-          uint32_t bw = mi.bit_width();
-          uint32_t first_byte = bo / 8;
-          uint32_t last_byte = (bo + bw - 1) / 8;
-          uint32_t num_bytes = last_byte - first_byte + 1;
-          std::vector<uint8_t> buf(num_bytes, 0);
-          memory_.read(addr + first_byte, buf.data(), num_bytes);
-          uint64_t raw = 0;
-          if (sub == MO::BIT_READ_LE) {
-            for (uint32_t i = 0; i < num_bytes; ++i)
-              raw |= static_cast<uint64_t>(buf[i]) << (i * 8);
-            raw >>= (bo % 8);
-          } else {
-            for (uint32_t i = 0; i < num_bytes; ++i)
-              raw = (raw << 8) | buf[i];
-            uint32_t top_bits = num_bytes * 8;
-            uint32_t shift = top_bits - (bo % 8) - bw;
-            raw >>= shift;
-          }
-          uint64_t mask = (bw >= 64) ? ~uint64_t{0}
-                                     : ((uint64_t{1} << bw) - 1);
-          raw &= mask;
-          result = make_int(static_cast<int64_t>(raw));
-        }
-      }
-      break;
-    }
-    case MO::BIT_WRITE_LE: case MO::BIT_WRITE_BE: {
-      if (ops.size() >= 2) {
-        auto *p = as_pointer(ops[0]);
-        if (p && is_concrete(*p)) {
-          uint64_t addr = concrete_address(*p);
-          uint32_t bo = mi.bit_offset();
-          uint32_t bw = mi.bit_width();
-          uint64_t val = static_cast<uint64_t>(as_int(ops[1]));
-          uint64_t mask = (bw >= 64) ? ~uint64_t{0}
-                                     : ((uint64_t{1} << bw) - 1);
-          val &= mask;
-          uint32_t first_byte = bo / 8;
-          uint32_t last_byte = (bo + bw - 1) / 8;
-          uint32_t num_bytes = last_byte - first_byte + 1;
-          std::vector<uint8_t> buf(num_bytes, 0);
-          memory_.read(addr + first_byte, buf.data(), num_bytes);
-          if (sub == MO::BIT_WRITE_LE) {
-            uint64_t raw = 0;
-            for (uint32_t i = 0; i < num_bytes; ++i)
-              raw |= static_cast<uint64_t>(buf[i]) << (i * 8);
-            uint32_t shift = bo % 8;
-            raw &= ~(mask << shift);
-            raw |= (val << shift);
-            for (uint32_t i = 0; i < num_bytes; ++i)
-              buf[i] = static_cast<uint8_t>(raw >> (i * 8));
-          } else {
-            uint64_t raw = 0;
-            for (uint32_t i = 0; i < num_bytes; ++i)
-              raw = (raw << 8) | buf[i];
-            uint32_t top_bits = num_bytes * 8;
-            uint32_t shift = top_bits - (bo % 8) - bw;
-            raw &= ~(mask << shift);
-            raw |= (val << shift);
-            for (uint32_t i = 0; i < num_bytes; ++i)
-              buf[num_bytes - 1 - i] = static_cast<uint8_t>(raw >> (i * 8));
-          }
-          memory_.write(addr + first_byte, buf.data(), num_bytes);
-        }
-      }
-      break;
-    }
-    case MO::CONSUME_VA_PARAM:
-      break;
-    default:
-      if (ir::IsCmpxchg(sub)) {
-        result = make_undef();
-      }
-      break;
-  }
-  return true;
+  return concrete_mem_bulk_op(memory_, sub, ops, mi, result);
 }
 
 void PythonPolicy::mem_poison(const Value &addr) {
-  if (has_concrete_address(addr)) {
-    memory_.poison(extract_address(addr));
+  if (concrete_has_address(addr)) {
+    memory_.poison(concrete_extract_address(addr));
   }
 }
 
 void PythonPolicy::mem_unpoison(const Value &addr) {
-  if (has_concrete_address(addr)) {
-    memory_.unpoison(extract_address(addr));
+  if (concrete_has_address(addr)) {
+    memory_.unpoison(concrete_extract_address(addr));
   }
 }
 

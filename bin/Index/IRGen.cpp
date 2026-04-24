@@ -4150,6 +4150,138 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
     }
   }
 
+  // AtomicExpr — Clang represents __atomic_* / _Atomic builtins as these.
+  if (auto ae = pasta::AtomicExpr::From(e)) {
+    auto aop = ae->Operation();
+    using AO = pasta::AtomicExprAtomicOp;
+
+    // Determine value type width.
+    unsigned val_width = 4;
+    {
+      auto vt = ae->ValueType();
+      if (auto sz = TypeSizeBytes(vt)) val_width = *sz;
+    }
+
+    // Loads → MEMORY instruction.
+    if (aop == AO::kAtomicLoad || aop == AO::kAtomicLoadN ||
+        aop == AO::kC11AtomicLoad || aop == AO::kScopedAtomicLoad ||
+        aop == AO::kScopedAtomicLoadN || aop == AO::kOpenclAtomicLoad ||
+        aop == AO::kHipAtomicLoad) {
+      InstructionIR load;
+      load.opcode = mx::ir::OpCode::MEMORY;
+      load.source_entity_id = eid;
+      load.operand_indices.push_back(EmitRValue(ae->Pointer()));
+      bool is_float = ae->ValueType().IsFloatingType();
+      load.mem_op = static_cast<uint8_t>(
+          DetermineMemOp(false, true, val_width, is_float));
+      return emit_typed(std::move(load));
+    }
+
+    // Stores → MEMORY instruction.
+    if (aop == AO::kAtomicStore || aop == AO::kAtomicStoreN ||
+        aop == AO::kC11AtomicStore || aop == AO::kScopedAtomicStore ||
+        aop == AO::kScopedAtomicStoreN || aop == AO::kOpenclAtomicStore ||
+        aop == AO::kHipAtomicStore) {
+      InstructionIR store;
+      store.opcode = mx::ir::OpCode::MEMORY;
+      store.source_entity_id = eid;
+      store.operand_indices.push_back(EmitRValue(ae->Pointer()));
+      if (auto val1 = ae->Value1()) {
+        store.operand_indices.push_back(EmitRValue(*val1));
+      }
+      bool is_float = ae->ValueType().IsFloatingType();
+      store.mem_op = static_cast<uint8_t>(
+          DetermineMemOp(true, true, val_width, is_float));
+      return emit_typed(std::move(store));
+    }
+
+    // RMW operations → READ_MODIFY_WRITE.
+    struct AtomicMapping {
+      AO op;
+      AtomicOp underlying;
+      bool returns_new;
+    };
+    static const AtomicMapping mappings[] = {
+      // GCC fetch-op (returns old value).
+      {AO::kAtomicFetchAdd, AtomicOp::ATOMIC_ADD, false},
+      {AO::kAtomicFetchSub, AtomicOp::ATOMIC_SUB, false},
+      {AO::kAtomicFetchAnd, AtomicOp::ATOMIC_AND, false},
+      {AO::kAtomicFetchOr, AtomicOp::ATOMIC_OR, false},
+      {AO::kAtomicFetchXor, AtomicOp::ATOMIC_XOR, false},
+      {AO::kAtomicFetchNand, AtomicOp::ATOMIC_NAND, false},
+      // GCC op-fetch (returns new value).
+      {AO::kAtomicAddFetch, AtomicOp::ATOMIC_ADD, true},
+      {AO::kAtomicSubFetch, AtomicOp::ATOMIC_SUB, true},
+      {AO::kAtomicAndFetch, AtomicOp::ATOMIC_AND, true},
+      {AO::kAtomicOrFetch, AtomicOp::ATOMIC_OR, true},
+      {AO::kAtomicXorFetch, AtomicOp::ATOMIC_XOR, true},
+      {AO::kAtomicNandFetch, AtomicOp::ATOMIC_NAND, true},
+      // GCC exchange.
+      {AO::kAtomicExchange, AtomicOp::ATOMIC_EXCHANGE, false},
+      {AO::kAtomicExchangeN, AtomicOp::ATOMIC_EXCHANGE, false},
+      // C11 fetch-op.
+      {AO::kC11AtomicFetchAdd, AtomicOp::ATOMIC_ADD, false},
+      {AO::kC11AtomicFetchSub, AtomicOp::ATOMIC_SUB, false},
+      {AO::kC11AtomicFetchAnd, AtomicOp::ATOMIC_AND, false},
+      {AO::kC11AtomicFetchOr, AtomicOp::ATOMIC_OR, false},
+      {AO::kC11AtomicFetchXor, AtomicOp::ATOMIC_XOR, false},
+      {AO::kC11AtomicFetchNand, AtomicOp::ATOMIC_NAND, false},
+      // C11 exchange.
+      {AO::kC11AtomicExchange, AtomicOp::ATOMIC_EXCHANGE, false},
+      // Scoped fetch-op.
+      {AO::kScopedAtomicFetchAdd, AtomicOp::ATOMIC_ADD, false},
+      {AO::kScopedAtomicFetchSub, AtomicOp::ATOMIC_SUB, false},
+      {AO::kScopedAtomicFetchAnd, AtomicOp::ATOMIC_AND, false},
+      {AO::kScopedAtomicFetchOr, AtomicOp::ATOMIC_OR, false},
+      {AO::kScopedAtomicFetchXor, AtomicOp::ATOMIC_XOR, false},
+      {AO::kScopedAtomicFetchNand, AtomicOp::ATOMIC_NAND, false},
+      // Scoped op-fetch.
+      {AO::kScopedAtomicAddFetch, AtomicOp::ATOMIC_ADD, true},
+      {AO::kScopedAtomicSubFetch, AtomicOp::ATOMIC_SUB, true},
+      {AO::kScopedAtomicAndFetch, AtomicOp::ATOMIC_AND, true},
+      {AO::kScopedAtomicOrFetch, AtomicOp::ATOMIC_OR, true},
+      {AO::kScopedAtomicXorFetch, AtomicOp::ATOMIC_XOR, true},
+      {AO::kScopedAtomicNandFetch, AtomicOp::ATOMIC_NAND, true},
+      // Scoped exchange.
+      {AO::kScopedAtomicExchange, AtomicOp::ATOMIC_EXCHANGE, false},
+      {AO::kScopedAtomicExchangeN, AtomicOp::ATOMIC_EXCHANGE, false},
+      // HIP/OpenCL exchange.
+      {AO::kHipAtomicExchange, AtomicOp::ATOMIC_EXCHANGE, false},
+      {AO::kOpenclAtomicExchange, AtomicOp::ATOMIC_EXCHANGE, false},
+      // HIP fetch-op.
+      {AO::kHipAtomicFetchAdd, AtomicOp::ATOMIC_ADD, false},
+      {AO::kHipAtomicFetchSub, AtomicOp::ATOMIC_SUB, false},
+      {AO::kHipAtomicFetchAnd, AtomicOp::ATOMIC_AND, false},
+      {AO::kHipAtomicFetchOr, AtomicOp::ATOMIC_OR, false},
+      {AO::kHipAtomicFetchXor, AtomicOp::ATOMIC_XOR, false},
+      // OpenCL fetch-op.
+      {AO::kOpenclAtomicFetchAdd, AtomicOp::ATOMIC_ADD, false},
+      {AO::kOpenclAtomicFetchSub, AtomicOp::ATOMIC_SUB, false},
+      {AO::kOpenclAtomicFetchAnd, AtomicOp::ATOMIC_AND, false},
+      {AO::kOpenclAtomicFetchOr, AtomicOp::ATOMIC_OR, false},
+      {AO::kOpenclAtomicFetchXor, AtomicOp::ATOMIC_XOR, false},
+    };
+
+    for (const auto &m : mappings) {
+      if (aop == m.op) {
+        InstructionIR rmw;
+        rmw.opcode = mx::ir::OpCode::READ_MODIFY_WRITE;
+        rmw.source_entity_id = eid;
+        rmw.compound_op = SizedAtomicOp(m.underlying, val_width);
+        rmw.flags = m.returns_new ? 1u : 0u;
+        rmw.operand_indices.push_back(EmitRValue(ae->Pointer()));
+        if (auto val1 = ae->Value1()) {
+          rmw.operand_indices.push_back(EmitRValue(*val1));
+        }
+        rmw.is_big_endian = ctx_.getTargetInfo().isBigEndian();
+        rmw.size_bytes = val_width;
+        return emit_typed(std::move(rmw));
+      }
+    }
+    // Compare-exchange, fetch_min/max, and other unhandled atomic ops
+    // fall through to UNKNOWN.
+  }
+
   // Emit UNKNOWN for anything we haven't explicitly handled.
   InstructionIR inst;
   inst.opcode = mx::ir::OpCode::UNKNOWN;

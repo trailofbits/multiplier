@@ -114,12 +114,6 @@ class MX_EXPORT ConcretePolicy
   ConcreteMemory &memory_;
   FunctionResolver func_resolver_;
   GlobalResolver global_resolver_;
-
-  // Concrete-only helpers. Never called by the interpreter.
-  static uint64_t extract_address(const Value &val);
-  static bool has_concrete_address(const Value &val);
-  void write_value_to_mem(uint64_t address, const Value &val, size_t size);
-  Value read_value_from_mem(uint64_t address, size_t size, bool is_float);
 };
 
 }  // namespace mx::ir::interpret

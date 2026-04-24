@@ -102,4 +102,25 @@ MX_EXPORT Value concrete_float_intrinsic(FloatOp sub,
                                          const std::vector<Value> &operands);
 MX_EXPORT std::optional<bool> concrete_is_true(const Value &val);
 
+// ===========================================================================
+// Memory address helpers (pure value operations, no memory needed).
+// ===========================================================================
+
+MX_EXPORT uint64_t concrete_extract_address(const Value &val);
+MX_EXPORT bool concrete_has_address(const Value &val);
+
+// ===========================================================================
+// Memory read/write and bulk operations.
+// ===========================================================================
+
+class ConcreteMemory;
+
+MX_EXPORT void concrete_write_to_mem(ConcreteMemory &memory, uint64_t address,
+                                     const Value &val, size_t size);
+MX_EXPORT Value concrete_read_from_mem(ConcreteMemory &memory, uint64_t address,
+                                       size_t size, bool is_float);
+MX_EXPORT bool concrete_mem_bulk_op(ConcreteMemory &memory, MemOp sub,
+                                    const std::vector<Value> &ops,
+                                    const MemoryInst &mi, Value &result);
+
 }  // namespace mx::ir::interpret

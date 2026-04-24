@@ -144,12 +144,6 @@ class PythonPolicy
   // Look up a method on the policy, caching the result.  Returns the
   // bound method (borrowed ref) or nullptr if the method doesn't exist.
   PyObject *lookup_method(PyObject *&cache, const char *name);
-
-  // Concrete helpers for memory operations.
-  static uint64_t extract_address(const Value &val);
-  static bool has_concrete_address(const Value &val);
-  void write_value_to_mem(uint64_t address, const Value &val, size_t size);
-  Value read_value_from_mem(uint64_t address, size_t size, bool is_float);
 };
 
 // Symbolic dispatch helpers called from unified init_state/step.

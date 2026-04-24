@@ -29,10 +29,10 @@ ConcretePolicy::ConcretePolicy(ConcreteMemory &memory,
       global_resolver_(std::move(global_resolver)) {}
 
 // ===========================================================================
-// Concrete-only helpers
+// Shared memory helpers — free functions usable by any policy.
 // ===========================================================================
 
-uint64_t ConcretePolicy::extract_address(const Value &val) {
+uint64_t concrete_extract_address(const Value &val) {
   if (auto *p = as_pointer(val)) {
     return concrete_address(*p);
   }
@@ -42,15 +42,15 @@ uint64_t ConcretePolicy::extract_address(const Value &val) {
   return 0;
 }
 
-bool ConcretePolicy::has_concrete_address(const Value &val) {
+bool concrete_has_address(const Value &val) {
   if (auto *p = as_pointer(val)) {
     return is_concrete(*p);
   }
   return std::holds_alternative<ScalarValue>(val);
 }
 
-void ConcretePolicy::write_value_to_mem(uint64_t address, const Value &val,
-                                        size_t size) {
+void concrete_write_to_mem(ConcreteMemory &memory_, uint64_t address,
+                           const Value &val, size_t size) {
   // Pointers are just integers — extract raw bits from any Value variant.
   uint64_t bits = 0;
   if (auto *ptr = as_pointer(val)) {
@@ -67,8 +67,8 @@ void ConcretePolicy::write_value_to_mem(uint64_t address, const Value &val,
                 static_cast<uint32_t>(std::min(size, sizeof(bits))));
 }
 
-Value ConcretePolicy::read_value_from_mem(uint64_t address, size_t size,
-                                          bool is_float) {
+Value concrete_read_from_mem(ConcreteMemory &memory_, uint64_t address,
+                             size_t size, bool is_float) {
   if (is_float) {
     if (size == 4) {
       float f = 0;
@@ -785,33 +785,34 @@ Value ConcretePolicy::mem_allocate(NoOpScheduler &, uint64_t size_bytes,
 }
 
 void ConcretePolicy::mem_free(NoOpScheduler &, const Value &address) {
-  if (has_concrete_address(address)) {
-    memory_.free(extract_address(address));
+  if (concrete_has_address(address)) {
+    memory_.free(concrete_extract_address(address));
   }
 }
 
 bool ConcretePolicy::mem_read(NoOpScheduler &, const Value &addr,
                               const MemAccessHint &hint, Value &result) {
-  if (!has_concrete_address(addr)) {
+  if (!concrete_has_address(addr)) {
     result = Undefined{};
     return true;  // not dead, just couldn't read
   }
-  result = read_value_from_mem(extract_address(addr), hint.size_bytes,
-                               hint.is_float);
+  result = concrete_read_from_mem(memory_, concrete_extract_address(addr),
+                                  hint.size_bytes, hint.is_float);
   return true;
 }
 
 bool ConcretePolicy::mem_write(NoOpScheduler &, const Value &addr,
                                const Value &val,
                                const MemAccessHint &hint) {
-  if (!has_concrete_address(addr)) return true;
-  write_value_to_mem(extract_address(addr), val, hint.size_bytes);
+  if (!concrete_has_address(addr)) return true;
+  concrete_write_to_mem(memory_, concrete_extract_address(addr), val,
+                        hint.size_bytes);
   return true;
 }
 
-bool ConcretePolicy::mem_bulk_op(NoOpScheduler &, MemOp sub,
-                                 const std::vector<Value> &ops,
-                                 const MemoryInst &mi, Value &result) {
+bool concrete_mem_bulk_op(ConcreteMemory &memory_, MemOp sub,
+                          const std::vector<Value> &ops,
+                          const MemoryInst &mi, Value &result) {
   result = make_undef();
   using MO = ir::MemOp;
 
@@ -1274,15 +1275,21 @@ bool ConcretePolicy::mem_bulk_op(NoOpScheduler &, MemOp sub,
   return true;
 }
 
+bool ConcretePolicy::mem_bulk_op(NoOpScheduler &, MemOp sub,
+                                 const std::vector<Value> &ops,
+                                 const MemoryInst &mi, Value &result) {
+  return concrete_mem_bulk_op(memory_, sub, ops, mi, result);
+}
+
 void ConcretePolicy::mem_poison(const Value &addr) {
-  if (has_concrete_address(addr)) {
-    memory_.poison(extract_address(addr));
+  if (concrete_has_address(addr)) {
+    memory_.poison(concrete_extract_address(addr));
   }
 }
 
 void ConcretePolicy::mem_unpoison(const Value &addr) {
-  if (has_concrete_address(addr)) {
-    memory_.unpoison(extract_address(addr));
+  if (concrete_has_address(addr)) {
+    memory_.unpoison(concrete_extract_address(addr));
   }
 }
 
