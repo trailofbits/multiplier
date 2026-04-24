@@ -56,7 +56,7 @@ PyObject *value_to_python(const Value &v) {
     uint64_t addr = concrete_address(*p);
     return Py_BuildValue("(sK)", "ptr", addr);
   }
-  if (std::holds_alternative<NullPtr>(v)) {
+  if (is_null(v)) {
     Py_RETURN_NONE;
   }
   if (gUndefSentinel) {
@@ -68,7 +68,7 @@ PyObject *value_to_python(const Value &v) {
 
 Value python_to_value(PyObject *obj) {
   if (obj == nullptr || obj == Py_None) {
-    return NullPtr{};
+    return Pointer(0);
   }
   if (gUndefSentinel && obj == gUndefSentinel) {
     return Undefined{};
@@ -125,6 +125,7 @@ struct ConcretePolicyWrapper {
 struct InterpreterStateWrapper {
   PyObject_HEAD
   InterpreterState<Value> *state;
+  InterpreterState<SharedPyPtr> *symbolic_state;
 };
 
 // Forward declarations.
@@ -222,12 +223,14 @@ static int ConcretePolicyWrapper_init(ConcretePolicyWrapper *self,
 
 static void InterpreterStateWrapper_dealloc(InterpreterStateWrapper *self) {
   delete self->state;
+  delete self->symbolic_state;
   Py_TYPE(self)->tp_free(reinterpret_cast<PyObject *>(self));
 }
 
 static int InterpreterStateWrapper_init(
     InterpreterStateWrapper *self, PyObject *, PyObject *) {
   self->state = new InterpreterState<Value>();
+  self->symbolic_state = new InterpreterState<SharedPyPtr>();
   return 0;
 }
 

@@ -3,11 +3,6 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-// Python bindings for symbolic execution via PythonPolicy.
-// Delegates value operations to a Python object, falling back to concrete
-// computation when the Python policy doesn't implement a method or returns
-// NotImplemented.
-
 #include "SymbolicInterpreter.h"
 
 #include <multiplier/IR/Interpret/InterpreterLoop.h>
@@ -36,8 +31,7 @@ using ir::FloatOp;
 using ir::MemOp;
 
 // ===========================================================================
-// Value <-> Python conversion (duplicated from Interpreter.cpp since the
-// originals live in an anonymous namespace)
+// Value <-> Python helpers (for concrete fallback inside policy methods)
 // ===========================================================================
 
 namespace {
@@ -55,16 +49,15 @@ PyObject *value_to_python(const Value &v) {
     uint64_t addr = concrete_address(*p);
     return Py_BuildValue("(sK)", "ptr", addr);
   }
-  if (std::holds_alternative<NullPtr>(v)) {
+  if (is_null(v)) {
     Py_RETURN_NONE;
   }
-  // Undefined -> None.
   Py_RETURN_NONE;
 }
 
 Value python_to_value(PyObject *obj) {
   if (obj == nullptr || obj == Py_None) {
-    return NullPtr{};
+    return Pointer(0);
   }
   if (PyLong_Check(obj)) {
     int64_t v = PyLong_AsLongLong(obj);
@@ -80,8 +73,7 @@ Value python_to_value(PyObject *obj) {
     return make_int(v);
   }
   if (PyFloat_Check(obj)) {
-    double v = PyFloat_AsDouble(obj);
-    return make_float(v);
+    return make_float(PyFloat_AsDouble(obj));
   }
   if (PyTuple_Check(obj) && PyTuple_Size(obj) == 2) {
     PyObject *tag = PyTuple_GetItem(obj, 0);
@@ -97,17 +89,36 @@ Value python_to_value(PyObject *obj) {
   return Undefined{};
 }
 
-// Wrapper struct layouts — must match the anonymous-namespace structs
-// in Interpreter.cpp exactly so we can reinterpret_cast PyObjects.
+// Convert concrete Value -> SharedPyPtr (for concrete fallback results).
+SharedPyPtr value_to_shared(const Value &v) {
+  PyObject *obj = value_to_python(v);
+  SharedPyPtr result(obj);
+  Py_XDECREF(obj);  // SharedPyPtr constructor INCREFed
+  return result;
+}
 
+// Check if a SharedPyPtr holds a ("ptr", addr) tuple.
+std::optional<uint64_t> extract_ptr_tuple(PyObject *obj) {
+  if (!obj || !PyTuple_Check(obj) || PyTuple_Size(obj) != 2) return std::nullopt;
+  PyObject *tag = PyTuple_GetItem(obj, 0);
+  if (!tag || !PyUnicode_Check(tag)) return std::nullopt;
+  const char *s = PyUnicode_AsUTF8(tag);
+  if (!s || std::strcmp(s, "ptr") != 0) return std::nullopt;
+  PyObject *addr_obj = PyTuple_GetItem(obj, 1);
+  return PyLong_AsUnsignedLongLong(addr_obj);
+}
+
+// Wrapper struct layouts — must match Interpreter.cpp exactly.
 struct ConcreteMemoryWrapper {
   PyObject_HEAD
   ConcreteMemory *memory;
 };
 
+// Must match InterpreterStateWrapper in Interpreter.cpp.
 struct InterpreterStateWrapper {
   PyObject_HEAD
   InterpreterState<Value> *state;
+  InterpreterState<SharedPyPtr> *symbolic_state;
 };
 
 }  // namespace
@@ -125,6 +136,7 @@ PythonPolicy::PythonPolicy(PyObject *py_policy, ConcreteMemory &memory,
       global_resolver_(std::move(global_resolver)) {}
 
 PythonPolicy::~PythonPolicy() {
+  Py_XDECREF(cached_make_const_);
   Py_XDECREF(cached_binary_op_);
   Py_XDECREF(cached_unary_op_);
   Py_XDECREF(cached_compare_);
@@ -133,14 +145,11 @@ PythonPolicy::~PythonPolicy() {
   Py_XDECREF(cached_resolve_branch_);
 }
 
-// Look up a method on the Python policy object, caching the result.
-// Returns the bound method (borrowed reference) or nullptr if the method
-// doesn't exist.  Uses Py_None as the sentinel for "looked up, not found".
 PyObject *PythonPolicy::lookup_method(PyObject *&cache, const char *name) {
   if (!cache) {
     PyObject *method = PyObject_GetAttrString(py_policy_.Get(), name);
     if (method) {
-      cache = method;  // new ref from GetAttrString; we own it
+      cache = method;
     } else {
       PyErr_Clear();
       cache = Py_None;
@@ -151,134 +160,193 @@ PyObject *PythonPolicy::lookup_method(PyObject *&cache, const char *name) {
 }
 
 // ===========================================================================
-// 1. Value construction — always concrete
+// 0. Value extraction / construction
 // ===========================================================================
 
-Value PythonPolicy::make_const(ConstOp op, int64_t signed_val,
-                               uint64_t unsigned_val) {
-  return concrete_make_const(op, signed_val, unsigned_val);
+std::optional<uint64_t> PythonPolicy::extract_address(const SharedPyPtr &val) {
+  return extract_ptr_tuple(val.Get());
 }
 
-Value PythonPolicy::make_null_ptr(void) { return NullPtr{}; }
+int64_t PythonPolicy::extract_int(const SharedPyPtr &val) {
+  PyObject *obj = val.Get();
+  if (obj && PyLong_Check(obj)) return PyLong_AsLongLong(obj);
+  return 0;
+}
+
+uint64_t PythonPolicy::extract_uint(const SharedPyPtr &val) {
+  PyObject *obj = val.Get();
+  if (obj && PyLong_Check(obj)) return PyLong_AsUnsignedLongLong(obj);
+  return 0;
+}
+
+SharedPyPtr PythonPolicy::make_literal_int(int64_t v, uint8_t) {
+  PyObject *obj = PyLong_FromLongLong(v);
+  SharedPyPtr result(obj);
+  Py_XDECREF(obj);
+  return result;
+}
+
+SharedPyPtr PythonPolicy::make_literal_ptr(uint64_t addr) {
+  PyObject *obj = Py_BuildValue("(sK)", "ptr", addr);
+  SharedPyPtr result(obj);
+  Py_XDECREF(obj);
+  return result;
+}
+
+SharedPyPtr PythonPolicy::make_default() {
+  return SharedPyPtr(Py_None);
+}
+
+bool PythonPolicy::has_address(const SharedPyPtr &val) {
+  return extract_ptr_tuple(val.Get()).has_value();
+}
 
 // ===========================================================================
-// 2. Arithmetic / logic — delegates to Python if available
+// 1. Value construction
 // ===========================================================================
 
-Value PythonPolicy::binary_op(OpCode op, const Value &lhs, const Value &rhs) {
+SharedPyPtr PythonPolicy::make_const(ConstOp op, int64_t signed_val,
+                                      uint64_t unsigned_val) {
+  if (PyObject *method = lookup_method(cached_make_const_, "make_const")) {
+    PyObject *result = PyObject_CallFunction(
+        method, "ilK", static_cast<int>(op), signed_val, unsigned_val);
+    if (result && result != Py_NotImplemented) {
+      SharedPyPtr v(result);
+      Py_DECREF(result);
+      return v;
+    }
+    Py_XDECREF(result);
+    PyErr_Clear();
+  }
+  return value_to_shared(concrete_make_const(op, signed_val, unsigned_val));
+}
+
+SharedPyPtr PythonPolicy::make_null_ptr(void) {
+  return SharedPyPtr(Py_None);
+}
+
+// ===========================================================================
+// 2. Arithmetic / logic
+// ===========================================================================
+
+SharedPyPtr PythonPolicy::binary_op(OpCode op, const SharedPyPtr &lhs,
+                                     const SharedPyPtr &rhs) {
   if (PyObject *method = lookup_method(cached_binary_op_, "binary_op")) {
-    PyObject *py_lhs = value_to_python(lhs);
-    PyObject *py_rhs = value_to_python(rhs);
     PyObject *result = PyObject_CallFunction(
-        method, "iOO", static_cast<int>(op), py_lhs, py_rhs);
-    Py_XDECREF(py_lhs);
-    Py_XDECREF(py_rhs);
+        method, "iOO", static_cast<int>(op), lhs.Get(), rhs.Get());
     if (result && result != Py_NotImplemented) {
-      Value v = python_to_value(result);
+      SharedPyPtr v(result);
       Py_DECREF(result);
       return v;
     }
     Py_XDECREF(result);
     PyErr_Clear();
   }
-  return concrete_binary_op(op, lhs, rhs);
+  return value_to_shared(concrete_binary_op(
+      op, python_to_value(lhs.Get()), python_to_value(rhs.Get())));
 }
 
-Value PythonPolicy::unary_op(OpCode op, const Value &operand) {
+SharedPyPtr PythonPolicy::unary_op(OpCode op, const SharedPyPtr &operand) {
   if (PyObject *method = lookup_method(cached_unary_op_, "unary_op")) {
-    PyObject *py_operand = value_to_python(operand);
     PyObject *result = PyObject_CallFunction(
-        method, "iO", static_cast<int>(op), py_operand);
-    Py_XDECREF(py_operand);
+        method, "iO", static_cast<int>(op), operand.Get());
     if (result && result != Py_NotImplemented) {
-      Value v = python_to_value(result);
+      SharedPyPtr v(result);
       Py_DECREF(result);
       return v;
     }
     Py_XDECREF(result);
     PyErr_Clear();
   }
-  return concrete_unary_op(op, operand);
+  return value_to_shared(concrete_unary_op(op, python_to_value(operand.Get())));
 }
 
-Value PythonPolicy::compare(OpCode op, const Value &lhs, const Value &rhs) {
+SharedPyPtr PythonPolicy::compare(OpCode op, const SharedPyPtr &lhs,
+                                   const SharedPyPtr &rhs) {
   if (PyObject *method = lookup_method(cached_compare_, "compare")) {
-    PyObject *py_lhs = value_to_python(lhs);
-    PyObject *py_rhs = value_to_python(rhs);
     PyObject *result = PyObject_CallFunction(
-        method, "iOO", static_cast<int>(op), py_lhs, py_rhs);
-    Py_XDECREF(py_lhs);
-    Py_XDECREF(py_rhs);
+        method, "iOO", static_cast<int>(op), lhs.Get(), rhs.Get());
     if (result && result != Py_NotImplemented) {
-      Value v = python_to_value(result);
+      SharedPyPtr v(result);
       Py_DECREF(result);
       return v;
     }
     Py_XDECREF(result);
     PyErr_Clear();
   }
-  return concrete_compare(op, lhs, rhs);
+  return value_to_shared(concrete_compare(
+      op, python_to_value(lhs.Get()), python_to_value(rhs.Get())));
 }
 
-Value PythonPolicy::cast(CastOp op, const Value &operand) {
+SharedPyPtr PythonPolicy::cast(CastOp op, const SharedPyPtr &operand) {
   if (PyObject *method = lookup_method(cached_cast_, "cast")) {
-    PyObject *py_operand = value_to_python(operand);
     PyObject *result = PyObject_CallFunction(
-        method, "iO", static_cast<int>(op), py_operand);
-    Py_XDECREF(py_operand);
+        method, "iO", static_cast<int>(op), operand.Get());
     if (result && result != Py_NotImplemented) {
-      Value v = python_to_value(result);
+      SharedPyPtr v(result);
       Py_DECREF(result);
       return v;
     }
     Py_XDECREF(result);
     PyErr_Clear();
   }
-  return concrete_cast(op, operand);
+  return value_to_shared(concrete_cast(op, python_to_value(operand.Get())));
 }
 
-Value PythonPolicy::ptr_add(const Value &base, const Value &index,
-                            int64_t element_size) {
-  return concrete_ptr_add(base, index, element_size);
+SharedPyPtr PythonPolicy::ptr_add(const SharedPyPtr &base,
+                                   const SharedPyPtr &index,
+                                   int64_t element_size) {
+  return value_to_shared(concrete_ptr_add(
+      python_to_value(base.Get()), python_to_value(index.Get()), element_size));
 }
 
-Value PythonPolicy::ptr_diff(const Value &lhs, const Value &rhs,
-                             int64_t element_size) {
-  return concrete_ptr_diff(lhs, rhs, element_size);
+SharedPyPtr PythonPolicy::ptr_diff(const SharedPyPtr &lhs,
+                                    const SharedPyPtr &rhs,
+                                    int64_t element_size) {
+  return value_to_shared(concrete_ptr_diff(
+      python_to_value(lhs.Get()), python_to_value(rhs.Get()), element_size));
 }
 
-Value PythonPolicy::ptr_offset(const Value &base, int64_t byte_offset) {
-  return concrete_ptr_offset(base, byte_offset);
+SharedPyPtr PythonPolicy::ptr_offset(const SharedPyPtr &base,
+                                      int64_t byte_offset) {
+  return value_to_shared(concrete_ptr_offset(
+      python_to_value(base.Get()), byte_offset));
 }
 
-Value PythonPolicy::select(const Value &cond, const Value &if_true,
-                           const Value &if_false) {
-  return concrete_select(cond, if_true, if_false);
+SharedPyPtr PythonPolicy::select(const SharedPyPtr &cond,
+                                  const SharedPyPtr &if_true,
+                                  const SharedPyPtr &if_false) {
+  return value_to_shared(concrete_select(
+      python_to_value(cond.Get()), python_to_value(if_true.Get()),
+      python_to_value(if_false.Get())));
 }
 
-Value PythonPolicy::bitwise_intrinsic(OpCode width_op, BitwiseOp sub,
-                                      const Value &val, const Value &val2) {
-  return concrete_bitwise_intrinsic(width_op, sub, val, val2);
+SharedPyPtr PythonPolicy::bitwise_intrinsic(OpCode width_op, BitwiseOp sub,
+                                             const SharedPyPtr &val,
+                                             const SharedPyPtr &val2) {
+  return value_to_shared(concrete_bitwise_intrinsic(
+      width_op, sub, python_to_value(val.Get()), python_to_value(val2.Get())));
 }
 
-Value PythonPolicy::float_intrinsic(FloatOp sub,
-                                    const std::vector<Value> &operands) {
-  return concrete_float_intrinsic(sub, operands);
+SharedPyPtr PythonPolicy::float_intrinsic(
+    FloatOp sub, const std::vector<SharedPyPtr> &operands) {
+  std::vector<Value> concrete_ops;
+  concrete_ops.reserve(operands.size());
+  for (auto &op : operands) concrete_ops.push_back(python_to_value(op.Get()));
+  return value_to_shared(concrete_float_intrinsic(sub, concrete_ops));
 }
 
 // ===========================================================================
-// 3. Truth test — delegates to Python if available
+// 3. Truth test
 // ===========================================================================
 
-std::optional<bool> PythonPolicy::is_true(const Value &val) {
+std::optional<bool> PythonPolicy::is_true(const SharedPyPtr &val) {
   if (PyObject *method = lookup_method(cached_is_true_, "is_true")) {
-    PyObject *py_val = value_to_python(val);
-    PyObject *result = PyObject_CallFunction(method, "O", py_val);
-    Py_XDECREF(py_val);
+    PyObject *result = PyObject_CallFunction(method, "O", val.Get());
     if (result && result != Py_NotImplemented) {
       if (result == Py_None) {
         Py_DECREF(result);
-        return std::nullopt;  // Python says "I don't know".
+        return std::nullopt;
       }
       bool truth = PyObject_IsTrue(result);
       Py_DECREF(result);
@@ -287,87 +355,89 @@ std::optional<bool> PythonPolicy::is_true(const Value &val) {
     Py_XDECREF(result);
     PyErr_Clear();
   }
-  return concrete_is_true(val);
+  return concrete_is_true(python_to_value(val.Get()));
 }
 
 // ===========================================================================
-// 4. Memory — concrete implementation (identical to ConcretePolicy)
+// 4. Memory
 // ===========================================================================
 
-Value PythonPolicy::mem_allocate(PythonScheduler &, uint64_t size_bytes,
-                                 uint64_t align_bytes) {
-  return make_ptr(memory_.allocate(size_bytes, align_bytes));
+SharedPyPtr PythonPolicy::mem_allocate(PythonScheduler &, uint64_t size_bytes,
+                                        uint64_t align_bytes) {
+  return make_literal_ptr(memory_.allocate(size_bytes, align_bytes));
 }
 
-void PythonPolicy::mem_free(PythonScheduler &, const Value &address) {
-  if (concrete_has_address(address)) {
-    memory_.free(concrete_extract_address(address));
+void PythonPolicy::mem_free(PythonScheduler &, const SharedPyPtr &address) {
+  if (auto addr = extract_address(address)) {
+    memory_.free(*addr);
   }
 }
 
-bool PythonPolicy::mem_read(PythonScheduler &, const Value &addr,
-                            const MemAccessHint &hint, Value &result) {
-  if (!concrete_has_address(addr)) {
-    result = Undefined{};
+bool PythonPolicy::mem_read(PythonScheduler &, const SharedPyPtr &addr,
+                             const MemAccessHint &hint, SharedPyPtr &result) {
+  auto a = extract_address(addr);
+  if (!a) {
+    result = make_default();
     return true;
   }
-  result = concrete_read_from_mem(memory_, concrete_extract_address(addr),
-                                  hint.size_bytes, hint.is_float);
+  result = value_to_shared(concrete_read_from_mem(memory_, *a,
+                                                   hint.size_bytes,
+                                                   hint.is_float));
   return true;
 }
 
-bool PythonPolicy::mem_write(PythonScheduler &, const Value &addr,
-                             const Value &val, const MemAccessHint &hint) {
-  if (!concrete_has_address(addr)) return true;
-  concrete_write_to_mem(memory_, concrete_extract_address(addr), val,
-                        hint.size_bytes, hint.is_float);
+bool PythonPolicy::mem_write(PythonScheduler &, const SharedPyPtr &addr,
+                              const SharedPyPtr &val,
+                              const MemAccessHint &hint) {
+  auto a = extract_address(addr);
+  if (!a) return true;
+  concrete_write_to_mem(memory_, *a, python_to_value(val.Get()),
+                        hint.size_bytes);
   return true;
 }
 
 bool PythonPolicy::mem_bulk_op(PythonScheduler &, MemOp sub,
-                               const std::vector<Value> &ops,
-                               const MemoryInst &mi, Value &result) {
-  return concrete_mem_bulk_op(memory_, sub, ops, mi, result);
+                                const std::vector<SharedPyPtr> &ops,
+                                const MemoryInst &mi, SharedPyPtr &result) {
+  std::vector<Value> concrete_ops;
+  concrete_ops.reserve(ops.size());
+  for (auto &op : ops) concrete_ops.push_back(python_to_value(op.Get()));
+  Value concrete_result;
+  bool alive = concrete_mem_bulk_op(memory_, sub, concrete_ops, mi,
+                                     concrete_result);
+  result = value_to_shared(concrete_result);
+  return alive;
 }
 
-void PythonPolicy::mem_poison(const Value &addr) {
-  if (concrete_has_address(addr)) {
-    memory_.poison(concrete_extract_address(addr));
-  }
+void PythonPolicy::mem_poison(const SharedPyPtr &addr) {
+  if (auto a = extract_address(addr)) memory_.poison(*a);
 }
 
-void PythonPolicy::mem_unpoison(const Value &addr) {
-  if (concrete_has_address(addr)) {
-    memory_.unpoison(concrete_extract_address(addr));
-  }
+void PythonPolicy::mem_unpoison(const SharedPyPtr &addr) {
+  if (auto a = extract_address(addr)) memory_.unpoison(*a);
 }
 
-bool PythonPolicy::is_undefined(const Value &val) {
-  return std::holds_alternative<Undefined>(val);
+bool PythonPolicy::is_undefined(const SharedPyPtr &val) {
+  PyObject *obj = val.Get();
+  return obj == nullptr || obj == Py_None;
 }
 
 // ===========================================================================
 // 5. Resolution
 // ===========================================================================
 
-bool PythonPolicy::resolve_branch(PythonScheduler &sched,
-                                  const Value &condition,
-                                  IRBlock true_block, IRBlock false_block,
-                                  IRBlock &chosen_block) {
+bool PythonPolicy::resolve_branch(PythonScheduler &,
+                                   const SharedPyPtr &condition,
+                                   IRBlock true_block, IRBlock false_block,
+                                   IRBlock &chosen_block) {
   if (PyObject *method = lookup_method(cached_resolve_branch_,
                                        "resolve_branch")) {
-    PyObject *py_cond = value_to_python(condition);
     auto true_eid = EntityId(true_block.id()).Pack();
     auto false_eid = EntityId(false_block.id()).Pack();
     PyObject *result = PyObject_CallFunction(
-        method, "OKK", py_cond, true_eid, false_eid);
-    Py_XDECREF(py_cond);
+        method, "OKK", condition.Get(), true_eid, false_eid);
     if (result && result != Py_NotImplemented) {
       if (result == Py_None) {
-        // Python says "fork both paths". Return false so the caller
-        // (decide_cond_branch) emits a branch Continuation with a
-        // state snapshot. The Python explorer can resume both paths
-        // from that snapshot.
         Py_DECREF(result);
         return false;
       }
@@ -376,7 +446,6 @@ bool PythonPolicy::resolve_branch(PythonScheduler &sched,
         chosen_block = true_block;
         return true;
       }
-      // Python returned False -> take false branch.
       Py_DECREF(result);
       chosen_block = false_block;
       return true;
@@ -384,41 +453,40 @@ bool PythonPolicy::resolve_branch(PythonScheduler &sched,
     Py_XDECREF(result);
     PyErr_Clear();
   }
-  // Default: take true path (same as ConcretePolicy).
   chosen_block = true_block;
   return true;
 }
 
 bool PythonPolicy::resolve_call(PythonScheduler &,
-                                const IRInstruction &,
-                                RawEntityId target_eid,
-                                RawEntityId indirect_target_eid,
-                                const std::vector<Value> &,
-                                bool, CallResolution &resolution) {
+                                 const IRInstruction &,
+                                 RawEntityId target_eid,
+                                 RawEntityId indirect_target_eid,
+                                 const std::vector<SharedPyPtr> &,
+                                 bool,
+                                 CallResolution<SharedPyPtr> &resolution) {
   if (func_resolver_) {
     for (auto eid : {target_eid, indirect_target_eid}) {
       if (eid != kInvalidEntityId) {
         if (auto ir = func_resolver_(eid)) {
-          resolution = CallResolution{
-              .action = CallAction::INLINE,
-              .return_value = Undefined{},
-              .callee_ir = *std::move(ir)};
+          resolution.action = CallAction::INLINE;
+          resolution.return_value = make_default();
+          resolution.callee_ir = *std::move(ir);
           return true;
         }
       }
     }
   }
-  resolution = CallResolution{.action = CallAction::SKIP,
-                              .return_value = Undefined{}};
+  resolution.action = CallAction::SKIP;
+  resolution.return_value = make_default();
   return true;
 }
 
 bool PythonPolicy::resolve_global(PythonScheduler &,
-                                  RawEntityId entity_id,
-                                  GlobalResolution &resolution) {
+                                   RawEntityId entity_id,
+                                   GlobalResolution &resolution) {
   if (global_resolver_) {
     if (auto info = global_resolver_(entity_id)) {
-      resolution = GlobalResolution{.info = *std::move(info)};
+      resolution.info = *std::move(info);
       return true;
     }
   }
@@ -427,7 +495,7 @@ bool PythonPolicy::resolve_global(PythonScheduler &,
 }
 
 // ===========================================================================
-// Symbolic dispatch helpers (called from unified init_state/step)
+// Symbolic dispatch helpers
 // ===========================================================================
 
 namespace {
@@ -475,35 +543,6 @@ GlobalResolver make_global_resolver(PyObject *obj) {
   };
 }
 
-PyObject *fork_to_python(const PythonScheduler::Fork &fork) {
-  PyObject *dict = PyDict_New();
-  if (!dict) return nullptr;
-  auto *transition_copy = new Transition(fork.transition);
-  PyObject *capsule = PyCapsule_New(
-      transition_copy, "transition",
-      [](PyObject *cap) {
-        auto *t = static_cast<Transition *>(
-            PyCapsule_GetPointer(cap, "transition"));
-        delete t;
-      });
-  PyDict_SetItemString(dict, "transition", capsule);
-  Py_XDECREF(capsule);
-  return dict;
-}
-
-PyObject *continuation_to_python(const Continuation &cont) {
-  if (cont.is_terminal()) {
-    if (cont.kind() == Continuation::COMPLETED) {
-      PyObject *py_val = value_to_python(cont.return_value());
-      return Py_BuildValue("(sN)", "completed", py_val);
-    }
-    return Py_BuildValue("(si)", "error",
-                         static_cast<int>(cont.error()));
-  }
-  return Py_BuildValue("(si)", "suspended",
-                       static_cast<int>(cont.kind()));
-}
-
 }  // namespace
 
 PyObject *SymbolicInitState(PyObject *state_obj, PyObject *memory_obj,
@@ -520,10 +559,11 @@ PyObject *SymbolicInitState(PyObject *state_obj, PyObject *memory_obj,
     return nullptr;
   }
 
-  std::vector<Value> c_args;
+  // Wrap Python args as SharedPyPtr directly.
+  std::vector<SharedPyPtr> c_args;
   if (args_list && args_list != Py_None && PyList_Check(args_list)) {
     for (Py_ssize_t i = 0; i < PyList_Size(args_list); ++i) {
-      c_args.push_back(python_to_value(PyList_GetItem(args_list, i)));
+      c_args.emplace_back(PyList_GetItem(args_list, i));
     }
   }
 
@@ -532,8 +572,8 @@ PyObject *SymbolicInitState(PyObject *state_obj, PyObject *memory_obj,
                        make_global_resolver(global_resolver_obj));
   PythonScheduler sched;
 
-  interp_init_state<PythonPolicy, PythonScheduler, Value>(
-      policy, sched, *sw->state, *func, c_args);
+  interp_init_state<PythonPolicy, PythonScheduler, SharedPyPtr>(
+      policy, sched, *sw->symbolic_state, *func, c_args);
 
   Py_RETURN_NONE;
 }
@@ -550,30 +590,52 @@ PyObject *SymbolicStep(PyObject *state_obj, PyObject *memory_obj,
                        make_global_resolver(global_resolver_obj));
   PythonScheduler sched;
 
-  bool budget_hit = interp_step<PythonPolicy, PythonScheduler, Value>(
-      policy, sched, *sw->state, max_steps);
+  bool budget_hit = interp_step<PythonPolicy, PythonScheduler, SharedPyPtr>(
+      policy, sched, *sw->symbolic_state, max_steps);
 
   PyObject *result_dict = PyDict_New();
   if (!result_dict) return nullptr;
 
-  if (sched.result.has_value()) {
-    PyObject *cont = continuation_to_python(sched.result.value());
-    PyDict_SetItemString(result_dict, "result", cont);
-    Py_XDECREF(cont);
-  } else if (budget_hit) {
-    PyObject *budget_tuple = Py_BuildValue(
-        "(sK)", "budget", sw->state->steps);
-    PyDict_SetItemString(result_dict, "result", budget_tuple);
-    Py_XDECREF(budget_tuple);
-  } else {
-    PyDict_SetItemString(result_dict, "result", Py_None);
+  switch (sched.result_kind) {
+    case PythonScheduler::COMPLETED: {
+      PyObject *py_val = sched.return_value.Get();
+      if (!py_val) py_val = Py_None;
+      PyObject *result_tuple = Py_BuildValue("(sO)", "completed", py_val);
+      PyDict_SetItemString(result_dict, "result", result_tuple);
+      Py_XDECREF(result_tuple);
+      break;
+    }
+    case PythonScheduler::ERRORED: {
+      PyObject *result_tuple = Py_BuildValue(
+          "(si)", "error", static_cast<int>(sched.error_kind));
+      PyDict_SetItemString(result_dict, "result", result_tuple);
+      Py_XDECREF(result_tuple);
+      break;
+    }
+    case PythonScheduler::BRANCH: {
+      PyObject *result_tuple = Py_BuildValue("(si)", "suspended", 0);
+      PyDict_SetItemString(result_dict, "result", result_tuple);
+      Py_XDECREF(result_tuple);
+      break;
+    }
+    case PythonScheduler::NONE: {
+      if (budget_hit) {
+        PyObject *budget_tuple = Py_BuildValue(
+            "(sK)", "budget", sw->symbolic_state->steps);
+        PyDict_SetItemString(result_dict, "result", budget_tuple);
+        Py_XDECREF(budget_tuple);
+      } else {
+        PyDict_SetItemString(result_dict, "result", Py_None);
+      }
+      break;
+    }
   }
 
   PyObject *forks_list = PyList_New(
       static_cast<Py_ssize_t>(sched.forks.size()));
   for (size_t i = 0; i < sched.forks.size(); ++i) {
-    PyList_SET_ITEM(forks_list, static_cast<Py_ssize_t>(i),
-                    fork_to_python(sched.forks[i]));
+    PyObject *dict = PyDict_New();
+    PyList_SET_ITEM(forks_list, static_cast<Py_ssize_t>(i), dict);
   }
   PyDict_SetItemString(result_dict, "forks", forks_list);
   Py_DECREF(forks_list);

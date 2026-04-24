@@ -153,6 +153,28 @@ def float_unary_inputs(width):
 
 
 # ---------------------------------------------------------------------------
+# f32 precision helpers -- the interpreter does true f32 arithmetic, so the
+# oracle must narrow to f32 precision before comparing.
+# ---------------------------------------------------------------------------
+
+def _f32_narrow(v):
+    """Round a Python float to f32 precision."""
+    try:
+        return struct.unpack('<f', struct.pack('<f', v))[0]
+    except (struct.error, OverflowError):
+        return math.copysign(float('inf'), v)
+
+
+def _f32_binary(op):
+    """Wrap a binary op to compute at f32 precision."""
+    def fn(a, b):
+        fa = _f32_narrow(a)
+        fb = _f32_narrow(b)
+        return _f32_narrow(op(fa, fb))
+    return fn
+
+
+# ---------------------------------------------------------------------------
 # Verification helpers
 # ---------------------------------------------------------------------------
 
@@ -462,27 +484,30 @@ def _run_float_unary(index, func_resolver, global_resolver, width,
 @pytest.mark.parametrize("width", [32, 64])
 def test_fadd(index, func_resolver, global_resolver, width):
     suffix = "f32" if width == 32 else "f64"
+    op = _f32_binary(lambda a, b: a + b) if width == 32 else lambda a, b: a + b
     _run_float_binary(
         index, func_resolver, global_resolver, width,
-        f"symbolic_test_fadd_{suffix}", lambda a, b: a + b,
+        f"symbolic_test_fadd_{suffix}", op,
         float_binary_inputs(width))
 
 
 @pytest.mark.parametrize("width", [32, 64])
 def test_fsub(index, func_resolver, global_resolver, width):
     suffix = "f32" if width == 32 else "f64"
+    op = _f32_binary(lambda a, b: a - b) if width == 32 else lambda a, b: a - b
     _run_float_binary(
         index, func_resolver, global_resolver, width,
-        f"symbolic_test_fsub_{suffix}", lambda a, b: a - b,
+        f"symbolic_test_fsub_{suffix}", op,
         float_binary_inputs(width))
 
 
 @pytest.mark.parametrize("width", [32, 64])
 def test_fmul(index, func_resolver, global_resolver, width):
     suffix = "f32" if width == 32 else "f64"
+    op = _f32_binary(lambda a, b: a * b) if width == 32 else lambda a, b: a * b
     _run_float_binary(
         index, func_resolver, global_resolver, width,
-        f"symbolic_test_fmul_{suffix}", lambda a, b: a * b,
+        f"symbolic_test_fmul_{suffix}", op,
         float_binary_inputs(width))
 
 
@@ -490,26 +515,29 @@ def test_fmul(index, func_resolver, global_resolver, width):
 def test_fdiv(index, func_resolver, global_resolver, width):
     suffix = "f32" if width == 32 else "f64"
 
-    def safe_div(a, b):
+    def ieee_div(a, b):
+        """IEEE 754 division — Python raises ZeroDivisionError, C doesn't."""
         try:
             return a / b
         except ZeroDivisionError:
-            if a == 0.0:
+            if a == 0.0 or math.isnan(a):
                 return float('nan')
-            return math.copysign(float('inf'), a * b) if b == 0.0 else a / b
+            return math.copysign(float('inf'), math.copysign(1.0, a) * math.copysign(1.0, b))
 
+    op = _f32_binary(ieee_div) if width == 32 else ieee_div
     _run_float_binary(
         index, func_resolver, global_resolver, width,
-        f"symbolic_test_fdiv_{suffix}", safe_div,
+        f"symbolic_test_fdiv_{suffix}", op,
         float_binary_inputs(width))
 
 
 @pytest.mark.parametrize("width", [32, 64])
 def test_frem(index, func_resolver, global_resolver, width):
     suffix = "f32" if width == 32 else "f64"
+    op = _f32_binary(math.fmod) if width == 32 else math.fmod
     _run_float_binary(
         index, func_resolver, global_resolver, width,
-        f"symbolic_test_frem_{suffix}", math.fmod,
+        f"symbolic_test_frem_{suffix}", op,
         # Skip pairs where b==0 or either is inf/nan (fmod is undefined)
         [(a, b) for a, b in float_binary_inputs(width)
          if b != 0.0 and not math.isinf(a) and not math.isnan(a)
@@ -737,7 +765,7 @@ def test_fptrunc(index, func_resolver, global_resolver):
         pytest.skip(f"{fname} not in index")
     for a in float_unary_inputs(64):
         result = run_ir_function(ir, [a], func_resolver, global_resolver)
-        expected = struct.unpack('<f', struct.pack('<f', a))[0]
+        expected = _f32_narrow(a)
         assert verify_float(result, expected, 32), \
             f"{fname}({a}): {result} != {expected}"
 

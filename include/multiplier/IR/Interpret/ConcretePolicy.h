@@ -44,6 +44,15 @@ class MX_EXPORT ConcretePolicy
   ConcreteMemory &memory(void) { return memory_; }
   const ConcreteMemory &memory(void) const { return memory_; }
 
+  // --- 0. Value extraction / construction (interpreter bookkeeping) ---
+  std::optional<uint64_t> extract_address(const Value &val);
+  int64_t extract_int(const Value &val);
+  uint64_t extract_uint(const Value &val);
+  Value make_literal_int(int64_t v, uint8_t width = 8);
+  Value make_literal_ptr(uint64_t addr);
+  Value make_default();
+  bool has_address(const Value &val);
+
   // --- 1. Value construction ---
   Value make_const(ConstOp op, int64_t signed_val, uint64_t unsigned_val);
   Value make_null_ptr(void);
@@ -93,7 +102,7 @@ class MX_EXPORT ConcretePolicy
                     RawEntityId indirect_target_eid,
                     const std::vector<Value> &arguments,
                     bool is_indirect,
-                    CallResolution &resolution);
+                    CallResolution<Value> &resolution);
   bool resolve_global(NoOpScheduler &sched, RawEntityId entity_id,
                       GlobalResolution &resolution);
 

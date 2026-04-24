@@ -50,46 +50,44 @@ bool concrete_has_address(const Value &val) {
 }
 
 void concrete_write_to_mem(ConcreteMemory &memory_, uint64_t address,
-                           const Value &val, size_t size, bool is_float) {
-  // Pointers are just integers — extract raw bits from any Value variant.
+                           const Value &val, size_t size) {
   uint64_t bits = 0;
+  size_t val_width = 8;
   if (auto *ptr = as_pointer(val)) {
     bits = concrete_address(*ptr);
   } else if (auto *s = std::get_if<ScalarValue>(&val)) {
-    if ((is_float || s->is_float) && size <= 4 && s->width == 8) {
-      // Narrow f64 → f32: convert double to float, store float bits.
+    if (s->is_float && s->width == 8 && size <= 4) {
+      // Narrow f64 → f32: the value holds double bits but the target slot
+      // is 4 bytes (e.g. Python float stored to a float32 parameter).
       float f = static_cast<float>(s->as_f64());
       uint32_t fbits;
       std::memcpy(&fbits, &f, sizeof(fbits));
       bits = fbits;
+      val_width = 4;
     } else {
       bits = s->bits;
-    }
-    if (s->width == 4) {
-      // float32 stored in low 32 bits.
-      size = std::min(size, size_t{4});
+      if (s->width > 0) val_width = s->width;
     }
   }
-  // NullPtr and Undefined both write zero.
+  // Pointer(0) and Undefined both write zero.
+  size = std::min(size, val_width);
   memory_.write(address, &bits,
                 static_cast<uint32_t>(std::min(size, sizeof(bits))));
 }
 
 Value concrete_read_from_mem(ConcreteMemory &memory_, uint64_t address,
                              size_t size, bool is_float) {
+  uint64_t bits = 0;
+  memory_.read(address, &bits,
+               static_cast<uint32_t>(std::min(size, sizeof(bits))));
   if (is_float) {
-    if (size == 4) {
-      float f = 0;
-      memory_.read(address, &f, 4);
-      return make_float32(f);
-    }
-    double d = 0;
-    memory_.read(address, &d, 8);
-    return make_float(d);
+    // Return raw bits with float tag — no interpretation.
+    return (size <= 4) ? ScalarValue{bits & 0xFFFFFFFFu, 4, true}
+                       : ScalarValue{bits, 8, true};
   }
-  int64_t v = 0;
-  memory_.read(address, &v,
-               static_cast<uint32_t>(std::min(size, sizeof(v))));
+  // Sign-extend for integer reads.
+  int64_t v;
+  std::memcpy(&v, &bits, sizeof(v));
   switch (size) {
     case 1: v = static_cast<int64_t>(static_cast<int8_t>(v)); break;
     case 2: v = static_cast<int64_t>(static_cast<int16_t>(v)); break;
@@ -118,7 +116,7 @@ Value concrete_make_const(ConstOp op, int64_t signed_val,
     case BOOL:   return ScalarValue::from_u64(unsigned_val ? 1u : 0u, 1);
     case WCHAR16: return ScalarValue::from_u64(unsigned_val & 0xFFFFu, 2);
     case WCHAR32: return ScalarValue::from_u64(unsigned_val & 0xFFFFFFFFu, 4);
-    case NULL_PTR: return NullPtr{};
+    case NULL_PTR: return Pointer(0);
     case FLOAT16:
     case FLOAT32: {
       // The int pool stores float values as their double representation
@@ -153,8 +151,8 @@ Value concrete_binary_op(OpCode op, const Value &lhs, const Value &rhs) {
         case FADD_32: case FADD_64: return a + b;
         case FSUB_32: case FSUB_64: return a - b;
         case FMUL_32: case FMUL_64: return a * b;
-        case FDIV_32: case FDIV_64: return b != 0.0 ? a / b : (a >= 0 ? INFINITY : -INFINITY);
-        case FREM_32: case FREM_64: return b != 0.0 ? std::fmod(a, b) : NAN;
+        case FDIV_32: case FDIV_64: return a / b;
+        case FREM_32: case FREM_64: return std::fmod(a, b);
         default: return 0.0;
       }
     };
@@ -288,10 +286,10 @@ Value concrete_compare(OpCode op, const Value &lhs, const Value &rhs) {
   // Pointer comparisons.
   auto *pl = as_pointer(lhs);
   auto *pr = as_pointer(rhs);
-  if (pl || pr || is_null(lhs) || is_null(rhs)) {
+  if (pl || pr) {
     uint64_t la = pl ? concrete_address(*pl) : 0;
     uint64_t ra = pr ? concrete_address(*pr) : 0;
-    // Treat NullPtr as address 0.
+    // Null pointer (address 0) comparison.
     bool result = false;
     if (op >= CMP_EQ_8 && op <= CMP_EQ_64) result = la == ra;
     else if (op >= CMP_NE_8 && op <= CMP_NE_64) result = la != ra;
@@ -721,6 +719,31 @@ std::optional<bool> concrete_is_true(const Value &val) {
 }
 
 // ===========================================================================
+// ConcretePolicy — value extraction / construction (interpreter bookkeeping)
+// ===========================================================================
+
+std::optional<uint64_t> ConcretePolicy::extract_address(const Value &val) {
+  if (auto *p = as_pointer(val)) return concrete_address(*p);
+  return std::nullopt;
+}
+
+int64_t ConcretePolicy::extract_int(const Value &val) { return as_int(val); }
+
+uint64_t ConcretePolicy::extract_uint(const Value &val) { return as_uint(val); }
+
+Value ConcretePolicy::make_literal_int(int64_t v, uint8_t w) {
+  return make_int(v, w);
+}
+
+Value ConcretePolicy::make_literal_ptr(uint64_t a) { return make_ptr(a); }
+
+Value ConcretePolicy::make_default() { return Undefined{}; }
+
+bool ConcretePolicy::has_address(const Value &val) {
+  return concrete_has_address(val);
+}
+
+// ===========================================================================
 // ConcretePolicy thin wrappers — delegate to free functions above
 // ===========================================================================
 
@@ -729,7 +752,7 @@ Value ConcretePolicy::make_const(ConstOp op, int64_t signed_val,
   return concrete_make_const(op, signed_val, unsigned_val);
 }
 
-Value ConcretePolicy::make_null_ptr(void) { return NullPtr{}; }
+Value ConcretePolicy::make_null_ptr(void) { return Pointer(0); }
 
 Value ConcretePolicy::binary_op(OpCode op, const Value &lhs,
                                 const Value &rhs) {
@@ -814,7 +837,7 @@ bool ConcretePolicy::mem_write(NoOpScheduler &, const Value &addr,
                                const MemAccessHint &hint) {
   if (!concrete_has_address(addr)) return true;
   concrete_write_to_mem(memory_, concrete_extract_address(addr), val,
-                        hint.size_bytes, hint.is_float);
+                        hint.size_bytes);
   return true;
 }
 
@@ -1326,22 +1349,21 @@ bool ConcretePolicy::resolve_call(NoOpScheduler &,
                                   RawEntityId target_eid,
                                   RawEntityId indirect_target_eid,
                                   const std::vector<Value> &,
-                                  bool, CallResolution &resolution) {
+                                  bool, CallResolution<Value> &resolution) {
   if (func_resolver_) {
     for (auto eid : {target_eid, indirect_target_eid}) {
       if (eid != kInvalidEntityId) {
         if (auto ir = func_resolver_(eid)) {
-          resolution = CallResolution{
-              .action = CallAction::INLINE,
-              .return_value = Undefined{},
-              .callee_ir = *std::move(ir)};
+          resolution.action = CallAction::INLINE;
+          resolution.return_value = Undefined{};
+          resolution.callee_ir = *std::move(ir);
           return true;
         }
       }
     }
   }
-  resolution = CallResolution{.action = CallAction::SKIP,
-                              .return_value = Undefined{}};
+  resolution.action = CallAction::SKIP;
+  resolution.return_value = Undefined{};
   return true;
 }
 

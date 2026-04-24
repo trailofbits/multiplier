@@ -67,9 +67,10 @@ enum class CallAction : uint8_t {
   MODEL,
 };
 
+template <typename ValueT = Value>
 struct CallResolution {
   CallAction action{CallAction::SKIP};
-  Value return_value;
+  ValueT return_value;
   IRFunction callee_ir;  // For INLINE.
 };
 
@@ -102,7 +103,7 @@ using Suspension = std::variant<
 
 using Resolution = std::variant<
     BranchDecision,
-    CallResolution,
+    CallResolution<Value>,
     GlobalResolution,
     ConcretePointerResolution
 >;

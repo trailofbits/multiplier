@@ -67,12 +67,8 @@ struct ScalarValue {
 // Sentinel for undefined/poison values.
 struct Undefined {};
 
-// Sentinel for a null pointer.
-struct NullPtr {};
-
 // An opaque pointer into the interpreter's virtual address space.
-// Address width (4 or 8 bytes) is a session property on Memory, not per-pointer.
-// Policies access the concrete address via the free functions below.
+// Pointer(0) is the null pointer.
 struct Pointer {
  private:
   uint64_t address_{0};
@@ -88,35 +84,26 @@ struct Pointer {
   friend uint64_t concrete_address(const Pointer &p);
 };
 
-// For the concrete interpreter, all pointers are concrete.
-// A future symbolic pointer variant would make this non-trivial.
 inline bool is_concrete(const Pointer &) { return true; }
-
-// Extract the concrete integral address. Only valid when is_concrete() is true.
 inline uint64_t concrete_address(const Pointer &p) { return p.address_; }
 
-// The value type the interpreter passes around.
-// Concrete implementation. A symbolic layer would extend/wrap this.
-using Value = std::variant<ScalarValue, Pointer, NullPtr, Undefined>;
+// The value type the concrete interpreter passes around.
+using Value = std::variant<ScalarValue, Pointer, Undefined>;
 
 // ---------------------------------------------------------------------------
 // Inline helper functions
 // ---------------------------------------------------------------------------
 
-// Extract as signed integer. Returns 0 for non-scalar values.
 inline int64_t as_int(const Value &v) {
   if (auto *s = std::get_if<ScalarValue>(&v)) return s->as_i64();
   return 0;
 }
 
-// Extract as unsigned integer. Returns 0 for non-scalar values.
 inline uint64_t as_uint(const Value &v) {
   if (auto *s = std::get_if<ScalarValue>(&v)) return s->as_u64();
   return 0;
 }
 
-// Extract as double. Returns 0.0 for non-scalar values.
-// Width-aware: float32 values (width=4) are read as float and widened.
 inline double as_float(const Value &v) {
   if (auto *s = std::get_if<ScalarValue>(&v)) {
     if (s->width == 4) return static_cast<double>(s->as_f32());
@@ -125,33 +112,34 @@ inline double as_float(const Value &v) {
   return 0.0;
 }
 
-// Extract as float. Returns 0.0f for non-scalar values.
 inline float as_float32(const Value &v) {
-  if (auto *s = std::get_if<ScalarValue>(&v)) return s->as_f32();
+  if (auto *s = std::get_if<ScalarValue>(&v)) {
+    // If the value is an f64 holding a double, narrow through double→float
+    // instead of reading the wrong low-32 bits of the f64 representation.
+    if (s->is_float && s->width == 8)
+      return static_cast<float>(s->as_f64());
+    return s->as_f32();
+  }
   return 0.0f;
 }
 
-// Returns pointer if the value holds one, nullptr otherwise.
 inline const Pointer *as_pointer(const Value &v) {
   return std::get_if<Pointer>(&v);
 }
 
-// Truth test for concrete values.
 inline bool is_truthy(const Value &v) {
   if (auto *s = std::get_if<ScalarValue>(&v)) return s->bits != 0;
-  if (std::holds_alternative<Pointer>(v)) return true;
-  if (std::holds_alternative<NullPtr>(v)) return false;
+  if (auto *p = std::get_if<Pointer>(&v)) return concrete_address(*p) != 0;
   return false;  // Undefined
 }
 
-// Check if the value is undefined/poison.
 inline bool is_undefined(const Value &v) {
   return std::holds_alternative<Undefined>(v);
 }
 
-// Check if the value is a null pointer.
 inline bool is_null(const Value &v) {
-  return std::holds_alternative<NullPtr>(v);
+  if (auto *p = std::get_if<Pointer>(&v)) return concrete_address(*p) == 0;
+  return false;
 }
 
 // --- Construction helpers ---
@@ -181,14 +169,11 @@ inline Value make_undef(void) {
 }
 
 inline Value make_null(void) {
-  return NullPtr{};
+  return Pointer(0);
 }
 
 // ---------------------------------------------------------------------------
 // ValueTraits — value lifecycle for templatized interpreter state.
-//
-// The default specialization for Value is a no-op. The PyObject *
-// specialization (Phase 4) will add Py_INCREF/Py_DECREF.
 // ---------------------------------------------------------------------------
 
 template <typename ValueT>

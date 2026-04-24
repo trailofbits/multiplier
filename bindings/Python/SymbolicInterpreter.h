@@ -24,50 +24,78 @@ using namespace ir;
 using namespace ir::interpret;
 
 // ===========================================================================
-// PythonScheduler — collects forks and terminal results for exploration.
-//
-// Uses Value as the value type. The scheduler stores forked state snapshots
-// so the Python explorer can resume them.
+// ValueTraits<SharedPyPtr> — Py_None as default value.
 // ===========================================================================
 
-struct PythonScheduler : Scheduler<PythonScheduler, Value> {
-  struct Fork {
-    std::shared_ptr<InterpreterState<Value>> snapshot;
-    Transition transition;
-  };
-
-  std::vector<Fork> forks;
-  std::optional<Continuation> result;
-
-  void emit_fork(const InterpreterState<Value> &state,
-                 Transition transition) {
-    forks.push_back({std::make_shared<InterpreterState<Value>>(state),
-                     std::move(transition)});
-  }
-
-  void emit_error(const InterpreterState<Value> &, std::string_view) {}
-
-  void add(Continuation cont) { result = std::move(cont); }
+template <>
+struct ValueTraits<SharedPyPtr> {
+  static SharedPyPtr default_value() { return SharedPyPtr(Py_None); }
 };
 
 // ===========================================================================
-// PythonPolicy — delegates value ops to a Python object.
+// PythonScheduler — stores results directly as SharedPyPtr.
 //
-// The py_policy_ Python object can implement any of:
-//   binary_op(op, lhs, rhs) -> value
-//   unary_op(op, operand) -> value
-//   compare(op, lhs, rhs) -> value
-//   cast(op, operand) -> value
-//   is_true(val) -> bool / None
-//   resolve_branch(condition, true_block_id, false_block_id) -> True/False/None
+// Does not use Continuation (which is Value-typed). Results are read
+// directly by SymbolicStep to build the Python result dict.
+// ===========================================================================
+
+struct PythonScheduler : Scheduler<PythonScheduler, SharedPyPtr> {
+  enum ResultKind { NONE, COMPLETED, ERRORED, BRANCH };
+
+  ResultKind result_kind{NONE};
+  SharedPyPtr return_value;
+  ErrorKind error_kind{};
+  SharedPyPtr branch_condition;
+  uint64_t true_block_eid{0};
+  uint64_t false_block_eid{0};
+
+  struct Fork {
+    std::shared_ptr<InterpreterState<SharedPyPtr>> snapshot;
+    std::function<void(InterpreterState<SharedPyPtr> &, void *)> transition;
+  };
+
+  std::vector<Fork> forks;
+
+  void emit_fork(const InterpreterState<SharedPyPtr> &state,
+                 std::function<void(InterpreterState<SharedPyPtr> &, void *)> transition) {
+    forks.push_back({std::make_shared<InterpreterState<SharedPyPtr>>(state),
+                     std::move(transition)});
+  }
+
+  void emit_error(const InterpreterState<SharedPyPtr> &, std::string_view) {}
+
+  void on_completed(SharedPyPtr val,
+                    std::shared_ptr<InterpreterState<SharedPyPtr>>) {
+    result_kind = COMPLETED;
+    return_value = std::move(val);
+  }
+
+  void on_errored(ErrorKind kind,
+                  std::shared_ptr<InterpreterState<SharedPyPtr>>) {
+    result_kind = ERRORED;
+    error_kind = kind;
+  }
+
+  void on_branch(SharedPyPtr cond, IRBlock tb, IRBlock fb,
+                 std::shared_ptr<InterpreterState<SharedPyPtr>>) {
+    result_kind = BRANCH;
+    branch_condition = std::move(cond);
+    true_block_eid = EntityId(tb.id()).Pack();
+    false_block_eid = EntityId(fb.id()).Pack();
+  }
+};
+
+// ===========================================================================
+// PythonPolicy — operates on SharedPyPtr (PyObject* with refcounting).
 //
-// For methods not implemented in Python, falls back to concrete computation.
-// Memory operations use ConcreteMemory directly (address space is always
-// concrete, even when values are symbolic).
+// Every value in the interpreter state is a SharedPyPtr. Policy methods
+// take and return SharedPyPtr natively. Python policy methods receive
+// the PyObject* directly — no conversion needed. Concrete fallback
+// converts at the boundary via value_to_python / python_to_value.
 // ===========================================================================
 
 class PythonPolicy
-    : public Policy<PythonPolicy, PythonScheduler, Value> {
+    : public Policy<PythonPolicy, PythonScheduler, SharedPyPtr> {
  public:
   PythonPolicy(PyObject *py_policy, ConcreteMemory &memory,
                FunctionResolver func_resolver = {},
@@ -77,52 +105,68 @@ class PythonPolicy
   ConcreteMemory &memory(void) { return memory_; }
   const ConcreteMemory &memory(void) const { return memory_; }
 
-  // 1. Value construction — always concrete.
-  Value make_const(ConstOp op, int64_t signed_val, uint64_t unsigned_val);
-  Value make_null_ptr(void);
+  // 0. Value extraction / construction.
+  std::optional<uint64_t> extract_address(const SharedPyPtr &val);
+  int64_t extract_int(const SharedPyPtr &val);
+  uint64_t extract_uint(const SharedPyPtr &val);
+  SharedPyPtr make_literal_int(int64_t v, uint8_t width = 8);
+  SharedPyPtr make_literal_ptr(uint64_t addr);
+  SharedPyPtr make_default();
+  bool has_address(const SharedPyPtr &val);
 
-  // 2. Arithmetic / logic — delegates to Python if available.
-  Value binary_op(OpCode op, const Value &lhs, const Value &rhs);
-  Value unary_op(OpCode op, const Value &operand);
-  Value compare(OpCode op, const Value &lhs, const Value &rhs);
-  Value cast(CastOp op, const Value &operand);
-  Value ptr_add(const Value &base, const Value &index, int64_t element_size);
-  Value ptr_diff(const Value &lhs, const Value &rhs, int64_t element_size);
-  Value ptr_offset(const Value &base, int64_t byte_offset);
-  Value select(const Value &cond, const Value &if_true, const Value &if_false);
-  Value bitwise_intrinsic(OpCode width_op, BitwiseOp sub,
-                          const Value &val, const Value &val2);
-  Value float_intrinsic(FloatOp sub, const std::vector<Value> &operands);
+  // 1. Value construction.
+  SharedPyPtr make_const(ConstOp op, int64_t signed_val, uint64_t unsigned_val);
+  SharedPyPtr make_null_ptr(void);
 
-  // 3. Truth test — delegates to Python if available.
-  std::optional<bool> is_true(const Value &val);
+  // 2. Arithmetic / logic.
+  SharedPyPtr binary_op(OpCode op, const SharedPyPtr &lhs,
+                        const SharedPyPtr &rhs);
+  SharedPyPtr unary_op(OpCode op, const SharedPyPtr &operand);
+  SharedPyPtr compare(OpCode op, const SharedPyPtr &lhs,
+                      const SharedPyPtr &rhs);
+  SharedPyPtr cast(CastOp op, const SharedPyPtr &operand);
+  SharedPyPtr ptr_add(const SharedPyPtr &base, const SharedPyPtr &index,
+                      int64_t element_size);
+  SharedPyPtr ptr_diff(const SharedPyPtr &lhs, const SharedPyPtr &rhs,
+                       int64_t element_size);
+  SharedPyPtr ptr_offset(const SharedPyPtr &base, int64_t byte_offset);
+  SharedPyPtr select(const SharedPyPtr &cond, const SharedPyPtr &if_true,
+                     const SharedPyPtr &if_false);
+  SharedPyPtr bitwise_intrinsic(OpCode width_op, BitwiseOp sub,
+                                const SharedPyPtr &val,
+                                const SharedPyPtr &val2);
+  SharedPyPtr float_intrinsic(FloatOp sub,
+                              const std::vector<SharedPyPtr> &operands);
 
-  // 4. Memory — concrete implementation.
-  Value mem_allocate(PythonScheduler &sched, uint64_t size_bytes,
-                     uint64_t align_bytes);
-  void mem_free(PythonScheduler &sched, const Value &address);
-  bool mem_read(PythonScheduler &sched, const Value &addr,
-                const MemAccessHint &hint, Value &result);
-  bool mem_write(PythonScheduler &sched, const Value &addr,
-                 const Value &val, const MemAccessHint &hint);
+  // 3. Truth test.
+  std::optional<bool> is_true(const SharedPyPtr &val);
+
+  // 4. Memory.
+  SharedPyPtr mem_allocate(PythonScheduler &sched, uint64_t size_bytes,
+                           uint64_t align_bytes);
+  void mem_free(PythonScheduler &sched, const SharedPyPtr &address);
+  bool mem_read(PythonScheduler &sched, const SharedPyPtr &addr,
+                const MemAccessHint &hint, SharedPyPtr &result);
+  bool mem_write(PythonScheduler &sched, const SharedPyPtr &addr,
+                 const SharedPyPtr &val, const MemAccessHint &hint);
   bool mem_bulk_op(PythonScheduler &sched, MemOp sub,
-                   const std::vector<Value> &ops,
-                   const MemoryInst &mi, Value &result);
-  void mem_poison(const Value &addr);
-  void mem_unpoison(const Value &addr);
-  bool is_undefined(const Value &val);
+                   const std::vector<SharedPyPtr> &ops,
+                   const MemoryInst &mi, SharedPyPtr &result);
+  void mem_poison(const SharedPyPtr &addr);
+  void mem_unpoison(const SharedPyPtr &addr);
+  bool is_undefined(const SharedPyPtr &val);
 
-  // 5. Resolution — delegates to Python if available.
-  bool resolve_branch(PythonScheduler &sched, const Value &condition,
+  // 5. Resolution.
+  bool resolve_branch(PythonScheduler &sched, const SharedPyPtr &condition,
                       IRBlock true_block, IRBlock false_block,
                       IRBlock &chosen_block);
   bool resolve_call(PythonScheduler &sched,
                     const IRInstruction &call_inst,
                     RawEntityId target_eid,
                     RawEntityId indirect_target_eid,
-                    const std::vector<Value> &arguments,
+                    const std::vector<SharedPyPtr> &arguments,
                     bool is_indirect,
-                    CallResolution &resolution);
+                    CallResolution<SharedPyPtr> &resolution);
   bool resolve_global(PythonScheduler &sched, RawEntityId entity_id,
                       GlobalResolution &resolution);
 
@@ -132,8 +176,7 @@ class PythonPolicy
   FunctionResolver func_resolver_;
   GlobalResolver global_resolver_;
 
-  // Cached Python method lookups.  nullptr means "not yet looked up",
-  // Py_None means "looked up but doesn't exist on the policy".
+  PyObject *cached_make_const_{nullptr};
   PyObject *cached_binary_op_{nullptr};
   PyObject *cached_unary_op_{nullptr};
   PyObject *cached_compare_{nullptr};
@@ -141,8 +184,6 @@ class PythonPolicy
   PyObject *cached_is_true_{nullptr};
   PyObject *cached_resolve_branch_{nullptr};
 
-  // Look up a method on the policy, caching the result.  Returns the
-  // bound method (borrowed ref) or nullptr if the method doesn't exist.
   PyObject *lookup_method(PyObject *&cache, const char *name);
 };
 

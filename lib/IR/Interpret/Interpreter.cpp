@@ -14,6 +14,27 @@
 namespace mx::ir::interpret {
 
 // ===========================================================================
+// NoOpScheduler result methods
+// ===========================================================================
+
+void NoOpScheduler::on_completed(Value return_value,
+                                  std::shared_ptr<InterpreterState<Value>> state) {
+  result = Continuation::completed(std::move(return_value), std::move(state));
+}
+
+void NoOpScheduler::on_errored(ErrorKind kind,
+                                std::shared_ptr<InterpreterState<Value>> state) {
+  result = Continuation::errored(kind, std::move(state));
+}
+
+void NoOpScheduler::on_branch(Value condition, IRBlock true_block,
+                               IRBlock false_block,
+                               std::shared_ptr<InterpreterState<Value>> state) {
+  result = Continuation::branch(std::move(state),
+      NeedBranchDecision{std::move(condition), true_block, false_block});
+}
+
+// ===========================================================================
 // ConcretePolicy methods — delegate to free template functions
 // ===========================================================================
 
@@ -106,7 +127,7 @@ InterpreterState<Value> Continuation::pump(ConcretePolicy &policy,
       break;
     }
     case CALL: {
-      auto *cr = std::get_if<CallResolution>(&resolution);
+      auto *cr = std::get_if<CallResolution<Value>>(&resolution);
       if (!cr) break;
       auto &cd = std::get<CallData>(data_);
       switch (cr->action) {
