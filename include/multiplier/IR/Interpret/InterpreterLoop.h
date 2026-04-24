@@ -19,6 +19,7 @@
 #include <multiplier/IR/Instruction.h>
 #include <multiplier/IR/InstructionKinds.h>
 #include <multiplier/IR/Object.h>
+#include <multiplier/AST/BuiltinType.h>
 #include <multiplier/IR/OpCode.h>
 #include <multiplier/IR/StructureKinds.h>
 #include <multiplier/AST.h>
@@ -1526,7 +1527,13 @@ inline void interp_init_state(PolicyT &policy, SchedT &sched,
             policy.memory().memcpy(concrete_address(*p),
                                    concrete_address(*arg_ptr), size);
           } else {
-            MemAccessHint hint{size, false, true};
+            bool param_is_float = false;
+            if (auto obj_type = obj.type()) {
+              if (auto bt = BuiltinType::from(*obj_type)) {
+                param_is_float = bt->is_floating_point();
+              }
+            }
+            MemAccessHint hint{size, param_is_float, true};
             policy.mem_write(sched, addr, args[param_idx], hint);
           }
         }

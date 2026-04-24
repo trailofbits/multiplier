@@ -50,13 +50,21 @@ bool concrete_has_address(const Value &val) {
 }
 
 void concrete_write_to_mem(ConcreteMemory &memory_, uint64_t address,
-                           const Value &val, size_t size) {
+                           const Value &val, size_t size, bool is_float) {
   // Pointers are just integers — extract raw bits from any Value variant.
   uint64_t bits = 0;
   if (auto *ptr = as_pointer(val)) {
     bits = concrete_address(*ptr);
   } else if (auto *s = std::get_if<ScalarValue>(&val)) {
-    bits = s->bits;
+    if ((is_float || s->is_float) && size <= 4 && s->width == 8) {
+      // Narrow f64 → f32: convert double to float, store float bits.
+      float f = static_cast<float>(s->as_f64());
+      uint32_t fbits;
+      std::memcpy(&fbits, &f, sizeof(fbits));
+      bits = fbits;
+    } else {
+      bits = s->bits;
+    }
     if (s->width == 4) {
       // float32 stored in low 32 bits.
       size = std::min(size, size_t{4});
@@ -806,7 +814,7 @@ bool ConcretePolicy::mem_write(NoOpScheduler &, const Value &addr,
                                const MemAccessHint &hint) {
   if (!concrete_has_address(addr)) return true;
   concrete_write_to_mem(memory_, concrete_extract_address(addr), val,
-                        hint.size_bytes);
+                        hint.size_bytes, hint.is_float);
   return true;
 }
 

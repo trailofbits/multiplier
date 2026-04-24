@@ -44,6 +44,11 @@ namespace {
 
 PyObject *value_to_python(const Value &v) {
   if (auto *s = std::get_if<ScalarValue>(&v)) {
+    if (s->is_float) {
+      double d = (s->width == 4) ? static_cast<double>(s->as_f32())
+                                 : s->as_f64();
+      return PyFloat_FromDouble(d);
+    }
     return PyLong_FromLongLong(s->as_i64());
   }
   if (auto *p = std::get_if<Pointer>(&v)) {
@@ -315,7 +320,7 @@ bool PythonPolicy::mem_write(PythonScheduler &, const Value &addr,
                              const Value &val, const MemAccessHint &hint) {
   if (!concrete_has_address(addr)) return true;
   concrete_write_to_mem(memory_, concrete_extract_address(addr), val,
-                        hint.size_bytes);
+                        hint.size_bytes, hint.is_float);
   return true;
 }
 

@@ -116,7 +116,8 @@ MX_EXPORT bool concrete_has_address(const Value &val);
 class ConcreteMemory;
 
 MX_EXPORT void concrete_write_to_mem(ConcreteMemory &memory, uint64_t address,
-                                     const Value &val, size_t size);
+                                     const Value &val, size_t size,
+                                     bool is_float = false);
 MX_EXPORT Value concrete_read_from_mem(ConcreteMemory &memory, uint64_t address,
                                        size_t size, bool is_float);
 MX_EXPORT bool concrete_mem_bulk_op(ConcreteMemory &memory, MemOp sub,

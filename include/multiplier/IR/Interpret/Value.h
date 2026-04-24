@@ -15,28 +15,29 @@ namespace mx::ir::interpret {
 // The interpreter moves bytes around; the ValueFactory gives them meaning.
 struct ScalarValue {
   uint64_t bits{0};
-  uint8_t width{0};  // 1, 2, 4, or 8 bytes
+  uint8_t width{0};    // 1, 2, 4, or 8 bytes
+  bool is_float{false}; // true if this holds a float/double
 
   static ScalarValue from_u64(uint64_t v, uint8_t w = 8) {
-    return {v, w};
+    return {v, w, false};
   }
 
   static ScalarValue from_i64(int64_t v, uint8_t w = 8) {
     uint64_t bits;
     std::memcpy(&bits, &v, sizeof(bits));
-    return {bits, w};
+    return {bits, w, false};
   }
 
   static ScalarValue from_f64(double v) {
     uint64_t bits;
     std::memcpy(&bits, &v, sizeof(bits));
-    return {bits, 8};
+    return {bits, 8, true};
   }
 
   static ScalarValue from_f32(float v) {
     uint32_t bits;
     std::memcpy(&bits, &v, sizeof(bits));
-    return {bits, 4};
+    return {bits, 4, true};
   }
 
   int64_t as_i64(void) const {

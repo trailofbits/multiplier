@@ -45,6 +45,11 @@ static PyObject *gUndefSentinel = nullptr;
 
 PyObject *value_to_python(const Value &v) {
   if (auto *s = std::get_if<ScalarValue>(&v)) {
+    if (s->is_float) {
+      double d = (s->width == 4) ? static_cast<double>(s->as_f32())
+                                 : s->as_f64();
+      return PyFloat_FromDouble(d);
+    }
     return PyLong_FromLongLong(s->as_i64());
   }
   if (auto *p = std::get_if<Pointer>(&v)) {
