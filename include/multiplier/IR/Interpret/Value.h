@@ -17,23 +17,23 @@ struct ScalarValue {
   uint64_t bits{0};
   uint8_t width{0};  // 1, 2, 4, or 8 bytes
 
-  static ScalarValue FromU64(uint64_t v, uint8_t w = 8) {
+  static ScalarValue from_u64(uint64_t v, uint8_t w = 8) {
     return {v, w};
   }
 
-  static ScalarValue FromI64(int64_t v, uint8_t w = 8) {
+  static ScalarValue from_i64(int64_t v, uint8_t w = 8) {
     uint64_t bits;
     std::memcpy(&bits, &v, sizeof(bits));
     return {bits, w};
   }
 
-  static ScalarValue FromF64(double v) {
+  static ScalarValue from_f64(double v) {
     uint64_t bits;
     std::memcpy(&bits, &v, sizeof(bits));
     return {bits, 8};
   }
 
-  static ScalarValue FromF32(float v) {
+  static ScalarValue from_f32(float v) {
     uint32_t bits;
     std::memcpy(&bits, &v, sizeof(bits));
     return {bits, 4};
@@ -83,16 +83,16 @@ struct Pointer {
   bool operator==(const Pointer &o) const { return address_ == o.address_; }
   bool operator!=(const Pointer &o) const { return address_ != o.address_; }
 
-  friend bool IsConcrete(const Pointer &p);
-  friend uint64_t ConcreteAddress(const Pointer &p);
+  friend bool is_concrete(const Pointer &p);
+  friend uint64_t concrete_address(const Pointer &p);
 };
 
 // For the concrete interpreter, all pointers are concrete.
 // A future symbolic pointer variant would make this non-trivial.
-inline bool IsConcrete(const Pointer &) { return true; }
+inline bool is_concrete(const Pointer &) { return true; }
 
-// Extract the concrete integral address. Only valid when IsConcrete() is true.
-inline uint64_t ConcreteAddress(const Pointer &p) { return p.address_; }
+// Extract the concrete integral address. Only valid when is_concrete() is true.
+inline uint64_t concrete_address(const Pointer &p) { return p.address_; }
 
 // The value type the interpreter passes around.
 // Concrete implementation. A symbolic layer would extend/wrap this.
@@ -103,36 +103,40 @@ using Value = std::variant<ScalarValue, Pointer, NullPtr, Undefined>;
 // ---------------------------------------------------------------------------
 
 // Extract as signed integer. Returns 0 for non-scalar values.
-inline int64_t AsInt(const Value &v) {
+inline int64_t as_int(const Value &v) {
   if (auto *s = std::get_if<ScalarValue>(&v)) return s->as_i64();
   return 0;
 }
 
 // Extract as unsigned integer. Returns 0 for non-scalar values.
-inline uint64_t AsUint(const Value &v) {
+inline uint64_t as_uint(const Value &v) {
   if (auto *s = std::get_if<ScalarValue>(&v)) return s->as_u64();
   return 0;
 }
 
 // Extract as double. Returns 0.0 for non-scalar values.
-inline double AsFloat(const Value &v) {
-  if (auto *s = std::get_if<ScalarValue>(&v)) return s->as_f64();
+// Width-aware: float32 values (width=4) are read as float and widened.
+inline double as_float(const Value &v) {
+  if (auto *s = std::get_if<ScalarValue>(&v)) {
+    if (s->width == 4) return static_cast<double>(s->as_f32());
+    return s->as_f64();
+  }
   return 0.0;
 }
 
 // Extract as float. Returns 0.0f for non-scalar values.
-inline float AsFloat32(const Value &v) {
+inline float as_float32(const Value &v) {
   if (auto *s = std::get_if<ScalarValue>(&v)) return s->as_f32();
   return 0.0f;
 }
 
 // Returns pointer if the value holds one, nullptr otherwise.
-inline const Pointer *AsPointer(const Value &v) {
+inline const Pointer *as_pointer(const Value &v) {
   return std::get_if<Pointer>(&v);
 }
 
 // Truth test for concrete values.
-inline bool IsTruthy(const Value &v) {
+inline bool is_truthy(const Value &v) {
   if (auto *s = std::get_if<ScalarValue>(&v)) return s->bits != 0;
   if (std::holds_alternative<Pointer>(v)) return true;
   if (std::holds_alternative<NullPtr>(v)) return false;
@@ -140,43 +144,60 @@ inline bool IsTruthy(const Value &v) {
 }
 
 // Check if the value is undefined/poison.
-inline bool IsUndefined(const Value &v) {
+inline bool is_undefined(const Value &v) {
   return std::holds_alternative<Undefined>(v);
 }
 
 // Check if the value is a null pointer.
-inline bool IsNull(const Value &v) {
+inline bool is_null(const Value &v) {
   return std::holds_alternative<NullPtr>(v);
 }
 
 // --- Construction helpers ---
 
-inline Value MakeInt(int64_t v, uint8_t w = 8) {
-  return ScalarValue::FromI64(v, w);
+inline Value make_int(int64_t v, uint8_t w = 8) {
+  return ScalarValue::from_i64(v, w);
 }
 
-inline Value MakeUint(uint64_t v, uint8_t w = 8) {
-  return ScalarValue::FromU64(v, w);
+inline Value make_uint(uint64_t v, uint8_t w = 8) {
+  return ScalarValue::from_u64(v, w);
 }
 
-inline Value MakeFloat(double v) {
-  return ScalarValue::FromF64(v);
+inline Value make_float(double v) {
+  return ScalarValue::from_f64(v);
 }
 
-inline Value MakeFloat32(float v) {
-  return ScalarValue::FromF32(v);
+inline Value make_float32(float v) {
+  return ScalarValue::from_f32(v);
 }
 
-inline Value MakePtr(uint64_t addr) {
+inline Value make_ptr(uint64_t addr) {
   return Pointer(addr);
 }
 
-inline Value MakeUndef(void) {
+inline Value make_undef(void) {
   return Undefined{};
 }
 
-inline Value MakeNull(void) {
+inline Value make_null(void) {
   return NullPtr{};
 }
+
+// ---------------------------------------------------------------------------
+// ValueTraits — value lifecycle for templatized interpreter state.
+//
+// The default specialization for Value is a no-op. The PyObject *
+// specialization (Phase 4) will add Py_INCREF/Py_DECREF.
+// ---------------------------------------------------------------------------
+
+template <typename ValueT>
+struct ValueTraits {
+  static ValueT default_value() { return ValueT{}; }
+};
+
+template <>
+struct ValueTraits<Value> {
+  static Value default_value() { return Undefined{}; }
+};
 
 }  // namespace mx::ir::interpret

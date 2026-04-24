@@ -71,7 +71,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[2]) || tp >= &(gTypes[3])) {
+  if (tp < &(gTypes[3]) || tp >= &(gTypes[44])) {
     return std::nullopt;
   }
 
@@ -120,12 +120,184 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::IRInstruction::id"),
     nullptr,
   },
+  {
+    "opcode",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->opcode());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRInstruction::opcode"),
+    nullptr,
+  },
+  {
+    "operands",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::operands);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRInstruction::operands"),
+    nullptr,
+  },
+  {
+    "num_operands",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_operands());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRInstruction::num_operands"),
+    nullptr,
+  },
+  {
+    "parent_instruction",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->parent_instruction());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRInstruction::parent_instruction"),
+    nullptr,
+  },
+  {
+    "is_root",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_root());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRInstruction::is_root"),
+    nullptr,
+  },
+  {
+    "users",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::users);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRInstruction::users"),
+    nullptr,
+  },
+  {
+    "num_users",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->num_users());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRInstruction::num_users"),
+    nullptr,
+  },
+  {
+    "source_statement",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->source_statement());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRInstruction::source_statement"),
+    nullptr,
+  },
+  {
+    "source_entity_id",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->source_entity_id());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRInstruction::source_entity_id"),
+    nullptr,
+  },
+  {
+    "parent_block",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->parent_block());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRInstruction::parent_block"),
+    nullptr,
+  },
+  {
+    "is_terminator",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_terminator());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRInstruction::is_terminator"),
+    nullptr,
+  },
+  {
+    "is_conditionally_executed",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_conditionally_executed());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRInstruction::is_conditionally_executed"),
+    nullptr,
+  },
+  {
+    "name",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->name());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRInstruction::name"),
+    nullptr,
+  },
+  {
+    "ref_string",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->ref_string());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRInstruction::ref_string"),
+    nullptr,
+  },
+  {
+    "to_string",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->to_string());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRInstruction::to_string"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace
 
 namespace {
 static PyMethodDef gMethods[] = {
+  {
+    "nth_operand",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          T *obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<uint32_t>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->nth_operand(std::move(arg_0.value())));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'nth_operand'";
+          return nullptr;
+        }),
+    METH_FASTCALL,
+    PyDoc_STR("Wrapper for mx::IRInstruction::nth_operand"),
+  },
   {}  // Sentinel.
 };
 }  // namespace
@@ -133,7 +305,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[2]);
+  PyTypeObject * const tp = &(gTypes[3]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

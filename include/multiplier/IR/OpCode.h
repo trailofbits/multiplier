@@ -146,6 +146,72 @@ inline bool IsFloatToInt(CastOp op) {
   return op >= CastOp::F32_TO_SI8 && op <= CastOp::F64_TO_UI64;
 }
 
+inline bool IsPtrToInt(CastOp op) {
+  return op == CastOp::PTR_TO_I32 || op == CastOp::PTR_TO_I64;
+}
+
+inline bool IsIntToPtr(CastOp op) {
+  return op == CastOp::I32_TO_PTR || op == CastOp::I64_TO_PTR;
+}
+
+inline bool IsFloatToSigned(CastOp op) {
+  return op >= CastOp::F32_TO_SI8 && op <= CastOp::F64_TO_SI64;
+}
+
+inline bool IsSignedToFloat(CastOp op) {
+  return op >= CastOp::SI8_TO_F32 && op <= CastOp::SI64_TO_F64;
+}
+
+inline bool IsToFloat32(CastOp op) {
+  unsigned v = static_cast<unsigned>(op);
+  // The *_TO_F32 variants alternate: even index = F32, odd = F64.
+  // SI8_TO_F32=22, SI8_TO_F64=23, SI16_TO_F32=24, ...
+  // UI8_TO_F32=30, UI8_TO_F64=31, ...
+  if (op >= CastOp::SI8_TO_F32 && op <= CastOp::UI64_TO_F64) {
+    return (v % 2) == (static_cast<unsigned>(CastOp::SI8_TO_F32) % 2);
+  }
+  return false;
+}
+
+// Source width in bytes for sign-extension.
+inline unsigned SignExtendSourceWidth(CastOp op) {
+  switch (op) {
+    case CastOp::SEXT_I8_I16:
+    case CastOp::SEXT_I8_I32:
+    case CastOp::SEXT_I8_I64: return 1;
+    case CastOp::SEXT_I16_I32:
+    case CastOp::SEXT_I16_I64: return 2;
+    case CastOp::SEXT_I32_I64: return 4;
+    default: return 8;
+  }
+}
+
+// Source width in bytes for zero-extension.
+inline unsigned ZeroExtendSourceWidth(CastOp op) {
+  switch (op) {
+    case CastOp::ZEXT_I8_I16:
+    case CastOp::ZEXT_I8_I32:
+    case CastOp::ZEXT_I8_I64: return 1;
+    case CastOp::ZEXT_I16_I32:
+    case CastOp::ZEXT_I16_I64: return 2;
+    case CastOp::ZEXT_I32_I64: return 4;
+    default: return 8;
+  }
+}
+
+// Destination width in bytes for truncation.
+inline unsigned TruncateDestWidth(CastOp op) {
+  switch (op) {
+    case CastOp::TRUNC_I16_I8:
+    case CastOp::TRUNC_I32_I8:
+    case CastOp::TRUNC_I64_I8: return 1;
+    case CastOp::TRUNC_I32_I16:
+    case CastOp::TRUNC_I64_I16: return 2;
+    case CastOp::TRUNC_I64_I32: return 4;
+    default: return 8;
+  }
+}
+
 // Single unified opcode enum for all IR instruction types. The C++ class
 // hierarchy on the read side is derived from this enum.
 enum class OpCode : uint8_t {
@@ -571,5 +637,24 @@ inline bool IsMemoryWrite(MemOp op) {
 MX_EXPORT const char *EnumeratorName(MemOp op) noexcept;
 MX_EXPORT const char *EnumeratorName(BitwiseOp op) noexcept;
 MX_EXPORT const char *EnumeratorName(FloatOp op) noexcept;
+
+// EnumerationName / NumEnumerators for sub-opcodes (needed by Python bindings).
+inline static const char *EnumerationName(ConstOp) { return "ConstOp"; }
+inline static constexpr unsigned NumEnumerators(ConstOp) { return 19u; }
+
+inline static const char *EnumerationName(AllocaKind) { return "AllocaKind"; }
+inline static constexpr unsigned NumEnumerators(AllocaKind) { return 4u; }
+
+inline static const char *EnumerationName(CastOp) { return "CastOp"; }
+inline static constexpr unsigned NumEnumerators(CastOp) { return 58u; }
+
+inline static const char *EnumerationName(MemOp) { return "MemOp"; }
+inline static constexpr unsigned NumEnumerators(MemOp) { return 78u; }
+
+inline static const char *EnumerationName(BitwiseOp) { return "BitwiseOp"; }
+inline static constexpr unsigned NumEnumerators(BitwiseOp) { return 10u; }
+
+inline static const char *EnumerationName(FloatOp) { return "FloatOp"; }
+inline static constexpr unsigned NumEnumerators(FloatOp) { return 82u; }
 
 }  // namespace mx::ir

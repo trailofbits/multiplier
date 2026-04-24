@@ -71,7 +71,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[871]) || tp >= &(gTypes[872])) {
+  if (tp < &(gTypes[923]) || tp >= &(gTypes[924])) {
     return std::nullopt;
   }
 
@@ -110,6 +110,16 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
 namespace {
 static PyGetSetDef gProperties[] = {
+  {
+    "version",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->version());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Index::version"),
+    nullptr,
+  },
   {
     "file_paths",
     reinterpret_cast<getter>(
@@ -872,6 +882,36 @@ static PyMethodDef gMethods[] = {
     PyDoc_STR("Wrapper for mx::Index::ir_object"),
   },
   {
+    "ir_structure",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          T *obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<uint64_t>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->ir_structure(std::move(arg_0.value())));
+          }
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<PackedIRStructureId>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->ir_structure(std::move(arg_0.value())));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'ir_structure'";
+          return nullptr;
+        }),
+    METH_FASTCALL,
+    PyDoc_STR("Wrapper for mx::Index::ir_structure"),
+  },
+  {
     "entity",
     reinterpret_cast<PyCFunction>(
         +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
@@ -922,7 +962,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[871]);
+  PyTypeObject * const tp = &(gTypes[923]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

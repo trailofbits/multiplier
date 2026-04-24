@@ -71,7 +71,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[3]) || tp >= &(gTypes[4])) {
+  if (tp < &(gTypes[44]) || tp >= &(gTypes[45])) {
     return std::nullopt;
   }
 
@@ -120,6 +120,76 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::IRObject::id"),
     nullptr,
   },
+  {
+    "kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRObject::kind"),
+    nullptr,
+  },
+  {
+    "source_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->source_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRObject::source_declaration"),
+    nullptr,
+  },
+  {
+    "type",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->type());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRObject::type"),
+    nullptr,
+  },
+  {
+    "size_bytes",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->size_bytes());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRObject::size_bytes"),
+    nullptr,
+  },
+  {
+    "align_bytes",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->align_bytes());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRObject::align_bytes"),
+    nullptr,
+  },
+  {
+    "frame_offset",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->frame_offset());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRObject::frame_offset"),
+    nullptr,
+  },
+  {
+    "needs_memory",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->needs_memory());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRObject::needs_memory"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace
@@ -133,7 +203,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[3]);
+  PyTypeObject * const tp = &(gTypes[44]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

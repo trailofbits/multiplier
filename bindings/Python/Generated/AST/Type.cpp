@@ -71,7 +71,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[414]) || tp >= &(gTypes[477])) {
+  if (tp < &(gTypes[466]) || tp >= &(gTypes[529])) {
     return std::nullopt;
   }
 
@@ -88,223 +88,223 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::TemplateTypeParmType::static_kind():
-      tp = &(gTypes[415]);
-      break;
-
-    case mx::TemplateSpecializationType::static_kind():
-      tp = &(gTypes[416]);
-      break;
-
-    case mx::RecordType::static_kind():
-      tp = &(gTypes[418]);
-      break;
-
-    case mx::EnumType::static_kind():
-      tp = &(gTypes[419]);
-      break;
-
-    case mx::SubstTemplateTypeParmType::static_kind():
-      tp = &(gTypes[420]);
-      break;
-
-    case mx::SubstTemplateTypeParmPackType::static_kind():
-      tp = &(gTypes[421]);
-      break;
-
-    case mx::RValueReferenceType::static_kind():
-      tp = &(gTypes[423]);
-      break;
-
-    case mx::LValueReferenceType::static_kind():
-      tp = &(gTypes[424]);
-      break;
-
-    case mx::QualifiedType::static_kind():
-      tp = &(gTypes[425]);
-      break;
-
-    case mx::PointerType::static_kind():
-      tp = &(gTypes[426]);
-      break;
-
-    case mx::PipeType::static_kind():
-      tp = &(gTypes[427]);
-      break;
-
-    case mx::ParenType::static_kind():
-      tp = &(gTypes[428]);
-      break;
-
-    case mx::PackExpansionType::static_kind():
-      tp = &(gTypes[429]);
-      break;
-
-    case mx::ObjCTypeParamType::static_kind():
-      tp = &(gTypes[430]);
-      break;
-
-    case mx::ObjCObjectType::static_kind():
-      tp = &(gTypes[431]);
-      break;
-
-    case mx::ObjCInterfaceType::static_kind():
-      tp = &(gTypes[432]);
-      break;
-
-    case mx::ObjCObjectPointerType::static_kind():
-      tp = &(gTypes[433]);
-      break;
-
-    case mx::MemberPointerType::static_kind():
-      tp = &(gTypes[434]);
-      break;
-
-    case mx::DependentSizedMatrixType::static_kind():
-      tp = &(gTypes[436]);
-      break;
-
-    case mx::ConstantMatrixType::static_kind():
-      tp = &(gTypes[437]);
-      break;
-
-    case mx::MacroQualifiedType::static_kind():
-      tp = &(gTypes[438]);
-      break;
-
-    case mx::InjectedClassNameType::static_kind():
-      tp = &(gTypes[439]);
-      break;
-
-    case mx::FunctionProtoType::static_kind():
-      tp = &(gTypes[441]);
-      break;
-
-    case mx::FunctionNoProtoType::static_kind():
-      tp = &(gTypes[442]);
-      break;
-
-    case mx::DependentVectorType::static_kind():
-      tp = &(gTypes[443]);
-      break;
-
-    case mx::DependentSizedExtVectorType::static_kind():
-      tp = &(gTypes[444]);
-      break;
-
-    case mx::DependentBitIntType::static_kind():
-      tp = &(gTypes[445]);
-      break;
-
-    case mx::DependentAddressSpaceType::static_kind():
-      tp = &(gTypes[446]);
-      break;
-
-    case mx::DeducedTemplateSpecializationType::static_kind():
-      tp = &(gTypes[448]);
-      break;
-
-    case mx::AutoType::static_kind():
-      tp = &(gTypes[449]);
-      break;
-
-    case mx::DecltypeType::static_kind():
-      tp = &(gTypes[450]);
-      break;
-
-    case mx::ComplexType::static_kind():
-      tp = &(gTypes[451]);
-      break;
-
-    case mx::BuiltinType::static_kind():
-      tp = &(gTypes[452]);
-      break;
-
-    case mx::BlockPointerType::static_kind():
-      tp = &(gTypes[453]);
-      break;
-
-    case mx::BitIntType::static_kind():
-      tp = &(gTypes[454]);
-      break;
-
-    case mx::BTFTagAttributedType::static_kind():
-      tp = &(gTypes[455]);
-      break;
-
-    case mx::AttributedType::static_kind():
-      tp = &(gTypes[456]);
-      break;
-
-    case mx::AtomicType::static_kind():
-      tp = &(gTypes[457]);
-      break;
-
-    case mx::VariableArrayType::static_kind():
-      tp = &(gTypes[459]);
-      break;
-
-    case mx::IncompleteArrayType::static_kind():
-      tp = &(gTypes[460]);
-      break;
-
-    case mx::DependentSizedArrayType::static_kind():
-      tp = &(gTypes[461]);
-      break;
-
-    case mx::ConstantArrayType::static_kind():
-      tp = &(gTypes[462]);
-      break;
-
-    case mx::AdjustedType::static_kind():
-      tp = &(gTypes[463]);
-      break;
-
-    case mx::DecayedType::static_kind():
-      tp = &(gTypes[464]);
-      break;
-
-    case mx::ElaboratedType::static_kind():
-      tp = &(gTypes[466]);
-      break;
-
-    case mx::DependentTemplateSpecializationType::static_kind():
       tp = &(gTypes[467]);
       break;
 
-    case mx::DependentNameType::static_kind():
+    case mx::TemplateSpecializationType::static_kind():
       tp = &(gTypes[468]);
       break;
 
-    case mx::VectorType::static_kind():
-      tp = &(gTypes[469]);
-      break;
-
-    case mx::ExtVectorType::static_kind():
+    case mx::RecordType::static_kind():
       tp = &(gTypes[470]);
       break;
 
-    case mx::UsingType::static_kind():
+    case mx::EnumType::static_kind():
       tp = &(gTypes[471]);
       break;
 
-    case mx::UnresolvedUsingType::static_kind():
+    case mx::SubstTemplateTypeParmType::static_kind():
       tp = &(gTypes[472]);
       break;
 
-    case mx::UnaryTransformType::static_kind():
+    case mx::SubstTemplateTypeParmPackType::static_kind():
       tp = &(gTypes[473]);
       break;
 
-    case mx::TypedefType::static_kind():
-      tp = &(gTypes[474]);
-      break;
-
-    case mx::TypeOfType::static_kind():
+    case mx::RValueReferenceType::static_kind():
       tp = &(gTypes[475]);
       break;
 
-    case mx::TypeOfExprType::static_kind():
+    case mx::LValueReferenceType::static_kind():
       tp = &(gTypes[476]);
+      break;
+
+    case mx::QualifiedType::static_kind():
+      tp = &(gTypes[477]);
+      break;
+
+    case mx::PointerType::static_kind():
+      tp = &(gTypes[478]);
+      break;
+
+    case mx::PipeType::static_kind():
+      tp = &(gTypes[479]);
+      break;
+
+    case mx::ParenType::static_kind():
+      tp = &(gTypes[480]);
+      break;
+
+    case mx::PackExpansionType::static_kind():
+      tp = &(gTypes[481]);
+      break;
+
+    case mx::ObjCTypeParamType::static_kind():
+      tp = &(gTypes[482]);
+      break;
+
+    case mx::ObjCObjectType::static_kind():
+      tp = &(gTypes[483]);
+      break;
+
+    case mx::ObjCInterfaceType::static_kind():
+      tp = &(gTypes[484]);
+      break;
+
+    case mx::ObjCObjectPointerType::static_kind():
+      tp = &(gTypes[485]);
+      break;
+
+    case mx::MemberPointerType::static_kind():
+      tp = &(gTypes[486]);
+      break;
+
+    case mx::DependentSizedMatrixType::static_kind():
+      tp = &(gTypes[488]);
+      break;
+
+    case mx::ConstantMatrixType::static_kind():
+      tp = &(gTypes[489]);
+      break;
+
+    case mx::MacroQualifiedType::static_kind():
+      tp = &(gTypes[490]);
+      break;
+
+    case mx::InjectedClassNameType::static_kind():
+      tp = &(gTypes[491]);
+      break;
+
+    case mx::FunctionProtoType::static_kind():
+      tp = &(gTypes[493]);
+      break;
+
+    case mx::FunctionNoProtoType::static_kind():
+      tp = &(gTypes[494]);
+      break;
+
+    case mx::DependentVectorType::static_kind():
+      tp = &(gTypes[495]);
+      break;
+
+    case mx::DependentSizedExtVectorType::static_kind():
+      tp = &(gTypes[496]);
+      break;
+
+    case mx::DependentBitIntType::static_kind():
+      tp = &(gTypes[497]);
+      break;
+
+    case mx::DependentAddressSpaceType::static_kind():
+      tp = &(gTypes[498]);
+      break;
+
+    case mx::DeducedTemplateSpecializationType::static_kind():
+      tp = &(gTypes[500]);
+      break;
+
+    case mx::AutoType::static_kind():
+      tp = &(gTypes[501]);
+      break;
+
+    case mx::DecltypeType::static_kind():
+      tp = &(gTypes[502]);
+      break;
+
+    case mx::ComplexType::static_kind():
+      tp = &(gTypes[503]);
+      break;
+
+    case mx::BuiltinType::static_kind():
+      tp = &(gTypes[504]);
+      break;
+
+    case mx::BlockPointerType::static_kind():
+      tp = &(gTypes[505]);
+      break;
+
+    case mx::BitIntType::static_kind():
+      tp = &(gTypes[506]);
+      break;
+
+    case mx::BTFTagAttributedType::static_kind():
+      tp = &(gTypes[507]);
+      break;
+
+    case mx::AttributedType::static_kind():
+      tp = &(gTypes[508]);
+      break;
+
+    case mx::AtomicType::static_kind():
+      tp = &(gTypes[509]);
+      break;
+
+    case mx::VariableArrayType::static_kind():
+      tp = &(gTypes[511]);
+      break;
+
+    case mx::IncompleteArrayType::static_kind():
+      tp = &(gTypes[512]);
+      break;
+
+    case mx::DependentSizedArrayType::static_kind():
+      tp = &(gTypes[513]);
+      break;
+
+    case mx::ConstantArrayType::static_kind():
+      tp = &(gTypes[514]);
+      break;
+
+    case mx::AdjustedType::static_kind():
+      tp = &(gTypes[515]);
+      break;
+
+    case mx::DecayedType::static_kind():
+      tp = &(gTypes[516]);
+      break;
+
+    case mx::ElaboratedType::static_kind():
+      tp = &(gTypes[518]);
+      break;
+
+    case mx::DependentTemplateSpecializationType::static_kind():
+      tp = &(gTypes[519]);
+      break;
+
+    case mx::DependentNameType::static_kind():
+      tp = &(gTypes[520]);
+      break;
+
+    case mx::VectorType::static_kind():
+      tp = &(gTypes[521]);
+      break;
+
+    case mx::ExtVectorType::static_kind():
+      tp = &(gTypes[522]);
+      break;
+
+    case mx::UsingType::static_kind():
+      tp = &(gTypes[523]);
+      break;
+
+    case mx::UnresolvedUsingType::static_kind():
+      tp = &(gTypes[524]);
+      break;
+
+    case mx::UnaryTransformType::static_kind():
+      tp = &(gTypes[525]);
+      break;
+
+    case mx::TypedefType::static_kind():
+      tp = &(gTypes[526]);
+      break;
+
+    case mx::TypeOfType::static_kind():
+      tp = &(gTypes[527]);
+      break;
+
+    case mx::TypeOfExprType::static_kind():
+      tp = &(gTypes[528]);
       break;
 
   }
@@ -722,7 +722,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[414]);
+  PyTypeObject * const tp = &(gTypes[466]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

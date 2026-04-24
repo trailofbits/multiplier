@@ -71,7 +71,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[14]) || tp >= &(gTypes[48])) {
+  if (tp < &(gTypes[66]) || tp >= &(gTypes[100])) {
     return std::nullopt;
   }
 
@@ -88,135 +88,135 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::SPtrAttr::static_kind():
-      tp = &(gTypes[15]);
+      tp = &(gTypes[67]);
       break;
 
     case mx::Ptr64Attr::static_kind():
-      tp = &(gTypes[16]);
+      tp = &(gTypes[68]);
       break;
 
     case mx::Ptr32Attr::static_kind():
-      tp = &(gTypes[17]);
+      tp = &(gTypes[69]);
       break;
 
     case mx::OpenCLPrivateAddressSpaceAttr::static_kind():
-      tp = &(gTypes[18]);
+      tp = &(gTypes[70]);
       break;
 
     case mx::OpenCLLocalAddressSpaceAttr::static_kind():
-      tp = &(gTypes[19]);
+      tp = &(gTypes[71]);
       break;
 
     case mx::OpenCLGlobalHostAddressSpaceAttr::static_kind():
-      tp = &(gTypes[20]);
+      tp = &(gTypes[72]);
       break;
 
     case mx::OpenCLGlobalDeviceAddressSpaceAttr::static_kind():
-      tp = &(gTypes[21]);
+      tp = &(gTypes[73]);
       break;
 
     case mx::OpenCLGlobalAddressSpaceAttr::static_kind():
-      tp = &(gTypes[22]);
+      tp = &(gTypes[74]);
       break;
 
     case mx::OpenCLGenericAddressSpaceAttr::static_kind():
-      tp = &(gTypes[23]);
+      tp = &(gTypes[75]);
       break;
 
     case mx::OpenCLConstantAddressSpaceAttr::static_kind():
-      tp = &(gTypes[24]);
+      tp = &(gTypes[76]);
       break;
 
     case mx::ObjCKindOfAttr::static_kind():
-      tp = &(gTypes[25]);
+      tp = &(gTypes[77]);
       break;
 
     case mx::ObjCInertUnsafeUnretainedAttr::static_kind():
-      tp = &(gTypes[26]);
+      tp = &(gTypes[78]);
       break;
 
     case mx::ObjCGCAttr::static_kind():
-      tp = &(gTypes[27]);
+      tp = &(gTypes[79]);
       break;
 
     case mx::NoDerefAttr::static_kind():
-      tp = &(gTypes[28]);
+      tp = &(gTypes[80]);
       break;
 
     case mx::HLSLParamModifierAttr::static_kind():
-      tp = &(gTypes[29]);
+      tp = &(gTypes[81]);
       break;
 
     case mx::HLSLGroupSharedAddressSpaceAttr::static_kind():
-      tp = &(gTypes[30]);
+      tp = &(gTypes[82]);
       break;
 
     case mx::CmseNSCallAttr::static_kind():
-      tp = &(gTypes[31]);
+      tp = &(gTypes[83]);
       break;
 
     case mx::BTFTypeTagAttr::static_kind():
-      tp = &(gTypes[32]);
+      tp = &(gTypes[84]);
       break;
 
     case mx::ArmStreamingCompatibleAttr::static_kind():
-      tp = &(gTypes[33]);
+      tp = &(gTypes[85]);
       break;
 
     case mx::ArmStreamingAttr::static_kind():
-      tp = &(gTypes[34]);
+      tp = &(gTypes[86]);
       break;
 
     case mx::ArmPreservesAttr::static_kind():
-      tp = &(gTypes[35]);
+      tp = &(gTypes[87]);
       break;
 
     case mx::ArmOutAttr::static_kind():
-      tp = &(gTypes[36]);
+      tp = &(gTypes[88]);
       break;
 
     case mx::ArmMveStrictPolymorphismAttr::static_kind():
-      tp = &(gTypes[37]);
+      tp = &(gTypes[89]);
       break;
 
     case mx::ArmInOutAttr::static_kind():
-      tp = &(gTypes[38]);
+      tp = &(gTypes[90]);
       break;
 
     case mx::ArmInAttr::static_kind():
-      tp = &(gTypes[39]);
+      tp = &(gTypes[91]);
       break;
 
     case mx::AnnotateTypeAttr::static_kind():
-      tp = &(gTypes[40]);
+      tp = &(gTypes[92]);
       break;
 
     case mx::AddressSpaceAttr::static_kind():
-      tp = &(gTypes[41]);
+      tp = &(gTypes[93]);
       break;
 
     case mx::WebAssemblyFuncrefAttr::static_kind():
-      tp = &(gTypes[42]);
+      tp = &(gTypes[94]);
       break;
 
     case mx::UPtrAttr::static_kind():
-      tp = &(gTypes[43]);
+      tp = &(gTypes[95]);
       break;
 
     case mx::TypeNullableResultAttr::static_kind():
-      tp = &(gTypes[44]);
+      tp = &(gTypes[96]);
       break;
 
     case mx::TypeNullableAttr::static_kind():
-      tp = &(gTypes[45]);
+      tp = &(gTypes[97]);
       break;
 
     case mx::TypeNullUnspecifiedAttr::static_kind():
-      tp = &(gTypes[46]);
+      tp = &(gTypes[98]);
       break;
 
     case mx::TypeNonNullAttr::static_kind():
-      tp = &(gTypes[47]);
+      tp = &(gTypes[99]);
       break;
 
   }
@@ -442,7 +442,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[14]);
+  PyTypeObject * const tp = &(gTypes[66]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -457,12 +457,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[10].tp_hash;
-  tp->tp_richcompare = gTypes[10].tp_richcompare;
+  tp->tp_hash = gTypes[62].tp_hash;
+  tp->tp_richcompare = gTypes[62].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[10]);
+  tp->tp_base = &(gTypes[62]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

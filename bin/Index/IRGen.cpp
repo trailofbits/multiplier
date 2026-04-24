@@ -407,10 +407,10 @@ std::optional<FunctionIR> IRGenerator::Generate(
     // Compute stack frame layout: assign offsets to non-dynamic objects.
     ComputeFrameLayout();
 
-    LOG(INFO) << "Generated IR for function entity "
-              << func_.func_decl_entity_id
-              << ": " << func_.blocks.size() << " blocks, "
-              << func_.instructions.size() << " instructions, "
+    DLOG(INFO) << "Generated IR for function entity "
+               << func_.func_decl_entity_id
+               << ": " << func_.blocks.size() << " blocks, "
+               << func_.instructions.size() << " instructions, "
               << func_.objects.size() << " objects"
               << ", frame=" << func_.frame_size_bytes << " bytes";
 
@@ -529,9 +529,9 @@ std::optional<FunctionIR> IRGenerator::GenerateGlobalInit(
     VerifyBlocks();
     ComputeFrameLayout();
 
-    LOG(INFO) << "Generated global init IR for var entity "
-              << func_.func_decl_entity_id
-              << ": " << func_.instructions.size() << " instructions"
+    DLOG(INFO) << "Generated global init IR for var entity "
+               << func_.func_decl_entity_id
+               << ": " << func_.instructions.size() << " instructions"
               << ", frame=" << func_.frame_size_bytes << " bytes";
 
     return std::move(func_);
@@ -1544,49 +1544,57 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
 
   std::function<void(const pasta::Stmt &)> emit_case_bodies;
   emit_case_bodies = [&](const pasta::Stmt &stmt) {
+    // Find the matching case entry by entity ID.  The AST traversal order
+    // may differ from the order collect_cases produced (e.g., default: nested
+    // inside a prior case's CompoundStmt sub-statement in PASTA's AST).
+    auto find_case = [&](mx::RawEntityId eid) -> int {
+      for (size_t i = 0; i < cases.size(); ++i) {
+        if (cases[i].source_entity_id == eid) return static_cast<int>(i);
+      }
+      return -1;
+    };
+
     if (auto cs = pasta::CaseStmt::From(stmt)) {
-      if (ci < cases.size()) {
-        maybe_emit_implicit_fallthrough(cases[ci].block_index);
+      int idx = find_case(EntityIdOf(stmt));
+      if (idx >= 0) {
+        auto ui = static_cast<size_t>(idx);
+        maybe_emit_implicit_fallthrough(cases[ui].block_index);
         PushStructure(mx::ir::StructureKind::SWITCH_CASE,
-                      cases[ci].source_entity_id);
-        // Store case value data in the structure.
+                      cases[ui].source_entity_id);
         auto &sc_struct = func_.structures[current_structure_index_];
-        sc_struct.case_low = cases[ci].low;
-        sc_struct.case_high = cases[ci].high;
+        sc_struct.case_low = cases[ui].low;
+        sc_struct.case_high = cases[ui].high;
         sc_struct.is_default = false;
-        // Record structure index back into the switch instruction.
-        func_.instructions[term_idx].switch_cases[ci].structure_index =
+        func_.instructions[term_idx].switch_cases[ui].structure_index =
             current_structure_index_;
-        SwitchToBlock(cases[ci].block_index);
-        AssociateBlockWithStructure(cases[ci].block_index);
-        // Record case block structure for Duff's device (external goto into case).
-        label_structure_[cases[ci].block_index] = current_structure_index_;
+        SwitchToBlock(cases[ui].block_index);
+        AssociateBlockWithStructure(cases[ui].block_index);
+        label_structure_[cases[ui].block_index] = current_structure_index_;
         ci++;
-        // Recurse into SubStatement. Handles direct nesting (case 1: case 2:)
-        // and Duff's device (case inside do-while). But if the sub IS a nested
-        // switch, emit it as code — its cases belong to the inner switch.
         auto sub = cs->SubStatement();
         if (pasta::SwitchStmt::From(sub)) {
           EmitStmt(sub);
         } else {
           emit_case_bodies(sub);
         }
-        PopStructure();  // SWITCH_CASE
+        PopStructure();
       }
       return;
     }
     if (auto ds = pasta::DefaultStmt::From(stmt)) {
-      if (ci < cases.size()) {
-        maybe_emit_implicit_fallthrough(cases[ci].block_index);
+      int idx = find_case(EntityIdOf(stmt));
+      if (idx >= 0) {
+        auto ui = static_cast<size_t>(idx);
+        maybe_emit_implicit_fallthrough(cases[ui].block_index);
         PushStructure(mx::ir::StructureKind::SWITCH_CASE,
-                      cases[ci].source_entity_id);
+                      cases[ui].source_entity_id);
         auto &sc_struct = func_.structures[current_structure_index_];
         sc_struct.is_default = true;
-        func_.instructions[term_idx].switch_cases[ci].structure_index =
+        func_.instructions[term_idx].switch_cases[ui].structure_index =
             current_structure_index_;
-        SwitchToBlock(cases[ci].block_index);
-        AssociateBlockWithStructure(cases[ci].block_index);
-        label_structure_[cases[ci].block_index] = current_structure_index_;
+        SwitchToBlock(cases[ui].block_index);
+        AssociateBlockWithStructure(cases[ui].block_index);
+        label_structure_[cases[ui].block_index] = current_structure_index_;
         ci++;
         auto sub = ds->SubStatement();
         if (pasta::SwitchStmt::From(sub)) {
@@ -1594,16 +1602,18 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
         } else {
           emit_case_bodies(sub);
         }
-        PopStructure();  // SWITCH_CASE (default)
+        PopStructure();
       }
       return;
     }
     if (pasta::CompoundStmt::From(stmt)) {
       // CompoundStmt: recurse into children (normal switch body).
       for (const auto &child : stmt.Children()) {
-        if (CurrentBlockTerminated() &&
-            !pasta::CaseStmt::From(child) &&
-            !pasta::DefaultStmt::From(child)) continue;
+        bool is_case = pasta::CaseStmt::From(child).has_value();
+        bool is_default = pasta::DefaultStmt::From(child).has_value();
+        bool is_label = pasta::LabelStmt::From(child).has_value();
+        if (CurrentBlockTerminated() && !is_case && !is_default && !is_label)
+          continue;
         if (pasta::SwitchStmt::From(child)) {
           EmitStmt(child);
         } else {
@@ -1638,12 +1648,33 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
       uint32_t loop_exit = NewBlock(mx::ir::BlockKind::LOOP_EXIT);
       EmitCondBranch(cond_val, loop_body_block, loop_exit, EntityIdOf(stmt));
       SwitchToBlock(loop_exit);
-    } else if (pasta::WhileStmt::From(stmt) || pasta::ForStmt::From(stmt)) {
-      // Other loops with nested cases — emit as regular code.
-      EmitStmt(stmt);
     } else {
-      // Regular statement: emit as code.
-      EmitStmt(stmt);
+      // For any other statement (if/while/for/etc.), check if it contains
+      // nested case/default labels (GCC extension: case labels can appear
+      // inside arbitrary statement bodies). If so, recurse to process them.
+      // Otherwise just emit as regular code.
+      bool has_nested_case = false;
+      std::function<bool(const pasta::Stmt &)> check_for_cases;
+      check_for_cases = [&](const pasta::Stmt &s) -> bool {
+        if (pasta::SwitchStmt::From(s)) return false;
+        if (pasta::CaseStmt::From(s) || pasta::DefaultStmt::From(s)) return true;
+        for (const auto &child : s.Children()) {
+          if (check_for_cases(child)) return true;
+        }
+        return false;
+      };
+      has_nested_case = check_for_cases(stmt);
+      if (has_nested_case) {
+        for (const auto &child : stmt.Children()) {
+          if (pasta::SwitchStmt::From(child)) {
+            EmitStmt(child);
+          } else {
+            emit_case_bodies(child);
+          }
+        }
+      } else {
+        EmitStmt(stmt);
+      }
     }
   };
   emit_case_bodies(body);
@@ -1652,12 +1683,12 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
   for (size_t sci = 0; sci < func_.instructions[term_idx].switch_cases.size();
        ++sci) {
     auto &sc = func_.instructions[term_idx].switch_cases[sci];
-    DCHECK(sc.structure_index != UINT32_MAX)
+    LOG_IF(ERROR, sc.structure_index == UINT32_MAX)
         << "Switch case " << sci << " (of "
         << func_.instructions[term_idx].switch_cases.size()
         << ") has no structure_index; ci=" << ci
         << " low=" << sc.low << " is_default=" << sc.is_default
-        << " func_eid=" << func_.func_decl_entity_id;
+        << PrefixedLocation(s, " at ");
   }
 
   // After all cases, if the last case didn't terminate, branch to exit.

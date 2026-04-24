@@ -61,7 +61,7 @@ struct BranchDecision {
   bool take_false{false};  // true = fork both paths.
 };
 
-enum class CallAction {
+enum class CallAction : uint8_t {
   INLINE,
   SKIP,
   MODEL,

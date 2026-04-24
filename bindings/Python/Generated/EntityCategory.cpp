@@ -92,9 +92,13 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
     // Assign each enumerator.
     for (T val : EnumerationRange<T>()) {
+      const char *name_cstr = EnumeratorName(val);
+      if (!name_cstr) {
+        continue;  // Skip gap values.
+      }
       auto ival = PyLong_FromUnsignedLongLong(static_cast<uint64_t>(val));
       if (ival) {
-        auto iname = PyUnicode_FromString(EnumeratorName(val));
+        auto iname = PyUnicode_FromString(name_cstr);
         if (!PyObject_SetItem(ns_dict, iname, ival)) {
           continue;
         }

@@ -15,11 +15,11 @@ capnp_generate_cpp(MX_RPC_SOURCES MX_RPC_HEADERS RPC.capnp)
 capnp_generate_cpp(MX_AST_SOURCES MX_AST_HEADERS AST.capnp)  # Bootstrapped file.
 capnp_generate_cpp(MX_IR_SOURCES MX_IR_HEADERS IR.capnp)
 
-file(GLOB frontend_headers CONFIGURE_DEPENDS "${MX_BOOTSTRAP_INCLUDE_DIR}/Frontend/*.h")
-file(GLOB frontend_sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/Frontend/*.cpp")
+file(GLOB frontend_headers "${MX_BOOTSTRAP_INCLUDE_DIR}/Frontend/*.h")
+file(GLOB frontend_sources "${CMAKE_CURRENT_LIST_DIR}/Frontend/*.cpp")
 
-file(GLOB ast_headers CONFIGURE_DEPENDS "${MX_BOOTSTRAP_INCLUDE_DIR}/AST/*.h")
-file(GLOB ast_sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/AST/*.cpp")
+file(GLOB ast_headers "${MX_BOOTSTRAP_INCLUDE_DIR}/AST/*.h")
+file(GLOB ast_sources "${CMAKE_CURRENT_LIST_DIR}/AST/*.cpp")
 
 # Configure the version to include the git hash.
 #
@@ -146,9 +146,8 @@ add_library("mx-api" OBJECT
   "IR/Structure.cpp"
   "IR/StructureKinds.cpp"
   "IR/Object.cpp"
-  "IR/Interpret/ConcreteValueFactory.cpp"
   "IR/Interpret/ConcreteMemory.cpp"
-  "IR/Interpret/ConcreteDriver.cpp"
+  "IR/Interpret/ConcretePolicy.cpp"
   "IR/Interpret/Interpreter.cpp"
   "InvalidEntityProvider.cpp"
   "InvalidEntityProvider.h"
@@ -331,7 +330,7 @@ if(MX_ENABLE_INSTALL AND NOT MX_ENABLE_BOOTSTRAP)
     DESTINATION
       "${MX_INSTALL_INCLUDE_DIR}/${lower_project_name}"
   )
-  file(GLOB ir_headers CONFIGURE_DEPENDS "${source_include_dir}/IR/*.h")
+  file(GLOB ir_headers "${source_include_dir}/IR/*.h")
   install(
     FILES
       ${ir_headers}

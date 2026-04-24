@@ -71,7 +71,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[829]) || tp >= &(gTypes[830])) {
+  if (tp < &(gTypes[881]) || tp >= &(gTypes[882])) {
     return std::nullopt;
   }
 
@@ -350,6 +350,16 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::Reference::as_ir_object"),
     nullptr,
   },
+  {
+    "as_ir_structure",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->as_ir_structure());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::Reference::as_ir_structure"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace
@@ -454,7 +464,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[829]);
+  PyTypeObject * const tp = &(gTypes[881]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

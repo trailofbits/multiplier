@@ -434,7 +434,7 @@ BuildCommandAction::GetCompilerInfo(void) {
       it == std::string::npos) {
     if (std::holds_alternative<std::error_code>(ret)) {
       return std::get<std::error_code>(ret).message();
-    
+
     } else if (it = output.sysroot.find("error: "); it != std::string::npos) {
       while (!output.sysroot.empty() && output.sysroot.back() == '\n') {
         output.sysroot.pop_back();

@@ -71,7 +71,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[756]) || tp >= &(gTypes[775])) {
+  if (tp < &(gTypes[808]) || tp >= &(gTypes[827])) {
     return std::nullopt;
   }
 
@@ -88,75 +88,75 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::VarDecl::static_kind():
-      tp = &(gTypes[757]);
+      tp = &(gTypes[809]);
       break;
 
     case mx::ParmVarDecl::static_kind():
-      tp = &(gTypes[758]);
+      tp = &(gTypes[810]);
       break;
 
     case mx::OMPCapturedExprDecl::static_kind():
-      tp = &(gTypes[759]);
+      tp = &(gTypes[811]);
       break;
 
     case mx::ImplicitParamDecl::static_kind():
-      tp = &(gTypes[760]);
+      tp = &(gTypes[812]);
       break;
 
     case mx::DecompositionDecl::static_kind():
-      tp = &(gTypes[761]);
+      tp = &(gTypes[813]);
       break;
 
     case mx::VarTemplateSpecializationDecl::static_kind():
-      tp = &(gTypes[762]);
+      tp = &(gTypes[814]);
       break;
 
     case mx::VarTemplatePartialSpecializationDecl::static_kind():
-      tp = &(gTypes[763]);
+      tp = &(gTypes[815]);
       break;
 
     case mx::NonTypeTemplateParmDecl::static_kind():
-      tp = &(gTypes[764]);
+      tp = &(gTypes[816]);
       break;
 
     case mx::MSPropertyDecl::static_kind():
-      tp = &(gTypes[765]);
+      tp = &(gTypes[817]);
       break;
 
     case mx::FunctionDecl::static_kind():
-      tp = &(gTypes[766]);
+      tp = &(gTypes[818]);
       break;
 
     case mx::CXXMethodDecl::static_kind():
-      tp = &(gTypes[767]);
+      tp = &(gTypes[819]);
       break;
 
     case mx::CXXDestructorDecl::static_kind():
-      tp = &(gTypes[768]);
+      tp = &(gTypes[820]);
       break;
 
     case mx::CXXConversionDecl::static_kind():
-      tp = &(gTypes[769]);
+      tp = &(gTypes[821]);
       break;
 
     case mx::CXXConstructorDecl::static_kind():
-      tp = &(gTypes[770]);
+      tp = &(gTypes[822]);
       break;
 
     case mx::CXXDeductionGuideDecl::static_kind():
-      tp = &(gTypes[771]);
+      tp = &(gTypes[823]);
       break;
 
     case mx::FieldDecl::static_kind():
-      tp = &(gTypes[772]);
+      tp = &(gTypes[824]);
       break;
 
     case mx::ObjCIvarDecl::static_kind():
-      tp = &(gTypes[773]);
+      tp = &(gTypes[825]);
       break;
 
     case mx::ObjCAtDefsFieldDecl::static_kind():
-      tp = &(gTypes[774]);
+      tp = &(gTypes[826]);
       break;
 
   }
@@ -522,7 +522,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[756]);
+  PyTypeObject * const tp = &(gTypes[808]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -537,12 +537,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[748].tp_hash;
-  tp->tp_richcompare = gTypes[748].tp_richcompare;
+  tp->tp_hash = gTypes[800].tp_hash;
+  tp->tp_richcompare = gTypes[800].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[748]);
+  tp->tp_base = &(gTypes[800]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

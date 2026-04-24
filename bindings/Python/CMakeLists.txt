@@ -13,7 +13,7 @@ include("${PROJECT_SOURCE_DIR}/cmake/python.cmake")
 # extension.
 get_python_extension_suffix(python_module_extension)
 
-file(GLOB_RECURSE generated_sources CONFIGURE_DEPENDS RELATIVE_PATH "${CMAKE_CURRENT_LIST_DIR}/Generated" "*.cpp")
+file(GLOB_RECURSE generated_sources RELATIVE_PATH "${CMAKE_CURRENT_LIST_DIR}/Generated" "*.cpp")
 
 add_library("mx-python" SHARED
   "${PROJECT_SOURCE_DIR}/include/${lower_project_name}/Bindings/Python.h"
@@ -32,6 +32,10 @@ add_library("mx-python" SHARED
   "SharedPyPtr.h"
   "TokenTreeVisitor.h"
   "TokenTreeVisitor.cpp"
+  "Interpreter.h"
+  "Interpreter.cpp"
+  "SymbolicInterpreter.h"
+  "SymbolicInterpreter.cpp"
   "Types.cpp"  # Auto-generated.
   "Types.h"
   "UserToken.cpp"
