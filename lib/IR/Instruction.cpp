@@ -269,6 +269,15 @@ void IRInstruction::format(std::ostream &os) const {
     os << "/" << ir::EnumeratorName(fi->sub_opcode());
   }
 
+  // Call target name.
+  if (auto ci = CallInst::from(*this)) {
+    if (auto fd = ci->target()) {
+      os << " @" << fd->name();
+    } else if (ci->is_indirect()) {
+      os << " @<indirect>";
+    }
+  }
+
   // Operands.
   unsigned n = num_operands();
   if (n > 0) {
