@@ -68,3 +68,20 @@ class ExploreUntil:
     @staticmethod
     def never():
         return _Predicate(lambda s: False, ".never()")
+
+    @staticmethod
+    def max_paths(n):
+        """Stop once the total number of paths created reaches `n`.
+
+        Equivalent to `path_count(n)`; included so the Phase 3 vocabulary
+        matches what the docs and analyst-facing examples use.
+        """
+        return _Predicate(lambda s: len(s.paths) >= n,
+                          f".max_paths({n})")
+
+    @staticmethod
+    def max_depth(d):
+        """Stop once any path's `steps` counter reaches `d`."""
+        return _Predicate(
+            lambda s: any(p.steps >= d for p in s.paths),
+            f".max_depth({d})")

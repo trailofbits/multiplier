@@ -170,10 +170,9 @@ def resolve_indirect(ctx, target_addr, next_hook):
     return ctx.layout.function_at(target_addr) or ctx.default()
 
 @engine.intercept.loop(func="process_users")
-def lp(ctx):
-    if ctx.loop.would_exit: return ctx.STOP
-    if ctx.loop.iteration > 3: return ctx.STOP
-    return ctx.CONTINUE
+def lp(ctx, next_hook):
+    if ctx.loop.iteration >= 3: return False  # take the exit edge
+    return next_hook(ctx)                     # natural concrete behavior
 
 # 3. OBSERVERS — passive. Return value ignored. Engine fires after the event.
 @engine.observe.global_read                            # any global, any path
@@ -434,18 +433,21 @@ analyst API.
 useful primitive.
 
 - Backedge analysis: a Python pass over IR's block CFG that
-  classifies each branch edge as `tree`, `forward`, `backward`,
+  classifies each branch edge as `tree`, `forward`, `back`, or
   `cross`. Result cached on the function.
-- `LoopContext` available on `ctx` inside loop-aware hooks —
-  `ctx.loop.iteration`, `ctx.loop.would_exit`,
-  `ctx.loop.would_recurse`.
-- `@engine.loop_policy(func=…)` decorator with returns
-  `ctx.CONTINUE`, `ctx.STOP`, `ctx.SKIP_BODY`, `ctx.REPLAY`.
-- Path concurrency control: `engine.explore(strategy=DFS|BFS)`,
-  `max_paths`, `max_depth`.
+- `LoopContext` available on `ctx.loop` inside loop-aware hooks —
+  `iteration`, `header_block`, `latch_block`, `would_exit`.
+- `intercept.branch(func=…, block=…)` chain dispatch and the
+  `intercept.loop(func=…, header_block=…)` sugar built on top.
+  Loop hooks compose: return `False` to take the exit edge,
+  `True` to continue, or call `next_hook(ctx)` to take the natural
+  concrete decision. `intercept.branch` handlers receive
+  `(ctx, condition, next_hook)`.
+- Path concurrency control: `engine.explore(strategy="dfs"|"bfs")`,
+  `ExploreUntil.max_paths(N)` / `max_depth(D)`.
 - `Path.snapshot()` / `Path.restore(snap)` /
-  `Path.replay(modify=callable)` — let the analyst surgically
-  retry a path with one variable changed.
+  `Path.replay(modify=callable, engine=…)` — let the analyst
+  surgically retry a path with one mutation applied first.
 
 **Tests:** P3.1–P3.6.
 

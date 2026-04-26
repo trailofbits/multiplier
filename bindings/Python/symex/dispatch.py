@@ -86,15 +86,16 @@ class _Selector:
     Empty / `None` attributes match anything.
     """
 
-    __slots__ = ("addr_range", "name", "eid", "func", "_layout",
-                 "_resolved_range")
+    __slots__ = ("addr_range", "name", "eid", "func", "block",
+                 "_layout", "_resolved_range")
 
     def __init__(self, addr_range=None, name=None, eid=None, func=None,
-                 layout=None):
+                 block=None, layout=None):
         self.addr_range = addr_range
         self.name = name
         self.eid = eid
         self.func = func
+        self.block = block
         self._layout = layout
         self._resolved_range = None
 
@@ -117,7 +118,16 @@ class _Selector:
     def matches_func(self, candidate_func):
         if self.func is None:
             return True
+        if candidate_func is None:
+            return False
         return self.func is candidate_func or self.func == candidate_func
+
+    def matches_block(self, candidate_block):
+        if self.block is None:
+            return True
+        if candidate_block is None:
+            return False
+        return int(self.block) == int(candidate_block)
 
     def _compute_range(self):
         if self._resolved_range is not None:
@@ -146,6 +156,7 @@ def make_selector(layout, **kwargs):
         name=kwargs.get("name"),
         eid=kwargs.get("eid"),
         func=kwargs.get("func"),
+        block=kwargs.get("block"),
         layout=layout,
     )
 
@@ -263,6 +274,19 @@ def _make_default_mem_write(is_float):
 def _default_call(ctx):
     """Chain bottom for a call event — defer to substrate inline."""
     return _DEFER
+
+
+def _default_branch(ctx, condition):
+    """Chain bottom for a branch event.
+
+    Concrete conditions resolve to True / False naturally; symbolic
+    conditions return `_FORK`, telling the InterceptorPolicy to hand
+    control back to the substrate so it can enumerate edges via a
+    BranchContinuation.
+    """
+    if isinstance(condition, (int, bool)):
+        return condition != 0
+    return _FORK
 
 
 # -----------------------------------------------------------------------
@@ -438,14 +462,57 @@ class InterceptorPolicy:
     # ----- truth + branch resolution: fork on non-concrete -----
 
     def is_true(self, val):
+        # If the analyst registered any BRANCH handlers, fall through to
+        # `resolve_branch` (where we have the target eids) so they get a
+        # chance to fire. The Phase 2 fast path only applies when no
+        # handler is interested.
+        if self._engine._intercepts.lookup(BRANCH):
+            return None
         if isinstance(val, (int, bool)):
             return val != 0
         return None
 
     def resolve_branch(self, condition, true_eid, false_eid):
-        if isinstance(condition, (int, bool)):
-            return condition != 0
-        return None
+        ctx = self._make_ctx()
+        t_eid = int(true_eid)
+        f_eid = int(false_eid)
+        ctx.true_eid = t_eid
+        ctx.false_eid = f_eid
+
+        # Resolve the source-block / function context — populated when
+        # an `intercept.branch(func=…)` or `intercept.loop(func=…)` was
+        # registered against the function containing this branch.
+        site = self._engine._branch_sites.get((t_eid, f_eid))
+        if site is not None:
+            ctx.source_block = site["src_id"]
+            ctx.func_id = site["func_id"]
+        else:
+            ctx.source_block = None
+            ctx.func_id = None
+
+        def _match(sel):
+            if not sel.matches_func(ctx.func_id):
+                return False
+            if not sel.matches_block(ctx.source_block):
+                return False
+            return True
+
+        handlers = self._matching_handlers(BRANCH, _match)
+        if not handlers and isinstance(condition, (int, bool)):
+            return condition != 0  # Phase 2 fast path
+        if not handlers:
+            return None  # symbolic, no handler — let substrate fork
+
+        chain = _build_chain(handlers, _default_branch)
+        try:
+            chosen = chain(ctx, condition)
+        except Exception as exc:  # noqa: BLE001
+            self._record_handler_error(ctx, BRANCH, exc, role="intercept")
+            chosen = _FORK
+
+        if chosen is _FORK:
+            return None
+        return bool(chosen)
 
     # ------------------------------------------------------------------
     # Internal helpers

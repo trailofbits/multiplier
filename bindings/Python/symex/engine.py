@@ -132,8 +132,43 @@ class SymExEngine:
         self._func_name_resolver = _make_func_name_resolver(index)
         self._intercepts = _Registry()
         self._observers = _Registry()
+        # Lazy-populated CFGInfo per function id (Phase 3).
+        self._cfg_cache = {}
+        # (true_eid, false_eid) -> {"src_id": …, "func_id": …}; populated
+        # when a function's CFG is analyzed for an intercept.branch /
+        # intercept.loop registration.
+        self._branch_sites = {}
         self.intercept = InterceptDispatcher(self)
         self.observe = ObserveDispatcher(self)
+
+    def _get_cfg(self, ir_func):
+        """Return the cached CFGInfo for `ir_func`, computing it on
+        first call. Also populates `_branch_sites` so the
+        InterceptorPolicy can resolve a (true_eid, false_eid) pair
+        back to its source block and function id."""
+        from .cfg import classify_edges
+        fid = int(ir_func.id)
+        cached = self._cfg_cache.get(fid)
+        if cached is not None:
+            return cached
+        cfg = classify_edges(ir_func)
+        self._cfg_cache[fid] = cfg
+        # Update the global branch site index. Each (true, false) tuple
+        # maps to its source block and function id; on collision we keep
+        # the first one (deterministic via DFS visit order in CFGInfo).
+        for key, src_ids in cfg.branch_to_src.items():
+            if key in self._branch_sites:
+                continue
+            self._branch_sites[key] = {
+                "src_id": src_ids[0],
+                "func_id": fid,
+            }
+        return cfg
+
+    def resolve_function(self, spec):
+        """Resolve a function spec (name string or IRFunction) to an
+        IRFunction. Public so decorator helpers can share the path."""
+        return self._resolve_start(spec)
 
     # ------------------------------------------------------------------
     # Public API
@@ -158,7 +193,7 @@ class SymExEngine:
 
     def explore(self, start_func, *, start_block=None, args=None, seed=None,
                 policy=None, until=None, slice_steps=_DEFAULT_SLICE_STEPS,
-                concretize=None):
+                concretize=None, strategy="bfs"):
         ir_func = self._resolve_start(start_func)
         if ir_func is None:
             raise ValueError(f"start_func {start_func!r} not found in index")
@@ -167,17 +202,22 @@ class SymExEngine:
             raise ValueError(
                 "value seed requires start_block (mid-block entry; Phase 3)")
 
+        if strategy not in ("bfs", "dfs"):
+            raise ValueError(f"unknown explore strategy {strategy!r}")
+
         until_pred = until if until is not None else ExploreUntil.never()
         if concretize is None:
             concretize = lambda fork: [0]
 
-        # If the analyst didn't pass a policy, build a fresh
-        # InterceptorPolicy per step bound to the current path. The
-        # `policy` value here is just a marker; the real per-step
-        # policy is created in `_step_one`.
         use_interceptor = policy is None
-
-        layout = self.layout if self.layout is not None else Layout()
+        if self.layout is None:
+            # Pin a layout the first time `explore` runs so subsequent
+            # calls (and `resume_from` / `Path.replay`) see the same
+            # address space — otherwise a freshly minted Layout() per
+            # call would diverge from the one whose addresses are baked
+            # into a previously-cloned state.
+            self.layout = Layout()
+        layout = self.layout
         memory = layout.memory
 
         init_policy = (InterceptorPolicy(self, None, layout=layout,
@@ -187,8 +227,24 @@ class SymExEngine:
             ir_func, memory, init_policy, args=args,
             start_block=start_block, value_seed=seed)
 
-        paths = [initial_path]
+        return self._drive([initial_path], memory, layout, policy,
+                           use_interceptor, until_pred, slice_steps,
+                           concretize, strategy)
 
+    def _drive(self, initial_paths, memory, layout, policy,
+               use_interceptor, until_pred, slice_steps, concretize,
+               strategy):
+        if strategy == "dfs":
+            return self._drive_dfs(initial_paths, memory, layout, policy,
+                                   use_interceptor, until_pred, slice_steps,
+                                   concretize)
+        return self._drive_bfs(initial_paths, memory, layout, policy,
+                               use_interceptor, until_pred, slice_steps,
+                               concretize)
+
+    def _drive_bfs(self, initial_paths, memory, layout, policy,
+                   use_interceptor, until_pred, slice_steps, concretize):
+        paths = list(initial_paths)
         while True:
             live = [p for p in paths if p.terminal is None]
             if not live:
@@ -202,8 +258,7 @@ class SymExEngine:
                 if path.terminal is not None:
                     new_paths.append(path)
                     continue
-                step_policy = (InterceptorPolicy(self, path,
-                                                  layout=layout,
+                step_policy = (InterceptorPolicy(self, path, layout=layout,
                                                   memory=memory)
                                 if use_interceptor else policy)
                 children = self._step_one(
@@ -221,6 +276,86 @@ class SymExEngine:
                 break
 
         return paths
+
+    def _drive_dfs(self, initial_paths, memory, layout, policy,
+                   use_interceptor, until_pred, slice_steps, concretize):
+        """DFS: take one live path off the top of the stack, step it
+        until it forks (fork → push children, deepest first) or
+        terminates. The terminal-path order in the result is "deepest
+        completes first," in contrast to BFS's "shallowest first."
+        """
+        all_paths = list(initial_paths)
+        stack = [p for p in initial_paths if p.terminal is None]
+
+        while stack:
+            total_steps = sum(p.steps for p in all_paths)
+            if until_pred(_ExploreState(all_paths, total_steps)):
+                break
+
+            path = stack.pop()
+            if path.terminal is not None:
+                continue
+
+            step_policy = (InterceptorPolicy(self, path, layout=layout,
+                                              memory=memory)
+                            if use_interceptor else policy)
+            children = self._step_one(
+                path, memory, step_policy, slice_steps, concretize)
+
+            if len(children) == 1 and children[0] is path:
+                # Path stepped without forking; keep driving it.
+                if path.terminal is None:
+                    stack.append(path)
+                continue
+
+            # Fork: replace `path` in `all_paths` with the children, push
+            # in reverse order so the lowest-id child is processed first.
+            try:
+                idx = all_paths.index(path)
+                all_paths[idx:idx + 1] = children
+            except ValueError:
+                all_paths.extend(children)
+            for child in reversed(children):
+                if child.terminal is None:
+                    stack.append(child)
+
+        return all_paths
+
+    def resume_from(self, snapshot, *, modify=None,
+                    slice_steps=_DEFAULT_SLICE_STEPS, concretize=None,
+                    parent_id=None, until=None, strategy="bfs"):
+        """Build a fresh `Path` from a `_Snapshot` (re-cloning its
+        state so the snapshot stays reusable), apply `modify(path)`
+        once, and resume exploration through the engine driver.
+
+        Returns the list of paths produced. Used by `Path.replay`.
+        """
+        layout = self.layout if self.layout is not None else Layout()
+        memory = layout.memory
+        if concretize is None:
+            concretize = lambda fork: [0]
+        until_pred = until if until is not None else ExploreUntil.never()
+
+        fresh_state = _interp.clone_state(snapshot.state)
+        path = Path(fresh_state, memory, parent_id=parent_id)
+        path.events = list(snapshot.events)
+        path.tags = set(snapshot.tags)
+        path._loop_iters = dict(snapshot.loop_iters)
+        path.terminal = snapshot.terminal
+        path.return_value = snapshot.return_value
+        path.error_kind = snapshot.error_kind
+
+        if modify is not None:
+            modify(path)
+
+        # If the snapshot was taken at a terminal point and modify
+        # didn't reset it, return the path as-is.
+        if path.terminal is not None:
+            return [path]
+
+        return self._drive([path], memory, layout, None, True,
+                            until_pred, slice_steps, concretize,
+                            strategy)
 
     # ------------------------------------------------------------------
     # internals
@@ -330,6 +465,7 @@ class SymExEngine:
             child.events = list(path.events)
             child.tags = set(path.tags)
             child.solver = path.solver
+            child._loop_iters = dict(path._loop_iters)
             child.events.append({
                 "kind": "branch",
                 "direction": direction,
@@ -365,6 +501,7 @@ class SymExEngine:
             child.events = list(path.events)
             child.tags = set(path.tags)
             child.solver = path.solver
+            child._loop_iters = dict(path._loop_iters)
             child.events.append({
                 "kind": "memaddr_concretize",
                 "address": addr,
