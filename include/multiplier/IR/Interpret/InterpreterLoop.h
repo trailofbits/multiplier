@@ -1000,11 +1000,7 @@ inline void exec_call(auto &state, PolicyT &policy,
   auto target_decl = ci->target();
   RawEntityId indirect_eid = kInvalidEntityId;
 
-  if (target_decl) {
-    callee_ir = IRFunction::from(*target_decl);
-  }
-
-  if (!callee_ir && ci->is_indirect()) {
+  if (ci->is_indirect()) {
     auto callee_op = inst.nth_operand(0);
     ValueT callee_val = val<ValueT>(frame, callee_op);
     MemAccessHint hint{8, false, false};
@@ -1018,7 +1014,10 @@ inline void exec_call(auto &state, PolicyT &policy,
         });
   }
 
-  if (!callee_ir) {
+  // Always consult the policy. Default policies fall through to
+  // `func_resolver_` so direct-call inlining is preserved; symex
+  // analysts can intercept any call site via `intercept.call(name=…)`.
+  {
     RawEntityId target_eid = target_decl
         ? target_decl->id().Pack() : kInvalidEntityId;
     CallResolution<ValueT> resolution;

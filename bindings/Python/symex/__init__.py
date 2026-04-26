@@ -6,8 +6,9 @@
 """Symbolic execution facade for Multiplier.
 
 Phase 1 ships the analyst-facing skeleton: Layout, SymExEngine, Path,
-Ctx, MemView, ArgsView, and ExploreUntil. Hooks (interceptors and
-observers) land in Phase 2.
+Ctx, MemView, ArgsView, and ExploreUntil. Phase 2 adds the hook layer
+(`engine.intercept.<event>` and `engine.observe.<event>`) and a small
+libc model pack.
 """
 
 from .layout import Layout
@@ -16,6 +17,8 @@ from .ctx import Ctx
 from .path import Path
 from .until import ExploreUntil
 from .engine import SymExEngine
+from .dispatch import InterceptorPolicy, SymExpr
+from . import models
 
 __all__ = [
     "Layout",
@@ -25,4 +28,7 @@ __all__ = [
     "Path",
     "ExploreUntil",
     "SymExEngine",
+    "InterceptorPolicy",
+    "SymExpr",
+    "models",
 ]

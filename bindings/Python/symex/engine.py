@@ -6,21 +6,17 @@
 """SymExEngine — orchestrates symbolic exploration over the IR
 interpreter.
 
-Phase 1 scope: enumerate paths through the existing C++ symbolic
-substrate. Forks come in two flavors:
+Phase 1 enumerated paths through the C++ symbolic substrate. Phase 2
+adds the analyst-facing hook layer:
 
-  * BranchContinuation — the policy returned `is_true is None` for a
-    COND_BRANCH cond. The substrate's `step` already enumerates the two
-    edges into `forks`; the driver adds one path per edge.
+  * `engine.intercept.<event>` — composable handlers; each receives
+    `next_hook` as its last positional arg and forwards by calling it.
+  * `engine.observe.<event>` — listener handlers; auto-recorded to
+    `path.events`.
 
-  * MemAddrContinuation — the policy returned a non-`("ptr", ...)`
-    value for a memory-op address. Phase 1 falls back to
-    ConcretizeFinite([0]); each candidate becomes a path via
-    `resume_addr`. Phase 5 swaps strategies in.
-
-The driver does NOT dispatch hooks (Phase 2) and does NOT integrate z3
-(Phase 4). It does record one structured `branch` event per fork so
-P1.4 has something to query.
+When the analyst supplies neither a custom policy nor a base policy,
+the engine instantiates an `InterceptorPolicy` per step that consults
+the registries and propagates symbolic values across pure operations.
 """
 
 import multiplier as mx
@@ -29,16 +25,11 @@ from .layout import Layout
 from .lens import MemView, ArgsView
 from .path import Path
 from .until import ExploreUntil
+from .dispatch import InterceptorPolicy, _Registry, SymExpr
+from .intercept import InterceptDispatcher
+from .observe import ObserveDispatcher
 
 _interp = mx.ir.interpret
-
-
-class _PassthroughPolicy:
-    """Default policy when the analyst hasn't supplied one.
-
-    No method overrides — the C++ side falls back to concrete semantics
-    everywhere.
-    """
 
 
 class _ExploreState:
@@ -77,6 +68,34 @@ def _make_func_resolver(index):
     return resolve
 
 
+def _make_func_name_resolver(index):
+    """Resolve a function entity id to its declared name.
+
+    Used by InterceptorPolicy to filter `intercept.call(name=...)`
+    selectors. Returns None on miss; the caller treats that as
+    "selectors with `name=` cannot match".
+    """
+    def resolve(eid):
+        try:
+            entity = index.entity(eid)
+        except Exception:
+            return None
+        fd = None
+        if isinstance(entity, mx.ast.Decl):
+            fd = mx.ast.FunctionDecl.FROM(entity)
+        elif isinstance(entity, mx.ast.Stmt):
+            dre = mx.ast.DeclRefExpr.FROM(entity)
+            if dre is not None:
+                fd = mx.ast.FunctionDecl.FROM(dre.declaration)
+        if fd is None:
+            return None
+        try:
+            return str(fd.name)
+        except Exception:
+            return None
+    return resolve
+
+
 def _make_global_resolver(index):
     def resolve(eid):
         entity = index.entity(eid)
@@ -110,6 +129,32 @@ class SymExEngine:
         self.layout = None
         self._func_resolver = _make_func_resolver(index)
         self._global_resolver = _make_global_resolver(index)
+        self._func_name_resolver = _make_func_name_resolver(index)
+        self._intercepts = _Registry()
+        self._observers = _Registry()
+        self.intercept = InterceptDispatcher(self)
+        self.observe = ObserveDispatcher(self)
+
+    # ------------------------------------------------------------------
+    # Public API
+    # ------------------------------------------------------------------
+
+    def use(self, model):
+        """Install a model pack. The pack is either a callable (called
+        with `engine`) or an object with a `register(engine)` method.
+
+        `engine.use(symex.models.libc)` registers all libc handlers in
+        one call.
+        """
+        if hasattr(model, "register"):
+            model.register(self)
+        elif callable(model):
+            model(self)
+        else:
+            raise TypeError(
+                f"engine.use(): {model!r} is not callable and lacks "
+                "register(engine)")
+        return self
 
     def explore(self, start_func, *, start_block=None, args=None, seed=None,
                 policy=None, until=None, slice_steps=_DEFAULT_SLICE_STEPS,
@@ -119,7 +164,6 @@ class SymExEngine:
             raise ValueError(f"start_func {start_func!r} not found in index")
 
         if seed is not None and start_block is None:
-            # seed maps eid -> python value; mid-block entry is Phase 3.
             raise ValueError(
                 "value seed requires start_block (mid-block entry; Phase 3)")
 
@@ -127,12 +171,20 @@ class SymExEngine:
         if concretize is None:
             concretize = lambda fork: [0]
 
-        active_policy = policy if policy is not None else _PassthroughPolicy()
+        # If the analyst didn't pass a policy, build a fresh
+        # InterceptorPolicy per step bound to the current path. The
+        # `policy` value here is just a marker; the real per-step
+        # policy is created in `_step_one`.
+        use_interceptor = policy is None
+
         layout = self.layout if self.layout is not None else Layout()
         memory = layout.memory
 
+        init_policy = (InterceptorPolicy(self, None, layout=layout,
+                                         memory=memory)
+                       if use_interceptor else policy)
         initial_path = self._init_path(
-            ir_func, memory, active_policy, args=args,
+            ir_func, memory, init_policy, args=args,
             start_block=start_block, value_seed=seed)
 
         paths = [initial_path]
@@ -150,15 +202,18 @@ class SymExEngine:
                 if path.terminal is not None:
                     new_paths.append(path)
                     continue
+                step_policy = (InterceptorPolicy(self, path,
+                                                  layout=layout,
+                                                  memory=memory)
+                                if use_interceptor else policy)
                 children = self._step_one(
-                    path, memory, active_policy, slice_steps, concretize)
+                    path, memory, step_policy, slice_steps, concretize)
                 new_paths.extend(children)
                 if until_pred(_ExploreState(new_paths +
                                             [p for p in paths
                                              if p not in new_paths and
                                              p.terminal is not None],
                                             sum(p.steps for p in new_paths))):
-                    # Predicate fired mid-tick; capture and break out.
                     break
 
             paths = new_paths
@@ -167,7 +222,9 @@ class SymExEngine:
 
         return paths
 
-    # -- internals ---------------------------------------------------------
+    # ------------------------------------------------------------------
+    # internals
+    # ------------------------------------------------------------------
 
     def _resolve_start(self, start_func):
         if isinstance(start_func, str):
@@ -233,8 +290,11 @@ class SymExEngine:
         result = out.get("result")
         forks = out.get("forks") or []
 
+        if path.terminal is not None:
+            # An intercept called ctx.stop_path() and short-circuited.
+            return [path]
+
         if result is None:
-            # Pre-CRDT idle tick — treat as live, no progress.
             return [path]
 
         kind = result[0]
@@ -247,7 +307,6 @@ class SymExEngine:
             path.error_kind = result[1]
             return [path]
         if kind == "budget":
-            # Slice exhausted; same path continues next tick.
             return [path]
         if kind == "branch":
             return self._handle_branch_forks(path, result, forks)

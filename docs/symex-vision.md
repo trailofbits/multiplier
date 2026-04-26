@@ -51,7 +51,7 @@ difference matters because the analyst has to pick the right tool:
 | Timing | Synchronous, blocking — engine waits for the answer | Notional async — engine moves on |
 | Tense | "Decide what *is*" | "Tell me what is *about to be* or *was*" |
 | Failure mode | Wrong answer corrupts execution | Wrong answer logs noise |
-| Composition | One winner per event (first non-`PASS`) | All run; order = registration |
+| Composition | Chained — each handler receives `next_hook` and forwards or short-circuits | All run; order = registration |
 | Implementation | Substrate (overrides on `PythonPolicy`) | Built on top of policy events |
 
 **Policies subsume observers.** Anything an observer can do, a policy
@@ -67,9 +67,11 @@ program sees.
 
 In the API this becomes two namespaces:
 
-- `@engine.intercept.<event>(…)` — agentic. Return value is the
-  decision. `PASS` means "I don't handle this, fall through to the
-  next intercept; if none handle, default policy runs."
+- `@engine.intercept.<event>(…)` — agentic. Each handler takes
+  `next_hook` as its last positional argument. Forward by calling
+  `next_hook(...)` (the rest of the chain ending in the substrate's
+  natural default); short-circuit by returning a value without
+  calling it.
 - `@engine.observe.<event>(…)` — observational. Return value
   ignored. Fires by default *after* the policy event commits
   (`observe.after.<event>` for explicitness; `observe.before.<event>`
@@ -150,12 +152,12 @@ engine.layout = layout
 
 # 2. INTERCEPTORS — agentic. Return value flows into execution.
 @engine.intercept.memory_read(addr_range=("g_users", 8 * 64))
-def read_user_table(ctx, addr, size):
+def read_user_table(ctx, addr, size, next_hook):
     idx_ = (addr - layout["g_users"]) // 8
     return z3.BitVec(f"user[{idx_}]", size * 8)        # becomes the read result
 
 @engine.intercept.call(name="read")
-def stub_read(ctx):
+def stub_read(ctx, next_hook):
     fd     = ctx.args.read_int(0)
     buf    = ctx.args[1]
     n_val  = ctx.args.read_int(2)
@@ -164,8 +166,8 @@ def stub_read(ctx):
     return ctx.solver.fresh_int("read_ret", lo=0, hi=n_val)
 
 @engine.intercept.indirect_call
-def resolve_indirect(ctx, target_addr):
-    return ctx.layout.function_at(target_addr) or ctx.SKIP
+def resolve_indirect(ctx, target_addr, next_hook):
+    return ctx.layout.function_at(target_addr) or ctx.default()
 
 @engine.intercept.loop(func="process_users")
 def lp(ctx):
@@ -225,7 +227,7 @@ The "killer" qualities of this surface:
 | Choose which callee fires for an indirect call | `intercept.indirect_call` |
 | Choose which addresses to enumerate when one is symbolic | `intercept.concretize` (concretization strategy) |
 | Stop / continue / skip a loop iteration | `intercept.loop(func=…)` |
-| Pre-write a value before a struct field is read | `intercept.memory_read` (write inside, return PASS) **or** `observe.before.memory_read` |
+| Pre-write a value before a struct field is read | `intercept.memory_read` (write inside, then `return next_hook(ctx, addr, size)`) **or** `observe.before.memory_read` |
 | Count how many times `foo` is called | `observe.call(name="foo")` |
 | Tag a path when it touches a sentinel address | `observe.memory_read(addr_range=…)` |
 | Build a per-path trace of global accesses | `observe.global_read` + `observe.global_write` |
@@ -272,7 +274,9 @@ are notifications** the engine emits *around* policy events.
 │   ┌─ InterceptorPolicy(PythonPolicy) ─────────────────────────────┐  │
 │   │  Sole consumer of the C++ policy hooks. For each event:       │  │
 │   │    1. fire `observe.before.<event>` notifications             │  │
-│   │    2. run matching `intercept.<event>` chain (first non-PASS) │  │
+│   │    2. compose matching `intercept.<event>` handlers into a    │  │
+│   │       chain ending in the substrate's natural default; each   │  │
+│   │       handler decides whether to forward via `next_hook`     │  │
 │   │    3. fire `observe.after.<event>` notifications              │  │
 │   │  Default behavior (when no intercept handles) = stock         │  │
 │   │  PythonPolicy / ConcretePolicy semantics.                     │  │
@@ -378,10 +382,12 @@ analyst API.
   - `intercept.loop(func=…)`
   - `intercept.concretize` (concretization strategy, see Phase 5)
 
-  Return values: a typed value (becomes the result), `ctx.PASS`
-  (fall through to next intercept / default policy), `ctx.SKIP`
-  (use default-undef result), `ctx.STOP` (halt this path).
-  First non-`PASS` from the chain wins.
+  Each handler takes `next_hook` as its last positional argument.
+  To forward to the rest of the chain (and ultimately the substrate's
+  natural default), call `next_hook(...)` and return its result.
+  To short-circuit, return a typed value without calling `next_hook`.
+  Use `ctx.default()` for the substrate's default value, or
+  `ctx.stop_path()` to mark the path as stopped before returning.
 
 - **Observers (passive).** Decorators register handlers on the
   `engine.observe.*` namespace, mirroring the intercept selector
@@ -557,8 +563,8 @@ returns `z3.BitVec(...)`; the value flows into the program's
 computation; the next arithmetic op sees the symbolic value.
 
 **P2.3** `test_intercept_memory_write_drops_write` — interceptor
-returns `ctx.SKIP`; subsequent read of the address returns the
-prior value, not the dropped one.
+returns `None` without calling `next_hook`; subsequent read of the
+address returns the prior value, not the dropped one.
 
 **P2.4** `test_intercept_call_by_name` —
 `@intercept.call(name="strlen")` fires; interceptor reads pointer
@@ -573,18 +579,19 @@ policy never sees the call.
 pointer table at known addresses; interceptor returns the right
 callee based on `ctx.layout.function_at(target_addr)`.
 
-**P2.7** `test_intercept_call_skip_returns_default` — interceptor
-returns `ctx.SKIP`; caller sees `ctx.policy.make_default()` as
+**P2.7** `test_intercept_call_default_returns_default` — interceptor
+returns `ctx.default()`; caller sees the substrate's default
 return value.
 
-**P2.8** `test_intercept_chain_first_non_pass_wins` — two
+**P2.8** `test_chain_forwards_through_next_hook` — two
 `@intercept.memory_read` handlers on overlapping ranges; first
-returns `PASS`, second handles; verify second's value reaches
-the program.
+calls `next_hook(...)`, second short-circuits with a value;
+verify the second's value propagates back through the first.
 
 **P2.9** `test_intercept_struct_field_pre_write` — interceptor
-on field's address `ctx.mem.write`s a value, then returns
-`ctx.PASS`; the natural read sees the pre-written value.
+on field's address `ctx.mem.write`s a value, then forwards via
+`next_hook(ctx, addr, size)`; the chain bottom's natural read
+returns the pre-written value.
 
 **P2.10** `test_observe_memory_read_records_to_path` — same
 event as P2.1, but with `@observe.memory_read`; the path's
@@ -700,9 +707,10 @@ docstring example block passes when run.
   always sees an `int`. Good.
 - **Interceptor ordering across files.** Explicit `priority=`
   kwarg, or registration order? Recommend registration order
-  with optional priority; print warnings when two interceptors
-  match the same event and neither returns `PASS` (an actual
-  conflict — for observers this is benign so no warning).
+  (first-registered = outermost in the chain) with optional
+  priority. The composition shape makes "two intercepts conflict"
+  impossible by construction: each handler decides whether to
+  forward or short-circuit, so ordering is the only knob.
 - **Mid-block (not just mid-loop) entry.** Sub-block granularity
   (e.g. resume after step 3 of block 5) requires saving the
   per-instruction work-stack. Defer; mid-block-as-block-entry is
@@ -723,7 +731,7 @@ bindings/Python/symex/__init__.py
 bindings/Python/symex/engine.py        # SymExEngine, explore, until-predicates
 bindings/Python/symex/layout.py        # Layout
 bindings/Python/symex/path.py          # Path, snapshot, replay
-bindings/Python/symex/ctx.py           # Ctx, control verbs (PASS/SKIP/STOP)
+bindings/Python/symex/ctx.py           # Ctx, default()/stop_path() helpers
 bindings/Python/symex/lens.py          # MemView, ArgsView, struct lenses
 
 bindings/Python/symex/intercept.py     # @intercept.* decorators (agentic)
