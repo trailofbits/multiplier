@@ -224,6 +224,18 @@ PyObject *SymbolicInitStateFrame(PyObject *state_obj, PyObject *memory_obj,
                                  PyObject *return_addr_obj,
                                  PyObject *func_resolver_obj,
                                  PyObject *global_resolver_obj);
+// Mid-block entry: start at a chosen IRBlock with a caller-supplied seed
+// of live-in values (dict mapping eid -> Python value). Symex driver uses
+// this for under-constrained execution that begins partway through a
+// function.
+PyObject *SymbolicInitStateAt(PyObject *state_obj, PyObject *memory_obj,
+                              PyObject *py_policy, PyObject *func_obj,
+                              PyObject *block_obj,
+                              PyObject *param_addrs_list,
+                              PyObject *return_addr_obj,
+                              PyObject *value_seed_dict,
+                              PyObject *func_resolver_obj,
+                              PyObject *global_resolver_obj);
 PyObject *SymbolicStep(PyObject *state_obj, PyObject *memory_obj,
                        PyObject *py_policy, uint64_t max_steps,
                        PyObject *func_resolver_obj,

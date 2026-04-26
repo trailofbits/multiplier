@@ -863,6 +863,73 @@ PyObject *SymbolicInitStateFrame(PyObject *state_obj, PyObject *memory_obj,
   Py_RETURN_NONE;
 }
 
+PyObject *SymbolicInitStateAt(PyObject *state_obj, PyObject *memory_obj,
+                              PyObject *py_policy, PyObject *func_obj,
+                              PyObject *block_obj,
+                              PyObject *param_addrs_list,
+                              PyObject *return_addr_obj,
+                              PyObject *value_seed_dict,
+                              PyObject *func_resolver_obj,
+                              PyObject *global_resolver_obj) {
+  auto *sw = reinterpret_cast<InterpreterStateWrapper *>(state_obj);
+  auto *mw = reinterpret_cast<ConcreteMemoryWrapper *>(memory_obj);
+
+  auto func = from_python<IRFunction>(func_obj);
+  if (!func) {
+    PyErr_SetString(PyExc_TypeError, "Expected IRFunction for func");
+    return nullptr;
+  }
+
+  auto block = from_python<IRBlock>(block_obj);
+  if (!block) {
+    PyErr_SetString(PyExc_TypeError, "Expected IRBlock for block");
+    return nullptr;
+  }
+
+  std::vector<uint64_t> param_addrs;
+  if (param_addrs_list && param_addrs_list != Py_None &&
+      PyList_Check(param_addrs_list)) {
+    for (Py_ssize_t i = 0; i < PyList_Size(param_addrs_list); ++i) {
+      PyObject *item = PyList_GetItem(param_addrs_list, i);
+      param_addrs.push_back(PyLong_AsUnsignedLongLong(item));
+      if (PyErr_Occurred()) return nullptr;
+    }
+  }
+
+  std::optional<uint64_t> return_addr;
+  if (return_addr_obj && return_addr_obj != Py_None) {
+    return_addr = PyLong_AsUnsignedLongLong(return_addr_obj);
+    if (PyErr_Occurred()) return nullptr;
+  }
+
+  // Build the value seed: {eid_int: python_value}. Each Python value is
+  // wrapped as a SharedPyPtr so it lives as long as the interpreter
+  // state needs it.
+  std::unordered_map<RawEntityId, SharedPyPtr> value_seed;
+  if (value_seed_dict && value_seed_dict != Py_None &&
+      PyDict_Check(value_seed_dict)) {
+    PyObject *key, *val;
+    Py_ssize_t pos = 0;
+    while (PyDict_Next(value_seed_dict, &pos, &key, &val)) {
+      uint64_t eid = PyLong_AsUnsignedLongLong(key);
+      if (PyErr_Occurred()) return nullptr;
+      value_seed.emplace(static_cast<RawEntityId>(eid), SharedPyPtr(val));
+    }
+  }
+
+  PythonPolicy policy(py_policy, *mw->memory,
+                       make_func_resolver(func_resolver_obj),
+                       make_global_resolver(global_resolver_obj));
+  PythonScheduler sched;
+
+  auto &symbolic = install_fresh_symbolic_state(sw);
+  interp_init_state_at<PythonPolicy, PythonScheduler, SharedPyPtr>(
+      policy, sched, symbolic, *func, *block, param_addrs, return_addr,
+      value_seed);
+
+  Py_RETURN_NONE;
+}
+
 PyObject *SymbolicStep(PyObject *state_obj, PyObject *memory_obj,
                        PyObject *py_policy, uint64_t max_steps,
                        PyObject *func_resolver_obj,

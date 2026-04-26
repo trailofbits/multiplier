@@ -48,6 +48,45 @@ uint64_t ConcreteMemory::allocate(uint64_t size_bytes, uint64_t align_bytes) {
   return base;
 }
 
+bool ConcreteMemory::place_at(uint64_t address, uint64_t size_bytes,
+                              uint64_t align_bytes) {
+  if (size_bytes == 0) {
+    size_bytes = 8;
+  }
+  if (align_bytes == 0) {
+    align_bytes = 8;
+  }
+  uint64_t mask = align_bytes - 1u;
+  if (address & mask) {
+    return false;  // misaligned
+  }
+  if (address_width_ == 4) {
+    address &= kMask32;
+  }
+
+  uint64_t end = address + size_bytes;
+  for (auto &[base, region] : regions_) {
+    if (region.freed) continue;
+    uint64_t r_end = region.base + region.size;
+    if (address < r_end && region.base < end) {
+      return false;  // overlap with live region
+    }
+  }
+
+  regions_[address] = Region{address, size_bytes, false, false};
+  backing_[address].resize(size_bytes, 0);
+
+  // Keep next_alloc_ ahead of every placed region so subsequent
+  // bump-allocations don't collide.
+  if (end > next_alloc_) {
+    next_alloc_ = end;
+    if (address_width_ == 4) {
+      next_alloc_ &= kMask32;
+    }
+  }
+  return true;
+}
+
 void ConcreteMemory::free(uint64_t address) {
   auto it = regions_.find(address);
   if (it != regions_.end()) {

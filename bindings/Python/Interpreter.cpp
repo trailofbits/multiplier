@@ -246,6 +246,14 @@ static PyObject *ConcreteMemoryWrapper_allocate(
   return PyLong_FromUnsignedLongLong(addr);
 }
 
+static PyObject *ConcreteMemoryWrapper_place_at(
+    ConcreteMemoryWrapper *self, PyObject *args) {
+  uint64_t addr, size, align = 8;
+  if (!PyArg_ParseTuple(args, "KK|K", &addr, &size, &align)) return nullptr;
+  bool ok = self->memory->place_at(addr, size, align);
+  return PyBool_FromLong(ok ? 1 : 0);
+}
+
 static PyObject *ConcreteMemoryWrapper_free(
     ConcreteMemoryWrapper *self, PyObject *args) {
   uint64_t addr;
@@ -319,6 +327,10 @@ static PyMethodDef ConcreteMemoryWrapper_methods[] = {
    METH_VARARGS, "write_bits(addr, bit_offset, bit_width, value)"},
   {"allocate", (PyCFunction)ConcreteMemoryWrapper_allocate,
    METH_VARARGS, "allocate(size[, align]) -> int"},
+  {"place_at", (PyCFunction)ConcreteMemoryWrapper_place_at,
+   METH_VARARGS, "place_at(addr, size[, align]) -> bool — pre-allocate "
+   "a region at a chosen address; returns False on overlap or "
+   "misalignment"},
   {"free", (PyCFunction)ConcreteMemoryWrapper_free,
    METH_VARARGS, "free(addr)"},
   {"fork", (PyCFunction)ConcreteMemoryWrapper_fork,
@@ -741,6 +753,49 @@ static PyObject *py_init_state_frame(PyObject *, PyObject *args) {
                                 func_resolver, global_resolver);
 }
 
+// init_state_at: mid-block entry for under-constrained symbolic execution.
+// init_state_at(state, memory, py_policy, func, block, param_addrs,
+//               return_addr, value_seed
+//               [, func_resolver[, global_resolver]])
+//
+// `value_seed` is a dict {eid_int: value} that pre-populates the chosen
+// block's live-in values, bypassing the normal predecessor-driven
+// computation.
+static PyObject *py_init_state_at(PyObject *, PyObject *args) {
+  Py_ssize_t nargs = PyTuple_Size(args);
+  if (nargs < 8) {
+    PyErr_SetString(PyExc_TypeError,
+        "init_state_at requires at least 8 arguments: "
+        "init_state_at(state, memory, py_policy, func, block, "
+        "param_addrs, return_addr, value_seed"
+        "[, func_resolver[, global_resolver]])");
+    return nullptr;
+  }
+
+  PyObject *state_obj    = PyTuple_GetItem(args, 0);
+  PyObject *memory_obj   = PyTuple_GetItem(args, 1);
+  PyObject *py_policy    = PyTuple_GetItem(args, 2);
+  PyObject *func_obj     = PyTuple_GetItem(args, 3);
+  PyObject *block_obj    = PyTuple_GetItem(args, 4);
+  PyObject *param_addrs  = PyTuple_GetItem(args, 5);
+  PyObject *return_addr  = PyTuple_GetItem(args, 6);
+  PyObject *value_seed   = PyTuple_GetItem(args, 7);
+  PyObject *func_resolver =
+      (nargs >= 9) ? PyTuple_GetItem(args, 8) : Py_None;
+  PyObject *global_resolver =
+      (nargs >= 10) ? PyTuple_GetItem(args, 9) : Py_None;
+
+  if (Py_TYPE(memory_obj) != &ConcreteMemoryType) {
+    PyErr_SetString(PyExc_TypeError,
+        "Second argument must be ConcreteMemory");
+    return nullptr;
+  }
+
+  return SymbolicInitStateAt(state_obj, memory_obj, py_policy, func_obj,
+                             block_obj, param_addrs, return_addr,
+                             value_seed, func_resolver, global_resolver);
+}
+
 // Module methods.
 static PyMethodDef InterpreterMethods[] = {
   {"init_state", py_init_state, METH_VARARGS,
@@ -752,6 +807,12 @@ static PyMethodDef InterpreterMethods[] = {
    "Initialize interpreter state with pre-allocated addresses.\n"
    "  init_state_frame(state, memory, policy, func, "
    "param_addrs, return_addr"
+   "[, func_resolver[, global_resolver]])"},
+  {"init_state_at", py_init_state_at, METH_VARARGS,
+   "Initialize interpreter state for mid-block (under-constrained) "
+   "entry.\n"
+   "  init_state_at(state, memory, py_policy, func, block, "
+   "param_addrs, return_addr, value_seed"
    "[, func_resolver[, global_resolver]])"},
   {"step", py_step, METH_VARARGS,
    "Execute interpreter steps.  Returns dict with 'result' and 'forks'.\n"

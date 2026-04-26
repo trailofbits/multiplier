@@ -24,6 +24,15 @@ class MX_EXPORT ConcreteMemory final : public Memory {
 
   uint64_t allocate(uint64_t size_bytes, uint64_t align_bytes) override;
   void free(uint64_t address) override;
+
+  // Pre-allocate a region at a chosen virtual address. Used by symbolic
+  // execution layouts that mimic a real process map (named globals at
+  // fixed addresses). Returns true on success, false if the request
+  // overlaps an existing live region or violates alignment.
+  // Bumps next_alloc_ past the placed region so future bump-allocations
+  // don't collide.
+  bool place_at(uint64_t address, uint64_t size_bytes, uint64_t align_bytes);
+
   bool read(uint64_t address, void *dest, uint32_t size) override;
   bool write(uint64_t address, const void *src, uint32_t size) override;
   bool memset(uint64_t address, uint8_t value, uint32_t size) override;

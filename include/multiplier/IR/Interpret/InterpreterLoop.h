@@ -113,10 +113,11 @@ inline ValueT resolve_va_list_val(const CallFrame<ValueT> &frame,
 // ENTER_BLOCK — push a block's root instructions onto the work stack
 // ===========================================================================
 
+// Walk a block's instructions and push them onto the work stack.
+// Does NOT clear frame.values; safe to call after pre-seeding live-in
+// values for mid-block entry (see interp_init_state_at).
 template <typename ValueT>
-inline void enter_block(auto &state, const IRBlock &block) {
-  // Clear transient values cache.
-  state.call_stack.top().values.clear();
+inline void push_block_work_items(auto &state, const IRBlock &block) {
   // Collect root instructions. Find the terminator.
   std::vector<IRInstruction> roots;
   IRInstruction terminator_inst;
@@ -154,6 +155,13 @@ inline void enter_block(auto &state, const IRBlock &block) {
   for (auto it = roots.rbegin(); it != roots.rend(); ++it) {
     state.work_stack.push_back({WorkKind::ANALYZE, *it, {}});
   }
+}
+
+template <typename ValueT>
+inline void enter_block(auto &state, const IRBlock &block) {
+  // Clear transient values cache, then push roots.
+  state.call_stack.top().values.clear();
+  push_block_work_items<ValueT>(state, block);
 }
 
 // ===========================================================================
@@ -1690,6 +1698,76 @@ inline void interp_init_state_prealloc(
   state.call_stack.push(std::move(frame));
   state.work_stack.push_back({WorkKind::ENTER_BLOCK, {},
                               func.entry_block()});
+}
+
+// Variant for mid-block (under-constrained) entry. Like _prealloc, but
+// starts execution at a chosen block with a caller-supplied seed of
+// live-in values (eid -> ValueT). The seed survives ENTER_BLOCK because
+// we push the block's work items directly via push_block_work_items
+// after seeding frame.values, bypassing the cache-clearing path that
+// the work-stack ENTER_BLOCK handler would take.
+template <typename PolicyT, typename SchedT, typename ValueT>
+inline void interp_init_state_at(
+    PolicyT &policy, SchedT &sched,
+    auto &state,
+    const IRFunction &func,
+    const IRBlock &block,
+    const std::vector<uint64_t> &param_addrs,
+    std::optional<uint64_t> return_addr,
+    const std::unordered_map<RawEntityId, ValueT> &value_seed) {
+
+  state.call_stack = CallStack<ValueT>();
+  state.global_addresses.clear();
+  state.steps = 0;
+  state.work_stack.clear();
+
+  CallFrame<ValueT> frame;
+  frame.func = func;
+
+  uint32_t param_idx = 0;
+  for (auto obj : func.objects()) {
+    auto k = obj.kind();
+    if (k == ir::ObjectKind::PARAMETER ||
+        k == ir::ObjectKind::PARAMETER_VALUE) {
+      if (param_idx < param_addrs.size()) {
+        uint64_t addr = param_addrs[param_idx];
+        frame.locals[EntityId(obj.id()).Pack()] = addr;
+        frame.param_ptrs.push_back(policy.make_literal_ptr(addr));
+      } else {
+        frame.param_ptrs.push_back(
+            ValueTraits<ValueT>::default_value());
+      }
+      ++param_idx;
+    }
+  }
+
+  frame.variadic_start_index = param_idx;
+
+  if (return_addr) {
+    frame.return_ptr = policy.make_literal_ptr(*return_addr);
+  } else {
+    if (auto fd = func.declaration()) {
+      auto rt = fd->return_type();
+      if (auto bits = rt.size_in_bits()) {
+        uint32_t sz = static_cast<uint32_t>((*bits + 7) / 8);
+        if (sz > 0) frame.return_ptr = policy.mem_allocate(sched, sz, 8);
+      }
+    }
+  }
+
+  // Pre-seed the instruction-result cache for live-in values of the
+  // chosen block. These represent values that, in normal flow, would
+  // have been computed by predecessor blocks; we materialize them
+  // directly so analyze() short-circuits when it sees them cached.
+  for (const auto &kv : value_seed) {
+    frame.values[kv.first] = kv.second;
+  }
+
+  state.call_stack.push(std::move(frame));
+
+  // Push the block's work items directly, skipping the work-stack
+  // ENTER_BLOCK handler that would clear frame.values.
+  push_block_work_items<ValueT>(state, block);
 }
 
 template <typename PolicyT, typename SchedT, typename ValueT>
