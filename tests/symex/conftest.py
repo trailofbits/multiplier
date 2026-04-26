@@ -18,6 +18,116 @@ class PassthroughPolicy:
     pass
 
 
+class SymExpr:
+    """Opaque symbolic value used by ForkOnSymbolicBranchPolicy.
+
+    A class (not a tuple) so the substrate's address-extraction
+    heuristic — which matches 2-tuples whose first element is "ptr" —
+    cannot accidentally see a symbolic compare result as a pointer.
+    """
+    __slots__ = ("kind", "args")
+
+    def __init__(self, kind, args):
+        self.kind = kind
+        self.args = args
+
+    def __repr__(self):
+        return f"SymExpr({self.kind}, {self.args})"
+
+    def __bool__(self):
+        # Truthiness is "unknown" — but we surface that via is_true.
+        # If something coerces this to bool, default to true so a
+        # missed instrument can be noticed in tests.
+        raise TypeError(
+            "SymExpr has no concrete truth value (this is a test bug)")
+
+
+def _extract_addr(addr):
+    """Pull a concrete address out of the substrate's value form.
+
+    The substrate hands the policy ("ptr", N) tuples for live pointers
+    and bare ints occasionally; both should normalize to an int.
+    """
+    if isinstance(addr, tuple) and len(addr) == 2 and addr[0] == "ptr":
+        return int(addr[1])
+    if isinstance(addr, int):
+        return addr
+    return None
+
+
+class ForkOnSymbolicBranchPolicy:
+    """Tracks symbolic values through memory and forces forks on branches.
+
+    Phase 1 testing aid. Real interceptor support arrives in Phase 2.
+    Behavior:
+      - mem_write of a non-int value records a shadow at the target
+        address; mem_read returns the shadow if present.
+      - compare/binary_op/cast where any operand is non-int return a
+        SymExpr so symbolic-ness propagates.
+      - is_true returns None for SymExpr; resolve_branch likewise.
+        Together these force the substrate to emit a
+        BranchContinuation that the driver enumerates.
+    """
+
+    def __init__(self):
+        self._shadow = {}
+
+    def mem_write(self, addr, val, size, is_float):
+        if isinstance(val, (int, bool)):
+            a = _extract_addr(addr)
+            if a is not None:
+                self._shadow.pop((a, int(size)), None)
+            return NotImplemented
+        a = _extract_addr(addr)
+        if a is None:
+            return NotImplemented
+        self._shadow[(a, int(size))] = val
+        return None
+
+    def mem_read(self, addr, size, is_float):
+        a = _extract_addr(addr)
+        if a is None:
+            return NotImplemented
+        key = (a, int(size))
+        if key in self._shadow:
+            return self._shadow[key]
+        return NotImplemented
+
+    def compare(self, op, lhs, rhs):
+        if isinstance(lhs, (int, bool)) and isinstance(rhs, (int, bool)):
+            return NotImplemented
+        return SymExpr("cmp", (op, lhs, rhs))
+
+    def binary_op(self, op, lhs, rhs):
+        if isinstance(lhs, (int, bool)) and isinstance(rhs, (int, bool)):
+            return NotImplemented
+        return SymExpr("bin", (op, lhs, rhs))
+
+    def unary_op(self, op, operand):
+        if isinstance(operand, (int, bool)):
+            return NotImplemented
+        return SymExpr("un", (op, operand))
+
+    def cast(self, op, operand):
+        if isinstance(operand, (int, bool)):
+            return NotImplemented
+        return SymExpr("cast", (op, operand))
+
+    def is_true(self, val):
+        if isinstance(val, SymExpr):
+            return None
+        if isinstance(val, (int, bool)):
+            return val != 0
+        return None
+
+    def resolve_branch(self, condition, true_eid, false_eid):
+        # Returning None signals "I can't decide" → BranchContinuation
+        # is emitted and the engine driver enumerates both edges.
+        if isinstance(condition, (int, bool)):
+            return condition != 0
+        return None
+
+
 def find_ir_function(index, name):
     for frag in mx.Fragment.IN(index):
         for decl in mx.ast.Decl.IN(frag):

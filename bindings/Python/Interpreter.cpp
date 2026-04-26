@@ -428,6 +428,12 @@ static PyObject *InterpreterStateWrapper_get_steps(
   if (auto *c = concrete_state_of(self)) {
     return PyLong_FromUnsignedLongLong(c->steps);
   }
+  if (self->symbolic_state) {
+    auto *symbolic = reinterpret_cast<
+        ir::interpret::PyWrapperFor<SymbolicState> *>(
+        self->symbolic_state)->data;
+    if (symbolic) return PyLong_FromUnsignedLongLong(symbolic->steps);
+  }
   return PyLong_FromUnsignedLongLong(0);
 }
 
@@ -436,6 +442,12 @@ static PyObject *InterpreterStateWrapper_get_empty(
   if (auto *c = concrete_state_of(self)) {
     return PyBool_FromLong(c->call_stack.empty());
   }
+  if (self->symbolic_state) {
+    auto *symbolic = reinterpret_cast<
+        ir::interpret::PyWrapperFor<SymbolicState> *>(
+        self->symbolic_state)->data;
+    if (symbolic) return PyBool_FromLong(symbolic->call_stack.empty());
+  }
   return PyBool_FromLong(1);
 }
 
@@ -443,6 +455,12 @@ static PyObject *InterpreterStateWrapper_get_depth(
     InterpreterStateWrapper *self, void *) {
   if (auto *c = concrete_state_of(self)) {
     return PyLong_FromSize_t(c->call_stack.depth());
+  }
+  if (self->symbolic_state) {
+    auto *symbolic = reinterpret_cast<
+        ir::interpret::PyWrapperFor<SymbolicState> *>(
+        self->symbolic_state)->data;
+    if (symbolic) return PyLong_FromSize_t(symbolic->call_stack.depth());
   }
   return PyLong_FromSize_t(0);
 }
