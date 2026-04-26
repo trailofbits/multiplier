@@ -8,6 +8,7 @@
 #include "Value.h"
 #include "Suspension.h"
 #include "Interpreter.h"
+#include "Continuation.h"
 
 #include <multiplier/IR/OpCode.h>
 #include <multiplier/IR/Block.h>
@@ -21,6 +22,8 @@
 #include <vector>
 
 namespace mx::ir::interpret {
+
+class ConcreteMemory;
 
 // ===========================================================================
 // MemAccessHint — context passed to memory operations.
@@ -50,59 +53,82 @@ struct Scheduler {
   Derived &self() { return static_cast<Derived &>(*this); }
 
  public:
-  void emit_fork(const InterpreterState<ValueT> &state,
-                 std::function<void(InterpreterState<ValueT> &, void *)> transition) {
+  // `state` parameters use `auto` so each scheduler's snapshot type
+  // (StdShared shared_ptr or PyObjectRC PyRef) flows through unchanged.
+  void emit_fork(const auto &state, auto transition) {
     self().emit_fork(state, std::move(transition));
   }
 
-  void emit_error(const InterpreterState<ValueT> &state,
-                  std::string_view message) {
+  void emit_error(const auto &state, std::string_view message) {
     self().emit_error(state, message);
   }
 
   // Result methods — called by the interpreter loop for terminal/suspension states.
-  void on_completed(ValueT return_value,
-                    std::shared_ptr<InterpreterState<ValueT>> state) {
-    self().on_completed(std::move(return_value), std::move(state));
+  void on_completed(ValueT return_value, auto &&state) {
+    self().on_completed(std::move(return_value),
+                        std::forward<decltype(state)>(state));
   }
 
-  void on_errored(ErrorKind kind,
-                  std::shared_ptr<InterpreterState<ValueT>> state) {
-    self().on_errored(kind, std::move(state));
+  void on_errored(ErrorKind kind, auto &&state) {
+    self().on_errored(kind, std::forward<decltype(state)>(state));
   }
 
-  void on_branch(ValueT condition, IRBlock true_block, IRBlock false_block,
-                 std::shared_ptr<InterpreterState<ValueT>> state) {
-    self().on_branch(std::move(condition), true_block, false_block,
-                     std::move(state));
+  void on_branch(ValueT condition, RawEntityId cond_eid,
+                 IRBlock true_block, IRBlock false_block,
+                 ValueT false_val, ValueT true_val,
+                 auto &&state) {
+    self().on_branch(std::move(condition), cond_eid, true_block, false_block,
+                     std::move(false_val), std::move(true_val),
+                     std::forward<decltype(state)>(state));
   }
 };
 
 // Concrete execution: no forking, no error collection.
-// Stores only the final continuation (COMPLETED or ERRORED).
+// Drains a single StepOutcome — the loop's terminal/continuation slots.
 struct NoOpScheduler : Scheduler<NoOpScheduler, Value> {
-  std::optional<Continuation> result;
+  StepOutcome<Value> outcome;
 
   void emit_fork(const InterpreterState<Value> &,
                  std::function<void(InterpreterState<Value> &, void *)>) {}
   void emit_error(const InterpreterState<Value> &, std::string_view) {}
 
   void on_completed(Value return_value,
-                    std::shared_ptr<InterpreterState<Value>> state);
+                    ref_t<InterpreterState<Value>> state) {
+    outcome.terminal = TerminalResult<Value>{
+        TerminalKind::COMPLETED, std::move(return_value), {},
+        std::move(state)};
+  }
+
   void on_errored(ErrorKind kind,
-                  std::shared_ptr<InterpreterState<Value>> state);
-  void on_branch(Value condition, IRBlock true_block, IRBlock false_block,
-                 std::shared_ptr<InterpreterState<Value>> state);
+                  ref_t<InterpreterState<Value>> state) {
+    outcome.terminal = TerminalResult<Value>{
+        TerminalKind::ERRORED, {}, kind, std::move(state)};
+  }
+
+  void on_branch(Value condition, RawEntityId cond_eid,
+                 IRBlock true_block, IRBlock false_block,
+                 Value false_val, Value true_val,
+                 ref_t<InterpreterState<Value>> state) {
+    outcome.continuations.emplace_back(
+        std::make_unique<BranchContinuation<Value>>(
+            std::move(state), std::move(condition), cond_eid,
+            true_block, false_block,
+            std::move(false_val), std::move(true_val)));
+  }
 };
 
 // ===========================================================================
-// Policy<Derived, Sched, ValueT> — CRTP base for all value-domain operations.
+// Policy<Derived, ValueT> — CRTP base for all value-domain operations.
 //
 // All methods use ValueT so the same template works for both concrete
 // (ValueT = Value) and Python (ValueT = SharedPyPtr) paths.
+//
+// The scheduler isn't part of the policy's identity — each scheduler-using
+// method is templated on its own `auto &sched`, so a single policy can run
+// under any scheduler whose interface the derived class accepts.
 // ===========================================================================
 
-template <typename Derived, typename Sched, typename ValueT = Value>
+template <typename Derived, typename ValueT = Value>
 struct Policy {
   using value_type = ValueT;
  protected:
@@ -216,26 +242,26 @@ struct Policy {
   // 4. MEMORY
   // =========================================================================
 
-  ValueT mem_allocate(Sched &sched, uint64_t size_bytes,
+  ValueT mem_allocate(auto &sched, uint64_t size_bytes,
                       uint64_t align_bytes) {
     return self().mem_allocate(sched, size_bytes, align_bytes);
   }
 
-  void mem_free(Sched &sched, const ValueT &address) {
+  void mem_free(auto &sched, const ValueT &address) {
     self().mem_free(sched, address);
   }
 
-  bool mem_read(Sched &sched, const ValueT &addr,
+  bool mem_read(auto &sched, const ValueT &addr,
                 const MemAccessHint &hint, ValueT &result) {
     return self().mem_read(sched, addr, hint, result);
   }
 
-  bool mem_write(Sched &sched, const ValueT &addr, const ValueT &val,
+  bool mem_write(auto &sched, const ValueT &addr, const ValueT &val,
                  const MemAccessHint &hint) {
     return self().mem_write(sched, addr, val, hint);
   }
 
-  bool mem_bulk_op(Sched &sched, MemOp sub,
+  bool mem_bulk_op(auto &sched, MemOp sub,
                    const std::vector<ValueT> &ops,
                    const MemoryInst &mi, ValueT &result) {
     return self().mem_bulk_op(sched, sub, ops, mi, result);
@@ -253,18 +279,55 @@ struct Policy {
     return self().is_undefined(val);
   }
 
+  // Continuation-passing memory access. The body receives the policy, a
+  // mutable memory reference, and a resolved 64-bit concrete address.
+  // Returns true iff the body ran (address could be resolved inline, or
+  // the override resolved it through a custom path). Returns false when
+  // the policy could not produce a concrete address; symbolic policies
+  // additionally emit a `MemAddrContinuation` describing the suspension.
+  //
+  // `addr_eid` is the operand entity-id whose value slot the driver will
+  // write into when resuming with a concrete address. Pass
+  // `kInvalidEntityId` from callsites that cannot meaningfully resume
+  // (e.g. init-time bulk copies). Suspension-capable overrides treat
+  // invalid eids as "do not suspend, just skip".
+  template <typename Body>
+  bool with_address(const ValueT &addr, ConcreteMemory &mem,
+                    const MemAccessHint &hint, RawEntityId addr_eid,
+                    auto &state, auto &sched, Body &&body) {
+    return self().with_address_impl(
+        addr, mem, hint, addr_eid, state, sched,
+        std::forward<Body>(body));
+  }
+
+  // Default override target for `with_address`. Concrete policies inherit
+  // this verbatim — `extract_address` always succeeds for concrete values,
+  // so the body runs inline and the function returns true.
+  template <typename Body>
+  bool with_address_impl(const ValueT &addr, ConcreteMemory &mem,
+                         const MemAccessHint & /*hint*/,
+                         RawEntityId /*addr_eid*/,
+                         auto & /*state*/, auto & /*sched*/,
+                         Body &&body) {
+    if (auto a = self().extract_address(addr)) {
+      body(self(), mem, *a);
+      return true;
+    }
+    return false;
+  }
+
   // =========================================================================
   // 5. RESOLUTION
   // =========================================================================
 
-  bool resolve_branch(Sched &sched, const ValueT &condition,
+  bool resolve_branch(auto &sched, const ValueT &condition,
                       IRBlock true_block, IRBlock false_block,
                       IRBlock &chosen_block) {
     return self().resolve_branch(
         sched, condition, true_block, false_block, chosen_block);
   }
 
-  bool resolve_call(Sched &sched,
+  bool resolve_call(auto &sched,
                     const IRInstruction &call_inst,
                     RawEntityId target_eid,
                     RawEntityId indirect_target_eid,
@@ -276,100 +339,11 @@ struct Policy {
         arguments, is_indirect, resolution);
   }
 
-  bool resolve_global(Sched &sched, RawEntityId entity_id,
+  bool resolve_global(auto &sched, RawEntityId entity_id,
                       GlobalResolution &resolution) {
     return self().resolve_global(
         sched, entity_id, resolution);
   }
-};
-
-// ===========================================================================
-// VirtualPolicy — base class for Python-subclassable policies (Value-typed).
-// ===========================================================================
-
-struct VirtualScheduler : Scheduler<VirtualScheduler> {
-  virtual ~VirtualScheduler(void) = default;
-
-  virtual void emit_fork(const InterpreterState<Value> &state,
-                         std::function<void(InterpreterState<Value> &, void *)> transition) = 0;
-  virtual void emit_error(const InterpreterState<Value> &state,
-                          std::string_view message) = 0;
-};
-
-class VirtualPolicy : public Policy<VirtualPolicy, VirtualScheduler> {
- public:
-  virtual ~VirtualPolicy(void) = default;
-
-  // 0. Value extraction / construction.
-  virtual std::optional<uint64_t> extract_address(const Value &val) = 0;
-  virtual int64_t extract_int(const Value &val) = 0;
-  virtual uint64_t extract_uint(const Value &val) = 0;
-  virtual Value make_literal_int(int64_t v, uint8_t width = 8) = 0;
-  virtual Value make_literal_ptr(uint64_t addr) = 0;
-  virtual Value make_default() = 0;
-  virtual bool has_address(const Value &val) = 0;
-
-  // 1. Value construction.
-  virtual Value make_const(ConstOp op, int64_t signed_val,
-                           uint64_t unsigned_val) = 0;
-  virtual Value make_null_ptr(void) = 0;
-
-  // 2. Arithmetic / logic.
-  virtual Value binary_op(OpCode op, const Value &lhs,
-                          const Value &rhs) = 0;
-  virtual Value unary_op(OpCode op, const Value &operand) = 0;
-  virtual Value compare(OpCode op, const Value &lhs,
-                        const Value &rhs) = 0;
-  virtual Value cast(CastOp op, const Value &operand) = 0;
-  virtual Value ptr_add(const Value &base, const Value &index,
-                        int64_t element_size) = 0;
-  virtual Value ptr_diff(const Value &lhs, const Value &rhs,
-                         int64_t element_size) = 0;
-  virtual Value ptr_offset(const Value &base, int64_t byte_offset) = 0;
-  virtual Value select(const Value &cond, const Value &if_true,
-                       const Value &if_false) = 0;
-  virtual Value bitwise_intrinsic(OpCode width_op, BitwiseOp sub,
-                                  const Value &val,
-                                  const Value &val2) = 0;
-  virtual Value float_intrinsic(FloatOp sub,
-                                const std::vector<Value> &operands) = 0;
-
-  // 3. Truth test.
-  virtual std::optional<bool> is_true(const Value &val) = 0;
-
-  // 4. Memory.
-  virtual Value mem_allocate(VirtualScheduler &sched,
-                             uint64_t size_bytes,
-                             uint64_t align_bytes) = 0;
-  virtual void mem_free(VirtualScheduler &sched,
-                        const Value &address) = 0;
-  virtual bool mem_read(VirtualScheduler &sched, const Value &addr,
-                        const MemAccessHint &hint, Value &result) = 0;
-  virtual bool mem_write(VirtualScheduler &sched, const Value &addr,
-                         const Value &val,
-                         const MemAccessHint &hint) = 0;
-  virtual bool mem_bulk_op(VirtualScheduler &sched, MemOp sub,
-                           const std::vector<Value> &ops,
-                           const MemoryInst &mi, Value &result) = 0;
-  virtual void mem_poison(const Value &addr) = 0;
-  virtual void mem_unpoison(const Value &addr) = 0;
-  virtual bool is_undefined(const Value &val) = 0;
-
-  // 5. Resolution.
-  virtual bool resolve_branch(VirtualScheduler &sched,
-                              const Value &condition,
-                              IRBlock true_block, IRBlock false_block,
-                              IRBlock &chosen_block) = 0;
-  virtual bool resolve_call(VirtualScheduler &sched,
-                            const IRInstruction &call_inst,
-                            RawEntityId target_eid,
-                            RawEntityId indirect_target_eid,
-                            const std::vector<Value> &arguments,
-                            bool is_indirect,
-                            CallResolution<Value> &resolution) = 0;
-  virtual bool resolve_global(VirtualScheduler &sched,
-                              RawEntityId entity_id,
-                              GlobalResolution &resolution) = 0;
 };
 
 }  // namespace mx::ir::interpret

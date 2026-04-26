@@ -6,16 +6,14 @@
 #pragma once
 
 #include "../../Compiler.h"
+#include "Sharable.h"
 #include "Value.h"
-#include "Suspension.h"
 #include <multiplier/IR/Block.h>
 #include <multiplier/IR/Function.h>
 #include <multiplier/IR/Instruction.h>
 #include <multiplier/Types.h>
 #include <memory>
-#include <optional>
 #include <unordered_map>
-#include <variant>
 #include <vector>
 
 namespace mx {
@@ -129,7 +127,8 @@ struct CallFrame {
 // ---------------------------------------------------------------------------
 
 template <typename ValueT>
-struct CallStackSegment {
+struct CallStackSegment
+    : public Sharable<CallStackSegment<ValueT>, StdShared> {
   std::vector<CallFrame<ValueT>> frames;
 };
 
@@ -137,7 +136,7 @@ template <typename ValueT>
 class CallStack {
  public:
   CallStack(void) {
-    segments_.push_back(std::make_shared<CallStackSegment<ValueT>>());
+    segments_.push_back(make_sharable<CallStackSegment<ValueT>>());
   }
 
   CallFrame<ValueT> &top(void) { return ensure_mutable().frames.back(); }
@@ -178,84 +177,41 @@ class CallStack {
   CallStackSegment<ValueT> &ensure_mutable(void) {
     auto &last = segments_.back();
     if (last.use_count() > 1) {
-      last = std::make_shared<CallStackSegment<ValueT>>(*last);
+      last = make_sharable<CallStackSegment<ValueT>>(*last);
     }
     return *last;
   }
 };
 
 // ---------------------------------------------------------------------------
-// InterpreterState<ValueT> — pure process state
+// InterpreterState<ValueT, Policy> — pure process state.
+//
+// `Policy` selects the ref-count system: `StdShared` (default) keeps the
+// state behind `std::shared_ptr`; `PyObjectRC` wraps it in a PyObject so
+// Python can hold references with normal refcount semantics.
 // ---------------------------------------------------------------------------
 
-template <typename ValueT>
-struct InterpreterState {
+template <typename ValueT, typename Policy = StdShared>
+struct InterpreterState
+    : public Sharable<InterpreterState<ValueT, Policy>, Policy> {
+  using value_type = ValueT;
+  using policy_type = Policy;
+
   CallStack<ValueT> call_stack;
   std::unordered_map<RawEntityId, uint64_t> global_addresses;
   uint64_t steps{0};
   std::vector<WorkItem> work_stack;
-};
 
-// ---------------------------------------------------------------------------
-// Continuation — a decision point produced by step(), pumped by scheduler
-//
-// Concrete-only: uses InterpreterState<Value>.
-// ---------------------------------------------------------------------------
+  // The work item currently being dispatched. Set by interp_step before
+  // each `dispatch(item)`. Suspension-capable policy hooks (e.g.
+  // `with_address`) read this to re-push the in-flight work item onto
+  // a snapshot's work_stack so resumption retries the same op.
+  WorkItem current_item{};
 
-class MX_EXPORT Continuation {
- public:
-  enum Kind : uint8_t { BRANCH, CALL, GLOBAL, COMPLETED, ERRORED };
-
-  static Continuation branch(
-      std::shared_ptr<InterpreterState<Value>> snapshot,
-      NeedBranchDecision info);
-  static Continuation call(
-      std::shared_ptr<InterpreterState<Value>> snapshot,
-      NeedCallResolution info,
-      RawEntityId instruction_id);
-  static Continuation global(
-      std::shared_ptr<InterpreterState<Value>> snapshot,
-      NeedGlobalResolution info,
-      RawEntityId instruction_id);
-  static Continuation completed(
-      Value return_value,
-      std::shared_ptr<InterpreterState<Value>> snapshot = {});
-  static Continuation errored(
-      ErrorKind kind,
-      std::shared_ptr<InterpreterState<Value>> snapshot = {});
-
-  Kind kind(void) const { return kind_; }
-  bool is_terminal(void) const {
-    return kind_ == COMPLETED || kind_ == ERRORED;
+  // Allocate a fresh ref-counted clone, using the same Policy.
+  ref_t<InterpreterState<ValueT, Policy>> clone(void) const {
+    return make_sharable<InterpreterState<ValueT, Policy>>(*this);
   }
-
-  const NeedBranchDecision &as_branch(void) const;
-  const NeedCallResolution &as_call(void) const;
-  const NeedGlobalResolution &as_global(void) const;
-  const Value &return_value(void) const;
-  ErrorKind error(void) const;
-
-  const std::shared_ptr<InterpreterState<Value>> &snapshot(void) const {
-    return snapshot_;
-  }
-
-  InterpreterState<Value> pump(ConcretePolicy &policy,
-                               const Resolution &resolution) const;
-
- private:
-  struct BranchData { NeedBranchDecision info; };
-  struct CallData { NeedCallResolution info; RawEntityId instruction_id; };
-  struct GlobalData { NeedGlobalResolution info; RawEntityId instruction_id; };
-  struct CompletedData { Value return_value; };
-  struct ErroredData { ErrorKind kind; };
-
-  Kind kind_;
-  std::shared_ptr<InterpreterState<Value>> snapshot_;
-  std::variant<BranchData, CallData, GlobalData,
-               CompletedData, ErroredData> data_;
-
-  Continuation(Kind k, std::shared_ptr<InterpreterState<Value>> snap)
-      : kind_(k), snapshot_(std::move(snap)) {}
 };
 
 }  // namespace mx::ir::interpret

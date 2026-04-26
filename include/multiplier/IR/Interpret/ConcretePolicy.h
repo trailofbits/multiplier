@@ -6,10 +6,12 @@
 #pragma once
 
 #include "../../Compiler.h"
-#include "Policy.h"
 #include "ConcreteMemory.h"
+#include "ConcreteOps.h"
+#include "Policy.h"
 
 #include <multiplier/IR/Function.h>
+#include <multiplier/IR/Instruction.h>
 #include <multiplier/Types.h>
 
 #include <functional>
@@ -35,7 +37,7 @@ using GlobalResolver =
 // are implemented directly here — they are stateless pure functions
 // and don't need a separate class.
 class MX_EXPORT ConcretePolicy
-    : public Policy<ConcretePolicy, NoOpScheduler> {
+    : public Policy<ConcretePolicy> {
  public:
   explicit ConcretePolicy(ConcreteMemory &memory,
                           FunctionResolver func_resolver = {},
@@ -78,46 +80,99 @@ class MX_EXPORT ConcretePolicy
   std::optional<bool> is_true(const Value &val);
 
   // --- 4. Memory ---
-  Value mem_allocate(NoOpScheduler &sched, uint64_t size_bytes,
-                     uint64_t align_bytes);
-  void mem_free(NoOpScheduler &sched, const Value &address);
-  bool mem_read(NoOpScheduler &sched, const Value &addr,
-                const MemAccessHint &hint, Value &result);
-  bool mem_write(NoOpScheduler &sched, const Value &addr,
-                 const Value &val, const MemAccessHint &hint);
-  bool mem_bulk_op(NoOpScheduler &sched, MemOp sub,
+  //
+  // Memory operations are scheduler-agnostic: ConcretePolicy never emits
+  // continuations from these calls (concrete addresses are always
+  // resolvable inline). The `Sched` parameter is templated so the same
+  // policy works under any scheduler the loop instantiates against.
+  template <typename Sched>
+  Value mem_allocate(Sched &, uint64_t size_bytes, uint64_t align_bytes) {
+    return make_ptr(memory_.allocate(size_bytes, align_bytes));
+  }
+
+  template <typename Sched>
+  void mem_free(Sched &, const Value &address) {
+    if (address.u64 != 0) {
+      memory_.free(address.u64);
+    }
+  }
+
+  template <typename Sched>
+  bool mem_read(Sched &, const Value &addr, const MemAccessHint &hint,
+                Value &result) {
+    if (addr.u64 == 0) {
+      result = make_undef();
+      return true;
+    }
+    result = concrete_read_from_mem(memory_, addr.u64,
+                                    hint.size_bytes, hint.is_float);
+    return true;
+  }
+
+  template <typename Sched>
+  bool mem_write(Sched &, const Value &addr, const Value &val,
+                 const MemAccessHint &hint) {
+    if (addr.u64 == 0) return true;
+    concrete_write_to_mem(memory_, addr.u64, val,
+                          hint.size_bytes, hint.is_float);
+    return true;
+  }
+
+  template <typename Sched>
+  bool mem_bulk_op(Sched &, MemOp sub,
                    const std::vector<Value> &ops,
-                   const MemoryInst &mi, Value &result);
+                   const MemoryInst &mi, Value &result) {
+    return concrete_mem_bulk_op(memory_, sub, ops, mi, result);
+  }
+
   void mem_poison(const Value &addr);
   void mem_unpoison(const Value &addr);
   bool is_undefined(const Value &val);
 
   // --- 5. Resolution ---
-  bool resolve_branch(NoOpScheduler &sched, const Value &condition,
-                      IRBlock true_block, IRBlock false_block,
-                      IRBlock &chosen_block);
-  bool resolve_call(NoOpScheduler &sched,
-                    const IRInstruction &call_inst,
+  template <typename Sched>
+  bool resolve_branch(Sched &, const Value &,
+                      IRBlock true_block, IRBlock /*false_block*/,
+                      IRBlock &chosen_block) {
+    chosen_block = true_block;
+    return true;
+  }
+
+  template <typename Sched>
+  bool resolve_call(Sched &, const IRInstruction &,
                     RawEntityId target_eid,
                     RawEntityId indirect_target_eid,
-                    const std::vector<Value> &arguments,
-                    bool is_indirect,
-                    CallResolution<Value> &resolution);
-  bool resolve_global(NoOpScheduler &sched, RawEntityId entity_id,
-                      GlobalResolution &resolution);
+                    const std::vector<Value> &,
+                    bool, CallResolution<Value> &resolution) {
+    if (func_resolver_) {
+      for (auto eid : {target_eid, indirect_target_eid}) {
+        if (eid != kInvalidEntityId) {
+          if (auto ir = func_resolver_(eid)) {
+            resolution.action = CallAction::INLINE;
+            resolution.return_value = make_undef();
+            resolution.callee_ir = *std::move(ir);
+            return true;
+          }
+        }
+      }
+    }
+    resolution.action = CallAction::SKIP;
+    resolution.return_value = make_undef();
+    return true;
+  }
 
-  // --- Interpreter control ---
-
-  // Initialize state for executing a function with the given arguments.
-  MX_EXPORT void init_state(InterpreterState<Value> &state,
-                            const IRFunction &func,
-                            const std::vector<Value> &args);
-
-  // Greedy step: runs up to max_steps instructions. Pushes continuations
-  // into the scheduler. Returns true if budget hit (state still runnable),
-  // false if state was consumed into continuation(s).
-  MX_EXPORT bool step(InterpreterState<Value> &state, NoOpScheduler &sched,
-                      uint64_t max_steps);
+  template <typename Sched>
+  bool resolve_global(Sched &, RawEntityId entity_id,
+                      GlobalResolution &resolution) {
+    if (global_resolver_) {
+      if (auto info = global_resolver_(entity_id)) {
+        resolution = GlobalResolution{.info = *std::move(info)};
+        return true;
+      }
+    }
+    resolution = GlobalResolution{};
+    return true;
+  }
 
  private:
   ConcreteMemory &memory_;

@@ -13,6 +13,7 @@
 #include "Policy.h"
 #include "Value.h"
 #include "Suspension.h"
+#include "ConcreteMemory.h"
 
 #include <multiplier/IR/Block.h>
 #include <multiplier/IR/Function.h>
@@ -113,7 +114,7 @@ inline ValueT resolve_va_list_val(const CallFrame<ValueT> &frame,
 // ===========================================================================
 
 template <typename ValueT>
-inline void enter_block(InterpreterState<ValueT> &state, const IRBlock &block) {
+inline void enter_block(auto &state, const IRBlock &block) {
   // Clear transient values cache.
   state.call_stack.top().values.clear();
   // Collect root instructions. Find the terminator.
@@ -160,7 +161,7 @@ inline void enter_block(InterpreterState<ValueT> &state, const IRBlock &block) {
 // ===========================================================================
 
 template <typename ValueT>
-inline void analyze(InterpreterState<ValueT> &state,
+inline void analyze(auto &state,
                     const IRInstruction &inst) {
   auto &frame = state.call_stack.top();
   auto id = eid(inst);
@@ -471,7 +472,7 @@ inline void analyze(InterpreterState<ValueT> &state,
 // ===========================================================================
 
 template <typename ValueT>
-inline void exec_goto(InterpreterState<ValueT> &state,
+inline void exec_goto(auto &state,
                       const IRInstruction &inst) {
   auto br = BranchInst::from(inst);
   if (br) {
@@ -526,7 +527,7 @@ inline void compute_const(CallFrame<ValueT> &frame, PolicyT &policy,
 }
 
 template <typename PolicyT, typename SchedT, typename ValueT>
-inline void compute_alloca(InterpreterState<ValueT> &state, PolicyT &policy,
+inline void compute_alloca(auto &state, PolicyT &policy,
                            SchedT &sched, const IRInstruction &inst) {
   auto &frame = state.call_stack.top();
   auto ai = AllocaInst::from(inst);
@@ -560,7 +561,7 @@ inline void compute_alloca(InterpreterState<ValueT> &state, PolicyT &policy,
 }
 
 template <typename PolicyT, typename SchedT, typename ValueT>
-inline void compute_string_ptr(InterpreterState<ValueT> &state, PolicyT &policy,
+inline void compute_string_ptr(auto &state, PolicyT &policy,
                                SchedT &sched, const IRInstruction &inst) {
   auto &frame = state.call_stack.top();
   auto inst_eid = eid(inst);
@@ -722,7 +723,7 @@ inline void compute_float_op(CallFrame<ValueT> &frame, PolicyT &policy,
 }
 
 template <typename PolicyT, typename SchedT, typename ValueT>
-inline void compute_global_ptr(InterpreterState<ValueT> &state, PolicyT &policy,
+inline void compute_global_ptr(auto &state, PolicyT &policy,
                                SchedT &sched, const IRInstruction &inst) {
   auto &frame = state.call_stack.top();
   auto src_eid = inst.source_entity_id();
@@ -785,7 +786,7 @@ inline void compute_global_ptr(InterpreterState<ValueT> &state, PolicyT &policy,
 }
 
 template <typename PolicyT, typename SchedT, typename ValueT>
-inline void compute_func_ptr(InterpreterState<ValueT> &state, PolicyT &policy,
+inline void compute_func_ptr(auto &state, PolicyT &policy,
                              SchedT &sched, const IRInstruction &inst) {
   auto &frame = state.call_stack.top();
   auto src_eid = inst.source_entity_id();
@@ -805,32 +806,41 @@ inline void compute_func_ptr(InterpreterState<ValueT> &state, PolicyT &policy,
 // ===========================================================================
 
 template <typename PolicyT, typename SchedT, typename ValueT>
-inline void exec_load(CallFrame<ValueT> &frame, PolicyT &policy,
+inline void exec_load(auto &state, PolicyT &policy,
                       SchedT &sched, const IRInstruction &inst) {
   auto mi = MemoryInst::from(inst);
   if (!mi) return;
   auto sub = mi->sub_opcode();
-  unsigned sz = ir::AccessSize(sub);
-  bool is_float = ir::IsFloatLoad(sub);
+  MemAccessHint hint{ir::AccessSize(sub), ir::IsFloatLoad(sub), false};
+  auto &frame = state.call_stack.top();
   ValueT addr = val<ValueT>(frame, mi->address());
-  MemAccessHint hint{sz, is_float, false};
-  ValueT result;
-  policy.mem_read(sched, addr, hint, result);
-  frame.values[eid(inst)] = result;
+  auto inst_eid = eid(inst);
+  auto addr_eid = eid(mi->address());
+  policy.with_address(addr, policy.memory(), hint, addr_eid, state, sched,
+      [&](auto &p, ConcreteMemory & /*mem*/, uint64_t a) {
+        ValueT result;
+        ValueT addr_val = p.make_literal_ptr(a);
+        p.mem_read(sched, addr_val, hint, result);
+        frame.values[inst_eid] = result;
+      });
 }
 
 template <typename PolicyT, typename SchedT, typename ValueT>
-inline void exec_store(CallFrame<ValueT> &frame, PolicyT &policy,
+inline void exec_store(auto &state, PolicyT &policy,
                        SchedT &sched, const IRInstruction &inst) {
   auto mi = MemoryInst::from(inst);
   if (!mi) return;
   auto sub = mi->sub_opcode();
-  unsigned sz = ir::AccessSize(sub);
-  bool is_float = ir::IsFloatLoad(sub);
+  MemAccessHint hint{ir::AccessSize(sub), ir::IsFloatStore(sub), true};
+  auto &frame = state.call_stack.top();
   ValueT addr = val<ValueT>(frame, mi->address());
   ValueT stored = val<ValueT>(frame, mi->stored_value());
-  MemAccessHint hint{sz, is_float, true};
-  policy.mem_write(sched, addr, stored, hint);
+  auto addr_eid = eid(mi->address());
+  policy.with_address(addr, policy.memory(), hint, addr_eid, state, sched,
+      [&](auto &p, ConcreteMemory & /*mem*/, uint64_t a) {
+        ValueT addr_val = p.make_literal_ptr(a);
+        p.mem_write(sched, addr_val, stored, hint);
+      });
 }
 
 template <typename PolicyT, typename SchedT, typename ValueT>
@@ -849,92 +859,100 @@ inline void exec_bulk_mem(CallFrame<ValueT> &frame, PolicyT &policy,
 }
 
 template <typename PolicyT, typename SchedT, typename ValueT>
-inline void exec_rmw(CallFrame<ValueT> &frame, PolicyT &policy,
+inline void exec_rmw(auto &state, PolicyT &policy,
                      SchedT &sched, const IRInstruction &inst) {
   auto rmw = ReadModifyWriteInst::from(inst);
   if (!rmw) return;
+  auto &frame = state.call_stack.top();
   ValueT addr = val<ValueT>(frame, rmw->address());
-  if (!policy.has_address(addr)) return;
 
   auto underlying = rmw->underlying_op();
   size_t access_sz = underlying_op_access_size(underlying);
   bool rmw_is_float = ir::IsFloatArithmetic(underlying);
-
-  ValueT old_val;
   MemAccessHint rhint{static_cast<uint32_t>(access_sz), rmw_is_float, false};
-  policy.mem_read(sched, addr, rhint, old_val);
+  auto inst_eid = eid(inst);
+  auto addr_eid = eid(rmw->address());
 
-  ValueT rhs = policy.make_literal_int(0);
-  for (auto rhs_op : rmw->rhs_operands()) {
-    rhs = val<ValueT>(frame, rhs_op);
-    break;
-  }
+  policy.with_address(addr, policy.memory(), rhint, addr_eid, state, sched,
+      [&](auto &p, ConcreteMemory & /*mem*/, uint64_t addr_u64) {
+    ValueT addr_val = p.make_literal_ptr(addr_u64);
+    ValueT old_val;
+    p.mem_read(sched, addr_val, rhint, old_val);
 
-  // Overflow-checked arithmetic.
-  if (underlying >= OpCode::ADD_OVERFLOW_8 &&
-      underlying <= OpCode::MUL_OVERFLOW_64) {
-    ValueT a = policy.make_literal_int(0), b = policy.make_literal_int(0);
-    int rhs_i = 0;
+    ValueT rhs = p.make_literal_int(0);
     for (auto rhs_op : rmw->rhs_operands()) {
-      if (rhs_i == 0) a = val<ValueT>(frame, rhs_op);
-      else if (rhs_i == 1) b = val<ValueT>(frame, rhs_op);
-      ++rhs_i;
+      rhs = val<ValueT>(frame, rhs_op);
+      break;
     }
-    __int128 wide;
+
+    // Overflow-checked arithmetic.
     if (underlying >= OpCode::ADD_OVERFLOW_8 &&
-        underlying <= OpCode::ADD_OVERFLOW_64)
-      wide = static_cast<__int128>(policy.extract_int(a)) + static_cast<__int128>(policy.extract_int(b));
-    else if (underlying >= OpCode::SUB_OVERFLOW_8 &&
-             underlying <= OpCode::SUB_OVERFLOW_64)
-      wide = static_cast<__int128>(policy.extract_int(a)) - static_cast<__int128>(policy.extract_int(b));
-    else
-      wide = static_cast<__int128>(policy.extract_int(a)) * static_cast<__int128>(policy.extract_int(b));
+        underlying <= OpCode::MUL_OVERFLOW_64) {
+      ValueT a = p.make_literal_int(0), b = p.make_literal_int(0);
+      int rhs_i = 0;
+      for (auto rhs_op : rmw->rhs_operands()) {
+        if (rhs_i == 0) a = val<ValueT>(frame, rhs_op);
+        else if (rhs_i == 1) b = val<ValueT>(frame, rhs_op);
+        ++rhs_i;
+      }
+      __int128 wide;
+      if (underlying >= OpCode::ADD_OVERFLOW_8 &&
+          underlying <= OpCode::ADD_OVERFLOW_64)
+        wide = static_cast<__int128>(p.extract_int(a)) +
+               static_cast<__int128>(p.extract_int(b));
+      else if (underlying >= OpCode::SUB_OVERFLOW_8 &&
+               underlying <= OpCode::SUB_OVERFLOW_64)
+        wide = static_cast<__int128>(p.extract_int(a)) -
+               static_cast<__int128>(p.extract_int(b));
+      else
+        wide = static_cast<__int128>(p.extract_int(a)) *
+               static_cast<__int128>(p.extract_int(b));
 
-    // Truncate to target width and check for overflow at that width.
-    int64_t truncated = static_cast<int64_t>(wide);
-    switch (access_sz) {
-      case 1: truncated = static_cast<int64_t>(static_cast<int8_t>(truncated)); break;
-      case 2: truncated = static_cast<int64_t>(static_cast<int16_t>(truncated)); break;
-      case 4: truncated = static_cast<int64_t>(static_cast<int32_t>(truncated)); break;
-      default: break;
+      int64_t truncated = static_cast<int64_t>(wide);
+      switch (access_sz) {
+        case 1: truncated = static_cast<int64_t>(static_cast<int8_t>(truncated)); break;
+        case 2: truncated = static_cast<int64_t>(static_cast<int16_t>(truncated)); break;
+        case 4: truncated = static_cast<int64_t>(static_cast<int32_t>(truncated)); break;
+        default: break;
+      }
+      ValueT new_val = p.make_literal_int(truncated);
+      bool overflow = (wide != static_cast<__int128>(truncated));
+      MemAccessHint whint{static_cast<uint32_t>(access_sz), rmw_is_float, true};
+      p.mem_write(sched, addr_val, new_val, whint);
+      frame.values[inst_eid] = p.make_literal_int(overflow ? 1 : 0);
+      return;
     }
-    ValueT new_val = policy.make_literal_int(truncated);
-    bool overflow = (wide != static_cast<__int128>(truncated));
+
+    // PTR_ADD in RMW.
+    if (underlying == OpCode::PTR_ADD_32 || underlying == OpCode::PTR_ADD_64) {
+      int64_t elem_sz = rmw->element_size();
+      if (elem_sz <= 0) elem_sz = 1;
+      ValueT new_val = p.ptr_add(old_val, rhs, elem_sz);
+      MemAccessHint whint{static_cast<uint32_t>(access_sz), false, true};
+      p.mem_write(sched, addr_val, new_val, whint);
+      frame.values[inst_eid] = rmw->returns_new_value() ? new_val : old_val;
+      return;
+    }
+
+    // Atomic exchange.
+    if (underlying >= OpCode::ATOMIC_EXCHANGE_8 &&
+        underlying <= OpCode::ATOMIC_EXCHANGE_64) {
+      MemAccessHint whint{static_cast<uint32_t>(access_sz), rmw_is_float, true};
+      p.mem_write(sched, addr_val, rhs, whint);
+      frame.values[inst_eid] = rmw->returns_new_value() ? rhs : old_val;
+      return;
+    }
+
+    // General case.
+    ValueT new_val = p.binary_op(underlying, old_val, rhs);
     MemAccessHint whint{static_cast<uint32_t>(access_sz), rmw_is_float, true};
-    policy.mem_write(sched, addr, new_val, whint);
-    frame.values[eid(inst)] = policy.make_literal_int(overflow ? 1 : 0);
-    return;
-  }
-
-  // PTR_ADD in RMW.
-  if (underlying == OpCode::PTR_ADD_32 || underlying == OpCode::PTR_ADD_64) {
-    int64_t elem_sz = rmw->element_size();
-    if (elem_sz <= 0) elem_sz = 1;
-    ValueT new_val = policy.ptr_add(old_val, rhs, elem_sz);
-    MemAccessHint whint{static_cast<uint32_t>(access_sz), false, true};
-    policy.mem_write(sched, addr, new_val, whint);
-    frame.values[eid(inst)] = rmw->returns_new_value() ? new_val : old_val;
-    return;
-  }
-
-  // Atomic exchange.
-  if (underlying >= OpCode::ATOMIC_EXCHANGE_8 &&
-      underlying <= OpCode::ATOMIC_EXCHANGE_64) {
-    MemAccessHint whint{static_cast<uint32_t>(access_sz), rmw_is_float, true};
-    policy.mem_write(sched, addr, rhs, whint);
-    frame.values[eid(inst)] = rmw->returns_new_value() ? rhs : old_val;
-    return;
-  }
-
-  // General case.
-  ValueT new_val = policy.binary_op(underlying, old_val, rhs);
-  MemAccessHint whint{static_cast<uint32_t>(access_sz), rmw_is_float, true};
-  policy.mem_write(sched, addr, new_val, whint);
-  frame.values[eid(inst)] = rmw->returns_new_value() ? new_val : old_val;
+    p.mem_write(sched, addr_val, new_val, whint);
+    frame.values[inst_eid] = rmw->returns_new_value() ? new_val : old_val;
+  });
 }
 
 template <typename PolicyT, typename SchedT, typename ValueT>
-inline void exec_call(InterpreterState<ValueT> &state, PolicyT &policy,
+inline void exec_call(auto &state, PolicyT &policy,
                       SchedT &sched, const IRInstruction &inst) {
   auto ci = CallInst::from(inst);
   if (!ci) return;
@@ -945,16 +963,25 @@ inline void exec_call(InterpreterState<ValueT> &state, PolicyT &policy,
   std::vector<ValueT> call_args;
   for (auto arg : ci->arguments()) {
     ValueT v = val<ValueT>(frame, arg);
-    if (policy.extract_address(v).has_value()) {
-      auto ai = AllocaInst::from(arg);
-      uint32_t sz = ai ? ai->size_bytes() : 8;
+    auto ai = AllocaInst::from(arg);
+    if (ai) {
+      uint32_t sz = ai->size_bytes();
       if (sz == 0) sz = 8;
       if (sz <= 8) {
-        ValueT loaded;
         MemAccessHint hint{sz, false, false};
-        policy.mem_read(sched, v, hint, loaded);
-        call_args.push_back(loaded);
-        continue;
+        bool dereffed = false;
+        ValueT loaded;
+        policy.with_address(v, policy.memory(), hint, eid(arg),
+            state, sched,
+            [&](auto &p, ConcreteMemory & /*mem*/, uint64_t a) {
+              ValueT addr_val = p.make_literal_ptr(a);
+              p.mem_read(sched, addr_val, hint, loaded);
+              dereffed = true;
+            });
+        if (dereffed) {
+          call_args.push_back(loaded);
+          continue;
+        }
       }
     }
     call_args.push_back(v);
@@ -970,13 +997,17 @@ inline void exec_call(InterpreterState<ValueT> &state, PolicyT &policy,
   }
 
   if (!callee_ir && ci->is_indirect()) {
-    ValueT callee_val = val<ValueT>(frame, inst.nth_operand(0));
-    if (policy.has_address(callee_val)) {
-      ValueT eid_val;
-      MemAccessHint hint{8, false, false};
-      policy.mem_read(sched, callee_val, hint, eid_val);
-      indirect_eid = static_cast<RawEntityId>(policy.extract_uint(eid_val));
-    }
+    auto callee_op = inst.nth_operand(0);
+    ValueT callee_val = val<ValueT>(frame, callee_op);
+    MemAccessHint hint{8, false, false};
+    policy.with_address(callee_val, policy.memory(), hint, eid(callee_op),
+        state, sched,
+        [&](auto &p, ConcreteMemory & /*mem*/, uint64_t a) {
+          ValueT addr_val = p.make_literal_ptr(a);
+          ValueT eid_val;
+          p.mem_read(sched, addr_val, hint, eid_val);
+          indirect_eid = static_cast<RawEntityId>(p.extract_uint(eid_val));
+        });
   }
 
   if (!callee_ir) {
@@ -1033,17 +1064,27 @@ inline void exec_call(InterpreterState<ValueT> &state, PolicyT &policy,
       uint32_t align = obj.align_bytes();
       if (align == 0) align = 8;
       ValueT addr = policy.mem_allocate(sched, size, align);
+      // mem_allocate-derived addresses are concrete by construction.
       if (auto a = policy.extract_address(addr)) {
         callee_frame.locals[EntityId(obj.id()).Pack()] = *a;
         if (param_idx < call_args.size()) {
           auto &arg = call_args[param_idx];
-          auto arg_addr = policy.extract_address(arg);
-          if (arg_addr && size > 8) {
-            // Large struct by-value: MEMCPY from source to parameter storage.
-            policy.memory().memcpy(*a, *arg_addr, size);
-          } else {
-            MemAccessHint hint{size, false, true};
-            policy.mem_write(sched, addr, arg, hint);
+          MemAccessHint w_hint{size, false, true};
+          bool memcpyed = false;
+          if (size > 8) {
+            // Init-time bulk copy: cannot meaningfully resume from a
+            // symbolic source pointer here, so suppress suspension by
+            // passing kInvalidEntityId.
+            policy.with_address(arg, policy.memory(), w_hint,
+                kInvalidEntityId, state, sched,
+                [&](auto &p, ConcreteMemory &mem, uint64_t arg_addr) {
+                  mem.memcpy(*a, arg_addr, size);
+                  memcpyed = true;
+                  (void)p;
+                });
+          }
+          if (!memcpyed) {
+            policy.mem_write(sched, addr, arg, w_hint);
           }
         }
       }
@@ -1183,12 +1224,12 @@ inline void exec_consume_va_param(CallFrame<ValueT> &frame, PolicyT &policy,
 // ===========================================================================
 
 template <typename PolicyT, typename SchedT, typename ValueT>
-inline ValueT read_return_value(PolicyT &policy,
+inline ValueT read_return_value(auto &state,
+                                PolicyT &policy,
                                 const CallFrame<ValueT> &frame,
                                 const ValueT &ret_from_inst,
                                 SchedT &sched) {
   if (policy.is_undefined(frame.return_ptr)) return ret_from_inst;
-  if (!policy.extract_address(frame.return_ptr).has_value()) return ret_from_inst;
 
   uint32_t sz = 0;
   bool ret_is_float = false;
@@ -1203,9 +1244,16 @@ inline ValueT read_return_value(PolicyT &policy,
   }
 
   if (sz > 0 && sz <= 8) {
-    ValueT result;
     MemAccessHint hint{sz, ret_is_float, false};
-    policy.mem_read(sched, frame.return_ptr, hint, result);
+    ValueT result = ret_from_inst;
+    // The return pointer is a Value held in the callee frame, not an IR
+    // operand of the RET; pass kInvalidEntityId to suppress suspension.
+    policy.with_address(frame.return_ptr, policy.memory(), hint,
+        kInvalidEntityId, state, sched,
+        [&](auto &p, ConcreteMemory & /*mem*/, uint64_t a) {
+          ValueT addr_val = p.make_literal_ptr(a);
+          p.mem_read(sched, addr_val, hint, result);
+        });
     return result;
   }
   if (sz > 8) return frame.return_ptr;
@@ -1213,7 +1261,7 @@ inline ValueT read_return_value(PolicyT &policy,
 }
 
 template <typename PolicyT, typename SchedT, typename ValueT>
-inline void exec_ret(InterpreterState<ValueT> &state, PolicyT &policy,
+inline void exec_ret(auto &state, PolicyT &policy,
                      SchedT &sched, const IRInstruction &inst) {
   auto &frame = state.call_stack.top();
   auto ri = RetInst::from(inst);
@@ -1226,7 +1274,7 @@ inline void exec_ret(InterpreterState<ValueT> &state, PolicyT &policy,
 
   if (state.call_stack.depth() > 1) {
     ValueT callee_result = read_return_value<PolicyT, SchedT, ValueT>(
-        policy, frame, ret_from_inst, sched);
+        state, policy, frame, ret_from_inst, sched);
     auto call_site = frame.call_site;
     state.call_stack.pop();
     if (call_site != kInvalidEntityId) {
@@ -1240,19 +1288,19 @@ inline void exec_ret(InterpreterState<ValueT> &state, PolicyT &policy,
 
   // Top-level return.
   ValueT final_result = read_return_value<PolicyT, SchedT, ValueT>(
-      policy, frame, ret_from_inst, sched);
+      state, policy, frame, ret_from_inst, sched);
   sched.on_completed(final_result,
-                     std::make_shared<InterpreterState<ValueT>>(state));
+                     state.clone());
   state.work_stack.clear();
 }
 
 template <typename PolicyT, typename SchedT, typename ValueT>
-inline void decide_cond_branch(InterpreterState<ValueT> &state, PolicyT &policy,
+inline void decide_cond_branch(auto &state, PolicyT &policy,
                                SchedT &sched, const IRInstruction &inst) {
   auto cb = CondBranchInst::from(inst);
   if (!cb) {
     sched.on_errored(ErrorKind::NO_TERMINATOR,
-                     std::make_shared<InterpreterState<ValueT>>(state));
+                     state.clone());
     state.work_stack.clear();
     return;
   }
@@ -1282,13 +1330,23 @@ inline void decide_cond_branch(InterpreterState<ValueT> &state, PolicyT &policy,
     return;
   }
 
-  sched.on_branch(cond, cb->true_block(), cb->false_block(),
-                  std::make_shared<InterpreterState<ValueT>>(state));
+  // Bind-and-redispatch protocol (mirrors `with_address`):
+  //   (1) re-push DECIDE_COND_BRANCH so the resumed state retries the
+  //       same op with cond_eid now cached;
+  //   (2) snapshot;
+  //   (3) emit BranchContinuation;
+  //   (4) clear the live work_stack so the current step halts.
+  state.work_stack.push_back({WorkKind::DECIDE_COND_BRANCH, inst, {}});
+  ValueT false_val = policy.make_literal_int(0, 1);
+  ValueT true_val = policy.make_literal_int(1, 1);
+  sched.on_branch(cond, cond_eid, cb->true_block(), cb->false_block(),
+                  std::move(false_val), std::move(true_val),
+                  state.clone());
   state.work_stack.clear();
 }
 
 template <typename PolicyT, typename ValueT>
-inline void decide_switch(InterpreterState<ValueT> &state, PolicyT &policy,
+inline void decide_switch(auto &state, PolicyT &policy,
                           const IRInstruction &inst) {
   auto sw = SwitchInst::from(inst);
   if (!sw) return;
@@ -1325,7 +1383,7 @@ inline void decide_switch(InterpreterState<ValueT> &state, PolicyT &policy,
 // ===========================================================================
 
 template <typename PolicyT, typename SchedT, typename ValueT>
-inline void dispatch(InterpreterState<ValueT> &state, PolicyT &policy,
+inline void dispatch(auto &state, PolicyT &policy,
                      SchedT &sched, const WorkItem &item) {
   auto &frame = state.call_stack.top();
 
@@ -1419,11 +1477,11 @@ inline void dispatch(InterpreterState<ValueT> &state, PolicyT &policy,
     // --- Side effects ---
     case WorkKind::EXEC_LOAD:
       ++state.steps;
-      exec_load<PolicyT, SchedT, ValueT>(frame, policy, sched, item.inst);
+      exec_load<PolicyT, SchedT, ValueT>(state, policy, sched, item.inst);
       break;
     case WorkKind::EXEC_STORE:
       ++state.steps;
-      exec_store<PolicyT, SchedT, ValueT>(frame, policy, sched, item.inst);
+      exec_store<PolicyT, SchedT, ValueT>(state, policy, sched, item.inst);
       break;
     case WorkKind::EXEC_BULK_MEM:
       ++state.steps;
@@ -1431,7 +1489,7 @@ inline void dispatch(InterpreterState<ValueT> &state, PolicyT &policy,
       break;
     case WorkKind::EXEC_RMW:
       ++state.steps;
-      exec_rmw<PolicyT, SchedT, ValueT>(frame, policy, sched, item.inst);
+      exec_rmw<PolicyT, SchedT, ValueT>(state, policy, sched, item.inst);
       break;
     case WorkKind::EXEC_CALL:
       ++state.steps;
@@ -1482,7 +1540,7 @@ inline void dispatch(InterpreterState<ValueT> &state, PolicyT &policy,
     case WorkKind::EXEC_UNREACHABLE:
       ++state.steps;
       sched.on_errored(ErrorKind::UNREACHABLE,
-                       std::make_shared<InterpreterState<ValueT>>(state));
+                       state.clone());
       state.work_stack.clear();
       break;
   }
@@ -1495,7 +1553,7 @@ inline void dispatch(InterpreterState<ValueT> &state, PolicyT &policy,
 
 template <typename PolicyT, typename SchedT, typename ValueT>
 inline void interp_init_state(PolicyT &policy, SchedT &sched,
-                              InterpreterState<ValueT> &state,
+                              auto &state,
                               const IRFunction &func,
                               const std::vector<ValueT> &args) {
   state.call_stack = CallStack<ValueT>();
@@ -1518,21 +1576,31 @@ inline void interp_init_state(PolicyT &policy, SchedT &sched,
       uint32_t align = obj.align_bytes();
       if (align == 0) align = 8;
       ValueT addr = policy.mem_allocate(sched, size, align);
+      // mem_allocate-derived addresses are concrete by construction.
       if (auto a = policy.extract_address(addr)) {
         frame.locals[EntityId(obj.id()).Pack()] = *a;
         if (param_idx < args.size()) {
-          auto arg_addr = policy.extract_address(args[param_idx]);
-          if (arg_addr && size > 8) {
-            policy.memory().memcpy(*a, *arg_addr, size);
-          } else {
-            bool param_is_float = false;
-            if (auto obj_type = obj.type()) {
-              if (auto bt = BuiltinType::from(*obj_type)) {
-                param_is_float = bt->is_floating_point();
-              }
+          bool param_is_float = false;
+          if (auto obj_type = obj.type()) {
+            if (auto bt = BuiltinType::from(*obj_type)) {
+              param_is_float = bt->is_floating_point();
             }
-            MemAccessHint hint{size, param_is_float, true};
-            policy.mem_write(sched, addr, args[param_idx], hint);
+          }
+          MemAccessHint w_hint{size, param_is_float, true};
+          bool memcpyed = false;
+          if (size > 8) {
+            // Init-time bulk copy: cannot resume from a symbolic source
+            // pointer here, so suppress suspension via kInvalidEntityId.
+            policy.with_address(args[param_idx], policy.memory(), w_hint,
+                kInvalidEntityId, state, sched,
+                [&](auto &p, ConcreteMemory &mem, uint64_t arg_addr) {
+                  mem.memcpy(*a, arg_addr, size);
+                  memcpyed = true;
+                  (void)p;
+                });
+          }
+          if (!memcpyed) {
+            policy.mem_write(sched, addr, args[param_idx], w_hint);
           }
         }
       }
@@ -1569,9 +1637,64 @@ inline void interp_init_state(PolicyT &policy, SchedT &sched,
                               func.entry_block()});
 }
 
+// Variant that uses pre-allocated parameter/return addresses.
+// Values must already be written into memory at those addresses.
+template <typename PolicyT, typename SchedT, typename ValueT>
+inline void interp_init_state_prealloc(
+    PolicyT &policy, SchedT &sched,
+    auto &state,
+    const IRFunction &func,
+    const std::vector<uint64_t> &param_addrs,
+    std::optional<uint64_t> return_addr) {
+
+  state.call_stack = CallStack<ValueT>();
+  state.global_addresses.clear();
+  state.steps = 0;
+  state.work_stack.clear();
+
+  CallFrame<ValueT> frame;
+  frame.func = func;
+
+  // Map IR objects to pre-allocated addresses.
+  uint32_t param_idx = 0;
+  for (auto obj : func.objects()) {
+    auto k = obj.kind();
+    if (k == ir::ObjectKind::PARAMETER ||
+        k == ir::ObjectKind::PARAMETER_VALUE) {
+      if (param_idx < param_addrs.size()) {
+        uint64_t addr = param_addrs[param_idx];
+        frame.locals[EntityId(obj.id()).Pack()] = addr;
+        frame.param_ptrs.push_back(policy.make_literal_ptr(addr));
+      } else {
+        frame.param_ptrs.push_back(
+            ValueTraits<ValueT>::default_value());
+      }
+      ++param_idx;
+    }
+  }
+
+  frame.variadic_start_index = param_idx;
+
+  if (return_addr) {
+    frame.return_ptr = policy.make_literal_ptr(*return_addr);
+  } else {
+    if (auto fd = func.declaration()) {
+      auto rt = fd->return_type();
+      if (auto bits = rt.size_in_bits()) {
+        uint32_t sz = static_cast<uint32_t>((*bits + 7) / 8);
+        if (sz > 0) frame.return_ptr = policy.mem_allocate(sched, sz, 8);
+      }
+    }
+  }
+
+  state.call_stack.push(std::move(frame));
+  state.work_stack.push_back({WorkKind::ENTER_BLOCK, {},
+                              func.entry_block()});
+}
+
 template <typename PolicyT, typename SchedT, typename ValueT>
 inline bool interp_step(PolicyT &policy, SchedT &sched,
-                        InterpreterState<ValueT> &state,
+                        auto &state,
                         uint64_t max_steps) {
   uint64_t target = state.steps + max_steps;
   uint64_t iters = 0;
@@ -1580,17 +1703,18 @@ inline bool interp_step(PolicyT &policy, SchedT &sched,
       (void) fprintf(stderr, "ABORT: work stack overflow (%zu items)\n",
                      state.work_stack.size());
       sched.on_errored(ErrorKind::NO_TERMINATOR,
-                       std::make_shared<InterpreterState<ValueT>>(state));
+                       state.clone());
       state.work_stack.clear();
       return false;
     }
     auto item = state.work_stack.back();
     state.work_stack.pop_back();
+    state.current_item = item;
     dispatch<PolicyT, SchedT, ValueT>(state, policy, sched, item);
     if (++iters > max_steps * 100) {
       // Safety: abort if the work stack is churning without stepping.
       sched.on_errored(ErrorKind::NO_TERMINATOR,
-                       std::make_shared<InterpreterState<ValueT>>(state));
+                       state.clone());
       state.work_stack.clear();
       return false;
     }

@@ -15,6 +15,7 @@
 #include <cstring>
 
 #include "Binding.h"
+#include "Interpreter.h"
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wc99-extensions"
@@ -37,27 +38,15 @@ using ir::MemOp;
 namespace {
 
 PyObject *value_to_python(const Value &v) {
-  if (auto *s = std::get_if<ScalarValue>(&v)) {
-    if (s->is_float) {
-      double d = (s->width == 4) ? static_cast<double>(s->as_f32())
-                                 : s->as_f64();
-      return PyFloat_FromDouble(d);
-    }
-    return PyLong_FromLongLong(s->as_i64());
-  }
-  if (auto *p = std::get_if<Pointer>(&v)) {
-    uint64_t addr = concrete_address(*p);
-    return Py_BuildValue("(sK)", "ptr", addr);
-  }
-  if (is_null(v)) {
-    Py_RETURN_NONE;
-  }
-  Py_RETURN_NONE;
+  return PyLong_FromLongLong(v.i64);
 }
 
 Value python_to_value(PyObject *obj) {
   if (obj == nullptr || obj == Py_None) {
-    return Pointer(0);
+    return make_uint(0);
+  }
+  if (PyFloat_Check(obj)) {
+    return make_float(PyFloat_AsDouble(obj));
   }
   if (PyLong_Check(obj)) {
     int64_t v = PyLong_AsLongLong(obj);
@@ -66,27 +55,22 @@ Value python_to_value(PyObject *obj) {
       uint64_t uv = PyLong_AsUnsignedLongLong(obj);
       if (uv == static_cast<uint64_t>(-1) && PyErr_Occurred()) {
         PyErr_Clear();
-        return Undefined{};
+        return make_uint(0);
       }
       return make_int(static_cast<int64_t>(uv));
     }
     return make_int(v);
-  }
-  if (PyFloat_Check(obj)) {
-    return make_float(PyFloat_AsDouble(obj));
   }
   if (PyTuple_Check(obj) && PyTuple_Size(obj) == 2) {
     PyObject *tag = PyTuple_GetItem(obj, 0);
     if (tag && PyUnicode_Check(tag)) {
       const char *s = PyUnicode_AsUTF8(tag);
       if (s && std::strcmp(s, "ptr") == 0) {
-        PyObject *addr_obj = PyTuple_GetItem(obj, 1);
-        uint64_t addr = PyLong_AsUnsignedLongLong(addr_obj);
-        return make_ptr(addr);
+        return make_uint(PyLong_AsUnsignedLongLong(PyTuple_GetItem(obj, 1)));
       }
     }
   }
-  return Undefined{};
+  return make_uint(0);
 }
 
 // Convert concrete Value -> SharedPyPtr (for concrete fallback results).
@@ -94,6 +78,60 @@ SharedPyPtr value_to_shared(const Value &v) {
   PyObject *obj = value_to_python(v);
   SharedPyPtr result(obj);
   Py_XDECREF(obj);  // SharedPyPtr constructor INCREFed
+  return result;
+}
+
+// PyFloat -> Value. When the consumer expects f32 form (low 32 bits hold
+// the f32 bit pattern), narrow through float; otherwise produce f64 form.
+// Non-float inputs (PyLong bit pattern) pass through unchanged because
+// integers carry their bits in u64 already.
+Value python_to_value_f32_aware(PyObject *obj, bool needs_f32) {
+  if (needs_f32 && PyFloat_Check(obj)) {
+    return make_float32(static_cast<float>(PyFloat_AsDouble(obj)));
+  }
+  if (obj == nullptr || obj == Py_None) return make_uint(0);
+  if (PyFloat_Check(obj)) return make_float(PyFloat_AsDouble(obj));
+  if (PyLong_Check(obj)) {
+    int64_t v = PyLong_AsLongLong(obj);
+    if (v == -1 && PyErr_Occurred()) {
+      PyErr_Clear();
+      uint64_t uv = PyLong_AsUnsignedLongLong(obj);
+      if (uv == static_cast<uint64_t>(-1) && PyErr_Occurred()) {
+        PyErr_Clear();
+        return make_uint(0);
+      }
+      return make_int(static_cast<int64_t>(uv));
+    }
+    return make_int(v);
+  }
+  if (PyTuple_Check(obj) && PyTuple_Size(obj) == 2) {
+    PyObject *tag = PyTuple_GetItem(obj, 0);
+    if (tag && PyUnicode_Check(tag)) {
+      const char *s = PyUnicode_AsUTF8(tag);
+      if (s && std::strcmp(s, "ptr") == 0) {
+        return make_uint(PyLong_AsUnsignedLongLong(PyTuple_GetItem(obj, 1)));
+      }
+    }
+  }
+  return make_uint(0);
+}
+
+// Float-tagged conversion: produce a PyFloat from the bit pattern. Used
+// at type-aware boundaries (memory loads, float arithmetic results) where
+// the caller knows the value should surface as a Python float.
+SharedPyPtr float_value_to_shared(const Value &v, uint32_t size) {
+  double d;
+  if (size <= 4) {
+    uint32_t bits = static_cast<uint32_t>(v.u64);
+    float f;
+    std::memcpy(&f, &bits, sizeof(f));
+    d = static_cast<double>(f);
+  } else {
+    std::memcpy(&d, &v.u64, sizeof(d));
+  }
+  PyObject *obj = PyFloat_FromDouble(d);
+  SharedPyPtr result(obj);
+  Py_XDECREF(obj);
   return result;
 }
 
@@ -115,13 +153,85 @@ struct ConcreteMemoryWrapper {
 };
 
 // Must match InterpreterStateWrapper in Interpreter.cpp.
+//
+// `symbolic_state` is a strong reference to a PyObject whose payload is a
+// `SymbolicState` — see Sharable<SymbolicState, PyObjectRC>. A null
+// pointer means the symbolic arm has not been initialized yet.
 struct InterpreterStateWrapper {
   PyObject_HEAD
   InterpreterState<Value> *state;
-  InterpreterState<SharedPyPtr> *symbolic_state;
+  ::PyObject *symbolic_state;
 };
 
+// Extract the embedded SymbolicState from the wrapper's symbolic_state
+// PyObject. Returns nullptr if the symbolic arm is uninitialized.
+inline SymbolicState *symbolic_state_of(InterpreterStateWrapper *sw) {
+  if (!sw || !sw->symbolic_state) return nullptr;
+  return reinterpret_cast<PyWrapperFor<SymbolicState> *>(
+      sw->symbolic_state)->data;
+}
+
+// Drop any existing symbolic state PyObject on `sw` and install a freshly
+// constructed one. Returns a reference to the new state for the caller
+// to mutate via interp_init_state. The wrapper holds the only strong
+// reference; continuations that survive a re-init keep their own.
+inline SymbolicState &install_fresh_symbolic_state(
+    InterpreterStateWrapper *sw) {
+  auto fresh = make_sharable<SymbolicState>();
+  Py_XDECREF(sw->symbolic_state);
+  sw->symbolic_state = fresh.release();
+  return *reinterpret_cast<PyWrapperFor<SymbolicState> *>(
+      sw->symbolic_state)->data;
+}
+
+// ===========================================================================
+// SymbolicState PyTypeObject — the storage for InterpreterState<SharedPyPtr,
+// PyObjectRC>. Registered as a hidden private type; never instantiated
+// directly from Python. Continuations and the wrapper's `symbolic_state`
+// slot hold strong references to instances of this type.
+// ===========================================================================
+
+static PyTypeObject SymbolicStatePyType;
+
+static void SymbolicStateType_dealloc(PyObject *self) {
+  auto *o = reinterpret_cast<PyWrapperFor<SymbolicState> *>(self);
+  if (o->data) {
+    o->data->~SymbolicState();
+    o->data = nullptr;
+  }
+  PyObject_Free(self);
+}
+
 }  // namespace
+
+}  // namespace mx
+
+namespace mx::ir::interpret {
+
+template <>
+::PyTypeObject &Sharable<mx::SymbolicState, PyObjectRC>::PyType(void) noexcept {
+  return mx::SymbolicStatePyType;
+}
+
+}  // namespace mx::ir::interpret
+
+namespace mx {
+
+bool LoadSymbolicStateType(::PyObject *interp_module) {
+  SymbolicStatePyType = {PyVarObject_HEAD_INIT(nullptr, 0)};
+  SymbolicStatePyType.tp_name =
+      "multiplier.ir.interpret._SymbolicState";
+  SymbolicStatePyType.tp_basicsize = sizeof(PyWrapperFor<SymbolicState>);
+  SymbolicStatePyType.tp_dealloc = SymbolicStateType_dealloc;
+  SymbolicStatePyType.tp_flags = Py_TPFLAGS_DEFAULT;
+  SymbolicStatePyType.tp_doc =
+      "Internal symbolic interpreter state (PyObjectRC payload)";
+  if (PyType_Ready(&SymbolicStatePyType) < 0) return false;
+  Py_INCREF(&SymbolicStatePyType);
+  return PyModule_AddObject(
+      interp_module, "_SymbolicState",
+      reinterpret_cast<PyObject *>(&SymbolicStatePyType)) == 0;
+}
 
 // ===========================================================================
 // PythonPolicy — construction
@@ -143,6 +253,9 @@ PythonPolicy::~PythonPolicy() {
   Py_XDECREF(cached_cast_);
   Py_XDECREF(cached_is_true_);
   Py_XDECREF(cached_resolve_branch_);
+  Py_XDECREF(cached_resolve_call_);
+  Py_XDECREF(cached_mem_read_);
+  Py_XDECREF(cached_mem_write_);
 }
 
 PyObject *PythonPolicy::lookup_method(PyObject *&cache, const char *name) {
@@ -242,8 +355,17 @@ SharedPyPtr PythonPolicy::binary_op(OpCode op, const SharedPyPtr &lhs,
     Py_XDECREF(result);
     PyErr_Clear();
   }
-  return value_to_shared(concrete_binary_op(
-      op, python_to_value(lhs.Get()), python_to_value(rhs.Get())));
+  bool is_float_arith = ir::IsFloatArithmetic(op);
+  bool is_float_cmp = ir::IsFloatComparison(op);
+  bool needs_f32 = (is_float_arith || is_float_cmp) &&
+                   (static_cast<unsigned>(op) % 2 == 1);
+  Value lv = python_to_value_f32_aware(lhs.Get(), needs_f32);
+  Value rv = python_to_value_f32_aware(rhs.Get(), needs_f32);
+  Value v = concrete_binary_op(op, lv, rv);
+  if (is_float_arith) {
+    return float_value_to_shared(v, needs_f32 ? 4u : 8u);
+  }
+  return value_to_shared(v);
 }
 
 SharedPyPtr PythonPolicy::unary_op(OpCode op, const SharedPyPtr &operand) {
@@ -258,7 +380,15 @@ SharedPyPtr PythonPolicy::unary_op(OpCode op, const SharedPyPtr &operand) {
     Py_XDECREF(result);
     PyErr_Clear();
   }
-  return value_to_shared(concrete_unary_op(op, python_to_value(operand.Get())));
+  bool is_float_arith = ir::IsFloatArithmetic(op);
+  bool needs_f32 = is_float_arith &&
+                   (static_cast<unsigned>(op) % 2 == 1);
+  Value v = concrete_unary_op(
+      op, python_to_value_f32_aware(operand.Get(), needs_f32));
+  if (is_float_arith) {
+    return float_value_to_shared(v, needs_f32 ? 4u : 8u);
+  }
+  return value_to_shared(v);
 }
 
 SharedPyPtr PythonPolicy::compare(OpCode op, const SharedPyPtr &lhs,
@@ -274,8 +404,11 @@ SharedPyPtr PythonPolicy::compare(OpCode op, const SharedPyPtr &lhs,
     Py_XDECREF(result);
     PyErr_Clear();
   }
-  return value_to_shared(concrete_compare(
-      op, python_to_value(lhs.Get()), python_to_value(rhs.Get())));
+  bool needs_f32 = ir::IsFloatComparison(op) &&
+                   (static_cast<unsigned>(op) % 2 == 1);
+  Value lv = python_to_value_f32_aware(lhs.Get(), needs_f32);
+  Value rv = python_to_value_f32_aware(rhs.Get(), needs_f32);
+  return value_to_shared(concrete_compare(op, lv, rv));
 }
 
 SharedPyPtr PythonPolicy::cast(CastOp op, const SharedPyPtr &operand) {
@@ -290,7 +423,20 @@ SharedPyPtr PythonPolicy::cast(CastOp op, const SharedPyPtr &operand) {
     Py_XDECREF(result);
     PyErr_Clear();
   }
-  return value_to_shared(concrete_cast(op, python_to_value(operand.Get())));
+  // Casts from f32 require the input to be in f32 form (low 32 bits).
+  bool input_is_f32 = (op == CastOp::F32_TO_F64) ||
+                      (op >= CastOp::F32_TO_SI8 && op <= CastOp::F32_TO_SI64) ||
+                      (op >= CastOp::F32_TO_UI8 && op <= CastOp::F32_TO_UI64);
+  Value v = concrete_cast(
+      op, python_to_value_f32_aware(operand.Get(), input_is_f32));
+  bool produces_float = ir::IsIntToFloat(op) ||
+                        op == CastOp::F32_TO_F64 ||
+                        op == CastOp::F64_TO_F32;
+  if (produces_float) {
+    bool is_f32 = (op == CastOp::F64_TO_F32) || ir::IsToFloat32(op);
+    return float_value_to_shared(v, is_f32 ? 4u : 8u);
+  }
+  return value_to_shared(v);
 }
 
 SharedPyPtr PythonPolicy::ptr_add(const SharedPyPtr &base,
@@ -330,10 +476,24 @@ SharedPyPtr PythonPolicy::bitwise_intrinsic(OpCode width_op, BitwiseOp sub,
 
 SharedPyPtr PythonPolicy::float_intrinsic(
     FloatOp sub, const std::vector<SharedPyPtr> &operands) {
+  // Per FloatOp layout: even index = f32, odd = f64.
+  bool is_f32 = (static_cast<unsigned>(sub) % 2 == 0);
   std::vector<Value> concrete_ops;
   concrete_ops.reserve(operands.size());
-  for (auto &op : operands) concrete_ops.push_back(python_to_value(op.Get()));
-  return value_to_shared(concrete_float_intrinsic(sub, concrete_ops));
+  for (auto &op : operands) {
+    concrete_ops.push_back(python_to_value_f32_aware(op.Get(), is_f32));
+  }
+  Value v = concrete_float_intrinsic(sub, concrete_ops);
+  // ISNAN/ISINF/ISFINITE/SIGNBIT return bool — surface as Python int.
+  using enum FloatOp;
+  bool returns_bool = (sub == ISNAN_32 || sub == ISNAN_64 ||
+                       sub == ISINF_32 || sub == ISINF_64 ||
+                       sub == ISFINITE_32 || sub == ISFINITE_64 ||
+                       sub == SIGNBIT_32 || sub == SIGNBIT_64);
+  if (returns_bool) {
+    return value_to_shared(v);
+  }
+  return float_value_to_shared(v, is_f32 ? 4u : 8u);
 }
 
 // ===========================================================================
@@ -375,24 +535,51 @@ void PythonPolicy::mem_free(PythonScheduler &, const SharedPyPtr &address) {
 
 bool PythonPolicy::mem_read(PythonScheduler &, const SharedPyPtr &addr,
                              const MemAccessHint &hint, SharedPyPtr &result) {
+  if (PyObject *method = lookup_method(cached_mem_read_, "mem_read")) {
+    PyObject *py_result = PyObject_CallFunction(
+        method, "OIi", addr.Get(), hint.size_bytes,
+        static_cast<int>(hint.is_float));
+    if (py_result && py_result != Py_NotImplemented) {
+      result = SharedPyPtr(py_result);
+      Py_DECREF(py_result);
+      return true;
+    }
+    Py_XDECREF(py_result);
+    PyErr_Clear();
+  }
+
+  // Concrete fallback.
   auto a = extract_address(addr);
   if (!a) {
     result = make_default();
     return true;
   }
-  result = value_to_shared(concrete_read_from_mem(memory_, *a,
-                                                   hint.size_bytes,
-                                                   hint.is_float));
+  Value v = concrete_read_from_mem(memory_, *a, hint.size_bytes, hint.is_float);
+  result = hint.is_float ? float_value_to_shared(v, hint.size_bytes)
+                         : value_to_shared(v);
   return true;
 }
 
 bool PythonPolicy::mem_write(PythonScheduler &, const SharedPyPtr &addr,
                               const SharedPyPtr &val,
                               const MemAccessHint &hint) {
+  if (PyObject *method = lookup_method(cached_mem_write_, "mem_write")) {
+    PyObject *py_result = PyObject_CallFunction(
+        method, "OOIi", addr.Get(), val.Get(), hint.size_bytes,
+        static_cast<int>(hint.is_float));
+    if (py_result && py_result != Py_NotImplemented) {
+      Py_DECREF(py_result);
+      return true;
+    }
+    Py_XDECREF(py_result);
+    PyErr_Clear();
+  }
+
+  // Concrete fallback.
   auto a = extract_address(addr);
   if (!a) return true;
   concrete_write_to_mem(memory_, *a, python_to_value(val.Get()),
-                        hint.size_bytes);
+                        hint.size_bytes, hint.is_float);
   return true;
 }
 
@@ -461,9 +648,61 @@ bool PythonPolicy::resolve_call(PythonScheduler &,
                                  const IRInstruction &,
                                  RawEntityId target_eid,
                                  RawEntityId indirect_target_eid,
-                                 const std::vector<SharedPyPtr> &,
-                                 bool,
+                                 const std::vector<SharedPyPtr> &arguments,
+                                 bool is_indirect,
                                  CallResolution<SharedPyPtr> &resolution) {
+  // Try Python policy first.
+  if (PyObject *method = lookup_method(cached_resolve_call_, "resolve_call")) {
+    PyObject *args_list = PyList_New(
+        static_cast<Py_ssize_t>(arguments.size()));
+    for (size_t i = 0; i < arguments.size(); ++i) {
+      PyObject *arg = arguments[i].Get();
+      Py_INCREF(arg);
+      PyList_SET_ITEM(args_list, static_cast<Py_ssize_t>(i), arg);
+    }
+
+    PyObject *result = PyObject_CallFunction(
+        method, "KKOi", target_eid, indirect_target_eid,
+        args_list, static_cast<int>(is_indirect));
+    Py_DECREF(args_list);
+
+    if (result && result != Py_NotImplemented && result != Py_None) {
+      // Parse ("skip", return_value) or ("model", return_value).
+      if (PyTuple_Check(result) && PyTuple_Size(result) == 2) {
+        PyObject *tag = PyTuple_GetItem(result, 0);
+        PyObject *val = PyTuple_GetItem(result, 1);
+        if (tag && PyUnicode_Check(tag)) {
+          const char *action = PyUnicode_AsUTF8(tag);
+          if (action && std::strcmp(action, "skip") == 0) {
+            resolution.action = CallAction::SKIP;
+            if (val && val != Py_None) {
+              resolution.return_value = SharedPyPtr(val);
+            } else {
+              resolution.return_value = make_default();
+            }
+            Py_DECREF(result);
+            return true;
+          }
+          if (action && std::strcmp(action, "model") == 0) {
+            resolution.action = CallAction::MODEL;
+            if (val && val != Py_None) {
+              resolution.return_value = SharedPyPtr(val);
+            } else {
+              resolution.return_value = make_default();
+            }
+            Py_DECREF(result);
+            return true;
+          }
+        }
+      }
+      Py_DECREF(result);
+    } else {
+      Py_XDECREF(result);
+      PyErr_Clear();
+    }
+  }
+
+  // Fall through to C++ func_resolver_.
   if (func_resolver_) {
     for (auto eid : {target_eid, indirect_target_eid}) {
       if (eid != kInvalidEntityId) {
@@ -572,8 +811,54 @@ PyObject *SymbolicInitState(PyObject *state_obj, PyObject *memory_obj,
                        make_global_resolver(global_resolver_obj));
   PythonScheduler sched;
 
+  auto &symbolic = install_fresh_symbolic_state(sw);
   interp_init_state<PythonPolicy, PythonScheduler, SharedPyPtr>(
-      policy, sched, *sw->symbolic_state, *func, c_args);
+      policy, sched, symbolic, *func, c_args);
+
+  Py_RETURN_NONE;
+}
+
+PyObject *SymbolicInitStateFrame(PyObject *state_obj, PyObject *memory_obj,
+                                 PyObject *py_policy, PyObject *func_obj,
+                                 PyObject *param_addrs_list,
+                                 PyObject *return_addr_obj,
+                                 PyObject *func_resolver_obj,
+                                 PyObject *global_resolver_obj) {
+  auto *sw = reinterpret_cast<InterpreterStateWrapper *>(state_obj);
+  auto *mw = reinterpret_cast<ConcreteMemoryWrapper *>(memory_obj);
+
+  auto func = from_python<IRFunction>(func_obj);
+  if (!func) {
+    PyErr_SetString(PyExc_TypeError, "Expected IRFunction");
+    return nullptr;
+  }
+
+  // Extract pre-allocated parameter addresses.
+  std::vector<uint64_t> param_addrs;
+  if (param_addrs_list && param_addrs_list != Py_None &&
+      PyList_Check(param_addrs_list)) {
+    for (Py_ssize_t i = 0; i < PyList_Size(param_addrs_list); ++i) {
+      PyObject *item = PyList_GetItem(param_addrs_list, i);
+      param_addrs.push_back(PyLong_AsUnsignedLongLong(item));
+      if (PyErr_Occurred()) return nullptr;
+    }
+  }
+
+  // Extract optional return address.
+  std::optional<uint64_t> return_addr;
+  if (return_addr_obj && return_addr_obj != Py_None) {
+    return_addr = PyLong_AsUnsignedLongLong(return_addr_obj);
+    if (PyErr_Occurred()) return nullptr;
+  }
+
+  PythonPolicy policy(py_policy, *mw->memory,
+                       make_func_resolver(func_resolver_obj),
+                       make_global_resolver(global_resolver_obj));
+  PythonScheduler sched;
+
+  auto &symbolic = install_fresh_symbolic_state(sw);
+  interp_init_state_prealloc<PythonPolicy, PythonScheduler, SharedPyPtr>(
+      policy, sched, symbolic, *func, param_addrs, return_addr);
 
   Py_RETURN_NONE;
 }
@@ -585,57 +870,135 @@ PyObject *SymbolicStep(PyObject *state_obj, PyObject *memory_obj,
   auto *sw = reinterpret_cast<InterpreterStateWrapper *>(state_obj);
   auto *mw = reinterpret_cast<ConcreteMemoryWrapper *>(memory_obj);
 
+  auto *symbolic = symbolic_state_of(sw);
+  if (!symbolic) {
+    PyErr_SetString(PyExc_RuntimeError,
+        "step: symbolic state not initialized — call init_state first");
+    return nullptr;
+  }
+
   PythonPolicy policy(py_policy, *mw->memory,
                        make_func_resolver(func_resolver_obj),
                        make_global_resolver(global_resolver_obj));
   PythonScheduler sched;
 
   bool budget_hit = interp_step<PythonPolicy, PythonScheduler, SharedPyPtr>(
-      policy, sched, *sw->symbolic_state, max_steps);
+      policy, sched, *symbolic, max_steps);
+  sched.outcome.budget_exhausted = budget_hit;
+  sched.outcome.steps = symbolic->steps;
 
   PyObject *result_dict = PyDict_New();
   if (!result_dict) return nullptr;
 
-  switch (sched.result_kind) {
-    case PythonScheduler::COMPLETED: {
-      PyObject *py_val = sched.return_value.Get();
+  // Terminal outcomes take precedence over continuations.
+  if (sched.outcome.terminal) {
+    auto &term = *sched.outcome.terminal;
+    if (term.kind == TerminalKind::COMPLETED) {
+      PyObject *py_val = term.return_value.Get();
       if (!py_val) py_val = Py_None;
       PyObject *result_tuple = Py_BuildValue("(sO)", "completed", py_val);
       PyDict_SetItemString(result_dict, "result", result_tuple);
       Py_XDECREF(result_tuple);
-      break;
-    }
-    case PythonScheduler::ERRORED: {
+    } else {
       PyObject *result_tuple = Py_BuildValue(
-          "(si)", "error", static_cast<int>(sched.error_kind));
+          "(si)", "error", static_cast<int>(term.error_kind));
       PyDict_SetItemString(result_dict, "result", result_tuple);
       Py_XDECREF(result_tuple);
-      break;
     }
-    case PythonScheduler::BRANCH: {
-      PyObject *result_tuple = Py_BuildValue("(si)", "suspended", 0);
+  } else if (!sched.outcome.continuations.empty()) {
+    auto *first = sched.outcome.continuations.front().get();
+    if (auto *bc = dynamic_cast<BranchContinuation<SharedPyPtr, PyObjectRC> *>(first)) {
+      PyObject *cond_obj = bc->condition().Get();
+      if (!cond_obj) cond_obj = Py_None;
+      uint64_t tb_eid = EntityId(bc->true_block().id()).Pack();
+      uint64_t fb_eid = EntityId(bc->false_block().id()).Pack();
+      PyObject *result_tuple = Py_BuildValue(
+          "(sOKK)", "branch", cond_obj, tb_eid, fb_eid);
       PyDict_SetItemString(result_dict, "result", result_tuple);
       Py_XDECREF(result_tuple);
-      break;
+    } else if (auto *mc = dynamic_cast<MemAddrContinuation<SharedPyPtr, PyObjectRC> *>(first)) {
+      PyObject *addr_obj = mc->symbolic_address().Get();
+      if (!addr_obj) addr_obj = Py_None;
+      PyObject *result_tuple = Py_BuildValue(
+          "(ssOKIN)", "suspended",
+          mc->is_write() ? "store-addr" : "load-addr",
+          addr_obj,
+          static_cast<uint64_t>(mc->address_eid()),
+          static_cast<unsigned int>(mc->size_bytes()),
+          PyBool_FromLong(mc->is_write() ? 1 : 0));
+      PyDict_SetItemString(result_dict, "result", result_tuple);
+      Py_XDECREF(result_tuple);
+    } else {
+      PyObject *desc = PyUnicode_FromString(first->describe().c_str());
+      PyObject *result_tuple = Py_BuildValue("(sO)", "suspended", desc);
+      PyDict_SetItemString(result_dict, "result", result_tuple);
+      Py_XDECREF(result_tuple);
+      Py_XDECREF(desc);
     }
-    case PythonScheduler::NONE: {
-      if (budget_hit) {
-        PyObject *budget_tuple = Py_BuildValue(
-            "(sK)", "budget", sw->symbolic_state->steps);
-        PyDict_SetItemString(result_dict, "result", budget_tuple);
-        Py_XDECREF(budget_tuple);
-      } else {
-        PyDict_SetItemString(result_dict, "result", Py_None);
-      }
-      break;
+  } else {
+    if (sched.outcome.budget_exhausted) {
+      PyObject *budget_tuple = Py_BuildValue(
+          "(sK)", "budget", sched.outcome.steps);
+      PyDict_SetItemString(result_dict, "result", budget_tuple);
+      Py_XDECREF(budget_tuple);
+    } else {
+      PyDict_SetItemString(result_dict, "result", Py_None);
     }
   }
 
-  PyObject *forks_list = PyList_New(
-      static_cast<Py_ssize_t>(sched.forks.size()));
-  for (size_t i = 0; i < sched.forks.size(); ++i) {
-    PyObject *dict = PyDict_New();
-    PyList_SET_ITEM(forks_list, static_cast<Py_ssize_t>(i), dict);
+  // Build forks list by enumerating each continuation. Branches walk
+  // their `next()` enumeration ({false, true}); each Resumption already
+  // carries a clone with cond_eid bound and DECIDE_COND_BRANCH re-pushed
+  // — stepping it dispatches the right edge. Memory-address suspensions
+  // produce a single fork holding the snapshot — the driver picks
+  // concrete addresses and calls `resume_addr` on each clone.
+  PyObject *forks_list = PyList_New(0);
+  for (auto &cont : sched.outcome.continuations) {
+    if (auto *bc = dynamic_cast<BranchContinuation<SharedPyPtr, PyObjectRC> *>(cont.get())) {
+      while (auto resumption = bc->next()) {
+        // resumption->state is already a fresh PyRef<SymbolicState>;
+        // hand it to the wrapper, which steals the strong ref.
+        PyObject *state_obj = MakeSymbolicStateWrapper(
+            std::move(resumption->state));
+        PyObject *dict = PyDict_New();
+        PyDict_SetItemString(dict, "state", state_obj);
+        Py_DECREF(state_obj);
+        PyObject *dir_str = PyUnicode_FromString(resumption->label.c_str());
+        PyDict_SetItemString(dict, "direction", dir_str);
+        Py_DECREF(dir_str);
+        PyList_Append(forks_list, dict);
+        Py_DECREF(dict);
+      }
+    } else if (auto *mc = dynamic_cast<MemAddrContinuation<SharedPyPtr, PyObjectRC> *>(cont.get())) {
+      auto snap = mc->snapshot();
+      if (!snap) continue;
+      // Clone the snapshot so the driver can mutate (resume_addr) without
+      // disturbing the original continuation's snapshot reference.
+      PyObject *state_obj = MakeSymbolicStateWrapper(snap->clone());
+      PyObject *dict = PyDict_New();
+      PyDict_SetItemString(dict, "state", state_obj);
+      Py_XDECREF(state_obj);
+      PyObject *kind_str = PyUnicode_FromString(
+          mc->is_write() ? "store-addr" : "load-addr");
+      PyDict_SetItemString(dict, "kind", kind_str);
+      Py_DECREF(kind_str);
+      PyObject *addr_obj = mc->symbolic_address().Get();
+      if (!addr_obj) addr_obj = Py_None;
+      Py_INCREF(addr_obj);
+      PyDict_SetItemString(dict, "address", addr_obj);
+      Py_DECREF(addr_obj);
+      PyObject *eid_obj = PyLong_FromUnsignedLongLong(mc->address_eid());
+      PyDict_SetItemString(dict, "address_eid", eid_obj);
+      Py_DECREF(eid_obj);
+      PyObject *size_obj = PyLong_FromUnsignedLong(mc->size_bytes());
+      PyDict_SetItemString(dict, "size", size_obj);
+      Py_DECREF(size_obj);
+      PyObject *iw_obj = PyBool_FromLong(mc->is_write() ? 1 : 0);
+      PyDict_SetItemString(dict, "is_write", iw_obj);
+      Py_DECREF(iw_obj);
+      PyList_Append(forks_list, dict);
+      Py_DECREF(dict);
+    }
   }
   PyDict_SetItemString(result_dict, "forks", forks_list);
   Py_DECREF(forks_list);

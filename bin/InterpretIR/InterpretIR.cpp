@@ -19,7 +19,9 @@
 #include <multiplier/AST.h>
 #include <multiplier/Entity.h>
 #include <multiplier/IR/Interpret/ConcretePolicy.h>
+#include <multiplier/IR/Interpret/Continuation.h>
 #include <multiplier/IR/Interpret/Interpreter.h>
+#include <multiplier/IR/Interpret/InterpreterLoop.h>
 #include <multiplier/IR/Interpret/Policy.h>
 
 DEFINE_uint64(entity_id, mx::kInvalidEntityId, "ID of the entity to interpret");
@@ -143,29 +145,23 @@ int main(int argc, char *argv[]) {
   InterpreterState<Value> state;
   NoOpScheduler sched;
 
-  policy.init_state(state, *ir_func, args);
+  interp_init_state<ConcretePolicy, NoOpScheduler, Value>(
+      policy, sched, state, *ir_func, args);
 
-  while (policy.step(state, sched, FLAGS_max_steps)) {}
+  while (interp_step<ConcretePolicy, NoOpScheduler, Value>(
+      policy, sched, state, FLAGS_max_steps)) {}
+  sched.outcome.steps = state.steps;
 
   std::cout << "Interpreter finished after " << state.steps << " steps.\n";
 
-  if (sched.result && sched.result->kind() == Continuation::COMPLETED) {
-    const auto &ret = sched.result->return_value();
-    if (auto *s = std::get_if<ScalarValue>(&ret)) {
-      if (s->width == 4) {
-        std::cout << "Return value: " << s->as_f32() << " (float)\n";
-      } else {
-        std::cout << "Return value: " << s->as_i64() << "\n";
-      }
-    } else if (auto *p = as_pointer(ret)) {
-      std::cout << "Return value: ptr(" << concrete_address(*p) << ")\n";
-    } else if (is_null(ret)) {
-      std::cout << "Return value: null\n";
-    } else {
-      std::cout << "Return value: void/undef\n";
-    }
-  } else if (sched.result && sched.result->kind() == Continuation::ERRORED) {
-    std::cerr << "Interpreter error (kind=" << static_cast<int>(sched.result->error())
+  if (sched.outcome.terminal &&
+      sched.outcome.terminal->kind == mx::ir::interpret::TerminalKind::COMPLETED) {
+    const auto &ret = sched.outcome.terminal->return_value;
+    std::cout << "Return value: " << ret.i64 << "\n";
+  } else if (sched.outcome.terminal &&
+             sched.outcome.terminal->kind == mx::ir::interpret::TerminalKind::ERRORED) {
+    std::cerr << "Interpreter error (kind="
+              << static_cast<int>(sched.outcome.terminal->error_kind)
               << ") after " << state.steps << " steps.\n";
     std::cout << "Return value: void/undef\n";
   } else {

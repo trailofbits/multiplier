@@ -9,9 +9,12 @@
 #include <multiplier/IR/Interpret/ConcreteOps.h>
 #include <multiplier/IR/Interpret/ConcreteMemory.h>
 #include <multiplier/IR/Interpret/ConcretePolicy.h>
+#include <multiplier/IR/Interpret/Continuation.h>
+#include <multiplier/IR/Interpret/SharablePy.h>
 #include <multiplier/IR/OpCode.h>
 
 #include <Python.h>
+#include <memory>
 #include <optional>
 #include <vector>
 
@@ -23,6 +26,11 @@ namespace mx {
 using namespace ir;
 using namespace ir::interpret;
 
+// PyObjectRC instantiation of the symbolic interpreter state. The Python
+// type registered for this struct IS the storage — no separate wrapper
+// indirection.
+using SymbolicState = InterpreterState<SharedPyPtr, PyObjectRC>;
+
 // ===========================================================================
 // ValueTraits<SharedPyPtr> — Py_None as default value.
 // ===========================================================================
@@ -33,55 +41,42 @@ struct ValueTraits<SharedPyPtr> {
 };
 
 // ===========================================================================
-// PythonScheduler — stores results directly as SharedPyPtr.
+// PythonScheduler — drains a single StepOutcome.
 //
-// Does not use Continuation (which is Value-typed). Results are read
-// directly by SymbolicStep to build the Python result dict.
+// Each suspension produced by the interpreter loop becomes a
+// `Continuation<SharedPyPtr>` pushed onto `outcome.continuations`.
+// Terminal outcomes (completed / errored) populate `outcome.terminal`
+// instead. SymbolicStep reads `outcome` to build the Python result dict.
 // ===========================================================================
 
 struct PythonScheduler : Scheduler<PythonScheduler, SharedPyPtr> {
-  enum ResultKind { NONE, COMPLETED, ERRORED, BRANCH };
+  StepOutcome<SharedPyPtr, PyObjectRC> outcome;
 
-  ResultKind result_kind{NONE};
-  SharedPyPtr return_value;
-  ErrorKind error_kind{};
-  SharedPyPtr branch_condition;
-  uint64_t true_block_eid{0};
-  uint64_t false_block_eid{0};
+  void emit_fork(const SymbolicState &,
+                 std::function<void(SymbolicState &, void *)>) {}
 
-  struct Fork {
-    std::shared_ptr<InterpreterState<SharedPyPtr>> snapshot;
-    std::function<void(InterpreterState<SharedPyPtr> &, void *)> transition;
-  };
-
-  std::vector<Fork> forks;
-
-  void emit_fork(const InterpreterState<SharedPyPtr> &state,
-                 std::function<void(InterpreterState<SharedPyPtr> &, void *)> transition) {
-    forks.push_back({std::make_shared<InterpreterState<SharedPyPtr>>(state),
-                     std::move(transition)});
-  }
-
-  void emit_error(const InterpreterState<SharedPyPtr> &, std::string_view) {}
+  void emit_error(const SymbolicState &, std::string_view) {}
 
   void on_completed(SharedPyPtr val,
-                    std::shared_ptr<InterpreterState<SharedPyPtr>>) {
-    result_kind = COMPLETED;
-    return_value = std::move(val);
+                    ref_t<SymbolicState> snap) {
+    outcome.terminal = TerminalResult<SharedPyPtr, PyObjectRC>{
+        TerminalKind::COMPLETED, std::move(val), {}, std::move(snap)};
   }
 
   void on_errored(ErrorKind kind,
-                  std::shared_ptr<InterpreterState<SharedPyPtr>>) {
-    result_kind = ERRORED;
-    error_kind = kind;
+                  ref_t<SymbolicState> snap) {
+    outcome.terminal = TerminalResult<SharedPyPtr, PyObjectRC>{
+        TerminalKind::ERRORED, {}, kind, std::move(snap)};
   }
 
-  void on_branch(SharedPyPtr cond, IRBlock tb, IRBlock fb,
-                 std::shared_ptr<InterpreterState<SharedPyPtr>>) {
-    result_kind = BRANCH;
-    branch_condition = std::move(cond);
-    true_block_eid = EntityId(tb.id()).Pack();
-    false_block_eid = EntityId(fb.id()).Pack();
+  void on_branch(SharedPyPtr cond, RawEntityId cond_eid,
+                 IRBlock tb, IRBlock fb,
+                 SharedPyPtr false_val, SharedPyPtr true_val,
+                 ref_t<SymbolicState> snapshot) {
+    outcome.continuations.emplace_back(
+        std::make_unique<BranchContinuation<SharedPyPtr, PyObjectRC>>(
+            std::move(snapshot), std::move(cond), cond_eid, tb, fb,
+            std::move(false_val), std::move(true_val)));
   }
 };
 
@@ -95,7 +90,7 @@ struct PythonScheduler : Scheduler<PythonScheduler, SharedPyPtr> {
 // ===========================================================================
 
 class PythonPolicy
-    : public Policy<PythonPolicy, PythonScheduler, SharedPyPtr> {
+    : public Policy<PythonPolicy, SharedPyPtr> {
  public:
   PythonPolicy(PyObject *py_policy, ConcreteMemory &memory,
                FunctionResolver func_resolver = {},
@@ -156,6 +151,33 @@ class PythonPolicy
   void mem_unpoison(const SharedPyPtr &addr);
   bool is_undefined(const SharedPyPtr &val);
 
+  // Symbolic-address suspension. Inline-resolve concrete addresses;
+  // when extract_address fails AND the callsite supplies a real
+  // `addr_eid`, snapshot the state, re-push the current work item, and
+  // emit a MemAddrContinuation. The current run halts (work_stack
+  // cleared) so the driver can resume after picking an address.
+  template <typename Body>
+  bool with_address_impl(const SharedPyPtr &addr, ConcreteMemory &mem,
+                         const MemAccessHint &hint, RawEntityId addr_eid,
+                         SymbolicState &state,
+                         PythonScheduler &sched, Body &&body) {
+    if (auto a = extract_address(addr)) {
+      body(*this, mem, *a);
+      return true;
+    }
+    if (addr_eid == kInvalidEntityId) {
+      return false;
+    }
+    auto snap = make_sharable<SymbolicState>(state);
+    snap->work_stack.push_back(state.current_item);
+    sched.outcome.continuations.emplace_back(
+        std::make_unique<MemAddrContinuation<SharedPyPtr, PyObjectRC>>(
+            std::move(snap), addr, addr_eid,
+            hint.size_bytes, hint.is_write));
+    state.work_stack.clear();
+    return false;
+  }
+
   // 5. Resolution.
   bool resolve_branch(PythonScheduler &sched, const SharedPyPtr &condition,
                       IRBlock true_block, IRBlock false_block,
@@ -183,6 +205,9 @@ class PythonPolicy
   PyObject *cached_cast_{nullptr};
   PyObject *cached_is_true_{nullptr};
   PyObject *cached_resolve_branch_{nullptr};
+  PyObject *cached_resolve_call_{nullptr};
+  PyObject *cached_mem_read_{nullptr};
+  PyObject *cached_mem_write_{nullptr};
 
   PyObject *lookup_method(PyObject *&cache, const char *name);
 };
@@ -193,9 +218,19 @@ PyObject *SymbolicInitState(PyObject *state_obj, PyObject *memory_obj,
                             PyObject *args_list,
                             PyObject *func_resolver_obj,
                             PyObject *global_resolver_obj);
+PyObject *SymbolicInitStateFrame(PyObject *state_obj, PyObject *memory_obj,
+                                 PyObject *py_policy, PyObject *func_obj,
+                                 PyObject *param_addrs_list,
+                                 PyObject *return_addr_obj,
+                                 PyObject *func_resolver_obj,
+                                 PyObject *global_resolver_obj);
 PyObject *SymbolicStep(PyObject *state_obj, PyObject *memory_obj,
                        PyObject *py_policy, uint64_t max_steps,
                        PyObject *func_resolver_obj,
                        PyObject *global_resolver_obj);
+
+// Register the private `_SymbolicState` PyTypeObject into the
+// interpreter submodule. Called once during module init.
+bool LoadSymbolicStateType(::PyObject *interp_module);
 
 }  // namespace mx

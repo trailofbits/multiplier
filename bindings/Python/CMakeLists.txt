@@ -92,6 +92,15 @@ set_target_properties("mx-python"
       "${PROJECT_BINARY_DIR}/lib/${site_packages_dir}"
 )
 
+# Copy memory_view.py to the build output alongside the .so.
+add_custom_command(
+  TARGET "mx-python" POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${CMAKE_CURRENT_LIST_DIR}/memory_view.py"
+    "${PROJECT_BINARY_DIR}/lib/${site_packages_dir}/memory_view.py"
+  COMMENT "Copying memory_view.py to build output"
+)
+
 target_include_directories("mx-python"
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
@@ -136,5 +145,13 @@ if(MX_ENABLE_INSTALL AND NOT MX_ENABLE_BOOTSTRAP)
     PUBLIC_HEADER
       DESTINATION
         "${MX_INSTALL_INCLUDE_DIR}/${lower_project_name}/Bindings"
+  )
+
+  # Install pure-Python helper modules alongside the extension.
+  install(
+    FILES
+      "${CMAKE_CURRENT_LIST_DIR}/memory_view.py"
+    DESTINATION
+      "${CMAKE_INSTALL_PREFIX}/${MX_INSTALL_LIB_DIR}/${site_packages_dir}"
   )
 endif()

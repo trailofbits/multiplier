@@ -4280,8 +4280,38 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         return emit_typed(std::move(rmw));
       }
     }
-    // Compare-exchange, fetch_min/max, and other unhandled atomic ops
-    // fall through to UNKNOWN.
+    // Compare-exchange → MEMORY (CMPXCHG).
+    if (aop == AO::kC11AtomicCompareExchangeStrong ||
+        aop == AO::kC11AtomicCompareExchangeWeak ||
+        aop == AO::kAtomicCompareExchange ||
+        aop == AO::kAtomicCompareExchangeN ||
+        aop == AO::kScopedAtomicCompareExchange ||
+        aop == AO::kScopedAtomicCompareExchangeN) {
+      InstructionIR inst;
+      inst.opcode = mx::ir::OpCode::MEMORY;
+      inst.source_entity_id = eid;
+      inst.operand_indices.push_back(EmitRValue(ae->Pointer()));
+      if (auto val1 = ae->Value1()) {
+        inst.operand_indices.push_back(EmitRValue(*val1));
+      }
+      if (auto val2 = ae->Value2()) {
+        inst.operand_indices.push_back(EmitRValue(*val2));
+      }
+      bool big = ctx_.getTargetInfo().isBigEndian();
+      unsigned size_idx;
+      switch (val_width) {
+        case 1: size_idx = 0; break;
+        case 2: size_idx = 1; break;
+        case 4: size_idx = 2; break;
+        case 8: default: size_idx = 3; break;
+      }
+      unsigned base = big ? static_cast<unsigned>(mx::ir::MemOp::CMPXCHG_BE_8)
+                          : static_cast<unsigned>(mx::ir::MemOp::CMPXCHG_LE_8);
+      inst.mem_op = static_cast<uint8_t>(base + size_idx);
+      return emit_typed(std::move(inst));
+    }
+
+    // fetch_min/max and other unhandled atomic ops fall through to UNKNOWN.
   }
 
   // Emit UNKNOWN for anything we haven't explicitly handled.

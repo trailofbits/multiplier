@@ -31,7 +31,7 @@ inline Value SignedIntBinOp(int64_t l, int64_t r, unsigned wi, Op fn) {
     case 1: return make_int(static_cast<int64_t>(static_cast<int16_t>(fn(static_cast<int16_t>(l), static_cast<int16_t>(r)))));
     case 2: return make_int(static_cast<int64_t>(static_cast<int32_t>(fn(static_cast<int32_t>(l), static_cast<int32_t>(r)))));
     case 3: return make_int(fn(l, r));
-    default: return Undefined{};
+    default: return make_undef();
   }
 }
 
@@ -42,7 +42,7 @@ inline Value UnsignedIntBinOp(uint64_t l, uint64_t r, unsigned wi, Op fn) {
     case 1: return make_int(static_cast<int64_t>(fn(static_cast<uint16_t>(l), static_cast<uint16_t>(r))));
     case 2: return make_int(static_cast<int64_t>(fn(static_cast<uint32_t>(l), static_cast<uint32_t>(r))));
     case 3: return make_int(static_cast<int64_t>(fn(static_cast<uint64_t>(l), static_cast<uint64_t>(r))));
-    default: return Undefined{};
+    default: return make_undef();
   }
 }
 
@@ -53,7 +53,7 @@ inline Value SignedIntUnaryOp(int64_t v, unsigned wi, Op fn) {
     case 1: return make_int(static_cast<int64_t>(static_cast<int16_t>(fn(static_cast<int16_t>(v)))));
     case 2: return make_int(static_cast<int64_t>(static_cast<int32_t>(fn(static_cast<int32_t>(v)))));
     case 3: return make_int(fn(v));
-    default: return Undefined{};
+    default: return make_undef();
   }
 }
 
@@ -64,7 +64,7 @@ inline Value UnsignedIntUnaryOp(uint64_t v, unsigned wi, Op fn) {
     case 1: return make_int(static_cast<int64_t>(fn(static_cast<uint16_t>(v))));
     case 2: return make_int(static_cast<int64_t>(fn(static_cast<uint32_t>(v))));
     case 3: return make_int(static_cast<int64_t>(fn(v)));
-    default: return Undefined{};
+    default: return make_undef();
   }
 }
 
@@ -116,7 +116,8 @@ MX_EXPORT bool concrete_has_address(const Value &val);
 class ConcreteMemory;
 
 MX_EXPORT void concrete_write_to_mem(ConcreteMemory &memory, uint64_t address,
-                                     const Value &val, size_t size);
+                                     const Value &val, size_t size,
+                                     bool is_float = false);
 MX_EXPORT Value concrete_read_from_mem(ConcreteMemory &memory, uint64_t address,
                                        size_t size, bool is_float);
 MX_EXPORT bool concrete_mem_bulk_op(ConcreteMemory &memory, MemOp sub,
