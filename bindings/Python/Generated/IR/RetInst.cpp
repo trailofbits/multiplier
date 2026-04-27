@@ -110,16 +110,6 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
 namespace {
 static PyGetSetDef gProperties[] = {
-  {
-    "return_value",
-    reinterpret_cast<getter>(
-        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
-          return ::mx::to_python(T_cast(self)->return_value());
-        }),
-    nullptr,
-    PyDoc_STR("Wrapper for mx::RetInst::return_value"),
-    nullptr,
-  },
   {}  // Sentinel.
 };
 }  // namespace

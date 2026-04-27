@@ -929,7 +929,6 @@ class ConsumeVAParamInst(multiplier.ir.IRInstruction):
     ...
 
 class RetInst(multiplier.ir.IRInstruction):
-  return_value: Optional[multiplier.ir.IRInstruction]
 
   @staticmethod
   def FROM(inst: multiplier.ir.IRInstruction) -> Optional[multiplier.ir.RetInst]:

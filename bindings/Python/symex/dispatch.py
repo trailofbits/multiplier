@@ -240,7 +240,7 @@ def _build_chain(handlers, default_fn):
 
 # ---- per-event default (chain bottom) functions -----------------------
 
-def _make_default_mem_read(is_float):
+def _make_default_mem_read(is_float, shadow=None):
     """Return the chain bottom for a memory_read event.
 
     Reads concrete bytes via the lens; for `is_float`, unpacks IEEE
@@ -249,8 +249,17 @@ def _make_default_mem_read(is_float):
     the C++ `ConcreteMemory::read` zero-fill semantics — so the
     surrounding event still fires and sinks (like `OOBSink`) get
     a chance to surface the OOB.
+
+    Phase 8c: when `shadow` (a `(addr, size) -> z3 expr` dict) holds
+    an exact-match entry for `(addr, size)`, the shadow value wins.
+    Partial-overlap and width-mismatch hits are out of scope; the
+    substrate's IR lowering keeps slot widths consistent.
     """
     def default(ctx, addr, size):
+        if shadow is not None:
+            cached = shadow.get((addr, size))
+            if cached is not None and _is_z3(cached):
+                return cached
         try:
             data = ctx.mem.read_bytes(addr, size)
         except RuntimeError:
@@ -263,32 +272,48 @@ def _make_default_mem_read(is_float):
     return default
 
 
-def _make_default_mem_write(is_float):
+def _make_default_mem_write(is_float, shadow=None):
     """Return the chain bottom for a memory_write event.
 
     Writes concrete bytes via the lens. Handles ints, ("ptr", N)
     pointer tuples, raw bytes, and IEEE floats. Returns None.
+
+    Phase 8c: a z3 expression written to a concrete address goes
+    into `shadow[(addr, size)]` (when `shadow` is provided) so a
+    later exact-match read returns it. Without a shadow the value
+    is dropped, preserving pre-Phase-8c behavior for tests that
+    construct a policy without a Path.
     """
     def default(ctx, addr, val, size):
         if isinstance(val, bool):
             val = int(val)
         if isinstance(val, int):
+            if shadow is not None:
+                shadow.pop((addr, size), None)
             ctx.mem.write_bytes(
                 addr, val.to_bytes(size, "little", signed=(val < 0)))
             return None
         if isinstance(val, tuple) and len(val) == 2 and val[0] == VALUE_TAG_PTR:
+            if shadow is not None:
+                shadow.pop((addr, size), None)
             ctx.mem.write_bytes(
                 addr, int(val[1]).to_bytes(size, "little", signed=False))
             return None
         if isinstance(val, (bytes, bytearray)):
+            if shadow is not None:
+                shadow.pop((addr, size), None)
             ctx.mem.write_bytes(addr, bytes(val))
             return None
         if isinstance(val, float):
+            if shadow is not None:
+                shadow.pop((addr, size), None)
             fmt = "<f" if size == 4 else "<d"
             ctx.mem.write_bytes(addr, _struct.pack(fmt, val))
             return None
-        # Symbolic or otherwise unknown — drop. Phase 4 will replace
-        # this with a typed write into the symbolic memory model.
+        if shadow is not None and _is_z3(val):
+            shadow[(addr, size)] = val
+            return None
+        # Symbolic or otherwise unknown without a shadow — drop.
         return None
     return default
 
@@ -494,6 +519,15 @@ class InterceptorPolicy:
             self._layout.memory if self._layout is not None else None)
         # Lazily built per-step MemView; ArgsView is per-call event.
         self._mem_view = MemView(self._memory) if self._memory else None
+        # Phase 8c: shadow map for symbolic values written to concrete
+        # substrate-allocated addresses. Held as a shared reference to
+        # the path's dict so writes and reads survive across steps
+        # (policy is fresh per step; path is durable). Test paths with
+        # `path is None` (or stub paths without the attr) get a
+        # per-policy ephemeral dict.
+        self._shadow = getattr(path, "_symbolic_shadow", None)
+        if self._shadow is None:
+            self._shadow = {}
 
     # ------------------------------------------------------------------
     # Hook entry points (lookup_method on PyPolicy fires these)
@@ -514,7 +548,9 @@ class InterceptorPolicy:
 
         handlers = self._matching_handlers(
             MEMORY_READ, lambda sel: sel.matches_addr(addr_int))
-        chain = _build_chain(handlers, _make_default_mem_read(bool(is_float)))
+        chain = _build_chain(handlers,
+                             _make_default_mem_read(bool(is_float),
+                                                    self._shadow))
         try:
             value = chain(ctx, addr_int, size_i)
         except Exception as exc:  # noqa: BLE001
@@ -558,7 +594,9 @@ class InterceptorPolicy:
 
         handlers = self._matching_handlers(
             MEMORY_WRITE, lambda sel: sel.matches_addr(addr_int))
-        chain = _build_chain(handlers, _make_default_mem_write(bool(is_float)))
+        chain = _build_chain(handlers,
+                             _make_default_mem_write(bool(is_float),
+                                                     self._shadow))
         try:
             chain(ctx, addr_int, val, size_i)
         except Exception as exc:  # noqa: BLE001

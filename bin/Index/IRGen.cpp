@@ -1718,9 +1718,8 @@ void IRGenerator::EmitReturnStmt(const pasta::Stmt &s) {
     uint32_t val_idx = EmitRValue(*rv);
     PopExpressionScope();
 
-    // RET carries the value as operand for backward compat
-    // (RetInst::return_value() reads it).
-    inst.operand_indices = {val_idx};
+    // RET is a pure terminator; the return value flows through the
+    // RETURN_PTR slot via the MEMORY/STORE below.
 
     // Emit RETURN_PTR to get pointer to caller's return storage.
     InstructionIR ret_ptr;

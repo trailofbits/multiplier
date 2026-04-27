@@ -157,6 +157,10 @@ class Path:
         # Phase 6: count of LazyRegion materializations charged to
         # this path so far (engine.lazy_region_budget caps).
         self._lazy_regions_used = 0
+        # Phase 8c: shadow map for symbolic values written to concrete
+        # substrate-allocated addresses (return slot, ALLOCA/ARG,
+        # ALLOCA/LOCAL). Keyed on (addr, size) -> z3 expression.
+        self._symbolic_shadow: dict = {}
 
     @property
     def state(self):
@@ -182,6 +186,7 @@ class Path:
         new_path.solver.adopt_fresh_vars(self.solver._fresh_vars)
         new_path._region_at_suspension = self._region_at_suspension
         new_path._lazy_regions_used = self._lazy_regions_used
+        new_path._symbolic_shadow = dict(self._symbolic_shadow)
         new_path.findings = FindingsList(self.findings)
         return new_path
 
@@ -204,6 +209,7 @@ class Path:
             loop_iters=dict(self._loop_iters),
             func_name=self._func_name,
             fresh_vars=dict(self.solver._fresh_vars),
+            symbolic_shadow=dict(self._symbolic_shadow),
         )
 
     def restore(self, snap):
@@ -219,6 +225,10 @@ class Path:
         self._loop_iters = dict(snap.loop_iters)
         self._func_name = snap.func_name
         self.solver.adopt_fresh_vars(snap.fresh_vars)
+        # Mutate in place so any InterceptorPolicy that captured a
+        # reference to this dict still sees the post-restore state.
+        self._symbolic_shadow.clear()
+        self._symbolic_shadow.update(snap.symbolic_shadow)
 
     def replay(self, *, modify, engine, slice_steps=1024,
                concretize=None, until=None):
@@ -350,11 +360,11 @@ class _Snapshot:
 
     __slots__ = ("state", "events", "tags", "path_condition", "terminal",
                  "return_value", "error_kind", "loop_iters", "func_name",
-                 "fresh_vars")
+                 "fresh_vars", "symbolic_shadow")
 
     def __init__(self, *, state, events, tags, path_condition, terminal,
                  return_value, error_kind, loop_iters, func_name,
-                 fresh_vars):
+                 fresh_vars, symbolic_shadow):
         self.state = state
         self.events = events
         self.tags = tags
@@ -365,3 +375,4 @@ class _Snapshot:
         self.loop_iters = loop_iters
         self.func_name = func_name
         self.fresh_vars = fresh_vars
+        self.symbolic_shadow = symbolic_shadow

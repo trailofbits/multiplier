@@ -977,6 +977,64 @@ Two surgical fixes that close honesty gaps Phase 8a left visible:
   (kind filter).
 - **P8b.10** selector by name routes correctly.
 
+### Phase 8c — symbolic-capable substrate slots + drop RET's operand (delivered)
+
+Phase 8b's `read_return_value` short-circuit was a surgical patch
+on a structural bug: the substrate's symbolic memory model only
+covered analyst-named layout regions. Substrate-internal
+allocations (return slot, `ALLOCA/ARG`, `ALLOCA/LOCAL`, VLA
+storage) had no overlay, so a z3 store to one of those addresses
+was silently dropped by the dispatcher's default `mem_write`.
+Phase 8b sidestepped this for primitive returns by preferring
+`RET`'s SSA operand. The same gap remained everywhere else (the
+next analyst who passes a z3 through `ALLOCA/ARG` to a callee
+that runs for real would see the input erased) and the workaround
+cemented a confusing dual-source-of-truth in the IR (RET carries
+the value AND the preceding store puts it in the slot).
+
+Phase 8c collapses the duplication:
+
+- **Substrate-internal slots can hold z3.** `Path` carries a
+  `_symbolic_shadow: dict[(addr, size) -> z3 expr]` whose
+  reference is shared with the `InterceptorPolicy` constructed
+  for that path. The dispatcher's default `mem_write` routes z3
+  values to the shadow keyed on `(addr, size)`; the default
+  `mem_read` consults it before falling back to concrete bytes.
+  Concrete writes evict the shadow entry at that key, preserving
+  store / load consistency. `snapshot()` round-trips the shadow;
+  `restore()` mutates in place so any policy still holding the
+  reference sees the post-restore state. Partial-overlap reads
+  and width-mismatch reads are out of scope (the substrate's IR
+  lowering keeps slot widths consistent).
+
+- **RET is a pure terminator.** `IRGen::EmitReturnStmt` no longer
+  sets `inst.operand_indices` on the RET; the value flows
+  exclusively through the preceding `RETURN_PTR` + `MEMORY/STORE`
+  into the slot. `RetInst::return_value()` is removed from the
+  C++ API, the Python binding, and the type stub.
+
+- **Phase 8b's substrate workaround is reverted.**
+  `read_return_value` returns to its pre-Phase-8b shape: no
+  `has_ret_value` parameter, no SSA-operand short-circuit. The
+  slot read is the universal mechanism. The Phase 8b user-facing
+  win (P8b.1: symbolic primitive returns survive in
+  `path.return_value`) still holds — now via the shadow-backed
+  slot read, not via an operand bypass.
+
+- **Phase 8b's global-event fan-out stays.**
+  `_fire_global_event_if_applicable` and the four call sites in
+  `mem_read` / `mem_write` / `symbolic_load` / `symbolic_store`
+  are orthogonal to the slot fix and remain in place.
+
+**Test catalog (`tests/symex/test_phase8c.py`):**
+
+- **P8c.1** an `InterceptorPolicy.mem_write` of a z3 expression
+  to a concrete substrate-allocated address followed by a
+  same-`(addr, size)` `mem_read` returns the stored expression.
+  Two distinct policies share the path's shadow, mirroring the
+  cross-step flow that the return slot, `ALLOCA/ARG`, and
+  `ALLOCA/LOCAL` all rely on.
+
 ---
 
 ## Open design questions
@@ -1080,6 +1138,14 @@ include/multiplier/IR/Interpret/ConcreteMemory.h    # place_at if missing
   observers; `tests/symex/test_phase8b.py` (10 tests,
   P8b.1–P8b.10; one skipped) green; total `tests/symex` count
   is 96.
+- Phase 8c: substrate-internal slots hold symbolic values via a
+  per-`Path` shadow consulted by the dispatcher's default
+  mem_read / mem_write; RET becomes a pure terminator
+  (`RetInst::return_value()` removed; `IRGen` stops setting the
+  operand); Phase 8b's `has_ret_value` short-circuit is reverted
+  and P8b.1's symbolic-return invariant now holds via the slot;
+  `tests/symex/test_phase8c.py` (1 test, P8c.1) green; total
+  `tests/symex` count is 97 collected (96 passed + 1 skipped).
 - The 235-test pre-existing harness still passes (regression gate).
 - Public API has docstrings; the README links to the Phase 7
   walkthrough.
