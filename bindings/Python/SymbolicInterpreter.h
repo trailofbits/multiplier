@@ -208,6 +208,9 @@ class PythonPolicy
   PyObject *cached_resolve_call_{nullptr};
   PyObject *cached_mem_read_{nullptr};
   PyObject *cached_mem_write_{nullptr};
+  PyObject *cached_ptr_add_{nullptr};
+  PyObject *cached_ptr_diff_{nullptr};
+  PyObject *cached_ptr_offset_{nullptr};
 
   PyObject *lookup_method(PyObject *&cache, const char *name);
 };

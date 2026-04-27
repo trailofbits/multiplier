@@ -681,6 +681,73 @@ class InterceptorPolicy:
         # No z3 cast lowering yet; SymExpr keeps propagation visible.
         return SymExpr("cast", (op, operand))
 
+    # ----- pointer arithmetic: lower symbolic operands to z3 BitVec(64) -----
+
+    def ptr_add(self, base, index, element_size):
+        if _is_concrete(base) and _is_concrete(index):
+            return NotImplemented
+        z3 = _z3_module()
+        if z3 is None:
+            return SymExpr("ptr_add", (base, index, element_size))
+        base_z = self._addr_as_z3(base, z3)
+        idx_z = self._addr_as_z3(index, z3)
+        if base_z is None or idx_z is None:
+            return SymExpr("ptr_add", (base, index, element_size))
+        if base_z.size() < 64:
+            base_z = z3.ZeroExt(64 - base_z.size(), base_z)
+        elif base_z.size() > 64:
+            base_z = z3.Extract(63, 0, base_z)
+        if idx_z.size() < 64:
+            idx_z = z3.SignExt(64 - idx_z.size(), idx_z)
+        elif idx_z.size() > 64:
+            idx_z = z3.Extract(63, 0, idx_z)
+        return base_z + idx_z * z3.BitVecVal(int(element_size), 64)
+
+    def ptr_diff(self, lhs, rhs, element_size):
+        if _is_concrete(lhs) and _is_concrete(rhs):
+            return NotImplemented
+        z3 = _z3_module()
+        if z3 is None:
+            return SymExpr("ptr_diff", (lhs, rhs, element_size))
+        l = self._addr_as_z3(lhs, z3)
+        r = self._addr_as_z3(rhs, z3)
+        if l is None or r is None:
+            return SymExpr("ptr_diff", (lhs, rhs, element_size))
+        diff = l - r
+        if int(element_size) > 1:
+            diff = z3.UDiv(diff, z3.BitVecVal(int(element_size), 64))
+        return diff
+
+    def ptr_offset(self, base, byte_offset):
+        if _is_concrete(base):
+            return NotImplemented
+        z3 = _z3_module()
+        if z3 is None:
+            return SymExpr("ptr_offset", (base, byte_offset))
+        base_z = self._addr_as_z3(base, z3)
+        if base_z is None:
+            return SymExpr("ptr_offset", (base, byte_offset))
+        return base_z + z3.BitVecVal(int(byte_offset), 64)
+
+    def _addr_as_z3(self, value, z3):
+        """Normalize a substrate address-shaped value to a z3 BitVec.
+
+        Accepts: a z3 ExprRef (passes through), a `("ptr", N)` tuple
+        (concrete pointer — wrap as a 64-bit BitVecVal), or a Python int
+        / bool. Anything else returns None so callers can fall back to a
+        SymExpr.
+        """
+        if isinstance(value, z3.ExprRef):
+            return value
+        if isinstance(value, tuple) and len(value) == 2 and \
+                value[0] == VALUE_TAG_PTR:
+            return z3.BitVecVal(int(value[1]), 64)
+        if isinstance(value, bool):
+            return z3.BitVecVal(int(value), 64)
+        if isinstance(value, int):
+            return z3.BitVecVal(int(value), 64)
+        return None
+
     # ----- truth + branch resolution: fork on non-concrete -----
 
     def is_true(self, val):

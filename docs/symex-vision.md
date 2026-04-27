@@ -557,16 +557,13 @@ chooses how to widen.
 
 **Tests:** P6.0–P6.13. 8 strategy/overlay unit tests + 6 end-to-end.
 
-**Deferred to Phase 7 (gating item):** Python dispatch for
-`PythonPolicy::ptr_add` / `ptr_diff` / `ptr_offset`
-(`SymbolicInterpreter.cpp:442/449/456`). Until that lands,
-organic explores never produce a suspension whose `address_expr`
-is a live z3 expression, and Phase 6's symbolic-addr modes only
-fire on synthesized fixtures (or on `DivByZeroSink` where
-`binary_op` is already Python-dispatched and routes a symbolic
-divisor through). Phase 6 is structured so the seam, region
-table, overlay, and sink registry are all correct under both
-modes — Phase 7 flips one switch.
+**Delivered by Phase 7:** Python dispatch for
+`PythonPolicy::ptr_add` / `ptr_diff` / `ptr_offset` mirrors the
+`binary_op` / `cast` shape; `InterceptorPolicy` propagates
+symbolic operands as z3 BitVec(64). Organic explores now
+produce suspensions whose `address_expr` is a live z3
+expression, and `_addr_feasible` filters strategy decisions
+against the actual path condition.
 
 ---
 
@@ -830,30 +827,69 @@ involvement); witness model contains `b_sym == 0`.
 candidate addresses; OOBSink records reproducible Findings on
 the OOB children.
 
-### Phase 7 — substrate dispatch + worked notebook polish
+### Phase 7 — substrate dispatch + worked notebook polish (delivered)
 
-**Gating item — `ptr_add` / `ptr_diff` / `ptr_offset` Python
-dispatch.** Make `PythonPolicy::ptr_add`, `ptr_diff`, and
-`ptr_offset` route through Python the same way `binary_op` and
-`cast` do. Once that lands, every Phase 6 [U] test has an [E2E]
-counterpart that runs on the same code path, OOBSink's
-symbolic-addr mode fires organically through
-`symbolic_test_ptr_add`, and Reps-style "region × interval"
-pointers become real for the engine.
+**Substrate dispatch.** `PythonPolicy::ptr_add`, `ptr_diff`, and
+`ptr_offset` now dispatch through Python first
+(`SymbolicInterpreter.cpp:442/461/485`), with cache fields
+`cached_ptr_*_` mirroring the `binary_op` / `cast` shape. The
+existing concrete fallback runs only when the policy returns
+`NotImplemented`, so callers without a `ptr_*` method see no
+behavior change. `InterceptorPolicy.{ptr_add, ptr_diff,
+ptr_offset}` lower symbolic operands to z3 BitVec(64) — base is
+zero-extended, index is sign-extended; element scaling is
+multiplied in z3; `ptr_diff`'s element_size division is `UDiv`.
 
-**P7.1** `test_under_constrained_loop_walkthrough` — end-to-end on
-a 50-line C program: layout, hooks for `read`/`write`, loop
-policy iterating 4×, indirect call dispatch, observe global
-access trace. **The exemplar test.**
+**Test catalog (`tests/symex/test_phase7.py`):**
 
-**P7.2** `test_docstring_examples` — every public symbol's
-docstring example block passes when run.
+- **P7.1** `test_p7_1_ptr_add_dispatches_through_python` —
+  proves the substrate emits a z3 `address_expr` at suspension
+  via the presence of a `MEMADDR_CONCRETIZE` event.
+- **P7.2** `test_p7_2_addr_feasibility_filters_unreachable_decisions`
+  — with `idx ∈ [0, 3]` constrained, ConcretizeFinite's
+  out-of-range candidate is rejected E2E by the strategy's
+  `_addr_feasible` check (vacuous pre-Phase 7).
+- **P7.3** `test_p7_3_constrain_to_alignment_no_concrete_fallback`
+  — `ConstrainTo(addr & 7 == 0)` over a synthesized z3
+  `address_expr` lands on the child path's path_condition; the
+  `constrain_to_concrete_addr` regression-guard event does *not*
+  fire.
+- **P7.4** `test_p7_4_oob_sink_symbolic_witness_through_split_by_region`
+  — drives `_dispatch_split_by_region` over a region whose size
+  is not a multiple of the access size; `OOBSink._check_symbolic`
+  emits a Finding for the partial-overflow at the upper boundary.
+- **P7.5** `test_p7_5_cwe787_oob_write_witness` — the
+  CWE-787 worked example. `store_at(base, idx, value)` over
+  `dst[16]` with `ConcretizeFinite` enumerating in/OOB
+  addresses; OOB children produce reproducible `oob_write`
+  Findings with witness `index = resolved_addr - dst.base`.
+- **P7.6** `test_p7_6_copy_into_loop_walkthrough` — end-to-end
+  exercise of `copy_into` from `tests/symex/c/cwe787_oob_write.c`,
+  verifying both branches of the bounds check (8 src reads + 8
+  dst writes on the safe path; 0 dst writes on the early-return
+  path).
+- **P7.7** `test_p7_7_docstring_examples` — `doctest.testmod`
+  sweep over the symex package; modules without examples are
+  skipped.
 
-**P7.3** `test_cwe787_oob_write_witness` — Phase 6's CWE-787
-worked example revisited with `ptr_add` dispatch fixed: the
-OOB write goes through a *symbolic* index, OOBSink fires in
-symbolic mode, and the Finding's witness is a model of the path
-condition (a true input that triggers the bug).
+**Future work explicitly out of scope for Phase 7:**
+
+- **Substrate symbolic-LOAD resolution.** `with_address_impl`
+  re-suspends every time the address is non-extractable, so
+  end-to-end exploration through `SplitByRegion` /
+  `ConstrainTo` (which resume via `resume_addr_symbolic`) needs
+  a future substrate hook — likely a `symbolic_load` /
+  `symbolic_store` Python policy method that consults the
+  region overlay. P7.3 / P7.4 cover the wiring up to that seam
+  via synthesized suspensions; P7.5 produces real bug witnesses
+  through ConcretizeFinite, which routes through `resume_addr`
+  (concrete) and is unaffected.
+- **Typed pointer values.** A region × interval representation
+  (a distinct `SymExpr` shape) instead of flat BitVec(64).
+  Z3's theory of arrays handles the targets we care about.
+- **Cross-path state merging.** Per the non-goals.
+- **Auto-derived layouts.** Layouts are still analyst-supplied;
+  points-to-driven `ConcretizeByRegion` is a future phase.
 
 ---
 
@@ -918,6 +954,8 @@ tests/symex/test_phase3.py
 tests/symex/test_phase4.py
 tests/symex/test_phase5.py
 tests/symex/test_phase6.py
+tests/symex/test_phase7.py
+tests/symex/c/cwe787_oob_write.c
 ```
 
 The split between `intercept.py` and `observe.py` is deliberate:
@@ -942,8 +980,9 @@ include/multiplier/IR/Interpret/ConcreteMemory.h    # place_at if missing
 - Phase 6: `tests/symex/test_phase6.py` 14 tests pass; sinks
   surface findings end-to-end on the worked example.
 - Phase 7: `ptr_add` / `ptr_diff` / `ptr_offset` dispatch through
-  Python; `tests/symex/test_phase7.py::test_under_constrained_loop_walkthrough`
-  runs in under 10 seconds on the test program.
+  Python; `tests/symex/test_phase7.py` (7 tests, P7.1–P7.7)
+  green; the CWE-787 worked example produces a reproducible
+  `oob_write` Finding (P7.5).
 - The 235-test pre-existing harness still passes (regression gate).
 - Public API has docstrings; the README links to the Phase 7
   walkthrough.

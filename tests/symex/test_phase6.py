@@ -499,7 +499,15 @@ def test_p6_8_oob_sink_fires_on_unsafe_read(index):
 
 def test_p6_9_null_deref_sink_fires(index):
     """Strategy includes 0 as a candidate; on the addr=0 child,
-    NullDerefSink fires in concrete-addr mode."""
+    NullDerefSink fires in concrete-addr mode.
+
+    `idx` is left unbounded so that ConcretizeFinite's `addr=0`
+    decision is feasible under the symbolic addr_expr
+    `BUF + sext(idx)*4` (idx == -BUF/4 satisfies it). Phase 6's
+    original bounds `[0, 10]` only worked because the substrate
+    collapsed ptr_add to concrete; Phase 7's organic dispatch
+    correctly rejects the unreachable child.
+    """
     pytest.importorskip("z3")
     BUF = 0x40000
     engine = SymExEngine(index)
@@ -514,7 +522,7 @@ def test_p6_9_null_deref_sink_fires(index):
     def hook(ctx, addr, size, next_hook):
         if size == 4 and not (BUF <= addr < BUF + 16) and not fired:
             fired.append(addr)
-            return ctx.solver.fresh_int("idx", size=size, lo=0, hi=10)
+            return ctx.solver.fresh_int("idx", size=size)
         return next_hook(ctx, addr, size)
 
     paths = engine.explore(
@@ -631,7 +639,13 @@ def test_p6_12_regions_touched_summary(index):
         if size == 4 and addr not in range(A, A + 16) \
                 and addr not in range(B, B + 16) and not fired:
             fired.append(addr)
-            return ctx.solver.fresh_int("idx", size=size, lo=0, hi=10)
+            # Unbounded so ConcretizeFinite([A, B]) admits both decisions
+            # under Phase 7's feasibility check. The IR lowers `base[idx]`
+            # (where base is `int*`) to `ptr_add(base, idx, sizeof(int))`,
+            # so `addr_expr = A + idx*4`. Reaching B requires
+            # `idx == (B - A) / sizeof(int)`; with the prior `hi=10`
+            # bound, no such idx existed.
+            return ctx.solver.fresh_int("idx", size=size)
         return next_hook(ctx, addr, size)
 
     paths = engine.explore("symbolic_test_ptr_add",

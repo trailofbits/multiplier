@@ -442,6 +442,18 @@ SharedPyPtr PythonPolicy::cast(CastOp op, const SharedPyPtr &operand) {
 SharedPyPtr PythonPolicy::ptr_add(const SharedPyPtr &base,
                                    const SharedPyPtr &index,
                                    int64_t element_size) {
+  if (PyObject *method = lookup_method(cached_ptr_add_, "ptr_add")) {
+    PyObject *result = PyObject_CallFunction(
+        method, "OOL", base.Get(), index.Get(),
+        static_cast<long long>(element_size));
+    if (result && result != Py_NotImplemented) {
+      SharedPyPtr v(result);
+      Py_DECREF(result);
+      return v;
+    }
+    Py_XDECREF(result);
+    PyErr_Clear();
+  }
   return value_to_shared(concrete_ptr_add(
       python_to_value(base.Get()), python_to_value(index.Get()), element_size));
 }
@@ -449,12 +461,36 @@ SharedPyPtr PythonPolicy::ptr_add(const SharedPyPtr &base,
 SharedPyPtr PythonPolicy::ptr_diff(const SharedPyPtr &lhs,
                                     const SharedPyPtr &rhs,
                                     int64_t element_size) {
+  if (PyObject *method = lookup_method(cached_ptr_diff_, "ptr_diff")) {
+    PyObject *result = PyObject_CallFunction(
+        method, "OOL", lhs.Get(), rhs.Get(),
+        static_cast<long long>(element_size));
+    if (result && result != Py_NotImplemented) {
+      SharedPyPtr v(result);
+      Py_DECREF(result);
+      return v;
+    }
+    Py_XDECREF(result);
+    PyErr_Clear();
+  }
   return value_to_shared(concrete_ptr_diff(
       python_to_value(lhs.Get()), python_to_value(rhs.Get()), element_size));
 }
 
 SharedPyPtr PythonPolicy::ptr_offset(const SharedPyPtr &base,
                                       int64_t byte_offset) {
+  if (PyObject *method = lookup_method(cached_ptr_offset_, "ptr_offset")) {
+    PyObject *result = PyObject_CallFunction(
+        method, "OL", base.Get(),
+        static_cast<long long>(byte_offset));
+    if (result && result != Py_NotImplemented) {
+      SharedPyPtr v(result);
+      Py_DECREF(result);
+      return v;
+    }
+    Py_XDECREF(result);
+    PyErr_Clear();
+  }
   return value_to_shared(concrete_ptr_offset(
       python_to_value(base.Get()), byte_offset));
 }
