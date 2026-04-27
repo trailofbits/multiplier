@@ -522,14 +522,51 @@ chooses how to widen.
 
 **Tests:** P5.1–P5.10.
 
-### Phase 6 — polishing & docs
+### Phase 6 — region-aware memory + first sink oracles
 
-- Docstrings on every public API.
-- One full worked example: a small CVE-style under-constrained
-  analysis on a real C function, end-to-end, in a Jupyter notebook.
-- `multiplier.symex` exposed cleanly; namespaces tightened.
-- Performance pass: profile path-explosion benchmarks, bound
-  per-event Python overhead.
+- `Region`, `LazyRegion`, and a sorted-by-base `RegionTable` in
+  `bindings/Python/symex/region.py`. `Layout` upgraded to back its
+  globals with `Region` objects; legacy `globals()` /
+  `functions()` / `address_range()` API preserved.
+- New `Decision` variants `SplitByRegion(regions=(…))` and
+  `ConstrainTo(constraint)` in `concretize.py`.
+  `ConcretizeByRegion` widened to return a single `SplitByRegion`
+  so the engine can fork one child per region with `addr_var ∈
+  region` asserted on each.
+- `lazy_region_budget` per path; `ConcretizeByRegion(...,
+  lazy_default=True)` materializes a fresh `LazyRegion` when the
+  layout has no regions to enumerate. Over-budget regions are
+  refused with a `lazy_budget_exhausted` event.
+- Per-region `z3.Array(BitVec(64), BitVec(8))` overlay backing
+  symbolic-offset reads/writes; concrete writes mirror byte-by-byte
+  into existing overlays so symbolic reads see the prior concrete
+  bytes (`Memory.py` blueprint, `_ReconstructValue`-shaped).
+- `SinkRegistry` + `Sink` ABC + three built-ins: `OOBSink`,
+  `NullDerefSink`, `DivByZeroSink`. Each has a *concrete-addr*
+  mode (containment check; no solver call) and a *symbolic-addr*
+  mode (path-condition + bad predicate). Findings land on
+  `path.findings` with a model-witness.
+- New events: `region_materialized`, `lazy_budget_exhausted`,
+  `constrain_to_concrete_addr`, `split_by_region`, `sink_fired`,
+  `binary_op` (sink event). New terminal: `Terminal.SINK_HIT` for
+  fatal sinks. Memory events tagged with `region` (name or None).
+- Required substrate hook: `interp_resume_addr_symbolic(state,
+  eid, py_value)` — sibling of `resume_addr` that writes a Python
+  value (typically z3 expression) into the suspended op's address
+  slot.
+
+**Tests:** P6.0–P6.13. 8 strategy/overlay unit tests + 6 end-to-end.
+
+**Deferred to Phase 7 (gating item):** Python dispatch for
+`PythonPolicy::ptr_add` / `ptr_diff` / `ptr_offset`
+(`SymbolicInterpreter.cpp:442/449/456`). Until that lands,
+organic explores never produce a suspension whose `address_expr`
+is a live z3 expression, and Phase 6's symbolic-addr modes only
+fire on synthesized fixtures (or on `DivByZeroSink` where
+`binary_op` is already Python-dispatched and routes a symbolic
+divisor through). Phase 6 is structured so the seam, region
+table, overlay, and sink registry are all correct under both
+modes — Phase 7 flips one switch.
 
 ---
 
@@ -737,15 +774,86 @@ zero decisions terminates the path with `concretization-refused`.
 `concretize=lambda fork: [k]` keeps working through the back-compat
 adapter.
 
-### Phase 6 — example & polish
+### Phase 6 — region-aware memory + first sink oracles
 
-**P6.1** `test_under_constrained_loop_walkthrough` — end-to-end on
+**P6.0** `test_p6_0_resume_addr_symbolic_substrate_hook` /
+`_round_trip` — the `resume_addr_symbolic` C++ hook writes a
+z3 expression into an address slot; `get_value_at` reads it back.
+
+**P6.1** `test_p6_1_split_by_region_two_regions` /
+`_engine_forks` — `ConcretizeByRegion(layout)` returns a
+`SplitByRegion`; engine forks one child per region with
+`addr_var ∈ region` asserted.
+
+**P6.2** `test_p6_2_split_by_region_offset_stays_symbolic` —
+in-region offset stays free: at least two distinct addresses
+satisfy each child's constraint.
+
+**P6.3** `test_p6_3_constrain_to_arbitrary_predicate` —
+`ConstrainTo(addr_var % 8 == 0)` lands on the child's
+path_condition.
+
+**P6.4** `test_p6_4_lazy_region_materialization` — empty layout +
+`lazy_default=True` materializes a `LazyRegion` and emits
+`region_materialized`.
+
+**P6.5** `test_p6_5_lazy_region_budget_caps` — budget=2; third
+LazyRegion materialization rejected with
+`lazy_budget_exhausted`.
+
+**P6.6** `test_p6_6_overlay_symbolic_write_concrete_read` —
+symbolic Store, concrete Select returns a non-trivial z3
+expression.
+
+**P6.7** `test_p6_7_overlay_concrete_write_symbolic_read` —
+concrete byte mirrors into the overlay; symbolic-offset read
+reproduces the value with the right model.
+
+**P6.8** `test_p6_8_oob_sink_fires_on_unsafe_read` — concrete-mode
+OOB findings on enumerated addresses past a region's end.
+
+**P6.9** `test_p6_9_null_deref_sink_fires` — concrete-mode null
+finding when the strategy enumerates 0.
+
+**P6.10** `test_p6_10_div_by_zero_sink_fires` — symbolic-mode
+finding via intercept-driven `binary_op` divisor (no ptr_add
+involvement); witness model contains `b_sym == 0`.
+
+**P6.11** `test_p6_11_fatal_sink_terminates_path` —
+`fatal=True` ends the OOB path with `Terminal.SINK_HIT`.
+
+**P6.12** `test_p6_12_regions_touched_summary` —
+`path.regions_touched()` aggregates per-region read/write counts.
+
+**P6.13** `test_p6_13_oob_worked_example` — CWE-787-style: an
+8-byte `g_buf` and a `ConcretizeFinite` enumeration over 8
+candidate addresses; OOBSink records reproducible Findings on
+the OOB children.
+
+### Phase 7 — substrate dispatch + worked notebook polish
+
+**Gating item — `ptr_add` / `ptr_diff` / `ptr_offset` Python
+dispatch.** Make `PythonPolicy::ptr_add`, `ptr_diff`, and
+`ptr_offset` route through Python the same way `binary_op` and
+`cast` do. Once that lands, every Phase 6 [U] test has an [E2E]
+counterpart that runs on the same code path, OOBSink's
+symbolic-addr mode fires organically through
+`symbolic_test_ptr_add`, and Reps-style "region × interval"
+pointers become real for the engine.
+
+**P7.1** `test_under_constrained_loop_walkthrough` — end-to-end on
 a 50-line C program: layout, hooks for `read`/`write`, loop
 policy iterating 4×, indirect call dispatch, observe global
 access trace. **The exemplar test.**
 
-**P6.2** `test_docstring_examples` — every public symbol's
+**P7.2** `test_docstring_examples` — every public symbol's
 docstring example block passes when run.
+
+**P7.3** `test_cwe787_oob_write_witness` — Phase 6's CWE-787
+worked example revisited with `ptr_add` dispatch fixed: the
+OOB write goes through a *symbolic* index, OOBSink fires in
+symbolic mode, and the Finding's witness is a model of the path
+condition (a true input that triggers the bug).
 
 ---
 
@@ -830,10 +938,13 @@ include/multiplier/IR/Interpret/ConcreteMemory.h    # place_at if missing
 
 ## Definition of done
 
-- Phases 0–6 complete, each with its test suite green.
-- `tests/symex/test_phase6.py::test_under_constrained_loop_walkthrough`
+- Phases 0–7 complete, each with its test suite green.
+- Phase 6: `tests/symex/test_phase6.py` 14 tests pass; sinks
+  surface findings end-to-end on the worked example.
+- Phase 7: `ptr_add` / `ptr_diff` / `ptr_offset` dispatch through
+  Python; `tests/symex/test_phase7.py::test_under_constrained_loop_walkthrough`
   runs in under 10 seconds on the test program.
 - The 235-test pre-existing harness still passes (regression gate).
-- Public API has docstrings; the README links to the Phase 6
+- Public API has docstrings; the README links to the Phase 7
   walkthrough.
 - A new project-memory entry summarizes the API for future sessions.

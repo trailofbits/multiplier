@@ -21,6 +21,7 @@ import multiplier as mx
 from .dispatch import _z3_module
 from .events import (
     EventLog, BRANCH, MEMORY_READ, MEMORY_WRITE, BranchDirection, Terminal,
+    _FilterableList, _match,
 )
 
 _interp = mx.ir.interpret
@@ -32,6 +33,29 @@ _id_counter = [0]
 def _next_id():
     _id_counter[0] += 1
     return _id_counter[0]
+
+
+class FindingsList(_FilterableList):
+    """Queryable list of `Finding` records on a Path. Filter syntax
+    matches the EventLog: `path.findings.where(kind="oob_write")`,
+    `path.findings.first(region="g_buf")`, etc."""
+
+    def _match(self, finding, filters):
+        # Adapt dataclass fields to the dict-keyed _match helper.
+        return _match(_finding_as_dict(finding), filters)
+
+
+def _finding_as_dict(f):
+    if isinstance(f, dict):
+        return f
+    return {
+        "kind": f.kind,
+        "addr_eid": f.addr_eid,
+        "step": f.step,
+        "witness": f.witness,
+        "region": f.region,
+        "mode": f.mode,
+    }
 
 
 class _PathSolver:
@@ -123,6 +147,16 @@ class Path:
         # Per-path back-edge counter; keyed by (latch_id, header_id).
         # Mutated by the dispatcher each time intercept.loop fires.
         self._loop_iters = {}
+        # Phase 6: queryable list of sink Findings recorded on this path.
+        self.findings = FindingsList()
+        # Phase 6: name of the region asserted on `addr_var` when this
+        # path was forked off a SplitByRegion / ConstrainTo decision.
+        # `None` for paths whose suspensions were resolved via
+        # ConcretizeTo (Phase 5 fast path) or never suspended.
+        self._region_at_suspension = None
+        # Phase 6: count of LazyRegion materializations charged to
+        # this path so far (engine.lazy_region_budget caps).
+        self._lazy_regions_used = 0
 
     @property
     def state(self):
@@ -146,6 +180,9 @@ class Path:
         new_path._func_name = self._func_name
         new_path._layout = self._layout
         new_path.solver.adopt_fresh_vars(self.solver._fresh_vars)
+        new_path._region_at_suspension = self._region_at_suspension
+        new_path._lazy_regions_used = self._lazy_regions_used
+        new_path.findings = FindingsList(self.findings)
         return new_path
 
     def snapshot(self):
@@ -271,6 +308,23 @@ class Path:
                     f"[style=dashed, label=\"not taken\"];")
         lines.append("}")
         return "\n".join(lines) + "\n"
+
+    def regions_touched(self):
+        """Aggregate `region` tags on memory_read / memory_write events
+        into `{region_name: {"reads": n, "writes": m}}`. Events whose
+        region is `None` (an OOB or layout-unaware access) are dropped.
+        """
+        out = {}
+        for entry in self.events.where(kind__in=(MEMORY_READ, MEMORY_WRITE)):
+            r = entry.get("region")
+            if r is None:
+                continue
+            slot = out.setdefault(r, {"reads": 0, "writes": 0})
+            if entry.get("kind") == MEMORY_READ:
+                slot["reads"] += 1
+            else:
+                slot["writes"] += 1
+        return out
 
     def _count_globals_touched(self):
         if self._layout is None:

@@ -244,10 +244,17 @@ def _make_default_mem_read(is_float):
     """Return the chain bottom for a memory_read event.
 
     Reads concrete bytes via the lens; for `is_float`, unpacks IEEE
-    float32 / float64. Returns the loaded value.
+    float32 / float64. Returns the loaded value. Falls back to
+    zero on a read failure (the address has no backing) — matching
+    the C++ `ConcreteMemory::read` zero-fill semantics — so the
+    surrounding event still fires and sinks (like `OOBSink`) get
+    a chance to surface the OOB.
     """
     def default(ctx, addr, size):
-        data = ctx.mem.read_bytes(addr, size)
+        try:
+            data = ctx.mem.read_bytes(addr, size)
+        except RuntimeError:
+            data = b"\x00" * size
         if is_float and size == 4:
             return _struct.unpack("<f", data)[0]
         if is_float and size == 8:
@@ -498,10 +505,12 @@ class InterceptorPolicy:
             return NotImplemented
         ctx = self._make_ctx()
         size_i = int(size)
+        region_name = self._region_name_for(addr_int)
 
         self._fire_observers(MEMORY_READ, Phase.BEFORE, ctx,
                              addr=addr_int, size=size_i,
-                             is_float=bool(is_float))
+                             is_float=bool(is_float),
+                             region=region_name)
 
         handlers = self._matching_handlers(
             MEMORY_READ, lambda sel: sel.matches_addr(addr_int))
@@ -514,13 +523,20 @@ class InterceptorPolicy:
             self._fire_observers(MEMORY_READ, Phase.AFTER, ctx,
                                  addr=addr_int, size=size_i,
                                  is_float=bool(is_float), value=None,
-                                 handled=False)
+                                 handled=False, region=region_name)
             return NotImplemented
 
         self._fire_observers(MEMORY_READ, Phase.AFTER, ctx,
                              addr=addr_int, size=size_i,
                              is_float=bool(is_float), value=value,
-                             handled=True)
+                             handled=True, region=region_name)
+        self._record_memory_event(ctx, MEMORY_READ, addr_int, size_i,
+                                  region_name, value=value,
+                                  is_float=bool(is_float))
+        self._fire_sinks(MEMORY_READ, ctx,
+                         {"addr": addr_int, "size": size_i,
+                          "value": value, "region": region_name,
+                          "is_float": bool(is_float)})
         return value
 
     def mem_write(self, addr, val, size, is_float):
@@ -529,10 +545,12 @@ class InterceptorPolicy:
             return NotImplemented
         ctx = self._make_ctx()
         size_i = int(size)
+        region_name = self._region_name_for(addr_int)
 
         self._fire_observers(MEMORY_WRITE, Phase.BEFORE, ctx,
                              addr=addr_int, size=size_i,
-                             value=val, is_float=bool(is_float))
+                             value=val, is_float=bool(is_float),
+                             region=region_name)
 
         handlers = self._matching_handlers(
             MEMORY_WRITE, lambda sel: sel.matches_addr(addr_int))
@@ -543,10 +561,27 @@ class InterceptorPolicy:
             self._record_handler_error(ctx, MEMORY_WRITE, exc,
                                        role="intercept")
 
+        # Phase 6 invariant: when the region's overlay has been
+        # materialized (some prior symbolic access forced its
+        # creation), mirror each concrete byte into the overlay so
+        # later symbolic-offset reads see the written value. Regions
+        # without an overlay pay zero — the cost is opt-in via earlier
+        # symbolic touches.
+        if region_name is not None and not bool(is_float):
+            self._mirror_concrete_write_to_overlay(
+                addr_int, val, size_i, region_name)
+
         self._fire_observers(MEMORY_WRITE, Phase.AFTER, ctx,
                              addr=addr_int, size=size_i,
                              value=val, is_float=bool(is_float),
-                             handled=True)
+                             handled=True, region=region_name)
+        self._record_memory_event(ctx, MEMORY_WRITE, addr_int, size_i,
+                                  region_name, value=val,
+                                  is_float=bool(is_float))
+        self._fire_sinks(MEMORY_WRITE, ctx,
+                         {"addr": addr_int, "size": size_i,
+                          "value": val, "region": region_name,
+                          "is_float": bool(is_float)})
         # InterceptorPolicy claims the write — chain decided whether
         # to actually mutate memory. Tell the substrate not to redo it.
         return None
@@ -618,6 +653,11 @@ class InterceptorPolicy:
         return SymExpr("cmp", (op, lhs, rhs))
 
     def binary_op(self, op, lhs, rhs):
+        sinks = getattr(self._engine, "sinks", None)
+        if sinks is not None and len(sinks):
+            ctx = self._make_ctx()
+            self._fire_sinks(EventKind.BINARY_OP, ctx,
+                             {"op": int(op), "lhs": lhs, "rhs": rhs})
         if _is_concrete(lhs) and _is_concrete(rhs):
             return NotImplemented
         if _is_z3(lhs) or _is_z3(rhs):
@@ -719,6 +759,73 @@ class InterceptorPolicy:
     def _matching_handlers(self, event, match):
         registry = self._engine._intercepts
         return [h for sel, h in registry.lookup(event) if match(sel)]
+
+    def _fire_sinks(self, event_kind, ctx, payload):
+        sinks = getattr(self._engine, "sinks", None)
+        if sinks is None or len(sinks) == 0:
+            return
+        sinks.fire(event_kind, ctx, payload)
+
+    def _record_memory_event(self, ctx, kind, addr, size, region_name,
+                              **extra):
+        """Append a memory event to `path.events` regardless of whether
+        an observer was registered. The event drives
+        `path.regions_touched()` and the events-based filters used by
+        sinks and analyst queries. Skipped if `ctx.path is None`
+        (synthesized/test contexts that don't carry a Path)."""
+        path = ctx.path
+        if path is None:
+            return
+        # If an observer for this event also fired (auto-record path),
+        # avoid duplicating the entry.
+        if self._engine._observers.lookup((kind, Phase.AFTER)):
+            return
+        entry = {"kind": kind, "phase": Phase.AFTER,
+                 "addr": addr, "size": size, "region": region_name,
+                 "handled": True}
+        entry.update(extra)
+        path.events.append(entry)
+
+    def _region_name_for(self, addr):
+        layout = self._layout
+        if layout is None:
+            return None
+        region = layout.region_containing(addr)
+        return region.name if region is not None else None
+
+    def _mirror_concrete_write_to_overlay(self, addr, val, size, region_name):
+        layout = self._layout
+        if layout is None:
+            return
+        region = layout.region_for_name(region_name)
+        if region is None or not region.has_overlay():
+            return
+        # Convert the value into an integer bit pattern, then store
+        # one byte at a time into the overlay. Pointer-typed values
+        # are written as their address bits; bytes/bytearray writes
+        # are spelled out byte-wise.
+        if isinstance(val, bool):
+            int_val = int(val)
+        elif isinstance(val, int):
+            int_val = val
+        elif (isinstance(val, tuple) and len(val) == 2
+              and val[0] == VALUE_TAG_PTR):
+            int_val = int(val[1])
+        elif isinstance(val, (bytes, bytearray)):
+            for i, b in enumerate(val):
+                region.store_byte(addr + i, int(b) & 0xFF)
+            return
+        else:
+            # Unhandled value shape (z3 expr written through concrete
+            # addr, etc.) — skip mirroring; next symbolic read sees
+            # the prior overlay state, which is the conservative
+            # answer.
+            return
+        if int_val < 0:
+            int_val &= (1 << (size * 8)) - 1
+        for i in range(size):
+            byte = (int_val >> (8 * i)) & 0xFF
+            region.store_byte(addr + i, byte)
 
     def _fire_observers(self, event, phase, ctx, **payload):
         registry = self._engine._observers

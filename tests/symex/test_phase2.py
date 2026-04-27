@@ -279,19 +279,22 @@ def test_p2_9_intercept_struct_field_pre_write(index):
 # --- P2.10 ---------------------------------------------------------------
 
 def test_p2_10_observe_memory_read_records_to_path(index):
-    """Baseline run + observed run: same return value; observed has
-    `memory_read` entries in path.events."""
+    """Memory events land in `path.events` so analyst queries (sinks,
+    region tagging, regions_touched) can run over them — Phase 6
+    expanded auto-recording to all paths so baseline and observer runs
+    both expose memory events. Both runs return the same value; both
+    record memory_read entries."""
     base = SymExEngine(index)
     base_paths = base.explore("symbolic_test_add_i32", args=[2, 3])
     assert base_paths[0].return_value == 5
-    base_event_count = len(base_paths[0].events)
 
     engine = SymExEngine(index)
 
     @engine.observe.memory_read
     def trace(ctx, **payload):
-        # The default auto-recorder appends; we just exercise the
-        # callback so an observer is registered.
+        # Observer registration is no longer required for events to
+        # land — the dispatcher records them regardless; this hook
+        # just exercises the observer-fired path.
         pass
 
     paths = engine.explore("symbolic_test_add_i32", args=[2, 3])
@@ -299,8 +302,10 @@ def test_p2_10_observe_memory_read_records_to_path(index):
     mem_events = [e for e in paths[0].events if e.get("kind") ==
                   "memory_read"]
     assert mem_events, "no memory_read entries in path.events"
-    # Baseline events did not include memory_read entries.
-    assert len(paths[0].events) > base_event_count
+    base_mem = [e for e in base_paths[0].events
+                if e.get("kind") == "memory_read"]
+    assert base_mem, "baseline must also expose memory_read entries"
+    assert len(mem_events) == len(base_mem)
 
 
 # --- P2.11 ---------------------------------------------------------------

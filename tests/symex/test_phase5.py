@@ -160,8 +160,16 @@ def test_p5_3_concretize_pointer_set_from_layout():
 # --- P5.4 ----------------------------------------------------------------
 
 def test_p5_4_concretize_by_region():
-    """ByRegion(layout) yields one decision per global region's base,
-    in deterministic (alphabetical) order."""
+    """ByRegion(layout) yields one SplitByRegion decision whose
+    regions are the layout's globals in deterministic (sorted-by-base)
+    order. Phase 6 widened the Decision shape from N ConcretizeTo to
+    a single SplitByRegion so the in-region offset can stay symbolic
+    (when the substrate carries it through). The legacy
+    `[ConcretizeTo(base) per region]` shape moved to the engine's
+    concrete-addr fallback inside `_dispatch_split_by_region`.
+    """
+    from symex import SplitByRegion
+
     layout = Layout()
     layout.place_global("g_a", addr=0x10000, size=16)
     layout.place_global("g_b", addr=0x20000, size=8)
@@ -171,11 +179,11 @@ def test_p5_4_concretize_by_region():
     susp = Suspension(address_expr=None, address_eid=0, size=4,
                       is_write=False, path=None, layout=layout, solver=None)
     decisions = list(strategy.next_decisions(susp))
-    assert decisions == [
-        ConcretizeTo(0x10000),
-        ConcretizeTo(0x20000),
-        ConcretizeTo(0x30000),
-    ]
+    assert len(decisions) == 1
+    sbr = decisions[0]
+    assert isinstance(sbr, SplitByRegion)
+    bases = [r.base for r in sbr.regions]
+    assert bases == [0x10000, 0x20000, 0x30000]
 
 
 # --- P5.5 ----------------------------------------------------------------

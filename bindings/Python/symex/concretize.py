@@ -18,19 +18,22 @@ diverges from the substrate's chosen address.
 """
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from typing import Iterable, Optional
+from dataclasses import dataclass, field
+from typing import Iterable, Optional, Tuple
 
 
 @dataclass(frozen=True)
 class Decision:
     """Base for what an `AddressStrategy.next_decisions(...)` returns.
 
-    Today only `ConcretizeTo` exists; Phase 6 will add `SplitByRegion`
-    and `ConstrainTo` as sibling dataclasses (not tagged-union fields)
-    so the engine's `isinstance` ladder in `_handle_suspension` is the
-    place where new variants gain semantics — and an unhandled variant
-    fails loudly rather than silently returning nothing.
+    Three variants ship today: `ConcretizeTo` picks one concrete int
+    and resumes; `ConstrainTo` resumes with the address symbolic but
+    asserts a z3 predicate on the child's path condition; and
+    `SplitByRegion` is the typed shorthand for "fork one child per
+    region, assert `addr ∈ region` on each." The engine's
+    `_handle_suspension` isinstance ladder is the place where each
+    variant gains its semantics — an unhandled variant fails loudly
+    rather than silently returning nothing.
     """
 
 
@@ -45,6 +48,39 @@ class ConcretizeTo(Decision):
     """
     addr: int
     extra_constraint: Optional[object] = None  # z3.BoolRef when set
+
+
+@dataclass(frozen=True)
+class ConstrainTo(Decision):
+    """Resume the suspension with the address symbolic; assert
+    `constraint` on the child path's `path_condition`. Fork count
+    is one. Use this when the analyst wants an arbitrary predicate
+    over `addr_var` (e.g., alignment, a finite set) rather than a
+    region-shaped constraint.
+
+    When the suspension's `address_expr` is concrete (the substrate
+    has collapsed pointer arithmetic — the deferred Phase 7 work),
+    the engine records a `constrain_to_concrete_addr` event and
+    resumes at the concrete address without asserting the predicate.
+    """
+    constraint: object  # z3.BoolRef
+
+
+@dataclass(frozen=True)
+class SplitByRegion(Decision):
+    """Fork one child per region; assert `addr_var ∈ region` on
+    each child's path condition. A typed shorthand for N
+    `ConstrainTo` decisions, one per region, plus a
+    `_region_at_suspension` tag on the child path for downstream
+    sinks and observers. Region order is the order returned by
+    `ConcretizeByRegion.next_decisions(...)`.
+
+    When the suspension's `address_expr` is concrete (the substrate
+    collapsed pointer arithmetic), the engine degrades to "resume
+    each child at the region's base" — equivalent to Phase 5's
+    `ConcretizeTo(base)` per region.
+    """
+    regions: Tuple = ()  # tuple[Region, ...]
 
 
 class Suspension:
@@ -128,26 +164,54 @@ class ConcretizePointerSet(AddressStrategy):
 
 
 class ConcretizeByRegion(AddressStrategy):
-    """Fork one path per overlapping layout region.
+    """Fork one path per region; the in-region offset stays symbolic
+    on the child (when the substrate carries it through — see the
+    Phase 6 deferred-work note in the plan).
 
-    Phase 5 ships the "constrain to region base" form — emits
-    `ConcretizeTo(base)` per region in deterministic order. Phase 6
-    will widen the Decision to `SplitByRegion` so the in-region offset
-    stays symbolic.
+    Phase 6 returns a single `SplitByRegion(regions=(...))` decision
+    so the engine can forward all regions in one isinstance dispatch.
+    Region order is the layout's natural sorted-by-base order.
+
+    `lazy_default=True` materializes a fresh `LazyRegion` (via
+    `layout.declare_lazy(...)`) when the layout has no regions to
+    enumerate. The engine asserts `addr_var ∈ [base, base+max_size)`
+    on the child and emits a `region_materialized` event. Bounded
+    by `engine.lazy_region_budget` per path.
     """
 
-    def __init__(self, layout, *, max_models=None):
+    _lazy_counter = 0
+
+    def __init__(self, layout, *, max_models=None, lazy_default=False,
+                 lazy_max_size=4096):
         self._layout = layout
         self.max_models = max_models
+        self._lazy_default = lazy_default
+        self._lazy_max_size = int(lazy_max_size)
 
-    def next_decisions(self, _suspension):
-        regions = sorted(self._layout.globals().items())
-        out = []
-        for _name, (base, _size) in regions:
-            out.append(ConcretizeTo(int(base)))
-            if self.max_models is not None and len(out) >= self.max_models:
-                break
-        return out
+    def next_decisions(self, suspension):
+        # Honor the suspension's path condition: drop regions that
+        # provably cannot contain the symbolic address. Concrete
+        # addresses bypass the filter (the engine's concrete-fallback
+        # branch will resume at the region's base regardless).
+        candidates = [r for r in self._layout.regions()
+                      if r.kind in ("global", "lazy") and r.size > 0]
+        if self.max_models is not None:
+            candidates = candidates[:self.max_models]
+
+        if not candidates and self._lazy_default:
+            lazy = self._fresh_lazy()
+            return [SplitByRegion(regions=(lazy,))]
+
+        if not candidates:
+            return []
+
+        return [SplitByRegion(regions=tuple(candidates))]
+
+    def _fresh_lazy(self):
+        ConcretizeByRegion._lazy_counter += 1
+        name = f"__lazy_{ConcretizeByRegion._lazy_counter}"
+        return self._layout.declare_lazy(
+            name, max_size=self._lazy_max_size)
 
 
 class ConcretizeViaSolver(AddressStrategy):

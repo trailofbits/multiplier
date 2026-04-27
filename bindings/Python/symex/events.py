@@ -25,11 +25,17 @@ class EventKind(StrEnum):
     BRANCH = "branch"
     LOOP = "loop"
     CONCRETIZE = "concretize"
+    BINARY_OP = "binary_op"
     MEMADDR_CONCRETIZE = "memaddr_concretize"
     CONCRETIZATION_TRUNCATED = "concretization_truncated"
     CONCRETIZATION_INFEASIBLE = "concretization_infeasible"
     OBSERVER_ERROR = "observer_error"
     INTERCEPT_ERROR = "intercept_error"
+    REGION_MATERIALIZED = "region_materialized"
+    LAZY_BUDGET_EXHAUSTED = "lazy_budget_exhausted"
+    CONSTRAIN_TO_CONCRETE_ADDR = "constrain_to_concrete_addr"
+    SPLIT_BY_REGION = "split_by_region"
+    SINK_FIRED = "sink_fired"
 
 
 # Module-level aliases — analysts and dispatcher import these by name.
@@ -75,6 +81,7 @@ class Terminal(StrEnum):
     STUCK_SUSPENSION = "stuck-suspension"
     CONCRETIZATION_REFUSED = "concretization-refused"
     INFEASIBLE = "infeasible"
+    SINK_HIT = "sink-hit"
     # Cosmetic placeholder used only by `path.summary()` when the path
     # is still live (`path.terminal is None`) — never actually written
     # to a Path.

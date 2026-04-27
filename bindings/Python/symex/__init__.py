@@ -20,9 +20,14 @@ from .until import ExploreUntil
 from .engine import SymExEngine, PathSet
 from .dispatch import InterceptorPolicy, SymExpr
 from .concretize import (
-    AddressStrategy, Decision, ConcretizeTo, Suspension,
+    AddressStrategy, Decision, ConcretizeTo, ConstrainTo, SplitByRegion,
+    Suspension,
     ConcretizeFinite, ConcretizeByRegion,
     ConcretizePointerSet, ConcretizeViaSolver,
+)
+from .region import Region, LazyRegion, RegionTable
+from .sinks import (
+    Sink, SinkRegistry, Finding, OOBSink, NullDerefSink, DivByZeroSink,
 )
 from . import models
 
@@ -41,10 +46,21 @@ __all__ = [
     "AddressStrategy",
     "Decision",
     "ConcretizeTo",
+    "ConstrainTo",
+    "SplitByRegion",
     "Suspension",
     "ConcretizeFinite",
     "ConcretizeByRegion",
     "ConcretizePointerSet",
     "ConcretizeViaSolver",
+    "Region",
+    "LazyRegion",
+    "RegionTable",
+    "Sink",
+    "SinkRegistry",
+    "Finding",
+    "OOBSink",
+    "NullDerefSink",
+    "DivByZeroSink",
     "models",
 ]

@@ -699,6 +699,71 @@ static PyObject *py_resume_addr(PyObject *, PyObject *args) {
   Py_RETURN_NONE;
 }
 
+// Resume a state suspended on a symbolic address by writing an arbitrary
+// Python value (e.g. a z3 expression) into the suspended op's
+// address-operand cache slot. Sibling of `resume_addr` for the
+// symbolic-address path opened by Phase 6's `SplitByRegion` /
+// `ConstrainTo` decisions.
+//
+//   resume_addr_symbolic(state, address_eid, py_value)
+static PyObject *py_resume_addr_symbolic(PyObject *, PyObject *args) {
+  PyObject *state_obj;
+  uint64_t address_eid;
+  PyObject *py_value;
+  if (!PyArg_ParseTuple(args, "OKO", &state_obj, &address_eid, &py_value)) {
+    return nullptr;
+  }
+  if (Py_TYPE(state_obj) != &InterpreterStateType) {
+    PyErr_SetString(PyExc_TypeError, "Expected InterpreterState");
+    return nullptr;
+  }
+  auto *sw = reinterpret_cast<InterpreterStateWrapper *>(state_obj);
+  auto *symbolic = sw->symbolic_state
+      ? reinterpret_cast<ir::interpret::PyWrapperFor<SymbolicState> *>(
+            sw->symbolic_state)->data
+      : nullptr;
+  if (!symbolic || symbolic->call_stack.empty()) {
+    PyErr_SetString(PyExc_RuntimeError,
+                    "resume_addr_symbolic: symbolic state has no live "
+                    "call frame");
+    return nullptr;
+  }
+  symbolic->call_stack.top().values[address_eid] = SharedPyPtr(py_value);
+  Py_RETURN_NONE;
+}
+
+// Read the cached Python value at a given operand entity-id from the
+// live call frame. Returns None when the slot has not been populated.
+// Used by Phase 6 P6.0 to validate `resume_addr_symbolic`'s round-trip
+// (and otherwise useful for diagnosing resumption state).
+//
+//   get_value_at(state, eid)
+static PyObject *py_get_value_at(PyObject *, PyObject *args) {
+  PyObject *state_obj;
+  uint64_t eid;
+  if (!PyArg_ParseTuple(args, "OK", &state_obj, &eid)) return nullptr;
+  if (Py_TYPE(state_obj) != &InterpreterStateType) {
+    PyErr_SetString(PyExc_TypeError, "Expected InterpreterState");
+    return nullptr;
+  }
+  auto *sw = reinterpret_cast<InterpreterStateWrapper *>(state_obj);
+  auto *symbolic = sw->symbolic_state
+      ? reinterpret_cast<ir::interpret::PyWrapperFor<SymbolicState> *>(
+            sw->symbolic_state)->data
+      : nullptr;
+  if (!symbolic || symbolic->call_stack.empty()) {
+    Py_RETURN_NONE;
+  }
+  auto &values = symbolic->call_stack.top().values;
+  auto it = values.find(eid);
+  if (it == values.end() || !it->second.Get()) {
+    Py_RETURN_NONE;
+  }
+  PyObject *obj = it->second.Get();
+  Py_INCREF(obj);
+  return obj;
+}
+
 static PyObject *py_clone_state(PyObject *, PyObject *args) {
   PyObject *state_obj;
   if (!PyArg_ParseTuple(args, "O", &state_obj)) return nullptr;
@@ -843,6 +908,15 @@ static PyMethodDef InterpreterMethods[] = {
    "resume_addr(state, address_eid, concrete_addr)\n"
    "  Specialize a memory-address suspension by binding the address "
    "operand to the chosen concrete pointer."},
+  {"resume_addr_symbolic", py_resume_addr_symbolic, METH_VARARGS,
+   "resume_addr_symbolic(state, address_eid, py_value)\n"
+   "  Symbolic-address sibling of resume_addr: writes an arbitrary "
+   "Python value (typically a z3 expression) into the suspended op's "
+   "address-operand cache slot."},
+  {"get_value_at", py_get_value_at, METH_VARARGS,
+   "get_value_at(state, eid) -> Python value\n"
+   "  Read the cached value at an operand entity-id from the live "
+   "call frame; None if not populated."},
   {nullptr}
 };
 

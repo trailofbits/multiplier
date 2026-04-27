@@ -36,9 +36,12 @@ from .dispatch import (
 from .intercept import InterceptDispatcher
 from .observe import ObserveDispatcher
 from .concretize import (
-    AddressStrategy, ConcretizeFinite, ConcretizeTo, Suspension,
+    AddressStrategy, ConcretizeFinite, ConcretizeTo, ConstrainTo,
+    SplitByRegion, Suspension,
     _coerce_strategy,
 )
+from .region import LazyRegion
+from .sinks import SinkRegistry
 
 _interp = mx.ir.interpret
 
@@ -52,30 +55,42 @@ class _ExploreState:
 
 
 def _resolve_function(index, name):
-    for frag in mx.Fragment.IN(index):
-        for decl in mx.ast.Decl.IN(frag):
-            fd = mx.ast.FunctionDecl.FROM(decl)
-            if fd and str(fd.name) == name:
-                ir = mx.ir.IRFunction.FROM(fd)
-                if ir is not None:
-                    return ir
+    for fd in mx.ast.FunctionDecl.IN(index):
+        if str(fd.name) == name:
+            ir = mx.ir.IRFunction.FROM(fd)
+            if ir is not None:
+                return ir
+    return None
+
+
+def _func_decl_for(entity):
+    """Pull a FunctionDecl out of either a direct decl or a DeclRefExpr."""
+    if isinstance(entity, mx.ast.FunctionDecl):
+        return entity
+    if isinstance(entity, mx.ast.DeclRefExpr):
+        decl = entity.declaration
+        if isinstance(decl, mx.ast.FunctionDecl):
+            return decl
+    return None
+
+
+def _var_decl_for(entity):
+    """Pull a VarDecl out of either a direct decl or a DeclRefExpr."""
+    if isinstance(entity, mx.ast.VarDecl):
+        return entity
+    if isinstance(entity, mx.ast.DeclRefExpr):
+        decl = entity.declaration
+        if isinstance(decl, mx.ast.VarDecl):
+            return decl
     return None
 
 
 def _make_func_resolver(index):
     def resolve(eid):
-        entity = index.entity(eid)
-        if isinstance(entity, mx.ast.Decl):
-            fd = mx.ast.FunctionDecl.FROM(entity)
-            if fd is not None:
-                return mx.ir.IRFunction.FROM(fd)
-        if isinstance(entity, mx.ast.Stmt):
-            dre = mx.ast.DeclRefExpr.FROM(entity)
-            if dre is not None:
-                fd = mx.ast.FunctionDecl.FROM(dre.declaration)
-                if fd is not None:
-                    return mx.ir.IRFunction.FROM(fd)
-        return None
+        fd = _func_decl_for(index.entity(eid))
+        if fd is None:
+            return None
+        return mx.ir.IRFunction.FROM(fd)
     return resolve
 
 
@@ -91,13 +106,7 @@ def _make_func_name_resolver(index):
             entity = index.entity(eid)
         except Exception:
             return None
-        fd = None
-        if isinstance(entity, mx.ast.Decl):
-            fd = mx.ast.FunctionDecl.FROM(entity)
-        elif isinstance(entity, mx.ast.Stmt):
-            dre = mx.ast.DeclRefExpr.FROM(entity)
-            if dre is not None:
-                fd = mx.ast.FunctionDecl.FROM(dre.declaration)
+        fd = _func_decl_for(entity)
         if fd is None:
             return None
         try:
@@ -109,14 +118,7 @@ def _make_func_name_resolver(index):
 
 def _make_global_resolver(index):
     def resolve(eid):
-        entity = index.entity(eid)
-        vd = None
-        if isinstance(entity, mx.ast.Decl):
-            vd = mx.ast.VarDecl.FROM(entity)
-        elif isinstance(entity, mx.ast.Stmt):
-            dre = mx.ast.DeclRefExpr.FROM(entity)
-            if dre is not None:
-                vd = mx.ast.VarDecl.FROM(dre.declaration)
+        vd = _var_decl_for(index.entity(eid))
         if vd is None:
             return None
         ty = vd.type
@@ -195,6 +197,15 @@ class SymExEngine:
         # Per-site overrides: list of `(selector, strategy)` pairs.
         # First match wins, identical to the intercept registry.
         self._strategy_overrides = []
+        # Phase 6: per-engine sink registry. Sinks fire after policy
+        # events in the same dispatcher pass as observers.
+        self.sinks = SinkRegistry()
+        # Phase 6: cap on LazyRegion materializations charged to a
+        # single path. Once exceeded, ConcretizeByRegion(lazy_default
+        # =True) is forced to refuse, terminating the path with
+        # Terminal.CONCRETIZATION_REFUSED + a lazy_budget_exhausted
+        # event.
+        self.lazy_region_budget = 8
 
     def _get_cfg(self, ir_func):
         """Return the cached CFGInfo for `ir_func`, computing it on
@@ -466,10 +477,7 @@ class SymExEngine:
         return path
 
     def _function_name(self, ir_func):
-        decl = ir_func.source_declaration
-        if decl is None:
-            return None
-        fd = mx.ast.FunctionDecl.FROM(decl)
+        fd = ir_func.declaration
         if fd is None:
             return None
         return str(fd.name)
@@ -484,10 +492,7 @@ class SymExEngine:
 
     def _allocate_param_slots(self, ir_func, memory, args):
         addrs = []
-        decl = ir_func.source_declaration
-        if decl is None:
-            return addrs
-        fd = mx.ast.FunctionDecl.FROM(decl)
+        fd = ir_func.declaration
         if fd is None:
             return addrs
         for i, p in enumerate(fd.parameters):
@@ -601,49 +606,31 @@ class SymExEngine:
             return [path]
 
         children = []
-        for i, d in enumerate(decisions):
-            if not isinstance(d, ConcretizeTo):
-                # Phase 6 will dispatch SplitByRegion / ConstrainTo here.
-                # An unknown variant must fail loudly rather than be
-                # silently swallowed.
+        # Track which fork-entry state has been "claimed" without a
+        # clone yet. The first ConcretizeTo / SplitByRegion-region
+        # consumes the original; subsequent forks clone.
+        first_state_used = [False]
+
+        def _take_state():
+            if not first_state_used[0]:
+                first_state_used[0] = True
+                return fork_entry["state"]
+            return _interp.clone_state(fork_entry["state"])
+
+        for d in decisions:
+            if isinstance(d, ConcretizeTo):
+                self._dispatch_concretize_to(
+                    path, suspension, d, _take_state, children, truncated,
+                    chosen)
+            elif isinstance(d, ConstrainTo):
+                self._dispatch_constrain_to(
+                    path, suspension, d, _take_state, children)
+            elif isinstance(d, SplitByRegion):
+                self._dispatch_split_by_region(
+                    path, suspension, d, _take_state, children)
+            else:
                 raise NotImplementedError(
-                    f"Phase 5 only handles ConcretizeTo; got "
-                    f"{type(d).__name__}")
-
-            if not self._addr_feasible(path, suspension, d):
-                path.events.append({
-                    "kind": EventKind.CONCRETIZATION_INFEASIBLE,
-                    "address": d.addr,
-                    "address_eid": suspension.address_eid,
-                    "step": path.steps,
-                })
-                continue
-
-            child_state = (fork_entry["state"] if i == 0
-                           else _interp.clone_state(fork_entry["state"]))
-            _interp.resume_addr(child_state, suspension.address_eid, d.addr)
-            child = self._fork_child(path, child_state)
-
-            if d.extra_constraint is not None:
-                child.path_condition.append(d.extra_constraint)
-                child.solver.invalidate()
-
-            child.events.append({
-                "kind": EventKind.MEMADDR_CONCRETIZE,
-                "address": d.addr,
-                "address_eid": suspension.address_eid,
-                "size": suspension.size,
-                "is_write": suspension.is_write,
-                "step": path.steps,
-            })
-            if truncated:
-                child.events.append({
-                    "kind": EventKind.CONCRETIZATION_TRUNCATED,
-                    "address_eid": suspension.address_eid,
-                    "max_models": chosen.max_models,
-                    "step": path.steps,
-                })
-            children.append(child)
+                    f"unknown Decision variant: {type(d).__name__}")
 
         if not children:
             # Every candidate was infeasible.
@@ -651,6 +638,155 @@ class SymExEngine:
             path.terminal = Terminal.CONCRETIZATION_REFUSED
             return [path]
         return children
+
+    def _dispatch_concretize_to(self, path, suspension, d, take_state,
+                                 children, truncated, chosen):
+        if not self._addr_feasible(path, suspension, d):
+            path.events.append({
+                "kind": EventKind.CONCRETIZATION_INFEASIBLE,
+                "address": d.addr,
+                "address_eid": suspension.address_eid,
+                "step": path.steps,
+            })
+            return
+        child_state = take_state()
+        _interp.resume_addr(child_state, suspension.address_eid, d.addr)
+        child = self._fork_child(path, child_state)
+
+        if d.extra_constraint is not None:
+            child.path_condition.append(d.extra_constraint)
+            child.solver.invalidate()
+
+        child.events.append({
+            "kind": EventKind.MEMADDR_CONCRETIZE,
+            "address": d.addr,
+            "address_eid": suspension.address_eid,
+            "size": suspension.size,
+            "is_write": suspension.is_write,
+            "step": path.steps,
+        })
+        if truncated:
+            child.events.append({
+                "kind": EventKind.CONCRETIZATION_TRUNCATED,
+                "address_eid": suspension.address_eid,
+                "max_models": chosen.max_models,
+                "step": path.steps,
+            })
+        children.append(child)
+
+    def _dispatch_constrain_to(self, path, suspension, d, take_state,
+                                children):
+        addr_expr = suspension.address_expr
+        addr_is_symbolic = self._is_z3_expr(addr_expr)
+        child_state = take_state()
+        if addr_is_symbolic:
+            _interp.resume_addr_symbolic(
+                child_state, suspension.address_eid, addr_expr)
+            child = self._fork_child(path, child_state)
+            child.path_condition.append(d.constraint)
+            child.solver.invalidate()
+        else:
+            # Concrete-addr fallback: the substrate has collapsed
+            # ptr_add (Phase 7 deferred). The constraint over a
+            # single concrete value would be vacuous against the
+            # sole satisfying assignment, so we record the situation
+            # and resume at the existing concrete address without
+            # asserting it.
+            self._record_constrain_to_concrete_addr(path, suspension)
+            try:
+                concrete = int(addr_expr) if addr_expr is not None else 0
+            except (TypeError, ValueError):
+                concrete = 0
+            _interp.resume_addr(
+                child_state, suspension.address_eid, concrete)
+            child = self._fork_child(path, child_state)
+        children.append(child)
+
+    def _dispatch_split_by_region(self, path, suspension, d, take_state,
+                                   children):
+        addr_expr = suspension.address_expr
+        addr_is_symbolic = self._is_z3_expr(addr_expr)
+
+        regions_emitted = []
+        for region in d.regions:
+            if isinstance(region, LazyRegion):
+                # Charge the materialization budget to the path; if
+                # the budget is exhausted, refuse this region.
+                if path._lazy_regions_used >= self._engine_lazy_budget():
+                    path.events.append({
+                        "kind": EventKind.LAZY_BUDGET_EXHAUSTED,
+                        "region": region.name,
+                        "address_eid": suspension.address_eid,
+                        "step": path.steps,
+                    })
+                    continue
+                self._record_region_materialized(path, region)
+                path._lazy_regions_used += 1
+
+            child_state = take_state()
+            if addr_is_symbolic:
+                _interp.resume_addr_symbolic(
+                    child_state, suspension.address_eid, addr_expr)
+                z3 = _z3_module()
+                in_region = z3.And(
+                    z3.UGE(addr_expr, region.base),
+                    z3.ULT(addr_expr, region.base + region.size))
+                child = self._fork_child(path, child_state)
+                child.path_condition.append(in_region)
+                child.solver.invalidate()
+            else:
+                # Concrete-addr fallback: degrade to "resume at the
+                # region's base." Mirrors Phase 5's
+                # ConcretizeByRegion(layout) semantics.
+                _interp.resume_addr(
+                    child_state, suspension.address_eid, region.base)
+                child = self._fork_child(path, child_state)
+            child._region_at_suspension = region.name
+            child.events.append({
+                "kind": EventKind.SPLIT_BY_REGION,
+                "region": region.name,
+                "region_base": region.base,
+                "region_size": region.size,
+                "address_eid": suspension.address_eid,
+                "is_write": suspension.is_write,
+                "step": path.steps,
+            })
+            children.append(child)
+            regions_emitted.append(region.name)
+
+        if not regions_emitted:
+            # Every region in the split was rejected (lazy budget
+            # exhausted etc.). The caller will mark
+            # CONCRETIZATION_REFUSED.
+            return
+
+    def _engine_lazy_budget(self):
+        return int(getattr(self, "lazy_region_budget", 8))
+
+    @staticmethod
+    def _is_z3_expr(value):
+        if value is None:
+            return False
+        z3 = _z3_module()
+        return z3 is not None and isinstance(value, z3.ExprRef)
+
+    def _record_region_materialized(self, path, region):
+        path.events.append({
+            "kind": EventKind.REGION_MATERIALIZED,
+            "region": region.name,
+            "region_base": region.base,
+            "region_size": region.size,
+            "step": path.steps,
+        })
+
+    def _record_constrain_to_concrete_addr(self, path, suspension):
+        path.events.append({
+            "kind": EventKind.CONSTRAIN_TO_CONCRETE_ADDR,
+            "address_eid": suspension.address_eid,
+            "size": suspension.size,
+            "is_write": suspension.is_write,
+            "step": path.steps,
+        })
 
     def _match_override(self, suspension):
         """Walk per-site overrides in registration order. Selector
