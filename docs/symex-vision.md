@@ -930,8 +930,52 @@ organically.
 - **Custom symbolic memory models.** The `symbolic_load` /
   `symbolic_store` hooks aren't yet exposed on
   `engine.intercept`; analyst-defined heap shapes (e.g. "every
-  malloc(N) returns a fresh region") would be a Phase 8b
+  malloc(N) returns a fresh region") would be a future
   addition with no further substrate work needed.
+
+### Phase 8b — symbolic returns + global access events (delivered)
+
+Two surgical fixes that close honesty gaps Phase 8a left visible:
+
+- **Symbolic returns no longer collapse to 0.**
+  `read_return_value` (in `InterpreterLoop.h`) used to overwrite
+  the live `ret_from_inst` with a slot read of `frame.return_ptr`.
+  For symbolic returns the slot was never written (the default
+  `mem_write` chain drops z3 values), so `path.return_value` on a
+  function whose hooks made the return symbolic silently came back
+  as `0` — no error, no warning. A new `bool has_ret_value` thread
+  through `exec_ret` short-circuits to `ret_from_inst` whenever the
+  RET carried an operand. Aggregate-style returns (RET without
+  operand, function memcpy'd into the slot) are unaffected.
+
+- **`engine.observe.global_read` / `global_write` actually fire.**
+  The events were declared, exported, and selector-matched but no
+  dispatch path ever called `_fire_observers(GLOBAL_READ, …)`.
+  `InterceptorPolicy` now fans `mem_read` / `mem_write` (and the
+  Phase 8a `symbolic_load` / `symbolic_store`) out to the global-
+  event registry when the access lands in a `kind == "global"`
+  region. Lazy and function-placement regions are filtered out —
+  they aren't analyst-named globals. Goal #9 ("per-path trace of
+  which globals were accessed and when") is now real.
+
+**Test catalog (`tests/symex/test_phase8b.py`):**
+
+- **P8b.1** symbolic return propagates through `path.return_value`
+  (post-fix is z3; pre-fix collapsed to 0).
+- **P8b.2** concrete primitive return regression — same value as
+  pre-fix.
+- **P8b.3** multi-frame concrete call regression — exercises the
+  callee_result branch of `exec_ret` across recursion.
+- **P8b.4** aggregate return — placeholder skip (no corpus
+  function exposes a no-operand RET; transitively covered by the
+  unchanged InterpretIR suite).
+- **P8b.5** observe.global_read fires on a concrete read.
+- **P8b.6** observe.global_write fires on a concrete write.
+- **P8b.7** observe.global_read fires on a `symbolic_load` access.
+- **P8b.8** lazy regions don't fire global_read (kind filter).
+- **P8b.9** function-placement regions don't fire global_read
+  (kind filter).
+- **P8b.10** selector by name routes correctly.
 
 ---
 
@@ -998,6 +1042,7 @@ tests/symex/test_phase5.py
 tests/symex/test_phase6.py
 tests/symex/test_phase7.py
 tests/symex/test_phase8a.py
+tests/symex/test_phase8b.py
 tests/symex/c/cwe787_oob_write.c
 ```
 
@@ -1029,6 +1074,12 @@ include/multiplier/IR/Interpret/ConcreteMemory.h    # place_at if missing
 - Phase 8a: substrate consults `symbolic_load` / `symbolic_store`
   before suspending; `tests/symex/test_phase8a.py` (7 tests,
   P8a.1–P8a.7) green; total `tests/symex` count is 86.
+- Phase 8b: `read_return_value` short-circuits to `ret_from_inst`
+  for primitive RETs with an operand; `InterceptorPolicy` fans
+  global-region accesses out to `GLOBAL_READ` / `GLOBAL_WRITE`
+  observers; `tests/symex/test_phase8b.py` (10 tests,
+  P8b.1–P8b.10; one skipped) green; total `tests/symex` count
+  is 96.
 - The 235-test pre-existing harness still passes (regression gate).
 - Public API has docstrings; the README links to the Phase 7
   walkthrough.

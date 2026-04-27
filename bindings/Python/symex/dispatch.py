@@ -537,6 +537,10 @@ class InterceptorPolicy:
                          {"addr": addr_int, "size": size_i,
                           "value": value, "region": region_name,
                           "is_float": bool(is_float)})
+        self._fire_global_event_if_applicable(
+            ctx, addr=addr_int, size=size_i, value=value,
+            region_name=region_name, is_float=bool(is_float),
+            is_write=False)
         return value
 
     def mem_write(self, addr, val, size, is_float):
@@ -582,6 +586,10 @@ class InterceptorPolicy:
                          {"addr": addr_int, "size": size_i,
                           "value": val, "region": region_name,
                           "is_float": bool(is_float)})
+        self._fire_global_event_if_applicable(
+            ctx, addr=addr_int, size=size_i, value=val,
+            region_name=region_name, is_float=bool(is_float),
+            is_write=True)
         # InterceptorPolicy claims the write — chain decided whether
         # to actually mutate memory. Tell the substrate not to redo it.
         return None
@@ -639,6 +647,10 @@ class InterceptorPolicy:
                          {"addr": addr, "size": size_i,
                           "value": result, "region": region_name,
                           "is_float": bool(is_float)})
+        self._fire_global_event_if_applicable(
+            ctx, addr=addr, size=size_i, value=result,
+            region_name=region_name, is_float=bool(is_float),
+            is_write=False)
         return result
 
     def symbolic_store(self, addr, val, size, is_float):
@@ -679,6 +691,10 @@ class InterceptorPolicy:
                          {"addr": addr, "size": size_i,
                           "value": val, "region": region_name,
                           "is_float": bool(is_float)})
+        self._fire_global_event_if_applicable(
+            ctx, addr=addr, size=size_i, value=val,
+            region_name=region_name, is_float=bool(is_float),
+            is_write=True)
         return True
 
     def _coerce_store_value(self, val, size, z3):
@@ -976,6 +992,31 @@ class InterceptorPolicy:
             return None
         region = layout.region_containing(addr)
         return region.name if region is not None else None
+
+    def _fire_global_event_if_applicable(self, ctx, *, addr, size, value,
+                                          region_name, is_float, is_write):
+        """Fan a `mem_read` / `mem_write` (or its symbolic peer) out to
+        `GLOBAL_READ` / `GLOBAL_WRITE` observers when the access lands
+        in a `kind == "global"` region. Lazy / function-placement
+        regions don't qualify — they aren't analyst-named globals.
+
+        Observer-only fan-out: analysts who want to *change* what a
+        global read returns already use
+        `intercept.memory_read(addr_range=("name", N))` — the
+        named-region selector routes correctly there. When the access
+        path went through `symbolic_load` / `symbolic_store`, `addr`
+        and (for reads) `value` are z3 expressions; observer hooks
+        that expect ints must guard accordingly."""
+        if region_name is None or self._layout is None:
+            return
+        region = self._layout.region_for_name(region_name)
+        if region is None or region.kind != "global":
+            return
+        global_event = GLOBAL_WRITE if is_write else GLOBAL_READ
+        self._fire_observers(global_event, Phase.AFTER, ctx,
+                             name=region_name, addr=addr,
+                             size=size, value=value,
+                             is_float=is_float)
 
     def _mirror_concrete_write_to_overlay(self, addr, val, size, region_name):
         layout = self._layout

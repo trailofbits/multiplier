@@ -1257,6 +1257,7 @@ inline ValueT read_return_value(auto &state,
                                 PolicyT &policy,
                                 const CallFrame<ValueT> &frame,
                                 const ValueT &ret_from_inst,
+                                bool has_ret_value,
                                 SchedT &sched) {
   if (policy.is_undefined(frame.return_ptr)) return ret_from_inst;
 
@@ -1273,6 +1274,11 @@ inline ValueT read_return_value(auto &state,
   }
 
   if (sz > 0 && sz <= 8) {
+    // RET carried an operand — that's the canonical return value; the
+    // slot is a redundant lowering. Returning `ret_from_inst` directly
+    // preserves symbolic returns that can't round-trip through concrete
+    // memory.
+    if (has_ret_value) return ret_from_inst;
     MemAccessHint hint{sz, ret_is_float, false};
     ValueT result = ret_from_inst;
     // The return pointer is a Value held in the callee frame, not an IR
@@ -1295,15 +1301,17 @@ inline void exec_ret(auto &state, PolicyT &policy,
   auto &frame = state.call_stack.top();
   auto ri = RetInst::from(inst);
   ValueT ret_from_inst = ValueTraits<ValueT>::default_value();
+  bool has_ret_value = false;
   if (ri) {
     if (auto rv = ri->return_value()) {
       ret_from_inst = val<ValueT>(frame, *rv);
+      has_ret_value = true;
     }
   }
 
   if (state.call_stack.depth() > 1) {
     ValueT callee_result = read_return_value<PolicyT, SchedT, ValueT>(
-        state, policy, frame, ret_from_inst, sched);
+        state, policy, frame, ret_from_inst, has_ret_value, sched);
     auto call_site = frame.call_site;
     state.call_stack.pop();
     if (call_site != kInvalidEntityId) {
@@ -1317,7 +1325,7 @@ inline void exec_ret(auto &state, PolicyT &policy,
 
   // Top-level return.
   ValueT final_result = read_return_value<PolicyT, SchedT, ValueT>(
-      state, policy, frame, ret_from_inst, sched);
+      state, policy, frame, ret_from_inst, has_ret_value, sched);
   sched.on_completed(final_result,
                      state.clone());
   state.work_stack.clear();
