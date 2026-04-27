@@ -19,6 +19,11 @@ from .events import EventLog
 from .until import ExploreUntil
 from .engine import SymExEngine, PathSet
 from .dispatch import InterceptorPolicy, SymExpr
+from .concretize import (
+    AddressStrategy, Decision, ConcretizeTo, Suspension,
+    ConcretizeFinite, ConcretizeByRegion,
+    ConcretizePointerSet, ConcretizeViaSolver,
+)
 from . import models
 
 __all__ = [
@@ -33,5 +38,13 @@ __all__ = [
     "SymExEngine",
     "InterceptorPolicy",
     "SymExpr",
+    "AddressStrategy",
+    "Decision",
+    "ConcretizeTo",
+    "Suspension",
+    "ConcretizeFinite",
+    "ConcretizeByRegion",
+    "ConcretizePointerSet",
+    "ConcretizeViaSolver",
     "models",
 ]

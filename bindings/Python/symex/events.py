@@ -26,6 +26,8 @@ class EventKind(StrEnum):
     LOOP = "loop"
     CONCRETIZE = "concretize"
     MEMADDR_CONCRETIZE = "memaddr_concretize"
+    CONCRETIZATION_TRUNCATED = "concretization_truncated"
+    CONCRETIZATION_INFEASIBLE = "concretization_infeasible"
     OBSERVER_ERROR = "observer_error"
     INTERCEPT_ERROR = "intercept_error"
 
@@ -71,6 +73,7 @@ class Terminal(StrEnum):
     STOPPED = "stopped"
     STUCK_BRANCH = "stuck-branch"
     STUCK_SUSPENSION = "stuck-suspension"
+    CONCRETIZATION_REFUSED = "concretization-refused"
     INFEASIBLE = "infeasible"
     # Cosmetic placeholder used only by `path.summary()` when the path
     # is still live (`path.terminal is None`) — never actually written

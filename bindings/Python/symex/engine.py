@@ -31,9 +31,14 @@ from .events import (
 from .until import ExploreUntil
 from .dispatch import (
     InterceptorPolicy, _Registry, SymExpr, _is_z3, _z3_bool, _z3_module,
+    make_selector,
 )
 from .intercept import InterceptDispatcher
 from .observe import ObserveDispatcher
+from .concretize import (
+    AddressStrategy, ConcretizeFinite, ConcretizeTo, Suspension,
+    _coerce_strategy,
+)
 
 _interp = mx.ir.interpret
 
@@ -182,6 +187,14 @@ class SymExEngine:
         self._branch_sites = {}
         self.intercept = InterceptDispatcher(self)
         self.observe = ObserveDispatcher(self)
+        # Default address strategy: concretize every symbolic-address
+        # suspension to 0. Analysts override per-engine
+        # (`engine.address_strategy = ...`), per-call (`explore(...,
+        # concretize=...)`), or per-site (`engine.concretize_at(...)`).
+        self.address_strategy = ConcretizeFinite([0])
+        # Per-site overrides: list of `(selector, strategy)` pairs.
+        # First match wins, identical to the intercept registry.
+        self._strategy_overrides = []
 
     def _get_cfg(self, ir_func):
         """Return the cached CFGInfo for `ir_func`, computing it on
@@ -233,6 +246,20 @@ class SymExEngine:
                 "register(engine)")
         return self
 
+    def concretize_at(self, strategy, **selector_kwargs):
+        """Register a strategy for suspensions whose payload matches the
+        selector. Selector vocabulary is identical to `@intercept.*` /
+        `@observe.*` — `addr_range=`, `name=`, `eid=`, `func=`,
+        `block=`. First registration wins on overlap.
+
+        Note: `eid=` keys on the *value's* eid (the symbolic value being
+        resolved), not the load instruction's use-site eid; that's what
+        the substrate's `MemAddrContinuation` reports.
+        """
+        selector = make_selector(self.layout, **selector_kwargs)
+        self._strategy_overrides.append(
+            (selector, _coerce_strategy(strategy)))
+
     def explore(self, start_func, *, start_block=None, args=None, seed=None,
                 policy=None, until=None, slice_steps=_DEFAULT_SLICE_STEPS,
                 concretize=None, strategy=Strategy.BFS):
@@ -248,8 +275,11 @@ class SymExEngine:
             raise ValueError(f"unknown explore strategy {strategy!r}")
 
         until_pred = until if until is not None else ExploreUntil.never()
-        if concretize is None:
-            concretize = lambda fork: [0]
+        # Per-call override of the default address strategy. None means
+        # "use engine.address_strategy"; a callable is wrapped for
+        # back-compat; an AddressStrategy is used directly.
+        strategy_obj = (_coerce_strategy(concretize)
+                        if concretize is not None else self.address_strategy)
 
         use_interceptor = policy is None
         if self.layout is None:
@@ -272,7 +302,7 @@ class SymExEngine:
         return PathSet(self._drive(
             [initial_path], memory, layout, policy,
             use_interceptor, until_pred, slice_steps,
-            concretize, strategy))
+            strategy_obj, strategy))
 
     def _drive(self, initial_paths, memory, layout, policy,
                use_interceptor, until_pred, slice_steps, concretize,
@@ -375,8 +405,8 @@ class SymExEngine:
         """
         layout = self.layout if self.layout is not None else Layout()
         memory = layout.memory
-        if concretize is None:
-            concretize = lambda fork: [0]
+        strategy_obj = (_coerce_strategy(concretize)
+                        if concretize is not None else self.address_strategy)
         until_pred = until if until is not None else ExploreUntil.never()
 
         fresh_state = _interp.clone_state(snapshot.state)
@@ -402,7 +432,7 @@ class SymExEngine:
 
         return PathSet(self._drive(
             [path], memory, layout, None, True,
-            until_pred, slice_steps, concretize, strategy))
+            until_pred, slice_steps, strategy_obj, strategy))
 
     # ------------------------------------------------------------------
     # internals
@@ -540,37 +570,172 @@ class SymExEngine:
             children.append(child)
         return children
 
-    def _handle_suspension(self, path, result, forks, concretize):
+    def _handle_suspension(self, path, result, forks, strategy):
         if not forks:
             path.suspended = result
             path.terminal = Terminal.STUCK_SUSPENSION
             return [path]
 
         fork_entry = forks[0]
-        addresses = list(concretize(fork_entry))
-        if not addresses:
+        suspension = Suspension(
+            address_expr=fork_entry.get("address"),
+            address_eid=int(fork_entry.get("address_eid") or 0),
+            size=fork_entry.get("size"),
+            is_write=fork_entry.get("is_write"),
+            path=path,
+            layout=self.layout,
+            solver=path.solver,
+        )
+
+        chosen = self._match_override(suspension)
+        if chosen is None:
+            chosen = strategy
+
+        decisions = list(chosen.next_decisions(suspension))
+        truncated = (chosen.max_models is not None
+                     and len(decisions) >= chosen.max_models)
+
+        if not decisions:
             path.suspended = result
-            path.terminal = Terminal.STUCK_SUSPENSION
+            path.terminal = Terminal.CONCRETIZATION_REFUSED
             return [path]
 
         children = []
-        size = fork_entry.get("size")
-        is_write = fork_entry.get("is_write")
-        for addr in addresses:
-            child_state = (fork_entry["state"]
-                           if addr is addresses[0]
+        for i, d in enumerate(decisions):
+            if not isinstance(d, ConcretizeTo):
+                # Phase 6 will dispatch SplitByRegion / ConstrainTo here.
+                # An unknown variant must fail loudly rather than be
+                # silently swallowed.
+                raise NotImplementedError(
+                    f"Phase 5 only handles ConcretizeTo; got "
+                    f"{type(d).__name__}")
+
+            if not self._addr_feasible(path, suspension, d):
+                path.events.append({
+                    "kind": EventKind.CONCRETIZATION_INFEASIBLE,
+                    "address": d.addr,
+                    "address_eid": suspension.address_eid,
+                    "step": path.steps,
+                })
+                continue
+
+            child_state = (fork_entry["state"] if i == 0
                            else _interp.clone_state(fork_entry["state"]))
-            _interp.resume_addr(child_state, fork_entry["address_eid"], addr)
+            _interp.resume_addr(child_state, suspension.address_eid, d.addr)
             child = self._fork_child(path, child_state)
+
+            if d.extra_constraint is not None:
+                child.path_condition.append(d.extra_constraint)
+                child.solver.invalidate()
+
             child.events.append({
                 "kind": EventKind.MEMADDR_CONCRETIZE,
-                "address": addr,
-                "size": size,
-                "is_write": is_write,
+                "address": d.addr,
+                "address_eid": suspension.address_eid,
+                "size": suspension.size,
+                "is_write": suspension.is_write,
                 "step": path.steps,
             })
+            if truncated:
+                child.events.append({
+                    "kind": EventKind.CONCRETIZATION_TRUNCATED,
+                    "address_eid": suspension.address_eid,
+                    "max_models": chosen.max_models,
+                    "step": path.steps,
+                })
             children.append(child)
+
+        if not children:
+            # Every candidate was infeasible.
+            path.suspended = result
+            path.terminal = Terminal.CONCRETIZATION_REFUSED
+            return [path]
         return children
+
+    def _match_override(self, suspension):
+        """Walk per-site overrides in registration order. Selector
+        axes:
+          - `eid=` matches the value's eid (what the substrate reports).
+          - `addr_range=` matches when a concrete address lands in
+            range, or the symbolic address can land in range under
+            the path's accumulated condition.
+          - `name=` (without `addr_range=`) routes through the
+            layout: a function's zero-size range matches concrete
+            equality; a global's range matches like `addr_range=`.
+        Empty axes match anything."""
+        addr_int = self._extract_concrete_addr(suspension.address_expr)
+        for selector, strategy in self._strategy_overrides:
+            if not selector.matches_eid(suspension.address_eid):
+                continue
+            if selector.addr_range is not None:
+                lo, hi = selector._compute_range()
+                if not self._addr_range_matches(suspension, addr_int, lo, hi):
+                    continue
+            elif selector.name is not None:
+                if not self._addr_name_matches(suspension, addr_int,
+                                                selector.name):
+                    continue
+            return strategy
+        return None
+
+    def _addr_range_matches(self, suspension, addr_int, lo, hi):
+        if addr_int is not None:
+            return lo <= addr_int < hi
+        return self._symbolic_in_range(suspension, lo, hi)
+
+    def _addr_name_matches(self, suspension, addr_int, name):
+        if self.layout is None:
+            return False
+        try:
+            lo, hi = self.layout.address_range(name)
+        except KeyError:
+            return False
+        if lo == hi:  # function placement: zero-size, exact match
+            return addr_int is not None and addr_int == lo
+        return self._addr_range_matches(suspension, addr_int, lo, hi)
+
+    @staticmethod
+    def _symbolic_in_range(suspension, lo, hi):
+        addr_expr = suspension.address_expr
+        if addr_expr is None:
+            return False
+        z3 = _z3_module()
+        if z3 is None or not isinstance(addr_expr, z3.ExprRef):
+            return False
+        s = z3.Solver()
+        for c in suspension.path.path_condition:
+            s.add(c)
+        s.add(z3.UGE(addr_expr, lo))
+        s.add(z3.ULT(addr_expr, hi))
+        return s.check() == z3.sat
+
+    @staticmethod
+    def _extract_concrete_addr(addr_expr):
+        if addr_expr is None:
+            return None
+        if isinstance(addr_expr, bool):
+            return None
+        if isinstance(addr_expr, int):
+            return addr_expr
+        return None
+
+    def _addr_feasible(self, path, suspension, decision):
+        """Cheap feasibility check: `path_condition ∧ (addr_var == k)`
+        must be sat for `k` to be a viable concrete address. When
+        `address_expr` is concrete or there are no constraints, no
+        solver call is needed."""
+        if not path.path_condition or suspension.address_expr is None:
+            return True
+        z3 = _z3_module()
+        if z3 is None:
+            return True
+        if not isinstance(suspension.address_expr, z3.ExprRef):
+            return True
+        s = z3.Solver()
+        for c in path.path_condition:
+            s.add(c)
+        s.add(suspension.address_expr == decision.addr)
+        return s.check() == z3.sat
 
     def _fork_child(self, parent, child_state):
         """Build a fresh Path that inherits everything from `parent`

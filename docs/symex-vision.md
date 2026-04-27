@@ -489,19 +489,38 @@ useful primitive.
 **Goal:** when symbolic addresses block progress, the analyst
 chooses how to widen.
 
-- `Strategy` interface: `next_addresses(addr_expr, hint, ctx) ->
-  Iterable[int]`.
+- `AddressStrategy` interface: `next_decisions(suspension) ->
+  Iterable[Decision]`. `Decision` today has one variant,
+  `ConcretizeTo(addr, *, extra_constraint=None)`; Phase 6 widens it
+  with `SplitByRegion` and `ConstrainTo` so region splits and
+  constraint-only decisions don't have to flatten to ints.
 - Built-ins:
   - `ConcretizeFinite([…])` — explicit address set.
-  - `ConcretizePointerSet(targets=[…])` — likely targets from
-    layout or function-pointer table.
-  - `ConcretizeViaSolver(max_models=k)` — z3 enumerate-models.
-  - `ConcretizeRange(low, high, step)` — array probing.
-- `engine.concretize_default = …`, plus per-hook override:
-  `@on_memory_read(strategy=ConcretizeViaSolver(8))`.
+  - `ConcretizePointerSet(layout=…, names=…)` — resolve named
+    globals/functions through a layout; `.functions(layout)` and
+    `.globals(layout)` are the common-case classmethods. (Range
+    probing subsumed by `ConcretizeFinite` + `ConcretizeByRegion`.)
+  - `ConcretizeByRegion(layout, *, max_models=None)` — fork one
+    path per layout region.
+  - `ConcretizeViaSolver(*, max_models=k)` — z3 enumerate distinct
+    sat-models, attaching `addr_var == k` as `extra_constraint`
+    so the child path's solver agrees with the executed address.
+- `engine.address_strategy = …` (default), per-call override via
+  `engine.explore(..., concretize=AddressStrategy)`, per-site
+  override via `engine.concretize_at(strategy, **selector_kwargs)`
+  reusing the intercept dispatch's `_Selector` (`addr_range=`,
+  `name=`, `eid=`, `func=`, `block=`).
+- Soundness: `ConcretizeViaSolver` attaches `addr_var == k` as
+  `extra_constraint`; the engine asserts a feasibility pre-check
+  (`path_condition ∧ addr == k`) on every concrete candidate and
+  drops infeasible picks before resuming.
+- Events: `concretization_truncated` (max_models reached),
+  `concretization_infeasible` (candidate dropped by feasibility
+  check). Terminal: `concretization-refused` (strategy returned
+  zero decisions — distinct from `stuck-suspension`).
 - Bound: max-models per suspension, total-fork budget.
 
-**Tests:** P5.1–P5.4.
+**Tests:** P5.1–P5.10.
 
 ### Phase 6 — polishing & docs
 
@@ -683,20 +702,40 @@ non-empty Graphviz string; smoke check it parses.
 
 ### Phase 5 — concretization strategies
 
-**P5.1** `test_concretize_finite` — symbolic-address read; strategy
-`ConcretizeFinite([a, b, c])` produces 3 paths with those
-addresses.
+**P5.1** `test_p5_1_concretize_finite` — `ConcretizeFinite([a, b, c])`
+produces 3 paths, each with the right `memaddr_concretize` event.
 
-**P5.2** `test_concretize_via_solver` — pointer constrained to
-`[lo, hi]` by path conditions; solver enumerator yields ≤ k
-distinct addresses, all in range.
+**P5.2** `test_p5_2_concretize_via_solver_attaches_constraint` —
+strategy unit test: `ConcretizeViaSolver(max_models=4)` over a
+constrained z3 BitVec yields ≤ 4 distinct sat-models in sorted
+order, each carrying `addr_var == k` as `extra_constraint`.
 
-**P5.3** `test_concretize_pointer_set` — function-pointer table
-known via layout; strategy yields exactly the table entries.
+**P5.3** `test_p5_3_concretize_pointer_set_from_layout` —
+`ConcretizePointerSet.functions(layout)` yields one decision per
+placed function in registration order.
 
-**P5.4** `test_concretize_budget_exhaustion` — finite address set
-of size 5 with `max_models=3`; engine explores 3 paths and
-emits a `concretization_truncated` event on the suspension.
+**P5.4** `test_p5_4_concretize_by_region` — `ConcretizeByRegion(layout)`
+yields one decision per global region's base, in deterministic order.
+
+**P5.5** `test_p5_5_concretize_truncation_event` — capped strategy
+hitting `max_models` emits `concretization_truncated` on every child.
+
+**P5.6** `test_p5_6_per_site_override_by_name` — `engine.concretize_at(
+strategy, name="g")` overrides the default for suspensions on the
+named region.
+
+**P5.7** `test_p5_7_per_site_override_by_addr_range` — `addr_range=`
+override fires when the suspension's address can land in range.
+
+**P5.8** `test_p5_8_concretize_infeasible_check` — engine's
+`_addr_feasible` drops candidates that violate `path_condition`.
+
+**P5.9** `test_p5_9_concretize_refused_terminal` — strategy returning
+zero decisions terminates the path with `concretization-refused`.
+
+**P5.10** `test_p5_10_legacy_callable_still_works` — pre-Phase-5
+`concretize=lambda fork: [k]` keeps working through the back-compat
+adapter.
 
 ### Phase 6 — example & polish
 
