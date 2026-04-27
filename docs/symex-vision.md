@@ -872,24 +872,66 @@ multiplied in z3; `ptr_diff`'s element_size division is `UDiv`.
   sweep over the symex package; modules without examples are
   skipped.
 
-**Future work explicitly out of scope for Phase 7:**
+### Phase 8a — symbolic-LOAD resolution (delivered)
 
-- **Substrate symbolic-LOAD resolution.** `with_address_impl`
-  re-suspends every time the address is non-extractable, so
-  end-to-end exploration through `SplitByRegion` /
-  `ConstrainTo` (which resume via `resume_addr_symbolic`) needs
-  a future substrate hook — likely a `symbolic_load` /
-  `symbolic_store` Python policy method that consults the
-  region overlay. P7.3 / P7.4 cover the wiring up to that seam
-  via synthesized suspensions; P7.5 produces real bug witnesses
-  through ConcretizeFinite, which routes through `resume_addr`
-  (concrete) and is unaffected.
+The substrate gap Phase 7 deferred is now closed. `exec_load` and
+`exec_store` consult `policy.exec_symbolic_load` /
+`exec_symbolic_store` *before* the suspension path; PythonPolicy's
+overrides cache `cached_symbolic_load_` / `cached_symbolic_store_`
+and dispatch to `InterceptorPolicy.symbolic_load` /
+`symbolic_store`. With `_region_at_suspension` set (by
+`SplitByRegion`), the dispatch reads/writes through
+`region.select_byte` / `store_byte` little-endian — returning a z3
+Concat of per-byte `Select`s — so the resumed substrate continues
+without re-suspending. End-to-end `engine.explore` through
+`SplitByRegion`, `ConstrainTo`, and `LazyRegion` flows now works
+organically.
+
+**Test catalog (`tests/symex/test_phase8a.py`):**
+
+- **P8a.1** `test_p8a_1_split_by_region_load_via_overlay_e2e` —
+  the resumed path completes; the load's recorded MEMORY_READ
+  event carries a z3 expression as its `value`.
+- **P8a.2** `test_p8a_2_split_by_region_offset_stays_symbolic_e2e`
+  — the in-region offset stays free under the path condition;
+  multiple distinct in-region addresses are admissible end to end.
+- **P8a.3** `test_p8a_3_oob_sink_symbolic_witness_e2e` — the
+  Phase 7 P7.4 setup driven through `engine.explore`; OOBSink's
+  symbolic-mode Finding witnesses the partial-overflow window.
+- **P8a.4** `test_p8a_4_overlay_concrete_then_symbolic_read` — a
+  symbolic read materializes the overlay; a subsequent concrete
+  write is mirrored in (Phase 6 invariant); a symbolic read
+  constrained to the write's offset returns the written byte.
+- **P8a.5** `test_p8a_5_constrain_to_alignment_and_overlay_load`
+  — ConstrainTo's predicate lands on path_condition, and a
+  region-tagged child sees `symbolic_load` return a z3 expression
+  rather than collapsing to default-0.
+- **P8a.6** `test_p8a_6_lazy_region_load_e2e` — a pre-declared
+  LazyRegion participates in `ConcretizeByRegion`; the resumed
+  load reads against the freshly-minted overlay.
+- **P8a.7** `test_p8a_7_no_region_falls_back_to_suspension` —
+  without `_region_at_suspension`, `symbolic_load` returns
+  NotImplemented and the existing suspension path fires; with
+  an empty strategy the path terminates `CONCRETIZATION_REFUSED`.
+
+**Future work still out of scope:**
+
 - **Typed pointer values.** A region × interval representation
   (a distinct `SymExpr` shape) instead of flat BitVec(64).
   Z3's theory of arrays handles the targets we care about.
 - **Cross-path state merging.** Per the non-goals.
 - **Auto-derived layouts.** Layouts are still analyst-supplied;
   points-to-driven `ConcretizeByRegion` is a future phase.
+- **Float-typed overlay slots.** `_coerce_store_value` lifts ints
+  / pointers / BitVecs; IEEE-typed stores aren't wired through
+  the overlay yet (the substrate's float path still rounds to a
+  bit pattern, but Phase 8a doesn't model float byte
+  decomposition end to end).
+- **Custom symbolic memory models.** The `symbolic_load` /
+  `symbolic_store` hooks aren't yet exposed on
+  `engine.intercept`; analyst-defined heap shapes (e.g. "every
+  malloc(N) returns a fresh region") would be a Phase 8b
+  addition with no further substrate work needed.
 
 ---
 
@@ -955,6 +997,7 @@ tests/symex/test_phase4.py
 tests/symex/test_phase5.py
 tests/symex/test_phase6.py
 tests/symex/test_phase7.py
+tests/symex/test_phase8a.py
 tests/symex/c/cwe787_oob_write.c
 ```
 
@@ -976,13 +1019,16 @@ include/multiplier/IR/Interpret/ConcreteMemory.h    # place_at if missing
 
 ## Definition of done
 
-- Phases 0–7 complete, each with its test suite green.
+- Phases 0–7 + 8a complete, each with its test suite green.
 - Phase 6: `tests/symex/test_phase6.py` 14 tests pass; sinks
   surface findings end-to-end on the worked example.
 - Phase 7: `ptr_add` / `ptr_diff` / `ptr_offset` dispatch through
   Python; `tests/symex/test_phase7.py` (7 tests, P7.1–P7.7)
   green; the CWE-787 worked example produces a reproducible
   `oob_write` Finding (P7.5).
+- Phase 8a: substrate consults `symbolic_load` / `symbolic_store`
+  before suspending; `tests/symex/test_phase8a.py` (7 tests,
+  P8a.1–P8a.7) green; total `tests/symex` count is 86.
 - The 235-test pre-existing harness still passes (regression gate).
 - Public API has docstrings; the README links to the Phase 7
   walkthrough.

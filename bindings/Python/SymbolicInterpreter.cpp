@@ -256,6 +256,11 @@ PythonPolicy::~PythonPolicy() {
   Py_XDECREF(cached_resolve_call_);
   Py_XDECREF(cached_mem_read_);
   Py_XDECREF(cached_mem_write_);
+  Py_XDECREF(cached_ptr_add_);
+  Py_XDECREF(cached_ptr_diff_);
+  Py_XDECREF(cached_ptr_offset_);
+  Py_XDECREF(cached_symbolic_load_);
+  Py_XDECREF(cached_symbolic_store_);
 }
 
 PyObject *PythonPolicy::lookup_method(PyObject *&cache, const char *name) {
@@ -617,6 +622,48 @@ bool PythonPolicy::mem_write(PythonScheduler &, const SharedPyPtr &addr,
   concrete_write_to_mem(memory_, *a, python_to_value(val.Get()),
                         hint.size_bytes, hint.is_float);
   return true;
+}
+
+// Phase 8a: symbolic-LOAD dispatch. The substrate consults this before
+// falling through to `with_address`'s suspension path. Python returns a
+// resolved value (typically a z3 Select against the region overlay) when
+// it can claim the access; NotImplemented (or Py_None) means "fall
+// through to the existing suspension path."
+bool PythonPolicy::exec_symbolic_load_impl(PythonScheduler &,
+                                            const SharedPyPtr &addr,
+                                            const MemAccessHint &hint,
+                                            SharedPyPtr &result) {
+  PyObject *method = lookup_method(cached_symbolic_load_, "symbolic_load");
+  if (!method) return false;
+  PyObject *py_result = PyObject_CallFunction(
+      method, "OIi", addr.Get(), hint.size_bytes,
+      static_cast<int>(hint.is_float));
+  if (py_result && py_result != Py_NotImplemented && py_result != Py_None) {
+    result = SharedPyPtr(py_result);
+    Py_DECREF(py_result);
+    return true;
+  }
+  Py_XDECREF(py_result);
+  PyErr_Clear();
+  return false;
+}
+
+bool PythonPolicy::exec_symbolic_store_impl(PythonScheduler &,
+                                             const SharedPyPtr &addr,
+                                             const SharedPyPtr &val,
+                                             const MemAccessHint &hint) {
+  PyObject *method = lookup_method(cached_symbolic_store_, "symbolic_store");
+  if (!method) return false;
+  PyObject *py_result = PyObject_CallFunction(
+      method, "OOIi", addr.Get(), val.Get(), hint.size_bytes,
+      static_cast<int>(hint.is_float));
+  if (py_result && py_result != Py_NotImplemented) {
+    Py_DECREF(py_result);
+    return true;
+  }
+  Py_XDECREF(py_result);
+  PyErr_Clear();
+  return false;
 }
 
 bool PythonPolicy::mem_bulk_op(PythonScheduler &, MemOp sub,

@@ -300,6 +300,35 @@ struct Policy {
         std::forward<Body>(body));
   }
 
+  // Phase 8a: symbolic-address dispatch for LOAD / STORE. Policies that
+  // can resolve a non-extractable address through their own machinery
+  // (e.g. a per-region z3 Array overlay) override `_impl` and return
+  // true after populating `result` (load) or claiming the write
+  // (store). The default returns false, leaving the caller to fall
+  // through to `with_address` and the existing concrete / suspension
+  // path. Concrete policies inherit the default verbatim.
+  bool exec_symbolic_load(auto &sched, const ValueT &addr,
+                          const MemAccessHint &hint, ValueT &result) {
+    return self().exec_symbolic_load_impl(sched, addr, hint, result);
+  }
+
+  bool exec_symbolic_store(auto &sched, const ValueT &addr,
+                           const ValueT &val, const MemAccessHint &hint) {
+    return self().exec_symbolic_store_impl(sched, addr, val, hint);
+  }
+
+  bool exec_symbolic_load_impl(auto & /*sched*/, const ValueT & /*addr*/,
+                               const MemAccessHint & /*hint*/,
+                               ValueT & /*result*/) {
+    return false;
+  }
+
+  bool exec_symbolic_store_impl(auto & /*sched*/, const ValueT & /*addr*/,
+                                const ValueT & /*val*/,
+                                const MemAccessHint & /*hint*/) {
+    return false;
+  }
+
   // Default override target for `with_address`. Concrete policies inherit
   // this verbatim — `extract_address` always succeeds for concrete values,
   // so the body runs inline and the function returns true.

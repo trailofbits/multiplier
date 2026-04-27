@@ -151,6 +151,19 @@ class PythonPolicy
   void mem_unpoison(const SharedPyPtr &addr);
   bool is_undefined(const SharedPyPtr &val);
 
+  // Phase 8a: symbolic-address dispatch. Consults the Python policy's
+  // `symbolic_load` / `symbolic_store` methods before the substrate
+  // suspends; when Python claims the access (e.g. via a region-overlay
+  // read), the substrate uses the returned value and skips suspension.
+  bool exec_symbolic_load_impl(PythonScheduler &sched,
+                               const SharedPyPtr &addr,
+                               const MemAccessHint &hint,
+                               SharedPyPtr &result);
+  bool exec_symbolic_store_impl(PythonScheduler &sched,
+                                const SharedPyPtr &addr,
+                                const SharedPyPtr &val,
+                                const MemAccessHint &hint);
+
   // Symbolic-address suspension. Inline-resolve concrete addresses;
   // when extract_address fails AND the callsite supplies a real
   // `addr_eid`, snapshot the state, re-push the current work item, and
@@ -211,6 +224,8 @@ class PythonPolicy
   PyObject *cached_ptr_add_{nullptr};
   PyObject *cached_ptr_diff_{nullptr};
   PyObject *cached_ptr_offset_{nullptr};
+  PyObject *cached_symbolic_load_{nullptr};
+  PyObject *cached_symbolic_store_{nullptr};
 
   PyObject *lookup_method(PyObject *&cache, const char *name);
 };

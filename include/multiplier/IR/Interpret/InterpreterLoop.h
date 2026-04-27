@@ -824,6 +824,20 @@ inline void exec_load(auto &state, PolicyT &policy,
   ValueT addr = val<ValueT>(frame, mi->address());
   auto inst_eid = eid(inst);
   auto addr_eid = eid(mi->address());
+
+  // Phase 8a: when the address didn't extract concretely but does carry
+  // an operand eid, give the policy a chance to resolve the load
+  // symbolically (e.g. via a region-overlay z3 Select). Returning false
+  // falls through to `with_address`, preserving the existing suspension
+  // behavior for policies that don't override the hook.
+  if (!policy.extract_address(addr) && addr_eid != kInvalidEntityId) {
+    ValueT result;
+    if (policy.exec_symbolic_load(sched, addr, hint, result)) {
+      frame.values[inst_eid] = result;
+      return;
+    }
+  }
+
   policy.with_address(addr, policy.memory(), hint, addr_eid, state, sched,
       [&](auto &p, ConcreteMemory & /*mem*/, uint64_t a) {
         ValueT result;
@@ -844,6 +858,14 @@ inline void exec_store(auto &state, PolicyT &policy,
   ValueT addr = val<ValueT>(frame, mi->address());
   ValueT stored = val<ValueT>(frame, mi->stored_value());
   auto addr_eid = eid(mi->address());
+
+  // Phase 8a: symmetric symbolic-STORE short-circuit (see exec_load).
+  if (!policy.extract_address(addr) && addr_eid != kInvalidEntityId) {
+    if (policy.exec_symbolic_store(sched, addr, stored, hint)) {
+      return;
+    }
+  }
+
   policy.with_address(addr, policy.memory(), hint, addr_eid, state, sched,
       [&](auto &p, ConcreteMemory & /*mem*/, uint64_t a) {
         ValueT addr_val = p.make_literal_ptr(a);

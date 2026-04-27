@@ -586,6 +586,123 @@ class InterceptorPolicy:
         # to actually mutate memory. Tell the substrate not to redo it.
         return None
 
+    # ------------------------------------------------------------------
+    # Phase 8a: symbolic-address LOAD / STORE
+    # ------------------------------------------------------------------
+    #
+    # Called by the substrate's `with_address`-equivalent path *before*
+    # suspension when the address didn't extract to ("ptr", N). When the
+    # current path was forked via `SplitByRegion` it carries
+    # `_region_at_suspension`; we read/write through that region's z3
+    # Array overlay so subsequent ops keep propagating symbolically.
+    # Returning NotImplemented falls back to the substrate's existing
+    # suspension path — the right answer when no region context is
+    # available (so analyst mistakes surface as suspension rather than
+    # silently collapsing to default-zero reads).
+
+    def symbolic_load(self, addr, size, is_float):
+        if not _is_z3(addr):
+            return NotImplemented
+        z3 = _z3_module()
+        if z3 is None:
+            return NotImplemented
+        path = self._path
+        region_name = getattr(path, "_region_at_suspension", None)
+        if region_name is None or self._layout is None:
+            return NotImplemented
+        region = self._layout.region_for_name(region_name)
+        if region is None:
+            return NotImplemented
+
+        size_i = int(size)
+        bytes_z = [region.select_byte(addr + i) for i in range(size_i)]
+        if size_i == 1:
+            result = bytes_z[0]
+        else:
+            # z3.Concat is MSB-first; little-endian means byte 0 is the
+            # low byte, hence reversed().
+            result = z3.Concat(*reversed(bytes_z))
+
+        ctx = self._make_ctx()
+        self._fire_observers(MEMORY_READ, Phase.BEFORE, ctx,
+                             addr=addr, size=size_i,
+                             is_float=bool(is_float),
+                             region=region_name)
+        self._fire_observers(MEMORY_READ, Phase.AFTER, ctx,
+                             addr=addr, size=size_i,
+                             is_float=bool(is_float), value=result,
+                             handled=True, region=region_name)
+        self._record_memory_event(ctx, MEMORY_READ, addr, size_i,
+                                  region_name, value=result,
+                                  is_float=bool(is_float))
+        self._fire_sinks(MEMORY_READ, ctx,
+                         {"addr": addr, "size": size_i,
+                          "value": result, "region": region_name,
+                          "is_float": bool(is_float)})
+        return result
+
+    def symbolic_store(self, addr, val, size, is_float):
+        if not _is_z3(addr):
+            return NotImplemented
+        z3 = _z3_module()
+        if z3 is None:
+            return NotImplemented
+        path = self._path
+        region_name = getattr(path, "_region_at_suspension", None)
+        if region_name is None or self._layout is None:
+            return NotImplemented
+        region = self._layout.region_for_name(region_name)
+        if region is None:
+            return NotImplemented
+
+        size_i = int(size)
+        val_z = self._coerce_store_value(val, size_i, z3)
+        if val_z is None:
+            return NotImplemented
+        for i in range(size_i):
+            byte_i = z3.Extract(8 * i + 7, 8 * i, val_z)
+            region.store_byte(addr + i, byte_i)
+
+        ctx = self._make_ctx()
+        self._fire_observers(MEMORY_WRITE, Phase.BEFORE, ctx,
+                             addr=addr, size=size_i,
+                             value=val, is_float=bool(is_float),
+                             region=region_name)
+        self._fire_observers(MEMORY_WRITE, Phase.AFTER, ctx,
+                             addr=addr, size=size_i,
+                             value=val, is_float=bool(is_float),
+                             handled=True, region=region_name)
+        self._record_memory_event(ctx, MEMORY_WRITE, addr, size_i,
+                                  region_name, value=val,
+                                  is_float=bool(is_float))
+        self._fire_sinks(MEMORY_WRITE, ctx,
+                         {"addr": addr, "size": size_i,
+                          "value": val, "region": region_name,
+                          "is_float": bool(is_float)})
+        return True
+
+    def _coerce_store_value(self, val, size, z3):
+        """Lift a substrate-shaped store value to a z3 BitVec of `8*size`
+        bits. Accepts ints, bools, `("ptr", N)` tuples, and z3 BitVecs.
+        Returns None for shapes the overlay can't represent (floats
+        aren't wired here yet)."""
+        bits = 8 * int(size)
+        if isinstance(val, bool):
+            return z3.BitVecVal(int(val), bits)
+        if isinstance(val, int):
+            return z3.BitVecVal(val & ((1 << bits) - 1), bits)
+        if isinstance(val, tuple) and len(val) == 2 and \
+                val[0] == VALUE_TAG_PTR:
+            return z3.BitVecVal(int(val[1]) & ((1 << bits) - 1), bits)
+        if isinstance(val, z3.BitVecRef):
+            cur = val.size()
+            if cur == bits:
+                return val
+            if cur < bits:
+                return z3.ZeroExt(bits - cur, val)
+            return z3.Extract(bits - 1, 0, val)
+        return None
+
     def resolve_call(self, target_eid, indirect_eid, args_list,
                      is_indirect):
         # Args land as a Python list of raw values (ints, ("ptr", N)
