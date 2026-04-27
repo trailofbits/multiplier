@@ -19,7 +19,7 @@ fires only on those sites with a `LoopContext` attached to `ctx.loop`.
 """
 
 from .dispatch import make_selector, _FORK
-from .events import ALL_EVENTS, BRANCH
+from .events import ALL_EVENTS, BRANCH, LOOP
 from .loop import LoopContext, _bump_path_counter
 
 
@@ -30,7 +30,7 @@ class InterceptDispatcher:
         self._engine = engine
 
     def __getattr__(self, name):
-        if name == "loop":
+        if name == LOOP:
             return _LoopDecorator(self._engine)
         if name not in ALL_EVENTS:
             raise AttributeError(

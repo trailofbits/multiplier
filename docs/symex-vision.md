@@ -456,20 +456,33 @@ useful primitive.
 **Goal:** the analyst can answer "what happened, where, why."
 
 - `path.events.where(...)` — predicate queries on the structured
-  event log. Operators: `kind__in`, `addr__between`, `name__eq`,
-  `step__gt`, etc.
-- `path.dot_cfg()` — emit a Graphviz of blocks visited, edges
-  taken, with annotations (which step, which hook fired).
-- `path.summary()` — human-readable: function/block visited,
-  globals touched, branches forked, suspension reason if not
-  completed.
-- Multi-path queries: `paths.first(events__contains="global_write:g_admin")`,
-  `paths.where(tags__contains="leak")`.
-- z3 integration: `path.solver.model()`,
-  `path.assert_(cond)` (no-op on the live path; prunes
-  unsatisfiable forks).
+  event log via the `EventLog` (a `list` subclass with predicate
+  methods). Operators: bare `field=v`, `__in=(…)`, `__between=(lo, hi)`,
+  `__gt`, `__lt`, `__ge`, `__le`, `__ne`, `__contains`. Companion
+  helpers: `events.first(...)`, `events.count(...)`.
+- `paths` is a `PathSet` (a `list` subclass) with the same
+  `where` / `first` / `count` shape over path-level filters:
+  `terminal=`, `return_value=`, `tags__contains=`,
+  `events__contains_kind=`, `events__contains_addr=`.
+- `path.summary()` — multi-line human-readable summary: function
+  name, terminal kind, return value, step count, globals_touched,
+  branch_forks, event count, tags.
+- `path.dot_cfg()` — emit a Graphviz string of branch transitions
+  this path took. Phase 4 caveat: the substrate doesn't yet emit
+  a per-block-enter event to Python, so the rendered graph is the
+  branch-transition graph, not every block visited.
+- z3 integration: `ctx.solver.fresh_int(name, *, size, lo=None,
+  hi=None)` mints (or returns the cached) z3 BitVec and adds the
+  bound constraints. `path.assert_(cond)` adds an assertion and
+  marks the path `terminal="infeasible"` if the resulting
+  constraint set is unsat. `path.solver.model()` runs `check()`
+  and returns `{name: int}` on `sat`, None on `unsat`.
+  `compare` / `binary_op` / `unary_op` produce derived z3 exprs
+  when an operand is a z3 expression; branch forks accumulate the
+  branch condition (`cond` on the true child, `Not(cond)` on the
+  false child) onto `path.path_condition`.
 
-**Tests:** P4.1–P4.6.
+**Tests:** P4.1–P4.6 plus the un-skipped `P1.5_z3_named_global`.
 
 ### Phase 5 — concretization strategies
 

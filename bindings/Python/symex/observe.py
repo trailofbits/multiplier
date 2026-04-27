@@ -18,7 +18,7 @@ observer (and the rest of execution).
 """
 
 from .dispatch import make_selector
-from .events import ALL_EVENTS
+from .events import ALL_EVENTS, Phase
 
 
 class _PhaseDispatcher:
@@ -49,15 +49,15 @@ class ObserveDispatcher:
 
     def __init__(self, engine):
         self._engine = engine
-        self.before = _PhaseDispatcher(engine, "before")
-        self.after = _PhaseDispatcher(engine, "after")
+        self.before = _PhaseDispatcher(engine, Phase.BEFORE)
+        self.after = _PhaseDispatcher(engine, Phase.AFTER)
 
     def __getattr__(self, name):
         if name not in ALL_EVENTS:
             raise AttributeError(
                 f"unknown observe event: {name!r} "
                 f"(known: {sorted(ALL_EVENTS)})")
-        return _ObserveDecorator(self._engine, name, "after")
+        return _ObserveDecorator(self._engine, name, Phase.AFTER)
 
 
 class _ObserveDecorator:

@@ -20,6 +20,19 @@ a concrete answer for concrete branch conditions without any extra IR
 walk at dispatch time.
 """
 
+from enum import StrEnum
+
+
+class EdgeKind(StrEnum):
+    TREE = "tree"
+    FORWARD = "forward"
+    BACK = "back"
+
+
+class _DfsColor(StrEnum):
+    ON_STACK = "on_stack"
+    VISITED = "visited"
+
 
 class CFGInfo:
     """Result of `classify_edges`. All fields are immutable after the
@@ -40,7 +53,7 @@ class CFGInfo:
         self.branch_to_src = {}
 
     def is_back_edge(self, src, dst):
-        return self.classification.get((src, dst)) == "back"
+        return self.classification.get((src, dst)) == EdgeKind.BACK
 
     def loop_info_for_branch(self, true_dst, false_dst):
         """Return the loop_branches entry for the cond_branch whose
@@ -80,10 +93,9 @@ def classify_edges(ir_func):
         # Pick the lowest-id block as entry if the IR didn't surface one.
         entry = blocks[min(blocks)]
 
-    # 'on_stack' = currently in DFS path; 'visited' = finished
     color = {}
     stack = []  # (node_id, sorted_succ_ids, child_index)
-    color[entry.id] = "on_stack"
+    color[entry.id] = _DfsColor.ON_STACK
     stack.append([entry.id,
                   sorted(s.id for s in blocks[entry.id].successors), 0])
 
@@ -91,28 +103,28 @@ def classify_edges(ir_func):
         frame = stack[-1]
         node_id, succs, idx = frame
         if idx >= len(succs):
-            color[node_id] = "visited"
+            color[node_id] = _DfsColor.VISITED
             stack.pop()
             continue
         child_id = succs[idx]
         frame[2] = idx + 1
 
         if child_id not in color:
-            info.classification[(node_id, child_id)] = "tree"
-            color[child_id] = "on_stack"
+            info.classification[(node_id, child_id)] = EdgeKind.TREE
+            color[child_id] = _DfsColor.ON_STACK
             stack.append([child_id,
                           sorted(s.id for s in
                                  blocks.get(child_id, blocks[node_id])
                                  .successors), 0])
-        elif color[child_id] == "on_stack":
-            info.classification[(node_id, child_id)] = "back"
+        elif color[child_id] == _DfsColor.ON_STACK:
+            info.classification[(node_id, child_id)] = EdgeKind.BACK
             info.back_edges.append((node_id, child_id))
             info.header_blocks.add(child_id)
             info.latch_blocks.add(node_id)
         else:
             # Forward (DFS-tree descendant) or cross (sibling subtree).
             # We don't distinguish; both are non-loop edges.
-            info.classification[(node_id, child_id)] = "forward"
+            info.classification[(node_id, child_id)] = EdgeKind.FORWARD
 
     # Any block not reached by DFS still gets classification entries for
     # its outgoing edges (best-effort; unreachable blocks are rare in
@@ -121,7 +133,8 @@ def classify_edges(ir_func):
         if block.id in color:
             continue
         for s in block.successors:
-            info.classification.setdefault((block.id, s.id), "forward")
+            info.classification.setdefault((block.id, s.id),
+                                            EdgeKind.FORWARD)
 
     # Build the (true, false) -> src reverse map and the loop_branches
     # table. Iterate ir_func.blocks (not the dict) so deterministic.

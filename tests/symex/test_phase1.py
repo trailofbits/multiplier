@@ -97,12 +97,35 @@ def test_p1_4_path_event_log_records_branches(index):
         assert "false_block" in last
 
 
-# --- P1.5 z3 named global (deferred) -------------------------------------
+# --- P1.5 z3 named global ------------------------------------------------
 
-@pytest.mark.skip(reason="z3 lazy-global readback lands with the "
-                          "Phase 4 solver integration")
-def test_p1_5_z3_named_global():
-    pass
+def test_p1_5_z3_named_global(index):
+    """Phase 4 z3 wiring: an intercept.memory_read returns a fresh
+    z3 BitVec ("the named global is symbolic"), the cmp on it forks
+    the path, and each child carries the branch condition. Solving on
+    one fork gives a satisfying input."""
+    z3 = pytest.importorskip("z3")
+
+    engine = SymExEngine(index)
+    fired = []
+
+    @engine.intercept.memory_read
+    def hook(ctx, addr, size, next_hook):
+        if not fired:
+            fired.append(addr)
+            return ctx.solver.fresh_int("g", size=size, lo=0, hi=255)
+        return next_hook(ctx, addr, size)
+
+    paths = engine.explore("factorial",
+                           args=[5],
+                           until=ExploreUntil.path_count(2),
+                           slice_steps=400)
+    branched = paths.where(events__contains_kind="branch")
+    assert len(branched) >= 1
+    p = branched[0]
+    model = p.solver.model()
+    assert model is not None and "g" in model
+    assert 0 <= model["g"] <= 255
 
 
 # --- P1.6 ExploreUntil.path_count ----------------------------------------

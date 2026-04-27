@@ -17,6 +17,8 @@ the chain. To short-circuit with the substrate's natural default
 `ctx.stop_path()` and then return `ctx.default()` (or any value).
 """
 
+from .events import Terminal
+
 
 class Ctx:
     """Per-event service locator.
@@ -53,4 +55,4 @@ class Ctx:
         `ctx.default()`).
         """
         if self.path is not None:
-            self.path.terminal = "stopped"
+            self.path.terminal = Terminal.STOPPED

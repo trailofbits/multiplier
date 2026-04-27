@@ -30,14 +30,29 @@ the analyst writing a propagation policy.
 
 import struct as _struct
 
+import multiplier as mx
+
 from .ctx import Ctx
 from .events import (
     MEMORY_READ, MEMORY_WRITE,
     GLOBAL_READ, GLOBAL_WRITE,
     CALL, INDIRECT_CALL,
     BRANCH, LOOP, CONCRETIZE,
+    EventKind, Phase, CallAction, VALUE_TAG_PTR,
 )
 from .lens import MemView, ArgsView
+
+_OP = mx.ir.OpCode
+
+
+def _op_range(lo_name, hi_name):
+    """Build an `(int, int)` inclusive range from two `mx.ir.OpCode`
+    enum names. Anchoring to the enum (rather than hardcoded numeric
+    boundaries) means ranges track OpCode.h automatically — adding a
+    new opcode in the gap between two width-grouped opcodes would
+    surface as a Python error rather than silently shifting the lookup.
+    """
+    return (int(getattr(_OP, lo_name)), int(getattr(_OP, hi_name)))
 
 
 class SymExpr:
@@ -70,7 +85,7 @@ def extract_addr(addr):
     bare ints occasionally; both normalize to an int. Anything else
     (e.g., SymExpr) yields None.
     """
-    if isinstance(addr, tuple) and len(addr) == 2 and addr[0] == "ptr":
+    if isinstance(addr, tuple) and len(addr) == 2 and addr[0] == VALUE_TAG_PTR:
         return int(addr[1])
     if isinstance(addr, int) and not isinstance(addr, bool):
         return int(addr)
@@ -254,7 +269,7 @@ def _make_default_mem_write(is_float):
             ctx.mem.write_bytes(
                 addr, val.to_bytes(size, "little", signed=(val < 0)))
             return None
-        if isinstance(val, tuple) and len(val) == 2 and val[0] == "ptr":
+        if isinstance(val, tuple) and len(val) == 2 and val[0] == VALUE_TAG_PTR:
             ctx.mem.write_bytes(
                 addr, int(val[1]).to_bytes(size, "little", signed=False))
             return None
@@ -287,6 +302,160 @@ def _default_branch(ctx, condition):
     if isinstance(condition, (int, bool)):
         return condition != 0
     return _FORK
+
+
+# ---- z3 helpers (lazy-imported, then cached so non-z3 analysts pay
+#      one import lookup ever and z3 analysts pay zero per IR op) ----
+
+_Z3 = None  # cached `z3` module; `False` = import attempted and failed.
+
+
+def _z3_module():
+    """Return the `z3` module, or None if it isn't installed.
+
+    The module reference is cached so the per-IR-op `_is_z3` check
+    isn't paying for `try: import z3` (and especially not paying for an
+    `ImportError` raise+catch when z3 isn't installed) on every call.
+    """
+    global _Z3
+    if _Z3 is None:
+        try:
+            import z3 as _module
+            _Z3 = _module
+        except ImportError:
+            _Z3 = False
+    return _Z3 if _Z3 is not False else None
+
+
+def _is_z3(value):
+    """Return True if `value` is a z3 expression (BitVec or Bool)."""
+    z3 = _z3_module()
+    return z3 is not None and isinstance(value, z3.ExprRef)
+
+
+def _z3_bool(value):
+    """Coerce a z3 value to a z3 boolean.
+
+    BitVecs become `value != 0`; bools pass through. Anything else
+    returns None — callers treat None as "can't represent this
+    symbolically; defer to substrate fork".
+    """
+    z3 = _z3_module()
+    if z3 is None:
+        return None
+    if isinstance(value, z3.BoolRef):
+        return value
+    if isinstance(value, z3.BitVecRef):
+        return value != 0
+    return None
+
+
+def _z3_coerce(v, sample):
+    """Coerce concrete `v` into z3 form, sized like `sample` if it's a
+    BitVec. Already-z3 inputs pass through."""
+    z3 = _z3_module()
+    if z3 is None:
+        return None
+    if isinstance(v, z3.ExprRef):
+        return v
+    if isinstance(v, bool):
+        v = int(v)
+    if isinstance(v, int):
+        if isinstance(sample, z3.BitVecRef):
+            return z3.BitVecVal(v, sample.size())
+        return z3.BitVecVal(v, 64)
+    return None
+
+
+# Per-arity dispatch tables: each entry is `(opcode_range, builder)`.
+# Builders for ops that need a z3 module function take (z3, a[, b]) so
+# the cached `_z3_module()` reference flows through; the rest are pure
+# operator overloads. Anchoring the ranges to `mx.ir.OpCode` keeps the
+# tables in lockstep with the C++ enum.
+_COMPARE_TABLE = [
+    (_op_range("CMP_EQ_8",  "CMP_EQ_64"),  lambda z3, a, b: a == b),
+    (_op_range("CMP_NE_8",  "CMP_NE_64"),  lambda z3, a, b: a != b),
+    (_op_range("CMP_LT_8",  "CMP_LT_64"),  lambda z3, a, b: a <  b),
+    (_op_range("CMP_LE_8",  "CMP_LE_64"),  lambda z3, a, b: a <= b),
+    (_op_range("CMP_GT_8",  "CMP_GT_64"),  lambda z3, a, b: a >  b),
+    (_op_range("CMP_GE_8",  "CMP_GE_64"),  lambda z3, a, b: a >= b),
+    (_op_range("UCMP_LT_8", "UCMP_LT_64"), lambda z3, a, b: z3.ULT(a, b)),
+    (_op_range("UCMP_LE_8", "UCMP_LE_64"), lambda z3, a, b: z3.ULE(a, b)),
+    (_op_range("UCMP_GT_8", "UCMP_GT_64"), lambda z3, a, b: z3.UGT(a, b)),
+    (_op_range("UCMP_GE_8", "UCMP_GE_64"), lambda z3, a, b: z3.UGE(a, b)),
+]
+
+_BINARY_TABLE = [
+    (_op_range("ADD_8",     "ADD_64"),     lambda z3, a, b: a + b),
+    (_op_range("SUB_8",     "SUB_64"),     lambda z3, a, b: a - b),
+    (_op_range("MUL_8",     "MUL_64"),     lambda z3, a, b: a * b),
+    (_op_range("DIV_8",     "DIV_64"),     lambda z3, a, b: a / b),
+    (_op_range("REM_8",     "REM_64"),     lambda z3, a, b: z3.SRem(a, b)),
+    (_op_range("UDIV_8",    "UDIV_64"),    lambda z3, a, b: z3.UDiv(a, b)),
+    (_op_range("UREM_8",    "UREM_64"),    lambda z3, a, b: z3.URem(a, b)),
+    (_op_range("USHR_8",    "USHR_64"),    lambda z3, a, b: z3.LShR(a, b)),
+    (_op_range("BIT_AND_8", "BIT_AND_64"), lambda z3, a, b: a & b),
+    (_op_range("BIT_OR_8",  "BIT_OR_64"),  lambda z3, a, b: a | b),
+    (_op_range("BIT_XOR_8", "BIT_XOR_64"), lambda z3, a, b: a ^ b),
+    (_op_range("SHL_8",     "SHL_64"),     lambda z3, a, b: a << b),
+    (_op_range("SHR_8",     "SHR_64"),     lambda z3, a, b: a >> b),  # arith
+]
+
+_UNARY_TABLE = [
+    (_op_range("NEG_8",     "NEG_64"),     lambda z3, a: -a),
+    (_op_range("BIT_NOT_8", "BIT_NOT_64"), lambda z3, a: ~a),
+    (_op_range("ABS_8",     "ABS_64"),
+        lambda z3, a: z3.If(a < 0, -a, a)),
+]
+
+
+def _dispatch_op(table, op):
+    for lo_hi, builder in table:
+        if lo_hi[0] <= op <= lo_hi[1]:
+            return builder
+    return None
+
+
+def _z3_compare(op, lhs, rhs):
+    """Build a z3 boolean from a comparison opcode and two operands.
+
+    Returns None if the opcode isn't recognised — caller falls back to
+    `SymExpr` so analysts who care can still detect propagation.
+    """
+    z3 = _z3_module()
+    builder = _dispatch_op(_COMPARE_TABLE, op)
+    if z3 is None or builder is None:
+        return None
+    sample = lhs if _is_z3(lhs) else rhs
+    a = _z3_coerce(lhs, sample)
+    b = _z3_coerce(rhs, sample)
+    if a is None or b is None:
+        return None
+    return builder(z3, a, b)
+
+
+def _z3_binary(op, lhs, rhs):
+    """Build a z3 BitVec from a binary opcode. None on unsupported."""
+    z3 = _z3_module()
+    builder = _dispatch_op(_BINARY_TABLE, op)
+    if z3 is None or builder is None:
+        return None
+    sample = lhs if _is_z3(lhs) else rhs
+    a = _z3_coerce(lhs, sample)
+    b = _z3_coerce(rhs, sample)
+    if a is None or b is None:
+        return None
+    return builder(z3, a, b)
+
+
+def _z3_unary(op, operand):
+    if not _is_z3(operand):
+        return None
+    z3 = _z3_module()
+    builder = _dispatch_op(_UNARY_TABLE, op)
+    if z3 is None or builder is None:
+        return None
+    return builder(z3, operand)
 
 
 # -----------------------------------------------------------------------
@@ -330,7 +499,7 @@ class InterceptorPolicy:
         ctx = self._make_ctx()
         size_i = int(size)
 
-        self._fire_observers(MEMORY_READ, "before", ctx,
+        self._fire_observers(MEMORY_READ, Phase.BEFORE, ctx,
                              addr=addr_int, size=size_i,
                              is_float=bool(is_float))
 
@@ -342,13 +511,13 @@ class InterceptorPolicy:
         except Exception as exc:  # noqa: BLE001
             self._record_handler_error(ctx, MEMORY_READ, exc,
                                        role="intercept")
-            self._fire_observers(MEMORY_READ, "after", ctx,
+            self._fire_observers(MEMORY_READ, Phase.AFTER, ctx,
                                  addr=addr_int, size=size_i,
                                  is_float=bool(is_float), value=None,
                                  handled=False)
             return NotImplemented
 
-        self._fire_observers(MEMORY_READ, "after", ctx,
+        self._fire_observers(MEMORY_READ, Phase.AFTER, ctx,
                              addr=addr_int, size=size_i,
                              is_float=bool(is_float), value=value,
                              handled=True)
@@ -361,7 +530,7 @@ class InterceptorPolicy:
         ctx = self._make_ctx()
         size_i = int(size)
 
-        self._fire_observers(MEMORY_WRITE, "before", ctx,
+        self._fire_observers(MEMORY_WRITE, Phase.BEFORE, ctx,
                              addr=addr_int, size=size_i,
                              value=val, is_float=bool(is_float))
 
@@ -374,7 +543,7 @@ class InterceptorPolicy:
             self._record_handler_error(ctx, MEMORY_WRITE, exc,
                                        role="intercept")
 
-        self._fire_observers(MEMORY_WRITE, "after", ctx,
+        self._fire_observers(MEMORY_WRITE, Phase.AFTER, ctx,
                              addr=addr_int, size=size_i,
                              value=val, is_float=bool(is_float),
                              handled=True)
@@ -399,7 +568,7 @@ class InterceptorPolicy:
         candidate_name = (indirect_name if is_indirect and indirect_name
                           else target_name)
 
-        self._fire_observers(event, "before", ctx,
+        self._fire_observers(event, Phase.BEFORE, ctx,
                              target_eid=target_for_match,
                              name=candidate_name, args=args,
                              is_indirect=is_indirect)
@@ -420,48 +589,66 @@ class InterceptorPolicy:
             chosen = _DEFER
 
         if chosen is _DEFER:
-            self._fire_observers(event, "after", ctx,
+            self._fire_observers(event, Phase.AFTER, ctx,
                                  target_eid=target_for_match,
                                  name=candidate_name, args=args,
                                  is_indirect=is_indirect, return_value=None,
                                  handled=False)
             return None  # PythonPolicy treats None as "fall through".
 
-        self._fire_observers(event, "after", ctx,
+        self._fire_observers(event, Phase.AFTER, ctx,
                              target_eid=target_for_match,
                              name=candidate_name, args=args,
                              is_indirect=is_indirect, return_value=chosen,
                              handled=True)
         if isinstance(chosen, tuple) and len(chosen) == 2 and \
-                chosen[0] in ("skip", "model"):
+                chosen[0] in (CallAction.SKIP, CallAction.MODEL):
             return chosen
-        return ("skip", chosen)
+        return (CallAction.SKIP, chosen)
 
     # ----- pure ops: propagate symbolic values, else fall through -----
 
     def compare(self, op, lhs, rhs):
         if _is_concrete(lhs) and _is_concrete(rhs):
             return NotImplemented
+        if _is_z3(lhs) or _is_z3(rhs):
+            z = _z3_compare(op, lhs, rhs)
+            if z is not None:
+                return z
         return SymExpr("cmp", (op, lhs, rhs))
 
     def binary_op(self, op, lhs, rhs):
         if _is_concrete(lhs) and _is_concrete(rhs):
             return NotImplemented
+        if _is_z3(lhs) or _is_z3(rhs):
+            z = _z3_binary(op, lhs, rhs)
+            if z is not None:
+                return z
         return SymExpr("bin", (op, lhs, rhs))
 
     def unary_op(self, op, operand):
         if _is_concrete(operand):
             return NotImplemented
+        if _is_z3(operand):
+            z = _z3_unary(op, operand)
+            if z is not None:
+                return z
         return SymExpr("un", (op, operand))
 
     def cast(self, op, operand):
         if _is_concrete(operand):
             return NotImplemented
+        # No z3 cast lowering yet; SymExpr keeps propagation visible.
         return SymExpr("cast", (op, operand))
 
     # ----- truth + branch resolution: fork on non-concrete -----
 
     def is_true(self, val):
+        # z3 truths always force a fork — the substrate enumerates
+        # both edges and the branch handler accumulates the path
+        # condition.
+        if _is_z3(val):
+            return None
         # If the analyst registered any BRANCH handlers, fall through to
         # `resolve_branch` (where we have the target eids) so they get a
         # chance to fire. The Phase 2 fast path only applies when no
@@ -498,7 +685,8 @@ class InterceptorPolicy:
             return True
 
         handlers = self._matching_handlers(BRANCH, _match)
-        if not handlers and isinstance(condition, (int, bool)):
+        if not handlers and isinstance(condition, (int, bool)) and \
+                not _is_z3(condition):
             return condition != 0  # Phase 2 fast path
         if not handlers:
             return None  # symbolic, no handler — let substrate fork
@@ -552,7 +740,7 @@ class InterceptorPolicy:
         to avoid duplicates."""
         if event == BRANCH:
             return
-        if phase != "after":
+        if phase != Phase.AFTER:
             return
         path = ctx.path
         if path is None:
@@ -566,9 +754,10 @@ class InterceptorPolicy:
         path = ctx.path
         if path is None:
             return
+        kind = (EventKind.OBSERVER_ERROR if role.startswith("observer")
+                else EventKind.INTERCEPT_ERROR)
         path.events.append({
-            "kind": "observer_error" if role.startswith("observer") else
-                    "intercept_error",
+            "kind": kind,
             "event": event,
             "role": role,
             "error": repr(exc),
@@ -596,7 +785,8 @@ def _is_concrete(value):
         return True
     if isinstance(value, (int, bool)):
         return True
-    if isinstance(value, tuple) and len(value) == 2 and value[0] == "ptr":
+    if isinstance(value, tuple) and len(value) == 2 and \
+            value[0] == VALUE_TAG_PTR:
         return True
     return False
 
