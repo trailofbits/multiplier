@@ -151,6 +151,16 @@ class PythonPolicy
   void mem_unpoison(const SharedPyPtr &addr);
   bool is_undefined(const SharedPyPtr &val);
 
+  // Phase 8d: per-block-enter event. Fires `engine.observe.block_enter`
+  // observers and appends a structured entry to `path.events`.
+  template <typename StateT>
+  void on_enter_block(StateT &, const IRBlock &block) {
+    on_enter_block_impl(block);
+  }
+  // Implementation is non-templated so it can use lookup_method without
+  // bloating each StateT instantiation.
+  void on_enter_block_impl(const IRBlock &block);
+
   // Phase 8a: symbolic-address dispatch. Consults the Python policy's
   // `symbolic_load` / `symbolic_store` methods before the substrate
   // suspends; when Python claims the access (e.g. via a region-overlay
@@ -226,6 +236,7 @@ class PythonPolicy
   PyObject *cached_ptr_offset_{nullptr};
   PyObject *cached_symbolic_load_{nullptr};
   PyObject *cached_symbolic_store_{nullptr};
+  PyObject *cached_on_enter_block_{nullptr};
 
   PyObject *lookup_method(PyObject *&cache, const char *name);
 };

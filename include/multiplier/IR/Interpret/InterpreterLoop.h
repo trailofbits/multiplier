@@ -157,8 +157,11 @@ inline void push_block_work_items(auto &state, const IRBlock &block) {
   }
 }
 
-template <typename ValueT>
-inline void enter_block(auto &state, const IRBlock &block) {
+template <typename PolicyT, typename ValueT>
+inline void enter_block(auto &state, PolicyT &policy, const IRBlock &block) {
+  // Phase 8d: notify the policy of the block entry so analysts can
+  // observe every block visit (not only branch transitions).
+  policy.on_enter_block(state, block);
   // Clear transient values cache, then push roots.
   state.call_stack.top().values.clear();
   push_block_work_items<ValueT>(state, block);
@@ -479,12 +482,12 @@ inline void analyze(auto &state,
 // exec_goto — unconditional branch
 // ===========================================================================
 
-template <typename ValueT>
-inline void exec_goto(auto &state,
+template <typename PolicyT, typename ValueT>
+inline void exec_goto(auto &state, PolicyT &policy,
                       const IRInstruction &inst) {
   auto br = BranchInst::from(inst);
   if (br) {
-    enter_block<ValueT>(state, br->target_block());
+    enter_block<PolicyT, ValueT>(state, policy, br->target_block());
   }
 }
 
@@ -1347,7 +1350,7 @@ inline void decide_cond_branch(auto &state, PolicyT &policy,
   auto truth = policy.is_true(cond);
   if (truth.has_value()) {
     auto target = *truth ? cb->true_block() : cb->false_block();
-    enter_block<ValueT>(state, target);
+    enter_block<PolicyT, ValueT>(state, policy, target);
     return;
   }
 
@@ -1355,7 +1358,7 @@ inline void decide_cond_branch(auto &state, PolicyT &policy,
   IRBlock chosen;
   if (policy.resolve_branch(sched, cond, cb->true_block(),
                             cb->false_block(), chosen)) {
-    enter_block<ValueT>(state, chosen);
+    enter_block<PolicyT, ValueT>(state, policy, chosen);
     return;
   }
 
@@ -1398,12 +1401,12 @@ inline void decide_switch(auto &state, PolicyT &policy,
       continue;
     }
     if (sel_val >= sc.low() && sel_val <= sc.high()) {
-      enter_block<ValueT>(state, sc.target_block());
+      enter_block<PolicyT, ValueT>(state, policy, sc.target_block());
       return;
     }
   }
   if (EntityId(default_block.id()).Pack()) {
-    enter_block<ValueT>(state, default_block);
+    enter_block<PolicyT, ValueT>(state, policy, default_block);
   }
 }
 
@@ -1418,7 +1421,7 @@ inline void dispatch(auto &state, PolicyT &policy,
 
   switch (item.kind) {
     case WorkKind::ENTER_BLOCK:
-      enter_block<ValueT>(state, item.block);
+      enter_block<PolicyT, ValueT>(state, policy, item.block);
       break;
 
     case WorkKind::ANALYZE:
@@ -1564,7 +1567,7 @@ inline void dispatch(auto &state, PolicyT &policy,
       break;
     case WorkKind::EXEC_GOTO:
       ++state.steps;
-      exec_goto<ValueT>(state, item.inst);
+      exec_goto<PolicyT, ValueT>(state, policy, item.inst);
       break;
     case WorkKind::EXEC_UNREACHABLE:
       ++state.steps;

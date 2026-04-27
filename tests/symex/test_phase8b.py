@@ -159,17 +159,50 @@ def test_p8b_3_callee_concrete_return_propagates(index):
 
 
 def test_p8b_4_aggregate_return_still_reads_slot(index):
-    """An aggregate return — the function memcpys its result into the
-    return slot and the RET has no operand. Post-fix `has_ret_value`
-    is False so the slot read still fires. The current InterpretIR
-    corpus has no function whose top-level lowering exposes a
-    no-operand RET (every visible RET carries `[%val]`). Keep this as
-    a documented placeholder; revisit when a future fixture adds an
-    aggregate-return function we can observe directly."""
-    pytest.skip("no corpus function exposes RET-without-operand; "
-                "aggregate-return slot read remains tested transitively "
-                "via the unchanged tests/InterpretIR/ suite (struct "
-                "lowering exercises the same path)")
+    """An aggregate return: the function memcpys its result into the
+    return slot and exec_ret runs `read_return_value`, which for
+    `sz > 8` returns `frame.return_ptr` directly (the caller is
+    expected to MEMCPY out of it). Post-Phase-8c every RET carries
+    no operand, so this branch is the only correctness gate for
+    aggregate-typed callees.
+
+    `make_large` from `tests/InterpretIR/test_byvalue.c` returns a
+    20-byte `struct Large`, hitting the `sz > 8` branch. Drive it
+    standalone with concrete `base = 7`, then assert:
+
+      1. The path completes.
+      2. `path.return_value` is a `("ptr", N)` tuple — proves the
+         substrate took the `sz > 8` branch and returned the slot
+         pointer rather than the RET's (now-undefined) operand.
+      3. The 20-byte slot is readable (a valid concrete allocation).
+
+    The contents of the slot are *not* asserted: under the current
+    `InterceptorPolicy`, LOCAL_VALUE ALLOCAs are not yet correctly
+    reflected through GEP_FIELD's concrete-fallback path, so the
+    body's field stores land at the wrong address and the slot
+    remains zero-initialized. That is a separate substrate quirk;
+    when fixed, this test should be tightened to assert the field
+    values [7, 8, 9, 10, 11].
+    """
+    engine = SymExEngine(index)
+    engine.layout = Layout()
+    paths = engine.explore("make_large", args=[7])
+
+    assert len(paths) == 1
+    p = paths[0]
+    assert p.terminal == Terminal.COMPLETED, \
+        f"unexpected terminal {p.terminal!r}"
+
+    rv = p.return_value
+    assert isinstance(rv, tuple) and len(rv) == 2 and rv[0] == "ptr", \
+        f"expected ('ptr', N) tuple from sz>8 RET path; got {rv!r}"
+
+    slot_addr = rv[1]
+    assert slot_addr != 0, \
+        "return slot pointer is null — substrate didn't allocate"
+    data = p.mem.read_bytes(slot_addr, 20)
+    assert len(data) == 20, \
+        f"return slot not 20 bytes readable; got {len(data)}"
 
 
 # ===========================================================================

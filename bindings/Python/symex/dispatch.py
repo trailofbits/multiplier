@@ -35,9 +35,11 @@ import multiplier as mx
 from .ctx import Ctx
 from .events import (
     MEMORY_READ, MEMORY_WRITE,
+    SYMBOLIC_LOAD, SYMBOLIC_STORE,
     GLOBAL_READ, GLOBAL_WRITE,
     CALL, INDIRECT_CALL,
     BRANCH, LOOP, CONCRETIZE,
+    BLOCK_ENTER,
     EventKind, Phase, CallAction, VALUE_TAG_PTR,
 )
 from .lens import MemView, ArgsView
@@ -101,16 +103,17 @@ class _Selector:
     Empty / `None` attributes match anything.
     """
 
-    __slots__ = ("addr_range", "name", "eid", "func", "block",
+    __slots__ = ("addr_range", "name", "eid", "func", "block", "region",
                  "_layout", "_resolved_range")
 
     def __init__(self, addr_range=None, name=None, eid=None, func=None,
-                 block=None, layout=None):
+                 block=None, region=None, layout=None):
         self.addr_range = addr_range
         self.name = name
         self.eid = eid
         self.func = func
         self.block = block
+        self.region = region
         self._layout = layout
         self._resolved_range = None
 
@@ -144,6 +147,11 @@ class _Selector:
             return False
         return int(self.block) == int(candidate_block)
 
+    def matches_region(self, candidate):
+        if self.region is None:
+            return True
+        return candidate is not None and candidate == self.region
+
     def _compute_range(self):
         if self._resolved_range is not None:
             return self._resolved_range
@@ -172,6 +180,7 @@ def make_selector(layout, **kwargs):
         eid=kwargs.get("eid"),
         func=kwargs.get("func"),
         block=kwargs.get("block"),
+        region=kwargs.get("region"),
         layout=layout,
     )
 
@@ -654,22 +663,54 @@ class InterceptorPolicy:
             return NotImplemented
         path = self._path
         region_name = getattr(path, "_region_at_suspension", None)
-        if region_name is None or self._layout is None:
-            return NotImplemented
-        region = self._layout.region_for_name(region_name)
-        if region is None:
-            return NotImplemented
-
         size_i = int(size)
-        bytes_z = [region.select_byte(addr + i) for i in range(size_i)]
-        if size_i == 1:
-            result = bytes_z[0]
-        else:
-            # z3.Concat is MSB-first; little-endian means byte 0 is the
-            # low byte, hence reversed().
-            result = z3.Concat(*reversed(bytes_z))
+        layout = self._layout
 
         ctx = self._make_ctx()
+        ctx.region = region_name
+        self._fire_observers(SYMBOLIC_LOAD, Phase.BEFORE, ctx,
+                             addr=addr, size=size_i,
+                             is_float=bool(is_float),
+                             region=region_name)
+
+        def _default(c, a, sz):
+            # Chain bottom: read through the suspension region's
+            # z3-Array overlay. NotImplemented when no region context
+            # is attached — preserves the pre-Phase-8d fallback so
+            # the substrate's existing suspension path keeps firing.
+            if region_name is None or layout is None:
+                return NotImplemented
+            region = layout.region_for_name(region_name)
+            if region is None:
+                return NotImplemented
+            bytes_z = [region.select_byte(a + i) for i in range(sz)]
+            if sz == 1:
+                return bytes_z[0]
+            # z3.Concat is MSB-first; little-endian means byte 0 is the
+            # low byte, hence reversed().
+            return z3.Concat(*reversed(bytes_z))
+
+        handlers = self._matching_handlers(
+            SYMBOLIC_LOAD,
+            lambda sel: (sel.matches_region(region_name) and
+                         sel.matches_name(region_name)))
+        chain = _build_chain(handlers, _default)
+        try:
+            result = chain(ctx, addr, size_i)
+        except Exception as exc:  # noqa: BLE001
+            self._record_handler_error(ctx, SYMBOLIC_LOAD, exc,
+                                       role="intercept")
+            return NotImplemented
+
+        if result is NotImplemented:
+            return NotImplemented
+
+        self._fire_observers(SYMBOLIC_LOAD, Phase.AFTER, ctx,
+                             addr=addr, size=size_i,
+                             is_float=bool(is_float), value=result,
+                             handled=True, region=region_name)
+        # Mirror the read into the canonical MEMORY_READ stream so
+        # observers keyed on memory_read still see symbolic accesses.
         self._fire_observers(MEMORY_READ, Phase.BEFORE, ctx,
                              addr=addr, size=size_i,
                              is_float=bool(is_float),
@@ -699,21 +740,51 @@ class InterceptorPolicy:
             return NotImplemented
         path = self._path
         region_name = getattr(path, "_region_at_suspension", None)
-        if region_name is None or self._layout is None:
-            return NotImplemented
-        region = self._layout.region_for_name(region_name)
-        if region is None:
-            return NotImplemented
-
         size_i = int(size)
-        val_z = self._coerce_store_value(val, size_i, z3)
-        if val_z is None:
-            return NotImplemented
-        for i in range(size_i):
-            byte_i = z3.Extract(8 * i + 7, 8 * i, val_z)
-            region.store_byte(addr + i, byte_i)
+        layout = self._layout
 
         ctx = self._make_ctx()
+        ctx.region = region_name
+        self._fire_observers(SYMBOLIC_STORE, Phase.BEFORE, ctx,
+                             addr=addr, size=size_i,
+                             value=val, is_float=bool(is_float),
+                             region=region_name)
+
+        coerce = self._coerce_store_value
+
+        def _default(c, a, v, sz):
+            if region_name is None or layout is None:
+                return NotImplemented
+            region = layout.region_for_name(region_name)
+            if region is None:
+                return NotImplemented
+            val_z = coerce(v, sz, z3)
+            if val_z is None:
+                return NotImplemented
+            for i in range(sz):
+                byte_i = z3.Extract(8 * i + 7, 8 * i, val_z)
+                region.store_byte(a + i, byte_i)
+            return True
+
+        handlers = self._matching_handlers(
+            SYMBOLIC_STORE,
+            lambda sel: (sel.matches_region(region_name) and
+                         sel.matches_name(region_name)))
+        chain = _build_chain(handlers, _default)
+        try:
+            result = chain(ctx, addr, val, size_i)
+        except Exception as exc:  # noqa: BLE001
+            self._record_handler_error(ctx, SYMBOLIC_STORE, exc,
+                                       role="intercept")
+            return NotImplemented
+
+        if result is NotImplemented:
+            return NotImplemented
+
+        self._fire_observers(SYMBOLIC_STORE, Phase.AFTER, ctx,
+                             addr=addr, size=size_i,
+                             value=val, is_float=bool(is_float),
+                             handled=True, region=region_name)
         self._fire_observers(MEMORY_WRITE, Phase.BEFORE, ctx,
                              addr=addr, size=size_i,
                              value=val, is_float=bool(is_float),
@@ -918,6 +989,34 @@ class InterceptorPolicy:
         if isinstance(value, int):
             return z3.BitVecVal(int(value), 64)
         return None
+
+    # ----- Phase 8d: per-block-enter event ---------------------------
+
+    def on_enter_block(self, block_id):
+        """Fired by the substrate at the top of every `enter_block`.
+        Fans out to `engine.observe.block_enter` and appends a
+        structured `block_enter` entry to `path.events` so renderers
+        like `path.dot_cfg` can walk every visited block (not just
+        branch transitions)."""
+        ctx = self._make_ctx()
+        ctx.block = int(block_id)
+        self._fire_observers(BLOCK_ENTER, Phase.AFTER, ctx,
+                             block=int(block_id))
+        # _fire_observers auto-records the event when an observer was
+        # registered; otherwise we still want the event on path.events
+        # so dot_cfg can render block visits without requiring the
+        # analyst to register a no-op observer.
+        path = self._path
+        if path is None:
+            return
+        if self._engine._observers.lookup((BLOCK_ENTER, Phase.AFTER)):
+            return
+        path.events.append({
+            "kind": BLOCK_ENTER,
+            "phase": Phase.AFTER,
+            "block": int(block_id),
+            "step": getattr(path, "steps", 0),
+        })
 
     # ----- truth + branch resolution: fork on non-concrete -----
 

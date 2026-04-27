@@ -129,6 +129,13 @@ class MX_EXPORT ConcretePolicy
   void mem_unpoison(const Value &addr);
   bool is_undefined(const Value &val);
 
+  // --- 4b. Block entry notification ---
+  // Phase 8d: invoked at the top of every block entry. The default is
+  // a no-op; the symbolic interpreter overrides this to fan a
+  // BLOCK_ENTER event out to Python observers / the path's event log.
+  template <typename StateT>
+  void on_enter_block(StateT &, const IRBlock &) {}
+
   // --- 5. Resolution ---
   template <typename Sched>
   bool resolve_branch(Sched &, const Value &,

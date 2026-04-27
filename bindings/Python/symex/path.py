@@ -20,7 +20,8 @@ import multiplier as mx
 
 from .dispatch import _z3_module
 from .events import (
-    EventLog, BRANCH, MEMORY_READ, MEMORY_WRITE, BranchDirection, Terminal,
+    EventLog, BRANCH, BLOCK_ENTER, MEMORY_READ, MEMORY_WRITE,
+    BranchDirection, Terminal,
     _FilterableList, _match,
 )
 
@@ -288,24 +289,38 @@ class Path:
         return "\n".join(lines)
 
     def dot_cfg(self):
-        """Render a Graphviz string of the branch transitions this path
-        took. The substrate doesn't surface per-block-enter events to
-        Python yet, so the rendered graph is the branch-transition
-        graph rather than every block visited. Each edge connects the
-        source block to the taken target with the step counter and
-        direction as label."""
-        branch_events = self.events.where(kind=BRANCH)
-        if not branch_events:
+        """Render a Graphviz string of the blocks this path visited.
+
+        Walks `BLOCK_ENTER` and `BRANCH` events in step order. Each
+        consecutive block visit becomes a solid edge labeled with the
+        step counter; branch events overlay the taken edge with a
+        direction label and emit a dashed not-taken edge for the
+        un-followed successor. Paths with no recorded events still
+        emit a placeholder digraph.
+        """
+        events = self.events.where(kind__in=(BRANCH, BLOCK_ENTER))
+        if not events:
             return (f"digraph path_{self.id} {{\n"
-                    f"  empty [label=\"no branch events recorded\"];\n"
+                    f"  empty [label=\"no events recorded\"];\n"
                     f"}}\n")
 
         lines = [f"digraph path_{self.id} {{"]
-        for entry in branch_events:
+        prev_block = None
+        for entry in events:
+            kind = entry.get("kind")
+            step = entry.get("step", "?")
+            if kind == BLOCK_ENTER:
+                block = entry.get("block")
+                if prev_block is not None and prev_block != block:
+                    lines.append(
+                        f"  block_{prev_block} -> block_{block} "
+                        f"[label=\"step {step}\"];")
+                prev_block = block
+                continue
+            # kind == BRANCH
             direction = entry.get("direction", BranchDirection.UNKNOWN)
             true_block = entry.get("true_block")
             false_block = entry.get("false_block")
-            step = entry.get("step", "?")
             took_true = (direction == BranchDirection.TRUE)
             taken = true_block if took_true else false_block
             other = false_block if took_true else true_block
@@ -316,6 +331,9 @@ class Path:
                 lines.append(
                     f"  block_{true_block} -> block_{other} "
                     f"[style=dashed, label=\"not taken\"];")
+            # Subsequent BLOCK_ENTERs continue from the taken branch's
+            # target.
+            prev_block = taken
         lines.append("}")
         return "\n".join(lines) + "\n"
 

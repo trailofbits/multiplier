@@ -170,9 +170,9 @@ def test_p4_5_z3_solver_model_extracts_input(index):
 
 def test_p4_6_path_dot_cfg_renders(index):
     """dot_cfg returns a Graphviz string starting with `digraph`,
-    whether or not the path took any branches. Concrete-only paths
-    produce a stub graph; forked paths produce a node per visited
-    block transition."""
+    whether or not the path took any branches. Phase 8d added
+    BLOCK_ENTER events, so even concrete-only paths render an edge
+    per visited block; forked paths overlay branch styling on top."""
     z3 = pytest.importorskip("z3")
 
     engine_a = SymExEngine(index)
@@ -180,7 +180,9 @@ def test_p4_6_path_dot_cfg_renders(index):
     dot = paths_no_branch[0].dot_cfg()
     assert dot.startswith("digraph")
     assert "}" in dot
-    assert "no branch events" in dot
+    # Phase 8d: branchless paths still emit at least one block edge.
+    assert "block_" in dot
+    assert "->" in dot
 
     engine_b = SymExEngine(index)
     fired = []

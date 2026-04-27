@@ -261,6 +261,7 @@ PythonPolicy::~PythonPolicy() {
   Py_XDECREF(cached_ptr_offset_);
   Py_XDECREF(cached_symbolic_load_);
   Py_XDECREF(cached_symbolic_store_);
+  Py_XDECREF(cached_on_enter_block_);
 }
 
 PyObject *PythonPolicy::lookup_method(PyObject *&cache, const char *name) {
@@ -690,6 +691,22 @@ void PythonPolicy::mem_unpoison(const SharedPyPtr &addr) {
 bool PythonPolicy::is_undefined(const SharedPyPtr &val) {
   PyObject *obj = val.Get();
   return obj == nullptr || obj == Py_None;
+}
+
+// Phase 8d: per-block-enter notification.
+//
+// Invoked at the top of every `enter_block` regardless of how the block
+// was reached (initial entry, branch resolution, switch dispatch,
+// implicit goto). Lets analysts observe block visits beyond just
+// branch transitions, which the renderer in `Path.dot_cfg` consumes.
+void PythonPolicy::on_enter_block_impl(const IRBlock &block) {
+  PyObject *method = lookup_method(cached_on_enter_block_, "on_enter_block");
+  if (!method) return;
+  auto block_eid = EntityId(block.id()).Pack();
+  PyObject *result = PyObject_CallFunction(method, "K",
+      static_cast<unsigned long long>(block_eid));
+  Py_XDECREF(result);
+  if (PyErr_Occurred()) PyErr_Clear();
 }
 
 // ===========================================================================

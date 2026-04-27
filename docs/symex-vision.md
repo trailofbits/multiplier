@@ -467,10 +467,12 @@ useful primitive.
 - `path.summary()` — multi-line human-readable summary: function
   name, terminal kind, return value, step count, globals_touched,
   branch_forks, event count, tags.
-- `path.dot_cfg()` — emit a Graphviz string of branch transitions
-  this path took. Phase 4 caveat: the substrate doesn't yet emit
-  a per-block-enter event to Python, so the rendered graph is the
-  branch-transition graph, not every block visited.
+- `path.dot_cfg()` — emit a Graphviz string of every block visited
+  on this path, with branch-direction styling overlaid where the
+  path forked. Phase 8d wired a substrate `on_enter_block`
+  callback through to `engine.observe.block_enter` and to
+  `path.events`, so even a branchless function renders an edge per
+  visited block (pre-8d this rendered an empty placeholder).
 - z3 integration: `ctx.solver.fresh_int(name, *, size, lo=None,
   hi=None)` mints (or returns the cached) z3 BitVec and adds the
   bound constraints. `path.assert_(cond)` adds an assertion and
@@ -1035,6 +1037,69 @@ Phase 8c collapses the duplication:
   cross-step flow that the return slot, `ALLOCA/ARG`, and
   `ALLOCA/LOCAL` all rely on.
 
+### Phase 8d — close analyst-facing gaps (delivered)
+
+Phase 8d is a "honesty pass": it closes four loose ends Phase 8c
+left visible, without architectural rework.
+
+- **`engine.intercept.symbolic_load` / `symbolic_store`.** The
+  substrate has consulted these hooks since Phase 8a, but the
+  `InterceptDispatcher` only routed `memory_read` / `memory_write`
+  events. Phase 8d adds `SYMBOLIC_LOAD` / `SYMBOLIC_STORE` to
+  `EventKind`, exposes them through `engine.intercept.*`, and
+  wraps the existing region-overlay logic in a chain bottom that
+  analyst handlers compose over via `next_hook`. A new `region=`
+  selector matches against `path._region_at_suspension` so an
+  analyst can scope a handler to a single SplitByRegion-tagged
+  region without it firing on unrelated paths.
+
+- **Init-time z3 args persist.** `engine._init_path` migrates the
+  init-policy's symbolic shadow to the path's durable shadow after
+  `init_state` runs. Pre-Phase-8d, a z3 written to an
+  `ALLOCA/ARG` slot during initialization landed in the
+  init-policy's ephemeral shadow and was lost when the path was
+  created; the body's first read returned the slot's
+  pre-symbolic concrete bytes. Post-fix, `engine.explore("foo",
+  args=[z3_var])` works as advertised.
+
+- **Aggregate-return E2E coverage.** P8b.4 was a documented skip
+  ("no corpus function exposes RET-without-operand"); after
+  Phase 8c every RET is no-operand, so the actual gate is
+  `read_return_value`'s `sz > 8` branch. The un-skipped test
+  drives `make_large` from `tests/InterpretIR/test_byvalue.c`
+  (returns `struct Large`, sz=20) and verifies the path
+  completes with the slot pointer. (A separate substrate quirk
+  with `LOCAL_VALUE` ALLOCAs through `InterceptorPolicy` keeps
+  the test from asserting field values; documented inline.)
+
+- **Per-block-enter event.** A new `on_enter_block(state, block)`
+  policy callback fires at the top of every `enter_block` in
+  `InterpreterLoop.h`. `ConcretePolicy` keeps a no-op default;
+  `PythonPolicy` calls back into Python with the block id. The
+  dispatcher fans out to `engine.observe.block_enter` and
+  appends a `BLOCK_ENTER` event to `path.events`. `path.dot_cfg`
+  walks `BRANCH` and `BLOCK_ENTER` events together, drawing
+  edges for every block visited — branchless functions now
+  render real graphs instead of the empty placeholder.
+
+**Test catalog (`tests/symex/test_phase8d.py`):**
+
+- **P8d.1** `intercept.symbolic_load(region="g_buf")`
+  short-circuits and the analyst's z3 expression appears as the
+  load result; the region overlay is not consulted.
+- **P8d.2** Two handlers compose: outer forwards via
+  `next_hook`; inner short-circuits with its own value; the
+  inner result reaches the load.
+- **P8d.2b** Handler scoped to a non-matching region is filtered
+  out — no spurious dispatch on unrelated paths.
+- **P8d.3** `engine.explore("symbolic_test_add_i32",
+  args=[z3.BitVec("a", 32), z3.BitVec("b", 32)])` returns a path
+  whose `return_value` is structurally `a + b`. Pre-8d the z3
+  args were dropped in init.
+- **P8d.4** `engine.observe.block_enter` fires per visited block
+  on a branchless function; `path.dot_cfg` renders edges for
+  every visit (no more empty placeholder).
+
 ---
 
 ## Open design questions
@@ -1146,6 +1211,16 @@ include/multiplier/IR/Interpret/ConcreteMemory.h    # place_at if missing
   and P8b.1's symbolic-return invariant now holds via the slot;
   `tests/symex/test_phase8c.py` (1 test, P8c.1) green; total
   `tests/symex` count is 97 collected (96 passed + 1 skipped).
+- Phase 8d: `engine.intercept.symbolic_load` / `symbolic_store`
+  exposed via `EventKind.SYMBOLIC_LOAD` / `SYMBOLIC_STORE` with
+  a `region=` selector; init-time z3 args migrate from
+  init-policy shadow to path shadow so `engine.explore("foo",
+  args=[z3_var])` works; P8b.4 un-skipped against `make_large`
+  for the sz>8 RET branch; new `on_enter_block` policy callback
+  fans out as `engine.observe.block_enter` and `path.dot_cfg`
+  renders block-visit edges. `tests/symex/test_phase8d.py` (5
+  tests, P8d.1–P8d.4) green; `tests/symex` count is 103 passed,
+  0 skipped.
 - The 235-test pre-existing harness still passes (regression gate).
 - Public API has docstrings; the README links to the Phase 7
   walkthrough.

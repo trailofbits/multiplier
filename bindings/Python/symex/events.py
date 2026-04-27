@@ -18,6 +18,8 @@ from enum import StrEnum
 class EventKind(StrEnum):
     MEMORY_READ = "memory_read"
     MEMORY_WRITE = "memory_write"
+    SYMBOLIC_LOAD = "symbolic_load"
+    SYMBOLIC_STORE = "symbolic_store"
     GLOBAL_READ = "global_read"
     GLOBAL_WRITE = "global_write"
     CALL = "call"
@@ -36,11 +38,14 @@ class EventKind(StrEnum):
     CONSTRAIN_TO_CONCRETE_ADDR = "constrain_to_concrete_addr"
     SPLIT_BY_REGION = "split_by_region"
     SINK_FIRED = "sink_fired"
+    BLOCK_ENTER = "block_enter"
 
 
 # Module-level aliases — analysts and dispatcher import these by name.
 MEMORY_READ = EventKind.MEMORY_READ
 MEMORY_WRITE = EventKind.MEMORY_WRITE
+SYMBOLIC_LOAD = EventKind.SYMBOLIC_LOAD
+SYMBOLIC_STORE = EventKind.SYMBOLIC_STORE
 GLOBAL_READ = EventKind.GLOBAL_READ
 GLOBAL_WRITE = EventKind.GLOBAL_WRITE
 CALL = EventKind.CALL
@@ -48,13 +53,16 @@ INDIRECT_CALL = EventKind.INDIRECT_CALL
 BRANCH = EventKind.BRANCH
 LOOP = EventKind.LOOP
 CONCRETIZE = EventKind.CONCRETIZE
+BLOCK_ENTER = EventKind.BLOCK_ENTER
 
 
 ALL_EVENTS = frozenset({
     MEMORY_READ, MEMORY_WRITE,
+    SYMBOLIC_LOAD, SYMBOLIC_STORE,
     GLOBAL_READ, GLOBAL_WRITE,
     CALL, INDIRECT_CALL,
     BRANCH, LOOP, CONCRETIZE,
+    BLOCK_ENTER,
 })
 
 

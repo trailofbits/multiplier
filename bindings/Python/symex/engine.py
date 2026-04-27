@@ -474,6 +474,12 @@ class SymExEngine:
         path = Path(state, memory)
         path._func_name = self._function_name(ir_func)
         path._layout = self.layout
+        # Init-time z3 args land in the init-policy's ephemeral shadow
+        # (path didn't exist yet). Migrate them to the path's durable
+        # shadow so subsequent steps see the symbolic param values.
+        init_shadow = getattr(policy, "_shadow", None)
+        if init_shadow:
+            path._symbolic_shadow.update(init_shadow)
         return path
 
     def _function_name(self, ir_func):
