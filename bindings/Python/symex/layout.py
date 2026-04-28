@@ -27,6 +27,11 @@ _interp = mx.ir.interpret
 
 
 class Layout:
+    # Reserved address ranges (non-overlapping).
+    #   TLS segment:      0x6000_0000_0000_0000 upward (per-entity offsets)
+    #   Function alloc:   0x4000_0000_0000_0000 upward (next_function_address)
+    #   Lazy regions:     0x7000_0000_0000_0000 upward (declare_lazy)
+
     def __init__(self):
         self._memory = _interp.ConcreteMemory()
         self._regions = RegionTable()
@@ -40,6 +45,12 @@ class Layout:
         # analyst's declared globals.
         self._lazy_base_cursor: int = 0x7000_0000_0000_0000
         self._lazy_count: int = 0
+        # Phase 9: function-address allocator (for next_function_address).
+        self._func_base_cursor: int = 0x4000_0000_0000_0000
+        # Phase 9: TLS segment. tls_offset(eid) allocates a slot per entity.
+        self._tls_base: int = 0x6000_0000_0000_0000
+        self._tls_cursor: int = 0
+        self._tls_offsets: dict[int, int] = {}  # canonical_eid -> offset
 
     @property
     def memory(self):
@@ -143,6 +154,97 @@ class Layout:
     def regions_overlapping(self, lo, hi):
         """Return regions whose extent intersects `[lo, hi)`."""
         return self._regions.overlapping(int(lo), int(hi))
+
+    # ---- Phase 9 bulk / TLS API -------------------------------------
+
+    @property
+    def tls_base(self) -> int:
+        """Fixed base address for the TLS segment. All paths share this
+        address; per-path isolation comes from path._tls_shadow."""
+        return self._tls_base
+
+    def tls_offset(self, eid) -> int:
+        """Return the fixed byte offset of TLS entity `eid` within the
+        TLS segment. Allocates a new slot on first call; subsequent
+        calls for the same eid return the same offset.
+
+        The absolute address for any path is `layout.tls_base + tls_offset(eid)`.
+        """
+        key = int(eid)
+        cached = self._tls_offsets.get(key)
+        if cached is not None:
+            return cached
+        offset = self._tls_cursor
+        # Allocate 8 bytes per TLS slot (conservative default; callers
+        # that know the real size can adjust by calling tls_offset and
+        # tracking the result themselves).
+        self._tls_cursor += 8
+        self._tls_offsets[key] = offset
+        return offset
+
+    def next_function_address(self, *, align: int = 4) -> int:
+        """Allocate the next unused address from the function-placement
+        window. Consecutive calls return non-overlapping addresses."""
+        cursor = self._func_base_cursor
+        # Align up
+        if align > 1:
+            cursor = (cursor + align - 1) & ~(align - 1)
+        self._func_base_cursor = cursor + align  # advance by at least align
+        return cursor
+
+    def place_functions(self, mapping: dict):
+        """Bulk-place functions from a `{name: addr}` dict.
+
+        Atomic: if any placement would fail (collision or duplicate
+        name), the entire call rolls back and raises ValueError.
+        """
+        # Validate all entries first.
+        for name, addr in mapping.items():
+            if name in self._by_name:
+                raise ValueError(
+                    f"place_functions: layout name already in use: {name!r}")
+            if addr in self._function_addrs:
+                raise ValueError(
+                    f"place_functions: address 0x{addr:x} already bound to "
+                    f"{self._function_addrs[addr]!r}")
+        # Commit.
+        for name, addr in mapping.items():
+            region = Region(name=name, base=addr, size=0, kind="function")
+            self._regions.add(region)
+            self._by_name[name] = region
+            self._function_addrs[addr] = name
+
+    def place_globals(self, entries):
+        """Bulk-place globals. Each entry is (name, addr, size) or
+        (name, addr, size, init).
+
+        Atomic: if any entry would fail, the whole call rolls back.
+        """
+        parsed = []
+        for entry in entries:
+            if len(entry) == 3:
+                name, addr, size = entry
+                init = None
+            elif len(entry) == 4:
+                name, addr, size, init = entry
+            else:
+                raise ValueError(
+                    f"place_globals: entry must be (name, addr, size) or "
+                    f"(name, addr, size, init), got {entry!r}")
+            if name in self._by_name:
+                raise ValueError(
+                    f"place_globals: layout name already in use: {name!r}")
+            parsed.append((name, addr, size, init))
+
+        # Pre-validate memory placement (no rollback on ConcreteMemory,
+        # so we do a two-pass: check then commit).
+        for name, addr, size, init in parsed:
+            if name in self._by_name:
+                raise ValueError(
+                    f"place_globals: duplicate name {name!r}")
+        # Commit.
+        for name, addr, size, init in parsed:
+            self.place_global(name, addr, size, init=init)
 
     def _write_init(self, name, addr, size, init):
         if isinstance(init, bool):

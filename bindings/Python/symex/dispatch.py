@@ -40,6 +40,7 @@ from .events import (
     CALL, INDIRECT_CALL,
     BRANCH, LOOP, CONCRETIZE,
     BLOCK_ENTER,
+    ADDRESS_FOR, ADDRESS_RESOLVED,
     EventKind, Phase, CallAction, VALUE_TAG_PTR,
 )
 from .lens import MemView, ArgsView
@@ -104,10 +105,11 @@ class _Selector:
     """
 
     __slots__ = ("addr_range", "name", "eid", "func", "block", "region",
-                 "_layout", "_resolved_range")
+                 "_layout", "_resolved_range", "kind", "target_kind")
 
     def __init__(self, addr_range=None, name=None, eid=None, func=None,
-                 block=None, region=None, layout=None):
+                 block=None, region=None, layout=None,
+                 kind=None, target_kind=None):
         self.addr_range = addr_range
         self.name = name
         self.eid = eid
@@ -116,6 +118,9 @@ class _Selector:
         self.region = region
         self._layout = layout
         self._resolved_range = None
+        # Phase 9 axes
+        self.kind = kind
+        self.target_kind = target_kind
 
     def matches_addr(self, addr):
         if self.addr_range is None:
@@ -152,6 +157,18 @@ class _Selector:
             return True
         return candidate is not None and candidate == self.region
 
+    def matches_kind(self, candidate):
+        """Match the entity kind: "function", "global", "thread_local"."""
+        if self.kind is None:
+            return True
+        return candidate is not None and candidate == self.kind
+
+    def matches_target_kind(self, candidate):
+        """Match the indirect-call target kind: "concrete" or "symbolic"."""
+        if self.target_kind is None:
+            return True
+        return candidate is not None and candidate == self.target_kind
+
     def _compute_range(self):
         if self._resolved_range is not None:
             return self._resolved_range
@@ -182,6 +199,8 @@ def make_selector(layout, **kwargs):
         block=kwargs.get("block"),
         region=kwargs.get("region"),
         layout=layout,
+        kind=kwargs.get("kind"),
+        target_kind=kwargs.get("target_kind"),
     )
 
 
@@ -861,10 +880,14 @@ class InterceptorPolicy:
                              name=candidate_name, args=args,
                              is_indirect=is_indirect)
 
+        this_target_kind = "concrete" if is_indirect else None
+
         def _match(sel):
             if not sel.matches_name(candidate_name):
                 return False
             if not sel.matches_eid(target_for_match):
+                return False
+            if not sel.matches_target_kind(this_target_kind):
                 return False
             return True
 
@@ -1285,6 +1308,15 @@ def _selector_matches_payload(selector, event, payload):
             return False
         return True
     if event in (GLOBAL_READ, GLOBAL_WRITE):
+        if not selector.matches_name(payload.get("name")):
+            return False
+        if not selector.matches_eid(payload.get("eid")):
+            return False
+        return True
+    # Phase 9: address_for / address_resolved filter on kind= / name= / eid=
+    if event in (ADDRESS_FOR, ADDRESS_RESOLVED):
+        if not selector.matches_kind(payload.get("kind")):
+            return False
         if not selector.matches_name(payload.get("name")):
             return False
         if not selector.matches_eid(payload.get("eid")):

@@ -199,6 +199,10 @@ struct InterpreterState
 
   CallStack<ValueT> call_stack;
   std::unordered_map<RawEntityId, uint64_t> global_addresses;
+  // Phase 9: state-level cache for function pointer addresses. Mirrors
+  // `global_addresses` in role: once a function eid is bound to an
+  // address, subsequent FUNC_PTR references reuse it across frames.
+  std::unordered_map<RawEntityId, uint64_t> function_addresses;
   uint64_t steps{0};
   std::vector<WorkItem> work_stack;
 

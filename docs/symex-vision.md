@@ -1210,6 +1210,58 @@ queries (`PathSet`, `path.events`, `path.dot_cfg`), and
 aggregate queries (`PathSet.by_entry()`) — enough for "find
 OOB writes across every public entry in this module."
 
+### Phase 9 — total address-space mediation (delivered)
+
+Phase 9 puts the analyst in the loop for every address the engine
+assigns. Two directions:
+
+**Forward (place):** `intercept.address_for(kind=, name=, eid=)` fires
+when the engine needs an address for a function, global, or TLS entity.
+Precedence: pre-placed in `Layout` wins → intercept chain → substrate
+auto-allocator. Memoized per `canonical_eid` on the engine so
+`explore_many` reuses placements across entries. The hook receives
+`(ctx, eid, name, kind, size, align, next_hook)` and may return an
+`int` address or forward via `next_hook(...)`.
+
+**Reverse (resolve):** `intercept.indirect_call` now accepts
+`target_kind="concrete"` / `"symbolic"` selectors. When a call target
+is symbolic, the substrate suspends with a `"call-addr"` sub_kind and
+the engine fires the `target_kind="symbolic"` handler. Returning a list
+of addresses forks one child path per candidate, each with
+`target_expr == addr` asserted. `Terminal.UNRESOLVED_CALL` terminates
+paths whose handler returns `None`.
+
+**Layout additions:**
+- `place_functions(mapping)` — atomic bulk placement from `{name: addr}`.
+- `place_globals(entries)` — atomic bulk placement from list of tuples.
+- `next_function_address(*, align=4)` — cursor-based allocation in the
+  `0x4000_0000_0000_0000` reserved range.
+- `tls_offset(eid)` — stable per-entity TLS offset within the TLS segment
+  (base at `0x6000_0000_0000_0000`). Per-path TLS isolation is
+  implemented via `path._tls_shadow` (same shape as `_symbolic_shadow`);
+  handlers install `intercept.memory_read/write` to route TLS reads to the
+  per-path dict.
+
+**Path additions:** `path.tls_base` (inherited through forks);
+`path._tls_shadow` (per-path TLS value dict, cloned at fork time).
+
+**Telemetry:** `observe.address_resolved` fires on every address
+invention with `source` (`"pre_placed"` / `"intercept"` / `"auto_alloc"`)
+and `handler` (qualname or `None`). `INDIRECT_CALL_RESOLVED` events
+record `fork_index` and `candidates` for provenance.
+
+`engine.value_origins` side-table is available for Phase 10 lineage
+walks; mint sites that ship in Phase 9 are `address_for`-intercept
+placements.
+
+Deferred: symbolic addresses returned from the forward hook (substrate
+expects concrete ints); full provenance walk `path.origin(expr)`
+(Phase 10); per-path TLS base without shared ConcreteMemory (requires
+state-level address-cache invalidation, a Phase 9b substrate item).
+
+Test suite: `tests/symex/test_phase9.py` (15 tests, P9.1–P9.13
+including P9.7b/c TLS isolation); `tests/symex` count is 131 passed.
+
 ---
 
 ## Open design questions
@@ -1348,6 +1400,14 @@ include/multiplier/IR/Interpret/ConcreteMemory.h    # place_at if missing
   serialization, and per-entry args mapping remain deferred.
   `tests/symex/test_phase8f.py` (7 tests, P8f.1–P8f.7) green;
   `tests/symex` count is 116 passed, 0 skipped.
+- Phase 9: total address-space mediation — `intercept.address_for`
+  + `observe.address_resolved` (forward); `intercept.indirect_call`
+  with `target_kind="symbolic"` + `Terminal.UNRESOLVED_CALL`
+  (reverse); `Layout.place_functions`, `place_globals`,
+  `next_function_address`, `tls_offset`; `Path.tls_base` +
+  `_tls_shadow`. `tests/symex/test_phase9.py` (15 tests,
+  P9.1–P9.13 with P9.7b/c TLS isolation) green; `tests/symex`
+  count is 131 passed, 0 skipped.
 - The 235-test pre-existing harness still passes (regression gate).
 - Public API has docstrings; the README links to the Phase 7
   walkthrough.

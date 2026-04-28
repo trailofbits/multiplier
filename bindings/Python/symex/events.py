@@ -39,6 +39,10 @@ class EventKind(StrEnum):
     SPLIT_BY_REGION = "split_by_region"
     SINK_FIRED = "sink_fired"
     BLOCK_ENTER = "block_enter"
+    # Phase 9: address-resolution telemetry
+    ADDRESS_FOR = "address_for"
+    ADDRESS_RESOLVED = "address_resolved"
+    INDIRECT_CALL_RESOLVED = "indirect_call_resolved"
 
 
 # Module-level aliases — analysts and dispatcher import these by name.
@@ -54,6 +58,9 @@ BRANCH = EventKind.BRANCH
 LOOP = EventKind.LOOP
 CONCRETIZE = EventKind.CONCRETIZE
 BLOCK_ENTER = EventKind.BLOCK_ENTER
+ADDRESS_FOR = EventKind.ADDRESS_FOR
+ADDRESS_RESOLVED = EventKind.ADDRESS_RESOLVED
+INDIRECT_CALL_RESOLVED = EventKind.INDIRECT_CALL_RESOLVED
 
 
 ALL_EVENTS = frozenset({
@@ -63,6 +70,8 @@ ALL_EVENTS = frozenset({
     CALL, INDIRECT_CALL,
     BRANCH, LOOP, CONCRETIZE,
     BLOCK_ENTER,
+    ADDRESS_FOR, ADDRESS_RESOLVED,
+    INDIRECT_CALL_RESOLVED,
 })
 
 
@@ -90,6 +99,8 @@ class Terminal(StrEnum):
     CONCRETIZATION_REFUSED = "concretization-refused"
     INFEASIBLE = "infeasible"
     SINK_HIT = "sink-hit"
+    # Phase 9: intercept.indirect_call returned None, refusing the call.
+    UNRESOLVED_CALL = "unresolved-call"
     # Cosmetic placeholder used only by `path.summary()` when the path
     # is still live (`path.terminal is None`) — never actually written
     # to a Path.

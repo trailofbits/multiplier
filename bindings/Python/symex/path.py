@@ -168,6 +168,14 @@ class Path:
         # substrate-allocated addresses (return slot, ALLOCA/ARG,
         # ALLOCA/LOCAL). Keyed on (addr, size) -> z3 expression.
         self._symbolic_shadow: dict = {}
+        # Phase 9: TLS base address for this logical thread. Set by
+        # the engine to layout.tls_base at init time. Inherited by
+        # forks (cloned, then diverge via _tls_shadow).
+        self.tls_base: int = 0
+        # Phase 9: per-path TLS values. Keyed (addr, size) -> value,
+        # same shape as _symbolic_shadow. Memory-read/write intercept
+        # handlers installed by the analyst use this for isolation.
+        self._tls_shadow: dict = {}
 
     @property
     def state(self):
@@ -195,6 +203,8 @@ class Path:
         new_path._region_at_suspension = self._region_at_suspension
         new_path._lazy_regions_used = self._lazy_regions_used
         new_path._symbolic_shadow = dict(self._symbolic_shadow)
+        new_path.tls_base = self.tls_base
+        new_path._tls_shadow = dict(self._tls_shadow)
         new_path.findings = FindingsList(self.findings)
         return new_path
 

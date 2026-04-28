@@ -373,6 +373,32 @@ struct Policy {
     return self().resolve_global(
         sched, entity_id, resolution);
   }
+
+  // Phase 9: per-entity address invention for FUNC_PTR. The
+  // interpreter consults this on first FUNC_PTR reference per
+  // function eid; a Some-result is reserved via place_at and used as
+  // the slot address. Default returns nullopt — the substrate falls
+  // through to `mem_allocate`, preserving today's behavior.
+  template <typename Sched>
+  std::optional<uint64_t> address_for_function(Sched &sched,
+                                                  RawEntityId eid) {
+    return self().address_for_function_impl(sched, eid);
+  }
+
+  template <typename Sched>
+  std::optional<uint64_t> address_for_function_impl(Sched &,
+                                                       RawEntityId) {
+    return std::nullopt;
+  }
+
+  // Phase 9: marks the next `with_address` suspension (when emitted from
+  // an indirect-call callee load) as a call-target suspension. Policies
+  // that care override `_impl`; the default is a no-op so concrete
+  // policies incur no overhead.
+  void mark_next_suspension_as_call_target() {
+    self().mark_next_suspension_as_call_target_impl();
+  }
+  void mark_next_suspension_as_call_target_impl() {}
 };
 
 }  // namespace mx::ir::interpret

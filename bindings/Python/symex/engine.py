@@ -29,6 +29,7 @@ from .path import Path
 from .events import (
     EventLog, EventKind, BRANCH, BranchDirection, Terminal,
     StepResultKind, Strategy, _FilterableList,
+    ADDRESS_FOR, ADDRESS_RESOLVED, INDIRECT_CALL_RESOLVED,
 )
 from .until import ExploreUntil
 from .dispatch import (
@@ -118,6 +119,18 @@ def _make_func_name_resolver(index):
     return resolve
 
 
+def _detect_tls(vd) -> bool:
+    """Return True if `vd` is a thread-local variable."""
+    try:
+        tls_kind = vd.tls_kind
+        if tls_kind is not None:
+            # TLSKind.NONE (or 0) means not TLS.
+            return int(tls_kind) != 0
+    except (AttributeError, TypeError):
+        pass
+    return False
+
+
 def _make_global_resolver(index):
     def resolve(eid):
         vd = _var_decl_for(index.entity(eid))
@@ -132,6 +145,34 @@ def _make_global_resolver(index):
             align = 8
         initializer = mx.ir.IRFunction.FROM(vd)
         return (vd.id, size, align, initializer)
+    return resolve
+
+
+def _make_global_resolver_with_hints(index, engine):
+    """Like `_make_global_resolver` but returns 5-tuples with an optional
+    address hint consulted before the substrate auto-allocates."""
+    def resolve(eid):
+        vd = _var_decl_for(index.entity(eid))
+        if vd is None:
+            return None
+        ty = vd.type
+        bits = ty.size_in_bits
+        size = (bits + 7) // 8 if bits is not None else 0
+        align_bits = ty.alignment
+        align = align_bits // 8 if align_bits is not None else 8
+        if align == 0:
+            align = 8
+        initializer = mx.ir.IRFunction.FROM(vd)
+        canonical_eid = int(vd.id)
+        is_tls = _detect_tls(vd)
+        kind = "thread_local" if is_tls else "global"
+        try:
+            name = str(vd.name) if vd.name else None
+        except Exception:
+            name = None
+        addr_hint = engine._resolve_address_for(
+            canonical_eid, name, kind, size, align)
+        return (canonical_eid, size, align, initializer, addr_hint)
     return resolve
 
 
@@ -194,7 +235,8 @@ class SymExEngine:
         self._index = index
         self.layout = None
         self._func_resolver = _make_func_resolver(index)
-        self._global_resolver = _make_global_resolver(index)
+        # Phase 9: upgraded to 5-tuple with address hint.
+        self._global_resolver = _make_global_resolver_with_hints(index, self)
         self._func_name_resolver = _make_func_name_resolver(index)
         self._intercepts = _Registry()
         self._observers = _Registry()
@@ -223,6 +265,21 @@ class SymExEngine:
         # Terminal.CONCRETIZATION_REFUSED + a lazy_budget_exhausted
         # event.
         self.lazy_region_budget = 8
+        # Phase 9: per-engine address cache. Maps canonical_eid (int) to
+        # the resolved concrete address. Shared across all paths in an
+        # explore call so repeated references to the same entity reuse
+        # the same address (memoized globally, not per-path).
+        self._address_for_cache: dict[int, int] = {}
+        # Phase 9: value-origin side-table. Mint sites (address_for,
+        # indirect_call, fresh_int) populate this for Phase 10 lineage.
+        self.value_origins: dict[int, dict] = {}
+        self._value_origin_counter = [0]
+        # Phase 9: the path currently being stepped. Set by _step_one and
+        # _init_path around each substrate call; used by the address
+        # resolver to build a ctx for the intercept chain.
+        self._current_path = None
+        # Phase 9: func_addr_resolver closure passed to the substrate.
+        self._func_addr_resolver = self._make_func_addr_resolver()
 
     def _get_cfg(self, ir_func):
         """Return the cached CFGInfo for `ir_func`, computing it on
@@ -247,6 +304,173 @@ class SymExEngine:
                 "func_id": fid,
             }
         return cfg
+
+    # ------------------------------------------------------------------
+    # Phase 9: address resolution machinery
+    # ------------------------------------------------------------------
+
+    def _make_func_addr_resolver(self):
+        """Build the func_addr_resolver closure passed to the substrate.
+
+        Called by `compute_func_ptr` in the C++ interpreter loop when
+        a FUNC_PTR is first referenced. Returns an int address or None
+        (let the substrate auto-allocate).
+        """
+        engine = self
+
+        def resolve(eid):
+            eid_i = int(eid)
+            cached = engine._address_for_cache.get(eid_i)
+            if cached is not None:
+                return cached
+            name = engine._func_name_resolver(eid_i)
+            if name is not None and engine.layout is not None and name in engine.layout:
+                addr = engine.layout[name]
+                engine._address_for_cache[eid_i] = addr
+                engine._fire_address_resolved(
+                    eid_i, name, "function", 0, 8, addr, "pre_placed", None)
+                return addr
+            addr = engine._dispatch_address_for(eid_i, name, "function", 0, 8)
+            if addr is not None:
+                engine._address_for_cache[eid_i] = addr
+            return addr
+
+        return resolve
+
+    def _resolve_address_for(self, eid: int, name, kind: str,
+                              size: int, align: int):
+        """Resolve an address for `eid` by checking the cache, layout
+        pre-placement, and finally the `intercept.address_for` chain.
+
+        Returns an int (the chosen address) or None (let substrate
+        auto-allocate). Always memoizes non-None results.
+        """
+        cached = self._address_for_cache.get(eid)
+        if cached is not None:
+            return cached
+        if name is not None and self.layout is not None and name in self.layout:
+            addr = self.layout[name]
+            self._address_for_cache[eid] = addr
+            self._fire_address_resolved(
+                eid, name, kind, size, align, addr, "pre_placed", None)
+            return addr
+        addr = self._dispatch_address_for(eid, name, kind, size, align)
+        if addr is not None:
+            self._address_for_cache[eid] = addr
+        return addr
+
+    def _dispatch_address_for(self, eid: int, name, kind: str,
+                               size: int, align: int):
+        """Fire the `intercept.address_for` chain for an unplaced entity.
+
+        The chain bottom returns None (substrate auto-allocates). If a
+        handler returns an int, that is used as the address.
+        Returns the resolved int or None.
+        """
+        from .dispatch import _build_chain
+        from .ctx import Ctx
+        from .lens import MemView
+
+        registry = self._intercepts
+
+        def _match(sel):
+            if not sel.matches_kind(kind):
+                return False
+            if not sel.matches_name(name):
+                return False
+            if not sel.matches_eid(eid):
+                return False
+            return True
+
+        handlers = [h for sel, h in registry.lookup(ADDRESS_FOR) if _match(sel)]
+        if not handlers:
+            return None
+
+        def _default_address_for(ctx, eid_, name_, kind_, size_, align_):
+            return None
+
+        chain = _build_chain(handlers, _default_address_for)
+
+        path = self._current_path
+        layout = self.layout
+        mem = layout.memory if layout is not None else None
+        mem_view = MemView(mem) if mem is not None else None
+        ctx = Ctx(
+            path=path,
+            mem=mem_view,
+            args=None,
+            layout=layout,
+            solver=getattr(path, "solver", None),
+        )
+
+        handler_name = None
+        if handlers:
+            h = handlers[0]
+            try:
+                handler_name = (getattr(h, "__qualname__", None) or
+                                getattr(h, "__name__", None))
+            except Exception:
+                pass
+
+        try:
+            result = chain(ctx, eid, name, kind, size, align)
+        except Exception:
+            return None
+
+        if result is None:
+            return None
+        if not isinstance(result, int) or isinstance(result, bool):
+            raise TypeError(
+                f"intercept.address_for handler must return int or None, "
+                f"got {type(result).__name__}")
+        self._fire_address_resolved(
+            eid, name, kind, size, align, result, "intercept", handler_name)
+        return result
+
+    def _fire_address_resolved(self, eid: int, name, kind: str,
+                                size: int, align: int, addr: int,
+                                source: str, handler_name):
+        """Emit `address_resolved` telemetry: observer event + event-log entry."""
+        from .dispatch import _selector_matches_payload
+        from .ctx import Ctx
+        from .lens import MemView
+        from .events import Phase
+
+        path = self._current_path
+        layout = self.layout
+        mem = layout.memory if layout is not None else None
+        mem_view = MemView(mem) if mem is not None else None
+        ctx = Ctx(
+            path=path,
+            mem=mem_view,
+            args=None,
+            layout=layout,
+            solver=getattr(path, "solver", None),
+        )
+
+        payload = {
+            "eid": eid,
+            "name": name,
+            "kind": kind,
+            "addr": addr,
+            "source": source,
+            "handler": handler_name,
+            "step": getattr(path, "steps", 0) if path is not None else 0,
+            "path_id": getattr(path, "id", None) if path is not None else None,
+        }
+
+        for selector, handler in self._observers.lookup(
+                (ADDRESS_RESOLVED, Phase.AFTER)):
+            if not _selector_matches_payload(selector, ADDRESS_RESOLVED, payload):
+                continue
+            try:
+                handler(ctx, **payload)
+            except Exception:
+                pass
+
+        if path is not None:
+            path.events.append(dict({"kind": ADDRESS_RESOLVED,
+                                     "phase": Phase.AFTER}, **payload))
 
     def resolve_function(self, spec):
         """Resolve a function spec (name string or IRFunction) to an
@@ -591,6 +815,7 @@ class SymExEngine:
         path.terminal = snapshot.terminal
         path.return_value = snapshot.return_value
         path.error_kind = snapshot.error_kind
+        path.tls_base = getattr(snapshot, "tls_base", 0)
 
         if modify is not None:
             modify(path)
@@ -619,21 +844,34 @@ class SymExEngine:
         if args is None:
             args = []
 
-        if start_block is None:
-            _interp.init_state(state, memory, policy, ir_func, list(args),
-                               self._func_resolver, self._global_resolver)
-        else:
-            block = self._resolve_block(ir_func, start_block)
-            param_addrs = self._allocate_param_slots(ir_func, memory, args)
-            seed_dict = {int(k): v for k, v in (value_seed or {}).items()}
-            _interp.init_state_at(
-                state, memory, policy, ir_func, block,
-                param_addrs, None, seed_dict,
-                self._func_resolver, self._global_resolver)
+        # Expose a temporary sentinel path so _resolve_address_for can
+        # call the intercept chain with ctx.path = None during init.
+        prev_path = self._current_path
+        self._current_path = None
+        try:
+            if start_block is None:
+                _interp.init_state(state, memory, policy, ir_func, list(args),
+                                   self._func_resolver, self._global_resolver,
+                                   self._func_addr_resolver)
+            else:
+                block = self._resolve_block(ir_func, start_block)
+                param_addrs = self._allocate_param_slots(ir_func, memory, args)
+                seed_dict = {int(k): v for k, v in (value_seed or {}).items()}
+                _interp.init_state_at(
+                    state, memory, policy, ir_func, block,
+                    param_addrs, None, seed_dict,
+                    self._func_resolver, self._global_resolver,
+                    self._func_addr_resolver)
+        finally:
+            self._current_path = prev_path
+
         path = Path(state, memory)
         path._func_name = self._function_name(ir_func)
         path._layout = self.layout
         path.entry_func = ir_func
+        # Set TLS base from layout (same for all paths; isolation via shadow).
+        if self.layout is not None:
+            path.tls_base = self.layout.tls_base
         # Init-time z3 args land in the init-policy's ephemeral shadow
         # (path didn't exist yet). Migrate them to the path's durable
         # shadow so subsequent steps see the symbolic param values.
@@ -680,8 +918,14 @@ class SymExEngine:
         return addrs
 
     def _step_one(self, path, memory, policy, slice_steps, concretize):
-        out = _interp.step(path.state, memory, policy, slice_steps,
-                           self._func_resolver, self._global_resolver)
+        self._current_path = path
+        try:
+            out = _interp.step(path.state, memory, policy, slice_steps,
+                               self._func_resolver, self._global_resolver,
+                               self._func_addr_resolver)
+        finally:
+            self._current_path = None
+
         result = out.get("result")
         forks = out.get("forks") or []
 
@@ -706,6 +950,10 @@ class SymExEngine:
         if kind == StepResultKind.BRANCH:
             return self._handle_branch_forks(path, result, forks)
         if kind == StepResultKind.SUSPENDED:
+            sub_kind = forks[0].get("sub_kind") if forks else None
+            if sub_kind == "call-addr":
+                return self._handle_symbolic_indirect_call(
+                    path, result, forks, concretize)
             return self._handle_suspension(path, result, forks, concretize)
 
         path.terminal = Terminal.UNKNOWN
@@ -803,6 +1051,140 @@ class SymExEngine:
             path.suspended = result
             path.terminal = Terminal.CONCRETIZATION_REFUSED
             return [path]
+        return children
+
+    def _handle_symbolic_indirect_call(self, path, result, forks, concretize):
+        """Handle a "call-addr" suspension: the substrate couldn't resolve
+        an indirect callee's address. Fire `intercept.indirect_call` with
+        `target_kind="symbolic"`. The handler may return:
+
+        - A list of int addresses / IRFunctions → fork one child per candidate.
+        - A single int or IRFunction → one child, no fork.
+        - None → refuse; mark path UNRESOLVED_CALL.
+        """
+        if not forks:
+            path.terminal = Terminal.UNRESOLVED_CALL
+            return [path]
+
+        fork_entry = forks[0]
+        addr_expr = fork_entry.get("address")
+        address_eid = int(fork_entry.get("address_eid") or 0)
+
+        from .dispatch import _build_chain, _DEFER
+        from .ctx import Ctx
+        from .lens import MemView, ArgsView
+
+        layout = self.layout
+        mem = layout.memory if layout is not None else None
+        mem_view = MemView(mem) if mem is not None else None
+        ctx = Ctx(
+            path=path,
+            mem=mem_view,
+            args=None,
+            layout=layout,
+            solver=getattr(path, "solver", None),
+        )
+
+        def _match(sel):
+            return sel.matches_target_kind("symbolic")
+
+        from .events import INDIRECT_CALL
+        handlers = [h for sel, h in
+                    self._intercepts.lookup(INDIRECT_CALL) if _match(sel)]
+
+        if not handlers:
+            path.terminal = Terminal.UNRESOLVED_CALL
+            return [path]
+
+        def _default_indirect(ctx_, target_expr_):
+            return None
+
+        chain = _build_chain(handlers, _default_indirect)
+        handler_name = None
+        if handlers:
+            h = handlers[0]
+            try:
+                handler_name = (getattr(h, "__qualname__", None) or
+                                getattr(h, "__name__", None))
+            except Exception:
+                pass
+
+        try:
+            chosen = chain(ctx, addr_expr)
+        except Exception:
+            path.terminal = Terminal.UNRESOLVED_CALL
+            return [path]
+
+        if chosen is None or chosen is _DEFER:
+            path.terminal = Terminal.UNRESOLVED_CALL
+            return [path]
+
+        # Normalize to a list of candidates.
+        if not isinstance(chosen, (list, tuple)):
+            candidates = [chosen]
+        else:
+            candidates = list(chosen)
+
+        if not candidates:
+            path.terminal = Terminal.UNRESOLVED_CALL
+            return [path]
+
+        # Resolve each candidate to a concrete address.
+        resolved_addrs = []
+        for c in candidates:
+            if isinstance(c, int) and not isinstance(c, bool):
+                resolved_addrs.append(c)
+            else:
+                # Try to treat as IRFunction: look up its address.
+                try:
+                    fid = int(c.id)
+                    addr = self._address_for_cache.get(fid)
+                    if addr is None:
+                        name = self._func_name_resolver(fid)
+                        addr = self._resolve_address_for(
+                            fid, name, "function", 0, 8)
+                    if addr is not None:
+                        resolved_addrs.append(addr)
+                except (AttributeError, TypeError):
+                    pass
+
+        if not resolved_addrs:
+            path.terminal = Terminal.UNRESOLVED_CALL
+            return [path]
+
+        children = []
+        first_used = [False]
+
+        def take_state():
+            if not first_used[0]:
+                first_used[0] = True
+                return fork_entry["state"]
+            return _interp.clone_state(fork_entry["state"])
+
+        z3 = _z3_module()
+        for fork_idx, addr in enumerate(resolved_addrs):
+            child_state = take_state()
+            _interp.resume_addr(child_state, address_eid, addr)
+            child = self._fork_child(path, child_state)
+            # Assert target_expr == addr in the path condition.
+            if z3 is not None and _is_z3(addr_expr):
+                child.path_condition.append(
+                    addr_expr == z3.BitVecVal(addr, 64))
+                child.solver.invalidate()
+            child.events.append({
+                "kind": INDIRECT_CALL_RESOLVED,
+                "target_kind": "symbolic",
+                "callee_eid": None,
+                "callee_name": self.layout.function_at(addr)
+                               if self.layout else None,
+                "candidates": resolved_addrs,
+                "fork_index": fork_idx,
+                "source": "intercept",
+                "handler": handler_name,
+                "step": path.steps,
+            })
+            children.append(child)
+
         return children
 
     def _dispatch_concretize_to(self, path, suspension, d, take_state,
@@ -1052,4 +1434,7 @@ class SymExEngine:
         child._layout = parent._layout
         child.entry_func = parent.entry_func
         child.solver.adopt_fresh_vars(parent.solver._fresh_vars)
+        # Phase 9: inherit TLS base and shadow (isolation via per-path shadow).
+        child.tls_base = parent.tls_base
+        child._tls_shadow = dict(parent._tls_shadow)
         return child

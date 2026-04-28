@@ -314,12 +314,19 @@ class MemAddrContinuation final : public Continuation<ValueT, StatePolicy> {
   uint32_t size_bytes(void) const { return size_bytes_; }
   bool is_write(void) const { return is_write_; }
 
+  // Phase 9: marks suspensions emitted from an indirect-call callee load.
+  // Python driver uses this to distinguish function-pointer suspensions from
+  // ordinary load suspensions and route them through intercept.indirect_call.
+  bool is_call_target(void) const { return is_call_target_; }
+  void set_call_target(bool v) { is_call_target_ = v; }
+
  private:
   state_ref snapshot_;
   ValueT symbolic_address_;
   RawEntityId address_eid_{kInvalidEntityId};
   uint32_t size_bytes_{0};
   bool is_write_{false};
+  bool is_call_target_{false};
 };
 
 // ===========================================================================

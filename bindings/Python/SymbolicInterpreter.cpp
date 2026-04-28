@@ -239,11 +239,13 @@ bool LoadSymbolicStateType(::PyObject *interp_module) {
 
 PythonPolicy::PythonPolicy(PyObject *py_policy, ConcreteMemory &memory,
                            FunctionResolver func_resolver,
-                           GlobalResolver global_resolver)
+                           GlobalResolver global_resolver,
+                           FunctionAddressResolver func_addr_resolver)
     : py_policy_(py_policy),
       memory_(memory),
       func_resolver_(std::move(func_resolver)),
-      global_resolver_(std::move(global_resolver)) {}
+      global_resolver_(std::move(global_resolver)),
+      func_addr_resolver_(std::move(func_addr_resolver)) {}
 
 PythonPolicy::~PythonPolicy() {
   Py_XDECREF(cached_make_const_);
@@ -902,7 +904,37 @@ GlobalResolver make_global_resolver(PyObject *obj) {
         if (ir) info.initializer = *ir;
       }
     }
+    // Phase 9: optional 5th element is an address_hint (None or int).
+    if (PyTuple_Size(ret.Get()) >= 5) {
+      PyObject *hint_obj = PyTuple_GetItem(ret.Get(), 4);
+      if (hint_obj && hint_obj != Py_None) {
+        uint64_t hint = PyLong_AsUnsignedLongLong(hint_obj);
+        if (!PyErr_Occurred()) {
+          info.address_hint = hint;
+        } else {
+          PyErr_Clear();
+        }
+      }
+    }
     return info;
+  };
+}
+
+FunctionAddressResolver make_func_addr_resolver(PyObject *obj) {
+  if (!obj || obj == Py_None || !PyCallable_Check(obj)) return {};
+  SharedPyPtr fr(obj);
+  return [fr](RawEntityId eid) -> std::optional<uint64_t> {
+    SharedPyPtr ret(PyObject_CallFunction(fr.Get(), "(K)", eid));
+    if (!ret || ret.Get() == Py_None) {
+      PyErr_Clear();
+      return std::nullopt;
+    }
+    uint64_t addr = PyLong_AsUnsignedLongLong(ret.Get());
+    if (PyErr_Occurred()) {
+      PyErr_Clear();
+      return std::nullopt;
+    }
+    return addr;
   };
 }
 
@@ -912,7 +944,8 @@ PyObject *SymbolicInitState(PyObject *state_obj, PyObject *memory_obj,
                             PyObject *py_policy, PyObject *func_obj,
                             PyObject *args_list,
                             PyObject *func_resolver_obj,
-                            PyObject *global_resolver_obj) {
+                            PyObject *global_resolver_obj,
+                            PyObject *func_addr_resolver_obj) {
   auto *sw = reinterpret_cast<InterpreterStateWrapper *>(state_obj);
   auto *mw = reinterpret_cast<ConcreteMemoryWrapper *>(memory_obj);
 
@@ -932,7 +965,8 @@ PyObject *SymbolicInitState(PyObject *state_obj, PyObject *memory_obj,
 
   PythonPolicy policy(py_policy, *mw->memory,
                        make_func_resolver(func_resolver_obj),
-                       make_global_resolver(global_resolver_obj));
+                       make_global_resolver(global_resolver_obj),
+                       make_func_addr_resolver(func_addr_resolver_obj));
   PythonScheduler sched;
 
   auto &symbolic = install_fresh_symbolic_state(sw);
@@ -947,7 +981,8 @@ PyObject *SymbolicInitStateFrame(PyObject *state_obj, PyObject *memory_obj,
                                  PyObject *param_addrs_list,
                                  PyObject *return_addr_obj,
                                  PyObject *func_resolver_obj,
-                                 PyObject *global_resolver_obj) {
+                                 PyObject *global_resolver_obj,
+                                 PyObject *func_addr_resolver_obj) {
   auto *sw = reinterpret_cast<InterpreterStateWrapper *>(state_obj);
   auto *mw = reinterpret_cast<ConcreteMemoryWrapper *>(memory_obj);
 
@@ -977,7 +1012,8 @@ PyObject *SymbolicInitStateFrame(PyObject *state_obj, PyObject *memory_obj,
 
   PythonPolicy policy(py_policy, *mw->memory,
                        make_func_resolver(func_resolver_obj),
-                       make_global_resolver(global_resolver_obj));
+                       make_global_resolver(global_resolver_obj),
+                       make_func_addr_resolver(func_addr_resolver_obj));
   PythonScheduler sched;
 
   auto &symbolic = install_fresh_symbolic_state(sw);
@@ -994,7 +1030,8 @@ PyObject *SymbolicInitStateAt(PyObject *state_obj, PyObject *memory_obj,
                               PyObject *return_addr_obj,
                               PyObject *value_seed_dict,
                               PyObject *func_resolver_obj,
-                              PyObject *global_resolver_obj) {
+                              PyObject *global_resolver_obj,
+                              PyObject *func_addr_resolver_obj) {
   auto *sw = reinterpret_cast<InterpreterStateWrapper *>(state_obj);
   auto *mw = reinterpret_cast<ConcreteMemoryWrapper *>(memory_obj);
 
@@ -1043,7 +1080,8 @@ PyObject *SymbolicInitStateAt(PyObject *state_obj, PyObject *memory_obj,
 
   PythonPolicy policy(py_policy, *mw->memory,
                        make_func_resolver(func_resolver_obj),
-                       make_global_resolver(global_resolver_obj));
+                       make_global_resolver(global_resolver_obj),
+                       make_func_addr_resolver(func_addr_resolver_obj));
   PythonScheduler sched;
 
   auto &symbolic = install_fresh_symbolic_state(sw);
@@ -1057,7 +1095,8 @@ PyObject *SymbolicInitStateAt(PyObject *state_obj, PyObject *memory_obj,
 PyObject *SymbolicStep(PyObject *state_obj, PyObject *memory_obj,
                        PyObject *py_policy, uint64_t max_steps,
                        PyObject *func_resolver_obj,
-                       PyObject *global_resolver_obj) {
+                       PyObject *global_resolver_obj,
+                       PyObject *func_addr_resolver_obj) {
   auto *sw = reinterpret_cast<InterpreterStateWrapper *>(state_obj);
   auto *mw = reinterpret_cast<ConcreteMemoryWrapper *>(memory_obj);
 
@@ -1070,7 +1109,8 @@ PyObject *SymbolicStep(PyObject *state_obj, PyObject *memory_obj,
 
   PythonPolicy policy(py_policy, *mw->memory,
                        make_func_resolver(func_resolver_obj),
-                       make_global_resolver(global_resolver_obj));
+                       make_global_resolver(global_resolver_obj),
+                       make_func_addr_resolver(func_addr_resolver_obj));
   PythonScheduler sched;
 
   bool budget_hit = interp_step<PythonPolicy, PythonScheduler, SharedPyPtr>(
@@ -1110,9 +1150,17 @@ PyObject *SymbolicStep(PyObject *state_obj, PyObject *memory_obj,
     } else if (auto *mc = dynamic_cast<MemAddrContinuation<SharedPyPtr, PyObjectRC> *>(first)) {
       PyObject *addr_obj = mc->symbolic_address().Get();
       if (!addr_obj) addr_obj = Py_None;
+      const char *sub_kind;
+      if (mc->is_call_target()) {
+        sub_kind = "call-addr";  // Phase 9: symbolic indirect-call callee
+      } else if (mc->is_write()) {
+        sub_kind = "store-addr";
+      } else {
+        sub_kind = "load-addr";
+      }
       PyObject *result_tuple = Py_BuildValue(
           "(ssOKIN)", "suspended",
-          mc->is_write() ? "store-addr" : "load-addr",
+          sub_kind,
           addr_obj,
           static_cast<uint64_t>(mc->address_eid()),
           static_cast<unsigned int>(mc->size_bytes()),

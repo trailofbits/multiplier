@@ -765,7 +765,32 @@ inline void compute_global_ptr(auto &state, PolicyT &policy,
 
   uint32_t align = info.align;
   if (align == 0) align = 8;
-  ValueT addr = policy.mem_allocate(sched, info.size, align);
+
+  // Phase 9: an `address_hint` from the resolver pre-empts the bump
+  // allocator. `place_at` returns true on first reference and false
+  // when the address is already live (e.g. Layout.place_global ran
+  // earlier) — both cases honor the hint. Only a misalignment / true
+  // overlap (place_at false AND the existing region's base differs)
+  // falls back to mem_allocate.
+  ValueT addr;
+  bool placed_via_hint = false;
+  if (info.address_hint) {
+    auto hint_addr = *info.address_hint;
+    if (policy.memory().place_at(hint_addr, info.size, align)) {
+      addr = policy.make_literal_ptr(hint_addr);
+      placed_via_hint = true;
+    } else {
+      // Already-live region at this address counts as a hit.
+      uint8_t probe = 0;
+      if (policy.memory().read(hint_addr, &probe, 1)) {
+        addr = policy.make_literal_ptr(hint_addr);
+        placed_via_hint = true;
+      }
+    }
+  }
+  if (!placed_via_hint) {
+    addr = policy.mem_allocate(sched, info.size, align);
+  }
   if (auto a = policy.extract_address(addr)) {
     state.global_addresses[key] = *a;
     if (key != src_eid) state.global_addresses[src_eid] = *a;
@@ -802,14 +827,42 @@ inline void compute_func_ptr(auto &state, PolicyT &policy,
   auto &frame = state.call_stack.top();
   auto src_eid = inst.source_entity_id();
   auto id = eid(inst);
-  if (frame.locals.find(src_eid) == frame.locals.end()) {
-    ValueT addr = policy.mem_allocate(sched, 8, 8);
-    if (auto a = policy.extract_address(addr)) {
-      frame.locals[src_eid] = *a;
-      policy.memory().write(*a, &src_eid, 8);
+
+  // Phase 9: state-level cache so repeat references to the same
+  // function — even from different frames — see one address.
+  uint64_t slot_addr;
+  auto sit = state.function_addresses.find(src_eid);
+  if (sit != state.function_addresses.end()) {
+    slot_addr = sit->second;
+  } else {
+    bool placed_via_hint = false;
+    if (auto hint = policy.address_for_function(sched, src_eid)) {
+      if (policy.memory().place_at(*hint, 8, 8)) {
+        slot_addr = *hint;
+        placed_via_hint = true;
+      } else {
+        // Already-live region at this address: reuse the slot.
+        uint8_t probe = 0;
+        if (policy.memory().read(*hint, &probe, 1)) {
+          slot_addr = *hint;
+          placed_via_hint = true;
+        }
+      }
     }
+    if (!placed_via_hint) {
+      ValueT addr = policy.mem_allocate(sched, 8, 8);
+      auto a = policy.extract_address(addr);
+      if (!a) {
+        frame.values[id] = ValueTraits<ValueT>::default_value();
+        return;
+      }
+      slot_addr = *a;
+    }
+    policy.memory().write(slot_addr, &src_eid, 8);
+    state.function_addresses[src_eid] = slot_addr;
   }
-  frame.values[id] = policy.make_literal_ptr(frame.locals[src_eid]);
+  frame.locals[src_eid] = slot_addr;
+  frame.values[id] = policy.make_literal_ptr(slot_addr);
 }
 
 // ===========================================================================
@@ -1029,6 +1082,12 @@ inline void exec_call(auto &state, PolicyT &policy,
     auto callee_op = inst.nth_operand(0);
     ValueT callee_val = val<ValueT>(frame, callee_op);
     MemAccessHint hint{8, false, false};
+    // Phase 9: mark the next suspension as a call-target so the Python
+    // driver can route it through intercept.indirect_call(target_kind=
+    // "symbolic") instead of the generic address strategy.
+    if (!policy.extract_address(callee_val)) {
+      policy.mark_next_suspension_as_call_target();
+    }
     policy.with_address(callee_val, policy.memory(), hint, eid(callee_op),
         state, sched,
         [&](auto &p, ConcreteMemory & /*mem*/, uint64_t a) {
@@ -1590,6 +1649,7 @@ inline void interp_init_state(PolicyT &policy, SchedT &sched,
                               const std::vector<ValueT> &args) {
   state.call_stack = CallStack<ValueT>();
   state.global_addresses.clear();
+  state.function_addresses.clear();
   state.steps = 0;
   state.work_stack.clear();
 
@@ -1681,6 +1741,7 @@ inline void interp_init_state_prealloc(
 
   state.call_stack = CallStack<ValueT>();
   state.global_addresses.clear();
+  state.function_addresses.clear();
   state.steps = 0;
   state.work_stack.clear();
 
@@ -1742,6 +1803,7 @@ inline void interp_init_state_at(
 
   state.call_stack = CallStack<ValueT>();
   state.global_addresses.clear();
+  state.function_addresses.clear();
   state.steps = 0;
   state.work_stack.clear();
 

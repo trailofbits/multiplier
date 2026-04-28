@@ -534,8 +534,11 @@ static PyObject *py_init_state(PyObject *, PyObject *args) {
     PyObject *args_list = (nargs >= 5) ? PyTuple_GetItem(args, 4) : nullptr;
     PyObject *func_resolver = (nargs >= 6) ? PyTuple_GetItem(args, 5) : Py_None;
     PyObject *global_resolver = (nargs >= 7) ? PyTuple_GetItem(args, 6) : Py_None;
+    PyObject *func_addr_resolver =
+        (nargs >= 8) ? PyTuple_GetItem(args, 7) : Py_None;
     return SymbolicInitState(state_obj, second, py_policy, func_obj,
-                             args_list, func_resolver, global_resolver);
+                             args_list, func_resolver, global_resolver,
+                             func_addr_resolver);
   }
 
   PyErr_SetString(PyExc_TypeError,
@@ -652,8 +655,11 @@ static PyObject *py_step(PyObject *, PyObject *args) {
     }
     PyObject *func_resolver = (nargs >= 5) ? PyTuple_GetItem(args, 4) : Py_None;
     PyObject *global_resolver = (nargs >= 6) ? PyTuple_GetItem(args, 5) : Py_None;
+    PyObject *func_addr_resolver =
+        (nargs >= 7) ? PyTuple_GetItem(args, 6) : Py_None;
     return SymbolicStep(state_obj, second, py_policy, max_steps,
-                        func_resolver, global_resolver);
+                        func_resolver, global_resolver,
+                        func_addr_resolver);
   }
 
   PyErr_SetString(PyExc_TypeError,
@@ -824,6 +830,8 @@ static PyObject *py_init_state_frame(PyObject *, PyObject *args) {
       (nargs >= 7) ? PyTuple_GetItem(args, 6) : Py_None;
   PyObject *global_resolver =
       (nargs >= 8) ? PyTuple_GetItem(args, 7) : Py_None;
+  PyObject *func_addr_resolver =
+      (nargs >= 9) ? PyTuple_GetItem(args, 8) : Py_None;
 
   if (Py_TYPE(memory_obj) != &ConcreteMemoryType) {
     PyErr_SetString(PyExc_TypeError,
@@ -833,7 +841,8 @@ static PyObject *py_init_state_frame(PyObject *, PyObject *args) {
 
   return SymbolicInitStateFrame(state_obj, memory_obj, py_policy, func_obj,
                                 param_addrs, return_addr,
-                                func_resolver, global_resolver);
+                                func_resolver, global_resolver,
+                                func_addr_resolver);
 }
 
 // init_state_at: mid-block entry for under-constrained symbolic execution.
@@ -867,6 +876,8 @@ static PyObject *py_init_state_at(PyObject *, PyObject *args) {
       (nargs >= 9) ? PyTuple_GetItem(args, 8) : Py_None;
   PyObject *global_resolver =
       (nargs >= 10) ? PyTuple_GetItem(args, 9) : Py_None;
+  PyObject *func_addr_resolver =
+      (nargs >= 11) ? PyTuple_GetItem(args, 10) : Py_None;
 
   if (Py_TYPE(memory_obj) != &ConcreteMemoryType) {
     PyErr_SetString(PyExc_TypeError,
@@ -876,7 +887,8 @@ static PyObject *py_init_state_at(PyObject *, PyObject *args) {
 
   return SymbolicInitStateAt(state_obj, memory_obj, py_policy, func_obj,
                              block_obj, param_addrs, return_addr,
-                             value_seed, func_resolver, global_resolver);
+                             value_seed, func_resolver, global_resolver,
+                             func_addr_resolver);
 }
 
 // Module methods.
