@@ -90,6 +90,19 @@ class MemView:
             f"MemView.write does not yet handle values of type {type(value)}")
 
     def write_bytes(self, addr, data):
+        try:
+            import z3 as _z3
+            if isinstance(data, _z3.ExprRef):
+                raise TypeError(
+                    "ctx.mem.write_bytes() does not accept z3 expressions — "
+                    "ConcreteMemory stores bytes, not symbolic values. "
+                    "To plant symbolic data in a buffer so reads return "
+                    "symbolic values, use engine.intercept.memory_read("
+                    "addr_range=...) to return a fresh z3 variable per "
+                    "load site, or write concrete placeholder bytes and "
+                    "constrain them via path.solver.")
+        except ImportError:
+            pass
         self._memory.write_bytes(addr, bytes(data))
 
     # ---- struct lens (Phase 2) ----------------------------------------

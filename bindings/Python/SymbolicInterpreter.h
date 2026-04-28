@@ -245,6 +245,25 @@ class PythonPolicy
     next_is_call_target_ = true;
   }
 
+  // Exception-propagation helpers. When a Python hook raises, the C++
+  // method captures the exception (instead of clearing it) and sets
+  // abort_requested so the interpreter loop exits cleanly. SymbolicStep
+  // then re-raises the exception into Python.
+  void capture_exception() {
+    if (!pending_exc_type_) {
+      PyErr_Fetch(&pending_exc_type_, &pending_exc_value_, &pending_exc_tb_);
+    } else {
+      PyErr_Clear();
+    }
+  }
+  bool has_pending_exception() const { return pending_exc_type_ != nullptr; }
+  bool abort_requested_impl() const { return has_pending_exception(); }
+  PyObject *raise_pending_exception() {
+    PyErr_Restore(pending_exc_type_, pending_exc_value_, pending_exc_tb_);
+    pending_exc_type_ = pending_exc_value_ = pending_exc_tb_ = nullptr;
+    return nullptr;
+  }
+
   // Per-instruction observe hook. Called from dispatch() for every
   // non-trivial instruction; fans out to the Python policy's
   // `on_instruction` method when registered.
@@ -278,6 +297,12 @@ class PythonPolicy
   PyObject *cached_symbolic_store_{nullptr};
   PyObject *cached_on_enter_block_{nullptr};
   PyObject *cached_on_instruction_{nullptr};
+
+  // Pending exception state. Captured when a Python hook raises so the
+  // interpreter loop can exit cleanly and SymbolicStep can re-raise it.
+  PyObject *pending_exc_type_{nullptr};
+  PyObject *pending_exc_value_{nullptr};
+  PyObject *pending_exc_tb_{nullptr};
 
   // Phase 9: set by mark_next_suspension_as_call_target_impl; consumed
   // and cleared in with_address_impl when it emits a MemAddrContinuation.

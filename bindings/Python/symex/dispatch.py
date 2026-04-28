@@ -893,11 +893,7 @@ class InterceptorPolicy:
 
         handlers = self._matching_handlers(event, _match)
         chain = _build_chain(handlers, _default_call)
-        try:
-            chosen = chain(ctx)
-        except Exception as exc:  # noqa: BLE001
-            self._record_handler_error(ctx, event, exc, role="intercept")
-            chosen = _DEFER
+        chosen = chain(ctx)
 
         if chosen is _DEFER:
             self._fire_observers(event, Phase.AFTER, ctx,

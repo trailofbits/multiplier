@@ -1886,6 +1886,10 @@ inline bool interp_step(PolicyT &policy, SchedT &sched,
     state.work_stack.pop_back();
     state.current_item = item;
     dispatch<PolicyT, SchedT, ValueT>(state, policy, sched, item);
+    if (policy.abort_requested()) {
+      state.work_stack.clear();
+      break;
+    }
     if (++iters > max_steps * 100) {
       // Safety: abort if the work stack is churning without stepping.
       sched.on_errored(ErrorKind::NO_TERMINATOR,

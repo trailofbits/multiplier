@@ -265,6 +265,9 @@ PythonPolicy::~PythonPolicy() {
   Py_XDECREF(cached_symbolic_store_);
   Py_XDECREF(cached_on_enter_block_);
   Py_XDECREF(cached_on_instruction_);
+  Py_XDECREF(pending_exc_type_);
+  Py_XDECREF(pending_exc_value_);
+  Py_XDECREF(pending_exc_tb_);
 }
 
 PyObject *PythonPolicy::lookup_method(PyObject *&cache, const char *name) {
@@ -804,7 +807,13 @@ bool PythonPolicy::resolve_call(PythonScheduler &,
         args_list, static_cast<int>(is_indirect));
     Py_DECREF(args_list);
 
-    if (result && result != Py_NotImplemented && result != Py_None) {
+    if (!result) {
+      // Python exception from the intercept handler — capture it so
+      // abort_requested() fires and SymbolicStep can re-raise it.
+      capture_exception();
+      return false;
+    }
+    if (result != Py_NotImplemented && result != Py_None) {
       // Parse ("skip", return_value) or ("model", return_value).
       if (PyTuple_Check(result) && PyTuple_Size(result) == 2) {
         PyObject *tag = PyTuple_GetItem(result, 0);
@@ -835,8 +844,7 @@ bool PythonPolicy::resolve_call(PythonScheduler &,
       }
       Py_DECREF(result);
     } else {
-      Py_XDECREF(result);
-      PyErr_Clear();
+      Py_DECREF(result);
     }
   }
 
@@ -1127,6 +1135,11 @@ PyObject *SymbolicStep(PyObject *state_obj, PyObject *memory_obj,
 
   bool budget_hit = interp_step<PythonPolicy, PythonScheduler, SharedPyPtr>(
       policy, sched, *symbolic, max_steps);
+
+  if (policy.has_pending_exception()) {
+    return policy.raise_pending_exception();
+  }
+
   sched.outcome.budget_exhausted = budget_hit;
   sched.outcome.steps = symbolic->steps;
 
