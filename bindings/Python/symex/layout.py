@@ -317,47 +317,17 @@ class Layout:
         size = len(data)
 
         if addr is None:
-            # Suffix-sharing: scan existing string regions to see if `data`
-            # appears as a tail of an already-placed string.  This mirrors
-            # the linker's string-table deduplication — "world\0" aliases
-            # into the tail of "hello world\0" without new allocation.
-            shared_addr = self._find_suffix(data)
-            if shared_addr is not None:
-                region = Region(name=name, base=shared_addr, size=size,
-                                kind="string", align=1)
-                # Register name but don't add to _regions — the bytes are
-                # already owned by the enclosing region.
-                self._by_name[name] = region
-                return shared_addr
-
             addr = self._memory.allocate(size, 1)
-        else:
-            if not self._memory.place_at(addr, size, 1):
-                raise ValueError(
-                    f"cannot place string {name!r} at 0x{addr:x} "
-                    f"(size={size}): overlap or misalignment")
 
         self._memory.write_bytes(addr, data)
 
-        region = Region(name=name, base=addr, size=size,
-                        kind="string", align=1)
-        self._regions.add(region)
-        self._by_name[name] = region
+        # String regions are not added to _regions (the sorted interval table)
+        # because strings may legitimately overlap (e.g. a short string placed
+        # at an explicit addr that sits inside a larger one).  The analyst just
+        # needs layout["name"] to get the pointer.
+        self._by_name[name] = Region(name=name, base=addr, size=size,
+                                     kind="string", align=1)
         return addr
-
-    def _find_suffix(self, data: bytes) -> int | None:
-        """Return the address where `data` appears as a suffix of an
-        existing string region, or None if no match exists."""
-        for region in self._regions:
-            if region.kind != "string":
-                continue
-            if region.size < len(data):
-                continue
-            tail_addr = region.base + region.size - len(data)
-            tail = self._memory.read_bytes(tail_addr, len(data))
-            if tail == data:
-                return tail_addr
-        return None
 
     def _write_init(self, name, addr, size, init):
         if isinstance(init, bool):
