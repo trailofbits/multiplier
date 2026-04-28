@@ -271,6 +271,94 @@ class Layout:
         for name, addr, size, init in parsed:
             self.place_global(name, addr, size, init=init)
 
+    def place_string(self, name: str, value, *,
+                     addr: int | None = None,
+                     encoding: str = "utf-8",
+                     null_terminate: bool = True) -> int:
+        """Place a string literal in memory and register it by name.
+
+        Parameters
+        ----------
+        name:           Symbolic name for layout lookups (``layout["s"]``).
+        value:          The string content — a ``str`` (encoded with
+                        ``encoding``) or ``bytes`` / ``bytearray``.
+        addr:           Explicit base address.  When omitted the memory's
+                        bump allocator assigns an address automatically.
+        encoding:       Text encoding used when ``value`` is a ``str``.
+                        Defaults to ``"utf-8"``.
+        null_terminate: Append a ``\\0`` byte.  True by default (C strings).
+                        Pass False for raw byte blobs that don't need one.
+
+        Returns
+        -------
+        int — the address of the first byte (the pointer value callers pass
+        to stubs, ``ctx.args``, etc.).
+
+        Example::
+
+            ptr = layout.place_string("error_msg", "invalid input")
+            layout.place_string("binary_blob", b"\\xde\\xad\\xbe\\xef",
+                                null_terminate=False)
+        """
+        if name in self._by_name:
+            raise ValueError(f"layout name already in use: {name!r}")
+
+        if isinstance(value, str):
+            data = value.encode(encoding)
+        elif isinstance(value, (bytes, bytearray)):
+            data = bytes(value)
+        else:
+            raise TypeError(
+                f"place_string: value must be str or bytes, got {type(value)}")
+
+        if null_terminate:
+            data = data + b"\x00"
+
+        size = len(data)
+
+        if addr is None:
+            # Suffix-sharing: scan existing string regions to see if `data`
+            # appears as a tail of an already-placed string.  This mirrors
+            # the linker's string-table deduplication — "world\0" aliases
+            # into the tail of "hello world\0" without new allocation.
+            shared_addr = self._find_suffix(data)
+            if shared_addr is not None:
+                region = Region(name=name, base=shared_addr, size=size,
+                                kind="string", align=1)
+                # Register name but don't add to _regions — the bytes are
+                # already owned by the enclosing region.
+                self._by_name[name] = region
+                return shared_addr
+
+            addr = self._memory.allocate(size, 1)
+        else:
+            if not self._memory.place_at(addr, size, 1):
+                raise ValueError(
+                    f"cannot place string {name!r} at 0x{addr:x} "
+                    f"(size={size}): overlap or misalignment")
+
+        self._memory.write_bytes(addr, data)
+
+        region = Region(name=name, base=addr, size=size,
+                        kind="string", align=1)
+        self._regions.add(region)
+        self._by_name[name] = region
+        return addr
+
+    def _find_suffix(self, data: bytes) -> int | None:
+        """Return the address where `data` appears as a suffix of an
+        existing string region, or None if no match exists."""
+        for region in self._regions:
+            if region.kind != "string":
+                continue
+            if region.size < len(data):
+                continue
+            tail_addr = region.base + region.size - len(data)
+            tail = self._memory.read_bytes(tail_addr, len(data))
+            if tail == data:
+                return tail_addr
+        return None
+
     def _write_init(self, name, addr, size, init):
         if isinstance(init, bool):
             init = int(init)
