@@ -62,8 +62,8 @@ import pytest
 
 import multiplier as mx
 
-import symex
-from symex import (
+import multiplier.symex as symex
+from multiplier.symex import (
     ConcretizeFinite,
     ConstrainTo,
     Layout,
@@ -72,9 +72,9 @@ from symex import (
     SymExEngine,
     Suspension,
 )
-from symex.concretize import AddressStrategy, ConcretizeTo
-from symex.events import EventKind, MEMORY_READ
-from symex.dispatch import _z3_module
+from multiplier.symex.concretize import AddressStrategy, ConcretizeTo
+from multiplier.symex.events import EventKind, MEMORY_READ
+from multiplier.symex.dispatch import _z3_module
 
 _interp = mx.ir.interpret
 

@@ -37,7 +37,7 @@ import pytest
 
 import multiplier as mx
 
-from symex import (
+from multiplier.symex import (
     ConcretizeByRegion,
     ConcretizeFinite,
     ConstrainTo,
@@ -46,8 +46,8 @@ from symex import (
     SymExEngine,
     Suspension,
 )
-from symex.dispatch import InterceptorPolicy, _is_z3, _z3_module
-from symex.events import EventKind, Terminal
+from multiplier.symex.dispatch import InterceptorPolicy, _is_z3, _z3_module
+from multiplier.symex.events import EventKind, Terminal
 
 _interp = mx.ir.interpret
 

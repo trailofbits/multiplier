@@ -32,9 +32,9 @@ import re
 
 import pytest
 
-from symex import Layout, SymExEngine
-from symex.events import Strategy, Terminal
-from symex.until import ExploreUntil
+from multiplier.symex import Layout, SymExEngine
+from multiplier.symex.events import Strategy, Terminal
+from multiplier.symex.until import ExploreUntil
 
 from conftest import find_ir_function, run_via_concrete_policy
 

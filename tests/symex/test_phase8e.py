@@ -36,9 +36,9 @@ import struct
 
 import pytest
 
-from symex import ConcretizeFinite, Layout, SymExEngine
-from symex.events import Terminal
-from symex.dispatch import InterceptorPolicy, _is_z3
+from multiplier.symex import ConcretizeFinite, Layout, SymExEngine
+from multiplier.symex.events import Terminal
+from multiplier.symex.dispatch import InterceptorPolicy, _is_z3
 
 from conftest import run_via_concrete_policy
 

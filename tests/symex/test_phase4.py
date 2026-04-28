@@ -12,7 +12,7 @@ P4.6 path.dot_cfg renders a Graphviz string.
 
 import pytest
 
-from symex import (
+from multiplier.symex import (
     Layout,
     SymExEngine,
     ExploreUntil,

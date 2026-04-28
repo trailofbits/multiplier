@@ -22,9 +22,9 @@ import pytest
 
 z3 = pytest.importorskip("z3")
 
-from symex.engine import SymExEngine, PathSet
-from symex.layout import Layout
-from symex.events import Terminal, MEMORY_READ, MEMORY_WRITE, BRANCH, BLOCK_ENTER
+from multiplier.symex.engine import SymExEngine, PathSet
+from multiplier.symex.layout import Layout
+from multiplier.symex.events import Terminal, MEMORY_READ, MEMORY_WRITE, BRANCH, BLOCK_ENTER
 
 
 # ---------------------------------------------------------------------------

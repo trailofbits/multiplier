@@ -19,7 +19,7 @@ pytestmark = pytest.mark.skipif(not _Z3_AVAILABLE, reason="z3 not installed")
 
 def _make_path():
     from unittest.mock import MagicMock
-    from symex.path import Path
+    from multiplier.symex.path import Path
     state = MagicMock()
     state.steps = 0
     return Path(state, MagicMock())

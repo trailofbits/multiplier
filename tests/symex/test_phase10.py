@@ -19,7 +19,7 @@ pytestmark = pytest.mark.skipif(not _Z3_AVAILABLE, reason="z3 not installed")
 def _make_path():
     """Return a bare Path with a dummy state and memory."""
     from unittest.mock import MagicMock
-    from symex.path import Path
+    from multiplier.symex.path import Path
 
     state = MagicMock()
     state.steps = 0
@@ -154,7 +154,7 @@ def test_p10_8_origin_tree_op():
 # ---------------------------------------------------------------------------
 
 def test_p10_9_clone_propagates_origins():
-    from symex.path import Path
+    from multiplier.symex.path import Path
     from unittest.mock import MagicMock
     import multiplier as mx
 

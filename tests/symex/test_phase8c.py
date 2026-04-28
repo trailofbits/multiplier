@@ -28,9 +28,9 @@ Catalog:
 
 import multiplier as mx
 
-from symex import Layout, SymExEngine
-from symex.dispatch import InterceptorPolicy, _is_z3
-from symex.path import Path
+from multiplier.symex import Layout, SymExEngine
+from multiplier.symex.dispatch import InterceptorPolicy, _is_z3
+from multiplier.symex.path import Path
 
 _interp = mx.ir.interpret
 

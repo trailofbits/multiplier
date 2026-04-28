@@ -12,7 +12,7 @@ P1.7 ExploreUntil.steps
 import pytest
 
 import multiplier as mx
-from symex import (
+from multiplier.symex import (
     Layout,
     SymExEngine,
     ExploreUntil,

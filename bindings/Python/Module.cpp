@@ -1726,5 +1726,42 @@ PyMODINIT_FUNC PyInit_multiplier(void) {
     return nullptr;
   }
 
+  // Make multiplier act as a package so `import multiplier.symex` works.
+  //
+  // We run a small Python snippet that uses importlib.util.find_spec to
+  // locate the multiplier .so, then sets __path__ on the module to the
+  // 'multiplier/' subdirectory alongside it.  This works even during
+  // the module's own PyInit call because find_spec does not import; it
+  // only locates.
+  {
+    PyObject *run_globals = PyDict_New();
+    PyObject *builtins = PyEval_GetBuiltins();
+    if (run_globals && builtins) {
+      PyDict_SetItemString(run_globals, "__builtins__", builtins);
+      PyObject *result = PyRun_String(
+        "import importlib.util as _u, os.path as _p, sys as _s\n"
+        "_spec = _u.find_spec('multiplier')\n"
+        "_origin = _spec.origin if _spec else None\n"
+        "_pkg_dir = _p.join(_p.dirname(_origin), 'multiplier') if _origin else None\n",
+        Py_file_input, run_globals, run_globals);
+      if (result) {
+        Py_DECREF(result);
+        PyObject *pkg_dir = PyDict_GetItemString(run_globals, "_pkg_dir");
+        if (pkg_dir && pkg_dir != Py_None) {
+          PyObject *path_list = PyList_New(1);
+          if (path_list) {
+            Py_INCREF(pkg_dir);
+            PyList_SET_ITEM(path_list, 0, pkg_dir);
+            if (PyModule_AddObject(m, "__path__", path_list) < 0) {
+              Py_DECREF(path_list);
+            }
+          }
+        }
+      }
+    }
+    Py_XDECREF(run_globals);
+    PyErr_Clear();  // non-fatal: symex will just not be importable as multiplier.symex
+  }
+
   return m;
 }

@@ -25,7 +25,7 @@ forks at branch) is the same.
 
 import pytest
 
-from symex import (
+from multiplier.symex import (
     Layout,
     SymExEngine,
     ExploreUntil,
@@ -33,7 +33,7 @@ from symex import (
     InterceptorPolicy,
     models,
 )
-from symex.dispatch import extract_addr
+from multiplier.symex.dispatch import extract_addr
 
 
 # --- P2.1 ----------------------------------------------------------------

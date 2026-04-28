@@ -22,7 +22,7 @@ P5.10 Legacy callable `concretize=lambda fork: [...]` still drives
 
 import pytest
 
-from symex import (
+from multiplier.symex import (
     AddressStrategy,
     ConcretizeByRegion,
     ConcretizeFinite,
@@ -34,7 +34,7 @@ from symex import (
     SymExEngine,
     Suspension,
 )
-from symex.events import EventKind, Terminal
+from multiplier.symex.events import EventKind, Terminal
 
 
 # ---------------------------------------------------------------------------
@@ -168,7 +168,7 @@ def test_p5_4_concretize_by_region():
     `[ConcretizeTo(base) per region]` shape moved to the engine's
     concrete-addr fallback inside `_dispatch_split_by_region`.
     """
-    from symex import SplitByRegion
+    from multiplier.symex import SplitByRegion
 
     layout = Layout()
     layout.place_global("g_a", addr=0x10000, size=16)

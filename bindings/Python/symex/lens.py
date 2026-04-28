@@ -17,6 +17,8 @@ Phase 1 shipped read/write byte access. Phase 2 adds:
 
 import struct as _struct
 
+import multiplier as mx
+
 
 def _coerce_addr(value):
     """Pull an integer address out of a raw arg or pointer tuple."""
@@ -188,6 +190,225 @@ class ArgsView:
             raise TypeError(
                 f"ArgsView.as_pointer_to: arg {i} is not pointer-shaped")
         return _PointerLens(self._mem, a)
+
+
+class LocalsView:
+    """Debugger-style lens over a function's local variables (ALLOCAs).
+
+    Discovers every ALLOCA in `ir_func`, allocates concrete backing memory
+    for each in `layout`, and exposes them by name.  Works for both
+    parameter slots (AllocaKind.ARG) and body-scoped locals (AllocaKind.LOCAL).
+
+    Parameters
+    ----------
+    index:    mx.Index — needed to resolve AST entities.
+    ir_func:  mx.ir.IRFunction — the function to analyse.
+    layout:   Layout — address space; backing memory is used for allocation.
+    kinds:    which ALLOCA categories to include.  "all" (default) covers
+              both parameters and locals; "locals" skips ARG slots;
+              "params" keeps only ARG slots.
+
+    Typical use
+    -----------
+    ::
+
+        lv = LocalsView(index, ir_func, layout)
+        lv["i"]   = z3.BitVec("i_init", 32)  # symbolic init
+        lv["ptr"] = layout["g_buf"]           # concrete address
+        lv.install_hooks(engine)              # wire z3 inits as intercepts
+        paths = engine.explore(ir_func, seed=lv.seed_dict)
+
+        for p in paths:
+            lv.dump(p)                  # GDB "info locals"
+            val = lv.read(p, "i")      # read one variable
+            lv.write(p, "i", 0)        # patch on a live path
+    """
+
+    def __init__(self, index: mx.Index, ir_func, layout, kinds: str = "all"):
+        self._index   = index
+        self._layout  = layout
+        self._memory  = layout.memory
+        # name → (inst_id, size_bytes, align_bytes, addr)
+        self._locals: dict[str, tuple[int, int, int, int]] = {}
+        # Symbolic initial values deferred until install_hooks().
+        self._symbolic_inits: dict[str, object] = {}
+        self._discover(ir_func, kinds)
+
+    # ------------------------------------------------------------------
+    # Discovery
+    # ------------------------------------------------------------------
+
+    def _discover(self, ir_func, kinds: str):
+        from .dispatch import _is_z3  # local import to avoid circularity
+        seen_ids: set[int] = set()
+        for block in ir_func.blocks:
+            for inst in block.all_instructions:
+                # AllocaInst.FROM returns None for non-ALLOCA instructions,
+                # so this doubles as both the isinstance check and the upcast.
+                alloca = mx.ir.AllocaInst.FROM(inst)
+                if alloca is None:
+                    continue
+
+                inst_id = int(alloca.id)
+                if inst_id in seen_ids:
+                    continue
+                seen_ids.add(inst_id)
+
+                kind_val = alloca.alloca_kind
+                if kinds == "locals" and kind_val != mx.ir.AllocaKind.LOCAL:
+                    continue
+                if kinds == "params" and kind_val != mx.ir.AllocaKind.ARG:
+                    continue
+                # "all" keeps LOCAL and ARG; skip RETURN and DYNAMIC slots
+                # (implementation details the analyst doesn't name).
+                if kinds == "all" and kind_val not in (
+                    mx.ir.AllocaKind.LOCAL, mx.ir.AllocaKind.ARG
+                ):
+                    continue
+
+                name  = alloca.name or f"anon_{inst_id}"
+                size  = max(1, alloca.size_bytes)
+                align = max(1, alloca.align_bytes)
+
+                addr = self._memory.allocate(size, align)
+                self._locals[name] = (inst_id, size, align, addr)
+
+    # ------------------------------------------------------------------
+    # Seeding (call before explore)
+    # ------------------------------------------------------------------
+
+    def __setitem__(self, name: str, value):
+        """Seed the initial value for a local before exploration.
+
+        Concrete int/bytes are written directly to backing memory.
+        A z3 expression is deferred; call `install_hooks()` afterward
+        to register the intercept that serves it on first read.
+        """
+        from .dispatch import _is_z3
+        if name not in self._locals:
+            raise KeyError(f"no ALLOCA found for {name!r}; "
+                           f"available: {sorted(self._locals)}")
+        inst_id, size, align, addr = self._locals[name]
+
+        if _is_z3(value):
+            self._symbolic_inits[name] = value
+        elif isinstance(value, (int, bool)):
+            val = int(value)
+            data = val.to_bytes(size, "little", signed=(val < 0))
+            self._memory.write_bytes(addr, data)
+        elif isinstance(value, (bytes, bytearray)):
+            self._memory.write_bytes(addr, bytes(value)[:size])
+        else:
+            raise TypeError(
+                f"value must be int, bytes, or z3 expression, got {type(value)}")
+
+    def install_hooks(self, engine):
+        """Register intercept.memory_read hooks for z3-seeded locals.
+
+        Must be called after `build_engine()` and before `explore()`.
+        Hooks are scoped to the exact (addr, size) of each slot so they
+        don't affect unrelated reads.  No-op if no symbolic inits are set.
+        """
+        for name, z3_val in list(self._symbolic_inits.items()):
+            inst_id, size, align, addr = self._locals[name]
+
+            def _make_hook(slot_addr, slot_size, sym_val):
+                @engine.intercept.memory_read(addr_range=(slot_addr, slot_size))
+                def _read_slot(ctx, addr_, sz, is_float, next_hook):
+                    return sym_val
+            _make_hook(addr, size, z3_val)
+
+    @property
+    def seed_dict(self) -> dict[int, int]:
+        """Return ``{inst_id: addr}`` for every discovered ALLOCA.
+
+        Pass as ``seed=lv.seed_dict`` to ``engine.explore()``.  The
+        interpreter uses these addresses for stack slots instead of
+        allocating fresh ones, so concrete writes and symbolic hooks
+        both take effect.
+        """
+        return {inst_id: addr
+                for name, (inst_id, size, align, addr) in self._locals.items()}
+
+    # ------------------------------------------------------------------
+    # Read / write on a live or completed path (debugger style)
+    # ------------------------------------------------------------------
+
+    def read(self, path, name: str):
+        """Read the current value of a local from a path.
+
+        Checks the per-path symbolic shadow first (z3 expression wins),
+        then falls back to the backing memory.  Returns a z3 expression
+        or a concrete int.
+        """
+        from .dispatch import _is_z3
+        if name not in self._locals:
+            raise KeyError(f"no ALLOCA found for {name!r}")
+        inst_id, size, align, addr = self._locals[name]
+
+        sym = path._symbolic_shadow.get((addr, size))
+        if sym is not None:
+            return sym
+
+        data = path.mem.read_bytes(addr, size)
+        if data:
+            return int.from_bytes(data, "little")
+        return 0
+
+    def write(self, path, name: str, value):
+        """Write to a local on a live path (GDB ``set var`` equivalent).
+
+        Concrete ints go to backing memory; z3 expressions go to the
+        per-path symbolic shadow so the next load sees the symbolic value.
+        """
+        from .dispatch import _is_z3
+        if name not in self._locals:
+            raise KeyError(f"no ALLOCA found for {name!r}")
+        inst_id, size, align, addr = self._locals[name]
+
+        if _is_z3(value):
+            path._symbolic_shadow[(addr, size)] = value
+        elif isinstance(value, (int, bool)):
+            val = int(value)
+            path.mem.write(addr, val, size)
+        else:
+            raise TypeError(
+                f"value must be int or z3 expression, got {type(value)}")
+
+    # ------------------------------------------------------------------
+    # Diagnostics
+    # ------------------------------------------------------------------
+
+    def names(self) -> list[str]:
+        """All discovered local variable names."""
+        return list(self._locals.keys())
+
+    def __repr__(self) -> str:
+        return f"LocalsView({list(self._locals)})"
+
+    def dump(self, path=None):
+        """Print a GDB-style local variable listing.
+
+        Without a path: shows the pre-exploration address plan and any
+        pending symbolic inits.  With a path: reads current runtime
+        values (like GDB ``info locals``).
+        """
+        from .dispatch import _is_z3
+        print("(locals)")
+        for name, (inst_id, size, align, addr) in self._locals.items():
+            if path is not None:
+                val = self.read(path, name)
+                val_str = str(val) if _is_z3(val) else hex(val)
+                print(f"  {name:20s} = {val_str}")
+            else:
+                pending = self._symbolic_inits.get(name)
+                if pending is not None:
+                    init_str = f"<symbolic: {pending}>"
+                else:
+                    data = self._memory.read_bytes(addr, size)
+                    init_str = hex(int.from_bytes(data, "little")) if data else "0x0"
+                print(f"  {name:20s}  addr=0x{addr:016x}  "
+                      f"size={size}  init={init_str}")
 
 
 class _PointerLens:

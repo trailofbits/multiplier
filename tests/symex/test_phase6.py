@@ -42,7 +42,7 @@ so Phase 6 splits its tests like Phase 5 did:
 
 import pytest
 
-from symex import (
+from multiplier.symex import (
     ConcretizeByRegion,
     ConcretizeFinite,
     ConstrainTo,
@@ -56,7 +56,7 @@ from symex import (
     SymExEngine,
     Suspension,
 )
-from symex.events import EventKind, Terminal
+from multiplier.symex.events import EventKind, Terminal
 
 
 import multiplier as mx
@@ -120,7 +120,7 @@ def test_p6_0_resume_addr_symbolic_round_trip(index):
     BitVec into a freshly-chosen eid, read it back, verify it's the
     same z3 expression."""
     z3 = pytest.importorskip("z3")
-    from symex.engine import _resolve_function
+    from multiplier.symex.engine import _resolve_function
 
     ir_func = _resolve_function(index, "symbolic_test_add_i32")
     assert ir_func is not None

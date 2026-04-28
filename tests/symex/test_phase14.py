@@ -17,14 +17,14 @@ except ImportError:
 
 def _make_path():
     from unittest.mock import MagicMock
-    from symex.path import Path
+    from multiplier.symex.path import Path
     state = MagicMock()
     state.steps = 0
     return Path(state, MagicMock())
 
 
 def _make_log(*entries):
-    from symex.events import EventLog
+    from multiplier.symex.events import EventLog
     return EventLog(entries)
 
 
@@ -53,7 +53,7 @@ def test_p14_3_last_no_match_returns_none():
 
 
 def test_p14_4_last_empty_log():
-    from symex.events import EventLog
+    from multiplier.symex.events import EventLog
     assert EventLog().last() is None
 
 
@@ -62,7 +62,7 @@ def test_p14_4_last_empty_log():
 # ---------------------------------------------------------------------------
 
 def test_p14_5_groupby_kind():
-    from symex.events import EventLog
+    from multiplier.symex.events import EventLog
     log = _make_log(
         {"kind": "memory_read",  "step": 1},
         {"kind": "branch",       "step": 2},
@@ -107,7 +107,7 @@ def test_p14_8_unique_kinds():
 
 
 def test_p14_9_unique_empty():
-    from symex.events import EventLog
+    from multiplier.symex.events import EventLog
     assert EventLog().unique("kind") == set()
 
 
@@ -121,8 +121,8 @@ def test_p14_10_unique_none_field():
 # ---------------------------------------------------------------------------
 
 def test_p14_11_pathset_groupby_terminal():
-    from symex.engine import PathSet
-    from symex.events import Terminal
+    from multiplier.symex.engine import PathSet
+    from multiplier.symex.events import Terminal
 
     paths = []
     for t in [Terminal.COMPLETED, Terminal.COMPLETED, Terminal.ERROR]:
@@ -141,7 +141,7 @@ def test_p14_11_pathset_groupby_terminal():
 # ---------------------------------------------------------------------------
 
 def test_p14_12_name_for_global():
-    from symex.layout import Layout
+    from multiplier.symex.layout import Layout
     layout = Layout()
     layout.place_global("my_buf", 0x1000, 64)
     assert layout.name_for(0x1000) == "my_buf"
@@ -149,14 +149,14 @@ def test_p14_12_name_for_global():
 
 
 def test_p14_13_name_for_unmapped():
-    from symex.layout import Layout
+    from multiplier.symex.layout import Layout
     layout = Layout()
     layout.place_global("buf", 0x2000, 32)
     assert layout.name_for(0xDEAD) is None
 
 
 def test_p14_14_name_for_function():
-    from symex.layout import Layout
+    from multiplier.symex.layout import Layout
     layout = Layout()
     layout.place_function("foo", 0x4000_0000_0000_0000)
     assert layout.name_for(0x4000_0000_0000_0000) == "foo"

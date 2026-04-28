@@ -12,7 +12,7 @@ libc model pack.
 """
 
 from .layout import Layout
-from .lens import MemView, ArgsView
+from .lens import MemView, ArgsView, LocalsView
 from .ctx import Ctx
 from .path import Path
 from .events import EventLog
@@ -35,6 +35,7 @@ __all__ = [
     "Layout",
     "MemView",
     "ArgsView",
+    "LocalsView",
     "Ctx",
     "Path",
     "EventLog",

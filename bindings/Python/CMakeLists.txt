@@ -101,13 +101,13 @@ add_custom_command(
   COMMENT "Copying memory_view.py to build output"
 )
 
-# Copy the symex/ analyst-facing package to the build output.
+# Copy the symex/ analyst-facing package to the build output as multiplier/symex/.
 add_custom_command(
   TARGET "mx-python" POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_directory
     "${CMAKE_CURRENT_LIST_DIR}/symex"
-    "${PROJECT_BINARY_DIR}/lib/${site_packages_dir}/symex"
-  COMMENT "Copying symex/ to build output"
+    "${PROJECT_BINARY_DIR}/lib/${site_packages_dir}/multiplier/symex"
+  COMMENT "Copying symex/ to build output as multiplier/symex/"
 )
 
 target_include_directories("mx-python"
@@ -164,11 +164,11 @@ if(MX_ENABLE_INSTALL AND NOT MX_ENABLE_BOOTSTRAP)
       "${CMAKE_INSTALL_PREFIX}/${MX_INSTALL_LIB_DIR}/${site_packages_dir}"
   )
 
-  # Install the symex/ analyst-facing package alongside the extension.
+  # Install the symex/ analyst-facing package as multiplier/symex/.
   install(
     DIRECTORY
       "${CMAKE_CURRENT_LIST_DIR}/symex"
     DESTINATION
-      "${CMAKE_INSTALL_PREFIX}/${MX_INSTALL_LIB_DIR}/${site_packages_dir}"
+      "${CMAKE_INSTALL_PREFIX}/${MX_INSTALL_LIB_DIR}/${site_packages_dir}/multiplier"
   )
 endif()

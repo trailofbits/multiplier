@@ -22,7 +22,7 @@ pytestmark = pytest.mark.skipif(not _Z3_AVAILABLE, reason="z3 not installed")
 
 def _make_path(steps=0):
     from unittest.mock import MagicMock
-    from symex.path import Path
+    from multiplier.symex.path import Path
     state = MagicMock()
     state.steps = steps
     return Path(state, MagicMock())
@@ -30,8 +30,8 @@ def _make_path(steps=0):
 
 def _make_pathset(terminals):
     """Build a PathSet whose paths have the given terminal strings (or None)."""
-    from symex.engine import PathSet
-    from symex.events import Terminal
+    from multiplier.symex.engine import PathSet
+    from multiplier.symex.events import Terminal
     paths = []
     for t in terminals:
         p = _make_path()
@@ -92,7 +92,7 @@ def test_p11_4_is_tainted_false():
 # ---------------------------------------------------------------------------
 
 def test_p11_5_all_terminal_true():
-    from symex.events import Terminal
+    from multiplier.symex.events import Terminal
     ps = _make_pathset([Terminal.COMPLETED, Terminal.COMPLETED])
     assert ps.all_terminal()
 
@@ -102,7 +102,7 @@ def test_p11_5_all_terminal_true():
 # ---------------------------------------------------------------------------
 
 def test_p11_6_all_terminal_false():
-    from symex.events import Terminal
+    from multiplier.symex.events import Terminal
     ps = _make_pathset([Terminal.COMPLETED, None])
     assert not ps.all_terminal()
 
@@ -112,7 +112,7 @@ def test_p11_6_all_terminal_false():
 # ---------------------------------------------------------------------------
 
 def test_p11_7_terminals_groups():
-    from symex.events import Terminal
+    from multiplier.symex.events import Terminal
     ps = _make_pathset([Terminal.COMPLETED, Terminal.COMPLETED, None, Terminal.ERROR])
     groups = ps.terminals()
     assert len(groups[Terminal.COMPLETED]) == 2
@@ -125,7 +125,7 @@ def test_p11_7_terminals_groups():
 # ---------------------------------------------------------------------------
 
 def test_p11_8_findings_aggregation():
-    from symex.engine import PathSet
+    from multiplier.symex.engine import PathSet
 
     p1 = _make_path()
     p2 = _make_path()
@@ -158,7 +158,7 @@ def test_p11_9_findings_empty():
 # ---------------------------------------------------------------------------
 
 def test_p11_10_summary_table():
-    from symex.events import Terminal
+    from multiplier.symex.events import Terminal
     ps = _make_pathset([Terminal.COMPLETED, Terminal.COMPLETED, None])
     table = ps.summary_table()
     assert "3" in table or "path" in table.lower()
@@ -171,8 +171,8 @@ def test_p11_10_summary_table():
 # ---------------------------------------------------------------------------
 
 def test_p11_11_counter_example_found():
-    from symex.engine import PathSet
-    from symex.events import Terminal
+    from multiplier.symex.engine import PathSet
+    from multiplier.symex.events import Terminal
 
     p = _make_path()
     p.terminal = Terminal.COMPLETED
@@ -196,7 +196,7 @@ def test_p11_11_counter_example_found():
 # ---------------------------------------------------------------------------
 
 def test_p11_12_counter_example_none():
-    from symex.events import Terminal
+    from multiplier.symex.events import Terminal
     ps = _make_pathset([Terminal.COMPLETED])
     result = ps.counter_example(lambda p: False)
     assert result is None
@@ -207,8 +207,8 @@ def test_p11_12_counter_example_none():
 # ---------------------------------------------------------------------------
 
 def test_p11_13_counter_example_skips_unsat():
-    from symex.engine import PathSet
-    from symex.events import Terminal
+    from multiplier.symex.engine import PathSet
+    from multiplier.symex.events import Terminal
 
     p = _make_path()
     p.terminal = Terminal.COMPLETED
@@ -229,7 +229,7 @@ def test_p11_13_counter_example_skips_unsat():
 # ---------------------------------------------------------------------------
 
 def test_p11_14_summary_table_shows_findings():
-    from symex.engine import PathSet
+    from multiplier.symex.engine import PathSet
 
     p = _make_path()
     p.terminal = "completed"

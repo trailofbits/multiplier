@@ -24,14 +24,14 @@ import pytest
 
 import multiplier as mx
 
-from symex import (
+from multiplier.symex import (
     ConcretizeByRegion,
     ConcretizeFinite,
     Layout,
     SymExEngine,
 )
-from symex.dispatch import InterceptorPolicy, _is_z3
-from symex.events import EventKind, Terminal
+from multiplier.symex.dispatch import InterceptorPolicy, _is_z3
+from multiplier.symex.events import EventKind, Terminal
 
 
 # ---------------------------------------------------------------------------

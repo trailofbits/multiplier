@@ -36,9 +36,9 @@ P9.13 indirect_call_resolved event records fork_index + candidates on
 
 import pytest
 
-from symex import Layout, SymExEngine
-from symex.events import Terminal, EventKind, ADDRESS_RESOLVED, INDIRECT_CALL_RESOLVED
-from symex.until import ExploreUntil
+from multiplier.symex import Layout, SymExEngine
+from multiplier.symex.events import Terminal, EventKind, ADDRESS_RESOLVED, INDIRECT_CALL_RESOLVED
+from multiplier.symex.until import ExploreUntil
 
 from conftest import find_ir_function
 
@@ -229,7 +229,7 @@ def test_p9_7b_tls_shadow_isolation():
     isolation is implemented at the Python-path level (via _tls_shadow)
     rather than at the C++ ConcreteMemory level.
     """
-    from symex.path import Path
+    from multiplier.symex.path import Path
     import multiplier as mx
 
     # Create a "parent" path stub with a tls_shadow entry.
@@ -266,7 +266,7 @@ def test_p9_7b_tls_shadow_isolation():
 
 def test_p9_7c_tls_fork_inherits_parent():
     """A parent write to _tls_shadow is inherited by both forks."""
-    from symex.path import Path
+    from multiplier.symex.path import Path
     import multiplier as mx
 
     mem = mx.ir.interpret.ConcreteMemory()
@@ -306,7 +306,7 @@ def test_p9_8_indirect_call_target_kind_concrete(index):
         return next_hook(ctx)
 
     # Simulate a concrete indirect call via InterceptorPolicy.resolve_call.
-    from symex.dispatch import InterceptorPolicy
+    from multiplier.symex.dispatch import InterceptorPolicy
     policy = InterceptorPolicy(engine, None)
     policy.resolve_call(
         target_eid=0, indirect_eid=1234, args_list=[], is_indirect=True)
@@ -345,9 +345,9 @@ def test_p9_9_symbolic_indirect_call_forks(index):
         return [func_a_addr, func_b_addr]
 
     # Test the handler dispatch directly: build the chain and call it.
-    from symex.dispatch import _build_chain, _DEFER
-    from symex.dispatch import InterceptorPolicy
-    from symex.events import INDIRECT_CALL
+    from multiplier.symex.dispatch import _build_chain, _DEFER
+    from multiplier.symex.dispatch import InterceptorPolicy
+    from multiplier.symex.events import INDIRECT_CALL
 
     def _match(sel):
         return sel.matches_target_kind("symbolic")
@@ -356,15 +356,15 @@ def test_p9_9_symbolic_indirect_call_forks(index):
                 if _match(sel)]
     assert handlers, "Handler must be registered"
 
-    from symex.path import Path
+    from multiplier.symex.path import Path
     import multiplier as mx
     mem = mx.ir.interpret.ConcreteMemory()
     state = mx.ir.interpret.InterpreterState()
     path = Path(state, mem)
     path._layout = engine.layout
 
-    from symex.ctx import Ctx
-    from symex.lens import MemView
+    from multiplier.symex.ctx import Ctx
+    from multiplier.symex.lens import MemView
     ctx = Ctx(path=path, mem=MemView(mem), args=None, layout=engine.layout,
               solver=None)
 
@@ -393,7 +393,7 @@ def test_p9_10_indirect_call_none_terminates(index):
     interp = mx.ir.interpret
     mem = interp.ConcreteMemory()
     state = interp.InterpreterState()
-    from symex.path import Path
+    from multiplier.symex.path import Path
     path = Path(state, mem)
     path._layout = engine.layout
 
@@ -497,7 +497,7 @@ def test_p9_13_indirect_call_resolved_records_provenance(index):
     candidates = [addr_x, addr_y]
 
     import multiplier as mx
-    from symex.path import Path
+    from multiplier.symex.path import Path
 
     mem = mx.ir.interpret.ConcreteMemory()
     state = mx.ir.interpret.InterpreterState()

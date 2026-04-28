@@ -17,12 +17,12 @@ P3.6  engine.explore(strategy="dfs") and "bfs" both run to completion;
 
 import pytest
 
-from symex import (
+from multiplier.symex import (
     SymExEngine,
     ExploreUntil,
     SymExpr,
 )
-from symex.cfg import classify_edges
+from multiplier.symex.cfg import classify_edges
 from conftest import ForkOnSymbolicBranchPolicy, SymExpr as _ConfSymExpr
 
 
@@ -32,7 +32,7 @@ def test_p3_1_backedge_analysis(index):
     """test_control_flow has multiple loops; classify_edges should
     discover at least one back-edge per loop and identify the loop's
     cond_branch source as a loop guard."""
-    from symex.engine import _resolve_function
+    from multiplier.symex.engine import _resolve_function
     ir_func = _resolve_function(index, "test_control_flow")
     assert ir_func is not None
     cfg = classify_edges(ir_func)

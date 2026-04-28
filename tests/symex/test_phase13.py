@@ -25,7 +25,7 @@ pytestmark = pytest.mark.skipif(not _Z3_AVAILABLE, reason="z3 not installed")
 
 def _make_path():
     from unittest.mock import MagicMock
-    from symex.path import Path
+    from multiplier.symex.path import Path
     state = MagicMock()
     state.steps = 0
     return Path(state, MagicMock())
@@ -219,7 +219,7 @@ def test_p13_8_snapshot_independence():
 # ---------------------------------------------------------------------------
 
 def test_p13_9_snapshot_slots():
-    from symex.path import _Snapshot
+    from multiplier.symex.path import _Snapshot
     required = {
         "state", "events", "tags", "path_condition", "terminal",
         "return_value", "error_kind", "loop_iters", "func_name",
