@@ -1298,6 +1298,40 @@ path stay local to that child.
 Test suite: `tests/symex/test_phase10.py` (10 tests, P10.1–P10.10);
 `tests/symex` count is 141 passed.
 
+### Phase 11 — PathSet analysis + Path taint helpers (delivered)
+
+Phase 11 completes the analyst-facing result API. After `engine.explore`
+returns a `PathSet`, analysts can now answer high-level questions without
+manually iterating over paths.
+
+**PathSet additions:**
+
+```python
+paths.all_terminal()          # bool — no live paths remain
+paths.terminals()             # {terminal_value: PathSet} partition
+paths.findings()              # FindingsList across all paths (path_id injected)
+paths.summary_table()         # human-readable text report
+paths.counter_example(pred)   # (path, {name: int} model) or None
+```
+
+`counter_example(pred)` walks paths, applies `pred(path)`, and asks the
+per-path SMT solver for a satisfying model. Returns the first `(path,
+model)` pair where both hold; skips UNSAT paths; returns `None` when
+nothing matches.
+
+**Path taint helpers** — thin wrappers over `path.origin()`:
+
+```python
+path.taint_sources(expr)  # frozenset[str] of fresh_int names in expr
+path.is_tainted(expr)     # bool shorthand
+```
+
+`taint_sources` excludes unknown/external variables (created outside
+`solver.fresh_int`) so it only reports analyst-controlled inputs.
+
+Test suite: `tests/symex/test_phase11.py` (14 tests, P11.1–P11.14);
+`tests/symex` count is 155 passed.
+
 ---
 
 ## Open design questions
@@ -1450,6 +1484,11 @@ include/multiplier/IR/Interpret/ConcreteMemory.h    # place_at if missing
   produces a recursive `{"kind":"leaf"/"op"}` view; propagated through
   `clone()` and `_fork_child`. `tests/symex/test_phase10.py` (10 tests,
   P10.1–P10.10) green; `tests/symex` count is 141 passed, 0 skipped.
+- Phase 11: PathSet analysis + Path taint helpers — `PathSet.all_terminal`,
+  `terminals`, `findings`, `summary_table`, `counter_example(pred)`;
+  `Path.taint_sources(expr)` and `Path.is_tainted(expr)` thin aliases
+  over `origin()`. `tests/symex/test_phase11.py` (14 tests, P11.1–P11.14)
+  green; `tests/symex` count is 155 passed, 0 skipped.
 - The 235-test pre-existing harness still passes (regression gate).
 - Public API has docstrings; the README links to the Phase 7
   walkthrough.
