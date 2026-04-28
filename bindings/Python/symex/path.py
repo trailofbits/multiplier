@@ -145,6 +145,12 @@ class Path:
         self.return_value = None
         self.error_kind = None
         self.suspended = None
+        # Phase 8f: the IRFunction this path started from. Set by
+        # `_init_path` (so both `explore` and `explore_many` populate
+        # it) and propagated by `clone` and `_fork_child`. `None` only
+        # for paths constructed bare (e.g., snapshot restoration that
+        # predates Phase 8f).
+        self.entry_func = None
         # Per-path back-edge counter; keyed by (latch_id, header_id).
         # Mutated by the dispatcher each time intercept.loop fires.
         self._loop_iters = {}
@@ -184,6 +190,7 @@ class Path:
         new_path._loop_iters = dict(self._loop_iters)
         new_path._func_name = self._func_name
         new_path._layout = self._layout
+        new_path.entry_func = self.entry_func
         new_path.solver.adopt_fresh_vars(self.solver._fresh_vars)
         new_path._region_at_suspension = self._region_at_suspension
         new_path._lazy_regions_used = self._lazy_regions_used

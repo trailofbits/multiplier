@@ -1151,6 +1151,65 @@ tests that relied on plain-int suspension were reworked to use
 an opaque-sentinel policy (`_OpaqueAddr`) so they still drive
 the suspension/resumption loop without exploiting the old bug.
 
+### Phase 8f — multi-function entry exploration (delivered)
+
+`engine.explore("foo")` runs from one entry. Real harness-style
+analysis usually wants "explore every function whose name matches
+X" — every public API entry, every `on_*_event`, every syscall
+handler. Phase 8f adds `engine.explore_many(start_funcs)`:
+
+- `start_funcs` accepts a list of names / IRFunctions (mixed
+  allowed), a compiled `re.Pattern` matched against function
+  names, or a callable `name -> bool` predicate. Pattern and
+  predicate forms iterate `mx.ast.FunctionDecl.IN(index)` and
+  de-duplicate by IRFunction id so multi-TU declarations don't
+  double up. Empty resolution raises `ValueError` (a typo'd
+  regex would otherwise vanish into a silent no-op).
+- Entries drive sequentially under one shared `Layout` (matching
+  `explore`'s pin-on-first-call behavior) and one shared `until`.
+  The user's `until` sees the cumulative `ExploreState` —
+  `paths` is every path produced across every entry — so a
+  threshold flips True from any entry's progress. A cross-entry
+  guard re-checks `until` before initializing each next entry,
+  so a triggered predicate cleanly skips remaining entries
+  (they leave no zero-step paths behind).
+- Each `Path` carries `entry_func` (the IRFunction it started
+  in), propagated through forks. `PathSet.by_entry()` groups
+  results, preserving resolution order.
+
+Per-entry `args` mapping (`{"foo": [1, 2], "bar": [3]}`) and
+concurrent entry exploration are deferred — sequential covers
+every harness shape we have today, and per-path z3 solver state
+isn't trivially shareable across processes anyway. Sub-block
+resume granularity and path serialization, the other two Phase 8f
+candidates the original sketch surfaced, remain deferred (both
+are substrate-shaped).
+
+**Test catalog (`tests/symex/test_phase8f.py`):**
+
+- **P8f.1** Two-name list resolves to two IRFunctions; each
+  entry's return value matches `ConcretePolicy`.
+- **P8f.2** A compiled regex resolves to the known
+  `test_(byvalue|struct_assign|init_lists|pointers)` set and
+  every match completes.
+- **P8f.3** A callable predicate resolves a single entry;
+  `factorial(5)` returns 120.
+- **P8f.4** Empty resolution (regex matching nothing, predicate
+  always-False) raises `ValueError`.
+- **P8f.5** A mixed list of `str` and pre-resolved IRFunction
+  resolves both.
+- **P8f.6** `path.entry_func` is the IRFunction the path
+  started in, set on every returned path (forks too).
+- **P8f.7** `until.steps(1)` firing on the first entry's first
+  slice short-circuits the cross-entry guard so the second
+  entry contributes no paths.
+
+After Phase 8f the symex API supports single-function entry
+(`explore`), multi-function entry (`explore_many`), per-path
+queries (`PathSet`, `path.events`, `path.dot_cfg`), and
+aggregate queries (`PathSet.by_entry()`) — enough for "find
+OOB writes across every public entry in this module."
+
 ---
 
 ## Open design questions
@@ -1173,9 +1232,6 @@ the suspension/resumption loop without exploiting the old bug.
   (e.g. resume after step 3 of block 5) requires saving the
   per-instruction work-stack. Defer; mid-block-as-block-entry is
   enough for Phase 1–2.
-- **Multi-function entry.** Today `start_func` is one function.
-  Composable? Imagine "explore from any function whose name
-  matches `r"on_.*_event"`." Defer to Phase 6.
 - **Path serialization.** Snapshot is in-process today; cross-
   process replay needs serializing the symbolic state + z3
   solver. Defer.
@@ -1282,6 +1338,16 @@ include/multiplier/IR/Interpret/ConcreteMemory.h    # place_at if missing
   `tests/symex/test_phase8e.py` (3 tests, P8e.1–P8e.3 with 4
   parametrizations on P8e.2) green; `tests/symex` count is 109
   passed, 0 skipped.
+- Phase 8f: `engine.explore_many(start_funcs)` accepts a list
+  of names / IRFunctions, a compiled regex pattern, or a name
+  predicate, and drives one combined exploration over every
+  matched entry under a shared `Layout` and a shared `until`.
+  Each `Path` carries `entry_func`; `PathSet.by_entry()` groups
+  the result by entry in resolution order. Empty resolution
+  raises `ValueError`. Sub-block resume granularity, path
+  serialization, and per-entry args mapping remain deferred.
+  `tests/symex/test_phase8f.py` (7 tests, P8f.1–P8f.7) green;
+  `tests/symex` count is 116 passed, 0 skipped.
 - The 235-test pre-existing harness still passes (regression gate).
 - Public API has docstrings; the README links to the Phase 7
   walkthrough.

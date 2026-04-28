@@ -19,6 +19,8 @@ the engine instantiates an `InterceptorPolicy` per step that consults
 the registries and propagates symbolic values across pure operations.
 """
 
+import re
+
 import multiplier as mx
 
 from .layout import Layout
@@ -152,6 +154,21 @@ class PathSet(_FilterableList):
             if not _path_match_one(path, key, target):
                 return False
         return True
+
+    def by_entry(self):
+        """Group paths by `entry_func`, preserving insertion order.
+
+        Useful after `engine.explore_many(...)` for per-entry queries
+        (e.g. "did the `on_*_event` exploration ever trip the OOB
+        sink?"). Paths whose `entry_func` is `None` (single-entry
+        `explore` results pre-Phase 8f, or paths constructed directly)
+        are grouped under the `None` key.
+        """
+        groups = {}
+        for p in self:
+            ef = getattr(p, "entry_func", None)
+            groups.setdefault(ef, []).append(p)
+        return {k: PathSet(v) for k, v in groups.items()}
 
 
 def _path_match_one(path, key, target):
@@ -315,6 +332,148 @@ class SymExEngine:
             use_interceptor, until_pred, slice_steps,
             strategy_obj, strategy))
 
+    def explore_many(self, start_funcs, *, args=None, until=None,
+                     strategy=Strategy.BFS, concretize=None,
+                     slice_steps=_DEFAULT_SLICE_STEPS):
+        """Drive symbolic exploration over multiple entry functions.
+
+        `start_funcs` accepts:
+          * a list of names / IRFunctions (mixed allowed),
+          * a compiled `re.Pattern` matched against function names, or
+          * a callable `name -> bool` predicate.
+
+        The engine drives entries sequentially under a shared `until`
+        predicate and one shared `Layout` (matching `explore`'s
+        layout-pinning behavior). The user-supplied `until` sees the
+        cumulative state — `paths` is every path produced so far across
+        every entry. An entry that pushes the cumulative state past
+        `until` short-circuits the remaining entries; those entries
+        are not initialized (so they leave no zero-step paths in the
+        result).
+
+        Empty resolution (no functions match) raises `ValueError` —
+        almost always a typo. `args=None` is forwarded verbatim to
+        each entry; per-entry args mapping is deferred.
+
+        Returns a `PathSet`. Each path carries `entry_func` (the
+        IRFunction it started in); `paths.by_entry()` groups by entry
+        in resolution order.
+        """
+        entries = self._resolve_start_many(start_funcs)
+        if not entries:
+            raise ValueError(
+                "explore_many: start_funcs resolved to zero functions; "
+                "check the names, regex, or predicate")
+
+        if strategy not in (Strategy.BFS, Strategy.DFS):
+            raise ValueError(f"unknown explore strategy {strategy!r}")
+
+        if self.layout is None:
+            self.layout = Layout()
+        layout = self.layout
+        memory = layout.memory
+
+        raw_until = until if until is not None else ExploreUntil.never()
+        strategy_obj = (_coerce_strategy(concretize)
+                        if concretize is not None else self.address_strategy)
+
+        aggregate = []  # paths from every entry explored so far
+
+        def cumulative_until(state):
+            # Wrap the user predicate so it sees aggregate + the
+            # in-flight entry's paths in one ExploreState.
+            full_paths = aggregate + list(state.paths)
+            total = sum(p.steps for p in full_paths)
+            return raw_until(_ExploreState(full_paths, total))
+
+        for ir_func in entries:
+            # Cross-entry short-circuit: if the user's `until` already
+            # fires on the aggregate from prior entries, skip the rest.
+            if cumulative_until(_ExploreState([], 0)):
+                break
+            init_policy = InterceptorPolicy(self, None, layout=layout,
+                                            memory=memory)
+            init_path = self._init_path(
+                ir_func, memory, init_policy, args=args,
+                start_block=None, value_seed=None)
+            entry_paths = self._drive(
+                [init_path], memory, layout, None, True,
+                cumulative_until, slice_steps, strategy_obj, strategy)
+            aggregate.extend(entry_paths)
+
+        return PathSet(aggregate)
+
+    def _resolve_start_many(self, start_funcs):
+        """Resolve the explore_many `start_funcs` argument into a
+        de-duplicated list of IRFunctions in resolution order.
+
+        Accepts a `re.Pattern`, a callable `name -> bool`, or a list /
+        tuple of `str` and / or pre-resolved IRFunctions. Pattern and
+        callable forms iterate `mx.ast.FunctionDecl.IN(index)` and
+        emit each matching function once (deduplicated by IRFunction
+        id, so multiple FunctionDecl entries for the same definition
+        across translation units don't double up).
+        """
+        if isinstance(start_funcs, re.Pattern):
+            return self._resolve_by_predicate(
+                lambda n: start_funcs.search(n) is not None)
+        if isinstance(start_funcs, str):
+            raise TypeError(
+                "explore_many: start_funcs is a bare string; pass a "
+                "list (e.g. [name]) or a regex / predicate")
+        if isinstance(start_funcs, (list, tuple)):
+            return self._resolve_explicit_list(start_funcs)
+        if callable(start_funcs):
+            return self._resolve_by_predicate(start_funcs)
+        raise TypeError(
+            f"explore_many: start_funcs has unexpected type "
+            f"{type(start_funcs).__name__}; expected list, "
+            f"re.Pattern, or callable")
+
+    def _resolve_explicit_list(self, items):
+        out = []
+        seen = set()
+        for item in items:
+            if isinstance(item, str):
+                ir = _resolve_function(self._index, item)
+                if ir is None:
+                    raise ValueError(
+                        f"explore_many: function name {item!r} "
+                        f"not found in index")
+            else:
+                ir = item
+            try:
+                fid = int(ir.id)
+            except (AttributeError, TypeError) as exc:
+                raise TypeError(
+                    f"explore_many: list entry {item!r} is neither "
+                    f"a name nor an IRFunction") from exc
+            if fid in seen:
+                continue
+            seen.add(fid)
+            out.append(ir)
+        return out
+
+    def _resolve_by_predicate(self, pred):
+        out = []
+        seen = set()
+        for fd in mx.ast.FunctionDecl.IN(self._index):
+            try:
+                name = str(fd.name)
+            except Exception:
+                continue
+            if not pred(name):
+                continue
+            ir = mx.ir.IRFunction.FROM(fd)
+            if ir is None:
+                continue
+            fid = int(ir.id)
+            if fid in seen:
+                continue
+            seen.add(fid)
+            out.append(ir)
+        return out
+
     def _drive(self, initial_paths, memory, layout, policy,
                use_interceptor, until_pred, slice_steps, concretize,
                strategy):
@@ -474,6 +633,7 @@ class SymExEngine:
         path = Path(state, memory)
         path._func_name = self._function_name(ir_func)
         path._layout = self.layout
+        path.entry_func = ir_func
         # Init-time z3 args land in the init-policy's ephemeral shadow
         # (path didn't exist yet). Migrate them to the path's durable
         # shadow so subsequent steps see the symbolic param values.
@@ -890,5 +1050,6 @@ class SymExEngine:
         child._loop_iters = dict(parent._loop_iters)
         child._func_name = parent._func_name
         child._layout = parent._layout
+        child.entry_func = parent.entry_func
         child.solver.adopt_fresh_vars(parent.solver._fresh_vars)
         return child
