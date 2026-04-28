@@ -50,60 +50,55 @@ def _type_align_bytes(ty):
     return (bits + 7) // 8 if bits else 8
 
 
+def _as(ty, cls):
+    """Return the canonical form of ty if it's an instance of cls, else None."""
+    t = _unwrap(ty)
+    return t if isinstance(t, cls) else None
+
+
 def _as_record(ty):
     """If ty is a struct/union, return its RecordDecl."""
-    ty = _unwrap(ty)
-    rt = ast.RecordType.FROM(ty)
-    if rt is None:
-        return None
-    return ast.RecordDecl.FROM(rt.declaration)
+    rt = _as(ty, ast.RecordType)
+    return rt.declaration if rt is not None else None
 
 
 def _as_array(ty):
     """If ty is an array type, return the ArrayType."""
-    return ast.ArrayType.FROM(_unwrap(ty))
+    return _as(ty, ast.ArrayType)
 
 
 def _as_constant_array(ty):
     """If ty is a fixed-size array, return the ConstantArrayType."""
-    return ast.ConstantArrayType.FROM(_unwrap(ty))
+    return _as(ty, ast.ConstantArrayType)
 
 
 def _as_pointer(ty):
     """If ty is a pointer type, return the PointerType."""
-    return ast.PointerType.FROM(_unwrap(ty))
+    return _as(ty, ast.PointerType)
 
 
 def _is_float_type(ty):
     """Check if a type is a floating-point type."""
-    bt = ast.BuiltinType.FROM(_unwrap(ty))
-    if bt is None:
-        return False
-    return bt.is_floating_point
+    bt = _as(ty, ast.BuiltinType)
+    return bt is not None and bt.is_floating_point
 
 
 def _is_signed_int_type(ty):
     """Check if a type is a signed integer type."""
-    bt = ast.BuiltinType.FROM(_unwrap(ty))
-    if bt is None:
-        return False
-    return bt.is_signed_integer
+    bt = _as(ty, ast.BuiltinType)
+    return bt is not None and bt.is_signed_integer
 
 
 def _is_bool_type(ty):
     """Check if a type is a boolean type."""
-    bt = ast.BuiltinType.FROM(_unwrap(ty))
-    if bt is None:
-        return False
-    return bt.builtin_kind == ast.BuiltinTypeKind.BOOLEAN
+    bt = _as(ty, ast.BuiltinType)
+    return bt is not None and bt.builtin_kind == ast.BuiltinTypeKind.BOOLEAN
 
 
 def _is_void_type(ty):
     """Check if a type is void."""
-    bt = ast.BuiltinType.FROM(_unwrap(ty))
-    if bt is None:
-        return False
-    return bt.builtin_kind == ast.BuiltinTypeKind.VOID
+    bt = _as(ty, ast.BuiltinType)
+    return bt is not None and bt.builtin_kind == ast.BuiltinTypeKind.VOID
 
 
 def _find_field(record_decl, name):
@@ -217,10 +212,11 @@ def _bitfield_width_from_layout(field, record):
 
 def _array_element_count(ty):
     """Compute element count of a ConstantArrayType from sizes."""
-    ty = _unwrap(ty)
-    total_bits = ty.size_in_bits
-    arr = ast.ArrayType.FROM(ty)
-    if total_bits is None or arr is None:
+    arr = _as(ty, ast.ArrayType)
+    if arr is None:
+        return None
+    total_bits = _unwrap(ty).size_in_bits
+    if total_bits is None:
         return None
     elem_bits = _unwrap(arr.element_type).size_in_bits
     if elem_bits is None or elem_bits == 0:

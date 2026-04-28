@@ -16,14 +16,12 @@ def find_ir_function(index, name):
     """Find IRFunction by name (cached)."""
     if name in _ir_func_cache:
         return _ir_func_cache[name]
-    for frag in mx.Fragment.IN(index):
-        for decl in mx.ast.Decl.IN(frag):
-            fd = mx.ast.FunctionDecl.FROM(decl)
-            if fd and str(fd.name) == name:
-                ir = mx.ir.IRFunction.FROM(fd)
-                if ir:
-                    _ir_func_cache[name] = ir
-                    return ir
+    for fd in mx.ast.FunctionDecl.IN(index):
+        if str(fd.name) == name:
+            ir = mx.ir.IRFunction.FROM(fd)
+            if ir:
+                _ir_func_cache[name] = ir
+                return ir
     _ir_func_cache[name] = None
     return None
 
@@ -50,33 +48,38 @@ def run_ir_function(ir_func, args, func_resolver, global_resolver,
     return res[1]
 
 
+def _func_decl_for(entity):
+    if isinstance(entity, mx.ast.FunctionDecl):
+        return entity
+    if isinstance(entity, mx.ast.DeclRefExpr):
+        decl = entity.declaration
+        if isinstance(decl, mx.ast.FunctionDecl):
+            return decl
+    return None
+
+
+def _var_decl_for(entity):
+    if isinstance(entity, mx.ast.VarDecl):
+        return entity
+    if isinstance(entity, mx.ast.DeclRefExpr):
+        decl = entity.declaration
+        if isinstance(decl, mx.ast.VarDecl):
+            return decl
+    return None
+
+
 def _make_func_resolver(index):
     def resolve(eid):
-        entity = index.entity(eid)
-        if isinstance(entity, mx.ast.Decl):
-            fd = mx.ast.FunctionDecl.FROM(entity)
-            if fd is not None:
-                return mx.ir.IRFunction.FROM(fd)
-        if isinstance(entity, mx.ast.Stmt):
-            dre = mx.ast.DeclRefExpr.FROM(entity)
-            if dre is not None:
-                fd = mx.ast.FunctionDecl.FROM(dre.declaration)
-                if fd is not None:
-                    return mx.ir.IRFunction.FROM(fd)
-        return None
+        fd = _func_decl_for(index.entity(eid))
+        if fd is None:
+            return None
+        return mx.ir.IRFunction.FROM(fd)
     return resolve
 
 
 def _make_global_resolver(index):
     def resolve(eid):
-        entity = index.entity(eid)
-        vd = None
-        if isinstance(entity, mx.ast.Decl):
-            vd = mx.ast.VarDecl.FROM(entity)
-        elif isinstance(entity, mx.ast.Stmt):
-            dre = mx.ast.DeclRefExpr.FROM(entity)
-            if dre is not None:
-                vd = mx.ast.VarDecl.FROM(dre.declaration)
+        vd = _var_decl_for(index.entity(eid))
         if vd is None:
             return None
         canonical_eid = vd.id

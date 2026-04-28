@@ -27,10 +27,7 @@ interp = mx.ir.interpret
 def _allocate_param_addrs(mem, ir_func):
     """Allocate one slot per parameter, return list of addresses."""
     addrs = []
-    decl = ir_func.source_declaration
-    if decl is None:
-        return addrs
-    fd = mx.ast.FunctionDecl.FROM(decl)
+    fd = ir_func.declaration
     if fd is None:
         return addrs
     for p in fd.parameters:

@@ -13,46 +13,49 @@ interp = mx.ir.interpret
 
 def find_ir_function(index, name):
     """Find an IRFunction by name in the index."""
-    for frag in mx.Fragment.IN(index):
-        for decl in mx.ast.Decl.IN(frag):
-            fd = mx.ast.FunctionDecl.FROM(decl)
-            if fd is None or fd.name != name:
-                continue
-            ir = mx.ir.IRFunction.FROM(fd)
-            if ir is not None:
-                return ir
+    for fd in mx.ast.FunctionDecl.IN(index):
+        if fd.name != name:
+            continue
+        ir = mx.ir.IRFunction.FROM(fd)
+        if ir is not None:
+            return ir
+    return None
+
+
+def _func_decl_for(entity):
+    if isinstance(entity, mx.ast.FunctionDecl):
+        return entity
+    if isinstance(entity, mx.ast.DeclRefExpr):
+        decl = entity.declaration
+        if isinstance(decl, mx.ast.FunctionDecl):
+            return decl
+    return None
+
+
+def _var_decl_for(entity):
+    if isinstance(entity, mx.ast.VarDecl):
+        return entity
+    if isinstance(entity, mx.ast.DeclRefExpr):
+        decl = entity.declaration
+        if isinstance(decl, mx.ast.VarDecl):
+            return decl
     return None
 
 
 def make_func_resolver(index):
     """Create a function resolver: entity ID -> IRFunction."""
     def resolve(eid):
-        entity = index.entity(eid)
-        if isinstance(entity, mx.ast.Decl):
-            fd = mx.ast.FunctionDecl.FROM(entity)
-            if fd is not None:
-                return mx.ir.IRFunction.FROM(fd)
-        if isinstance(entity, mx.ast.Stmt):
-            dre = mx.ast.DeclRefExpr.FROM(entity)
-            if dre is not None:
-                fd = mx.ast.FunctionDecl.FROM(dre.declaration)
-                if fd is not None:
-                    return mx.ir.IRFunction.FROM(fd)
-        return None
+        fd = _func_decl_for(index.entity(eid))
+        if fd is None:
+            return None
+        return mx.ir.IRFunction.FROM(fd)
     return resolve
 
 
 def make_global_resolver(index):
     """Create a global resolver: entity ID -> (canonical_eid, size, align, init)."""
     def resolve(eid):
-        entity = index.entity(eid)
-        vd = None
-        if isinstance(entity, mx.ast.Decl):
-            vd = mx.ast.VarDecl.FROM(entity)
-        elif isinstance(entity, mx.ast.Stmt):
-            dre = mx.ast.DeclRefExpr.FROM(entity)
-            if dre is not None:
-                vd = mx.ast.VarDecl.FROM(dre.declaration)
+        vd = _var_decl_for(index.entity(eid))
         if vd is None:
             return None
         canonical_eid = vd.id
@@ -84,12 +87,10 @@ def interpret_function(index, ir_func):
 
     # Build zero-initialized arguments from declaration.
     args = []
-    decl = ir_func.source_declaration
-    if decl is not None:
-        fd = mx.ast.FunctionDecl.FROM(decl)
-        if fd is not None:
-            for _ in fd.parameters:
-                args.append(0)
+    fd = ir_func.declaration
+    if fd is not None:
+        for _ in fd.parameters:
+            args.append(0)
 
     interp.init_state(state, policy, ir_func, args)
 

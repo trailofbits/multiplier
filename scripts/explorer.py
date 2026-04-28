@@ -67,34 +67,36 @@ class Explorer:
         self.results: List[ExplorationResult] = []
 
     def _find_function(self) -> Optional[mx.ir.IRFunction]:
-        for frag in mx.Fragment.IN(self.idx):
-            for decl in mx.ast.Decl.IN(frag):
-                fd = mx.ast.FunctionDecl.FROM(decl)
-                if fd and str(fd.name) == self.func_name:
-                    ir = mx.ir.IRFunction.FROM(fd)
-                    if ir:
-                        return ir
+        for fd in mx.ast.FunctionDecl.IN(self.idx):
+            if str(fd.name) == self.func_name:
+                ir = mx.ir.IRFunction.FROM(fd)
+                if ir:
+                    return ir
         return None
 
     def _make_func_resolver(self):
         idx = self.idx
         def resolver(eid):
-            entity = mx.Entity.FROM(idx, eid)
-            if entity:
-                fd = mx.ast.FunctionDecl.FROM(entity)
-                if fd:
-                    return mx.ir.IRFunction.FROM(fd)
+            entity = idx.entity(eid)
+            if isinstance(entity, mx.ast.FunctionDecl):
+                return mx.ir.IRFunction.FROM(entity)
+            if isinstance(entity, mx.ast.DeclRefExpr):
+                decl = entity.declaration
+                if isinstance(decl, mx.ast.FunctionDecl):
+                    return mx.ir.IRFunction.FROM(decl)
             return None
         return resolver
 
     def _make_global_resolver(self):
         idx = self.idx
         def resolver(eid):
-            entity = mx.Entity.FROM(idx, eid)
-            if not entity:
-                return None
-            vd = mx.ast.VarDecl.FROM(entity)
-            if not vd:
+            entity = idx.entity(eid)
+            vd = entity if isinstance(entity, mx.ast.VarDecl) else None
+            if vd is None and isinstance(entity, mx.ast.DeclRefExpr):
+                decl = entity.declaration
+                if isinstance(decl, mx.ast.VarDecl):
+                    vd = decl
+            if vd is None:
                 return None
             vt = vd.type
             size = 0
@@ -106,10 +108,7 @@ class Explorer:
                 size = 8
             align = 8
             canonical = eid
-            initializer = None
-            ir = mx.ir.IRFunction.FROM(vd)
-            if ir:
-                initializer = ir
+            initializer = mx.ir.IRFunction.FROM(vd)
             return (canonical, size, align, initializer)
         return resolver
 
