@@ -32,8 +32,21 @@ class Layout:
     #   Function alloc:   0x4000_0000_0000_0000 upward (next_function_address)
     #   Lazy regions:     0x7000_0000_0000_0000 upward (declare_lazy)
 
-    def __init__(self):
-        self._memory = _interp.ConcreteMemory()
+    def __init__(self, memory=None):
+        """Create a Layout.
+
+        Parameters
+        ----------
+        memory : ConcreteMemory, optional
+            The backing address space.  When omitted a default 64-bit
+            ``ConcreteMemory()`` is created automatically.  Pass an
+            explicitly constructed memory to control address width or
+            the initial bump-allocator cursor::
+
+                mem = mx.ir.interpret.ConcreteMemory(4)  # 32-bit
+                layout = Layout(mem)
+        """
+        self._memory = memory if memory is not None else _interp.ConcreteMemory()
         self._regions = RegionTable()
         # name -> addr fast lookup for __getitem__ / __contains__.
         self._by_name: dict[str, Region] = {}
