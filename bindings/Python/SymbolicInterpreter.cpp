@@ -264,6 +264,7 @@ PythonPolicy::~PythonPolicy() {
   Py_XDECREF(cached_symbolic_load_);
   Py_XDECREF(cached_symbolic_store_);
   Py_XDECREF(cached_on_enter_block_);
+  Py_XDECREF(cached_on_instruction_);
 }
 
 PyObject *PythonPolicy::lookup_method(PyObject *&cache, const char *name) {
@@ -731,6 +732,17 @@ void PythonPolicy::on_enter_block_impl(const IRBlock &block) {
   auto block_eid = EntityId(block.id()).Pack();
   PyObject *result = PyObject_CallFunction(method, "K",
       static_cast<unsigned long long>(block_eid));
+  Py_XDECREF(result);
+  if (PyErr_Occurred()) PyErr_Clear();
+}
+
+// Per-instruction observer hook.
+void PythonPolicy::on_instruction_impl_inner(const IRInstruction &inst) {
+  PyObject *method = lookup_method(cached_on_instruction_, "on_instruction");
+  if (!method) return;
+  PyObject *inst_obj = ::mx::to_python<IRInstruction>(inst);
+  if (!inst_obj) { PyErr_Clear(); return; }
+  PyObject *result = PyObject_CallFunction(method, "N", inst_obj);
   Py_XDECREF(result);
   if (PyErr_Occurred()) PyErr_Clear();
 }

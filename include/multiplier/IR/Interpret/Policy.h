@@ -399,6 +399,24 @@ struct Policy {
     self().mark_next_suspension_as_call_target_impl();
   }
   void mark_next_suspension_as_call_target_impl() {}
+
+  // Per-instruction observe hook. Called by `dispatch` before each
+  // non-trivial work item so analysts can record per-instruction events.
+  // Default is a no-op; PythonPolicy overrides via `on_instruction_impl`.
+  template <typename StateT, typename SchedT>
+  void on_instruction(StateT &state, SchedT &sched,
+                      const IRInstruction &inst) {
+    self().on_instruction_impl(state, sched, inst);
+  }
+  template <typename StateT, typename SchedT>
+  void on_instruction_impl(StateT &, SchedT &, const IRInstruction &) {}
+
+  // Abort-request gate. PythonPolicy sets this when a Python hook raises
+  // an exception so the loop can exit cleanly after the current item.
+  bool abort_requested() const {
+    return self().abort_requested_impl();
+  }
+  bool abort_requested_impl() const { return false; }
 };
 
 }  // namespace mx::ir::interpret

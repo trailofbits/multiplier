@@ -1478,6 +1478,17 @@ inline void dispatch(auto &state, PolicyT &policy,
                      SchedT &sched, const WorkItem &item) {
   auto &frame = state.call_stack.top();
 
+  // Fire the per-instruction observe hook for every work item that
+  // represents a real instruction execution (not scheduling helpers).
+  if (item.kind != WorkKind::ENTER_BLOCK &&
+      item.kind != WorkKind::ANALYZE) {
+    policy.on_instruction(state, sched, item.inst);
+    if (policy.abort_requested()) {
+      state.work_stack.clear();
+      return;
+    }
+  }
+
   switch (item.kind) {
     case WorkKind::ENTER_BLOCK:
       enter_block<PolicyT, ValueT>(state, policy, item.block);

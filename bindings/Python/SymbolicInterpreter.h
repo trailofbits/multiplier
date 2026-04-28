@@ -245,6 +245,15 @@ class PythonPolicy
     next_is_call_target_ = true;
   }
 
+  // Per-instruction observe hook. Called from dispatch() for every
+  // non-trivial instruction; fans out to the Python policy's
+  // `on_instruction` method when registered.
+  template <typename StateT, typename SchedT>
+  void on_instruction_impl(StateT &, SchedT &, const IRInstruction &inst) {
+    on_instruction_impl_inner(inst);
+  }
+  void on_instruction_impl_inner(const IRInstruction &inst);
+
  private:
   SharedPyPtr py_policy_;
   ConcreteMemory &memory_;
@@ -268,6 +277,7 @@ class PythonPolicy
   PyObject *cached_symbolic_load_{nullptr};
   PyObject *cached_symbolic_store_{nullptr};
   PyObject *cached_on_enter_block_{nullptr};
+  PyObject *cached_on_instruction_{nullptr};
 
   // Phase 9: set by mark_next_suspension_as_call_target_impl; consumed
   // and cleared in with_address_impl when it emits a MemAddrContinuation.

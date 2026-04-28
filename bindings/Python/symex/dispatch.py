@@ -39,7 +39,7 @@ from .events import (
     GLOBAL_READ, GLOBAL_WRITE,
     CALL, INDIRECT_CALL,
     BRANCH, LOOP, CONCRETIZE,
-    BLOCK_ENTER,
+    BLOCK_ENTER, INSTRUCTION,
     ADDRESS_FOR, ADDRESS_RESOLVED,
     EventKind, Phase, CallAction, VALUE_TAG_PTR,
 )
@@ -1051,6 +1051,17 @@ class InterceptorPolicy:
             "block": int(block_id),
             "step": getattr(path, "steps", 0),
         })
+
+    # ----- Phase: per-instruction observe hook ----------------------
+
+    def on_instruction(self, inst):
+        """Fired by the substrate before every non-trivial instruction.
+        Fans out to `engine.observe.instruction` observers."""
+        if not self._engine._observers.lookup((INSTRUCTION, Phase.AFTER)):
+            return
+        ctx = self._make_ctx()
+        ctx.inst = inst
+        self._fire_observers(INSTRUCTION, Phase.AFTER, ctx, inst=inst)
 
     # ----- truth + branch resolution: fork on non-concrete -----
 
