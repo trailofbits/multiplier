@@ -799,7 +799,7 @@ inline void compute_global_ptr(auto &state, PolicyT &policy,
     // the push may reallocate the segment's vector and invalidate `frame`.
     frame.values[id] = addr;
 
-    if (info.initializer) {
+    if (info.initializer && !placed_via_hint) {
       CallFrame<ValueT> init_frame;
       init_frame.func = *info.initializer;
       init_frame.params = {addr};
