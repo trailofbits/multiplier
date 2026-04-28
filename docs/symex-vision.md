@@ -1533,6 +1533,12 @@ include/multiplier/IR/Interpret/ConcreteMemory.h    # place_at if missing
   `Path.value_range(expr)`. All side-effect-free; use fresh solvers /
   z3.Optimize per call. `tests/symex/test_phase12.py` (14 tests,
   P12.1–P12.14) green; `tests/symex` count is 169 passed, 0 skipped.
+- Phase 13 (correctness fix): `_Snapshot` completeness — added 7 missing
+  fields (`findings`, `region_at_suspension`, `lazy_regions_used`,
+  `entry_func`, `tls_base`, `tls_shadow`, `origin_by_name`); fixed
+  `Path.restore()` and `engine.resume_from()` to fully restore them.
+  `tests/symex/test_phase13.py` (10 tests, P13.1–P13.9 + P13.1b) green;
+  `tests/symex` count is 179 passed, 0 skipped.
 - The 235-test pre-existing harness still passes (regression gate).
 - Public API has docstrings; the README links to the Phase 7
   walkthrough.
