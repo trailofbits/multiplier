@@ -1332,6 +1332,45 @@ path.is_tainted(expr)     # bool shorthand
 Test suite: `tests/symex/test_phase11.py` (14 tests, P11.1–P11.14);
 `tests/symex` count is 155 passed.
 
+### Phase 12 — Path SMT query helpers (delivered)
+
+Phase 12 adds four side-effect-free query methods to `Path` that let
+analysts ask questions about reachable values without manually constructing
+z3 queries:
+
+```python
+path.can_be(expr, value)              # bool — is expr == value SAT?
+path.must_be(expr, value)             # bool — is expr != value UNSAT?
+path.possible_values(expr, limit=10)  # sorted list[int] of satisfying values
+path.value_range(expr)                # (lo, hi) tight unsigned bounds, or None
+```
+
+Each call builds a fresh `z3.Solver` (or `z3.Optimize` for
+`value_range`) from the path's current `path_condition` so the query is
+completely side-effect-free — the path condition list is never mutated.
+
+`possible_values` blocks each found assignment and re-queries until
+`limit` values are collected or the solver becomes UNSAT. The result is
+sorted. `value_range` uses `z3.Optimize.minimize` / `maximize` with a
+zero-extension guard for sub-64-bit variables; returns `None` on UNSAT.
+
+Typical uses:
+
+```python
+# Can this array index be out of bounds?
+if path.can_be(index_expr, buf_size):
+    print("OOB possible!")
+
+# What values can this function return?
+print(path.possible_values(path.return_value, limit=5))
+
+# Tight bounds on a pointer offset:
+lo, hi = path.value_range(offset_expr)
+```
+
+Test suite: `tests/symex/test_phase12.py` (14 tests, P12.1–P12.14);
+`tests/symex` count is 169 passed.
+
 ---
 
 ## Open design questions
@@ -1489,6 +1528,11 @@ include/multiplier/IR/Interpret/ConcreteMemory.h    # place_at if missing
   `Path.taint_sources(expr)` and `Path.is_tainted(expr)` thin aliases
   over `origin()`. `tests/symex/test_phase11.py` (14 tests, P11.1–P11.14)
   green; `tests/symex` count is 155 passed, 0 skipped.
+- Phase 12: Path SMT query helpers — `Path.can_be(expr, value)`,
+  `Path.must_be(expr, value)`, `Path.possible_values(expr, *, limit=10)`,
+  `Path.value_range(expr)`. All side-effect-free; use fresh solvers /
+  z3.Optimize per call. `tests/symex/test_phase12.py` (14 tests,
+  P12.1–P12.14) green; `tests/symex` count is 169 passed, 0 skipped.
 - The 235-test pre-existing harness still passes (regression gate).
 - Public API has docstrings; the README links to the Phase 7
   walkthrough.
