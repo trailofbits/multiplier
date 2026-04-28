@@ -331,6 +331,85 @@ class Path:
                     for i in range(expr.num_args())]
         return {"kind": "op", "op": str(expr.decl()), "args": children}
 
+    def can_be(self, expr, value) -> bool:
+        """Return True if there exists a satisfying assignment for the
+        path condition where `expr == value`.
+
+        Builds a fresh solver from the path condition each call so the
+        query is side-effect-free. `value` is coerced to a z3 BitVec of
+        the same width as `expr`.
+        """
+        z3 = _z3_module()
+        s = z3.Solver()
+        for c in self.path_condition:
+            s.add(c)
+        target = z3.BitVecVal(int(value), expr.size())
+        s.add(expr == target)
+        return s.check() == z3.sat
+
+    def must_be(self, expr, value) -> bool:
+        """Return True if `expr == value` holds in every satisfying
+        assignment for the path condition (i.e. no counter-example
+        exists).
+
+        Equivalent to checking that `expr != value` is UNSAT.
+        """
+        z3 = _z3_module()
+        s = z3.Solver()
+        for c in self.path_condition:
+            s.add(c)
+        target = z3.BitVecVal(int(value), expr.size())
+        s.add(expr != target)
+        return s.check() == z3.unsat
+
+    def possible_values(self, expr, *, limit: int = 10) -> list:
+        """Enumerate up to `limit` distinct concrete values that `expr`
+        can take under the current path condition.
+
+        Returns a sorted list of Python ints. If the expression is
+        fully constrained the list has exactly one element; if the path
+        is UNSAT the list is empty.
+        """
+        z3 = _z3_module()
+        s = z3.Solver()
+        for c in self.path_condition:
+            s.add(c)
+        results = []
+        while len(results) < limit:
+            if s.check() != z3.sat:
+                break
+            m = s.model()
+            val_z = m.eval(expr, model_completion=True)
+            val_i = val_z.as_long()
+            results.append(val_i)
+            s.add(expr != val_z)
+        return sorted(results)
+
+    def value_range(self, expr) -> tuple:
+        """Return `(lo, hi)` — the tight unsigned bounds for `expr`
+        under the current path condition, found via z3.Optimize.
+
+        Returns `None` if the path is UNSAT. Both bounds are Python ints.
+        """
+        z3 = _z3_module()
+        bounds = []
+        for minimize in (True, False):
+            opt = z3.Optimize()
+            for c in self.path_condition:
+                opt.add(c)
+            if minimize:
+                opt.minimize(z3.ZeroExt(64, expr)
+                             if expr.size() < 64 else expr)
+            else:
+                opt.maximize(z3.ZeroExt(64, expr)
+                             if expr.size() < 64 else expr)
+            if opt.check() != z3.sat:
+                return None
+            m = opt.model()
+            val = m.eval(expr, model_completion=True).as_long()
+            bounds.append(val)
+        return (bounds[0], bounds[1])
+
     def taint_sources(self, expr) -> frozenset:
         """Return the frozenset of `fresh_int` variable names whose values
         flow into `expr`. Unknown variables (created outside `fresh_int`)
