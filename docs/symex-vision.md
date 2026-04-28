@@ -1255,12 +1255,48 @@ walks; mint sites that ship in Phase 9 are `address_for`-intercept
 placements.
 
 Deferred: symbolic addresses returned from the forward hook (substrate
-expects concrete ints); full provenance walk `path.origin(expr)`
-(Phase 10); per-path TLS base without shared ConcreteMemory (requires
-state-level address-cache invalidation, a Phase 9b substrate item).
+expects concrete ints); per-path TLS base without shared ConcreteMemory
+(requires state-level address-cache invalidation, a Phase 9b substrate
+item).
 
 Test suite: `tests/symex/test_phase9.py` (15 tests, P9.1–P9.13
 including P9.7b/c TLS isolation); `tests/symex` count is 131 passed.
+
+### Phase 10 — `path.origin(expr)` provenance walk (delivered)
+
+Phase 10 adds symbolic-value provenance to every `Path`. The entry point
+is `solver.fresh_int(name, *, size, ...)`, which now records a mint-site
+dict into `path._origin_by_name`:
+
+```python
+{
+    "kind":    "fresh_int",
+    "name":    name,
+    "size":    size,       # bytes
+    "path_id": path.id,
+    "step":    path.steps, # interpreter step counter at mint time
+}
+```
+
+Two new `Path` methods consume the table:
+
+- `path.origin(expr) -> list[dict]` — DFS-walks a z3 expression,
+  collects the origin record for every distinct leaf `BitVecRef` variable.
+  Unknown variables (minted outside `fresh_int`, e.g. raw `z3.BitVec`)
+  produce `{"kind": "unknown", "name": <str>}`. Duplicate leaf
+  appearances are deduplicated; concrete literals return only unknown
+  records.
+- `path.origin_tree(expr) -> dict` — recursive view:
+  - Leaves: `{"kind": "leaf", "name": ..., "origin": <record>}`
+  - Compound nodes: `{"kind": "op", "op": <str>, "args": [...]}`
+
+`_origin_by_name` is propagated in `Path.clone()` and
+`SymExEngine._fork_child()` so forked paths retain full provenance of
+all inputs minted before the fork. Newly minted variables on a child
+path stay local to that child.
+
+Test suite: `tests/symex/test_phase10.py` (10 tests, P10.1–P10.10);
+`tests/symex` count is 141 passed.
 
 ---
 
@@ -1408,6 +1444,12 @@ include/multiplier/IR/Interpret/ConcreteMemory.h    # place_at if missing
   `_tls_shadow`. `tests/symex/test_phase9.py` (15 tests,
   P9.1–P9.13 with P9.7b/c TLS isolation) green; `tests/symex`
   count is 131 passed, 0 skipped.
+- Phase 10: `path.origin(expr)` provenance walk — `solver.fresh_int`
+  records mint-site metadata into `path._origin_by_name`; `Path.origin`
+  DFS-walks a z3 AST to collect origin records; `Path.origin_tree`
+  produces a recursive `{"kind":"leaf"/"op"}` view; propagated through
+  `clone()` and `_fork_child`. `tests/symex/test_phase10.py` (10 tests,
+  P10.1–P10.10) green; `tests/symex` count is 141 passed, 0 skipped.
 - The 235-test pre-existing harness still passes (regression gate).
 - Public API has docstrings; the README links to the Phase 7
   walkthrough.
