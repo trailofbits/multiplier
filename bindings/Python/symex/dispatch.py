@@ -808,14 +808,25 @@ class InterceptorPolicy:
 
     def _coerce_store_value(self, val, size, z3):
         """Lift a substrate-shaped store value to a z3 BitVec of `8*size`
-        bits. Accepts ints, bools, `("ptr", N)` tuples, and z3 BitVecs.
-        Returns None for shapes the overlay can't represent (floats
-        aren't wired here yet)."""
+        bits. Accepts ints, bools, Python floats, `("ptr", N)` tuples,
+        and z3 BitVecs. Floats pack via the IEEE byte pattern (size 4 →
+        f32, size 8 → f64); the resulting BitVec is the bit pattern of
+        the float, matching how concrete float stores land on the
+        substrate's byte buffer. Returns None for shapes the overlay
+        can't represent."""
         bits = 8 * int(size)
         if isinstance(val, bool):
             return z3.BitVecVal(int(val), bits)
         if isinstance(val, int):
             return z3.BitVecVal(val & ((1 << bits) - 1), bits)
+        if isinstance(val, float):
+            if int(size) == 4:
+                packed = _struct.pack("<f", val)
+            elif int(size) == 8:
+                packed = _struct.pack("<d", val)
+            else:
+                return None
+            return z3.BitVecVal(int.from_bytes(packed, "little"), bits)
         if isinstance(val, tuple) and len(val) == 2 and \
                 val[0] == VALUE_TAG_PTR:
             return z3.BitVecVal(int(val[1]) & ((1 << bits) - 1), bits)

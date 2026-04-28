@@ -129,43 +129,46 @@ class ForkOnSymbolicBranchPolicy:
 
 
 def find_ir_function(index, name):
-    for frag in mx.Fragment.IN(index):
-        for decl in mx.ast.Decl.IN(frag):
-            fd = mx.ast.FunctionDecl.FROM(decl)
-            if fd and str(fd.name) == name:
-                ir = mx.ir.IRFunction.FROM(fd)
-                if ir is not None:
-                    return ir
+    for fd in mx.ast.FunctionDecl.IN(index):
+        if str(fd.name) == name:
+            ir = mx.ir.IRFunction.FROM(fd)
+            if ir is not None:
+                return ir
+    return None
+
+
+def _func_decl_for(entity):
+    if isinstance(entity, mx.ast.FunctionDecl):
+        return entity
+    if isinstance(entity, mx.ast.DeclRefExpr):
+        decl = entity.declaration
+        if isinstance(decl, mx.ast.FunctionDecl):
+            return decl
+    return None
+
+
+def _var_decl_for(entity):
+    if isinstance(entity, mx.ast.VarDecl):
+        return entity
+    if isinstance(entity, mx.ast.DeclRefExpr):
+        decl = entity.declaration
+        if isinstance(decl, mx.ast.VarDecl):
+            return decl
     return None
 
 
 def make_func_resolver(index):
     def resolve(eid):
-        entity = index.entity(eid)
-        if isinstance(entity, mx.ast.Decl):
-            fd = mx.ast.FunctionDecl.FROM(entity)
-            if fd is not None:
-                return mx.ir.IRFunction.FROM(fd)
-        if isinstance(entity, mx.ast.Stmt):
-            dre = mx.ast.DeclRefExpr.FROM(entity)
-            if dre is not None:
-                fd = mx.ast.FunctionDecl.FROM(dre.declaration)
-                if fd is not None:
-                    return mx.ir.IRFunction.FROM(fd)
-        return None
+        fd = _func_decl_for(index.entity(eid))
+        if fd is None:
+            return None
+        return mx.ir.IRFunction.FROM(fd)
     return resolve
 
 
 def make_global_resolver(index):
     def resolve(eid):
-        entity = index.entity(eid)
-        vd = None
-        if isinstance(entity, mx.ast.Decl):
-            vd = mx.ast.VarDecl.FROM(entity)
-        elif isinstance(entity, mx.ast.Stmt):
-            dre = mx.ast.DeclRefExpr.FROM(entity)
-            if dre is not None:
-                vd = mx.ast.VarDecl.FROM(dre.declaration)
+        vd = _var_decl_for(index.entity(eid))
         if vd is None:
             return None
         canonical_eid = vd.id
@@ -229,4 +232,52 @@ def run_until_terminal(state, mem, policy, func_resolver, global_resolver,
         if status == "budget":
             continue
         return result
+    return None
+
+
+def run_via_concrete_policy(index, name, args=None):
+    """Run `name` through `interp.ConcretePolicy` (pure C++ semantics)
+    and return the function's result. Used as the ground-truth reference
+    for symex tests that compare `engine.explore(name)` against the
+    concrete driver.
+
+    Returns `None` if the function isn't in the index, the run errored,
+    suspended, or exhausted its budget.
+    """
+    ir = find_ir_function(index, name)
+    if ir is None:
+        return None
+
+    memory = interp.ConcreteMemory()
+    policy = interp.ConcretePolicy(
+        memory,
+        make_func_resolver(index),
+        make_global_resolver(index))
+
+    if args is None:
+        args = []
+        fd = ir.declaration
+        if fd is not None:
+            for _ in fd.parameters:
+                args.append(0)
+
+    state = interp.InterpreterState()
+    interp.init_state(state, policy, ir, args)
+
+    max_total_steps = 100000
+    while state.steps < max_total_steps:
+        out = interp.step(state, policy, 1000)
+        if out is None:
+            return None
+        result = out.get("result") if isinstance(out, dict) else out
+        if result is None:
+            return None
+        status = result[0]
+        if status == "completed":
+            return result[1]
+        if status in ("error", "suspended"):
+            return None
+        if status == "budget":
+            continue
+        return None
     return None

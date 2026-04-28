@@ -283,7 +283,24 @@ PyObject *PythonPolicy::lookup_method(PyObject *&cache, const char *name) {
 // ===========================================================================
 
 std::optional<uint64_t> PythonPolicy::extract_address(const SharedPyPtr &val) {
-  return extract_ptr_tuple(val.Get());
+  if (auto a = extract_ptr_tuple(val.Get())) return a;
+  // A bare PyLong is also a concrete address — it's what
+  // `value_to_python` produces for a pointer loaded out of a slot
+  // (the C-level `Value` carries no "pointer-ness" tag, so the slot
+  // load surfaces as an int). Treating only `("ptr", N)` tuples as
+  // concrete sent every loaded-pointer dereference through the
+  // symbolic-suspension path, which the default address strategy
+  // collapsed to zero.
+  PyObject *obj = val.Get();
+  if (obj && PyLong_Check(obj) && !PyBool_Check(obj)) {
+    uint64_t v = PyLong_AsUnsignedLongLong(obj);
+    if (v == static_cast<uint64_t>(-1) && PyErr_Occurred()) {
+      PyErr_Clear();
+      return std::nullopt;
+    }
+    return v;
+  }
+  return std::nullopt;
 }
 
 int64_t PythonPolicy::extract_int(const SharedPyPtr &val) {
@@ -460,8 +477,14 @@ SharedPyPtr PythonPolicy::ptr_add(const SharedPyPtr &base,
     Py_XDECREF(result);
     PyErr_Clear();
   }
-  return value_to_shared(concrete_ptr_add(
-      python_to_value(base.Get()), python_to_value(index.Get()), element_size));
+  // ptr_add yields a pointer; preserve the ("ptr", N) tagging so
+  // downstream `extract_address` can recover it. value_to_shared loses
+  // the tag (it always returns a PyLong), which would force callers
+  // through the symbolic-address suspension path with a default
+  // strategy that resolves to 0 and corrupts later memory ops.
+  Value v = concrete_ptr_add(
+      python_to_value(base.Get()), python_to_value(index.Get()), element_size);
+  return make_literal_ptr(v.u64);
 }
 
 SharedPyPtr PythonPolicy::ptr_diff(const SharedPyPtr &lhs,
@@ -497,8 +520,9 @@ SharedPyPtr PythonPolicy::ptr_offset(const SharedPyPtr &base,
     Py_XDECREF(result);
     PyErr_Clear();
   }
-  return value_to_shared(concrete_ptr_offset(
-      python_to_value(base.Get()), byte_offset));
+  // GEP_FIELD's result is a pointer — see the ptr_add comment.
+  Value v = concrete_ptr_offset(python_to_value(base.Get()), byte_offset);
+  return make_literal_ptr(v.u64);
 }
 
 SharedPyPtr PythonPolicy::select(const SharedPyPtr &cond,

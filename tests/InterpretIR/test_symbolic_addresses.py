@@ -1,10 +1,10 @@
 """Symbolic-address forking through the suspension API.
 
-A Python policy that lets the interpreter compute a non-`("ptr", ...)`
-value for a load address (e.g. an integer-arithmetic-derived pointer)
-will trigger `with_address` to emit a `MemAddrContinuation`.  The driver
-picks one or more concrete addresses, calls `resume_addr`, and continues
-stepping — once per chosen address.
+A Python policy that returns a value the substrate cannot extract as a
+concrete pointer (anything that isn't a `("ptr", N)` tuple) for a load
+address triggers `with_address` to emit a `MemAddrContinuation`. The
+driver picks one or more concrete addresses, calls `resume_addr`, and
+continues stepping — once per chosen address.
 
 These tests exercise the full suspension/resumption cycle.
 """
@@ -24,6 +24,34 @@ class _PassthroughPolicy:
     pass
 
 
+class _OpaqueAddr:
+    """A non-int, non-tuple sentinel `ptr_add` returns to force the
+    surrounding load through the symbolic-suspension path. Carries the
+    "real" target address so the test's `resume_addr` call can pass the
+    right concrete value back."""
+
+    __slots__ = ("addr",)
+
+    def __init__(self, addr):
+        self.addr = int(addr)
+
+    def __repr__(self):
+        return f"_OpaqueAddr({self.addr:#x})"
+
+
+class _IntegerPtrAddPolicy:
+    """Forces `ptr_add` to return a value the substrate cannot extract
+    as a concrete pointer (`extract_address` only accepts `("ptr", N)`
+    tuples and bare ints). The opaque sentinel triggers a
+    `MemAddrContinuation` so the test can drive the
+    suspension/resumption loop without constructing a real z3
+    expression."""
+
+    def ptr_add(self, base, index, elem_size):
+        b = base[1] if isinstance(base, tuple) else int(base)
+        return _OpaqueAddr(b + int(index) * int(elem_size))
+
+
 def _step_until_suspension(state, mem, policy, max_iter=20):
     """Step until the run reaches a suspended/completed/error/budget terminal."""
     for _ in range(max_iter):
@@ -37,7 +65,8 @@ def _step_until_suspension(state, mem, policy, max_iter=20):
 
 
 def test_indirect_load_suspends_on_int_address(index):
-    """A pointer arg passed as a Python int triggers a load-addr suspension."""
+    """A pointer arg routed through `_IntegerPtrAddPolicy.ptr_add`
+    becomes an opaque sentinel; the surrounding load suspends."""
     ir = find_ir_function(index, "symbolic_test_ptr_add")
     if ir is None:
         pytest.skip("symbolic_test_ptr_add not in index")
@@ -46,7 +75,7 @@ def test_indirect_load_suspends_on_int_address(index):
     buf = mem.allocate(64, 8)
     mem.write_bytes(buf, struct.pack("<iii", 42, 1337, 999))
 
-    policy = _PassthroughPolicy()
+    policy = _IntegerPtrAddPolicy()
     state = interp.InterpreterState()
     interp.init_state(state, mem, policy, ir, [buf, 0], None, None)
 
@@ -54,7 +83,7 @@ def test_indirect_load_suspends_on_int_address(index):
     res = r["result"]
     assert res[0] == "suspended"
     assert res[1] == "load-addr"
-    assert res[2] == buf
+    assert isinstance(res[2], _OpaqueAddr) and res[2].addr == buf
     assert res[4] == 4
     assert res[5] is False
 
@@ -62,7 +91,8 @@ def test_indirect_load_suspends_on_int_address(index):
     assert len(forks) == 1
     fork = forks[0]
     assert fork["kind"] == "load-addr"
-    assert fork["address"] == buf
+    assert isinstance(fork["address"], _OpaqueAddr) and \
+        fork["address"].addr == buf
     assert fork["size"] == 4
     assert fork["is_write"] is False
 
@@ -77,7 +107,7 @@ def test_resume_addr_completes_load(index):
     buf = mem.allocate(64, 8)
     mem.write_bytes(buf, struct.pack("<iii", 42, 1337, 999))
 
-    policy = _PassthroughPolicy()
+    policy = _IntegerPtrAddPolicy()
     state = interp.InterpreterState()
     interp.init_state(state, mem, policy, ir, [buf, 0], None, None)
 
@@ -102,7 +132,7 @@ def test_resume_addr_different_choices_diverge(index):
     values = (42, 1337, 999)
     mem.write_bytes(buf, struct.pack("<iii", *values))
 
-    policy = _PassthroughPolicy()
+    policy = _IntegerPtrAddPolicy()
     state = interp.InterpreterState()
     interp.init_state(state, mem, policy, ir, [buf, 0], None, None)
 

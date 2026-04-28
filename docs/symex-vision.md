@@ -1100,6 +1100,57 @@ left visible, without architectural rework.
   on a branchless function; `path.dot_cfg` renders edges for
   every visit (no more empty placeholder).
 
+### Phase 8e — fix LOCAL_VALUE alloca regression + float overlay (delivered)
+
+Phase 8d's "honesty pass" left two threads dangling. Phase 8e
+closes both.
+
+- **LOCAL_VALUE alloca regression.** Phase 8d's tightened
+  P8b.4 surfaced that `engine.explore("make_large", args=[7])`
+  silently returned a return slot full of zeros — the body's
+  field stores landed at address 0 instead of the local's slot.
+  Three substrate seams were complicit: (a) `value_to_python`
+  lowers a `Value` to a bare `PyLong`, dropping the `("ptr", N)`
+  tag carried by `make_literal_ptr`; (b) the ptr_add /
+  ptr_offset C++ fallbacks ran results through that lowering,
+  producing plain ints from pointer arithmetic; (c)
+  `PythonPolicy::extract_address` only accepted tuple-tagged
+  pointers, so any plain-int address triggered the
+  symbolic-suspension path, which the default address strategy
+  collapsed to 0. Phase 8e wraps the ptr_add / ptr_offset
+  fallbacks in `make_literal_ptr` and teaches `extract_address`
+  to also accept bare PyLongs (a plain int IS a concrete
+  address). With both fixes, `engine.explore` is correctness-
+  equivalent to `ConcretePolicy` on every function in the
+  corpus that exercises LOCAL_VALUE allocas through GEP_FIELD.
+
+- **Float-typed overlay slots.** `_coerce_store_value` now packs
+  Python floats via `_struct.pack("<f"|"<d", val)` and lifts the
+  IEEE byte pattern into a `z3.BitVecVal`. A symbolic-overlay
+  float store + load round-trips through the bit pattern. The
+  read path returns the z3 expression unchanged; substrate-
+  facing concretization (when a unique value is forced) is left
+  for a future pass.
+
+**Test catalog (`tests/symex/test_phase8e.py`):**
+
+- **P8e.1** `engine.explore("make_large", args=[7])` decodes the
+  return slot to `[7, 8, 9, 10, 11]` (pre-fix it was all zeros).
+- **P8e.2** Functions exercising LOCAL_VALUE allocas through
+  GEP_FIELD (`test_byvalue`, `test_struct_assign`,
+  `test_pointers`, `test_init_lists`) match `ConcretePolicy`'s
+  return value when run through `engine.explore`.
+- **P8e.3** `_coerce_store_value` packs Python floats into IEEE
+  bit patterns; a symbolic-overlay float store + same-address
+  load round-trips through the bit pattern.
+
+P8b.4's "substrate quirk" caveat is removed — the tightened
+test now asserts `[7, 8, 9, 10, 11]` field values directly.
+Three pre-existing `tests/InterpretIR/test_symbolic_addresses.py`
+tests that relied on plain-int suspension were reworked to use
+an opaque-sentinel policy (`_OpaqueAddr`) so they still drive
+the suspension/resumption loop without exploiting the old bug.
+
 ---
 
 ## Open design questions
@@ -1221,6 +1272,16 @@ include/multiplier/IR/Interpret/ConcreteMemory.h    # place_at if missing
   renders block-visit edges. `tests/symex/test_phase8d.py` (5
   tests, P8d.1–P8d.4) green; `tests/symex` count is 103 passed,
   0 skipped.
+- Phase 8e: ptr_add / ptr_offset C++ fallbacks preserve the
+  `("ptr", N)` tag (no more silent collapse to 0 through the
+  default address strategy); `extract_address` accepts bare
+  PyLong addresses; `_coerce_store_value` packs Python floats
+  into IEEE bit patterns. P8b.4 tightened to assert field
+  values; three InterpretIR tests reworked to use an opaque
+  sentinel after the substrate's int-as-address normalization.
+  `tests/symex/test_phase8e.py` (3 tests, P8e.1–P8e.3 with 4
+  parametrizations on P8e.2) green; `tests/symex` count is 109
+  passed, 0 skipped.
 - The 235-test pre-existing harness still passes (regression gate).
 - Public API has docstrings; the README links to the Phase 7
   walkthrough.

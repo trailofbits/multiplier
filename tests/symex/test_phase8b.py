@@ -174,15 +174,10 @@ def test_p8b_4_aggregate_return_still_reads_slot(index):
       2. `path.return_value` is a `("ptr", N)` tuple — proves the
          substrate took the `sz > 8` branch and returned the slot
          pointer rather than the RET's (now-undefined) operand.
-      3. The 20-byte slot is readable (a valid concrete allocation).
-
-    The contents of the slot are *not* asserted: under the current
-    `InterceptorPolicy`, LOCAL_VALUE ALLOCAs are not yet correctly
-    reflected through GEP_FIELD's concrete-fallback path, so the
-    body's field stores land at the wrong address and the slot
-    remains zero-initialized. That is a separate substrate quirk;
-    when fixed, this test should be tightened to assert the field
-    values [7, 8, 9, 10, 11].
+      3. The 20-byte slot decodes to the five field values
+         `[base, base+1, ..., base+4]` (the function's per-field
+         stores landed in the right place — Phase 8e's LOCAL_VALUE
+         alloca fix).
     """
     engine = SymExEngine(index)
     engine.layout = Layout()
@@ -203,6 +198,10 @@ def test_p8b_4_aggregate_return_still_reads_slot(index):
     data = p.mem.read_bytes(slot_addr, 20)
     assert len(data) == 20, \
         f"return slot not 20 bytes readable; got {len(data)}"
+    fields = [int.from_bytes(data[i * 4:(i + 1) * 4], "little", signed=True)
+              for i in range(5)]
+    assert fields == [7, 8, 9, 10, 11], \
+        f"return slot fields are wrong: {fields!r}"
 
 
 # ===========================================================================
