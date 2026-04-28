@@ -331,6 +331,21 @@ class Path:
                     for i in range(expr.num_args())]
         return {"kind": "op", "op": str(expr.decl()), "args": children}
 
+    def taint_sources(self, expr) -> frozenset:
+        """Return the frozenset of `fresh_int` variable names whose values
+        flow into `expr`. Unknown variables (created outside `fresh_int`)
+        are excluded. Returns an empty frozenset for concrete expressions.
+        """
+        return frozenset(
+            r["name"]
+            for r in self.origin(expr)
+            if r.get("kind") == "fresh_int"
+        )
+
+    def is_tainted(self, expr) -> bool:
+        """Return True if any `fresh_int` variable contributes to `expr`."""
+        return bool(self.taint_sources(expr))
+
     def summary(self):
         """Single human-readable summary of what happened on this path.
 

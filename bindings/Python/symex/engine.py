@@ -211,6 +211,68 @@ class PathSet(_FilterableList):
             groups.setdefault(ef, []).append(p)
         return {k: PathSet(v) for k, v in groups.items()}
 
+    def all_terminal(self) -> bool:
+        """Return True if every path has a non-None terminal (i.e. the
+        exploration is fully drained — no live paths remain)."""
+        return all(p.terminal is not None for p in self)
+
+    def terminals(self) -> dict:
+        """Return a `{terminal_value: PathSet}` partition. Live paths
+        (terminal is None) are grouped under the key `None`."""
+        groups: dict = {}
+        for p in self:
+            groups.setdefault(p.terminal, []).append(p)
+        return {k: PathSet(v) for k, v in groups.items()}
+
+    def findings(self):
+        """Aggregate every `Finding` across all paths into a single
+        `FindingsList`. Each finding is yielded with a `path_id`
+        attribute injected so the caller can trace back to its source
+        path."""
+        from .path import FindingsList, _finding_as_dict
+        out = FindingsList()
+        for p in self:
+            for f in p.findings:
+                d = dict(_finding_as_dict(f))
+                d["path_id"] = p.id
+                out.append(d)
+        return out
+
+    def summary_table(self) -> str:
+        """Return a human-readable text table grouping paths by terminal.
+
+        Reports counts per terminal state, total findings across all
+        paths, and the number of live (non-terminated) paths."""
+        term_groups = self.terminals()
+        lines = [f"PathSet: {len(self)} path(s)"]
+        for term, group in sorted(
+            term_groups.items(), key=lambda kv: (kv[0] is None, str(kv[0]))
+        ):
+            label = str(term) if term is not None else "live"
+            lines.append(f"  {label}: {len(group)}")
+        total_findings = sum(len(p.findings) for p in self)
+        if total_findings:
+            lines.append(f"  findings: {total_findings}")
+        return "\n".join(lines)
+
+    def counter_example(self, pred) -> tuple:
+        """Find the first path where `pred(path)` is truthy and the SMT
+        solver produces a satisfying model.
+
+        Returns `(path, model)` where `model` is `{name: int}` for every
+        `fresh_int` the path minted, or `(path, {})` if the path has no
+        symbolic inputs. Returns `None` if no path satisfies `pred` or
+        all such paths are UNSAT.
+        """
+        for p in self:
+            if not pred(p):
+                continue
+            model = p.solver.model()
+            if model is None:
+                continue
+            return (p, model)
+        return None
+
 
 def _path_match_one(path, key, target):
     if key == "tags__contains":
