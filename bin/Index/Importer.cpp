@@ -237,7 +237,6 @@ class BuildCommandAction final : public Action {
 std::variant<CompilerPathInfo, std::string>
 BuildCommandAction::GetCompilerInfo(void) {
   std::vector<std::string> new_args;
-  bool has_output = false;
   bool next_is_language = false;
   std::string_view inferred_lang = "c";
   std::string_view specified_lang = "c";
@@ -327,15 +326,16 @@ BuildCommandAction::GetCompilerInfo(void) {
       continue;
     }
 
-    // Output file, `-o <file>`, `--output <arg>`.
+    // Output file, `-o <file>`, `--output <arg>`. Strip it so the probe's
+    // stdout (already discarded by Subprocess::Execute) carries the
+    // preprocessor output, and avoids "cannot specify -o when generating
+    // multiple output files" errors with some Apple clang flag combinations.
     if (arg == "-o" || arg == "--output") {
-      has_output = true;
       skip_following = 1;
       continue;
 
     // `--output=<arg>`
     } else if (arg.starts_with("--output=")) {
-      has_output = true;
       continue;
 
     // `-o<file>`, or maybe another option like `-object-file-name=...`.
@@ -343,7 +343,6 @@ BuildCommandAction::GetCompilerInfo(void) {
                !arg.starts_with("-output") &&
                !arg.starts_with("-obj") &&
                arg.find('=') == std::string_view::npos) {
-      has_output = true;
       continue;
 
     // Turns on the x87 FPU.
@@ -406,11 +405,6 @@ BuildCommandAction::GetCompilerInfo(void) {
   // which prevents any compilation jobs from proceeding.
   new_args.emplace_back("-include");
   new_args.emplace_back("/trail/of/bits");
-
-  if (has_output) {
-    new_args.emplace_back("-o");
-    new_args.emplace_back("/dev/null");
-  }
 
   // Probably not needed, but if the first argument looks like a relative path
   // then convert it to an absolute path.
@@ -540,6 +534,21 @@ static bool IsOptNeedingFixing(std::string_view arg) {
          arg.starts_with("-mrelocation-model");
 }
 
+// Detect commands that only run the preprocessor (e.g. APR's `export_vars.c`
+// is fed through `clang -E | sed` to generate an exports list; it is not a
+// real translation unit). PASTA's job creator strips `-E` to force AST
+// construction, which makes such commands fail later with confusing
+// diagnostics about missing types. Skipping them up front avoids that.
+static bool IsPreprocessOnly(const pasta::ArgumentVector &argv) {
+  for (const char *arg : argv) {
+    std::string_view sv(arg);
+    if (sv == "-E" || sv == "--preprocess" || sv == "-Eonly") {
+      return true;
+    }
+  }
+  return false;
+}
+
 static bool IsOpt1NeedingFixing(std::string_view arg) {
   return arg.starts_with(kXClang) || arg.starts_with(kMLLVM);
 }
@@ -637,6 +646,11 @@ void BuildCommandAction::RunWithCompiler(pasta::CompileCommand cmd,
 void BuildCommandAction::Run(void) {
 
   ProgressBarWork progress_tracker(ctx.eval_command_progress);
+
+  if (IsPreprocessOnly(command.vec)) {
+    LOG(INFO) << "Skipping preprocess-only command: " << command.vec.Join();
+    return;
+  }
 
   pasta::Result<pasta::CompileCommand, std::string_view> maybe_cmd =
       pasta::CompileCommand::CreateFromArguments(
