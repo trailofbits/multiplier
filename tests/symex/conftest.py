@@ -195,12 +195,35 @@ def _default_db_path():
         os.path.join(here, "..", "InterpretIR", "mx-index.db"))
 
 
+def _default_symex_db_path():
+    here = os.path.dirname(os.path.abspath(__file__))
+    return os.path.normpath(os.path.join(here, "c", "mx-index.db"))
+
+
 @pytest.fixture(scope="session")
 def index():
     db_path = os.environ.get("MX_INDEX_DB", _default_db_path())
     if not os.path.exists(db_path):
         pytest.skip(f"index database not found at {db_path}; "
                     f"set MX_INDEX_DB or build tests/InterpretIR/mx-index.db")
+    return mx.Index.from_database(db_path)
+
+
+@pytest.fixture(scope="session")
+def symex_index():
+    """Index built from tests/symex/c/symex_integration.c (si_* functions).
+
+    Used by integration tests for phases 9-14. Set MX_SYMEX_DB to override
+    the path, or rebuild with:
+        mx-index --db tests/symex/c/mx-index.db \\
+                 --workspace tests/symex/c/mx-workspace \\
+                 --target tests/symex/c/compile_commands.json \\
+                 --fork_mode
+    """
+    db_path = os.environ.get("MX_SYMEX_DB", _default_symex_db_path())
+    if not os.path.exists(db_path):
+        pytest.skip(f"symex integration index not found at {db_path}; "
+                    f"set MX_SYMEX_DB or rebuild tests/symex/c/mx-index.db")
     return mx.Index.from_database(db_path)
 
 

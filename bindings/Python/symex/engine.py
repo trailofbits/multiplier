@@ -950,6 +950,22 @@ class SymExEngine:
         init_shadow = getattr(policy, "_shadow", None)
         if init_shadow:
             path._symbolic_shadow.update(init_shadow)
+        # Register externally-supplied z3 BitVec args in the provenance
+        # table so origin() / taint_sources() can trace through them.
+        for arg in (args or []):
+            if _is_z3(arg):
+                try:
+                    name = str(arg.decl().name())
+                    if name not in path._origin_by_name:
+                        path._origin_by_name[name] = {
+                            "kind": "fresh_int",
+                            "name": name,
+                            "size": arg.size() // 8,
+                            "path_id": path.id,
+                            "step": 0,
+                        }
+                except Exception:
+                    pass
         return path
 
     def _function_name(self, ir_func):
