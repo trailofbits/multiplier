@@ -1539,6 +1539,12 @@ include/multiplier/IR/Interpret/ConcreteMemory.h    # place_at if missing
   `Path.restore()` and `engine.resume_from()` to fully restore them.
   `tests/symex/test_phase13.py` (10 tests, P13.1–P13.9 + P13.1b) green;
   `tests/symex` count is 179 passed, 0 skipped.
+- Phase 14: EventLog / _FilterableList enhancements (`last`, `groupby`,
+  `unique`, `_get_field` hook); `Layout.name_for(addr)` reverse lookup;
+  `path.condition_str()` human-readable path condition. Applies to
+  `EventLog`, `PathSet`, and `FindingsList` via the shared base.
+  `tests/symex/test_phase14.py` (18 tests, P14.1–P14.18) green;
+  `tests/symex` count is 197 passed, 0 skipped.
 - The 235-test pre-existing harness still passes (regression gate).
 - Public API has docstrings; the README links to the Phase 7
   walkthrough.
