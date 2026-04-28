@@ -98,6 +98,13 @@ class _PathSolver:
         z3 = _z3_module()
         var = z3.BitVec(name, size * 8)
         self._fresh_vars[name] = var
+        self._path._origin_by_name[name] = {
+            "kind": "fresh_int",
+            "name": name,
+            "size": size,
+            "path_id": self._path.id,
+            "step": self._path.steps,
+        }
         if lo is not None:
             self._path.path_condition.append(z3.UGE(var, lo))
         if hi is not None:
@@ -176,6 +183,10 @@ class Path:
         # same shape as _symbolic_shadow. Memory-read/write intercept
         # handlers installed by the analyst use this for isolation.
         self._tls_shadow: dict = {}
+        # Phase 10: provenance table. Maps BitVec variable name -> origin
+        # record dict. Populated by solver.fresh_int and any engine hook
+        # that mints a named symbolic value (e.g. address_for).
+        self._origin_by_name: dict = {}
 
     @property
     def state(self):
@@ -205,6 +216,7 @@ class Path:
         new_path._symbolic_shadow = dict(self._symbolic_shadow)
         new_path.tls_base = self.tls_base
         new_path._tls_shadow = dict(self._tls_shadow)
+        new_path._origin_by_name = dict(self._origin_by_name)
         new_path.findings = FindingsList(self.findings)
         return new_path
 
@@ -274,6 +286,50 @@ class Path:
         self.solver.invalidate()
         if self.solver.solver.check() == z3.unsat:
             self.terminal = Terminal.INFEASIBLE
+
+    def origin(self, expr) -> list:
+        """Return a list of origin records for all named symbolic inputs
+        that appear as leaves in the z3 expression `expr`.
+
+        Each record is the dict that was stored when the variable was
+        minted (e.g. via `solver.fresh_int`). Unknown variables produce
+        `{"kind": "unknown", "name": <str>}`. Concrete (non-BitVec) exprs
+        return an empty list.
+        """
+        seen = {}
+        stack = [expr]
+        while stack:
+            e = stack.pop()
+            if e.num_args() == 0:
+                name = str(e)
+                if name not in seen:
+                    seen[name] = self._origin_by_name.get(
+                        name, {"kind": "unknown", "name": name}
+                    )
+            else:
+                for i in range(e.num_args()):
+                    stack.append(e.arg(i))
+        return list(seen.values())
+
+    def origin_tree(self, expr) -> dict:
+        """Recursive provenance tree for `expr`.
+
+        Leaves: `{"kind": "leaf", "name": <str>, "origin": <record>}`
+        Compound nodes: `{"kind": "op", "op": <str>, "args": [...]}`
+
+        `origin` at a leaf is the same dict that `origin()` would return
+        for that variable. Unknown variables have `{"kind": "unknown", ...}`
+        as their origin.
+        """
+        if expr.num_args() == 0:
+            name = str(expr)
+            rec = self._origin_by_name.get(
+                name, {"kind": "unknown", "name": name}
+            )
+            return {"kind": "leaf", "name": name, "origin": rec}
+        children = [self.origin_tree(expr.arg(i))
+                    for i in range(expr.num_args())]
+        return {"kind": "op", "op": str(expr.decl()), "args": children}
 
     def summary(self):
         """Single human-readable summary of what happened on this path.

@@ -1437,4 +1437,7 @@ class SymExEngine:
         # Phase 9: inherit TLS base and shadow (isolation via per-path shadow).
         child.tls_base = parent.tls_base
         child._tls_shadow = dict(parent._tls_shadow)
+        # Phase 10: inherit provenance table so forked paths know the
+        # origins of all symbolic inputs minted before the fork.
+        child._origin_by_name = dict(parent._origin_by_name)
         return child
