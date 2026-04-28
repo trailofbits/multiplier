@@ -25,7 +25,7 @@ import multiplier as mx
 
 from .layout import Layout
 from .lens import MemView, ArgsView
-from .path import Path
+from .path import Path, FindingsList
 from .events import (
     EventLog, EventKind, BRANCH, BranchDirection, Terminal,
     StepResultKind, Strategy, _FilterableList,
@@ -229,7 +229,7 @@ class PathSet(_FilterableList):
         `FindingsList`. Each finding is yielded with a `path_id`
         attribute injected so the caller can trace back to its source
         path."""
-        from .path import FindingsList, _finding_as_dict
+        from .path import _finding_as_dict
         out = FindingsList()
         for p in self:
             for f in p.findings:
@@ -877,7 +877,17 @@ class SymExEngine:
         path.terminal = snapshot.terminal
         path.return_value = snapshot.return_value
         path.error_kind = snapshot.error_kind
+        # Phase 6
+        path.findings = FindingsList(getattr(snapshot, "findings", []))
+        path._region_at_suspension = getattr(snapshot, "region_at_suspension", None)
+        path._lazy_regions_used = getattr(snapshot, "lazy_regions_used", 0)
+        # Phase 8f
+        path.entry_func = getattr(snapshot, "entry_func", None)
+        # Phase 9
         path.tls_base = getattr(snapshot, "tls_base", 0)
+        path._tls_shadow = dict(getattr(snapshot, "tls_shadow", {}))
+        # Phase 10
+        path._origin_by_name = dict(getattr(snapshot, "origin_by_name", {}))
 
         if modify is not None:
             modify(path)

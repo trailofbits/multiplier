@@ -240,6 +240,17 @@ class Path:
             func_name=self._func_name,
             fresh_vars=dict(self.solver._fresh_vars),
             symbolic_shadow=dict(self._symbolic_shadow),
+            # Phase 6
+            findings=FindingsList(self.findings),
+            region_at_suspension=self._region_at_suspension,
+            lazy_regions_used=self._lazy_regions_used,
+            # Phase 8f
+            entry_func=self.entry_func,
+            # Phase 9
+            tls_base=self.tls_base,
+            tls_shadow=dict(self._tls_shadow),
+            # Phase 10
+            origin_by_name=dict(self._origin_by_name),
         )
 
     def restore(self, snap):
@@ -259,6 +270,19 @@ class Path:
         # reference to this dict still sees the post-restore state.
         self._symbolic_shadow.clear()
         self._symbolic_shadow.update(snap.symbolic_shadow)
+        # Phase 6
+        self.findings = FindingsList(snap.findings)
+        self._region_at_suspension = snap.region_at_suspension
+        self._lazy_regions_used = snap.lazy_regions_used
+        # Phase 8f
+        self.entry_func = snap.entry_func
+        # Phase 9
+        self.tls_base = snap.tls_base
+        self._tls_shadow.clear()
+        self._tls_shadow.update(snap.tls_shadow)
+        # Phase 10
+        self._origin_by_name.clear()
+        self._origin_by_name.update(snap.origin_by_name)
 
     def replay(self, *, modify, engine, slice_steps=1024,
                concretize=None, until=None):
@@ -545,11 +569,21 @@ class _Snapshot:
 
     __slots__ = ("state", "events", "tags", "path_condition", "terminal",
                  "return_value", "error_kind", "loop_iters", "func_name",
-                 "fresh_vars", "symbolic_shadow")
+                 "fresh_vars", "symbolic_shadow",
+                 # Phase 6
+                 "findings", "region_at_suspension", "lazy_regions_used",
+                 # Phase 8f
+                 "entry_func",
+                 # Phase 9
+                 "tls_base", "tls_shadow",
+                 # Phase 10
+                 "origin_by_name")
 
     def __init__(self, *, state, events, tags, path_condition, terminal,
                  return_value, error_kind, loop_iters, func_name,
-                 fresh_vars, symbolic_shadow):
+                 fresh_vars, symbolic_shadow,
+                 findings, region_at_suspension, lazy_regions_used,
+                 entry_func, tls_base, tls_shadow, origin_by_name):
         self.state = state
         self.events = events
         self.tags = tags
@@ -561,3 +595,10 @@ class _Snapshot:
         self.func_name = func_name
         self.fresh_vars = fresh_vars
         self.symbolic_shadow = symbolic_shadow
+        self.findings = findings
+        self.region_at_suspension = region_at_suspension
+        self.lazy_regions_used = lazy_regions_used
+        self.entry_func = entry_func
+        self.tls_base = tls_base
+        self.tls_shadow = tls_shadow
+        self.origin_by_name = origin_by_name
