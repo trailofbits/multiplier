@@ -64,6 +64,8 @@ class Layout:
         self._tls_base: int = 0x6000_0000_0000_0000
         self._tls_cursor: int = 0
         self._tls_offsets: dict[int, int] = {}  # canonical_eid -> offset
+        # StringLiteral entity id -> pre-placed address (for STRING_PTR hook).
+        self._string_entity_addrs: dict = {}
 
     @property
     def memory(self):
@@ -271,10 +273,22 @@ class Layout:
         for name, addr, size, init in parsed:
             self.place_global(name, addr, size, init=init)
 
+    def bind_string_literal(self, entity, addr: int) -> None:
+        """Register a StringLiteral entity → address mapping so that when
+        the interpreter hits the corresponding STRING_PTR instruction it
+        returns `addr` instead of bump-allocating fresh storage.
+
+        `entity` may be an AST ``StringLiteral`` object or any object whose
+        ``.id`` attribute gives a hashable entity ID.
+        """
+        eid = entity.id if hasattr(entity, "id") else entity
+        self._string_entity_addrs[eid] = addr
+
     def place_string(self, name: str, value, *,
                      addr: int | None = None,
                      encoding: str = "utf-8",
-                     null_terminate: bool = True) -> int:
+                     null_terminate: bool = True,
+                     entity=None) -> int:
         """Place a string literal in memory and register it by name.
 
         Parameters
@@ -327,6 +341,8 @@ class Layout:
         # needs layout["name"] to get the pointer.
         self._by_name[name] = Region(name=name, base=addr, size=size,
                                      kind="string", align=1)
+        if entity is not None:
+            self.bind_string_literal(entity, addr)
         return addr
 
     def _write_init(self, name, addr, size, init):

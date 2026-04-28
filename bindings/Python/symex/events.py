@@ -39,6 +39,7 @@ class EventKind(StrEnum):
     SPLIT_BY_REGION = "split_by_region"
     SINK_FIRED = "sink_fired"
     BLOCK_ENTER = "block_enter"
+    INSTRUCTION = "instruction"
     # Phase 9: address-resolution telemetry
     ADDRESS_FOR = "address_for"
     ADDRESS_RESOLVED = "address_resolved"
@@ -58,6 +59,7 @@ BRANCH = EventKind.BRANCH
 LOOP = EventKind.LOOP
 CONCRETIZE = EventKind.CONCRETIZE
 BLOCK_ENTER = EventKind.BLOCK_ENTER
+INSTRUCTION = EventKind.INSTRUCTION
 ADDRESS_FOR = EventKind.ADDRESS_FOR
 ADDRESS_RESOLVED = EventKind.ADDRESS_RESOLVED
 INDIRECT_CALL_RESOLVED = EventKind.INDIRECT_CALL_RESOLVED
@@ -69,7 +71,7 @@ ALL_EVENTS = frozenset({
     GLOBAL_READ, GLOBAL_WRITE,
     CALL, INDIRECT_CALL,
     BRANCH, LOOP, CONCRETIZE,
-    BLOCK_ENTER,
+    BLOCK_ENTER, INSTRUCTION,
     ADDRESS_FOR, ADDRESS_RESOLVED,
     INDIRECT_CALL_RESOLVED,
 })

@@ -325,7 +325,8 @@ class _FakeCtx:
 # P7.5 — CWE-787 worked example: oob_write witness via store_at
 # ===========================================================================
 
-def test_p7_5_cwe787_oob_write_witness(index):
+def test_p7_5_cwe787_oob_write_witness(symex_index):
+    index = symex_index
     """`store_at(char *base, int index, char value)` writes one byte
     at `base[index]`. With a bounded `dst` region and ConcretizeFinite
     enumerating addresses both inside and past the end, OOBSink emits
@@ -381,7 +382,8 @@ def test_p7_5_cwe787_oob_write_witness(index):
 # P7.6 — Loop walkthrough: copy_into bounds check + safe loop
 # ===========================================================================
 
-def test_p7_6_copy_into_loop_walkthrough(index):
+def test_p7_6_copy_into_loop_walkthrough(symex_index):
+    index = symex_index
     """End-to-end exercise of the `copy_into` helper from the new
     CWE-787 corpus, verifying both branches of its bounds check
     deterministically:
