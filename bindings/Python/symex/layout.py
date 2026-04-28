@@ -151,6 +151,18 @@ class Layout:
         placements that share a base address."""
         return self._regions.containing(int(addr))
 
+    def name_for(self, addr) -> str:
+        """Return the name of the global, function, or region that
+        contains `addr`, or None if the address is not mapped.
+
+        Wraps `region_containing` for the common case where the analyst
+        just wants a name string rather than the full Region object.
+        """
+        region = self.region_containing(addr)
+        if region is None:
+            return None
+        return region.name
+
     def regions_overlapping(self, lo, hi):
         """Return regions whose extent intersects `[lo, hi)`."""
         return self._regions.overlapping(int(lo), int(hi))

@@ -311,6 +311,17 @@ class Path:
         if self.solver.solver.check() == z3.unsat:
             self.terminal = Terminal.INFEASIBLE
 
+    def condition_str(self, *, sep="\nAND ") -> str:
+        """Return the path condition as a human-readable string.
+
+        Each z3 constraint is rendered via `str()` and joined by `sep`
+        (default: `"\\nAND "`). Returns `"True"` for an unconstrained
+        path (empty condition list).
+        """
+        if not self.path_condition:
+            return "True"
+        return sep.join(str(c) for c in self.path_condition)
+
     def origin(self, expr) -> list:
         """Return a list of origin records for all named symbolic inputs
         that appear as leaves in the z3 expression `expr`.

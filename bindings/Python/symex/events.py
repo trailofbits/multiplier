@@ -187,14 +187,21 @@ def _match(entry, filters):
 class _FilterableList(list):
     """List subclass that adds Django-ORM-style predicate queries.
 
-    Subclasses provide `_match(item, filters) -> bool`; this base then
-    derives `where` / `first` / `count` from it. `where` returns a new
-    instance of the same subclass so chaining (`a.where(...).where(...)`)
-    preserves the type.
+    Subclasses provide `_match(item, filters) -> bool` and optionally
+    `_get_field(item, key)` (default: `item.get(key, None)` for dict-like
+    items, `getattr(item, key, None)` otherwise). This base then derives
+    `where` / `first` / `last` / `count` / `groupby` / `unique` from them.
+    `where` returns a new instance of the same subclass so chaining
+    (`a.where(...).where(...)`) preserves the type.
     """
 
     def _match(self, item, filters):
         raise NotImplementedError
+
+    def _get_field(self, item, key):
+        if hasattr(item, "get"):
+            return item.get(key)
+        return getattr(item, key, None)
 
     def where(self, **filters):
         cls = type(self)
@@ -206,8 +213,30 @@ class _FilterableList(list):
                 return item
         return None
 
+    def last(self, **filters):
+        """Return the last item matching `filters`, or None."""
+        found = None
+        for item in self:
+            if self._match(item, filters):
+                found = item
+        return found
+
     def count(self, **filters):
         return sum(1 for item in self if self._match(item, filters))
+
+    def groupby(self, field) -> dict:
+        """Partition items by the value of `field`. Returns
+        `{field_value: <same subclass>}` preserving insertion order."""
+        groups: dict = {}
+        for item in self:
+            val = self._get_field(item, field)
+            groups.setdefault(val, []).append(item)
+        cls = type(self)
+        return {k: cls(v) for k, v in groups.items()}
+
+    def unique(self, field) -> set:
+        """Return the set of distinct values for `field` across all items."""
+        return {self._get_field(item, field) for item in self}
 
 
 class EventLog(_FilterableList):
