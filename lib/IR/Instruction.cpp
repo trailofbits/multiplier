@@ -269,12 +269,24 @@ void IRInstruction::format(std::ostream &os) const {
     os << "/" << ir::EnumeratorName(fi->sub_opcode());
   }
 
-  // Call target name.
+  // Named entity annotations.
   if (auto ci = CallInst::from(*this)) {
     if (auto fd = ci->target()) {
       os << " @" << fd->name();
     } else if (ci->is_indirect()) {
       os << " @<indirect>";
+    }
+  } else if (auto gp = GlobalPtrInst::from(*this)) {
+    if (auto vd = gp->variable()) {
+      os << " @" << vd->name();
+    }
+  } else if (auto tp = ThreadLocalPtrInst::from(*this)) {
+    if (auto vd = tp->variable()) {
+      os << " @" << vd->name();
+    }
+  } else if (auto fp = FuncPtrInst::from(*this)) {
+    if (auto fd = fp->function()) {
+      os << " @" << fd->name();
     }
   }
 

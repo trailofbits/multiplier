@@ -324,15 +324,24 @@ def _shadow_read(shadow, addr, size, data, buf):
     back to the original variable.
     """
     # Fast scan on concrete bytes — no dict touches if no sentinel present.
-    found = False
     i = 0
     while i < size:
         if data[i] == _SHADOW_SENTINEL:
-            found = True
             break
         i += 1
-    if not found:
-        return None
+    if i == size:
+        return None  # no sentinel bytes at all
+
+    # At least one sentinel found. Confirm at least one position has an actual
+    # shadow entry — a real 0xCD byte with no entry is a false positive and
+    # should fall through to the concrete path.
+    j = 0
+    while j < size:
+        if data[j] == _SHADOW_SENTINEL and (addr + j) in shadow:
+            break
+        j += 1
+    if j == size:
+        return None  # all sentinels were false positives
 
     z3 = _z3_module()
 
