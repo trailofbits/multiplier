@@ -171,9 +171,11 @@ class Path:
         # Phase 6: count of LazyRegion materializations charged to
         # this path so far (engine.lazy_region_budget caps).
         self._lazy_regions_used = 0
-        # Phase 8c: shadow map for symbolic values written to concrete
-        # substrate-allocated addresses (return slot, ALLOCA/ARG,
-        # ALLOCA/LOCAL). Keyed on (addr, size) -> z3 expression.
+        # Phase 8c: byte-granular shadow for symbolic values written to
+        # concrete addresses. Keyed addr -> z3.BitVec(8) (one entry per
+        # byte). z3 writes are decomposed into per-byte Extract()s;
+        # reads reconstruct via Concat so memcpy-style byte-at-a-time
+        # accesses see the correct symbolic value.
         self._symbolic_shadow: dict = {}
         # Phase 9: TLS base address for this logical thread. Set by
         # the engine to layout.tls_base at init time. Inherited by

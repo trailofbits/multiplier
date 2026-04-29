@@ -268,26 +268,79 @@ def _build_chain(handlers, default_fn):
 
 # ---- per-event default (chain bottom) functions -----------------------
 
+def _shadow_write(shadow, addr, val, size):
+    """Decompose a z3 value into per-byte shadow entries (little-endian).
+
+    Each byte slot ``shadow[addr + i]`` holds a ``BitVec(8)`` extract of
+    ``val``.  Concrete writes (int, pointer tuple, bytes, float) erase the
+    byte slots they cover so concrete memory remains the source of truth for
+    those addresses.  Partial overlap is handled naturally: only the written
+    byte positions are touched.
+    """
+    z3 = _z3_module()
+    if z3 is not None and _is_z3(val):
+        for i in range(size):
+            shadow[addr + i] = z3.Extract(8 * (i + 1) - 1, 8 * i, val)
+    else:
+        for i in range(size):
+            shadow.pop(addr + i, None)
+
+
+def _shadow_read(shadow, ctx, addr, size):
+    """Reconstruct a value from the byte-granular shadow.
+
+    Returns a z3 expression if any byte in ``[addr, addr+size)`` is
+    shadowed, ``None`` if the range is fully concrete (caller falls
+    through to ``ConcreteMemory``).
+
+    When some bytes are concrete and some are symbolic the concrete bytes
+    are lifted to ``BitVecVal(8)`` and concatenated with the symbolic
+    neighbours.  ``z3.simplify`` collapses the common case — a read whose
+    width matches the original write — back to the original z3 variable,
+    preserving its identity in the solver.
+    """
+    if not any((addr + i) in shadow for i in range(size)):
+        return None
+
+    z3 = _z3_module()
+    pieces = []
+    for i in range(size):
+        key = addr + i
+        if key in shadow:
+            pieces.append(shadow[key])          # BitVec(8)
+        else:
+            try:
+                b = ctx.mem.read_bytes(key, 1)[0]
+            except (RuntimeError, IndexError):
+                b = 0
+            pieces.append(z3.BitVecVal(b, 8))
+
+    if size == 1:
+        return pieces[0]
+    # Concat is MSB-first; little-endian byte[size-1] is the most significant.
+    return z3.simplify(z3.Concat(*reversed(pieces)))
+
+
 def _make_default_mem_read(is_float, shadow=None):
     """Return the chain bottom for a memory_read event.
 
-    Reads concrete bytes via the lens; for `is_float`, unpacks IEEE
-    float32 / float64. Returns the loaded value. Falls back to
-    zero on a read failure (the address has no backing) — matching
-    the C++ `ConcreteMemory::read` zero-fill semantics — so the
-    surrounding event still fires and sinks (like `OOBSink`) get
-    a chance to surface the OOB.
+    Reads concrete bytes via the lens; for ``is_float``, unpacks IEEE
+    float32 / float64. Returns the loaded value. Falls back to zero on a
+    read failure (the address has no backing) — matching the C++
+    ``ConcreteMemory::read`` zero-fill semantics — so the surrounding event
+    still fires and sinks (like ``OOBSink``) get a chance to surface OOB.
 
-    Phase 8c: when `shadow` (a `(addr, size) -> z3 expr` dict) holds
-    an exact-match entry for `(addr, size)`, the shadow value wins.
-    Partial-overlap and width-mismatch hits are out of scope; the
-    substrate's IR lowering keeps slot widths consistent.
+    The shadow is byte-granular: each ``shadow[addr]`` slot holds a
+    ``BitVec(8)`` extract.  A read of any width checks all covered byte
+    positions; if any are symbolic the bytes are recombined via
+    ``z3.Concat`` so memcpy-style byte-at-a-time accesses see the
+    symbolic value correctly.
     """
     def default(ctx, addr, size):
         if shadow is not None:
-            cached = shadow.get((addr, size))
-            if cached is not None and _is_z3(cached):
-                return cached
+            sym = _shadow_read(shadow, ctx, addr, size)
+            if sym is not None:
+                return sym
         try:
             data = ctx.mem.read_bytes(addr, size)
         except RuntimeError:
@@ -303,43 +356,43 @@ def _make_default_mem_read(is_float, shadow=None):
 def _make_default_mem_write(is_float, shadow=None):
     """Return the chain bottom for a memory_write event.
 
-    Writes concrete bytes via the lens. Handles ints, ("ptr", N)
-    pointer tuples, raw bytes, and IEEE floats. Returns None.
+    Writes concrete bytes via the lens. Handles ints, ("ptr", N) pointer
+    tuples, raw bytes, and IEEE floats.
 
-    Phase 8c: a z3 expression written to a concrete address goes
-    into `shadow[(addr, size)]` (when `shadow` is provided) so a
-    later exact-match read returns it. Without a shadow the value
-    is dropped, preserving pre-Phase-8c behavior for tests that
-    construct a policy without a Path.
+    The shadow is byte-granular.  A z3 write decomposes ``val`` into
+    per-byte ``BitVec(8)`` extracts stored at ``shadow[addr + i]``.  A
+    concrete write clears the covered byte slots (concrete memory is the
+    source of truth for those bytes).  Partial overlaps are handled
+    naturally — only the written byte positions are touched.
     """
     def default(ctx, addr, val, size):
         if isinstance(val, bool):
             val = int(val)
         if isinstance(val, int):
             if shadow is not None:
-                shadow.pop((addr, size), None)
+                _shadow_write(shadow, addr, val, size)
             ctx.mem.write_bytes(
                 addr, val.to_bytes(size, "little", signed=(val < 0)))
             return None
         if isinstance(val, tuple) and len(val) == 2 and val[0] == VALUE_TAG_PTR:
             if shadow is not None:
-                shadow.pop((addr, size), None)
+                _shadow_write(shadow, addr, val, size)
             ctx.mem.write_bytes(
                 addr, int(val[1]).to_bytes(size, "little", signed=False))
             return None
         if isinstance(val, (bytes, bytearray)):
             if shadow is not None:
-                shadow.pop((addr, size), None)
+                _shadow_write(shadow, addr, val, size)
             ctx.mem.write_bytes(addr, bytes(val))
             return None
         if isinstance(val, float):
             if shadow is not None:
-                shadow.pop((addr, size), None)
+                _shadow_write(shadow, addr, val, size)
             fmt = "<f" if size == 4 else "<d"
             ctx.mem.write_bytes(addr, _struct.pack(fmt, val))
             return None
         if shadow is not None and _is_z3(val):
-            shadow[(addr, size)] = val
+            _shadow_write(shadow, addr, val, size)
             return None
         # Symbolic or otherwise unknown without a shadow — drop.
         return None

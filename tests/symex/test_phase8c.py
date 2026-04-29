@@ -70,5 +70,8 @@ def test_p8c_1_shadow_roundtrips_symbolic_write(index):
 
     assert _is_z3(got), \
         f"expected z3 expression from shadow read; got {type(got).__name__}"
-    assert got is sym or got.eq(sym), \
+    # The byte-granular shadow reconstructs via Concat(Extract(...)); z3.simplify
+    # collapses that back to the original variable, so structural eq holds.
+    import z3 as _z3
+    assert _z3.simplify(got).eq(_z3.simplify(sym)), \
         f"shadow returned a different expression: {got!r} vs {sym!r}"
