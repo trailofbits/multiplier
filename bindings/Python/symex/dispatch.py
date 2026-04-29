@@ -272,56 +272,79 @@ def _shadow_write(shadow, addr, val, size):
     """Decompose a z3 value into per-byte shadow entries (little-endian).
 
     Each byte slot ``shadow[addr + i]`` holds a ``BitVec(8)`` extract of
-    ``val``.  Concrete writes (int, pointer tuple, bytes, float) erase the
-    byte slots they cover so concrete memory remains the source of truth for
-    those addresses.  Partial overlap is handled naturally: only the written
-    byte positions are touched.
+    ``val``.  Concrete writes erase the covered byte slots so concrete memory
+    remains the source of truth.  Partial overlap is handled naturally.
     """
     z3 = _z3_module()
     if z3 is not None and _is_z3(val):
-        for i in range(size):
+        i = 0
+        while i < size:
             shadow[addr + i] = z3.Extract(8 * (i + 1) - 1, 8 * i, val)
+            i += 1
     else:
-        for i in range(size):
+        i = 0
+        while i < size:
             shadow.pop(addr + i, None)
+            i += 1
 
 
-def _shadow_read(shadow, ctx, addr, size):
+def _shadow_read(shadow, ctx, addr, size, buf):
     """Reconstruct a value from the byte-granular shadow.
 
     Returns a z3 expression if any byte in ``[addr, addr+size)`` is
-    shadowed, ``None`` if the range is fully concrete (caller falls
-    through to ``ConcreteMemory``).
+    shadowed, ``None`` if the range is fully concrete.
 
-    When some bytes are concrete and some are symbolic the concrete bytes
-    are lifted to ``BitVecVal(8)`` and concatenated with the symbolic
-    neighbours.  ``z3.simplify`` collapses the common case — a read whose
-    width matches the original write — back to the original z3 variable,
-    preserving its identity in the solver.
+    ``buf`` is a pre-allocated list (held on Path) reused across calls to
+    avoid per-read allocation.  It is grown in-place when ``size`` exceeds
+    its current length (rare).  ``z3.simplify`` collapses the common case
+    — a same-width read of a single symbolic write — back to the original
+    z3 variable.
     """
-    if not any((addr + i) in shadow for i in range(size)):
+    # Fast scan: check for any shadowed byte without building temporaries.
+    found = False
+    i = 0
+    while i < size:
+        if (addr + i) in shadow:
+            found = True
+            break
+        i += 1
+    if not found:
         return None
 
     z3 = _z3_module()
-    pieces = []
-    for i in range(size):
+
+    # Grow the reusable buffer if needed (happens at most log2(max_size) times
+    # over the lifetime of the path).
+    while len(buf) < size:
+        buf.append(None)
+
+    # Fill buf[0..size-1] in-place.
+    i = 0
+    while i < size:
         key = addr + i
         if key in shadow:
-            pieces.append(shadow[key])          # BitVec(8)
+            buf[i] = shadow[key]
         else:
             try:
-                b = ctx.mem.read_bytes(key, 1)[0]
+                buf[i] = z3.BitVecVal(ctx.mem.read_bytes(key, 1)[0], 8)
             except (RuntimeError, IndexError):
-                b = 0
-            pieces.append(z3.BitVecVal(b, 8))
+                buf[i] = z3.BitVecVal(0, 8)
+        i += 1
 
     if size == 1:
-        return pieces[0]
-    # Concat is MSB-first; little-endian byte[size-1] is the most significant.
-    return z3.simplify(z3.Concat(*reversed(pieces)))
+        return buf[0]
+
+    # Concat is MSB-first; little-endian means buf[size-1] is most significant.
+    # Build iteratively to avoid constructing a reversed list.
+    result = buf[size - 1]
+    j = size - 2
+    while j >= 0:
+        result = z3.Concat(result, buf[j])
+        j -= 1
+    return z3.simplify(result)
 
 
-def _make_default_mem_read(is_float, shadow=None):
+def _make_default_mem_read(is_float, shadow=None, buf=None):
     """Return the chain bottom for a memory_read event.
 
     Reads concrete bytes via the lens; for ``is_float``, unpacks IEEE
@@ -334,11 +357,14 @@ def _make_default_mem_read(is_float, shadow=None):
     ``BitVec(8)`` extract.  A read of any width checks all covered byte
     positions; if any are symbolic the bytes are recombined via
     ``z3.Concat`` so memcpy-style byte-at-a-time accesses see the
-    symbolic value correctly.
+    symbolic value correctly.  ``buf`` is a pre-allocated list reused
+    across reads to avoid per-call allocation.
     """
+    _buf = buf if buf is not None else []
+
     def default(ctx, addr, size):
         if shadow is not None:
-            sym = _shadow_read(shadow, ctx, addr, size)
+            sym = _shadow_read(shadow, ctx, addr, size, _buf)
             if sym is not None:
                 return sym
         try:
@@ -609,6 +635,9 @@ class InterceptorPolicy:
         self._shadow = getattr(path, "_symbolic_shadow", None)
         if self._shadow is None:
             self._shadow = {}
+        self._shadow_buf = getattr(path, "_shadow_buf", None)
+        if self._shadow_buf is None:
+            self._shadow_buf = []
 
     # ------------------------------------------------------------------
     # Hook entry points (lookup_method on PyPolicy fires these)
@@ -631,7 +660,8 @@ class InterceptorPolicy:
             MEMORY_READ, lambda sel: sel.matches_addr(addr_int))
         chain = _build_chain(handlers,
                              _make_default_mem_read(bool(is_float),
-                                                    self._shadow))
+                                                    self._shadow,
+                                                    self._shadow_buf))
         try:
             value = chain(ctx, addr_int, size_i)
         except Exception as exc:  # noqa: BLE001

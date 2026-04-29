@@ -177,6 +177,11 @@ class Path:
         # reads reconstruct via Concat so memcpy-style byte-at-a-time
         # accesses see the correct symbolic value.
         self._symbolic_shadow: dict = {}
+        # Pre-allocated working buffer for _shadow_read reconstruction.
+        # Grown in-place if a read exceeds its current length; reused
+        # across all reads within and between steps to avoid per-read
+        # list allocation.
+        self._shadow_buf: list = []
         # Phase 9: TLS base address for this logical thread. Set by
         # the engine to layout.tls_base at init time. Inherited by
         # forks (cloned, then diverge via _tls_shadow).
