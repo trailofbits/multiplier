@@ -755,6 +755,7 @@ void PythonPolicy::on_instruction_impl_inner(const IRInstruction &inst) {
 // ===========================================================================
 
 bool PythonPolicy::resolve_branch(PythonScheduler &,
+                                   const IRInstruction &branch_inst,
                                    const SharedPyPtr &condition,
                                    IRBlock true_block, IRBlock false_block,
                                    IRBlock &chosen_block) {
@@ -762,8 +763,10 @@ bool PythonPolicy::resolve_branch(PythonScheduler &,
                                        "resolve_branch")) {
     auto true_eid = EntityId(true_block.id()).Pack();
     auto false_eid = EntityId(false_block.id()).Pack();
+    PyObject *inst_obj = ::mx::to_python<IRInstruction>(branch_inst);
+    if (!inst_obj) { PyErr_Clear(); inst_obj = Py_None; Py_INCREF(Py_None); }
     PyObject *result = PyObject_CallFunction(
-        method, "OKK", condition.Get(), true_eid, false_eid);
+        method, "NOKK", inst_obj, condition.Get(), true_eid, false_eid);
     if (result && result != Py_NotImplemented) {
       if (result == Py_None) {
         Py_DECREF(result);
@@ -786,7 +789,7 @@ bool PythonPolicy::resolve_branch(PythonScheduler &,
 }
 
 bool PythonPolicy::resolve_call(PythonScheduler &,
-                                 const IRInstruction &,
+                                 const IRInstruction &call_inst,
                                  RawEntityId target_eid,
                                  RawEntityId indirect_target_eid,
                                  const std::vector<SharedPyPtr> &arguments,
@@ -802,8 +805,10 @@ bool PythonPolicy::resolve_call(PythonScheduler &,
       PyList_SET_ITEM(args_list, static_cast<Py_ssize_t>(i), arg);
     }
 
+    PyObject *inst_obj = ::mx::to_python<IRInstruction>(call_inst);
+    if (!inst_obj) { PyErr_Clear(); inst_obj = Py_None; Py_INCREF(Py_None); }
     PyObject *result = PyObject_CallFunction(
-        method, "KKOi", target_eid, indirect_target_eid,
+        method, "NKKOi", inst_obj, target_eid, indirect_target_eid,
         args_list, static_cast<int>(is_indirect));
     Py_DECREF(args_list);
 

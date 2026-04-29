@@ -349,11 +349,12 @@ struct Policy {
   // 5. RESOLUTION
   // =========================================================================
 
-  bool resolve_branch(auto &sched, const ValueT &condition,
+  bool resolve_branch(auto &sched, const IRInstruction &branch_inst,
+                      const ValueT &condition,
                       IRBlock true_block, IRBlock false_block,
                       IRBlock &chosen_block) {
     return self().resolve_branch(
-        sched, condition, true_block, false_block, chosen_block);
+        sched, branch_inst, condition, true_block, false_block, chosen_block);
   }
 
   bool resolve_call(auto &sched,

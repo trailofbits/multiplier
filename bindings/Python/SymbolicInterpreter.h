@@ -216,7 +216,9 @@ class PythonPolicy
   }
 
   // 5. Resolution.
-  bool resolve_branch(PythonScheduler &sched, const SharedPyPtr &condition,
+  bool resolve_branch(PythonScheduler &sched,
+                      const IRInstruction &branch_inst,
+                      const SharedPyPtr &condition,
                       IRBlock true_block, IRBlock false_block,
                       IRBlock &chosen_block);
   bool resolve_call(PythonScheduler &sched,

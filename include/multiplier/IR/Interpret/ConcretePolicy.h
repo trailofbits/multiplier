@@ -138,7 +138,8 @@ class MX_EXPORT ConcretePolicy
 
   // --- 5. Resolution ---
   template <typename Sched>
-  bool resolve_branch(Sched &, const Value &,
+  bool resolve_branch(Sched &, const IRInstruction & /*branch_inst*/,
+                      const Value &,
                       IRBlock true_block, IRBlock /*false_block*/,
                       IRBlock &chosen_block) {
     chosen_block = true_block;

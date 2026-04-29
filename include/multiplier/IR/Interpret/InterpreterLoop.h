@@ -1415,7 +1415,7 @@ inline void decide_cond_branch(auto &state, PolicyT &policy,
 
   // Unresolvable branch -> suspension continuation.
   IRBlock chosen;
-  if (policy.resolve_branch(sched, cond, cb->true_block(),
+  if (policy.resolve_branch(sched, inst, cond, cb->true_block(),
                             cb->false_block(), chosen)) {
     enter_block<PolicyT, ValueT>(state, policy, chosen);
     return;

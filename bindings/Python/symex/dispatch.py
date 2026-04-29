@@ -858,13 +858,14 @@ class InterceptorPolicy:
             return z3.Extract(bits - 1, 0, val)
         return None
 
-    def resolve_call(self, target_eid, indirect_eid, args_list,
+    def resolve_call(self, call_inst, target_eid, indirect_eid, args_list,
                      is_indirect):
         # Args land as a Python list of raw values (ints, ("ptr", N)
         # tuples, SymExprs, …). Build an ArgsView over them so hooks
         # have a consistent lens API.
         args = list(args_list)
         ctx = self._make_ctx(args=args)
+        ctx.inst = call_inst
 
         target_name = self._lookup_name(target_eid)
         indirect_name = self._lookup_name(indirect_eid)
@@ -1077,8 +1078,9 @@ class InterceptorPolicy:
             return val != 0
         return None
 
-    def resolve_branch(self, condition, true_eid, false_eid):
+    def resolve_branch(self, branch_inst, condition, true_eid, false_eid):
         ctx = self._make_ctx()
+        ctx.inst = branch_inst
         t_eid = int(true_eid)
         f_eid = int(false_eid)
         ctx.true_eid = t_eid
