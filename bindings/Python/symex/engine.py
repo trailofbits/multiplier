@@ -474,10 +474,7 @@ class SymExEngine:
             except Exception:
                 pass
 
-        try:
-            result = chain(ctx, eid, name, kind, size, align)
-        except Exception:
-            return None
+        result = chain(ctx, eid, name, kind, size, align)
 
         if result is None:
             return None
@@ -525,10 +522,7 @@ class SymExEngine:
                 (ADDRESS_RESOLVED, Phase.AFTER)):
             if not _selector_matches_payload(selector, ADDRESS_RESOLVED, payload):
                 continue
-            try:
-                handler(ctx, **payload)
-            except Exception:
-                pass
+            handler(ctx, **payload)
 
         if path is not None:
             path.events.append(dict({"kind": ADDRESS_RESOLVED,
@@ -1197,11 +1191,7 @@ class SymExEngine:
             except Exception:
                 pass
 
-        try:
-            chosen = chain(ctx, addr_expr)
-        except Exception:
-            path.terminal = Terminal.UNRESOLVED_CALL
-            return [path]
+        chosen = chain(ctx, addr_expr)
 
         if chosen is None or chosen is _DEFER:
             path.terminal = Terminal.UNRESOLVED_CALL
