@@ -381,7 +381,8 @@ class LocalsView:
 
         if _is_z3(value):
             from .dispatch import _shadow_write
-            _shadow_write(path._symbolic_shadow, addr, value, size)
+            _shadow_write(path._symbolic_shadow, addr, value, size,
+                          mem=self._memory)
         elif isinstance(value, (int, bool)):
             val = int(value)
             path.mem.write(addr, val, size)

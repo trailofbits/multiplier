@@ -268,15 +268,36 @@ def _build_chain(handlers, default_fn):
 
 # ---- per-event default (chain bottom) functions -----------------------
 
-def _shadow_write(shadow, addr, val, size):
+# Sentinel byte written to concrete memory when a symbolic value is stored.
+# Reads scan for this byte; a hit triggers a shadow-dict lookup.
+# False positives (a real 0xCD in concrete memory) cause one extra dict miss
+# and then return the concrete value — correct, just slightly wasteful.
+_SHADOW_SENTINEL = 0xCD
+
+# Pre-built byte strings and zero-fill strings indexed by size (0-16).
+# Avoids any per-call allocation on the write hot-path.
+_SENTINEL_BYTES = tuple(bytes([_SHADOW_SENTINEL] * n) for n in range(17))
+_ZERO_BYTES     = tuple(bytes(n)                       for n in range(17))
+
+
+def _shadow_write(shadow, addr, val, size, mem=None):
     """Decompose a z3 value into per-byte shadow entries (little-endian).
 
-    Each byte slot ``shadow[addr + i]`` holds a ``BitVec(8)`` extract of
-    ``val``.  Concrete writes erase the covered byte slots so concrete memory
-    remains the source of truth.  Partial overlap is handled naturally.
+    Each ``shadow[addr + i]`` slot holds a ``BitVec(8)`` extract of ``val``.
+    When ``mem`` is provided the sentinel byte is also stamped into concrete
+    memory so ``_shadow_read`` can detect symbolic presence by scanning the
+    concrete bytes rather than probing the dict on every read.
+
+    Concrete writes erase covered shadow slots (concrete memory is the source
+    of truth).  Partial overlap is handled naturally — only touched positions
+    are updated.
     """
     z3 = _z3_module()
     if z3 is not None and _is_z3(val):
+        if mem is not None:
+            sb = _SENTINEL_BYTES[size] if size < len(_SENTINEL_BYTES) \
+                 else bytes([_SHADOW_SENTINEL] * size)
+            mem.write_bytes(addr, sb)
         i = 0
         while i < size:
             shadow[addr + i] = z3.Extract(8 * (i + 1) - 1, 8 * i, val)
@@ -288,23 +309,25 @@ def _shadow_write(shadow, addr, val, size):
             i += 1
 
 
-def _shadow_read(shadow, ctx, addr, size, buf):
-    """Reconstruct a value from the byte-granular shadow.
+def _shadow_read(shadow, addr, size, data, buf):
+    """Reconstruct a symbolic value from the byte-granular shadow.
 
-    Returns a z3 expression if any byte in ``[addr, addr+size)`` is
-    shadowed, ``None`` if the range is fully concrete.
+    ``data`` is the already-read concrete bytes for ``[addr, addr+size)``.
+    Scans ``data`` for the sentinel byte; returns ``None`` immediately if
+    none found (zero dict lookups on the fully-concrete fast path).
 
-    ``buf`` is a pre-allocated list (held on Path) reused across calls to
-    avoid per-read allocation.  It is grown in-place when ``size`` exceeds
-    its current length (rare).  ``z3.simplify`` collapses the common case
-    — a same-width read of a single symbolic write — back to the original
-    z3 variable.
+    When a sentinel is found each covered position is resolved: shadow-dict
+    hit → z3 ``BitVec(8)`` extract; miss (spurious sentinel or mixed
+    concrete) → ``BitVecVal`` of the concrete byte.  ``buf`` is a
+    pre-allocated list (held on ``Path``) reused across calls.
+    ``z3.simplify`` collapses a same-width read of a single symbolic write
+    back to the original variable.
     """
-    # Fast scan: check for any shadowed byte without building temporaries.
+    # Fast scan on concrete bytes — no dict touches if no sentinel present.
     found = False
     i = 0
     while i < size:
-        if (addr + i) in shadow:
+        if data[i] == _SHADOW_SENTINEL:
             found = True
             break
         i += 1
@@ -313,29 +336,23 @@ def _shadow_read(shadow, ctx, addr, size, buf):
 
     z3 = _z3_module()
 
-    # Grow the reusable buffer if needed (happens at most log2(max_size) times
-    # over the lifetime of the path).
+    # Grow the reusable buffer in-place if needed (rare).
     while len(buf) < size:
         buf.append(None)
 
-    # Fill buf[0..size-1] in-place.
     i = 0
     while i < size:
-        key = addr + i
-        if key in shadow:
-            buf[i] = shadow[key]
+        if data[i] == _SHADOW_SENTINEL:
+            entry = shadow.get(addr + i)
+            buf[i] = entry if entry is not None else z3.BitVecVal(_SHADOW_SENTINEL, 8)
         else:
-            try:
-                buf[i] = z3.BitVecVal(ctx.mem.read_bytes(key, 1)[0], 8)
-            except (RuntimeError, IndexError):
-                buf[i] = z3.BitVecVal(0, 8)
+            buf[i] = z3.BitVecVal(data[i], 8)
         i += 1
 
     if size == 1:
         return buf[0]
 
     # Concat is MSB-first; little-endian means buf[size-1] is most significant.
-    # Build iteratively to avoid constructing a reversed list.
     result = buf[size - 1]
     j = size - 2
     while j >= 0:
@@ -347,30 +364,22 @@ def _shadow_read(shadow, ctx, addr, size, buf):
 def _make_default_mem_read(is_float, shadow=None, buf=None):
     """Return the chain bottom for a memory_read event.
 
-    Reads concrete bytes via the lens; for ``is_float``, unpacks IEEE
-    float32 / float64. Returns the loaded value. Falls back to zero on a
-    read failure (the address has no backing) — matching the C++
-    ``ConcreteMemory::read`` zero-fill semantics — so the surrounding event
-    still fires and sinks (like ``OOBSink``) get a chance to surface OOB.
-
-    The shadow is byte-granular: each ``shadow[addr]`` slot holds a
-    ``BitVec(8)`` extract.  A read of any width checks all covered byte
-    positions; if any are symbolic the bytes are recombined via
-    ``z3.Concat`` so memcpy-style byte-at-a-time accesses see the
-    symbolic value correctly.  ``buf`` is a pre-allocated list reused
-    across reads to avoid per-call allocation.
+    Reads concrete bytes first (one call, always needed), then checks for
+    the shadow sentinel.  The fully-concrete fast path costs zero dict
+    lookups — just a byte scan of the already-fetched data.  Falls back to
+    zero-fill on a read failure so OOB sinks still fire.
     """
     _buf = buf if buf is not None else []
 
     def default(ctx, addr, size):
-        if shadow is not None:
-            sym = _shadow_read(shadow, ctx, addr, size, _buf)
-            if sym is not None:
-                return sym
         try:
             data = ctx.mem.read_bytes(addr, size)
         except RuntimeError:
-            data = b"\x00" * size
+            data = _ZERO_BYTES[size] if size < len(_ZERO_BYTES) else bytes(size)
+        if shadow is not None:
+            sym = _shadow_read(shadow, addr, size, data, _buf)
+            if sym is not None:
+                return sym
         if is_float and size == 4:
             return _struct.unpack("<f", data)[0]
         if is_float and size == 8:
@@ -385,11 +394,11 @@ def _make_default_mem_write(is_float, shadow=None):
     Writes concrete bytes via the lens. Handles ints, ("ptr", N) pointer
     tuples, raw bytes, and IEEE floats.
 
-    The shadow is byte-granular.  A z3 write decomposes ``val`` into
-    per-byte ``BitVec(8)`` extracts stored at ``shadow[addr + i]``.  A
-    concrete write clears the covered byte slots (concrete memory is the
-    source of truth for those bytes).  Partial overlaps are handled
-    naturally — only the written byte positions are touched.
+    The shadow is byte-granular.  A z3 write stamps the sentinel into
+    concrete memory and decomposes ``val`` into per-byte extracts in the
+    shadow dict.  A concrete write clears covered shadow slots and writes
+    real bytes, erasing any sentinel.  Partial overlaps are handled
+    naturally.
     """
     def default(ctx, addr, val, size):
         if isinstance(val, bool):
@@ -418,7 +427,7 @@ def _make_default_mem_write(is_float, shadow=None):
             ctx.mem.write_bytes(addr, _struct.pack(fmt, val))
             return None
         if shadow is not None and _is_z3(val):
-            _shadow_write(shadow, addr, val, size)
+            _shadow_write(shadow, addr, val, size, mem=ctx.mem)
             return None
         # Symbolic or otherwise unknown without a shadow — drop.
         return None
