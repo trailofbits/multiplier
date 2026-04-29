@@ -467,6 +467,24 @@ class Path:
         """Return True if any `fresh_int` variable contributes to `expr`."""
         return bool(self.taint_sources(expr))
 
+    def write_symbolic(self, addr: int, value, size: int = None) -> None:
+        """Write a z3 expression into the symbolic shadow at ``addr``.
+
+        ``size`` defaults to ``value.size() // 8`` (the BitVec's byte width).
+        The sentinel is stamped into concrete memory so subsequent reads
+        detect the symbolic value without probing the shadow dict on every
+        access.  Raises ``TypeError`` if ``value`` is not a z3 expression.
+        """
+        from .dispatch import _shadow_write, _is_z3
+        if not _is_z3(value):
+            raise TypeError(
+                f"write_symbolic: value must be a z3 expression, "
+                f"got {type(value).__name__}")
+        if size is None:
+            size = value.size() // 8
+        _shadow_write(self._symbolic_shadow, addr, value, size,
+                      mem=self._mem)
+
     def summary(self):
         """Single human-readable summary of what happened on this path.
 
