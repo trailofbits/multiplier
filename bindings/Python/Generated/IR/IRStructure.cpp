@@ -78,9 +78,38 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   return *T_cast(obj);
 }
 
+// NOTE(manual): dispatch to most-derived Python type based on StructureKind.
+// gTypes[45]=IRStructure, 46=IRScopeStructure, 47=IRIfStructure,
+// 48=IRIfThenStructure, 49=IRIfElseStructure, 50=IRForStructure,
+// 51=IRWhileStructure, 52=IRDoWhileStructure, 53=IRSwitchStructure,
+// 54=IRSwitchCaseStructure, 55=IRExpressionScopeStructure
 template <>
 SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
-  auto ret = gType->tp_alloc(gType, 0);
+  using _k = ir::StructureKind;
+  PyTypeObject *tp;
+  switch (val.kind()) {
+    case _k::FUNCTION_SCOPE:
+    case _k::SCOPE:            tp = &(gTypes[46]); break;
+    case _k::IF:               tp = &(gTypes[47]); break;
+    case _k::IF_THEN:          tp = &(gTypes[48]); break;
+    case _k::IF_ELSE:          tp = &(gTypes[49]); break;
+    case _k::FOR:
+    case _k::FOR_INIT:
+    case _k::FOR_CONDITION:
+    case _k::FOR_INCREMENT:
+    case _k::FOR_BODY:         tp = &(gTypes[50]); break;
+    case _k::WHILE:
+    case _k::WHILE_CONDITION:
+    case _k::WHILE_BODY:       tp = &(gTypes[51]); break;
+    case _k::DO_WHILE:
+    case _k::DO_WHILE_BODY:
+    case _k::DO_WHILE_CONDITION: tp = &(gTypes[52]); break;
+    case _k::SWITCH:           tp = &(gTypes[53]); break;
+    case _k::SWITCH_CASE:      tp = &(gTypes[54]); break;
+    case _k::EXPRESSION_SCOPE: tp = &(gTypes[55]); break;
+    default:                   tp = gType;          break;
+  }
+  auto ret = tp->tp_alloc(tp, 0);
   if (auto obj = O_cast(ret)) {
     obj->data = new (obj->backing_storage) T(std::move(val));
   }
