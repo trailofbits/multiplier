@@ -790,4 +790,7 @@ from_python(BorrowedPyObject *obj) noexcept {
   return PythonBinding<T>::from_python(obj);
 }
 
+// Hand-written interpreter module loader (Interpreter.cpp).
+bool LoadInterpreterModule(BorrowedPyObject *ir_module);
+
 }  // namespace mx

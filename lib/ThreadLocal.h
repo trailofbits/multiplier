@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <functional>
 #include <memory>
 
@@ -34,6 +35,10 @@ class ThreadLocalBase {
 
  protected:
   std::shared_ptr<ThreadLocalBaseImpl> impl;
+
+  // Unique ID assigned at construction; used by the thread-local fast-path
+  // cache to detect address reuse after destruction.
+  uint64_t id_;
 
   ThreadLocalBase(void) = delete;
 

@@ -388,7 +388,6 @@ class MX_EXPORT ConsumeVAParamInst : public IRInstruction {
 class MX_EXPORT RetInst : public IRInstruction {
  public:
   MX_DECLARE_IR_INSTRUCTION(RetInst)
-  std::optional<IRInstruction> return_value(void) const;
 };
 
 class MX_EXPORT BranchInst : public IRInstruction {

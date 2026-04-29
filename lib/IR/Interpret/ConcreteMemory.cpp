@@ -22,7 +22,7 @@ ConcreteMemory::ConcreteMemory(uint8_t address_width, uint64_t base_address)
   }
 }
 
-uint64_t ConcreteMemory::Allocate(uint64_t size_bytes, uint64_t align_bytes) {
+uint64_t ConcreteMemory::allocate(uint64_t size_bytes, uint64_t align_bytes) {
   if (size_bytes == 0) {
     size_bytes = 8;
   }
@@ -48,14 +48,53 @@ uint64_t ConcreteMemory::Allocate(uint64_t size_bytes, uint64_t align_bytes) {
   return base;
 }
 
-void ConcreteMemory::Free(uint64_t address) {
+bool ConcreteMemory::place_at(uint64_t address, uint64_t size_bytes,
+                              uint64_t align_bytes) {
+  if (size_bytes == 0) {
+    size_bytes = 8;
+  }
+  if (align_bytes == 0) {
+    align_bytes = 8;
+  }
+  uint64_t mask = align_bytes - 1u;
+  if (address & mask) {
+    return false;  // misaligned
+  }
+  if (address_width_ == 4) {
+    address &= kMask32;
+  }
+
+  uint64_t end = address + size_bytes;
+  for (auto &[base, region] : regions_) {
+    if (region.freed) continue;
+    uint64_t r_end = region.base + region.size;
+    if (address < r_end && region.base < end) {
+      return false;  // overlap with live region
+    }
+  }
+
+  regions_[address] = Region{address, size_bytes, false, false};
+  backing_[address].resize(size_bytes, 0);
+
+  // Keep next_alloc_ ahead of every placed region so subsequent
+  // bump-allocations don't collide.
+  if (end > next_alloc_) {
+    next_alloc_ = end;
+    if (address_width_ == 4) {
+      next_alloc_ &= kMask32;
+    }
+  }
+  return true;
+}
+
+void ConcreteMemory::free(uint64_t address) {
   auto it = regions_.find(address);
   if (it != regions_.end()) {
     it->second.freed = true;
   }
 }
 
-const ConcreteMemory::Region *ConcreteMemory::FindRegion(
+const ConcreteMemory::Region *ConcreteMemory::find_region(
     uint64_t address) const {
   // Fast path: exact base address match.
   auto it = regions_.find(address);
@@ -72,7 +111,7 @@ const ConcreteMemory::Region *ConcreteMemory::FindRegion(
   return nullptr;
 }
 
-ConcreteMemory::Region *ConcreteMemory::FindRegion(uint64_t address) {
+ConcreteMemory::Region *ConcreteMemory::find_region(uint64_t address) {
   auto it = regions_.find(address);
   if (it != regions_.end()) {
     return &it->second;
@@ -86,14 +125,14 @@ ConcreteMemory::Region *ConcreteMemory::FindRegion(uint64_t address) {
   return nullptr;
 }
 
-uint8_t *ConcreteMemory::GetBytes(uint64_t region_base, uint64_t offset) {
+uint8_t *ConcreteMemory::get_bytes(uint64_t region_base, uint64_t offset) {
   auto it = backing_.find(region_base);
   assert(it != backing_.end() && "backing store missing for region");
   assert(offset < it->second.size() && "offset out of bounds");
   return it->second.data() + offset;
 }
 
-const uint8_t *ConcreteMemory::GetBytes(uint64_t region_base,
+const uint8_t *ConcreteMemory::get_bytes(uint64_t region_base,
                                         uint64_t offset) const {
   auto it = backing_.find(region_base);
   assert(it != backing_.end() && "backing store missing for region");
@@ -101,8 +140,8 @@ const uint8_t *ConcreteMemory::GetBytes(uint64_t region_base,
   return it->second.data() + offset;
 }
 
-bool ConcreteMemory::Read(uint64_t address, void *dest, uint32_t size) {
-  const Region *region = FindRegion(address);
+bool ConcreteMemory::read(uint64_t address, void *dest, uint32_t size) {
+  const Region *region = find_region(address);
   if (!region || region->freed) {
     std::memset(dest, 0, size);
     return false;
@@ -129,28 +168,8 @@ bool ConcreteMemory::Read(uint64_t address, void *dest, uint32_t size) {
   return true;
 }
 
-bool ConcreteMemory::WritePointer(uint64_t address, uint64_t pointer_value) {
-  // Write raw bytes first (this clears any stale shadow), then set the
-  // new shadow entry so ReadPointer can recover the pointer identity.
-  bool ok = Write(address, &pointer_value, sizeof(pointer_value));
-  pointer_shadow_[address] = Pointer(pointer_value);
-  return ok;
-}
-
-bool ConcreteMemory::ReadPointer(uint64_t address, uint64_t &pointer_value) {
-  auto it = pointer_shadow_.find(address);
-  if (it != pointer_shadow_.end()) {
-    pointer_value = ConcreteAddress(it->second);
-    return true;
-  }
-  return false;
-}
-
-bool ConcreteMemory::Write(uint64_t address, const void *src, uint32_t size) {
-  // Clear pointer shadow: a raw write overwrites any pointer provenance.
-  pointer_shadow_.erase(address);
-
-  Region *region = FindRegion(address);
+bool ConcreteMemory::write(uint64_t address, const void *src, uint32_t size) {
+  Region *region = find_region(address);
   if (!region || region->freed) {
     return false;
   }
@@ -172,8 +191,8 @@ bool ConcreteMemory::Write(uint64_t address, const void *src, uint32_t size) {
   return true;
 }
 
-bool ConcreteMemory::Memset(uint64_t address, uint8_t value, uint32_t size) {
-  Region *region = FindRegion(address);
+bool ConcreteMemory::memset(uint64_t address, uint8_t value, uint32_t size) {
+  Region *region = find_region(address);
   if (!region || region->freed) {
     return false;
   }
@@ -194,30 +213,30 @@ bool ConcreteMemory::Memset(uint64_t address, uint8_t value, uint32_t size) {
   return true;
 }
 
-bool ConcreteMemory::Memcpy(uint64_t dest_address, uint64_t src_address,
+bool ConcreteMemory::memcpy(uint64_t dest_address, uint64_t src_address,
                             uint32_t size) {
   std::vector<uint8_t> temp(size);
-  if (!Read(src_address, temp.data(), size)) {
+  if (!read(src_address, temp.data(), size)) {
     return false;
   }
-  return Write(dest_address, temp.data(), size);
+  return write(dest_address, temp.data(), size);
 }
 
-void ConcreteMemory::Poison(uint64_t address) {
+void ConcreteMemory::poison(uint64_t address) {
   auto it = regions_.find(address);
   if (it != regions_.end()) {
     it->second.poisoned = true;
   }
 }
 
-void ConcreteMemory::Unpoison(uint64_t address) {
+void ConcreteMemory::unpoison(uint64_t address) {
   auto it = regions_.find(address);
   if (it != regions_.end()) {
     it->second.poisoned = false;
   }
 }
 
-bool ConcreteMemory::IsPoisoned(uint64_t address) const {
+bool ConcreteMemory::is_poisoned(uint64_t address) const {
   auto it = regions_.find(address);
   if (it != regions_.end()) {
     return it->second.poisoned;
@@ -225,31 +244,13 @@ bool ConcreteMemory::IsPoisoned(uint64_t address) const {
   return false;
 }
 
-std::unique_ptr<Memory> ConcreteMemory::Fork(void) const {
+std::unique_ptr<Memory> ConcreteMemory::fork(void) const {
   auto copy = std::make_unique<ConcreteMemory>(address_width_, 0);
   copy->next_alloc_ = next_alloc_;
   copy->auto_grow_ = auto_grow_;
   copy->backing_ = backing_;
   copy->regions_ = regions_;
-  copy->pointer_shadow_ = pointer_shadow_;
   return copy;
-}
-
-void ConcreteMemory::WritePointerShadow(uint64_t address,
-                                        const Pointer &ptr) {
-  pointer_shadow_[address] = ptr;
-}
-
-void ConcreteMemory::ClearPointerShadow(uint64_t address) {
-  pointer_shadow_.erase(address);
-}
-
-const Pointer *ConcreteMemory::ReadPointerShadow(uint64_t address) const {
-  auto it = pointer_shadow_.find(address);
-  if (it != pointer_shadow_.end()) {
-    return &it->second;
-  }
-  return nullptr;
 }
 
 }  // namespace mx::ir::interpret

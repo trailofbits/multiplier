@@ -35,7 +35,13 @@ class ThreadLocalBaseImpl {
 
 namespace {
 
+// Global counter for unique ThreadLocalBase IDs. Prevents false fast-path
+// hits when a new ThreadLocalBase is allocated at the same address as a
+// previously destroyed one.
+static std::atomic<uint64_t> gNextId{1u};
+
 static thread_local void *tInstance = nullptr;
+static thread_local uint64_t tInstanceId = 0u;
 static thread_local void *tThreadData = nullptr;
 
 // A thread-local garbage collector for the thread-local data.
@@ -96,22 +102,29 @@ ThreadLocalBase::ThreadLocalBase(std::function<void *(unsigned)> allocator_,
                                  std::function<void(void *)> deleter_,
                                  int)
     : impl(std::make_shared<ThreadLocalBaseImpl>(
-          std::move(allocator_), std::move(deleter_))) {}
+          std::move(allocator_), std::move(deleter_))),
+      id_(gNextId.fetch_add(1u, std::memory_order_relaxed)) {}
 
 // Get or initialize the thread-local data.
 void *ThreadLocalBase::GetOrInit(void) & {
 
   // Fast-path: Ideally, we just have a single instance of `ThreadLocal<T>`.
-  if (tInstance == this) {
+  // Check both the pointer and the unique ID to guard against address reuse
+  // after a ThreadLocalBase is destroyed and a new one allocated at the same
+  // address.
+  if (tInstance == this && tInstanceId == id_) {
     return tThreadData;
   }
 
   auto thread_id = std::this_thread::get_id();
   void *data = nullptr;
   ThreadLocalBaseImpl &self = *impl;
-  if (tInstance) {
+  {
     std::shared_lock<std::shared_mutex> locker(self.data_lock);
-    data = self.data[thread_id];
+    auto it = self.data.find(thread_id);
+    if (it != self.data.end()) {
+      data = it->second;
+    }
   }
 
   ThreadLocalGC *cleanups = tCleanups.get();
@@ -122,7 +135,7 @@ void *ThreadLocalBase::GetOrInit(void) & {
     cleanups->Collect();
   }
 
-  if (!tThreadData) {
+  if (!data) {
     data = impl->allocator(self.next_worker_index.fetch_add(1u));
     assert(data != nullptr);
 
@@ -138,6 +151,7 @@ void *ThreadLocalBase::GetOrInit(void) & {
 
   tThreadData = data;
   tInstance = this;
+  tInstanceId = id_;
   return data;
 }
 

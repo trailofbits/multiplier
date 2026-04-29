@@ -71,7 +71,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[490]) || tp >= &(gTypes[566])) {
+  if (tp < &(gTypes[542]) || tp >= &(gTypes[618])) {
     return std::nullopt;
   }
 
@@ -88,291 +88,291 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::OMPErrorDirective::static_kind():
-      tp = &(gTypes[491]);
-      break;
-
-    case mx::OMPDispatchDirective::static_kind():
-      tp = &(gTypes[492]);
-      break;
-
-    case mx::OMPDepobjDirective::static_kind():
-      tp = &(gTypes[493]);
-      break;
-
-    case mx::OMPCriticalDirective::static_kind():
-      tp = &(gTypes[494]);
-      break;
-
-    case mx::OMPCancellationPointDirective::static_kind():
-      tp = &(gTypes[495]);
-      break;
-
-    case mx::OMPCancelDirective::static_kind():
-      tp = &(gTypes[496]);
-      break;
-
-    case mx::OMPBarrierDirective::static_kind():
-      tp = &(gTypes[497]);
-      break;
-
-    case mx::OMPAtomicDirective::static_kind():
-      tp = &(gTypes[498]);
-      break;
-
-    case mx::OMPTeamsDirective::static_kind():
-      tp = &(gTypes[499]);
-      break;
-
-    case mx::OMPTaskyieldDirective::static_kind():
-      tp = &(gTypes[500]);
-      break;
-
-    case mx::OMPTaskwaitDirective::static_kind():
-      tp = &(gTypes[501]);
-      break;
-
-    case mx::OMPTaskgroupDirective::static_kind():
-      tp = &(gTypes[502]);
-      break;
-
-    case mx::OMPTaskDirective::static_kind():
-      tp = &(gTypes[503]);
-      break;
-
-    case mx::OMPTargetUpdateDirective::static_kind():
-      tp = &(gTypes[504]);
-      break;
-
-    case mx::OMPTargetTeamsDirective::static_kind():
-      tp = &(gTypes[505]);
-      break;
-
-    case mx::OMPTargetParallelDirective::static_kind():
-      tp = &(gTypes[506]);
-      break;
-
-    case mx::OMPTargetExitDataDirective::static_kind():
-      tp = &(gTypes[507]);
-      break;
-
-    case mx::OMPTargetEnterDataDirective::static_kind():
-      tp = &(gTypes[508]);
-      break;
-
-    case mx::OMPTargetDirective::static_kind():
-      tp = &(gTypes[509]);
-      break;
-
-    case mx::OMPTargetDataDirective::static_kind():
-      tp = &(gTypes[510]);
-      break;
-
-    case mx::OMPSingleDirective::static_kind():
-      tp = &(gTypes[511]);
-      break;
-
-    case mx::OMPSectionsDirective::static_kind():
-      tp = &(gTypes[512]);
-      break;
-
-    case mx::OMPSectionDirective::static_kind():
-      tp = &(gTypes[513]);
-      break;
-
-    case mx::OMPScopeDirective::static_kind():
-      tp = &(gTypes[514]);
-      break;
-
-    case mx::OMPScanDirective::static_kind():
-      tp = &(gTypes[515]);
-      break;
-
-    case mx::OMPParallelSectionsDirective::static_kind():
-      tp = &(gTypes[516]);
-      break;
-
-    case mx::OMPParallelMasterDirective::static_kind():
-      tp = &(gTypes[517]);
-      break;
-
-    case mx::OMPParallelMaskedDirective::static_kind():
-      tp = &(gTypes[518]);
-      break;
-
-    case mx::OMPParallelDirective::static_kind():
-      tp = &(gTypes[519]);
-      break;
-
-    case mx::OMPOrderedDirective::static_kind():
-      tp = &(gTypes[520]);
-      break;
-
-    case mx::OMPMetaDirective::static_kind():
-      tp = &(gTypes[521]);
-      break;
-
-    case mx::OMPMasterDirective::static_kind():
-      tp = &(gTypes[522]);
-      break;
-
-    case mx::OMPMaskedDirective::static_kind():
-      tp = &(gTypes[523]);
-      break;
-
-    case mx::OMPUnrollDirective::static_kind():
-      tp = &(gTypes[526]);
-      break;
-
-    case mx::OMPTileDirective::static_kind():
-      tp = &(gTypes[527]);
-      break;
-
-    case mx::OMPGenericLoopDirective::static_kind():
-      tp = &(gTypes[529]);
-      break;
-
-    case mx::OMPForSimdDirective::static_kind():
-      tp = &(gTypes[530]);
-      break;
-
-    case mx::OMPForDirective::static_kind():
-      tp = &(gTypes[531]);
-      break;
-
-    case mx::OMPDistributeSimdDirective::static_kind():
-      tp = &(gTypes[532]);
-      break;
-
-    case mx::OMPDistributeParallelForSimdDirective::static_kind():
-      tp = &(gTypes[533]);
-      break;
-
-    case mx::OMPDistributeParallelForDirective::static_kind():
-      tp = &(gTypes[534]);
-      break;
-
-    case mx::OMPDistributeDirective::static_kind():
-      tp = &(gTypes[535]);
-      break;
-
-    case mx::OMPTeamsGenericLoopDirective::static_kind():
-      tp = &(gTypes[536]);
-      break;
-
-    case mx::OMPTeamsDistributeSimdDirective::static_kind():
-      tp = &(gTypes[537]);
-      break;
-
-    case mx::OMPTeamsDistributeParallelForSimdDirective::static_kind():
-      tp = &(gTypes[538]);
-      break;
-
-    case mx::OMPTeamsDistributeParallelForDirective::static_kind():
-      tp = &(gTypes[539]);
-      break;
-
-    case mx::OMPTeamsDistributeDirective::static_kind():
-      tp = &(gTypes[540]);
-      break;
-
-    case mx::OMPTaskLoopSimdDirective::static_kind():
-      tp = &(gTypes[541]);
-      break;
-
-    case mx::OMPTaskLoopDirective::static_kind():
-      tp = &(gTypes[542]);
-      break;
-
-    case mx::OMPTargetTeamsGenericLoopDirective::static_kind():
       tp = &(gTypes[543]);
       break;
 
-    case mx::OMPTargetTeamsDistributeSimdDirective::static_kind():
+    case mx::OMPDispatchDirective::static_kind():
       tp = &(gTypes[544]);
       break;
 
-    case mx::OMPTargetTeamsDistributeParallelForSimdDirective::static_kind():
+    case mx::OMPDepobjDirective::static_kind():
       tp = &(gTypes[545]);
       break;
 
-    case mx::OMPTargetTeamsDistributeParallelForDirective::static_kind():
+    case mx::OMPCriticalDirective::static_kind():
       tp = &(gTypes[546]);
       break;
 
-    case mx::OMPTargetTeamsDistributeDirective::static_kind():
+    case mx::OMPCancellationPointDirective::static_kind():
       tp = &(gTypes[547]);
       break;
 
-    case mx::OMPTargetSimdDirective::static_kind():
+    case mx::OMPCancelDirective::static_kind():
       tp = &(gTypes[548]);
       break;
 
-    case mx::OMPTargetParallelGenericLoopDirective::static_kind():
+    case mx::OMPBarrierDirective::static_kind():
       tp = &(gTypes[549]);
       break;
 
-    case mx::OMPTargetParallelForSimdDirective::static_kind():
+    case mx::OMPAtomicDirective::static_kind():
       tp = &(gTypes[550]);
       break;
 
-    case mx::OMPTargetParallelForDirective::static_kind():
+    case mx::OMPTeamsDirective::static_kind():
       tp = &(gTypes[551]);
       break;
 
-    case mx::OMPSimdDirective::static_kind():
+    case mx::OMPTaskyieldDirective::static_kind():
       tp = &(gTypes[552]);
       break;
 
-    case mx::OMPParallelMasterTaskLoopSimdDirective::static_kind():
+    case mx::OMPTaskwaitDirective::static_kind():
       tp = &(gTypes[553]);
       break;
 
-    case mx::OMPParallelMasterTaskLoopDirective::static_kind():
+    case mx::OMPTaskgroupDirective::static_kind():
       tp = &(gTypes[554]);
       break;
 
-    case mx::OMPParallelMaskedTaskLoopSimdDirective::static_kind():
+    case mx::OMPTaskDirective::static_kind():
       tp = &(gTypes[555]);
       break;
 
-    case mx::OMPParallelMaskedTaskLoopDirective::static_kind():
+    case mx::OMPTargetUpdateDirective::static_kind():
       tp = &(gTypes[556]);
       break;
 
-    case mx::OMPParallelGenericLoopDirective::static_kind():
+    case mx::OMPTargetTeamsDirective::static_kind():
       tp = &(gTypes[557]);
       break;
 
-    case mx::OMPParallelForSimdDirective::static_kind():
+    case mx::OMPTargetParallelDirective::static_kind():
       tp = &(gTypes[558]);
       break;
 
-    case mx::OMPParallelForDirective::static_kind():
+    case mx::OMPTargetExitDataDirective::static_kind():
       tp = &(gTypes[559]);
       break;
 
-    case mx::OMPMasterTaskLoopSimdDirective::static_kind():
+    case mx::OMPTargetEnterDataDirective::static_kind():
       tp = &(gTypes[560]);
       break;
 
-    case mx::OMPMasterTaskLoopDirective::static_kind():
+    case mx::OMPTargetDirective::static_kind():
       tp = &(gTypes[561]);
       break;
 
-    case mx::OMPMaskedTaskLoopSimdDirective::static_kind():
+    case mx::OMPTargetDataDirective::static_kind():
       tp = &(gTypes[562]);
       break;
 
-    case mx::OMPMaskedTaskLoopDirective::static_kind():
+    case mx::OMPSingleDirective::static_kind():
       tp = &(gTypes[563]);
       break;
 
-    case mx::OMPInteropDirective::static_kind():
+    case mx::OMPSectionsDirective::static_kind():
       tp = &(gTypes[564]);
       break;
 
-    case mx::OMPFlushDirective::static_kind():
+    case mx::OMPSectionDirective::static_kind():
       tp = &(gTypes[565]);
+      break;
+
+    case mx::OMPScopeDirective::static_kind():
+      tp = &(gTypes[566]);
+      break;
+
+    case mx::OMPScanDirective::static_kind():
+      tp = &(gTypes[567]);
+      break;
+
+    case mx::OMPParallelSectionsDirective::static_kind():
+      tp = &(gTypes[568]);
+      break;
+
+    case mx::OMPParallelMasterDirective::static_kind():
+      tp = &(gTypes[569]);
+      break;
+
+    case mx::OMPParallelMaskedDirective::static_kind():
+      tp = &(gTypes[570]);
+      break;
+
+    case mx::OMPParallelDirective::static_kind():
+      tp = &(gTypes[571]);
+      break;
+
+    case mx::OMPOrderedDirective::static_kind():
+      tp = &(gTypes[572]);
+      break;
+
+    case mx::OMPMetaDirective::static_kind():
+      tp = &(gTypes[573]);
+      break;
+
+    case mx::OMPMasterDirective::static_kind():
+      tp = &(gTypes[574]);
+      break;
+
+    case mx::OMPMaskedDirective::static_kind():
+      tp = &(gTypes[575]);
+      break;
+
+    case mx::OMPUnrollDirective::static_kind():
+      tp = &(gTypes[578]);
+      break;
+
+    case mx::OMPTileDirective::static_kind():
+      tp = &(gTypes[579]);
+      break;
+
+    case mx::OMPGenericLoopDirective::static_kind():
+      tp = &(gTypes[581]);
+      break;
+
+    case mx::OMPForSimdDirective::static_kind():
+      tp = &(gTypes[582]);
+      break;
+
+    case mx::OMPForDirective::static_kind():
+      tp = &(gTypes[583]);
+      break;
+
+    case mx::OMPDistributeSimdDirective::static_kind():
+      tp = &(gTypes[584]);
+      break;
+
+    case mx::OMPDistributeParallelForSimdDirective::static_kind():
+      tp = &(gTypes[585]);
+      break;
+
+    case mx::OMPDistributeParallelForDirective::static_kind():
+      tp = &(gTypes[586]);
+      break;
+
+    case mx::OMPDistributeDirective::static_kind():
+      tp = &(gTypes[587]);
+      break;
+
+    case mx::OMPTeamsGenericLoopDirective::static_kind():
+      tp = &(gTypes[588]);
+      break;
+
+    case mx::OMPTeamsDistributeSimdDirective::static_kind():
+      tp = &(gTypes[589]);
+      break;
+
+    case mx::OMPTeamsDistributeParallelForSimdDirective::static_kind():
+      tp = &(gTypes[590]);
+      break;
+
+    case mx::OMPTeamsDistributeParallelForDirective::static_kind():
+      tp = &(gTypes[591]);
+      break;
+
+    case mx::OMPTeamsDistributeDirective::static_kind():
+      tp = &(gTypes[592]);
+      break;
+
+    case mx::OMPTaskLoopSimdDirective::static_kind():
+      tp = &(gTypes[593]);
+      break;
+
+    case mx::OMPTaskLoopDirective::static_kind():
+      tp = &(gTypes[594]);
+      break;
+
+    case mx::OMPTargetTeamsGenericLoopDirective::static_kind():
+      tp = &(gTypes[595]);
+      break;
+
+    case mx::OMPTargetTeamsDistributeSimdDirective::static_kind():
+      tp = &(gTypes[596]);
+      break;
+
+    case mx::OMPTargetTeamsDistributeParallelForSimdDirective::static_kind():
+      tp = &(gTypes[597]);
+      break;
+
+    case mx::OMPTargetTeamsDistributeParallelForDirective::static_kind():
+      tp = &(gTypes[598]);
+      break;
+
+    case mx::OMPTargetTeamsDistributeDirective::static_kind():
+      tp = &(gTypes[599]);
+      break;
+
+    case mx::OMPTargetSimdDirective::static_kind():
+      tp = &(gTypes[600]);
+      break;
+
+    case mx::OMPTargetParallelGenericLoopDirective::static_kind():
+      tp = &(gTypes[601]);
+      break;
+
+    case mx::OMPTargetParallelForSimdDirective::static_kind():
+      tp = &(gTypes[602]);
+      break;
+
+    case mx::OMPTargetParallelForDirective::static_kind():
+      tp = &(gTypes[603]);
+      break;
+
+    case mx::OMPSimdDirective::static_kind():
+      tp = &(gTypes[604]);
+      break;
+
+    case mx::OMPParallelMasterTaskLoopSimdDirective::static_kind():
+      tp = &(gTypes[605]);
+      break;
+
+    case mx::OMPParallelMasterTaskLoopDirective::static_kind():
+      tp = &(gTypes[606]);
+      break;
+
+    case mx::OMPParallelMaskedTaskLoopSimdDirective::static_kind():
+      tp = &(gTypes[607]);
+      break;
+
+    case mx::OMPParallelMaskedTaskLoopDirective::static_kind():
+      tp = &(gTypes[608]);
+      break;
+
+    case mx::OMPParallelGenericLoopDirective::static_kind():
+      tp = &(gTypes[609]);
+      break;
+
+    case mx::OMPParallelForSimdDirective::static_kind():
+      tp = &(gTypes[610]);
+      break;
+
+    case mx::OMPParallelForDirective::static_kind():
+      tp = &(gTypes[611]);
+      break;
+
+    case mx::OMPMasterTaskLoopSimdDirective::static_kind():
+      tp = &(gTypes[612]);
+      break;
+
+    case mx::OMPMasterTaskLoopDirective::static_kind():
+      tp = &(gTypes[613]);
+      break;
+
+    case mx::OMPMaskedTaskLoopSimdDirective::static_kind():
+      tp = &(gTypes[614]);
+      break;
+
+    case mx::OMPMaskedTaskLoopDirective::static_kind():
+      tp = &(gTypes[615]);
+      break;
+
+    case mx::OMPInteropDirective::static_kind():
+      tp = &(gTypes[616]);
+      break;
+
+    case mx::OMPFlushDirective::static_kind():
+      tp = &(gTypes[617]);
       break;
 
   }
@@ -676,7 +676,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[490]);
+  PyTypeObject * const tp = &(gTypes[542]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -691,12 +691,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[477].tp_hash;
-  tp->tp_richcompare = gTypes[477].tp_richcompare;
+  tp->tp_hash = gTypes[529].tp_hash;
+  tp->tp_richcompare = gTypes[529].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[477]);
+  tp->tp_base = &(gTypes[529]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

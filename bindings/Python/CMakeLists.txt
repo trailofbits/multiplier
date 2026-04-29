@@ -13,7 +13,7 @@ include("${PROJECT_SOURCE_DIR}/cmake/python.cmake")
 # extension.
 get_python_extension_suffix(python_module_extension)
 
-file(GLOB_RECURSE generated_sources CONFIGURE_DEPENDS RELATIVE_PATH "${CMAKE_CURRENT_LIST_DIR}/Generated" "*.cpp")
+file(GLOB_RECURSE generated_sources RELATIVE_PATH "${CMAKE_CURRENT_LIST_DIR}/Generated" "*.cpp")
 
 add_library("mx-python" SHARED
   "${PROJECT_SOURCE_DIR}/include/${lower_project_name}/Bindings/Python.h"
@@ -32,6 +32,10 @@ add_library("mx-python" SHARED
   "SharedPyPtr.h"
   "TokenTreeVisitor.h"
   "TokenTreeVisitor.cpp"
+  "Interpreter.h"
+  "Interpreter.cpp"
+  "SymbolicInterpreter.h"
+  "SymbolicInterpreter.cpp"
   "Types.cpp"  # Auto-generated.
   "Types.h"
   "UserToken.cpp"
@@ -88,6 +92,24 @@ set_target_properties("mx-python"
       "${PROJECT_BINARY_DIR}/lib/${site_packages_dir}"
 )
 
+# Copy memory_view.py to the build output alongside the .so.
+add_custom_command(
+  TARGET "mx-python" POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${CMAKE_CURRENT_LIST_DIR}/memory_view.py"
+    "${PROJECT_BINARY_DIR}/lib/${site_packages_dir}/memory_view.py"
+  COMMENT "Copying memory_view.py to build output"
+)
+
+# Copy the symex/ analyst-facing package to the build output as multiplier/symex/.
+add_custom_command(
+  TARGET "mx-python" POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CMAKE_CURRENT_LIST_DIR}/symex"
+    "${PROJECT_BINARY_DIR}/lib/${site_packages_dir}/multiplier/symex"
+  COMMENT "Copying symex/ to build output as multiplier/symex/"
+)
+
 target_include_directories("mx-python"
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
@@ -132,5 +154,21 @@ if(MX_ENABLE_INSTALL AND NOT MX_ENABLE_BOOTSTRAP)
     PUBLIC_HEADER
       DESTINATION
         "${MX_INSTALL_INCLUDE_DIR}/${lower_project_name}/Bindings"
+  )
+
+  # Install pure-Python helper modules alongside the extension.
+  install(
+    FILES
+      "${CMAKE_CURRENT_LIST_DIR}/memory_view.py"
+    DESTINATION
+      "${CMAKE_INSTALL_PREFIX}/${MX_INSTALL_LIB_DIR}/${site_packages_dir}"
+  )
+
+  # Install the symex/ analyst-facing package as multiplier/symex/.
+  install(
+    DIRECTORY
+      "${CMAKE_CURRENT_LIST_DIR}/symex"
+    DESTINATION
+      "${CMAKE_INSTALL_PREFIX}/${MX_INSTALL_LIB_DIR}/${site_packages_dir}/multiplier"
   )
 endif()

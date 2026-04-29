@@ -55,12 +55,14 @@ class EntityCategory(IntEnum):
   IR_BLOCK = 16
   IR_INSTRUCTION = 17
   IR_OBJECT = 18
+  IR_STRUCTURE = 19
 
 class IREntityKind(IntEnum):
   IR_FUNCTION = 0
   IR_BLOCK = 1
   IR_INSTRUCTION = 2
   IR_OBJECT = 3
+  IR_STRUCTURE = 4
 
 class BuiltinReferenceKind(IntEnum):
   USES_VALUE = 0
@@ -85,6 +87,11 @@ class IndexStatus(IntEnum):
   UNINITIALIZED = 0
   INDEXING_IN_PROGRESS = 1
   INDEXED = 2
+
+class IndexVersion(object):
+
+  def same_index(self, other: multiplier.IndexVersion) -> bool:
+    ...
 
 class ReferenceKind(object):
   builtin_reference_kind: Optional[multiplier.BuiltinReferenceKind]
@@ -125,23 +132,24 @@ class Reference(object):
   as_ir_block: Optional[multiplier.ir.IRBlock]
   as_ir_instruction: Optional[multiplier.ir.IRInstruction]
   as_ir_object: Optional[multiplier.ir.IRObject]
+  as_ir_structure: Optional[multiplier.ir.IRStructure]
 
   @overload
   @staticmethod
-  def add(kind: multiplier.ReferenceKind, from_: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject], to: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> bool:
+  def add(kind: multiplier.ReferenceKind, from_: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject | multiplier.ir.IRStructure], to: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject | multiplier.ir.IRStructure]) -> bool:
     ...
 
   @overload
   @staticmethod
-  def add(kind: multiplier.ReferenceKind, from_: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject], to: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject], context: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> bool:
+  def add(kind: multiplier.ReferenceKind, from_: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject | multiplier.ir.IRStructure], to: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject | multiplier.ir.IRStructure], context: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject | multiplier.ir.IRStructure]) -> bool:
     ...
 
   @staticmethod
-  def FROM(entity: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Iterable[multiplier.Reference]:
+  def FROM(entity: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject | multiplier.ir.IRStructure]) -> Iterable[multiplier.Reference]:
     ...
 
   @staticmethod
-  def to(entity: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Iterable[multiplier.Reference]:
+  def to(entity: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject | multiplier.ir.IRStructure]) -> Iterable[multiplier.Reference]:
     ...
 
 class Fragment(multiplier.Entity):
@@ -221,11 +229,11 @@ class Fragment(multiplier.Entity):
 
   @overload
   @staticmethod
-  def containing(arg_0: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.Fragment]:
+  def containing(arg_0: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject | multiplier.ir.IRStructure]) -> Optional[multiplier.Fragment]:
     ...
 
   @staticmethod
-  def FROM(arg_0: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.Fragment]:
+  def FROM(arg_0: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject | multiplier.ir.IRStructure]) -> Optional[multiplier.Fragment]:
     ...
 
   @staticmethod
@@ -240,6 +248,7 @@ class Fragment(multiplier.Entity):
     ...
 
 class Index(object):
+  version: multiplier.IndexVersion
   file_paths: FilePathMap
   compilations: Iterable[multiplier.frontend.Compilation]
   files: Iterable[multiplier.frontend.File]
@@ -320,7 +329,7 @@ class Index(object):
 
   @overload
   @staticmethod
-  def containing(entity: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject]) -> Optional[multiplier.Index]:
+  def containing(entity: Optional[multiplier.Fragment | multiplier.ast.Decl | multiplier.ast.Stmt | multiplier.ast.Attr | multiplier.frontend.Macro | multiplier.ast.Type | multiplier.frontend.File | multiplier.frontend.Token | multiplier.ast.TemplateArgument | multiplier.ast.TemplateParameterList | multiplier.ast.CXXBaseSpecifier | multiplier.ast.Designator | multiplier.ast.CXXCtorInitializer | multiplier.frontend.Compilation | multiplier.ir.IRFunction | multiplier.ir.IRBlock | multiplier.ir.IRInstruction | multiplier.ir.IRObject | multiplier.ir.IRStructure]) -> Optional[multiplier.Index]:
     ...
 
   def status(self, block: bool) -> multiplier.IndexStatus:
@@ -463,6 +472,14 @@ class Index(object):
 
   @overload
   def ir_object(self, id: multiplier.IRObjectId) -> Optional[multiplier.ir.IRObject]:
+    ...
+
+  @overload
+  def ir_structure(self, id: int) -> Optional[multiplier.ir.IRStructure]:
+    ...
+
+  @overload
+  def ir_structure(self, id: multiplier.IRStructureId) -> Optional[multiplier.ir.IRStructure]:
     ...
 
   def entity(self, eid: int) -> multiplier.Entity:

@@ -43,49 +43,31 @@ std::optional<Stmt> Decl::parent_statement(void) const {
   return std::nullopt;
 }
 
-static std::optional<VariantEntity> IrFromRaw(
-    const EntityProvider::Ptr &ep, RawEntityId raw) {
+std::optional<VariantEntity> Decl::ir(void) const {
+  auto raw = impl->reader.getVal2();
   if (raw == kInvalidEntityId) return std::nullopt;
   auto vid = EntityId(raw).Unpack();
   if (auto *p = std::get_if<IRFunctionId>(&vid)) {
-    if (auto ptr = ep->IRFunctionFor(ep, raw)) {
+    if (auto ptr = impl->ep->IRFunctionFor(impl->ep, raw)) {
       return IRFunction(std::move(ptr));
     }
   } else if (auto *p = std::get_if<IRBlockId>(&vid)) {
-    if (auto ptr = ep->IRBlockFor(ep, raw)) {
+    if (auto ptr = impl->ep->IRBlockFor(impl->ep, raw)) {
       return IRBlock(std::move(ptr));
     }
   } else if (auto *p = std::get_if<IRInstructionId>(&vid)) {
-    if (auto ptr = ep->IRInstructionFor(ep, raw)) {
+    if (auto ptr = impl->ep->IRInstructionFor(impl->ep, raw)) {
       return IRInstruction(std::move(ptr));
     }
   } else if (auto *p = std::get_if<IRObjectId>(&vid)) {
-    if (auto ptr = ep->IRObjectFor(ep, raw)) {
+    if (auto ptr = impl->ep->IRObjectFor(impl->ep, raw)) {
       return IRObject(std::move(ptr));
     }
   } else if (auto *p = std::get_if<IRStructureId>(&vid)) {
-    if (auto ptr = ep->IRStructureFor(ep, raw)) {
+    if (auto ptr = impl->ep->IRStructureFor(impl->ep, raw)) {
       return IRStructure(std::move(ptr));
     }
   }
-  return std::nullopt;
-}
-
-std::optional<VariantEntity> Decl::ir(void) const {
-  // Try this specific declaration.
-  if (auto result = IrFromRaw(impl->ep, impl->reader.getVal2())) {
-    return result;
-  }
-
-  // If this declaration has no IR, try redeclarations (e.g., a forward
-  // declaration of a function whose definition has IR).
-  for (Decl redecl : redeclarations()) {
-    if (auto result = IrFromRaw(redecl.impl->ep,
-                                 redecl.impl->reader.getVal2())) {
-      return result;
-    }
-  }
-
   return std::nullopt;
 }
 

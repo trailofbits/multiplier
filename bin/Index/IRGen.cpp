@@ -407,10 +407,10 @@ std::optional<FunctionIR> IRGenerator::Generate(
     // Compute stack frame layout: assign offsets to non-dynamic objects.
     ComputeFrameLayout();
 
-    LOG(INFO) << "Generated IR for function entity "
-              << func_.func_decl_entity_id
-              << ": " << func_.blocks.size() << " blocks, "
-              << func_.instructions.size() << " instructions, "
+    DLOG(INFO) << "Generated IR for function entity "
+               << func_.func_decl_entity_id
+               << ": " << func_.blocks.size() << " blocks, "
+               << func_.instructions.size() << " instructions, "
               << func_.objects.size() << " objects"
               << ", frame=" << func_.frame_size_bytes << " bytes";
 
@@ -529,9 +529,9 @@ std::optional<FunctionIR> IRGenerator::GenerateGlobalInit(
     VerifyBlocks();
     ComputeFrameLayout();
 
-    LOG(INFO) << "Generated global init IR for var entity "
-              << func_.func_decl_entity_id
-              << ": " << func_.instructions.size() << " instructions"
+    DLOG(INFO) << "Generated global init IR for var entity "
+               << func_.func_decl_entity_id
+               << ": " << func_.instructions.size() << " instructions"
               << ", frame=" << func_.frame_size_bytes << " bytes";
 
     return std::move(func_);
@@ -1544,49 +1544,57 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
 
   std::function<void(const pasta::Stmt &)> emit_case_bodies;
   emit_case_bodies = [&](const pasta::Stmt &stmt) {
+    // Find the matching case entry by entity ID.  The AST traversal order
+    // may differ from the order collect_cases produced (e.g., default: nested
+    // inside a prior case's CompoundStmt sub-statement in PASTA's AST).
+    auto find_case = [&](mx::RawEntityId eid) -> int {
+      for (size_t i = 0; i < cases.size(); ++i) {
+        if (cases[i].source_entity_id == eid) return static_cast<int>(i);
+      }
+      return -1;
+    };
+
     if (auto cs = pasta::CaseStmt::From(stmt)) {
-      if (ci < cases.size()) {
-        maybe_emit_implicit_fallthrough(cases[ci].block_index);
+      int idx = find_case(EntityIdOf(stmt));
+      if (idx >= 0) {
+        auto ui = static_cast<size_t>(idx);
+        maybe_emit_implicit_fallthrough(cases[ui].block_index);
         PushStructure(mx::ir::StructureKind::SWITCH_CASE,
-                      cases[ci].source_entity_id);
-        // Store case value data in the structure.
+                      cases[ui].source_entity_id);
         auto &sc_struct = func_.structures[current_structure_index_];
-        sc_struct.case_low = cases[ci].low;
-        sc_struct.case_high = cases[ci].high;
+        sc_struct.case_low = cases[ui].low;
+        sc_struct.case_high = cases[ui].high;
         sc_struct.is_default = false;
-        // Record structure index back into the switch instruction.
-        func_.instructions[term_idx].switch_cases[ci].structure_index =
+        func_.instructions[term_idx].switch_cases[ui].structure_index =
             current_structure_index_;
-        SwitchToBlock(cases[ci].block_index);
-        AssociateBlockWithStructure(cases[ci].block_index);
-        // Record case block structure for Duff's device (external goto into case).
-        label_structure_[cases[ci].block_index] = current_structure_index_;
+        SwitchToBlock(cases[ui].block_index);
+        AssociateBlockWithStructure(cases[ui].block_index);
+        label_structure_[cases[ui].block_index] = current_structure_index_;
         ci++;
-        // Recurse into SubStatement. Handles direct nesting (case 1: case 2:)
-        // and Duff's device (case inside do-while). But if the sub IS a nested
-        // switch, emit it as code — its cases belong to the inner switch.
         auto sub = cs->SubStatement();
         if (pasta::SwitchStmt::From(sub)) {
           EmitStmt(sub);
         } else {
           emit_case_bodies(sub);
         }
-        PopStructure();  // SWITCH_CASE
+        PopStructure();
       }
       return;
     }
     if (auto ds = pasta::DefaultStmt::From(stmt)) {
-      if (ci < cases.size()) {
-        maybe_emit_implicit_fallthrough(cases[ci].block_index);
+      int idx = find_case(EntityIdOf(stmt));
+      if (idx >= 0) {
+        auto ui = static_cast<size_t>(idx);
+        maybe_emit_implicit_fallthrough(cases[ui].block_index);
         PushStructure(mx::ir::StructureKind::SWITCH_CASE,
-                      cases[ci].source_entity_id);
+                      cases[ui].source_entity_id);
         auto &sc_struct = func_.structures[current_structure_index_];
         sc_struct.is_default = true;
-        func_.instructions[term_idx].switch_cases[ci].structure_index =
+        func_.instructions[term_idx].switch_cases[ui].structure_index =
             current_structure_index_;
-        SwitchToBlock(cases[ci].block_index);
-        AssociateBlockWithStructure(cases[ci].block_index);
-        label_structure_[cases[ci].block_index] = current_structure_index_;
+        SwitchToBlock(cases[ui].block_index);
+        AssociateBlockWithStructure(cases[ui].block_index);
+        label_structure_[cases[ui].block_index] = current_structure_index_;
         ci++;
         auto sub = ds->SubStatement();
         if (pasta::SwitchStmt::From(sub)) {
@@ -1594,16 +1602,18 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
         } else {
           emit_case_bodies(sub);
         }
-        PopStructure();  // SWITCH_CASE (default)
+        PopStructure();
       }
       return;
     }
     if (pasta::CompoundStmt::From(stmt)) {
       // CompoundStmt: recurse into children (normal switch body).
       for (const auto &child : stmt.Children()) {
-        if (CurrentBlockTerminated() &&
-            !pasta::CaseStmt::From(child) &&
-            !pasta::DefaultStmt::From(child)) continue;
+        bool is_case = pasta::CaseStmt::From(child).has_value();
+        bool is_default = pasta::DefaultStmt::From(child).has_value();
+        bool is_label = pasta::LabelStmt::From(child).has_value();
+        if (CurrentBlockTerminated() && !is_case && !is_default && !is_label)
+          continue;
         if (pasta::SwitchStmt::From(child)) {
           EmitStmt(child);
         } else {
@@ -1638,12 +1648,33 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
       uint32_t loop_exit = NewBlock(mx::ir::BlockKind::LOOP_EXIT);
       EmitCondBranch(cond_val, loop_body_block, loop_exit, EntityIdOf(stmt));
       SwitchToBlock(loop_exit);
-    } else if (pasta::WhileStmt::From(stmt) || pasta::ForStmt::From(stmt)) {
-      // Other loops with nested cases — emit as regular code.
-      EmitStmt(stmt);
     } else {
-      // Regular statement: emit as code.
-      EmitStmt(stmt);
+      // For any other statement (if/while/for/etc.), check if it contains
+      // nested case/default labels (GCC extension: case labels can appear
+      // inside arbitrary statement bodies). If so, recurse to process them.
+      // Otherwise just emit as regular code.
+      bool has_nested_case = false;
+      std::function<bool(const pasta::Stmt &)> check_for_cases;
+      check_for_cases = [&](const pasta::Stmt &s) -> bool {
+        if (pasta::SwitchStmt::From(s)) return false;
+        if (pasta::CaseStmt::From(s) || pasta::DefaultStmt::From(s)) return true;
+        for (const auto &child : s.Children()) {
+          if (check_for_cases(child)) return true;
+        }
+        return false;
+      };
+      has_nested_case = check_for_cases(stmt);
+      if (has_nested_case) {
+        for (const auto &child : stmt.Children()) {
+          if (pasta::SwitchStmt::From(child)) {
+            EmitStmt(child);
+          } else {
+            emit_case_bodies(child);
+          }
+        }
+      } else {
+        EmitStmt(stmt);
+      }
     }
   };
   emit_case_bodies(body);
@@ -1652,12 +1683,12 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
   for (size_t sci = 0; sci < func_.instructions[term_idx].switch_cases.size();
        ++sci) {
     auto &sc = func_.instructions[term_idx].switch_cases[sci];
-    DCHECK(sc.structure_index != UINT32_MAX)
+    LOG_IF(ERROR, sc.structure_index == UINT32_MAX)
         << "Switch case " << sci << " (of "
         << func_.instructions[term_idx].switch_cases.size()
         << ") has no structure_index; ci=" << ci
         << " low=" << sc.low << " is_default=" << sc.is_default
-        << " func_eid=" << func_.func_decl_entity_id;
+        << PrefixedLocation(s, " at ");
   }
 
   // After all cases, if the last case didn't terminate, branch to exit.
@@ -1687,9 +1718,8 @@ void IRGenerator::EmitReturnStmt(const pasta::Stmt &s) {
     uint32_t val_idx = EmitRValue(*rv);
     PopExpressionScope();
 
-    // RET carries the value as operand for backward compat
-    // (RetInst::return_value() reads it).
-    inst.operand_indices = {val_idx};
+    // RET is a pure terminator; the return value flows through the
+    // RETURN_PTR slot via the MEMORY/STORE below.
 
     // Emit RETURN_PTR to get pointer to caller's return storage.
     InstructionIR ret_ptr;
@@ -3227,9 +3257,11 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
           {"__builtin_popcount", BO::POPCOUNT, false},
           {"__builtin_popcountl", BO::POPCOUNT, false},
           {"__builtin_popcountll", BO::POPCOUNT, false},
+          {"__builtin_clzs", BO::CLZ, true},
           {"__builtin_clz", BO::CLZ, true},
           {"__builtin_clzl", BO::CLZ, true},
           {"__builtin_clzll", BO::CLZ, true},
+          {"__builtin_ctzs", BO::CTZ, true},
           {"__builtin_ctz", BO::CTZ, true},
           {"__builtin_ctzl", BO::CTZ, true},
           {"__builtin_ctzll", BO::CTZ, true},
@@ -4117,6 +4149,168 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
         return emit_typed(std::move(inst));
       }
     }
+  }
+
+  // AtomicExpr — Clang represents __atomic_* / _Atomic builtins as these.
+  if (auto ae = pasta::AtomicExpr::From(e)) {
+    auto aop = ae->Operation();
+    using AO = pasta::AtomicExprAtomicOp;
+
+    // Determine value type width.
+    unsigned val_width = 4;
+    {
+      auto vt = ae->ValueType();
+      if (auto sz = TypeSizeBytes(vt)) val_width = *sz;
+    }
+
+    // Loads → MEMORY instruction.
+    if (aop == AO::kAtomicLoad || aop == AO::kAtomicLoadN ||
+        aop == AO::kC11AtomicLoad || aop == AO::kScopedAtomicLoad ||
+        aop == AO::kScopedAtomicLoadN || aop == AO::kOpenclAtomicLoad ||
+        aop == AO::kHipAtomicLoad) {
+      InstructionIR load;
+      load.opcode = mx::ir::OpCode::MEMORY;
+      load.source_entity_id = eid;
+      load.operand_indices.push_back(EmitRValue(ae->Pointer()));
+      bool is_float = ae->ValueType().IsFloatingType();
+      load.mem_op = static_cast<uint8_t>(
+          DetermineMemOp(false, true, val_width, is_float));
+      return emit_typed(std::move(load));
+    }
+
+    // Stores → MEMORY instruction.
+    if (aop == AO::kAtomicStore || aop == AO::kAtomicStoreN ||
+        aop == AO::kC11AtomicStore || aop == AO::kScopedAtomicStore ||
+        aop == AO::kScopedAtomicStoreN || aop == AO::kOpenclAtomicStore ||
+        aop == AO::kHipAtomicStore) {
+      InstructionIR store;
+      store.opcode = mx::ir::OpCode::MEMORY;
+      store.source_entity_id = eid;
+      store.operand_indices.push_back(EmitRValue(ae->Pointer()));
+      if (auto val1 = ae->Value1()) {
+        store.operand_indices.push_back(EmitRValue(*val1));
+      }
+      bool is_float = ae->ValueType().IsFloatingType();
+      store.mem_op = static_cast<uint8_t>(
+          DetermineMemOp(true, true, val_width, is_float));
+      return emit_typed(std::move(store));
+    }
+
+    // RMW operations → READ_MODIFY_WRITE.
+    struct AtomicMapping {
+      AO op;
+      AtomicOp underlying;
+      bool returns_new;
+    };
+    static const AtomicMapping mappings[] = {
+      // GCC fetch-op (returns old value).
+      {AO::kAtomicFetchAdd, AtomicOp::ATOMIC_ADD, false},
+      {AO::kAtomicFetchSub, AtomicOp::ATOMIC_SUB, false},
+      {AO::kAtomicFetchAnd, AtomicOp::ATOMIC_AND, false},
+      {AO::kAtomicFetchOr, AtomicOp::ATOMIC_OR, false},
+      {AO::kAtomicFetchXor, AtomicOp::ATOMIC_XOR, false},
+      {AO::kAtomicFetchNand, AtomicOp::ATOMIC_NAND, false},
+      // GCC op-fetch (returns new value).
+      {AO::kAtomicAddFetch, AtomicOp::ATOMIC_ADD, true},
+      {AO::kAtomicSubFetch, AtomicOp::ATOMIC_SUB, true},
+      {AO::kAtomicAndFetch, AtomicOp::ATOMIC_AND, true},
+      {AO::kAtomicOrFetch, AtomicOp::ATOMIC_OR, true},
+      {AO::kAtomicXorFetch, AtomicOp::ATOMIC_XOR, true},
+      {AO::kAtomicNandFetch, AtomicOp::ATOMIC_NAND, true},
+      // GCC exchange.
+      {AO::kAtomicExchange, AtomicOp::ATOMIC_EXCHANGE, false},
+      {AO::kAtomicExchangeN, AtomicOp::ATOMIC_EXCHANGE, false},
+      // C11 fetch-op.
+      {AO::kC11AtomicFetchAdd, AtomicOp::ATOMIC_ADD, false},
+      {AO::kC11AtomicFetchSub, AtomicOp::ATOMIC_SUB, false},
+      {AO::kC11AtomicFetchAnd, AtomicOp::ATOMIC_AND, false},
+      {AO::kC11AtomicFetchOr, AtomicOp::ATOMIC_OR, false},
+      {AO::kC11AtomicFetchXor, AtomicOp::ATOMIC_XOR, false},
+      {AO::kC11AtomicFetchNand, AtomicOp::ATOMIC_NAND, false},
+      // C11 exchange.
+      {AO::kC11AtomicExchange, AtomicOp::ATOMIC_EXCHANGE, false},
+      // Scoped fetch-op.
+      {AO::kScopedAtomicFetchAdd, AtomicOp::ATOMIC_ADD, false},
+      {AO::kScopedAtomicFetchSub, AtomicOp::ATOMIC_SUB, false},
+      {AO::kScopedAtomicFetchAnd, AtomicOp::ATOMIC_AND, false},
+      {AO::kScopedAtomicFetchOr, AtomicOp::ATOMIC_OR, false},
+      {AO::kScopedAtomicFetchXor, AtomicOp::ATOMIC_XOR, false},
+      {AO::kScopedAtomicFetchNand, AtomicOp::ATOMIC_NAND, false},
+      // Scoped op-fetch.
+      {AO::kScopedAtomicAddFetch, AtomicOp::ATOMIC_ADD, true},
+      {AO::kScopedAtomicSubFetch, AtomicOp::ATOMIC_SUB, true},
+      {AO::kScopedAtomicAndFetch, AtomicOp::ATOMIC_AND, true},
+      {AO::kScopedAtomicOrFetch, AtomicOp::ATOMIC_OR, true},
+      {AO::kScopedAtomicXorFetch, AtomicOp::ATOMIC_XOR, true},
+      {AO::kScopedAtomicNandFetch, AtomicOp::ATOMIC_NAND, true},
+      // Scoped exchange.
+      {AO::kScopedAtomicExchange, AtomicOp::ATOMIC_EXCHANGE, false},
+      {AO::kScopedAtomicExchangeN, AtomicOp::ATOMIC_EXCHANGE, false},
+      // HIP/OpenCL exchange.
+      {AO::kHipAtomicExchange, AtomicOp::ATOMIC_EXCHANGE, false},
+      {AO::kOpenclAtomicExchange, AtomicOp::ATOMIC_EXCHANGE, false},
+      // HIP fetch-op.
+      {AO::kHipAtomicFetchAdd, AtomicOp::ATOMIC_ADD, false},
+      {AO::kHipAtomicFetchSub, AtomicOp::ATOMIC_SUB, false},
+      {AO::kHipAtomicFetchAnd, AtomicOp::ATOMIC_AND, false},
+      {AO::kHipAtomicFetchOr, AtomicOp::ATOMIC_OR, false},
+      {AO::kHipAtomicFetchXor, AtomicOp::ATOMIC_XOR, false},
+      // OpenCL fetch-op.
+      {AO::kOpenclAtomicFetchAdd, AtomicOp::ATOMIC_ADD, false},
+      {AO::kOpenclAtomicFetchSub, AtomicOp::ATOMIC_SUB, false},
+      {AO::kOpenclAtomicFetchAnd, AtomicOp::ATOMIC_AND, false},
+      {AO::kOpenclAtomicFetchOr, AtomicOp::ATOMIC_OR, false},
+      {AO::kOpenclAtomicFetchXor, AtomicOp::ATOMIC_XOR, false},
+    };
+
+    for (const auto &m : mappings) {
+      if (aop == m.op) {
+        InstructionIR rmw;
+        rmw.opcode = mx::ir::OpCode::READ_MODIFY_WRITE;
+        rmw.source_entity_id = eid;
+        rmw.compound_op = SizedAtomicOp(m.underlying, val_width);
+        rmw.flags = m.returns_new ? 1u : 0u;
+        rmw.operand_indices.push_back(EmitRValue(ae->Pointer()));
+        if (auto val1 = ae->Value1()) {
+          rmw.operand_indices.push_back(EmitRValue(*val1));
+        }
+        rmw.is_big_endian = ctx_.getTargetInfo().isBigEndian();
+        rmw.size_bytes = val_width;
+        return emit_typed(std::move(rmw));
+      }
+    }
+    // Compare-exchange → MEMORY (CMPXCHG).
+    if (aop == AO::kC11AtomicCompareExchangeStrong ||
+        aop == AO::kC11AtomicCompareExchangeWeak ||
+        aop == AO::kAtomicCompareExchange ||
+        aop == AO::kAtomicCompareExchangeN ||
+        aop == AO::kScopedAtomicCompareExchange ||
+        aop == AO::kScopedAtomicCompareExchangeN) {
+      InstructionIR inst;
+      inst.opcode = mx::ir::OpCode::MEMORY;
+      inst.source_entity_id = eid;
+      inst.operand_indices.push_back(EmitRValue(ae->Pointer()));
+      if (auto val1 = ae->Value1()) {
+        inst.operand_indices.push_back(EmitRValue(*val1));
+      }
+      if (auto val2 = ae->Value2()) {
+        inst.operand_indices.push_back(EmitRValue(*val2));
+      }
+      bool big = ctx_.getTargetInfo().isBigEndian();
+      unsigned size_idx;
+      switch (val_width) {
+        case 1: size_idx = 0; break;
+        case 2: size_idx = 1; break;
+        case 4: size_idx = 2; break;
+        case 8: default: size_idx = 3; break;
+      }
+      unsigned base = big ? static_cast<unsigned>(mx::ir::MemOp::CMPXCHG_BE_8)
+                          : static_cast<unsigned>(mx::ir::MemOp::CMPXCHG_LE_8);
+      inst.mem_op = static_cast<uint8_t>(base + size_idx);
+      return emit_typed(std::move(inst));
+    }
+
+    // fetch_min/max and other unhandled atomic ops fall through to UNKNOWN.
   }
 
   // Emit UNKNOWN for anything we haven't explicitly handled.

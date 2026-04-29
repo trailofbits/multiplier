@@ -71,7 +71,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[865]) || tp >= &(gTypes[871])) {
+  if (tp < &(gTypes[917]) || tp >= &(gTypes[923])) {
     return std::nullopt;
   }
 
@@ -88,23 +88,23 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::EmptyTokenTreeNode::static_kind():
-      tp = &(gTypes[866]);
+      tp = &(gTypes[918]);
       break;
 
     case mx::TokenTokenTreeNode::static_kind():
-      tp = &(gTypes[867]);
+      tp = &(gTypes[919]);
       break;
 
     case mx::ChoiceTokenTreeNode::static_kind():
-      tp = &(gTypes[868]);
+      tp = &(gTypes[920]);
       break;
 
     case mx::SubstitutionTokenTreeNode::static_kind():
-      tp = &(gTypes[869]);
+      tp = &(gTypes[921]);
       break;
 
     case mx::SequenceTokenTreeNode::static_kind():
-      tp = &(gTypes[870]);
+      tp = &(gTypes[922]);
       break;
 
   }
@@ -161,7 +161,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[865]);
+  PyTypeObject * const tp = &(gTypes[917]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

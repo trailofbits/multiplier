@@ -71,7 +71,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[0]) || tp >= &(gTypes[1])) {
+  if (tp < &(gTypes[1]) || tp >= &(gTypes[2])) {
     return std::nullopt;
   }
 
@@ -120,12 +120,176 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::IRFunction::id"),
     nullptr,
   },
+  {
+    "kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRFunction::kind"),
+    nullptr,
+  },
+  {
+    "declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRFunction::declaration"),
+    nullptr,
+  },
+  {
+    "source_declaration",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->source_declaration());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRFunction::source_declaration"),
+    nullptr,
+  },
+  {
+    "entry_block",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->entry_block());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRFunction::entry_block"),
+    nullptr,
+  },
+  {
+    "blocks",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::blocks);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRFunction::blocks"),
+    nullptr,
+  },
+  {
+    "objects",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::objects);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRFunction::objects"),
+    nullptr,
+  },
+  {
+    "body_scope",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->body_scope());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRFunction::body_scope"),
+    nullptr,
+  },
+  {
+    "frame_size_bytes",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->frame_size_bytes());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRFunction::frame_size_bytes"),
+    nullptr,
+  },
+  {
+    "has_dynamic_allocas",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->has_dynamic_allocas());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRFunction::has_dynamic_allocas"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace
 
 namespace {
 static PyMethodDef gMethods[] = {
+  {
+    "FROM",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<mx::FunctionDecl>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(T::from(arg_0.value()));
+          }
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<mx::VarDecl>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(T::from(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'FROM'";
+          return nullptr;
+        }),
+    METH_FASTCALL | METH_STATIC,
+    PyDoc_STR("Wrapper for mx::IRFunction::from"),
+  },
+  {
+    "containing",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<mx::Decl>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(T::containing(arg_0.value()));
+          }
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<mx::Stmt>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(T::containing(arg_0.value()));
+          }
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<mx::IRBlock>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(T::containing(arg_0.value()));
+          }
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<mx::IRInstruction>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(T::containing(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'containing'";
+          return nullptr;
+        }),
+    METH_FASTCALL | METH_STATIC,
+    PyDoc_STR("Wrapper for mx::IRFunction::containing"),
+  },
   {}  // Sentinel.
 };
 }  // namespace
@@ -133,7 +297,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[0]);
+  PyTypeObject * const tp = &(gTypes[1]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

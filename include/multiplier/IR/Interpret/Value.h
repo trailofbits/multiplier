@@ -6,177 +6,105 @@
 #pragma once
 
 #include <cstdint>
-#include <cstring>
-#include <variant>
 
 namespace mx::ir::interpret {
 
-// A concrete scalar value: up to 8 bytes, type-punnable.
-// The interpreter moves bytes around; the ValueFactory gives them meaning.
-struct ScalarValue {
-  uint64_t bits{0};
-  uint8_t width{0};  // 1, 2, 4, or 8 bytes
+// A concrete value: 8 bytes, type-punnable via union. The instruction
+// determines interpretation — no variant tag, no width, no is_float.
+// Pointers, integers, floats, and "undefined" are all just bit patterns.
+struct Value {
+  union {
+    uint64_t u64;
+    int64_t  i64;
+    double   f64;
+    struct { float    val; uint32_t _pad; } f32;
+    struct { uint32_t val; uint32_t _pad; } u32;
+    struct { int32_t  val; uint32_t _pad; } i32;
+    struct { uint16_t val; uint16_t _pad[3]; } u16;
+    struct { int16_t  val; uint16_t _pad[3]; } i16;
+    struct { uint8_t  val; uint8_t  _pad[7]; } u8;
+    struct { int8_t   val; uint8_t  _pad[7]; } i8;
+  };
+};
 
-  static ScalarValue FromU64(uint64_t v, uint8_t w = 8) {
-    return {v, w};
-  }
+static_assert(sizeof(Value) == 8,
+    "Value must be exactly 8 bytes — check struct packing");
+static_assert(alignof(Value) == alignof(uint64_t),
+    "Value must be naturally aligned to 8 bytes");
 
-  static ScalarValue FromI64(int64_t v, uint8_t w = 8) {
-    uint64_t bits;
-    std::memcpy(&bits, &v, sizeof(bits));
-    return {bits, w};
-  }
+// ---------------------------------------------------------------------------
+// Accessors — direct union reads, no dispatch
+// ---------------------------------------------------------------------------
 
-  static ScalarValue FromF64(double v) {
-    uint64_t bits;
-    std::memcpy(&bits, &v, sizeof(bits));
-    return {bits, 8};
-  }
+inline int64_t  as_int(const Value &v)     { return v.i64; }
+inline uint64_t as_uint(const Value &v)    { return v.u64; }
+inline double   as_float(const Value &v)   { return v.f64; }
+inline float    as_float32(const Value &v) { return v.f32.val; }
+inline bool     is_truthy(const Value &v)  { return v.u64 != 0; }
 
-  static ScalarValue FromF32(float v) {
-    uint32_t bits;
-    std::memcpy(&bits, &v, sizeof(bits));
-    return {bits, 4};
-  }
+// ---------------------------------------------------------------------------
+// Construction helpers — every path writes all 8 bytes
+// ---------------------------------------------------------------------------
 
-  int64_t as_i64(void) const {
-    int64_t v;
-    std::memcpy(&v, &bits, sizeof(v));
-    return v;
-  }
+inline Value make_int(int64_t v, uint8_t = 8) {
+  Value r;
+  r.i64 = v;
+  return r;
+}
 
-  uint64_t as_u64(void) const {
-    return bits;
-  }
+inline Value make_uint(uint64_t v, uint8_t = 8) {
+  Value r;
+  r.u64 = v;
+  return r;
+}
 
-  double as_f64(void) const {
-    double v;
-    std::memcpy(&v, &bits, sizeof(v));
-    return v;
-  }
+inline Value make_float(double v) {
+  Value r;
+  r.f64 = v;
+  return r;
+}
 
-  float as_f32(void) const {
-    uint32_t lo = static_cast<uint32_t>(bits);
-    float v;
-    std::memcpy(&v, &lo, sizeof(v));
+inline Value make_float32(float v) {
+  Value r;
+  r.u64 = 0;
+  r.f32.val = v;
+  return r;
+}
+
+inline Value make_ptr(uint64_t addr) {
+  Value r;
+  r.u64 = addr;
+  return r;
+}
+
+inline Value make_undef(void) {
+  Value r;
+  r.u64 = 0;
+  return r;
+}
+
+inline Value make_null(void) {
+  Value r;
+  r.u64 = 0;
+  return r;
+}
+
+// ---------------------------------------------------------------------------
+// ValueTraits — value lifecycle for templatized interpreter state.
+// ---------------------------------------------------------------------------
+
+template <typename ValueT>
+struct ValueTraits {
+  static ValueT default_value() { return ValueT{}; }
+};
+
+template <>
+struct ValueTraits<Value> {
+  static Value default_value() {
+    Value v;
+    v.u64 = 0;
     return v;
   }
 };
-
-// Sentinel for undefined/poison values.
-struct Undefined {};
-
-// Sentinel for a null pointer.
-struct NullPtr {};
-
-// An opaque pointer into the interpreter's virtual address space.
-// Address width (4 or 8 bytes) is a session property on Memory, not per-pointer.
-// Policies access the concrete address via the free functions below.
-struct Pointer {
- private:
-  uint64_t address_{0};
-
- public:
-  Pointer(void) = default;
-  explicit Pointer(uint64_t addr) : address_(addr) {}
-
-  bool operator==(const Pointer &o) const { return address_ == o.address_; }
-  bool operator!=(const Pointer &o) const { return address_ != o.address_; }
-
-  friend bool IsConcrete(const Pointer &p);
-  friend uint64_t ConcreteAddress(const Pointer &p);
-};
-
-// For the concrete interpreter, all pointers are concrete.
-// A future symbolic pointer variant would make this non-trivial.
-inline bool IsConcrete(const Pointer &) { return true; }
-
-// Extract the concrete integral address. Only valid when IsConcrete() is true.
-inline uint64_t ConcreteAddress(const Pointer &p) { return p.address_; }
-
-// The value type the interpreter passes around.
-// Concrete implementation. A symbolic layer would extend/wrap this.
-using Value = std::variant<ScalarValue, Pointer, NullPtr, Undefined>;
-
-// ---------------------------------------------------------------------------
-// Inline helper functions
-// ---------------------------------------------------------------------------
-
-// Extract as signed integer. Returns 0 for non-scalar values.
-inline int64_t AsInt(const Value &v) {
-  if (auto *s = std::get_if<ScalarValue>(&v)) return s->as_i64();
-  return 0;
-}
-
-// Extract as unsigned integer. Returns 0 for non-scalar values.
-inline uint64_t AsUint(const Value &v) {
-  if (auto *s = std::get_if<ScalarValue>(&v)) return s->as_u64();
-  return 0;
-}
-
-// Extract as double. Returns 0.0 for non-scalar values.
-inline double AsFloat(const Value &v) {
-  if (auto *s = std::get_if<ScalarValue>(&v)) return s->as_f64();
-  return 0.0;
-}
-
-// Extract as float. Returns 0.0f for non-scalar values.
-inline float AsFloat32(const Value &v) {
-  if (auto *s = std::get_if<ScalarValue>(&v)) return s->as_f32();
-  return 0.0f;
-}
-
-// Returns pointer if the value holds one, nullptr otherwise.
-inline const Pointer *AsPointer(const Value &v) {
-  return std::get_if<Pointer>(&v);
-}
-
-// Truth test for concrete values.
-inline bool IsTruthy(const Value &v) {
-  if (auto *s = std::get_if<ScalarValue>(&v)) return s->bits != 0;
-  if (std::holds_alternative<Pointer>(v)) return true;
-  if (std::holds_alternative<NullPtr>(v)) return false;
-  return false;  // Undefined
-}
-
-// Check if the value is undefined/poison.
-inline bool IsUndefined(const Value &v) {
-  return std::holds_alternative<Undefined>(v);
-}
-
-// Check if the value is a null pointer.
-inline bool IsNull(const Value &v) {
-  return std::holds_alternative<NullPtr>(v);
-}
-
-// --- Construction helpers ---
-
-inline Value MakeInt(int64_t v, uint8_t w = 8) {
-  return ScalarValue::FromI64(v, w);
-}
-
-inline Value MakeUint(uint64_t v, uint8_t w = 8) {
-  return ScalarValue::FromU64(v, w);
-}
-
-inline Value MakeFloat(double v) {
-  return ScalarValue::FromF64(v);
-}
-
-inline Value MakeFloat32(float v) {
-  return ScalarValue::FromF32(v);
-}
-
-inline Value MakePtr(uint64_t addr) {
-  return Pointer(addr);
-}
-
-inline Value MakeUndef(void) {
-  return Undefined{};
-}
-
-inline Value MakeNull(void) {
-  return NullPtr{};
-}
 
 }  // namespace mx::ir::interpret

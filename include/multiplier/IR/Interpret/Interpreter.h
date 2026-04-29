@@ -6,8 +6,8 @@
 #pragma once
 
 #include "../../Compiler.h"
+#include "Sharable.h"
 #include "Value.h"
-#include "Suspension.h"
 #include <multiplier/IR/Block.h>
 #include <multiplier/IR/Function.h>
 #include <multiplier/IR/Instruction.h>
@@ -23,88 +23,199 @@ class MemoryInst;
 
 namespace mx::ir::interpret {
 
-class Driver;
-class Memory;
-class ValueFactory;
+class ConcretePolicy;
 
 // ---------------------------------------------------------------------------
-// StepResult — what Step() returns
+// ErrorKind — non-sticky error descriptor (lives in Continuation, not state)
 // ---------------------------------------------------------------------------
 
-enum class StepStatus {
-  CONTINUE,    // More instructions to execute.
-  SUSPENDED,   // Needs external resolution before resuming.
-  COMPLETED,   // Top-level function returned normally.
-  ERROR,       // Unrecoverable error (unreachable, etc.).
-};
-
-struct StepResult {
-  StepStatus status{StepStatus::ERROR};
-  Suspension suspension;  // Valid when status == SUSPENDED.
-  Value return_value;     // Valid when status == COMPLETED.
+enum class ErrorKind : uint8_t {
+  UNREACHABLE,
+  EMPTY_STACK,
+  NO_TERMINATOR,
 };
 
 // ---------------------------------------------------------------------------
-// CallFrame — per-function-invocation state
+// WorkKind — the explicit instruction pointer is a stack of these
+//
+// Dispatch happens at PUSH time (ENTER_BLOCK, ANALYZE).
+// Pop-time handlers (COMPUTE_*, EXEC_*, DECIDE_*) are specific and
+// dispatch-free — operands are guaranteed cached.
 // ---------------------------------------------------------------------------
 
+enum class WorkKind : uint8_t {
+  // Push-time dispatch:
+  ENTER_BLOCK,
+  ANALYZE,
+
+  // Value computation:
+  COMPUTE_CONST,
+  COMPUTE_ALLOCA,
+  COMPUTE_BINARY,
+  COMPUTE_COMPARE,
+  COMPUTE_UNARY,
+  COMPUTE_CAST,
+  COMPUTE_GEP_FIELD,
+  COMPUTE_PTR_ADD,
+  COMPUTE_PTR_DIFF,
+  COMPUTE_SELECT,
+  COMPUTE_LAST_VALUE,
+  COMPUTE_PARAM_PTR,
+  COMPUTE_BITWISE,
+  COMPUTE_FLOAT_OP,
+  COMPUTE_GLOBAL_PTR,
+  COMPUTE_FUNC_PTR,
+  COMPUTE_RETURN_PTR,
+  COMPUTE_STRING_PTR,
+  COMPUTE_UNDEFINED,
+
+  // Side effects:
+  EXEC_STORE,
+  EXEC_LOAD,
+  EXEC_BULK_MEM,
+  EXEC_RMW,
+  EXEC_CALL,
+  EXEC_ENTER_SCOPE,
+  EXEC_EXIT_SCOPE,
+  EXEC_VA_START,
+  EXEC_VA_END,
+  EXEC_VA_COPY,
+  EXEC_CONSUME_VA_PARAM,
+
+  // Control flow (terminators):
+  DECIDE_COND_BRANCH,
+  DECIDE_SWITCH,
+  EXEC_RET,
+  EXEC_GOTO,
+  EXEC_UNREACHABLE,
+};
+
+struct WorkItem {
+  WorkKind kind;
+  IRInstruction inst;
+  IRBlock block;  // Only meaningful for ENTER_BLOCK.
+};
+
+// ---------------------------------------------------------------------------
+// CallFrame<ValueT> — per-function-invocation state
+// ---------------------------------------------------------------------------
+
+template <typename ValueT>
 struct CallFrame {
   IRFunction func;
-  std::vector<Value> params;
-  std::vector<Value> param_ptrs;
-  Value return_ptr{Undefined{}};
-
-  // Index into param_ptrs where variadic arguments begin.
+  std::vector<ValueT> params;
+  std::vector<ValueT> param_ptrs;
+  ValueT return_ptr{};
   uint32_t variadic_start_index{0};
 
-  // Instruction ID → computed value.
-  std::unordered_map<RawEntityId, Value> values;
+  // Instruction result cache (transient — cleared per block).
+  std::unordered_map<RawEntityId, ValueT> values;
 
-  // Entity ID → allocated address in Memory.
-  std::unordered_map<RawEntityId, uint64_t> entity_to_address;
+  // CALL return values (persistent — survives across blocks).
+  // Keyed by the CALL instruction's entity ID.
+  std::unordered_map<RawEntityId, ValueT> call_results;
 
-  // Block ID → IRBlock (for CFG navigation).
-  std::unordered_map<RawEntityId, IRBlock> block_map;
+  // Local variable addresses (per-invocation).
+  std::unordered_map<RawEntityId, uint64_t> locals;
 
-  // Current execution position.
-  IRBlock current_block;
-
-  // When a CALL pushes a callee frame, this records the CALL instruction's
-  // entity ID so that after the callee returns, we can resume from the
-  // instruction after the CALL and store the return value.
-  RawEntityId resume_after_inst{kInvalidEntityId};
+  // The CALL instruction EID that this frame was pushed for.
+  RawEntityId call_site{kInvalidEntityId};
 };
 
 // ---------------------------------------------------------------------------
-// InterpreterState — everything needed to resume execution
+// CallStack<ValueT> — COW via shared_ptr segments
 // ---------------------------------------------------------------------------
 
-struct MX_EXPORT InterpreterState {
-  std::vector<CallFrame> call_stack;
+template <typename ValueT>
+struct CallStackSegment
+    : public Sharable<CallStackSegment<ValueT>, StdShared> {
+  std::vector<CallFrame<ValueT>> frames;
+};
 
-  // Global variable addresses: entity ID → allocated address.
+template <typename ValueT>
+class CallStack {
+ public:
+  CallStack(void) {
+    segments_.push_back(make_sharable<CallStackSegment<ValueT>>());
+  }
+
+  CallFrame<ValueT> &top(void) { return ensure_mutable().frames.back(); }
+  const CallFrame<ValueT> &top(void) const {
+    return segments_.back()->frames.back();
+  }
+
+  void push(CallFrame<ValueT> frame) {
+    ensure_mutable().frames.push_back(std::move(frame));
+  }
+
+  void pop(void) {
+    auto &seg = ensure_mutable();
+    seg.frames.pop_back();
+    if (seg.frames.empty() && segments_.size() > 1) {
+      segments_.pop_back();
+    }
+  }
+
+  bool empty(void) const {
+    for (auto &seg : segments_) {
+      if (!seg->frames.empty()) return false;
+    }
+    return true;
+  }
+
+  size_t depth(void) const {
+    size_t d = 0;
+    for (auto &seg : segments_) d += seg->frames.size();
+    return d;
+  }
+
+  CallStack fork(void) const { return *this; }
+
+ private:
+  std::vector<std::shared_ptr<CallStackSegment<ValueT>>> segments_;
+
+  CallStackSegment<ValueT> &ensure_mutable(void) {
+    auto &last = segments_.back();
+    if (last.use_count() > 1) {
+      last = make_sharable<CallStackSegment<ValueT>>(*last);
+    }
+    return *last;
+  }
+};
+
+// ---------------------------------------------------------------------------
+// InterpreterState<ValueT, Policy> — pure process state.
+//
+// `Policy` selects the ref-count system: `StdShared` (default) keeps the
+// state behind `std::shared_ptr`; `PyObjectRC` wraps it in a PyObject so
+// Python can hold references with normal refcount semantics.
+// ---------------------------------------------------------------------------
+
+template <typename ValueT, typename Policy = StdShared>
+struct InterpreterState
+    : public Sharable<InterpreterState<ValueT, Policy>, Policy> {
+  using value_type = ValueT;
+  using policy_type = Policy;
+
+  CallStack<ValueT> call_stack;
   std::unordered_map<RawEntityId, uint64_t> global_addresses;
-
-  // Instruction step counter.
+  // Phase 9: state-level cache for function pointer addresses. Mirrors
+  // `global_addresses` in role: once a function eid is bound to an
+  // address, subsequent FUNC_PTR references reuse it across frames.
+  std::unordered_map<RawEntityId, uint64_t> function_addresses;
   uint64_t steps{0};
+  std::vector<WorkItem> work_stack;
 
-  // Current frame (convenience).
-  CallFrame &Frame(void) { return call_stack.back(); }
-  const CallFrame &Frame(void) const { return call_stack.back(); }
-  bool Empty(void) const { return call_stack.empty(); }
+  // The work item currently being dispatched. Set by interp_step before
+  // each `dispatch(item)`. Suspension-capable policy hooks (e.g.
+  // `with_address`) read this to re-push the in-flight work item onto
+  // a snapshot's work_stack so resumption retries the same op.
+  WorkItem current_item{};
+
+  // Allocate a fresh ref-counted clone, using the same Policy.
+  ref_t<InterpreterState<ValueT, Policy>> clone(void) const {
+    return make_sharable<InterpreterState<ValueT, Policy>>(*this);
+  }
 };
-
-// ---------------------------------------------------------------------------
-// Free functions — the interpreter is a state transition function
-// ---------------------------------------------------------------------------
-
-// Initialize state for executing a function with the given arguments.
-MX_EXPORT void InitState(InterpreterState &state, Memory &memory,
-                         const IRFunction &func, const std::vector<Value> &args);
-
-// Execute one block. Advances state in place.
-// The caller (driver) owns the loop and handles suspensions.
-MX_EXPORT StepResult Step(InterpreterState &state, Memory &memory,
-                          ValueFactory &factory, Driver &driver);
 
 }  // namespace mx::ir::interpret

@@ -71,7 +71,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[1]) || tp >= &(gTypes[2])) {
+  if (tp < &(gTypes[2]) || tp >= &(gTypes[3])) {
     return std::nullopt;
   }
 
@@ -120,12 +120,144 @@ static PyGetSetDef gProperties[] = {
     PyDoc_STR("Wrapper for mx::IRBlock::id"),
     nullptr,
   },
+  {
+    "kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRBlock::kind"),
+    nullptr,
+  },
+  {
+    "parent_structure",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->parent_structure());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRBlock::parent_structure"),
+    nullptr,
+  },
+  {
+    "parent_function",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->parent_function());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRBlock::parent_function"),
+    nullptr,
+  },
+  {
+    "all_instructions",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::all_instructions);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRBlock::all_instructions"),
+    nullptr,
+  },
+  {
+    "instructions",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::instructions);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRBlock::instructions"),
+    nullptr,
+  },
+  {
+    "successors",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::successors);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRBlock::successors"),
+    nullptr,
+  },
+  {
+    "predecessors",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::predecessors);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRBlock::predecessors"),
+    nullptr,
+  },
+  {
+    "immediate_dominator",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->immediate_dominator());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRBlock::immediate_dominator"),
+    nullptr,
+  },
+  {
+    "immediate_post_dominator",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->immediate_post_dominator());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRBlock::immediate_post_dominator"),
+    nullptr,
+  },
+  {
+    "dominators",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::dominators);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRBlock::dominators"),
+    nullptr,
+  },
+  {
+    "post_dominators",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::post_dominators);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRBlock::post_dominators"),
+    nullptr,
+  },
   {}  // Sentinel.
 };
 }  // namespace
 
 namespace {
 static PyMethodDef gMethods[] = {
+  {
+    "dominates",
+    reinterpret_cast<PyCFunction>(
+        +[] (BorrowedPyObject *self, BorrowedPyObject * const *args, int num_args) -> SharedPyObject * {
+          T *obj = T_cast(self);
+          (void) args;
+          while (num_args == 1) {
+            auto arg_0 = ::mx::from_python<mx::IRBlock>(args[0]);
+            if (!arg_0.has_value()) {
+              break;
+            }
+
+            return ::mx::to_python(obj->dominates(arg_0.value()));
+          }
+
+          PyErrorStreamer(PyExc_TypeError)
+              << "Invalid arguments passed to 'dominates'";
+          return nullptr;
+        }),
+    METH_FASTCALL,
+    PyDoc_STR("Wrapper for mx::IRBlock::dominates"),
+  },
   {}  // Sentinel.
 };
 }  // namespace
@@ -133,7 +265,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[1]);
+  PyTypeObject * const tp = &(gTypes[2]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {

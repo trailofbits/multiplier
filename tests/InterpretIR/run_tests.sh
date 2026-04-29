@@ -46,6 +46,8 @@ TEST_FUNCS=(
   test_width_rmw
   test_overflow_exact
   test_cast_precision
+  test_unions
+  test_atomics
 )
 
 for func in "${TEST_FUNCS[@]}"; do

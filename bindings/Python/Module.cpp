@@ -38,6 +38,7 @@ static PyModuleDef gModule = {
 };
 
 static LoaderFunc * const gLoaders[] = {
+  PythonBinding<mx::IndexVersion>::load,
   PythonBinding<mx::EntityCategory>::load,
   PythonBinding<mx::IREntityKind>::load,
   PythonBinding<mx::BuiltinReferenceKind>::load,
@@ -62,13 +63,72 @@ static PyModuleDef gIRModule = {
 };
 
 static LoaderFunc * const gIRLoaders[] = {
+  PythonBinding<mx::ir::FunctionKind>::load,
   PythonBinding<mx::IRFunction>::load,
-  PythonBinding<mx::IRBlock>::load,
-  PythonBinding<mx::IRInstruction>::load,
-  PythonBinding<mx::IRObject>::load,
-  PythonBinding<mx::ir::OpCode>::load,
-  PythonBinding<mx::ir::ObjectKind>::load,
   PythonBinding<mx::ir::BlockKind>::load,
+  PythonBinding<mx::IRBlock>::load,
+  PythonBinding<mx::ir::ConstOp>::load,
+  PythonBinding<mx::ir::AllocaKind>::load,
+  PythonBinding<mx::ir::CastOp>::load,
+  PythonBinding<mx::ir::OpCode>::load,
+  PythonBinding<mx::ir::MemOp>::load,
+  PythonBinding<mx::ir::BitwiseOp>::load,
+  PythonBinding<mx::ir::FloatOp>::load,
+  PythonBinding<mx::IRInstruction>::load,
+  PythonBinding<mx::ir::ObjectKind>::load,
+  PythonBinding<mx::IRObject>::load,
+  PythonBinding<mx::ir::StructureKind>::load,
+  PythonBinding<mx::IRStructure>::load,
+  PythonBinding<mx::IRScopeStructure>::load,
+  PythonBinding<mx::IRIfStructure>::load,
+  PythonBinding<mx::IRIfThenStructure>::load,
+  PythonBinding<mx::IRIfElseStructure>::load,
+  PythonBinding<mx::IRForStructure>::load,
+  PythonBinding<mx::IRWhileStructure>::load,
+  PythonBinding<mx::IRDoWhileStructure>::load,
+  PythonBinding<mx::IRSwitchStructure>::load,
+  PythonBinding<mx::IRSwitchCaseStructure>::load,
+  PythonBinding<mx::IRExpressionScopeStructure>::load,
+  PythonBinding<mx::ConstInst>::load,
+  PythonBinding<mx::AllocaInst>::load,
+  PythonBinding<mx::LocalAllocaInst>::load,
+  PythonBinding<mx::ArgAllocaInst>::load,
+  PythonBinding<mx::ReturnAllocaInst>::load,
+  PythonBinding<mx::DynamicAllocaInst>::load,
+  PythonBinding<mx::MemoryInst>::load,
+  PythonBinding<mx::GEPFieldInst>::load,
+  PythonBinding<mx::PtrAddInst>::load,
+  PythonBinding<mx::PtrDiffInst>::load,
+  PythonBinding<mx::BinaryInst>::load,
+  PythonBinding<mx::ComparisonInst>::load,
+  PythonBinding<mx::UnaryInst>::load,
+  PythonBinding<mx::CastInst>::load,
+  PythonBinding<mx::CallInst>::load,
+  PythonBinding<mx::ReadModifyWriteInst>::load,
+  PythonBinding<mx::LastValueInst>::load,
+  PythonBinding<mx::SelectInst>::load,
+  PythonBinding<mx::ParamPtrInst>::load,
+  PythonBinding<mx::GlobalPtrInst>::load,
+  PythonBinding<mx::ThreadLocalPtrInst>::load,
+  PythonBinding<mx::FuncPtrInst>::load,
+  PythonBinding<mx::ReturnPtrInst>::load,
+  PythonBinding<mx::BitwiseOpInst>::load,
+  PythonBinding<mx::FloatOpInst>::load,
+  PythonBinding<mx::FramePtrInst>::load,
+  PythonBinding<mx::ReturnAddressInst>::load,
+  PythonBinding<mx::UndefinedInst>::load,
+  PythonBinding<mx::EnterScopeInst>::load,
+  PythonBinding<mx::ExitScopeInst>::load,
+  PythonBinding<mx::VAStartInst>::load,
+  PythonBinding<mx::VAEndInst>::load,
+  PythonBinding<mx::VACopyInst>::load,
+  PythonBinding<mx::ConsumeVAParamInst>::load,
+  PythonBinding<mx::RetInst>::load,
+  PythonBinding<mx::BranchInst>::load,
+  PythonBinding<mx::CondBranchInst>::load,
+  PythonBinding<mx::SwitchInst>::load,
+  PythonBinding<mx::UnreachableInst>::load,
+  PythonBinding<mx::UnknownInst>::load,
 };
 
 // multiplier.ast
@@ -1585,6 +1645,12 @@ PyMODINIT_FUNC PyInit_multiplier(void) {
     }
   }
 
+  // Load the hand-written interpreter submodule.
+  if (!mx::LoadInterpreterModule(irm)) {
+    Py_DECREF(m);
+    return nullptr;
+  }
+
   if (m) {
     if (0 != PyModule_AddObjectRef(m, "ir", irm)) {
       Py_DECREF(irm);
@@ -1658,6 +1724,43 @@ PyMODINIT_FUNC PyInit_multiplier(void) {
   if (!mx::PythonBinding<mx::ProxyTokenTreeVisitor>::load(frontendm)) {
     Py_DECREF(m);
     return nullptr;
+  }
+
+  // Make multiplier act as a package so `import multiplier.symex` works.
+  //
+  // We run a small Python snippet that uses importlib.util.find_spec to
+  // locate the multiplier .so, then sets __path__ on the module to the
+  // 'multiplier/' subdirectory alongside it.  This works even during
+  // the module's own PyInit call because find_spec does not import; it
+  // only locates.
+  {
+    PyObject *run_globals = PyDict_New();
+    PyObject *builtins = PyEval_GetBuiltins();
+    if (run_globals && builtins) {
+      PyDict_SetItemString(run_globals, "__builtins__", builtins);
+      PyObject *result = PyRun_String(
+        "import importlib.util as _u, os.path as _p, sys as _s\n"
+        "_spec = _u.find_spec('multiplier')\n"
+        "_origin = _spec.origin if _spec else None\n"
+        "_pkg_dir = _p.join(_p.dirname(_origin), 'multiplier') if _origin else None\n",
+        Py_file_input, run_globals, run_globals);
+      if (result) {
+        Py_DECREF(result);
+        PyObject *pkg_dir = PyDict_GetItemString(run_globals, "_pkg_dir");
+        if (pkg_dir && pkg_dir != Py_None) {
+          PyObject *path_list = PyList_New(1);
+          if (path_list) {
+            Py_INCREF(pkg_dir);
+            PyList_SET_ITEM(path_list, 0, pkg_dir);
+            if (PyModule_AddObject(m, "__path__", path_list) < 0) {
+              Py_DECREF(path_list);
+            }
+          }
+        }
+      }
+    }
+    Py_XDECREF(run_globals);
+    PyErr_Clear();  // non-fatal: symex will just not be importable as multiplier.symex
   }
 
   return m;

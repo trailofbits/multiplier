@@ -3,7 +3,7 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-// Stub binding for IRStructure — will be replaced by bootstrap regeneration.
+// Auto-generated file; do not modify!
 
 #include <multiplier/IR/Structure.h>
 
@@ -20,34 +20,288 @@
 #include "Error.h"
 #include "Types.h"
 
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wc99-extensions"
+#pragma GCC diagnostic ignored "-Wunused-function"
+namespace {
+using T = mx::IRStructure;
+
+struct O final : public ::PyObject {
+
+  // When initialized, points to `backing_storage`.
+  T *data{nullptr};
+
+  // Aligned storage for `T`. Pointed to by `data`.
+  alignas(alignof(T)) char backing_storage[sizeof(T)];  
+};
+
+inline static O *O_cast(void *obj) noexcept {
+  return reinterpret_cast<O *>(obj);
+}
+
+inline static const O *O_cast(const void *obj) noexcept {
+  return reinterpret_cast<const O *>(obj);
+}
+
+inline static T *T_cast(void *obj) noexcept {
+  return O_cast(obj)->data;
+}
+
+inline static const T *T_cast(const void *obj) noexcept {
+  return O_cast(obj)->data;
+}
+
+}  // namespace
 namespace mx {
 
 namespace {
-using T = mx::IRStructure;
+static PyTypeObject *gType = nullptr;
 }  // namespace
 
 template <>
 PyTypeObject *PythonBinding<T>::type(void) noexcept {
-  // TODO: assign proper gTypes slot after bootstrap regeneration.
-  return PythonBinding<VariantEntity>::type();
+  return gType;
 }
 
 template <>
-std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *) noexcept {
-  // IRStructure cannot be created from Python yet.
-  return std::nullopt;
+std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
+  if (!obj) {
+    return std::nullopt;
+  }
+
+  PyTypeObject * const tp = Py_TYPE(obj);
+  if (tp < &(gTypes[45]) || tp >= &(gTypes[56])) {
+    return std::nullopt;
+  }
+
+  return *T_cast(obj);
 }
 
+// NOTE(manual): dispatch to most-derived Python type based on StructureKind.
+// gTypes[45]=IRStructure, 46=IRScopeStructure, 47=IRIfStructure,
+// 48=IRIfThenStructure, 49=IRIfElseStructure, 50=IRForStructure,
+// 51=IRWhileStructure, 52=IRDoWhileStructure, 53=IRSwitchStructure,
+// 54=IRSwitchCaseStructure, 55=IRExpressionScopeStructure
 template <>
 SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
-  // Convert to VariantEntity and use that binding.
-  return ::mx::to_python(VariantEntity(std::move(val)));
+  using _k = ir::StructureKind;
+  PyTypeObject *tp;
+  switch (val.kind()) {
+    case _k::FUNCTION_SCOPE:
+    case _k::SCOPE:            tp = &(gTypes[46]); break;
+    case _k::IF:               tp = &(gTypes[47]); break;
+    case _k::IF_THEN:          tp = &(gTypes[48]); break;
+    case _k::IF_ELSE:          tp = &(gTypes[49]); break;
+    case _k::FOR:
+    case _k::FOR_INIT:
+    case _k::FOR_CONDITION:
+    case _k::FOR_INCREMENT:
+    case _k::FOR_BODY:         tp = &(gTypes[50]); break;
+    case _k::WHILE:
+    case _k::WHILE_CONDITION:
+    case _k::WHILE_BODY:       tp = &(gTypes[51]); break;
+    case _k::DO_WHILE:
+    case _k::DO_WHILE_BODY:
+    case _k::DO_WHILE_CONDITION: tp = &(gTypes[52]); break;
+    case _k::SWITCH:           tp = &(gTypes[53]); break;
+    case _k::SWITCH_CASE:      tp = &(gTypes[54]); break;
+    case _k::EXPRESSION_SCOPE: tp = &(gTypes[55]); break;
+    default:                   tp = gType;          break;
+  }
+  auto ret = tp->tp_alloc(tp, 0);
+  if (auto obj = O_cast(ret)) {
+    obj->data = new (obj->backing_storage) T(std::move(val));
+  }
+  return ret;
 }
 
+namespace {
+static PyTypeObject *InitType(void) noexcept;
+}  // namespace
+
 template <>
-bool PythonBinding<T>::load(BorrowedPyObject *) noexcept {
-  // Will be registered after bootstrap regeneration.
+bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
+  if (!gType) {
+    gType = InitType();
+    if (!gType) {
+      return false;
+    }
+  }
+
+  auto tp_obj = reinterpret_cast<BorrowedPyObject *>(gType);
+  if (0 != PyModule_AddObjectRef(module, "IRStructure", tp_obj)) {
+    return false;
+  }
+
   return true;
 }
 
+namespace {
+static PyGetSetDef gProperties[] = {
+  {
+    "id",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->id());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRStructure::id"),
+    nullptr,
+  },
+  {
+    "kind",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->kind());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRStructure::kind"),
+    nullptr,
+  },
+  {
+    "source_statement",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->source_statement());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRStructure::source_statement"),
+    nullptr,
+  },
+  {
+    "parent_structure",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->parent_structure());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRStructure::parent_structure"),
+    nullptr,
+  },
+  {
+    "parent_function",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->parent_function());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRStructure::parent_function"),
+    nullptr,
+  },
+  {
+    "child_structures",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::child_structures);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRStructure::child_structures"),
+    nullptr,
+  },
+  {
+    "child_blocks",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::child_blocks);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRStructure::child_blocks"),
+    nullptr,
+  },
+  {
+    "objects",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::generator_to_python(*T_cast(self), &T::objects);
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRStructure::objects"),
+    nullptr,
+  },
+  {
+    "is_scope",
+    reinterpret_cast<getter>(
+        +[] (BorrowedPyObject *self, void * /* closure */) -> SharedPyObject * {
+          return ::mx::to_python(T_cast(self)->is_scope());
+        }),
+    nullptr,
+    PyDoc_STR("Wrapper for mx::IRStructure::is_scope"),
+    nullptr,
+  },
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
+static PyMethodDef gMethods[] = {
+  {}  // Sentinel.
+};
+}  // namespace
+
+namespace {
+
+PyTypeObject *InitType(void) noexcept {
+  PyTypeObject * const tp = &(gTypes[45]);
+  tp->tp_basicsize = sizeof(O);
+  tp->tp_itemsize = 0;
+  tp->tp_dealloc = [] (::PyObject *obj) {
+    if (auto *data = T_cast(obj)) {
+      data->~T();
+    }
+    PyObject_Free(obj);
+  };
+  tp->tp_name = "multiplier.ir.IRStructure";
+  tp->tp_flags = Py_TPFLAGS_DEFAULT;
+  tp->tp_doc = PyDoc_STR("Wrapper for mx::::IRStructure");
+  tp->tp_as_number = nullptr;
+  tp->tp_as_sequence = nullptr;
+  tp->tp_as_mapping = nullptr;
+  tp->tp_hash = [] (BorrowedPyObject *obj) -> Py_hash_t {
+    return static_cast<Py_hash_t>(EntityId(T_cast(obj)->id()).Pack());
+  };
+  tp->tp_richcompare = nullptr;
+  tp->tp_iter = nullptr;
+  tp->tp_methods = gMethods;
+  tp->tp_getset = gProperties;
+  tp->tp_base = PythonBinding<VariantEntity>::type();
+  tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
+    if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
+      PyErrorStreamer(PyExc_TypeError)
+          << "'IRStructure.__init__' does not take any keyword arguments";
+      return -1;
+    }
+
+    if (!args || !PySequence_Check(args)) {
+      PyErrorStreamer(PyExc_TypeError)
+          << "Invalid positional arguments passed to 'IRStructure.__init__'";
+      return -1;
+    }
+
+    auto obj = O_cast(self);
+    auto num_args = PySequence_Size(args);
+    
+    while (num_args == 0) {
+      obj->data = new (obj->backing_storage) IRStructure();
+      return 0;
+    }
+
+    PyErrorStreamer(PyExc_TypeError)
+        << "Invalid arguments to 'IRStructure.__init__'";
+    return -1;
+
+  };
+  tp->tp_alloc = PyType_GenericAlloc;
+  tp->tp_new = PyType_GenericNew;
+
+  if (0 != PyType_Ready(tp)) {
+    return nullptr;
+  }
+
+  return tp;
+}
+
+}  // namespace
+
+#pragma GCC diagnostic pop
 }  // namespace mx

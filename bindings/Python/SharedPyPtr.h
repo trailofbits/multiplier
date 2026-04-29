@@ -12,11 +12,10 @@ namespace mx {
 // An RAII wrapper around a python pointer.
 class SharedPyPtr final {
  private:
-  SharedPyPtr(void) = delete;
-
   ::PyObject *obj;
 
  public:
+  inline SharedPyPtr(void) : obj(nullptr) {}
 
   inline ~SharedPyPtr(void) {
     Py_XDECREF(obj);

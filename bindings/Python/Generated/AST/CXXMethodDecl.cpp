@@ -71,7 +71,7 @@ std::optional<T> PythonBinding<T>::from_python(BorrowedPyObject *obj) noexcept {
   }
 
   PyTypeObject * const tp = Py_TYPE(obj);
-  if (tp < &(gTypes[767]) || tp >= &(gTypes[771])) {
+  if (tp < &(gTypes[819]) || tp >= &(gTypes[823])) {
     return std::nullopt;
   }
 
@@ -88,19 +88,19 @@ SharedPyObject *PythonBinding<T>::to_python(T val) noexcept {
       break;
 
     case mx::CXXMethodDecl::static_kind():
-      tp = &(gTypes[767]);
+      tp = &(gTypes[819]);
       break;
 
     case mx::CXXDestructorDecl::static_kind():
-      tp = &(gTypes[768]);
+      tp = &(gTypes[820]);
       break;
 
     case mx::CXXConversionDecl::static_kind():
-      tp = &(gTypes[769]);
+      tp = &(gTypes[821]);
       break;
 
     case mx::CXXConstructorDecl::static_kind():
-      tp = &(gTypes[770]);
+      tp = &(gTypes[822]);
       break;
 
   }
@@ -603,7 +603,7 @@ static PyMethodDef gMethods[] = {
 namespace {
 
 PyTypeObject *InitType(void) noexcept {
-  PyTypeObject * const tp = &(gTypes[767]);
+  PyTypeObject * const tp = &(gTypes[819]);
   tp->tp_basicsize = sizeof(O);
   tp->tp_itemsize = 0;
   tp->tp_dealloc = [] (::PyObject *obj) {
@@ -618,12 +618,12 @@ PyTypeObject *InitType(void) noexcept {
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
-  tp->tp_hash = gTypes[766].tp_hash;
-  tp->tp_richcompare = gTypes[766].tp_richcompare;
+  tp->tp_hash = gTypes[818].tp_hash;
+  tp->tp_richcompare = gTypes[818].tp_richcompare;
   tp->tp_iter = nullptr;
   tp->tp_methods = gMethods;
   tp->tp_getset = gProperties;
-  tp->tp_base = &(gTypes[766]);
+  tp->tp_base = &(gTypes[818]);
   tp->tp_init = [] (BorrowedPyObject *self, BorrowedPyObject *args, BorrowedPyObject *kwargs) -> int {
     if (kwargs && (!PyMapping_Check(kwargs) || PyMapping_Size(kwargs))) {
       PyErrorStreamer(PyExc_TypeError)

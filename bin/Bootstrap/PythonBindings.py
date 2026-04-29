@@ -859,9 +859,13 @@ bool PythonBinding<T>::load(BorrowedPyObject *module) noexcept {
 
     // Assign each enumerator.
     for (T val : EnumerationRange<T>()) {
+      const char *name_cstr = EnumeratorName(val);
+      if (!name_cstr) {
+        continue;  // Skip gap values.
+      }
       auto ival = PyLong_FromUnsignedLongLong(static_cast<uint64_t>(val));
       if (ival) {
-        auto iname = PyUnicode_FromString(EnumeratorName(val));
+        auto iname = PyUnicode_FromString(name_cstr);
         if (!PyObject_SetItem(ns_dict, iname, ival)) {
           continue;
         }
@@ -920,12 +924,17 @@ BINDING_CPP_HEADER = """// Copyright (c) 2023-present, Trail of Bits, Inc.
 #include <multiplier/Frontend.h>
 #include <multiplier/Index.h>
 #include <multiplier/IR/Function.h>
+#include <multiplier/IR/FunctionKind.h>
 #include <multiplier/IR/Block.h>
-#include <multiplier/IR/Instruction.h>
-#include <multiplier/IR/Object.h>
-#include <multiplier/IR/OpCode.h>
-#include <multiplier/IR/ObjectKind.h>
 #include <multiplier/IR/BlockKind.h>
+#include <multiplier/IR/Instruction.h>
+#include <multiplier/IR/InstructionKinds.h>
+#include <multiplier/IR/Object.h>
+#include <multiplier/IR/ObjectKind.h>
+#include <multiplier/IR/OpCode.h>
+#include <multiplier/IR/Structure.h>
+#include <multiplier/IR/StructureKind.h>
+#include <multiplier/IR/StructureKinds.h>
 #include <multiplier/Re2.h>
 #include <multiplier/Reference.h>
 
@@ -1129,7 +1138,7 @@ TO_EXPORTS: Set[Schema] = set()
 
 def _wrap_method_impl(class_schema: ClassSchema, schema: MethodSchema,
                       is_static: bool, is_overload: bool, out: List[str],
-                      stubs_out: List[str]):
+                      stubs_out: List[str], renamer: "Renamer" = None):
   global FROM_EXPORTS, TO_EXPORTS
 
   if isinstance(schema.return_type, UnknownSchema):
@@ -1233,9 +1242,9 @@ def _wrap_method(class_schema: ClassSchema, schema: NamedSchema,
 
   if isinstance(schema, OverloadSetSchema):
     for method in schema.overloads:
-      _wrap_method_impl(class_schema, method, is_static, True, out, stubs_out)
+      _wrap_method_impl(class_schema, method, is_static, True, out, stubs_out, renamer)
   elif isinstance(schema, MethodSchema):
-    _wrap_method_impl(class_schema, schema, is_static, False, out, stubs_out)
+    _wrap_method_impl(class_schema, schema, is_static, False, out, stubs_out, renamer)
   else:
     assert False
 

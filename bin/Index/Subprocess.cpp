@@ -63,40 +63,45 @@ struct PipeHandler {
       return;
     }
 
-    if (poll_fds[poll_index].revents & (POLLHUP | POLLERR | POLLNVAL)) {
+    auto close_pipe = [&]() {
       close(fd);
       fd = -1;
       done = true;
       poll_fds.erase(poll_fds.begin() + static_cast<std::ptrdiff_t>(poll_index));
-      return;
-    }
+    };
 
     if (this->buffer) { // Read from stdout/stderr (buffer is non-null)
-      ssize_t bytes_read = read(fd, buffer.data(), buffer.size());
-      if (bytes_read > 0) {
-        this->buffer->append(buffer.data(), static_cast<size_t>(bytes_read));
-      } else if (bytes_read == 0 || (bytes_read == -1 && errno != EAGAIN && errno != EINTR)) {
-        close(fd);
-        fd = -1;
-        done = true;
-        poll_fds.erase(poll_fds.begin() + static_cast<std::ptrdiff_t>(poll_index));
+      // Drain all available data first, even if POLLHUP is also set.
+      // On macOS, POLLIN and POLLHUP can be set simultaneously when the
+      // child exits — we must read the remaining data before closing.
+      if (poll_fds[poll_index].revents & POLLIN) {
+        ssize_t bytes_read = read(fd, buffer.data(), buffer.size());
+        if (bytes_read > 0) {
+          this->buffer->append(buffer.data(), static_cast<size_t>(bytes_read));
+          return;  // Come back to read more or handle POLLHUP next time.
+        } else if (bytes_read == 0 || (bytes_read == -1 && errno != EAGAIN && errno != EINTR)) {
+          close_pipe();
+          return;
+        }
+      }
+      // No data to read — now handle POLLHUP/POLLERR.
+      if (poll_fds[poll_index].revents & (POLLHUP | POLLERR | POLLNVAL)) {
+        close_pipe();
       }
     } else { // Write to stdin (buffer is null)
+      if (poll_fds[poll_index].revents & (POLLHUP | POLLERR | POLLNVAL)) {
+        close_pipe();
+        return;
+      }
       ssize_t written = write(fd, input_data + input_pos, input_remaining);
       if (written > 0) {
         input_pos += static_cast<size_t>(written);
         input_remaining -= static_cast<size_t>(written);
         if (input_remaining == 0) {
-          close(fd);
-          fd = -1;
-          done = true;
-          poll_fds.erase(poll_fds.begin() + static_cast<std::ptrdiff_t>(poll_index));
+          close_pipe();
         }
       } else if (written == 0 || (written == -1 && errno != EAGAIN && errno != EINTR)) {
-        close(fd);
-        fd = -1;
-        done = true;
-        poll_fds.erase(poll_fds.begin() + static_cast<std::ptrdiff_t>(poll_index));
+        close_pipe();
       }
     }
   }
@@ -351,24 +356,14 @@ Subprocess::Execute(const std::vector<std::string>& cmd,
                     const std::unordered_map<std::string, std::string>* env,
                     std::string* input, std::string* output,
                     std::string* error) {
-  // Check if running in Docker and use fork+exec if so
   bool insideDocker = IsRunningInDocker();
   if (!FLAGS_reproc_mode) {
     if (FLAGS_fork_mode) {
-      LOG(INFO) << "Using fork+exec (forced by --fork_mode)" << std::endl;
       return ExecuteFork(cmd, env, input, output, error);
     }
     if (insideDocker) {
-      LOG(INFO) << "Executing fork+exec way for Docker environments" << std::endl;
       return ExecuteFork(cmd, env, input, output, error);
     }
-  }
-
-  // reproc implementation
-  if (insideDocker) {
-    LOG(INFO) << "Using reproc library for Docker environment" << std::endl;
-  } else {
-    LOG(INFO) << "Using reproc library for non-Docker environments" << std::endl;
   }
   reproc::process process;
   reproc::arguments args(cmd);

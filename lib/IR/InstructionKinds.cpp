@@ -613,12 +613,9 @@ Type SelectInst::result_type(void) const {
 
 // CopyInst removed: use CastInst with CastOp::IDENTITY instead.
 
-// ---- RetInst ----
-
-std::optional<IRInstruction> RetInst::return_value(void) const {
-  if (num_operands() > 0) return nth_operand(0);
-  return std::nullopt;
-}
+// RetInst is a pure terminator: its return value (if any) lives in
+// the slot pointed to by the preceding RETURN_PTR + MEMORY/STORE,
+// not as an SSA operand on the RET itself.
 
 // ---- BranchInst ----
 

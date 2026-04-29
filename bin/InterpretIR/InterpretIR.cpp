@@ -18,10 +18,11 @@
 #include "Index.h"
 #include <multiplier/AST.h>
 #include <multiplier/Entity.h>
-#include <multiplier/IR/Interpret/ConcreteValueFactory.h>
-#include <multiplier/IR/Interpret/ConcreteMemory.h>
-#include <multiplier/IR/Interpret/ConcreteDriver.h>
+#include <multiplier/IR/Interpret/ConcretePolicy.h>
+#include <multiplier/IR/Interpret/Continuation.h>
 #include <multiplier/IR/Interpret/Interpreter.h>
+#include <multiplier/IR/Interpret/InterpreterLoop.h>
+#include <multiplier/IR/Interpret/Policy.h>
 
 DEFINE_uint64(entity_id, mx::kInvalidEntityId, "ID of the entity to interpret");
 DEFINE_string(entity_name, "", "Name of the function to interpret");
@@ -87,47 +88,35 @@ int main(int argc, char *argv[]) {
   if (auto fd = mx::FunctionDecl::from(*decl)) {
     for (auto p : fd->parameters()) {
       (void)p;
-      args.push_back(MakeInt(0));
+      args.push_back(make_int(0));
     }
   }
   std::cout << "Running with " << args.size()
             << " zero-initialized arguments...\n\n";
 
-  // Create policy objects with function resolvers for interprocedural calls.
-  ConcreteValueFactory factory;
-  ConcreteMemory memory;
-
-  // Resolve entity ID → IRFunction. Handles both FunctionDecl entity IDs
-  // (direct calls) and DeclRefExpr entity IDs (indirect calls via FUNC_PTR).
+  // Resolve entity ID → IRFunction.
   FunctionResolver func_resolver =
       [&index](mx::RawEntityId eid) -> std::optional<mx::IRFunction> {
     auto entity = index.entity(mx::EntityId(eid));
-
     if (auto *decl = std::get_if<mx::Decl>(&entity)) {
       if (auto fd = mx::FunctionDecl::from(*decl)) {
         return mx::IRFunction::from(*fd);
       }
-      return std::nullopt;
     }
-
     if (auto *stmt = std::get_if<mx::Stmt>(&entity)) {
       if (auto dre = mx::DeclRefExpr::from(*stmt)) {
         if (auto fd = mx::FunctionDecl::from(dre->declaration())) {
           return mx::IRFunction::from(*fd);
         }
       }
-      return std::nullopt;
     }
-
     return std::nullopt;
   };
 
-  // Resolve global variable entity ID → GlobalInfo (size, initializer).
+  // Resolve global variable entity ID → GlobalInfo.
   GlobalResolver global_resolver =
       [&index](mx::RawEntityId eid) -> std::optional<GlobalInfo> {
     auto entity = index.entity(mx::EntityId(eid));
-
-    // Get the VarDecl.
     std::optional<mx::VarDecl> vd;
     if (auto *decl = std::get_if<mx::Decl>(&entity)) {
       vd = mx::VarDecl::from(*decl);
@@ -137,65 +126,47 @@ int main(int argc, char *argv[]) {
       }
     }
     if (!vd) return std::nullopt;
-
     GlobalInfo info;
     info.canonical_eid = vd->id().Pack();
     auto ty = vd->type();
-    if (auto bits = ty.size_in_bits()) {
+    if (auto bits = ty.size_in_bits())
       info.size = static_cast<uint32_t>((*bits + 7) / 8);
-    }
-    if (auto al = ty.alignment()) {
+    if (auto al = ty.alignment())
       info.align = static_cast<uint32_t>(*al / 8);
-    }
     if (info.align == 0) info.align = 8;
-
-    // Direct lookup: VarDecl → GLOBAL_INITIALIZER IRFunction.
     info.initializer = mx::IRFunction::from(*vd);
     return info;
   };
 
-  ConcreteDriver driver(std::move(func_resolver), std::move(global_resolver));
+  // Run using the new policy-based interpreter.
+  ConcreteMemory memory;
+  ConcretePolicy policy(memory, std::move(func_resolver),
+                        std::move(global_resolver));
+  InterpreterState<Value> state;
+  NoOpScheduler sched;
 
-  // Run the interpreter.
-  InterpreterState state;
-  InitState(state, memory, *ir_func, args);
+  interp_init_state<ConcretePolicy, NoOpScheduler, Value>(
+      policy, sched, state, *ir_func, args);
 
-  StepResult last_result{StepStatus::ERROR};
-  while (true) {
-    if (state.steps >= FLAGS_max_steps) {
-      std::cerr << "Step budget exhausted after " << state.steps
-                << " steps.\n";
-      break;
-    }
-    last_result = Step(state, memory, factory, driver);
-    if (last_result.status == StepStatus::COMPLETED) break;
-    if (last_result.status == StepStatus::ERROR) {
-      std::cerr << "Interpreter error after " << state.steps
-                << " steps.\n";
-      break;
-    }
-    if (last_result.status == StepStatus::SUSPENDED) {
-      std::cerr << "Interpreter suspended (unexpected in concrete mode).\n";
-      break;
-    }
-  }
+  while (interp_step<ConcretePolicy, NoOpScheduler, Value>(
+      policy, sched, state, FLAGS_max_steps)) {}
+  sched.outcome.steps = state.steps;
 
-  std::cout << "Interpreter finished after " << state.steps
-            << " steps.\n";
+  std::cout << "Interpreter finished after " << state.steps << " steps.\n";
 
-  // Print the return value.
-  const auto &ret = last_result.return_value;
-  if (auto *s = std::get_if<ScalarValue>(&ret)) {
-    if (s->width == 4) {
-      std::cout << "Return value: " << s->as_f32() << " (float)\n";
-    } else {
-      std::cout << "Return value: " << s->as_i64() << "\n";
-    }
-  } else if (auto *p = AsPointer(ret)) {
-    std::cout << "Return value: ptr(" << ConcreteAddress(*p) << ")\n";
-  } else if (IsNull(ret)) {
-    std::cout << "Return value: null\n";
+  if (sched.outcome.terminal &&
+      sched.outcome.terminal->kind == mx::ir::interpret::TerminalKind::COMPLETED) {
+    const auto &ret = sched.outcome.terminal->return_value;
+    std::cout << "Return value: " << ret.i64 << "\n";
+  } else if (sched.outcome.terminal &&
+             sched.outcome.terminal->kind == mx::ir::interpret::TerminalKind::ERRORED) {
+    std::cerr << "Interpreter error (kind="
+              << static_cast<int>(sched.outcome.terminal->error_kind)
+              << ") after " << state.steps << " steps.\n";
+    std::cout << "Return value: void/undef\n";
   } else {
+    std::cerr << "Step budget exhausted after " << state.steps
+              << " steps.\n";
     std::cout << "Return value: void/undef\n";
   }
 
