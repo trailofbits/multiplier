@@ -858,8 +858,8 @@ class InterceptorPolicy:
             return z3.Extract(bits - 1, 0, val)
         return None
 
-    def resolve_call(self, call_inst, target_eid, indirect_eid, args_list,
-                     is_indirect):
+    def resolve_call(self, call_inst=None, target_eid=0, indirect_eid=0,
+                     args_list=(), is_indirect=False):
         # Args land as a Python list of raw values (ints, ("ptr", N)
         # tuples, SymExprs, …). Build an ArgsView over them so hooks
         # have a consistent lens API.

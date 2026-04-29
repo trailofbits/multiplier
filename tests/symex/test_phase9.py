@@ -309,7 +309,8 @@ def test_p9_8_indirect_call_target_kind_concrete(index):
     from multiplier.symex.dispatch import InterceptorPolicy
     policy = InterceptorPolicy(engine, None)
     policy.resolve_call(
-        target_eid=0, indirect_eid=1234, args_list=[], is_indirect=True)
+        call_inst=None, target_eid=0, indirect_eid=1234,
+        args_list=[], is_indirect=True)
 
     assert concrete_count[0] >= 1
     assert symbolic_count[0] == 0

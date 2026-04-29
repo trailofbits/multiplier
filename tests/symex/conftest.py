@@ -120,7 +120,7 @@ class ForkOnSymbolicBranchPolicy:
             return val != 0
         return None
 
-    def resolve_branch(self, condition, true_eid, false_eid):
+    def resolve_branch(self, branch_inst, condition, true_eid, false_eid):
         # Returning None signals "I can't decide" → BranchContinuation
         # is emitted and the engine driver enumerates both edges.
         if isinstance(condition, (int, bool)):
