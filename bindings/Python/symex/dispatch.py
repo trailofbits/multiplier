@@ -305,13 +305,18 @@ def _shadow_write(shadow, addr, val, size):
     """
     z3 = _z3_module()
     if z3 is not None and _is_z3(val):
-        # Simplify before per-byte decomposition: when ``val`` was
-        # constructed by re-concatenating bytes earlier read from the
-        # shadow (the common round-trip), z3 collapses the
-        # ``Extract(i+7, i, Concat(b_n, …, b_0))`` patterns back to the
-        # original byte expressions. Without this, every load-modify-store
-        # cycle accumulates Concat/Extract layers around the same bytes.
-        val = z3.simplify(val)
+        # Structural Concat-fold before per-byte decomposition: when
+        # ``val`` was built by re-concatenating bytes earlier read from
+        # the shadow (the load-modify-store round-trip), the fold
+        # collapses ``Concat(Extract(31,24,X),Extract(23,16,X),...)``
+        # back to ``X`` (or a single Extract) so the per-byte
+        # decomposition below stores raw ``Extract(8i+7, 8i, X)``
+        # entries. Using the structural fold here instead of
+        # ``z3.simplify`` avoids the asymmetric-byte-arith collapse
+        # that would otherwise produce ``212 + 255*b`` for the low
+        # byte of ``1492 - zext_32(b)`` and lose the parent identity
+        # for future loads.
+        val = _z3_concat_fold(z3, val)
         i = 0
         while i < size:
             shadow[addr + i] = _z3_byte_at(val, i)
@@ -369,7 +374,13 @@ def _shadow_read(shadow, addr, size, data, buf):
     while j >= 0:
         result = z3.Concat(result, buf[j])
         j -= 1
-    return z3.simplify(result)
+    # Structural fold only — collapses consecutive Extracts of the
+    # same parent back to the parent (or a single Extract). Avoids
+    # ``z3.simplify`` here on purpose: simplify folds the low byte
+    # through byte arith asymmetrically and prevents the parent from
+    # being recovered. A consumer op (compare, branch, cast) is the
+    # right place to run a full simplify.
+    return _z3_concat_fold(z3, result)
 
 
 def _make_default_mem_read(is_float, shadow=None, buf=None, byte_order="little"):
@@ -567,6 +578,82 @@ def _z3_byte_at(val, i):
         return val
     z3 = _z3_module()
     return z3.Extract(8 * (i + 1) - 1, 8 * i, val)
+
+
+def _z3_concat_fold(z3, expr):
+    """Structural fold for Concat-of-consecutive-Extracts-of-same-parent.
+
+    Pure structure rewrite — never folds Extract through arithmetic.
+    `z3.simplify` would do that asymmetrically (the low byte of a
+    subtraction has no incoming borrow, so it folds into byte arith,
+    while high bytes don't), producing shapes like
+    `Concat(Extract(31, 8, X), 212 + 255*b)` where the low byte's
+    parent identity has been lost and the round-trip back to X is
+    impossible to recover.
+
+    Steps:
+
+      1. Flatten nested Concats — z3 stores n-ary Concat as a
+         left-associated chain of binary applications, so
+         `Concat(a, b, c, d)` is `Concat(Concat(Concat(a, b), c), d)`
+         under the hood. The fold has to see it as a flat MSB→LSB
+         sequence to merge consecutive Extracts.
+      2. Merge consecutive Extracts of the same parent at adjacent
+         bit ranges into a single Extract.
+      3. If a single Extract spans the parent's full width, return
+         the parent itself.
+
+    Rules 2 + 3 together recover the original parent expression on a
+    full-width round trip: store a 32-bit value as four byte shadows,
+    load all four, and the result is the original 32-bit term — no
+    z3.simplify required, and (more importantly) no asymmetric
+    arithmetic folding to the low byte.
+    """
+    if not z3.is_app(expr) or expr.decl().kind() != z3.Z3_OP_CONCAT:
+        return expr
+
+    # Step 1: flatten nested Concats into a single MSB→LSB list.
+    parts = []
+    stack = [expr]
+    while stack:
+        node = stack.pop()
+        if z3.is_app(node) and node.decl().kind() == z3.Z3_OP_CONCAT:
+            # Children are MSB→LSB; push in reverse so the pop order
+            # walks them MSB-first.
+            kids = node.children()
+            for k in reversed(kids):
+                stack.append(k)
+        else:
+            parts.append(node)
+
+    if len(parts) == 1:
+        return parts[0]
+
+    # Step 2: left-to-right merge of adjacent same-parent Extracts.
+    out = []
+    for p in parts:
+        if (out and
+                z3.is_app(p) and p.decl().kind() == z3.Z3_OP_EXTRACT and
+                z3.is_app(out[-1]) and
+                out[-1].decl().kind() == z3.Z3_OP_EXTRACT and
+                p.arg(0).eq(out[-1].arg(0))):
+            top_hi, top_lo = out[-1].params()
+            bot_hi, bot_lo = p.params()
+            if top_lo == bot_hi + 1:
+                out[-1] = z3.Extract(top_hi, bot_lo, p.arg(0))
+                continue
+        out.append(p)
+
+    if len(out) == 1:
+        only = out[0]
+        # Step 3: full-width Extract collapses to its parent.
+        if z3.is_app(only) and only.decl().kind() == z3.Z3_OP_EXTRACT:
+            hi, lo = only.params()
+            parent = only.arg(0)
+            if lo == 0 and hi == parent.size() - 1:
+                return parent
+        return only
+    return z3.Concat(*out)
 
 
 # Per-arity dispatch tables: each entry is `(opcode_range, builder)`.
