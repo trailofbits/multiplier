@@ -22,17 +22,18 @@ class EventKind(StrEnum):
     SYMBOLIC_STORE = "symbolic_store"
     GLOBAL_READ = "global_read"
     GLOBAL_WRITE = "global_write"
+    GLOBAL_INITIALIZED = "global_initialized"
     CALL = "call"
     INDIRECT_CALL = "indirect_call"
     BRANCH = "branch"
+    SWITCH_CASE = "switch_case"
+    SWITCH_DEFAULT = "switch_default"
     LOOP = "loop"
     CONCRETIZE = "concretize"
     BINARY_OP = "binary_op"
     MEMADDR_CONCRETIZE = "memaddr_concretize"
     CONCRETIZATION_TRUNCATED = "concretization_truncated"
     CONCRETIZATION_INFEASIBLE = "concretization_infeasible"
-    OBSERVER_ERROR = "observer_error"
-    INTERCEPT_ERROR = "intercept_error"
     REGION_MATERIALIZED = "region_materialized"
     LAZY_BUDGET_EXHAUSTED = "lazy_budget_exhausted"
     CONSTRAIN_TO_CONCRETE_ADDR = "constrain_to_concrete_addr"
@@ -53,9 +54,12 @@ SYMBOLIC_LOAD = EventKind.SYMBOLIC_LOAD
 SYMBOLIC_STORE = EventKind.SYMBOLIC_STORE
 GLOBAL_READ = EventKind.GLOBAL_READ
 GLOBAL_WRITE = EventKind.GLOBAL_WRITE
+GLOBAL_INITIALIZED = EventKind.GLOBAL_INITIALIZED
 CALL = EventKind.CALL
 INDIRECT_CALL = EventKind.INDIRECT_CALL
 BRANCH = EventKind.BRANCH
+SWITCH_CASE = EventKind.SWITCH_CASE
+SWITCH_DEFAULT = EventKind.SWITCH_DEFAULT
 LOOP = EventKind.LOOP
 CONCRETIZE = EventKind.CONCRETIZE
 BLOCK_ENTER = EventKind.BLOCK_ENTER
@@ -68,9 +72,9 @@ INDIRECT_CALL_RESOLVED = EventKind.INDIRECT_CALL_RESOLVED
 ALL_EVENTS = frozenset({
     MEMORY_READ, MEMORY_WRITE,
     SYMBOLIC_LOAD, SYMBOLIC_STORE,
-    GLOBAL_READ, GLOBAL_WRITE,
+    GLOBAL_READ, GLOBAL_WRITE, GLOBAL_INITIALIZED,
     CALL, INDIRECT_CALL,
-    BRANCH, LOOP, CONCRETIZE,
+    BRANCH, SWITCH_CASE, SWITCH_DEFAULT, LOOP, CONCRETIZE,
     BLOCK_ENTER, INSTRUCTION,
     ADDRESS_FOR, ADDRESS_RESOLVED,
     INDIRECT_CALL_RESOLVED,
@@ -86,6 +90,18 @@ class BranchDirection(StrEnum):
     TRUE = "true"
     FALSE = "false"
     UNKNOWN = "?"
+
+
+class StopNow(BaseException):
+    """Raise from any hook to halt the current slice immediately.
+
+    The C++ interpreter catches this via the existing exception-propagation
+    mechanism, clears the work stack, and surfaces it back to the Python
+    driver.  `_step_one` intercepts it and treats the path as stopped.
+
+    Prefer `ctx.stop_now(terminal=...)` over raising this directly so the
+    terminal value is recorded before the interpreter halts.
+    """
 
 
 class Terminal(StrEnum):
@@ -115,12 +131,19 @@ class StepResultKind(StrEnum):
     ERROR = "error"
     BUDGET = "budget"
     BRANCH = "branch"
+    SWITCH = "switch"
     SUSPENDED = "suspended"
 
 
 class Strategy(StrEnum):
     BFS = "bfs"
     DFS = "dfs"
+
+
+# Endian lives in `_types` (a leaf module) since it's a fundamental
+# constant used by Layout, MemView, Path, and the engine. Re-exported
+# here for back-compat with existing `from .events import Endian` users.
+from ._types import Endian  # noqa: E402,F401
 
 
 class CallAction(StrEnum):

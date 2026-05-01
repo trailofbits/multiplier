@@ -21,7 +21,7 @@ static const std::string_view kEmptyStringView("");
 //            arguments per sub-match, hence the requirement for enclosing
 //            `pattern_` in a match group with `(` and `)`.
 RegexQueryImpl::RegexQueryImpl(std::string pattern_)
-    : pattern("(" + pattern_ + ")"),
+    : pattern("(?m)(" + pattern_ + ")"),
       re(pattern) {}
 
 void RegexQueryImpl::ForEachMatch(

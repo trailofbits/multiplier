@@ -122,3 +122,49 @@ int32_t si_rw_branch(int32_t *arr, int32_t n, int32_t val) {
     arr[0] = val;
     return arr[0];
 }
+
+// -----------------------------------------------------------------------
+// Symbolic-switch corpus.
+// -----------------------------------------------------------------------
+
+// Three single-value cases + default. Symbolic selector forks 4 paths.
+int32_t si_switch_three(int32_t sel) {
+    switch (sel) {
+        case 1: return 10;
+        case 2: return 20;
+        case 3: return 30;
+        default: return -1;
+    }
+}
+
+// GNU range case + default — symbolic selector forks 2 paths.
+int32_t si_switch_range(int32_t sel) {
+    switch (sel) {
+        case 2 ... 5: return 100;
+        default: return -1;
+    }
+}
+
+// No default — symbolic selector forks exactly 2 paths (one per case).
+// Falls through to an implicit return 0 for unmatched selectors.
+int32_t si_switch_no_default(int32_t sel) {
+    int32_t r = 0;
+    switch (sel) {
+        case 1: r = 10; break;
+        case 2: r = 20; break;
+    }
+    return r;
+}
+
+// Pre-constrained selector: an early branch narrows `sel` to {0, 1}.
+// Cases 2 and the default block become infeasible and the engine should
+// drop them rather than enqueueing dead paths.
+int32_t si_switch_constrained(int32_t sel) {
+    if (sel > 1) return -2;
+    switch (sel) {
+        case 0: return 100;
+        case 1: return 200;
+        case 2: return 300;
+        default: return -1;
+    }
+}

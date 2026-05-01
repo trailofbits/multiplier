@@ -22,6 +22,7 @@ API is preserved unchanged.
 import multiplier as mx
 
 from .region import LazyRegion, Region, RegionTable
+from ._types import _BYTES_TYPES, Endian
 
 _interp = mx.ir.interpret
 
@@ -32,7 +33,7 @@ class Layout:
     #   Function alloc:   0x4000_0000_0000_0000 upward (next_function_address)
     #   Lazy regions:     0x7000_0000_0000_0000 upward (declare_lazy)
 
-    def __init__(self, memory=None):
+    def __init__(self, memory=None, endian: Endian = Endian.LITTLE):
         """Create a Layout.
 
         Parameters
@@ -47,6 +48,7 @@ class Layout:
                 layout = Layout(mem)
         """
         self._memory = memory if memory is not None else _interp.ConcreteMemory()
+        self._byte_order = str(endian)
         self._regions = RegionTable()
         # name -> addr fast lookup for __getitem__ / __contains__.
         self._by_name: dict[str, Region] = {}
@@ -70,6 +72,14 @@ class Layout:
     @property
     def memory(self):
         return self._memory
+
+    @property
+    def byte_order(self) -> str:
+        return self._byte_order
+
+    @byte_order.setter
+    def byte_order(self, value):
+        self._byte_order = str(value)
 
     def place_global(self, name, addr, size, init=None, align=8):
         if name in self._by_name:
@@ -319,7 +329,7 @@ class Layout:
 
         if isinstance(value, str):
             data = value.encode(encoding)
-        elif isinstance(value, (bytes, bytearray)):
+        elif isinstance(value, _BYTES_TYPES):
             data = bytes(value)
         else:
             raise TypeError(
@@ -350,9 +360,10 @@ class Layout:
             init = int(init)
         if isinstance(init, int):
             self._memory.write_bytes(
-                addr, init.to_bytes(size, "little", signed=(init < 0)))
+                addr, init.to_bytes(size, self._byte_order,
+                                    signed=(init < 0)))
             return
-        if isinstance(init, (bytes, bytearray)):
+        if isinstance(init, _BYTES_TYPES):
             data = bytes(init)
             if len(data) > size:
                 raise ValueError(

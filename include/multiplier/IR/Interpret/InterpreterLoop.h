@@ -162,8 +162,19 @@ inline void enter_block(auto &state, PolicyT &policy, const IRBlock &block) {
   // Phase 8d: notify the policy of the block entry so analysts can
   // observe every block visit (not only branch transitions).
   policy.on_enter_block(state, block);
-  // Clear transient values cache, then push roots.
-  state.call_stack.top().values.clear();
+  // Clear the transient values cache.
+  auto &frame = state.call_stack.top();
+  frame.values.clear();
+  // Evict call_results entries for CALL instructions that live in this
+  // block. Cross-block entries (calls from other blocks whose results
+  // this block reads as operands) are preserved. Without this, a loop
+  // re-entering this block would reuse the first iteration's return
+  // values for every subsequent call, skipping resolve_call entirely.
+  for (auto inst : block.all_instructions()) {
+    if (inst.opcode() == OpCode::CALL) {
+      frame.call_results.erase(EntityId(inst.id()).Pack());
+    }
+  }
   push_block_work_items<ValueT>(state, block);
 }
 
@@ -287,10 +298,16 @@ inline void analyze(auto &state,
     case OpCode::FMUL_32: case OpCode::FMUL_64:
     case OpCode::FDIV_32: case OpCode::FDIV_64:
     case OpCode::FREM_32: case OpCode::FREM_64:
-    case OpCode::LOGICAL_AND: case OpCode::LOGICAL_OR:
       if (auto bin = BinaryInst::from(inst)) {
         push(WorkKind::COMPUTE_BINARY);
         push_operand(bin->rhs());
+        push_operand(bin->lhs());
+      }
+      break;
+
+    case OpCode::LOGICAL_AND: case OpCode::LOGICAL_OR:
+      if (auto bin = BinaryInst::from(inst)) {
+        push(WorkKind::COMPUTE_LOGICAL);
         push_operand(bin->lhs());
       }
       break;
@@ -609,6 +626,37 @@ inline void compute_binary(CallFrame<ValueT> &frame, PolicyT &policy,
       val<ValueT>(frame, bin->rhs()));
 }
 
+// Short-circuit evaluation for LOGICAL_AND / LOGICAL_OR.
+// Called after LHS has been evaluated; pushes RHS + COMPUTE_BINARY if the
+// result can't be determined from LHS alone, otherwise stores the result
+// directly without evaluating RHS.
+template <typename PolicyT, typename SchedT, typename ValueT>
+inline void compute_logical(auto &state, PolicyT &policy, SchedT &sched,
+                            const IRInstruction &inst) {
+  auto &frame = state.call_stack.top();
+  auto bin = BinaryInst::from(inst);
+  if (!bin) {
+    frame.values[eid(inst)] = ValueTraits<ValueT>::default_value();
+    return;
+  }
+  const ValueT &lhs = val<ValueT>(frame, bin->lhs());
+  auto truth = policy.is_true(lhs);
+  bool is_and = inst.opcode() == OpCode::LOGICAL_AND;
+  if (truth.has_value()) {
+    bool lhs_true = *truth;
+    if (is_and ? !lhs_true : lhs_true) {
+      // LOGICAL_AND + false LHS → 0; LOGICAL_OR + true LHS → 1.
+      frame.values[eid(inst)] = policy.make_const(
+          ConstOp::UINT8, lhs_true ? 1 : 0, lhs_true ? 1u : 0u);
+      return;
+    }
+  }
+  // Symbolic LHS or non-short-circuit concrete: evaluate RHS, then
+  // combine with binary_op (which handles the symbolic case correctly).
+  state.work_stack.push_back({WorkKind::COMPUTE_BINARY, inst, {}});
+  state.work_stack.push_back({WorkKind::ANALYZE, bin->rhs(), {}});
+}
+
 template <typename PolicyT, typename SchedT, typename ValueT>
 inline void compute_compare(CallFrame<ValueT> &frame, PolicyT &policy,
                             const IRInstruction &inst) {
@@ -799,7 +847,7 @@ inline void compute_global_ptr(auto &state, PolicyT &policy,
     // the push may reallocate the segment's vector and invalidate `frame`.
     frame.values[id] = addr;
 
-    if (info.initializer && !placed_via_hint) {
+    if (info.initializer) {
       CallFrame<ValueT> init_frame;
       init_frame.func = *info.initializer;
       init_frame.params = {addr};
@@ -858,7 +906,6 @@ inline void compute_func_ptr(auto &state, PolicyT &policy,
       }
       slot_addr = *a;
     }
-    policy.memory().write(slot_addr, &src_eid, 8);
     state.function_addresses[src_eid] = slot_addr;
   }
   frame.locals[src_eid] = slot_addr;
@@ -875,7 +922,8 @@ inline void exec_load(auto &state, PolicyT &policy,
   auto mi = MemoryInst::from(inst);
   if (!mi) return;
   auto sub = mi->sub_opcode();
-  MemAccessHint hint{ir::AccessSize(sub), ir::IsFloatLoad(sub), false};
+  MemAccessHint hint{ir::AccessSize(sub), ir::IsFloatLoad(sub), false,
+                     false, false, sub};
   auto &frame = state.call_stack.top();
   ValueT addr = val<ValueT>(frame, mi->address());
   auto inst_eid = eid(inst);
@@ -909,11 +957,20 @@ inline void exec_store(auto &state, PolicyT &policy,
   auto mi = MemoryInst::from(inst);
   if (!mi) return;
   auto sub = mi->sub_opcode();
-  MemAccessHint hint{ir::AccessSize(sub), ir::IsFloatStore(sub), true};
+  MemAccessHint hint{ir::AccessSize(sub), ir::IsFloatStore(sub), true,
+                     false, false, sub};
   auto &frame = state.call_stack.top();
   ValueT addr = val<ValueT>(frame, mi->address());
   ValueT stored = val<ValueT>(frame, mi->stored_value());
+  auto inst_eid = eid(inst);
   auto addr_eid = eid(mi->address());
+
+  // The STORE's result slot holds the stored value, so an assignment
+  // expression like `(p = expr)` evaluates to `expr` — i.e. the IR
+  // operand referencing the STORE instruction yields the value that
+  // was just written.  Set this BEFORE the side effect so it's also
+  // visible if `with_address` suspends (the snapshot already has it).
+  frame.values[inst_eid] = stored;
 
   // Phase 8a: symmetric symbolic-STORE short-circuit (see exec_load).
   if (!policy.extract_address(addr) && addr_eid != kInvalidEntityId) {
@@ -1077,6 +1134,7 @@ inline void exec_call(auto &state, PolicyT &policy,
   std::optional<IRFunction> callee_ir;
   auto target_decl = ci->target();
   RawEntityId indirect_eid = kInvalidEntityId;
+  uint64_t target_addr = 0;
 
   if (ci->is_indirect()) {
     auto callee_op = inst.nth_operand(0);
@@ -1091,10 +1149,14 @@ inline void exec_call(auto &state, PolicyT &policy,
     policy.with_address(callee_val, policy.memory(), hint, eid(callee_op),
         state, sched,
         [&](auto &p, ConcreteMemory & /*mem*/, uint64_t a) {
-          ValueT addr_val = p.make_literal_ptr(a);
-          ValueT eid_val;
-          p.mem_read(sched, addr_val, hint, eid_val);
-          indirect_eid = static_cast<RawEntityId>(p.extract_uint(eid_val));
+          // `a` IS the function's virtual address (the value a function
+          // pointer carries after store/load roundtrip).  Resolve it back
+          // to a declaration entity id via the policy's reverse resolver
+          // rather than reading synthetic data from memory; the address
+          // itself is also forwarded to resolve_call so analyst hooks
+          // can act on addresses that aren't (yet) in the reverse map.
+          target_addr = a;
+          indirect_eid = p.entity_for_address(a);
         });
   }
 
@@ -1106,7 +1168,7 @@ inline void exec_call(auto &state, PolicyT &policy,
         ? target_decl->id().Pack() : kInvalidEntityId;
     CallResolution<ValueT> resolution;
     bool alive = policy.resolve_call(
-        sched, inst, target_eid, indirect_eid,
+        sched, inst, target_eid, indirect_eid, target_addr,
         call_args, ci->is_indirect(), resolution);
     if (!alive) {
       frame.values[id] = policy.make_default();
@@ -1367,12 +1429,29 @@ inline void exec_ret(auto &state, PolicyT &policy,
     ValueT callee_result = read_return_value<PolicyT, SchedT, ValueT>(
         state, policy, frame, ret_from_inst, sched);
     auto call_site = frame.call_site;
+    auto func_kind = frame.func.kind();
+    bool is_global_init =
+        (func_kind == ir::FunctionKind::GLOBAL_INITIALIZER ||
+         func_kind == ir::FunctionKind::THREAD_LOCAL_INITIALIZER);
+    IRFunction init_func;
+    ValueT init_addr;
+    if (is_global_init) {
+      init_func = frame.func;
+      if (!frame.params.empty()) {
+        init_addr = frame.params[0];
+      } else {
+        init_addr = ValueTraits<ValueT>::default_value();
+      }
+    }
     state.call_stack.pop();
     if (call_site != kInvalidEntityId) {
       // Store in both caches: values (for within-block use) and
       // call_results (persistent across block transitions).
       state.call_stack.top().values[call_site] = callee_result;
       state.call_stack.top().call_results[call_site] = callee_result;
+    }
+    if (is_global_init) {
+      policy.on_global_initialized(sched, init_func, init_addr);
     }
     return;
   }
@@ -1436,8 +1515,8 @@ inline void decide_cond_branch(auto &state, PolicyT &policy,
   state.work_stack.clear();
 }
 
-template <typename PolicyT, typename ValueT>
-inline void decide_switch(auto &state, PolicyT &policy,
+template <typename PolicyT, typename SchedT, typename ValueT>
+inline void decide_switch(auto &state, PolicyT &policy, SchedT &sched,
                           const IRInstruction &inst) {
   auto sw = SwitchInst::from(inst);
   if (!sw) return;
@@ -1452,21 +1531,41 @@ inline void decide_switch(auto &state, PolicyT &policy,
   }
 
   ValueT sel = frame.values[sel_eid];
-  int64_t sel_val = policy.extract_int(sel);
+  auto maybe_sel = policy.try_extract_int(sel);
+  if (maybe_sel) {
+    int64_t sel_val = *maybe_sel;
+    IRBlock default_block{};
+    for (auto sc : sw->cases()) {
+      if (sc.is_default()) {
+        default_block = sc.target_block();
+        continue;
+      }
+      if (sel_val >= sc.low() && sel_val <= sc.high()) {
+        enter_block<PolicyT, ValueT>(state, policy, sc.target_block());
+        return;
+      }
+    }
+    if (EntityId(default_block.id()).Pack()) {
+      enter_block<PolicyT, ValueT>(state, policy, default_block);
+    }
+    return;
+  }
+
+  // Symbolic selector: collect cases + default and emit a switch
+  // continuation. The driver clones the snapshot per case, enters the
+  // case's target block, and adds a path-condition constraint.
+  std::vector<SwitchCaseRange> case_list;
   IRBlock default_block{};
   for (auto sc : sw->cases()) {
     if (sc.is_default()) {
       default_block = sc.target_block();
-      continue;
-    }
-    if (sel_val >= sc.low() && sel_val <= sc.high()) {
-      enter_block<PolicyT, ValueT>(state, policy, sc.target_block());
-      return;
+    } else {
+      case_list.push_back({sc.low(), sc.high(), sc.target_block()});
     }
   }
-  if (EntityId(default_block.id()).Pack()) {
-    enter_block<PolicyT, ValueT>(state, policy, default_block);
-  }
+  sched.on_switch(std::move(sel), sel_eid, std::move(case_list),
+                  default_block, state.clone());
+  state.work_stack.clear();
 }
 
 // ===========================================================================
@@ -1481,7 +1580,8 @@ inline void dispatch(auto &state, PolicyT &policy,
   // Fire the per-instruction observe hook for every work item that
   // represents a real instruction execution (not scheduling helpers).
   if (item.kind != WorkKind::ENTER_BLOCK &&
-      item.kind != WorkKind::ANALYZE) {
+      item.kind != WorkKind::ANALYZE &&
+      item.kind != WorkKind::COMPUTE_LOGICAL) {
     policy.on_instruction(state, sched, item.inst);
     if (policy.abort_requested()) {
       state.work_stack.clear();
@@ -1514,6 +1614,10 @@ inline void dispatch(auto &state, PolicyT &policy,
     case WorkKind::COMPUTE_BINARY:
       ++state.steps;
       compute_binary<PolicyT, SchedT, ValueT>(frame, policy, item.inst);
+      break;
+    case WorkKind::COMPUTE_LOGICAL:
+      ++state.steps;
+      compute_logical<PolicyT, SchedT, ValueT>(state, policy, sched, item.inst);
       break;
     case WorkKind::COMPUTE_COMPARE:
       ++state.steps;
@@ -1629,7 +1733,7 @@ inline void dispatch(auto &state, PolicyT &policy,
       break;
     case WorkKind::DECIDE_SWITCH:
       ++state.steps;
-      decide_switch<PolicyT, ValueT>(state, policy, item.inst);
+      decide_switch<PolicyT, SchedT, ValueT>(state, policy, sched, item.inst);
       break;
     case WorkKind::EXEC_RET:
       ++state.steps;

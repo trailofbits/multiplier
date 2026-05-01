@@ -296,9 +296,9 @@ def test_p9_8_indirect_call_target_kind_concrete(index):
     symbolic_count = [0]
 
     @engine.intercept.indirect_call(target_kind="concrete")
-    def on_concrete(ctx, next_hook):
+    def on_concrete(ctx, target_addr, next_hook):
         concrete_count[0] += 1
-        return next_hook(ctx)
+        return next_hook(ctx, target_addr)
 
     @engine.intercept.indirect_call(target_kind="symbolic")
     def on_symbolic(ctx, next_hook):

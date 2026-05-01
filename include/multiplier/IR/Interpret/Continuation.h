@@ -172,6 +172,58 @@ class BranchContinuation final
 };
 
 // ===========================================================================
+// SwitchContinuation<ValueT> — driver must pick a switch case (or default).
+//
+// Emitted when a SWITCH instruction's selector is non-extractable (e.g. a
+// symbolic z3 BitVec). The driver realizes each case as a forked path,
+// adding a path-condition constraint that pins the selector into that
+// case's range; the default fork constrains the selector outside every
+// case.
+// ===========================================================================
+
+// Plain struct (named `SwitchCaseRange` to avoid colliding with
+// `mx::SwitchCase` from the AST when both namespaces are pulled in via
+// `using namespace ir::interpret;`).
+struct SwitchCaseRange {
+  int64_t low;
+  int64_t high;
+  IRBlock target_block;
+};
+
+template <typename ValueT, typename StatePolicy = StdShared>
+class SwitchContinuation final : public Continuation<ValueT, StatePolicy> {
+ public:
+  using state_ref = typename Continuation<ValueT, StatePolicy>::state_ref;
+
+  SwitchContinuation(state_ref snap, ValueT selector, RawEntityId sel_eid,
+                     std::vector<SwitchCaseRange> cases,
+                     IRBlock default_block)
+      : snapshot_(std::move(snap)),
+        selector_(std::move(selector)),
+        sel_eid_(sel_eid),
+        cases_(std::move(cases)),
+        default_block_(default_block) {}
+
+  state_ref snapshot(void) const override { return snapshot_; }
+
+  std::string describe(void) const override { return "switch"; }
+
+  RawEntityId operand_eid(void) const override { return sel_eid_; }
+
+  const ValueT &selector(void) const { return selector_; }
+  RawEntityId selector_eid(void) const { return sel_eid_; }
+  const std::vector<SwitchCaseRange> &cases(void) const { return cases_; }
+  const IRBlock &default_block(void) const { return default_block_; }
+
+ private:
+  state_ref snapshot_;
+  ValueT selector_;
+  RawEntityId sel_eid_{kInvalidEntityId};
+  std::vector<SwitchCaseRange> cases_;
+  IRBlock default_block_;
+};
+
+// ===========================================================================
 // CallContinuation<ValueT> — driver must resolve an unresolved CALL.
 //
 // Emitted when the interpreter encounters a CALL site whose target IR is

@@ -36,7 +36,7 @@ from .ctx import Ctx
 from .events import (
     MEMORY_READ, MEMORY_WRITE,
     SYMBOLIC_LOAD, SYMBOLIC_STORE,
-    GLOBAL_READ, GLOBAL_WRITE,
+    GLOBAL_READ, GLOBAL_WRITE, GLOBAL_INITIALIZED,
     CALL, INDIRECT_CALL,
     BRANCH, LOOP, CONCRETIZE,
     BLOCK_ENTER, INSTRUCTION,
@@ -105,14 +105,29 @@ class _Selector:
     """
 
     __slots__ = ("addr_range", "name", "eid", "func", "block", "region",
-                 "_layout", "_resolved_range", "kind", "target_kind")
+                 "_layout", "_resolved_range", "kind", "target_kind", "decl")
 
     def __init__(self, addr_range=None, name=None, eid=None, func=None,
                  block=None, region=None, layout=None,
-                 kind=None, target_kind=None):
+                 kind=None, target_kind=None, decl=None):
         self.addr_range = addr_range
         self.name = name
+        # Allow `decl=<NamedDecl>` to substitute for both name and eid:
+        # we extract them up front so matches_name / matches_eid still
+        # do their cheap equality checks at dispatch time.
+        if decl is not None:
+            try:
+                if name is None:
+                    self.name = str(decl.name) if decl.name else None
+            except (AttributeError, TypeError):
+                pass
+            if eid is None:
+                try:
+                    eid = int(decl.id)
+                except (AttributeError, TypeError):
+                    eid = None
         self.eid = eid
+        self.decl = decl
         self.func = func
         self.block = block
         self.region = region
@@ -195,6 +210,7 @@ def make_selector(layout, **kwargs):
         addr_range=kwargs.get("addr_range"),
         name=kwargs.get("name"),
         eid=kwargs.get("eid"),
+        decl=kwargs.get("decl"),
         func=kwargs.get("func"),
         block=kwargs.get("block"),
         region=kwargs.get("region"),
@@ -268,86 +284,180 @@ def _build_chain(handlers, default_fn):
 
 # ---- per-event default (chain bottom) functions -----------------------
 
-def _make_default_mem_read(is_float, shadow=None):
+from ._types import _BYTES_TYPES, _INT_TYPES, _SEQ_TYPES
+
+# Pre-built zero-fill byte strings indexed by size (0-16).
+_ZERO_BYTES = tuple(bytes(n) for n in range(17))
+
+
+def _shadow_write(shadow, addr, val, size):
+    """Decompose a z3 value into per-byte shadow entries (little-endian).
+
+    Each ``shadow[addr + i]`` slot holds a ``BitVec(8)`` extract of ``val``
+    (or, when ``val.size() == 8``, ``val`` itself — avoids accumulating
+    nested ``Extract(7, 0, ...)`` layers when a symbolic byte is
+    read-and-rewritten).
+
+    Concrete writes erase covered shadow slots (``ConcreteMemory`` is the
+    source of truth for concrete bytes); the caller is responsible for
+    writing the actual bytes to ``ConcreteMemory``. Partial overlap is
+    handled naturally — only touched positions are updated.
+    """
+    z3 = _z3_module()
+    if z3 is not None and _is_z3(val):
+        # Simplify before per-byte decomposition: when ``val`` was
+        # constructed by re-concatenating bytes earlier read from the
+        # shadow (the common round-trip), z3 collapses the
+        # ``Extract(i+7, i, Concat(b_n, …, b_0))`` patterns back to the
+        # original byte expressions. Without this, every load-modify-store
+        # cycle accumulates Concat/Extract layers around the same bytes.
+        val = z3.simplify(val)
+        i = 0
+        while i < size:
+            shadow[addr + i] = _z3_byte_at(val, i)
+            i += 1
+    else:
+        i = 0
+        while i < size:
+            shadow.pop(addr + i, None)
+            i += 1
+
+
+def _shadow_read(shadow, addr, size, data, buf):
+    """Reconstruct a symbolic value from the byte-granular shadow.
+
+    ``data`` is the already-read concrete bytes for ``[addr, addr+size)``.
+    Returns ``None`` immediately when no shadow entry overlaps the range
+    (zero dict lookups beyond the in-check on the fast path).
+
+    For each covered position: shadow-dict hit → ``z3.BitVec(8)`` extract;
+    miss → ``BitVecVal`` of the concrete byte.  ``buf`` is a pre-allocated
+    list (held on ``Path``) reused across calls.  ``z3.simplify`` collapses
+    a same-width read of a single symbolic write back to the original
+    variable.
+    """
+    # Fast path: check whether any byte in the range is shadowed. Sparse
+    # paths see a non-shadowed range and return immediately, so this is
+    # the no-symbolic-data hot path.
+    found = False
+    i = 0
+    while i < size:
+        if (addr + i) in shadow:
+            found = True
+            break
+        i += 1
+    if not found:
+        return None
+
+    z3 = _z3_module()
+
+    while len(buf) < size:
+        buf.append(None)
+
+    i = 0
+    while i < size:
+        entry = shadow.get(addr + i)
+        buf[i] = entry if entry is not None else z3.BitVecVal(data[i], 8)
+        i += 1
+
+    if size == 1:
+        return buf[0]
+
+    # Concat is MSB-first; little-endian layout means buf[size-1] is the MSB.
+    result = buf[size - 1]
+    j = size - 2
+    while j >= 0:
+        result = z3.Concat(result, buf[j])
+        j -= 1
+    return z3.simplify(result)
+
+
+def _make_default_mem_read(is_float, shadow=None, buf=None, byte_order="little"):
     """Return the chain bottom for a memory_read event.
 
-    Reads concrete bytes via the lens; for `is_float`, unpacks IEEE
-    float32 / float64. Returns the loaded value. Falls back to
-    zero on a read failure (the address has no backing) — matching
-    the C++ `ConcreteMemory::read` zero-fill semantics — so the
-    surrounding event still fires and sinks (like `OOBSink`) get
-    a chance to surface the OOB.
-
-    Phase 8c: when `shadow` (a `(addr, size) -> z3 expr` dict) holds
-    an exact-match entry for `(addr, size)`, the shadow value wins.
-    Partial-overlap and width-mismatch hits are out of scope; the
-    substrate's IR lowering keeps slot widths consistent.
+    Reads baseline bytes from ``ConcreteMemory`` first (always needed as
+    fallback), then defers to ``_shadow_read`` which checks the per-path
+    shadow dict.  Shadow entries shadow the baseline; any range with no
+    shadow entry goes straight to the concrete fallback.  Falls back to
+    zero-fill on a read failure so OOB sinks still fire.
     """
+    _buf = buf if buf is not None else []
+
     def default(ctx, addr, size):
-        if shadow is not None:
-            cached = shadow.get((addr, size))
-            if cached is not None and _is_z3(cached):
-                return cached
         try:
             data = ctx.mem.read_bytes(addr, size)
         except RuntimeError:
-            data = b"\x00" * size
+            data = _ZERO_BYTES[size] if size < len(_ZERO_BYTES) else bytes(size)
+        if shadow is not None:
+            sym = _shadow_read(shadow, addr, size, data, _buf)
+            if sym is not None:
+                return sym
         if is_float and size == 4:
-            return _struct.unpack("<f", data)[0]
+            fmt = "<f" if byte_order == "little" else ">f"
+            return _struct.unpack(fmt, data)[0]
         if is_float and size == 8:
-            return _struct.unpack("<d", data)[0]
-        return int.from_bytes(data, "little", signed=False)
+            fmt = "<d" if byte_order == "little" else ">d"
+            return _struct.unpack(fmt, data)[0]
+        return int.from_bytes(data, byte_order, signed=False)
     return default
 
 
-def _make_default_mem_write(is_float, shadow=None):
+def _make_default_mem_write(is_float, shadow=None, byte_order="little"):
     """Return the chain bottom for a memory_write event.
 
-    Writes concrete bytes via the lens. Handles ints, ("ptr", N)
-    pointer tuples, raw bytes, and IEEE floats. Returns None.
-
-    Phase 8c: a z3 expression written to a concrete address goes
-    into `shadow[(addr, size)]` (when `shadow` is provided) so a
-    later exact-match read returns it. Without a shadow the value
-    is dropped, preserving pre-Phase-8c behavior for tests that
-    construct a policy without a Path.
+    Writes concrete bytes via the lens. Handles ints, ("ptr", N) pointer
+    tuples, raw bytes, and IEEE floats. A z3 write decomposes ``val`` into
+    per-byte extracts in the shadow dict; a concrete write clears any
+    covered shadow slots (concrete memory is the source of truth) and
+    writes the real bytes to ``ConcreteMemory``.
     """
     def default(ctx, addr, val, size):
         if isinstance(val, bool):
             val = int(val)
         if isinstance(val, int):
             if shadow is not None:
-                shadow.pop((addr, size), None)
+                _shadow_write(shadow, addr, val, size)
             ctx.mem.write_bytes(
-                addr, val.to_bytes(size, "little", signed=(val < 0)))
+                addr, val.to_bytes(size, byte_order, signed=(val < 0)))
             return None
         if isinstance(val, tuple) and len(val) == 2 and val[0] == VALUE_TAG_PTR:
             if shadow is not None:
-                shadow.pop((addr, size), None)
+                _shadow_write(shadow, addr, val, size)
             ctx.mem.write_bytes(
-                addr, int(val[1]).to_bytes(size, "little", signed=False))
+                addr, int(val[1]).to_bytes(size, byte_order, signed=False))
             return None
-        if isinstance(val, (bytes, bytearray)):
+        if isinstance(val, _BYTES_TYPES):
             if shadow is not None:
-                shadow.pop((addr, size), None)
-            ctx.mem.write_bytes(addr, bytes(val))
+                _shadow_write(shadow, addr, val, size)
+            ctx.mem.write_bytes(addr, val)
             return None
         if isinstance(val, float):
             if shadow is not None:
-                shadow.pop((addr, size), None)
-            fmt = "<f" if size == 4 else "<d"
+                _shadow_write(shadow, addr, val, size)
+            prefix = "<" if byte_order == "little" else ">"
+            fmt = f"{prefix}f" if size == 4 else f"{prefix}d"
             ctx.mem.write_bytes(addr, _struct.pack(fmt, val))
             return None
         if shadow is not None and _is_z3(val):
-            shadow[(addr, size)] = val
+            _shadow_write(shadow, addr, val, size)
             return None
-        # Symbolic or otherwise unknown without a shadow — drop.
         return None
     return default
 
 
 def _default_call(ctx):
     """Chain bottom for a call event — defer to substrate inline."""
+    return _DEFER
+
+
+def _default_indirect_call(ctx, target_addr):
+    """Chain bottom for an indirect_call event — defer to substrate inline.
+
+    Indirect-call hooks receive `target_addr` as a positional argument
+    (per the design doc); the chain bottom accepts and ignores it so
+    handlers that forward via `next_hook(ctx, target_addr)` reach a
+    concrete sentinel.
+    """
     return _DEFER
 
 
@@ -359,7 +469,7 @@ def _default_branch(ctx, condition):
     control back to the substrate so it can enumerate edges via a
     BranchContinuation.
     """
-    if isinstance(condition, (int, bool)):
+    if isinstance(condition, _INT_TYPES):
         return condition != 0
     return _FORK
 
@@ -427,6 +537,38 @@ def _z3_coerce(v, sample):
     return None
 
 
+def _z3_resize(val, target_bits, signed=False):
+    """Return a z3 BitVec of exactly ``target_bits`` derived from ``val``.
+
+    If ``val`` is already that wide, returned unchanged — z3 doesn't
+    auto-simplify ``Extract(N-1, 0, BitVec(N))`` or ``ZeroExt(0, …)`` /
+    ``SignExt(0, …)`` to identity, so wrapping a same-width value in those
+    ops just bloats every downstream expression. Avoiding the wrap keeps
+    expressions canonical across repeated read-modify-write cycles.
+    """
+    cur = val.size()
+    if cur == target_bits:
+        return val
+    z3 = _z3_module()
+    if cur > target_bits:
+        return z3.Extract(target_bits - 1, 0, val)
+    return z3.SignExt(target_bits - cur, val) if signed \
+        else z3.ZeroExt(target_bits - cur, val)
+
+
+def _z3_byte_at(val, i):
+    """Extract the i-th byte (8 bits, little-endian) of ``val``.
+
+    Skips the wrap when ``val`` is already exactly one byte wide and
+    we're asking for byte 0 — the common case for byte-granular shadow
+    writes of an already-extracted symbolic byte.
+    """
+    if val.size() == 8 and i == 0:
+        return val
+    z3 = _z3_module()
+    return z3.Extract(8 * (i + 1) - 1, 8 * i, val)
+
+
 # Per-arity dispatch tables: each entry is `(opcode_range, builder)`.
 # Builders for ops that need a z3 module function take (z3, a[, b]) so
 # the cached `_z3_module()` reference flows through; the rest are pure
@@ -476,11 +618,28 @@ def _dispatch_op(table, op):
     return None
 
 
+def _dispatch_op_sized(table, op):
+    """Like ``_dispatch_op`` but also returns the operand width in bits.
+
+    Assumes the entry has _8/_16/_32/_64 variants in that order (so a
+    range of size 4). Used by integer binary/unary dispatch so a
+    width-mismatched operand pair is reconciled before reaching z3.
+    """
+    for lo_hi, builder in table:
+        if lo_hi[0] <= op <= lo_hi[1]:
+            return builder, 8 << (op - lo_hi[0])
+    return None
+
+
 def _z3_compare(op, lhs, rhs):
     """Build a z3 boolean from a comparison opcode and two operands.
 
-    Returns None if the opcode isn't recognised — caller falls back to
-    `SymExpr` so analysts who care can still detect propagation.
+    For BitVec operands, both are resized to a matching width (the
+    larger of the two) before the op is built — z3 sort-checks
+    aggressively and an upstream cast may have left the pair mismatched.
+    FP operands fall through unchanged (already same-width by construction).
+
+    Returns None if the opcode isn't recognised. Result is simplified.
     """
     z3 = _z3_module()
     builder = _dispatch_op(_COMPARE_TABLE, op)
@@ -491,31 +650,89 @@ def _z3_compare(op, lhs, rhs):
     b = _z3_coerce(rhs, sample)
     if a is None or b is None:
         return None
-    return builder(z3, a, b)
+    if isinstance(a, z3.BitVecRef) and isinstance(b, z3.BitVecRef) \
+            and a.size() != b.size():
+        target = max(a.size(), b.size())
+        a = _z3_resize(a, target)
+        b = _z3_resize(b, target)
+    return z3.simplify(builder(z3, a, b))
 
 
 def _z3_binary(op, lhs, rhs):
-    """Build a z3 BitVec from a binary opcode. None on unsupported."""
+    """Build a z3 BitVec from a binary opcode. None on unsupported.
+
+    Both operands are coerced to the opcode's declared width before the
+    op is built — without this, an upstream cast that left an operand
+    wider/narrower than its companion (or wider/narrower than the
+    opcode's width) crashes z3 with a sort-mismatch.
+    Result is simplified so each step in a chain of arithmetic ops stays
+    canonical.
+    """
     z3 = _z3_module()
-    builder = _dispatch_op(_BINARY_TABLE, op)
-    if z3 is None or builder is None:
+    sized = _dispatch_op_sized(_BINARY_TABLE, op)
+    if z3 is None or sized is None:
         return None
+    builder, bits = sized
     sample = lhs if _is_z3(lhs) else rhs
     a = _z3_coerce(lhs, sample)
     b = _z3_coerce(rhs, sample)
     if a is None or b is None:
         return None
-    return builder(z3, a, b)
+    a = _z3_resize(a, bits)
+    b = _z3_resize(b, bits)
+    return z3.simplify(builder(z3, a, b))
 
 
 def _z3_unary(op, operand):
     if not _is_z3(operand):
         return None
     z3 = _z3_module()
-    builder = _dispatch_op(_UNARY_TABLE, op)
-    if z3 is None or builder is None:
+    sized = _dispatch_op_sized(_UNARY_TABLE, op)
+    if z3 is None or sized is None:
         return None
-    return builder(z3, operand)
+    builder, bits = sized
+    return z3.simplify(builder(z3, _z3_resize(operand, bits)))
+
+
+def _z3_cast(op, operand):
+    """Lower a CastOp to z3 ops so symbolic values flow through casts.
+
+    Returns None for casts we don't model symbolically (float ↔ int,
+    F32_TO_F64, etc.); the caller falls back to a SymExpr placeholder
+    in that case, which keeps the value visible but blocks z3 reasoning
+    until those casts are wired up.
+    """
+    z3 = _z3_module()
+    if z3 is None or not isinstance(operand, z3.ExprRef):
+        return None
+    name = mx.ir.CastOp(int(op)).name
+
+    # Each cast result is z3.simplify'd — `_z3_resize` may emit a fresh
+    # Extract/SignExt/ZeroExt node that the simplifier can immediately
+    # collapse against an existing one (common when a SEXT feeds into a
+    # TRUNC on the same value).
+    if name.startswith("SEXT_I") or name.startswith("ZEXT_I"):
+        # SEXT_I{src}_I{tgt} or ZEXT_I{src}_I{tgt}. Use the operand's
+        # actual width (not src) — earlier casts may already have
+        # widened or narrowed it past what the opcode claims.
+        prefix = "SEXT_I" if name.startswith("SEXT_I") else "ZEXT_I"
+        parts = name[len(prefix):].split("_I")
+        _, tgt = int(parts[0]), int(parts[1])
+        return z3.simplify(_z3_resize(operand, tgt, signed=(prefix == "SEXT_I")))
+    if name.startswith("TRUNC_I"):
+        # TRUNC_I{src}_I{tgt}.
+        parts = name[len("TRUNC_I"):].split("_I")
+        _, tgt = int(parts[0]), int(parts[1])
+        return z3.simplify(_z3_resize(operand, tgt))
+    if name in ("BITCAST", "IDENTITY"):
+        return operand
+    if name in ("PTR_TO_I64", "I64_TO_PTR"):
+        return z3.simplify(_z3_resize(operand, 64))
+    if name == "PTR_TO_I32":
+        return z3.simplify(_z3_resize(operand, 32))
+    if name == "I32_TO_PTR":
+        return z3.simplify(_z3_resize(operand, 64))
+    return None  # float casts unhandled; caller produces a SymExpr
 
 
 # -----------------------------------------------------------------------
@@ -546,7 +763,8 @@ class InterceptorPolicy:
         self._memory = memory if memory is not None else (
             self._layout.memory if self._layout is not None else None)
         # Lazily built per-step MemView; ArgsView is per-call event.
-        self._mem_view = MemView(self._memory) if self._memory else None
+        self._mem_view = (MemView(self._memory, endian=engine.endian)
+                          if self._memory else None)
         # Phase 8c: shadow map for symbolic values written to concrete
         # substrate-allocated addresses. Held as a shared reference to
         # the path's dict so writes and reads survive across steps
@@ -556,6 +774,9 @@ class InterceptorPolicy:
         self._shadow = getattr(path, "_symbolic_shadow", None)
         if self._shadow is None:
             self._shadow = {}
+        self._shadow_buf = getattr(path, "_shadow_buf", None)
+        if self._shadow_buf is None:
+            self._shadow_buf = []
 
     # ------------------------------------------------------------------
     # Hook entry points (lookup_method on PyPolicy fires these)
@@ -578,17 +799,10 @@ class InterceptorPolicy:
             MEMORY_READ, lambda sel: sel.matches_addr(addr_int))
         chain = _build_chain(handlers,
                              _make_default_mem_read(bool(is_float),
-                                                    self._shadow))
-        try:
-            value = chain(ctx, addr_int, size_i)
-        except Exception as exc:  # noqa: BLE001
-            self._record_handler_error(ctx, MEMORY_READ, exc,
-                                       role="intercept")
-            self._fire_observers(MEMORY_READ, Phase.AFTER, ctx,
-                                 addr=addr_int, size=size_i,
-                                 is_float=bool(is_float), value=None,
-                                 handled=False, region=region_name)
-            return NotImplemented
+                                                    self._shadow,
+                                                    self._shadow_buf,
+                                                    byte_order=str(self._engine.endian)))
+        value = chain(ctx, addr_int, size_i)
 
         self._fire_observers(MEMORY_READ, Phase.AFTER, ctx,
                              addr=addr_int, size=size_i,
@@ -624,12 +838,9 @@ class InterceptorPolicy:
             MEMORY_WRITE, lambda sel: sel.matches_addr(addr_int))
         chain = _build_chain(handlers,
                              _make_default_mem_write(bool(is_float),
-                                                     self._shadow))
-        try:
-            chain(ctx, addr_int, val, size_i)
-        except Exception as exc:  # noqa: BLE001
-            self._record_handler_error(ctx, MEMORY_WRITE, exc,
-                                       role="intercept")
+                                                     self._shadow,
+                                                     byte_order=str(self._engine.endian)))
+        chain(ctx, addr_int, val, size_i)
 
         # Phase 6 invariant: when the region's overlay has been
         # materialized (some prior symbolic access forced its
@@ -714,12 +925,7 @@ class InterceptorPolicy:
             lambda sel: (sel.matches_region(region_name) and
                          sel.matches_name(region_name)))
         chain = _build_chain(handlers, _default)
-        try:
-            result = chain(ctx, addr, size_i)
-        except Exception as exc:  # noqa: BLE001
-            self._record_handler_error(ctx, SYMBOLIC_LOAD, exc,
-                                       role="intercept")
-            return NotImplemented
+        result = chain(ctx, addr, size_i)
 
         if result is NotImplemented:
             return NotImplemented
@@ -781,8 +987,7 @@ class InterceptorPolicy:
             if val_z is None:
                 return NotImplemented
             for i in range(sz):
-                byte_i = z3.Extract(8 * i + 7, 8 * i, val_z)
-                region.store_byte(a + i, byte_i)
+                region.store_byte(a + i, _z3_byte_at(val_z, i))
             return True
 
         handlers = self._matching_handlers(
@@ -790,12 +995,7 @@ class InterceptorPolicy:
             lambda sel: (sel.matches_region(region_name) and
                          sel.matches_name(region_name)))
         chain = _build_chain(handlers, _default)
-        try:
-            result = chain(ctx, addr, val, size_i)
-        except Exception as exc:  # noqa: BLE001
-            self._record_handler_error(ctx, SYMBOLIC_STORE, exc,
-                                       role="intercept")
-            return NotImplemented
+        result = chain(ctx, addr, val, size_i)
 
         if result is NotImplemented:
             return NotImplemented
@@ -839,27 +1039,24 @@ class InterceptorPolicy:
         if isinstance(val, int):
             return z3.BitVecVal(val & ((1 << bits) - 1), bits)
         if isinstance(val, float):
+            byte_order = str(self._engine.endian)
+            prefix = "<" if byte_order == "little" else ">"
             if int(size) == 4:
-                packed = _struct.pack("<f", val)
+                packed = _struct.pack(f"{prefix}f", val)
             elif int(size) == 8:
-                packed = _struct.pack("<d", val)
+                packed = _struct.pack(f"{prefix}d", val)
             else:
                 return None
-            return z3.BitVecVal(int.from_bytes(packed, "little"), bits)
+            return z3.BitVecVal(int.from_bytes(packed, byte_order), bits)
         if isinstance(val, tuple) and len(val) == 2 and \
                 val[0] == VALUE_TAG_PTR:
             return z3.BitVecVal(int(val[1]) & ((1 << bits) - 1), bits)
         if isinstance(val, z3.BitVecRef):
-            cur = val.size()
-            if cur == bits:
-                return val
-            if cur < bits:
-                return z3.ZeroExt(bits - cur, val)
-            return z3.Extract(bits - 1, 0, val)
+            return _z3_resize(val, bits)
         return None
 
     def resolve_call(self, call_inst=None, target_eid=0, indirect_eid=0,
-                     args_list=(), is_indirect=False):
+                     target_addr=0, args_list=(), is_indirect=False):
         # Args land as a Python list of raw values (ints, ("ptr", N)
         # tuples, SymExprs, …). Build an ArgsView over them so hooks
         # have a consistent lens API.
@@ -879,6 +1076,7 @@ class InterceptorPolicy:
         self._fire_observers(event, Phase.BEFORE, ctx,
                              target_eid=target_for_match,
                              name=candidate_name, args=args,
+                             target_addr=target_addr,
                              is_indirect=is_indirect)
 
         this_target_kind = "concrete" if is_indirect else None
@@ -893,13 +1091,20 @@ class InterceptorPolicy:
             return True
 
         handlers = self._matching_handlers(event, _match)
-        chain = _build_chain(handlers, _default_call)
-        chosen = chain(ctx)
+        # Indirect-call hooks expect `(ctx, target_addr, next_hook)` per
+        # the design doc; direct-call hooks expect `(ctx, next_hook)`.
+        if is_indirect:
+            chain = _build_chain(handlers, _default_indirect_call)
+            chosen = chain(ctx, int(target_addr))
+        else:
+            chain = _build_chain(handlers, _default_call)
+            chosen = chain(ctx)
 
         if chosen is _DEFER:
             self._fire_observers(event, Phase.AFTER, ctx,
                                  target_eid=target_for_match,
                                  name=candidate_name, args=args,
+                                 target_addr=target_addr,
                                  is_indirect=is_indirect, return_value=None,
                                  handled=False)
             return None  # PythonPolicy treats None as "fall through".
@@ -907,6 +1112,7 @@ class InterceptorPolicy:
         self._fire_observers(event, Phase.AFTER, ctx,
                              target_eid=target_for_match,
                              name=candidate_name, args=args,
+                             target_addr=target_addr,
                              is_indirect=is_indirect, return_value=chosen,
                              handled=True)
         if isinstance(chosen, tuple) and len(chosen) == 2 and \
@@ -951,7 +1157,10 @@ class InterceptorPolicy:
     def cast(self, op, operand):
         if _is_concrete(operand):
             return NotImplemented
-        # No z3 cast lowering yet; SymExpr keeps propagation visible.
+        if _is_z3(operand):
+            z = _z3_cast(op, operand)
+            if z is not None:
+                return z
         return SymExpr("cast", (op, operand))
 
     # ----- pointer arithmetic: lower symbolic operands to z3 BitVec(64) -----
@@ -966,15 +1175,9 @@ class InterceptorPolicy:
         idx_z = self._addr_as_z3(index, z3)
         if base_z is None or idx_z is None:
             return SymExpr("ptr_add", (base, index, element_size))
-        if base_z.size() < 64:
-            base_z = z3.ZeroExt(64 - base_z.size(), base_z)
-        elif base_z.size() > 64:
-            base_z = z3.Extract(63, 0, base_z)
-        if idx_z.size() < 64:
-            idx_z = z3.SignExt(64 - idx_z.size(), idx_z)
-        elif idx_z.size() > 64:
-            idx_z = z3.Extract(63, 0, idx_z)
-        return base_z + idx_z * z3.BitVecVal(int(element_size), 64)
+        base_z = _z3_resize(base_z, 64)
+        idx_z = _z3_resize(idx_z, 64, signed=True)
+        return z3.simplify(base_z + idx_z * z3.BitVecVal(int(element_size), 64))
 
     def ptr_diff(self, lhs, rhs, element_size):
         if _is_concrete(lhs) and _is_concrete(rhs):
@@ -1060,6 +1263,34 @@ class InterceptorPolicy:
         ctx.inst = inst
         self._fire_observers(INSTRUCTION, Phase.AFTER, ctx, inst=inst)
 
+    def on_global_initialized(self, init_func, addr):
+        """Fired by the substrate when a GLOBAL_INITIALIZER /
+        THREAD_LOCAL_INITIALIZER frame returns — i.e. the global's IR
+        initializer has finished executing. Fans out to
+        `engine.observe.global_initialized` observers.
+
+        `init_func` is the initializer IRFunction; `init_func.source_declaration`
+        is the VarDecl. `addr` is the global's virtual address (int)."""
+        if not self._engine._observers.lookup(
+                (GLOBAL_INITIALIZED, Phase.AFTER)):
+            return
+        decl = init_func.source_declaration if init_func is not None else None
+        name = None
+        eid = 0
+        if decl is not None:
+            try:
+                name = str(decl.name) if decl.name else None
+            except Exception:
+                name = None
+            try:
+                eid = int(decl.id)
+            except (AttributeError, TypeError):
+                eid = 0
+        ctx = self._make_ctx()
+        self._fire_observers(GLOBAL_INITIALIZED, Phase.AFTER, ctx,
+                             init_func=init_func, decl=decl,
+                             name=name, eid=eid, addr=int(addr))
+
     # ----- truth + branch resolution: fork on non-concrete -----
 
     def is_true(self, val):
@@ -1074,7 +1305,7 @@ class InterceptorPolicy:
         # handler is interested.
         if self._engine._intercepts.lookup(BRANCH):
             return None
-        if isinstance(val, (int, bool)):
+        if isinstance(val, _INT_TYPES):
             return val != 0
         return None
 
@@ -1105,18 +1336,14 @@ class InterceptorPolicy:
             return True
 
         handlers = self._matching_handlers(BRANCH, _match)
-        if not handlers and isinstance(condition, (int, bool)) and \
+        if not handlers and isinstance(condition, _INT_TYPES) and \
                 not _is_z3(condition):
             return condition != 0  # Phase 2 fast path
         if not handlers:
             return None  # symbolic, no handler — let substrate fork
 
         chain = _build_chain(handlers, _default_branch)
-        try:
-            chosen = chain(ctx, condition)
-        except Exception as exc:  # noqa: BLE001
-            self._record_handler_error(ctx, BRANCH, exc, role="intercept")
-            chosen = _FORK
+        chosen = chain(ctx, condition)
 
         if chosen is _FORK:
             return None
@@ -1216,9 +1443,11 @@ class InterceptorPolicy:
         elif (isinstance(val, tuple) and len(val) == 2
               and val[0] == VALUE_TAG_PTR):
             int_val = int(val[1])
-        elif isinstance(val, (bytes, bytearray)):
-            for i, b in enumerate(val):
+        elif isinstance(val, _BYTES_TYPES):
+            i = 0
+            for b in val:
                 region.store_byte(addr + i, int(b) & 0xFF)
+                i += 1
             return
         else:
             # Unhandled value shape (z3 expr written through concrete
@@ -1238,12 +1467,7 @@ class InterceptorPolicy:
         for selector, handler in registry.lookup(key):
             if not _selector_matches_payload(selector, event, payload):
                 continue
-            try:
-                handler(ctx, **payload)
-            except Exception as exc:  # noqa: BLE001 — swallow + log
-                self._record_handler_error(ctx, event, exc,
-                                           role=f"observer.{phase}")
-                continue
+            handler(ctx, **payload)
             self._auto_record_event(ctx, event, phase, payload)
 
     def _auto_record_event(self, ctx, event, phase, payload):
@@ -1261,19 +1485,6 @@ class InterceptorPolicy:
         for k, v in payload.items():
             entry[k] = v
         path.events.append(entry)
-
-    def _record_handler_error(self, ctx, event, exc, *, role):
-        path = ctx.path
-        if path is None:
-            return
-        kind = (EventKind.OBSERVER_ERROR if role.startswith("observer")
-                else EventKind.INTERCEPT_ERROR)
-        path.events.append({
-            "kind": kind,
-            "event": event,
-            "role": role,
-            "error": repr(exc),
-        })
 
     def _lookup_name(self, eid):
         """Best-effort resolution of an entity id to a function name.
@@ -1295,7 +1506,7 @@ def _is_concrete(value):
     policy help: ints, bools, None, and ("ptr", N) tuples."""
     if value is None:
         return True
-    if isinstance(value, (int, bool)):
+    if isinstance(value, _INT_TYPES):
         return True
     if isinstance(value, tuple) and len(value) == 2 and \
             value[0] == VALUE_TAG_PTR:
@@ -1320,6 +1531,15 @@ def _selector_matches_payload(selector, event, payload):
         if not selector.matches_name(payload.get("name")):
             return False
         if not selector.matches_eid(payload.get("eid")):
+            return False
+        return True
+    if event == GLOBAL_INITIALIZED:
+        if not selector.matches_name(payload.get("name")):
+            return False
+        if not selector.matches_eid(payload.get("eid")):
+            return False
+        addr = payload.get("addr")
+        if addr is not None and not selector.matches_addr(addr):
             return False
         return True
     # Phase 9: address_for / address_resolved filter on kind= / name= / eid=

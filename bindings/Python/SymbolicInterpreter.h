@@ -78,6 +78,16 @@ struct PythonScheduler : Scheduler<PythonScheduler, SharedPyPtr> {
             std::move(snapshot), std::move(cond), cond_eid, tb, fb,
             std::move(false_val), std::move(true_val)));
   }
+
+  void on_switch(SharedPyPtr selector, RawEntityId sel_eid,
+                 std::vector<SwitchCaseRange> cases,
+                 IRBlock default_block,
+                 ref_t<SymbolicState> snapshot) {
+    outcome.continuations.emplace_back(
+        std::make_unique<SwitchContinuation<SharedPyPtr, PyObjectRC>>(
+            std::move(snapshot), std::move(selector), sel_eid,
+            std::move(cases), default_block));
+  }
 };
 
 // ===========================================================================
@@ -95,13 +105,19 @@ struct PythonScheduler : Scheduler<PythonScheduler, SharedPyPtr> {
 using FunctionAddressResolver =
     std::function<std::optional<uint64_t>(RawEntityId)>;
 
+// Reverse-direction resolver: virtual address → entity id.
+// Called by exec_call to map an indirect callee address back to a
+// known declaration.  Returns kInvalidEntityId on miss.
+using EntityByAddressResolver = std::function<RawEntityId(uint64_t)>;
+
 class PythonPolicy
     : public Policy<PythonPolicy, SharedPyPtr> {
  public:
   PythonPolicy(PyObject *py_policy, ConcreteMemory &memory,
                FunctionResolver func_resolver = {},
                GlobalResolver global_resolver = {},
-               FunctionAddressResolver func_addr_resolver = {});
+               FunctionAddressResolver func_addr_resolver = {},
+               EntityByAddressResolver entity_by_addr_resolver = {});
   ~PythonPolicy();
 
   ConcreteMemory &memory(void) { return memory_; }
@@ -111,6 +127,10 @@ class PythonPolicy
   std::optional<uint64_t> extract_address(const SharedPyPtr &val);
   int64_t extract_int(const SharedPyPtr &val);
   uint64_t extract_uint(const SharedPyPtr &val);
+  // Concreteness-preserving variant: returns nullopt for non-PyLong
+  // values so callers (e.g. decide_switch) can fork on symbolic ints
+  // instead of silently treating them as 0.
+  std::optional<int64_t> try_extract_int_impl(const SharedPyPtr &val);
   SharedPyPtr make_literal_int(int64_t v, uint8_t width = 8);
   SharedPyPtr make_literal_ptr(uint64_t addr);
   SharedPyPtr make_default();
@@ -225,18 +245,36 @@ class PythonPolicy
                     const IRInstruction &call_inst,
                     RawEntityId target_eid,
                     RawEntityId indirect_target_eid,
+                    uint64_t target_addr,
                     const std::vector<SharedPyPtr> &arguments,
                     bool is_indirect,
                     CallResolution<SharedPyPtr> &resolution);
   bool resolve_global(PythonScheduler &sched, RawEntityId entity_id,
                       GlobalResolution &resolution);
 
+  // Reverse-direction resolver: address → entity id.
+  RawEntityId entity_for_address_impl(uint64_t addr) {
+    if (entity_by_addr_resolver_) {
+      RawEntityId result = entity_by_addr_resolver_(addr);
+      if (PyErr_Occurred()) {
+        capture_exception();
+        return kInvalidEntityId;
+      }
+      return result;
+    }
+    return kInvalidEntityId;
+  }
+
   // Phase 9: per-function address invention. Falls back to nullopt
   // (substrate auto-allocates) when no resolver is wired in.
   std::optional<uint64_t> address_for_function_impl(PythonScheduler &,
                                                        RawEntityId eid) {
     if (func_addr_resolver_) {
-      return func_addr_resolver_(eid);
+      auto addr = func_addr_resolver_(eid);
+      if (PyErr_Occurred()) {
+        capture_exception();
+      }
+      return addr;
     }
     return std::nullopt;
   }
@@ -275,12 +313,24 @@ class PythonPolicy
   }
   void on_instruction_impl_inner(const IRInstruction &inst);
 
+  // Fires when a GLOBAL_INITIALIZER / THREAD_LOCAL_INITIALIZER frame
+  // returns. Fans out to the Python policy's `on_global_initialized`
+  // method (delegated to InterceptorPolicy in dispatch.py).
+  template <typename SchedT>
+  void on_global_initialized_impl(SchedT &, const IRFunction &init_func,
+                                  const SharedPyPtr &addr) {
+    on_global_initialized_impl_inner(init_func, addr);
+  }
+  void on_global_initialized_impl_inner(const IRFunction &init_func,
+                                        const SharedPyPtr &addr);
+
  private:
   SharedPyPtr py_policy_;
   ConcreteMemory &memory_;
   FunctionResolver func_resolver_;
   GlobalResolver global_resolver_;
   FunctionAddressResolver func_addr_resolver_;
+  EntityByAddressResolver entity_by_addr_resolver_;
 
   PyObject *cached_make_const_{nullptr};
   PyObject *cached_binary_op_{nullptr};
@@ -299,6 +349,7 @@ class PythonPolicy
   PyObject *cached_symbolic_store_{nullptr};
   PyObject *cached_on_enter_block_{nullptr};
   PyObject *cached_on_instruction_{nullptr};
+  PyObject *cached_on_global_initialized_{nullptr};
 
   // Pending exception state. Captured when a Python hook raises so the
   // interpreter loop can exit cleanly and SymbolicStep can re-raise it.
@@ -319,14 +370,16 @@ PyObject *SymbolicInitState(PyObject *state_obj, PyObject *memory_obj,
                             PyObject *args_list,
                             PyObject *func_resolver_obj,
                             PyObject *global_resolver_obj,
-                            PyObject *func_addr_resolver_obj);
+                            PyObject *func_addr_resolver_obj,
+                            PyObject *entity_by_addr_resolver_obj);
 PyObject *SymbolicInitStateFrame(PyObject *state_obj, PyObject *memory_obj,
                                  PyObject *py_policy, PyObject *func_obj,
                                  PyObject *param_addrs_list,
                                  PyObject *return_addr_obj,
                                  PyObject *func_resolver_obj,
                                  PyObject *global_resolver_obj,
-                                 PyObject *func_addr_resolver_obj);
+                                 PyObject *func_addr_resolver_obj,
+                                 PyObject *entity_by_addr_resolver_obj);
 // Mid-block entry: start at a chosen IRBlock with a caller-supplied seed
 // of live-in values (dict mapping eid -> Python value). Symex driver uses
 // this for under-constrained execution that begins partway through a
@@ -339,12 +392,14 @@ PyObject *SymbolicInitStateAt(PyObject *state_obj, PyObject *memory_obj,
                               PyObject *value_seed_dict,
                               PyObject *func_resolver_obj,
                               PyObject *global_resolver_obj,
-                              PyObject *func_addr_resolver_obj);
+                              PyObject *func_addr_resolver_obj,
+                              PyObject *entity_by_addr_resolver_obj);
 PyObject *SymbolicStep(PyObject *state_obj, PyObject *memory_obj,
                        PyObject *py_policy, uint64_t max_steps,
                        PyObject *func_resolver_obj,
                        PyObject *global_resolver_obj,
-                       PyObject *func_addr_resolver_obj);
+                       PyObject *func_addr_resolver_obj,
+                       PyObject *entity_by_addr_resolver_obj);
 
 // Register the private `_SymbolicState` PyTypeObject into the
 // interpreter submodule. Called once during module init.

@@ -314,6 +314,7 @@ std::optional<FunctionIR> IRGenerator::Generate(
     uint32_t func_scope = PushStructure(
         mx::ir::StructureKind::FUNCTION_SCOPE, EntityIdOf(*body));
     func_.body_scope_index = func_scope;
+    AssociateBlockWithStructure(frame);  // FRAME was created before scope; wire it up now.
     AssociateBlockWithStructure(entry);
 
     // ENTER_SCOPE for the function body.
@@ -374,6 +375,17 @@ std::optional<FunctionIR> IRGenerator::Generate(
 
     // Insert compensation blocks for gotos that cross scope boundaries.
     InsertGotoCompensationBlocks();
+
+    // Safety net: any block still without a parent structure (e.g. a
+    // LABEL block forward-referenced by a goto whose label was never
+    // defined, or any future synthetic block that escapes the per-site
+    // associate calls) gets attached to the function body scope so
+    // `IRBlock::parent_function()` always resolves.
+    for (uint32_t bi = 0; bi < func_.blocks.size(); ++bi) {
+      if (func_.blocks[bi].parent_structure_index == UINT32_MAX) {
+        AssociateBlockWithStructure(bi, func_.body_scope_index);
+      }
+    }
 
     // Patch empty blocks before computing dominators.
     // Empty blocks arise when all paths into a merge/exit block already
@@ -464,6 +476,7 @@ std::optional<FunctionIR> IRGenerator::GenerateGlobalInit(
     uint32_t func_scope = PushStructure(
         mx::ir::StructureKind::FUNCTION_SCOPE, EntityIdOf(var));
     func_.body_scope_index = func_scope;
+    AssociateBlockWithStructure(frame);  // FRAME was created before scope; wire it up now.
     AssociateBlockWithStructure(entry);
 
     // ENTER_SCOPE for the function body.
@@ -503,6 +516,14 @@ std::optional<FunctionIR> IRGenerator::GenerateGlobalInit(
 
     // Pop FUNCTION_SCOPE.
     PopStructure();
+
+    // Safety net: associate any block missing a parent structure with the
+    // function body scope. Mirrors the pass in `Generate()`.
+    for (uint32_t bi = 0; bi < func_.blocks.size(); ++bi) {
+      if (func_.blocks[bi].parent_structure_index == UINT32_MAX) {
+        AssociateBlockWithStructure(bi, func_.body_scope_index);
+      }
+    }
 
     // Patch empty blocks.
     for (uint32_t bi = 0; bi < func_.blocks.size(); ++bi) {
@@ -579,12 +600,17 @@ void IRGenerator::PopStructure() {
 }
 
 void IRGenerator::AssociateBlockWithStructure(uint32_t block_idx) {
-  if (current_structure_index_ == UINT32_MAX) return;
-  func_.blocks[block_idx].parent_structure_index = current_structure_index_;
+  AssociateBlockWithStructure(block_idx, current_structure_index_);
+}
+
+void IRGenerator::AssociateBlockWithStructure(uint32_t block_idx,
+                                               uint32_t struct_idx) {
+  if (struct_idx == UINT32_MAX) return;
+  func_.blocks[block_idx].parent_structure_index = struct_idx;
   StructureIR::ChildRef ref;
   ref.index = block_idx;
   ref.is_structure = false;
-  func_.structures[current_structure_index_].children.push_back(ref);
+  func_.structures[struct_idx].children.push_back(ref);
 }
 
 void IRGenerator::AssociateObjectWithScope(uint32_t obj_idx) {
@@ -631,7 +657,12 @@ uint32_t IRGenerator::NewBlock(mx::ir::BlockKind kind) {
 // The dead block gets an IMPLICIT_UNREACHABLE terminator immediately so that
 // CurrentBlockTerminated() returns true and dead-code skipping works.
 void IRGenerator::SwitchToDeadBlock() {
-  SwitchToBlock(NewBlock(mx::ir::BlockKind::UNREACHABLE));
+  uint32_t dead = NewBlock(mx::ir::BlockKind::UNREACHABLE);
+  // Anchor the dead block to the current scope so its parent_function()
+  // resolves; otherwise downstream consumers walking up the structure
+  // chain hit a nullopt parent.
+  AssociateBlockWithStructure(dead);
+  SwitchToBlock(dead);
   InstructionIR term;
   term.opcode = mx::ir::OpCode::IMPLICIT_UNREACHABLE;
   EmitTopLevel(std::move(term));
@@ -1495,22 +1526,33 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
   }
 
   // If no explicit default, add an implicit default that branches to the
-  // switch exit block. Without this, the interpreter errors when no case
-  // matches (e.g., a switch with gaps in its case values).
+  // switch exit block. The default needs its own block (not exit_block
+  // directly) because IRSwitchCaseStructure::target_block() looks up the
+  // structure's first child block; if we used exit_block, it would belong
+  // to the outer SWITCH structure (line ~1703 below) and the default's
+  // SWITCH_CASE structure would have no children, making target_block()
+  // return {} and the interpreter's `decide_switch` skip past the default
+  // entirely on a non-matching selector.
   if (!has_default) {
-    // Create a structure for the implicit default so serialization succeeds.
+    uint32_t default_block = NewBlock(mx::ir::BlockKind::SWITCH_DEFAULT);
+
     uint32_t impl_struct = PushStructure(
         mx::ir::StructureKind::SWITCH_CASE, EntityIdOf(s));
     auto &sc_struct = func_.structures[impl_struct];
     sc_struct.is_default = true;
+    AssociateBlockWithStructure(default_block);
     PopStructure();
 
     InstructionIR::SwitchCaseIR implicit_default;
     implicit_default.is_default = true;
-    implicit_default.block_index = exit_block;
+    implicit_default.block_index = default_block;
     implicit_default.structure_index = impl_struct;
     term.switch_cases.push_back(implicit_default);
-    AddEdge(current_block_index_, exit_block);
+    AddEdge(current_block_index_, default_block);
+    // The empty default_block falls through to the switch exit; the
+    // post-processing pass at the top of Generate() gives empty blocks
+    // an IMPLICIT_GOTO terminator to their first successor.
+    AddEdge(default_block, exit_block);
   }
 
   uint32_t term_idx = EmitTopLevel(std::move(term));
@@ -1634,6 +1676,7 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
       // Emit the loop condition and back-edge.
       // After the last case in the body, branch to the condition block.
       uint32_t cond_block = NewBlock(mx::ir::BlockKind::LOOP_CONDITION);
+      AssociateBlockWithStructure(cond_block);
       EmitBranch(cond_block);
       SwitchToBlock(cond_block);
 
@@ -1646,6 +1689,7 @@ void IRGenerator::EmitSwitchStmt(const pasta::Stmt &s) {
           ? cases[loop_top_ci].block_index
           : exit_block;
       uint32_t loop_exit = NewBlock(mx::ir::BlockKind::LOOP_EXIT);
+      AssociateBlockWithStructure(loop_exit);
       EmitCondBranch(cond_val, loop_body_block, loop_exit, EntityIdOf(stmt));
       SwitchToBlock(loop_exit);
     } else {
@@ -4595,8 +4639,16 @@ void IRGenerator::InsertGotoCompensationBlocks() {
 
     // Compensation block needed.
 
-    // Create a compensation block.
+    // Create a compensation block. This pass runs *after* all PushStructure
+    // / PopStructure activity, so `current_structure_index_` is no longer
+    // meaningful — anchor the new block explicitly to the common-ancestor
+    // scope (the structure the compensation logically lives at), or to the
+    // function body scope as a fallback. Without a parent, the block has no
+    // path back to its function via `IRBlock::parent_function()`.
     uint32_t comp_block = NewBlock(mx::ir::BlockKind::COMPENSATION);
+    uint32_t comp_parent = (common_ancestor != UINT32_MAX) ? common_ancestor
+                                                            : func_.body_scope_index;
+    AssociateBlockWithStructure(comp_block, comp_parent);
 
     // Redirect the source instruction → comp_block instead of → target.
     auto &goto_inst = func_.instructions[pg.goto_inst_idx];

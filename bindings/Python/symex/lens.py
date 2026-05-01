@@ -18,6 +18,8 @@ Phase 1 shipped read/write byte access. Phase 2 adds:
 import struct as _struct
 
 import multiplier as mx
+from ._types import _BYTES_TYPES, _INT_TYPES
+from ._types import Endian
 
 
 def _coerce_addr(value):
@@ -36,12 +38,17 @@ class MemView:
     only — it never copies the underlying memory.
     """
 
-    def __init__(self, memory):
+    def __init__(self, memory, endian: Endian = Endian.LITTLE):
         self._memory = memory
+        self._byte_order = str(endian)
 
     @property
     def memory(self):
         return self._memory
+
+    @property
+    def byte_order(self) -> str:
+        return self._byte_order
 
     # ---- read primitives ----------------------------------------------
 
@@ -61,7 +68,7 @@ class MemView:
 
     def read_int(self, addr, size, signed=False):
         data = self._memory.read_bytes(addr, size)
-        return int.from_bytes(data, "little", signed=signed)
+        return int.from_bytes(data, self._byte_order, signed=signed)
 
     def read_str(self, addr, max=4096, encoding="utf-8"):
         out = bytearray()
@@ -75,8 +82,8 @@ class MemView:
     # ---- write primitives ---------------------------------------------
 
     def write(self, addr, value, size=None):
-        if isinstance(value, (bytes, bytearray)):
-            self._memory.write_bytes(addr, bytes(value))
+        if isinstance(value, _BYTES_TYPES):
+            self._memory.write_bytes(addr, value)
             return
         if isinstance(value, bool):
             value = int(value)
@@ -84,7 +91,8 @@ class MemView:
             if size is None:
                 raise ValueError("size required when writing an integer")
             self._memory.write_bytes(
-                addr, value.to_bytes(size, "little", signed=(value < 0)))
+                addr, value.to_bytes(size, self._byte_order,
+                                     signed=(value < 0)))
             return
         raise TypeError(
             f"MemView.write does not yet handle values of type {type(value)}")
@@ -103,7 +111,7 @@ class MemView:
                     "constrain them via path.solver.")
         except ImportError:
             pass
-        self._memory.write_bytes(addr, bytes(data))
+        self._memory.write_bytes(addr, data)
 
     # ---- struct lens (Phase 2) ----------------------------------------
 
@@ -130,7 +138,7 @@ class MemView:
                 value = int(value)
             self._memory.write_bytes(
                 addr + offset,
-                int(value).to_bytes(size, "little", signed=signed))
+                int(value).to_bytes(size, self._byte_order, signed=signed))
 
 
 class ArgsView:
@@ -241,6 +249,7 @@ class LocalsView:
         self._index   = index
         self._layout  = layout
         self._memory  = layout.memory
+        self._byte_order = getattr(layout, "byte_order", str(Endian.LITTLE))
         # name → (inst_id, size_bytes, align_bytes, addr)
         self._locals: dict[str, tuple[int, int, int, int]] = {}
         # Symbolic initial values deferred until install_hooks().
@@ -256,11 +265,9 @@ class LocalsView:
         seen_ids: set[int] = set()
         for block in ir_func.blocks:
             for inst in block.all_instructions:
-                # AllocaInst.FROM returns None for non-ALLOCA instructions,
-                # so this doubles as both the isinstance check and the upcast.
-                alloca = mx.ir.AllocaInst.FROM(inst)
-                if alloca is None:
+                if not isinstance(inst, mx.ir.AllocaInst):
                     continue
+                alloca = inst
 
                 inst_id = int(alloca.id)
                 if inst_id in seen_ids:
@@ -305,12 +312,12 @@ class LocalsView:
 
         if _is_z3(value):
             self._symbolic_inits[name] = value
-        elif isinstance(value, (int, bool)):
+        elif isinstance(value, _INT_TYPES):
             val = int(value)
-            data = val.to_bytes(size, "little", signed=(val < 0))
+            data = val.to_bytes(size, self._byte_order, signed=(val < 0))
             self._memory.write_bytes(addr, data)
-        elif isinstance(value, (bytes, bytearray)):
-            self._memory.write_bytes(addr, bytes(value)[:size])
+        elif isinstance(value, _BYTES_TYPES):
+            self._memory.write_bytes(addr, value[:size])
         else:
             raise TypeError(
                 f"value must be int, bytes, or z3 expression, got {type(value)}")
@@ -365,7 +372,7 @@ class LocalsView:
 
         data = path.mem.read_bytes(addr, size)
         if data:
-            return int.from_bytes(data, "little")
+            return int.from_bytes(data, self._byte_order)
         return 0
 
     def write(self, path, name: str, value):
@@ -380,8 +387,9 @@ class LocalsView:
         inst_id, size, align, addr = self._locals[name]
 
         if _is_z3(value):
-            path._symbolic_shadow[(addr, size)] = value
-        elif isinstance(value, (int, bool)):
+            from .dispatch import _shadow_write
+            _shadow_write(path._symbolic_shadow, addr, value, size)
+        elif isinstance(value, _INT_TYPES):
             val = int(value)
             path.mem.write(addr, val, size)
         else:
@@ -419,7 +427,8 @@ class LocalsView:
                     init_str = f"<symbolic: {pending}>"
                 else:
                     data = self._memory.read_bytes(addr, size)
-                    init_str = hex(int.from_bytes(data, "little")) if data else "0x0"
+                    init_str = (hex(int.from_bytes(data, self._byte_order))
+                                if data else "0x0")
                 print(f"  {name:20s}  addr=0x{addr:016x}  "
                       f"size={size}  init={init_str}")
 

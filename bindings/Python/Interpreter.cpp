@@ -536,9 +536,11 @@ static PyObject *py_init_state(PyObject *, PyObject *args) {
     PyObject *global_resolver = (nargs >= 7) ? PyTuple_GetItem(args, 6) : Py_None;
     PyObject *func_addr_resolver =
         (nargs >= 8) ? PyTuple_GetItem(args, 7) : Py_None;
+    PyObject *entity_by_addr_resolver =
+        (nargs >= 9) ? PyTuple_GetItem(args, 8) : Py_None;
     return SymbolicInitState(state_obj, second, py_policy, func_obj,
                              args_list, func_resolver, global_resolver,
-                             func_addr_resolver);
+                             func_addr_resolver, entity_by_addr_resolver);
   }
 
   PyErr_SetString(PyExc_TypeError,
@@ -657,9 +659,11 @@ static PyObject *py_step(PyObject *, PyObject *args) {
     PyObject *global_resolver = (nargs >= 6) ? PyTuple_GetItem(args, 5) : Py_None;
     PyObject *func_addr_resolver =
         (nargs >= 7) ? PyTuple_GetItem(args, 6) : Py_None;
+    PyObject *entity_by_addr_resolver =
+        (nargs >= 8) ? PyTuple_GetItem(args, 7) : Py_None;
     return SymbolicStep(state_obj, second, py_policy, max_steps,
                         func_resolver, global_resolver,
-                        func_addr_resolver);
+                        func_addr_resolver, entity_by_addr_resolver);
   }
 
   PyErr_SetString(PyExc_TypeError,
@@ -770,6 +774,45 @@ static PyObject *py_get_value_at(PyObject *, PyObject *args) {
   return obj;
 }
 
+// Resume a state suspended on a symbolic SWITCH selector by entering
+// the chosen target block. The driver picks one case (or default) per
+// fork and calls this with the cloned snapshot + the IRBlock to enter.
+//
+// Path-condition constraints (selector ∈ [low, high], etc.) are added on
+// the Python side; this entry-point only manipulates the substrate state.
+//
+//   resume_switch_case(state, target_block_obj)
+static PyObject *py_resume_switch_case(PyObject *, PyObject *args) {
+  PyObject *state_obj;
+  PyObject *block_obj;
+  if (!PyArg_ParseTuple(args, "OO", &state_obj, &block_obj)) {
+    return nullptr;
+  }
+  if (Py_TYPE(state_obj) != &InterpreterStateType) {
+    PyErr_SetString(PyExc_TypeError, "Expected InterpreterState");
+    return nullptr;
+  }
+  auto block = from_python<IRBlock>(block_obj);
+  if (!block) {
+    PyErr_SetString(PyExc_TypeError,
+                    "resume_switch_case: second argument must be IRBlock");
+    return nullptr;
+  }
+  auto *sw = reinterpret_cast<InterpreterStateWrapper *>(state_obj);
+  auto *symbolic = sw->symbolic_state
+      ? reinterpret_cast<ir::interpret::PyWrapperFor<SymbolicState> *>(
+            sw->symbolic_state)->data
+      : nullptr;
+  if (!symbolic || symbolic->call_stack.empty()) {
+    PyErr_SetString(PyExc_RuntimeError,
+                    "resume_switch_case: symbolic state has no live call frame");
+    return nullptr;
+  }
+  symbolic->work_stack.push_back(
+      {ir::interpret::WorkKind::ENTER_BLOCK, IRInstruction{}, *block});
+  Py_RETURN_NONE;
+}
+
 static PyObject *py_clone_state(PyObject *, PyObject *args) {
   PyObject *state_obj;
   if (!PyArg_ParseTuple(args, "O", &state_obj)) return nullptr;
@@ -832,6 +875,8 @@ static PyObject *py_init_state_frame(PyObject *, PyObject *args) {
       (nargs >= 8) ? PyTuple_GetItem(args, 7) : Py_None;
   PyObject *func_addr_resolver =
       (nargs >= 9) ? PyTuple_GetItem(args, 8) : Py_None;
+  PyObject *entity_by_addr_resolver =
+      (nargs >= 10) ? PyTuple_GetItem(args, 9) : Py_None;
 
   if (Py_TYPE(memory_obj) != &ConcreteMemoryType) {
     PyErr_SetString(PyExc_TypeError,
@@ -842,7 +887,7 @@ static PyObject *py_init_state_frame(PyObject *, PyObject *args) {
   return SymbolicInitStateFrame(state_obj, memory_obj, py_policy, func_obj,
                                 param_addrs, return_addr,
                                 func_resolver, global_resolver,
-                                func_addr_resolver);
+                                func_addr_resolver, entity_by_addr_resolver);
 }
 
 // init_state_at: mid-block entry for under-constrained symbolic execution.
@@ -878,6 +923,8 @@ static PyObject *py_init_state_at(PyObject *, PyObject *args) {
       (nargs >= 10) ? PyTuple_GetItem(args, 9) : Py_None;
   PyObject *func_addr_resolver =
       (nargs >= 11) ? PyTuple_GetItem(args, 10) : Py_None;
+  PyObject *entity_by_addr_resolver =
+      (nargs >= 12) ? PyTuple_GetItem(args, 11) : Py_None;
 
   if (Py_TYPE(memory_obj) != &ConcreteMemoryType) {
     PyErr_SetString(PyExc_TypeError,
@@ -888,7 +935,7 @@ static PyObject *py_init_state_at(PyObject *, PyObject *args) {
   return SymbolicInitStateAt(state_obj, memory_obj, py_policy, func_obj,
                              block_obj, param_addrs, return_addr,
                              value_seed, func_resolver, global_resolver,
-                             func_addr_resolver);
+                             func_addr_resolver, entity_by_addr_resolver);
 }
 
 // Module methods.
@@ -925,6 +972,11 @@ static PyMethodDef InterpreterMethods[] = {
    "  Symbolic-address sibling of resume_addr: writes an arbitrary "
    "Python value (typically a z3 expression) into the suspended op's "
    "address-operand cache slot."},
+  {"resume_switch_case", py_resume_switch_case, METH_VARARGS,
+   "resume_switch_case(state, target_block)\n"
+   "  Resume a state suspended on a symbolic SWITCH selector by "
+   "entering the chosen target IRBlock. Path-condition constraints are "
+   "the driver's responsibility."},
   {"get_value_at", py_get_value_at, METH_VARARGS,
    "get_value_at(state, eid) -> Python value\n"
    "  Read the cached value at an operand entity-id from the live "

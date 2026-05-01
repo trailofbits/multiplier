@@ -193,8 +193,8 @@ def test_p2_6_intercept_indirect_call_resolution(index):
     fired = []
 
     @engine.intercept.indirect_call
-    def hook(ctx, next_hook):
-        fired.append(True)
+    def hook(ctx, target_addr, next_hook):
+        fired.append(target_addr)
         return 4242  # sentinel return
 
     paths = engine.explore("test_function_calls")
@@ -353,20 +353,16 @@ def test_p2_12_intercept_and_observe_coexist_on_same_event(index):
 
 # --- P2.13 ---------------------------------------------------------------
 
-def test_p2_13_observer_exception_does_not_corrupt_path(index):
+def test_p2_13_observer_exception_propagates(index):
     engine = SymExEngine(index)
 
-    @engine.observe.memory_read
-    def boom(ctx, **payload):
+    @engine.observe.instruction
+    def boom(ctx, inst, **_):
         raise RuntimeError("test bug")
 
-    paths = engine.explore("symbolic_test_add_i32", args=[2, 3])
-    # Path completes normally despite observer raising.
-    assert paths[0].return_value == 5
-    errors = [e for e in paths[0].events if e.get("kind") ==
-              "observer_error"]
-    assert errors, "observer_error not recorded on path.events"
-    assert "test bug" in errors[0]["error"]
+    import pytest
+    with pytest.raises(RuntimeError, match="test bug"):
+        engine.explore("symbolic_test_add_i32", args=[2, 3])
 
 
 # --- P2.14 ---------------------------------------------------------------

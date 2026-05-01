@@ -371,9 +371,9 @@ gap::generator<RegexQueryMatch> RegexQueryResultImpl::Enumerate(void) & {
 
     if (auto result = GetNextMatchInFragment()) {
       co_yield *result;
+    } else {
+      ++index;
     }
-
-    ++index;
   }
 }
 

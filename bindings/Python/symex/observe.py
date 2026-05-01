@@ -11,10 +11,8 @@ an observer runs, the chosen value is known, so most analysts want to
 see the resolved decision. Use `engine.observe.before.<event>` for the
 narrower pre-dispatch window.
 
-Observer dispatch is "fire all in registration order". An exception in
-one observer does NOT propagate; the dispatcher records it as an
-`observer_error` entry on `path.events` and continues with the next
-observer (and the rest of execution).
+Observer dispatch is "fire all in registration order". Exceptions
+propagate immediately — a buggy observer aborts the step.
 """
 
 from .dispatch import make_selector

@@ -81,6 +81,17 @@ struct Scheduler {
                      std::move(false_val), std::move(true_val),
                      std::forward<decltype(state)>(state));
   }
+
+  // Symbolic SWITCH: scheduler emits one continuation describing every
+  // case + default. The driver realizes them as forked paths.
+  void on_switch(ValueT selector, RawEntityId sel_eid,
+                 std::vector<SwitchCaseRange> cases,
+                 IRBlock default_block,
+                 auto &&state) {
+    self().on_switch(std::move(selector), sel_eid, std::move(cases),
+                     default_block,
+                     std::forward<decltype(state)>(state));
+  }
 };
 
 // Concrete execution: no forking, no error collection.
@@ -115,6 +126,16 @@ struct NoOpScheduler : Scheduler<NoOpScheduler, Value> {
             true_block, false_block,
             std::move(false_val), std::move(true_val)));
   }
+
+  void on_switch(Value selector, RawEntityId sel_eid,
+                 std::vector<SwitchCaseRange> cases,
+                 IRBlock default_block,
+                 ref_t<InterpreterState<Value>> state) {
+    outcome.continuations.emplace_back(
+        std::make_unique<SwitchContinuation<Value>>(
+            std::move(state), std::move(selector), sel_eid,
+            std::move(cases), default_block));
+  }
 };
 
 // ===========================================================================
@@ -146,6 +167,18 @@ struct Policy {
   }
 
   int64_t extract_int(const ValueT &val) {
+    return self().extract_int(val);
+  }
+
+  // Concreteness-preserving variant of extract_int: returns nullopt for
+  // values the policy cannot represent as a concrete int (e.g. symbolic
+  // z3 BitVecs in PythonPolicy). Used by `decide_switch` to fork on
+  // symbolic selectors instead of silently picking case-zero.
+  std::optional<int64_t> try_extract_int(const ValueT &val) {
+    return self().try_extract_int_impl(val);
+  }
+  // Default: defer to extract_int — concrete policies always produce an int.
+  std::optional<int64_t> try_extract_int_impl(const ValueT &val) {
     return self().extract_int(val);
   }
 
@@ -361,12 +394,13 @@ struct Policy {
                     const IRInstruction &call_inst,
                     RawEntityId target_eid,
                     RawEntityId indirect_target_eid,
+                    uint64_t target_addr,
                     const std::vector<ValueT> &arguments,
                     bool is_indirect,
                     CallResolution<ValueT> &resolution) {
     return self().resolve_call(
         sched, call_inst, target_eid, indirect_target_eid,
-        arguments, is_indirect, resolution);
+        target_addr, arguments, is_indirect, resolution);
   }
 
   bool resolve_global(auto &sched, RawEntityId entity_id,
@@ -392,6 +426,16 @@ struct Policy {
     return std::nullopt;
   }
 
+  // Reverse-direction resolver: given a virtual address previously assigned
+  // to some entity (function, global), return the entity's RawEntityId.
+  // Used by exec_call to map an indirect callee address back to a known
+  // declaration without reading synthetic data from the interpreter's
+  // flat address space.  Default returns kInvalidEntityId (no mapping).
+  RawEntityId entity_for_address(uint64_t addr) {
+    return self().entity_for_address_impl(addr);
+  }
+  RawEntityId entity_for_address_impl(uint64_t) { return kInvalidEntityId; }
+
   // Phase 9: marks the next `with_address` suspension (when emitted from
   // an indirect-call callee load) as a call-target suspension. Policies
   // that care override `_impl`; the default is a no-op so concrete
@@ -411,6 +455,20 @@ struct Policy {
   }
   template <typename StateT, typename SchedT>
   void on_instruction_impl(StateT &, SchedT &, const IRInstruction &) {}
+
+  // Fires when a GLOBAL_INITIALIZER / THREAD_LOCAL_INITIALIZER frame
+  // returns — i.e. after the global's IR initializer has finished
+  // executing. `init_func` is the initializer IRFunction; its
+  // source_declaration is the VarDecl. `addr` is the global's
+  // virtual address (ValueT — concrete pointer).
+  template <typename SchedT>
+  void on_global_initialized(SchedT &sched, const IRFunction &init_func,
+                             const ValueT &addr) {
+    self().on_global_initialized_impl(sched, init_func, addr);
+  }
+  template <typename SchedT>
+  void on_global_initialized_impl(SchedT &, const IRFunction &,
+                                  const ValueT &) {}
 
   // Abort-request gate. PythonPolicy sets this when a Python hook raises
   // an exception so the loop can exit cleanly after the current item.
