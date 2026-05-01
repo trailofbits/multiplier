@@ -360,6 +360,13 @@ class IRGenerator {
   void ComputeDominators();
   void ComputeRPO();
   void VerifyBlocks();
+  // Semantic-level checks: catches malformed instructions that would
+  // pass VerifyBlocks (well-formed CFG, valid operand indices) but are
+  // semantically nonsense — e.g. a LOAD whose address operand is the
+  // entry IMPLICIT_GOTO, or a value-producing instruction whose operand
+  // points at a terminator/scope marker. Emits LOG(ERROR) per finding;
+  // does not throw — the partial IR is kept for downstream investigation.
+  void VerifyIR();
   void ComputeFrameLayout();
 };
 
