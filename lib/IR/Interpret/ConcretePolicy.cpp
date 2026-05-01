@@ -40,37 +40,102 @@ bool concrete_has_address(const Value &val) {
   return val.u64 != 0;
 }
 
-void concrete_write_to_mem(ConcreteMemory &memory_, uint64_t address,
-                           const Value &val, size_t size, bool is_float) {
+// Endian-explicit byte composition / decomposition.  Both helpers
+// operate on `Value::u64` directly so they are independent of the
+// host's byte order and never alias the anonymous-struct fields.
+//
+// Sign extension for integer reads is done via integer arithmetic on
+// `u64`, again so the result is host-agnostic.
+
+namespace {
+
+inline uint64_t narrow_float_bits(const Value &val, size_t size) {
   uint64_t bits = val.u64;
-  // If storing a float to a 4-byte slot and the value holds f64 bits
-  // (high 32 non-zero), narrow f64 → f32.
-  if (is_float && size <= 4 && (bits >> 32) != 0) {
+  if (size <= 4 && (bits >> 32) != 0) {
     float f = static_cast<float>(val.f64);
     uint32_t fbits;
     std::memcpy(&fbits, &f, sizeof(fbits));
     bits = fbits;
   }
-  memory_.write(address, &bits,
-                static_cast<uint32_t>(std::min(size, sizeof(bits))));
+  return bits;
 }
 
-Value concrete_read_from_mem(ConcreteMemory &memory_, uint64_t address,
-                             size_t size, bool is_float) {
+inline Value sign_extend_int_value(uint64_t bits, size_t size) {
   Value result;
-  result.u64 = 0;
-  memory_.read(address, &result.u64,
-               static_cast<uint32_t>(std::min(size, sizeof(result.u64))));
-  if (!is_float) {
-    // Sign-extend integer reads.
-    switch (size) {
-      case 1: result.i64 = static_cast<int64_t>(result.i8.val); break;
-      case 2: result.i64 = static_cast<int64_t>(result.i16.val); break;
-      case 4: result.i64 = static_cast<int64_t>(result.i32.val); break;
-      default: break;
-    }
+  result.u64 = bits;
+  switch (size) {
+    case 1:
+      result.i64 = static_cast<int64_t>(static_cast<int8_t>(bits & 0xff));
+      break;
+    case 2:
+      result.i64 = static_cast<int64_t>(static_cast<int16_t>(bits & 0xffff));
+      break;
+    case 4:
+      result.i64 = static_cast<int64_t>(
+          static_cast<int32_t>(bits & 0xffffffff));
+      break;
+    default:
+      break;
   }
   return result;
+}
+
+}  // namespace
+
+void concrete_write_to_mem_le(ConcreteMemory &memory_, uint64_t address,
+                              const Value &val, size_t size, bool is_float) {
+  uint64_t bits = is_float ? narrow_float_bits(val, size) : val.u64;
+  uint8_t buf[8];
+  size_t n = std::min(size, sizeof(buf));
+  for (size_t i = 0; i < n; ++i) {
+    buf[i] = static_cast<uint8_t>((bits >> (i * 8)) & 0xff);
+  }
+  memory_.write(address, buf, static_cast<uint32_t>(n));
+}
+
+void concrete_write_to_mem_be(ConcreteMemory &memory_, uint64_t address,
+                              const Value &val, size_t size, bool is_float) {
+  uint64_t bits = is_float ? narrow_float_bits(val, size) : val.u64;
+  uint8_t buf[8];
+  size_t n = std::min(size, sizeof(buf));
+  for (size_t i = 0; i < n; ++i) {
+    buf[n - 1 - i] = static_cast<uint8_t>((bits >> (i * 8)) & 0xff);
+  }
+  memory_.write(address, buf, static_cast<uint32_t>(n));
+}
+
+Value concrete_read_from_mem_le(ConcreteMemory &memory_, uint64_t address,
+                                size_t size, bool is_float) {
+  uint8_t buf[8] = {0};
+  size_t n = std::min(size, sizeof(buf));
+  memory_.read(address, buf, static_cast<uint32_t>(n));
+  uint64_t bits = 0;
+  for (size_t i = 0; i < n; ++i) {
+    bits |= static_cast<uint64_t>(buf[i]) << (i * 8);
+  }
+  if (is_float) {
+    Value result;
+    result.u64 = bits;
+    return result;
+  }
+  return sign_extend_int_value(bits, size);
+}
+
+Value concrete_read_from_mem_be(ConcreteMemory &memory_, uint64_t address,
+                                size_t size, bool is_float) {
+  uint8_t buf[8] = {0};
+  size_t n = std::min(size, sizeof(buf));
+  memory_.read(address, buf, static_cast<uint32_t>(n));
+  uint64_t bits = 0;
+  for (size_t i = 0; i < n; ++i) {
+    bits |= static_cast<uint64_t>(buf[n - 1 - i]) << (i * 8);
+  }
+  if (is_float) {
+    Value result;
+    result.u64 = bits;
+    return result;
+  }
+  return sign_extend_int_value(bits, size);
 }
 
 // ===========================================================================

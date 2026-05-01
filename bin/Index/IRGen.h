@@ -249,6 +249,11 @@ class IRGenerator {
                          mx::RawEntityId source_eid = mx::kInvalidEntityId);
   void PopStructure();
   void AssociateBlockWithStructure(uint32_t block_idx);
+  // Explicit-target overload: used by post-emission passes (e.g. goto
+  // compensation) where `current_structure_index_` is no longer
+  // meaningful but the synthetic block still needs a parent so
+  // `IRBlock::parent_function()` resolves.
+  void AssociateBlockWithStructure(uint32_t block_idx, uint32_t struct_idx);
   void AssociateObjectWithScope(uint32_t obj_idx);
 
   // Emit EXIT_SCOPE for all enclosing scopes up to (but not including)

@@ -112,6 +112,7 @@ class RegionTable:
         # `_bases[i]` is `_regions[i].base`; kept parallel for bisect.
         self._regions: list[Region] = []
         self._bases: list[int] = []
+        self._by_name: dict[str, Region] = {}
 
     def add(self, region: Region) -> None:
         """Insert `region`. Raises `ValueError` if it would overlap
@@ -133,20 +134,20 @@ class RegionTable:
                     f"size={region.size}) overlaps {prev.name!r}")
         self._regions.insert(idx, region)
         self._bases.insert(idx, region.base)
+        self._by_name[region.name] = region
 
     def remove(self, name: str) -> None:
-        for i, r in enumerate(self._regions):
-            if r.name == name:
-                del self._regions[i]
-                del self._bases[i]
-                return
-        raise KeyError(name)
+        region = self._by_name.pop(name, None)
+        if region is None:
+            raise KeyError(name)
+        idx = bisect.bisect_left(self._bases, region.base)
+        while idx < len(self._regions) and self._regions[idx] is not region:
+            idx += 1
+        del self._regions[idx]
+        del self._bases[idx]
 
     def get(self, name: str) -> Optional[Region]:
-        for r in self._regions:
-            if r.name == name:
-                return r
-        return None
+        return self._by_name.get(name)
 
     def __iter__(self):
         return iter(self._regions)

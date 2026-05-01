@@ -104,8 +104,13 @@ class MX_EXPORT ConcretePolicy
       result = make_undef();
       return true;
     }
-    result = concrete_read_from_mem(memory_, addr.u64,
-                                    hint.size_bytes, hint.is_float);
+    if (IsBigEndian(hint.sub_op)) {
+      result = concrete_read_from_mem_be(memory_, addr.u64,
+                                          hint.size_bytes, hint.is_float);
+    } else {
+      result = concrete_read_from_mem_le(memory_, addr.u64,
+                                          hint.size_bytes, hint.is_float);
+    }
     return true;
   }
 
@@ -113,8 +118,13 @@ class MX_EXPORT ConcretePolicy
   bool mem_write(Sched &, const Value &addr, const Value &val,
                  const MemAccessHint &hint) {
     if (addr.u64 == 0) return true;
-    concrete_write_to_mem(memory_, addr.u64, val,
-                          hint.size_bytes, hint.is_float);
+    if (IsBigEndian(hint.sub_op)) {
+      concrete_write_to_mem_be(memory_, addr.u64, val,
+                                hint.size_bytes, hint.is_float);
+    } else {
+      concrete_write_to_mem_le(memory_, addr.u64, val,
+                                hint.size_bytes, hint.is_float);
+    }
     return true;
   }
 
@@ -150,6 +160,7 @@ class MX_EXPORT ConcretePolicy
   bool resolve_call(Sched &, const IRInstruction &,
                     RawEntityId target_eid,
                     RawEntityId indirect_target_eid,
+                    uint64_t /*target_addr*/,
                     const std::vector<Value> &,
                     bool, CallResolution<Value> &resolution) {
     if (func_resolver_) {

@@ -17,7 +17,7 @@ the chain. To short-circuit with the substrate's natural default
 `ctx.stop_path()` and then return `ctx.default()` (or any value).
 """
 
-from .events import Terminal
+from .events import Terminal, StopNow
 
 
 class Ctx:
@@ -56,3 +56,19 @@ class Ctx:
         """
         if self.path is not None:
             self.path.terminal = Terminal.STOPPED
+
+    def stop_now(self, terminal=Terminal.STOPPED):
+        """Halt the current interpreter slice immediately.
+
+        Sets `path.terminal` to `terminal` and raises `StopNow`, which
+        the C++ interpreter catches to clear the work stack.  The engine
+        driver intercepts `StopNow` after `_interp.step()` returns and
+        treats the path as stopped — no further slices are taken.
+
+        Works from any hook type (intercept or observe).  Unlike
+        `stop_path()`, execution does not continue to the end of the
+        current slice.
+        """
+        if self.path is not None:
+            self.path.terminal = terminal
+        raise StopNow()

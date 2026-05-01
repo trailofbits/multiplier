@@ -19,6 +19,7 @@ stream.
 import multiplier as mx
 
 from .dispatch import _z3_module
+from ._types import _BYTES_TYPES, _INT_TYPES, _SEQ_TYPES, Endian
 from .events import (
     EventLog, BRANCH, BLOCK_ENTER, MEMORY_READ, MEMORY_WRITE,
     BranchDirection, Terminal,
@@ -26,6 +27,10 @@ from .events import (
 )
 
 _interp = mx.ir.interpret
+
+# 256-entry table of single-byte byte strings — avoids any
+# allocation when writing one concrete byte at a time.
+_BYTE_TABLE = tuple(bytes([i]) for i in range(256))
 
 
 _id_counter = [0]
@@ -137,10 +142,12 @@ class _PathSolver:
 
 
 class Path:
-    def __init__(self, state, mem, *, parent_id=None):
+    def __init__(self, state, mem, *, parent_id=None,
+                 endian: Endian = Endian.LITTLE):
         self.id = _next_id()
         self._state = state
         self._mem = mem
+        self._byte_order = str(endian)
         self._parent_id = parent_id
         self.events = EventLog()
         self.tags = set()
@@ -194,6 +201,12 @@ class Path:
         # record dict. Populated by solver.fresh_int and any engine hook
         # that mints a named symbolic value (e.g. address_for).
         self._origin_by_name: dict = {}
+        # Phase 15: analyst variable bags.
+        # `vars`   — copied on fork; each path gets its own dict.
+        # `shared` — same dict object across all forks; mutations are
+        #            visible to every path that shares the reference.
+        self.vars: dict = {}
+        self.shared: dict = {}
 
     @property
     def state(self):
@@ -207,9 +220,14 @@ class Path:
     def steps(self):
         return self._state.steps
 
+    @property
+    def byte_order(self) -> str:
+        return self._byte_order
+
     def clone(self):
         cloned_state = _interp.clone_state(self._state)
         new_path = Path(cloned_state, self._mem, parent_id=self.id)
+        new_path._byte_order = self._byte_order
         new_path.events = EventLog(self.events)
         new_path.tags = set(self.tags)
         new_path.path_condition = list(self.path_condition)
@@ -225,6 +243,8 @@ class Path:
         new_path._tls_shadow = dict(self._tls_shadow)
         new_path._origin_by_name = dict(self._origin_by_name)
         new_path.findings = FindingsList(self.findings)
+        new_path.vars = dict(self.vars)
+        new_path.shared = self.shared
         return new_path
 
     def snapshot(self):
@@ -258,6 +278,9 @@ class Path:
             tls_shadow=dict(self._tls_shadow),
             # Phase 10
             origin_by_name=dict(self._origin_by_name),
+            # Phase 15
+            vars=dict(self.vars),
+            shared=dict(self.shared),
         )
 
     def restore(self, snap):
@@ -290,6 +313,9 @@ class Path:
         # Phase 10
         self._origin_by_name.clear()
         self._origin_by_name.update(snap.origin_by_name)
+        # Phase 15
+        self.vars = dict(snap.vars)
+        self.shared = dict(snap.shared)
 
     def replay(self, *, modify, engine, slice_steps=1024,
                concretize=None, until=None):
@@ -467,23 +493,96 @@ class Path:
         """Return True if any `fresh_int` variable contributes to `expr`."""
         return bool(self.taint_sources(expr))
 
-    def write_symbolic(self, addr: int, value, size: int = None) -> None:
+    def _resolve_endian(self, endian, byte_order) -> Endian:
+        """Pick the effective byte order for a write call.
+
+        Accepts both ``endian=`` and ``byte_order=`` for ergonomic flexibility
+        (the rest of the codebase mixes the two names — ``Layout(endian=...)``
+        and ``Path.byte_order`` for the property). Falls back to the path's
+        own byte order when neither is given.
+        """
+        if endian is not None and byte_order is not None:
+            raise TypeError(
+                "pass either endian= or byte_order=, not both")
+        choice = endian if endian is not None else byte_order
+        return choice if choice is not None else self._byte_order
+
+    def write_symbolic(self, addr: int, value, size: int = None,
+                       *, endian: Endian = None,
+                       byte_order: Endian = None) -> None:
         """Write a z3 expression into the symbolic shadow at ``addr``.
 
         ``size`` defaults to ``value.size() // 8`` (the BitVec's byte width).
-        The sentinel is stamped into concrete memory so subsequent reads
-        detect the symbolic value without probing the shadow dict on every
-        access.  Raises ``TypeError`` if ``value`` is not a z3 expression.
+        ``endian`` (or its alias ``byte_order``) defaults to the path's byte
+        order (``path.byte_order``); pass ``Endian.BIG`` or ``Endian.LITTLE``
+        to override per-call.
+        Raises ``TypeError`` if ``value`` is not a z3 expression.
         """
-        from .dispatch import _shadow_write, _is_z3
+        from .dispatch import _shadow_write, _is_z3, _z3_byte_at
         if not _is_z3(value):
             raise TypeError(
                 f"write_symbolic: value must be a z3 expression, "
                 f"got {type(value).__name__}")
         if size is None:
             size = value.size() // 8
-        _shadow_write(self._symbolic_shadow, addr, value, size,
-                      mem=self._mem)
+        bo = self._resolve_endian(endian, byte_order)
+        if bo == Endian.BIG:
+            # Byte at addr is the MSB; LSB lands at addr + size - 1.
+            for i in range(size):
+                self._symbolic_shadow[addr + i] = _z3_byte_at(value, size - 1 - i)
+        else:
+            _shadow_write(self._symbolic_shadow, addr, value, size)
+
+    def write_memory(self, addr: int, value, size: int = None,
+                     *, endian: Endian = None,
+                     byte_order: Endian = None) -> None:
+        """Write ``value`` to ``addr``, handling symbolic and concrete cases.
+
+        - z3 expression  → symbolic shadow
+        - int / bool     → concrete memory; ``size`` is required
+        - bytes/bytearray → concrete memory; ``size`` is ignored
+
+        ``endian`` (or its alias ``byte_order``) defaults to the path's byte
+        order (``path.byte_order``); pass ``Endian.BIG`` or ``Endian.LITTLE``
+        to override for this write only. For ``bytes`` input the byte order
+        is moot — bytes are written as-is.
+        """
+        from .dispatch import _shadow_write, _is_z3, _z3_byte_at
+        bo = self._resolve_endian(endian, byte_order)
+        if _is_z3(value):
+            if size is None:
+                size = value.size() // 8
+            if bo == Endian.BIG:
+                for i in range(size):
+                    self._symbolic_shadow[addr + i] = _z3_byte_at(value, size - 1 - i)
+            else:
+                _shadow_write(self._symbolic_shadow, addr, value, size)
+        elif isinstance(value, _BYTES_TYPES):
+            self._mem.write_bytes(addr, value)
+        elif isinstance(value, _SEQ_TYPES):
+            i = 0
+            for elem in value:
+                if _is_z3(elem):
+                    _shadow_write(self._symbolic_shadow, addr + i, elem, 1)
+                elif isinstance(elem, _INT_TYPES):
+                    self._mem.write_bytes(addr + i, _BYTE_TABLE[int(elem) & 0xFF])
+                else:
+                    raise TypeError(
+                        f"write_memory: element {i} has unsupported type "
+                        f"{type(elem).__name__}; expected int or z3 expression")
+                i += 1
+        elif isinstance(value, _INT_TYPES):
+            if size is None:
+                raise ValueError(
+                    "write_memory: size is required when writing an integer")
+            val = int(value)
+            self._mem.write_bytes(addr,
+                                  val.to_bytes(size, str(bo),
+                                               signed=(val < 0)))
+        else:
+            raise TypeError(
+                f"write_memory: unsupported value type {type(value).__name__}; "
+                f"expected z3 expression, int, or bytes")
 
     def summary(self):
         """Single human-readable summary of what happened on this path.
@@ -613,13 +712,16 @@ class _Snapshot:
                  # Phase 9
                  "tls_base", "tls_shadow",
                  # Phase 10
-                 "origin_by_name")
+                 "origin_by_name",
+                 # Phase 15
+                 "vars", "shared")
 
     def __init__(self, *, state, events, tags, path_condition, terminal,
                  return_value, error_kind, loop_iters, func_name,
                  fresh_vars, symbolic_shadow,
                  findings, region_at_suspension, lazy_regions_used,
-                 entry_func, tls_base, tls_shadow, origin_by_name):
+                 entry_func, tls_base, tls_shadow, origin_by_name,
+                 vars, shared):
         self.state = state
         self.events = events
         self.tags = tags
@@ -638,3 +740,5 @@ class _Snapshot:
         self.tls_base = tls_base
         self.tls_shadow = tls_shadow
         self.origin_by_name = origin_by_name
+        self.vars = vars
+        self.shared = shared

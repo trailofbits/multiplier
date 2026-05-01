@@ -6,10 +6,12 @@
 #include <multiplier/IR/Instruction.h>
 #include <multiplier/IR/InstructionKinds.h>
 #include <multiplier/IR/Block.h>
+#include <multiplier/IR/StructureKinds.h>
 #include <multiplier/IR/OpCode.h>
 #include <multiplier/AST/NamedDecl.h>
 #include <multiplier/AST/VarDecl.h>
 #include <multiplier/AST/FunctionDecl.h>
+#include <multiplier/AST/FieldDecl.h>
 #include <multiplier/AST/Decl.h>
 #include <sstream>
 
@@ -267,6 +269,8 @@ void IRInstruction::format(std::ostream &os) const {
     os << "/" << ir::EnumeratorName(bi->sub_opcode());
   } else if (auto fi = FloatOpInst::from(*this)) {
     os << "/" << ir::EnumeratorName(fi->sub_opcode());
+  } else if (auto rmw = ReadModifyWriteInst::from(*this)) {
+    os << "/" << ir::EnumeratorName(rmw->underlying_op());
   }
 
   // Named entity annotations.
@@ -287,6 +291,24 @@ void IRInstruction::format(std::ostream &os) const {
   } else if (auto fp = FuncPtrInst::from(*this)) {
     if (auto fd = fp->function()) {
       os << " @" << fd->name();
+    }
+  } else if (auto gep = GEPFieldInst::from(*this)) {
+    os << " ." << gep->field().name() << "+" << gep->byte_offset();
+  } else if (auto bi = BranchInst::from(*this)) {
+    os << " -> %" << bi->target_block().id().Pack();
+  } else if (auto cb = CondBranchInst::from(*this)) {
+    os << " -> %" << cb->true_block().id().Pack()
+       << " / %" << cb->false_block().id().Pack();
+  } else if (auto sw = SwitchInst::from(*this)) {
+    for (auto c : sw->cases()) {
+      if (c.is_default()) {
+        os << " [default -> %" << c.target_block().id().Pack() << "]";
+      } else if (c.is_range()) {
+        os << " [" << c.low() << ".." << c.high()
+           << " -> %" << c.target_block().id().Pack() << "]";
+      } else {
+        os << " [" << c.low() << " -> %" << c.target_block().id().Pack() << "]";
+      }
     }
   }
 

@@ -15,7 +15,7 @@ from .layout import Layout
 from .lens import MemView, ArgsView, LocalsView
 from .ctx import Ctx
 from .path import Path
-from .events import EventLog
+from .events import EventLog, StopNow
 from .until import ExploreUntil
 from .engine import SymExEngine, PathSet
 from .dispatch import InterceptorPolicy, SymExpr
@@ -39,6 +39,7 @@ __all__ = [
     "Ctx",
     "Path",
     "EventLog",
+    "StopNow",
     "PathSet",
     "ExploreUntil",
     "SymExEngine",

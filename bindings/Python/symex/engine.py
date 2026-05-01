@@ -26,16 +26,19 @@ import multiplier as mx
 from .layout import Layout
 from .lens import MemView, ArgsView
 from .path import Path, FindingsList
+from ._types import Endian
 from .events import (
-    EventLog, EventKind, BRANCH, BranchDirection, Terminal,
+    EventLog, EventKind, BRANCH, BranchDirection, Terminal, StopNow,
     StepResultKind, Strategy, _FilterableList,
     ADDRESS_FOR, ADDRESS_RESOLVED, INDIRECT_CALL_RESOLVED,
+    SWITCH_CASE, SWITCH_DEFAULT,
 )
 from .until import ExploreUntil
 from .dispatch import (
     InterceptorPolicy, _Registry, SymExpr, _is_z3, _z3_bool, _z3_module,
     make_selector,
 )
+from ._types import _SEQ_TYPES
 from .intercept import InterceptDispatcher
 from .observe import ObserveDispatcher
 from .concretize import (
@@ -60,7 +63,7 @@ class _ExploreState:
 def _resolve_function(index, name):
     for fd in mx.ast.FunctionDecl.IN(index):
         if str(fd.name) == name:
-            ir = mx.ir.IRFunction.FROM(fd)
+            ir = _ir_for_decl(fd)
             if ir is not None:
                 return ir
     return None
@@ -75,6 +78,17 @@ def _func_decl_for(entity):
         if isinstance(decl, mx.ast.FunctionDecl):
             return decl
     return None
+
+
+def _ir_for_decl(decl):
+    """Return the IRFunction for `decl`, falling back to the canonical decl."""
+    ir = mx.ir.IRFunction.FROM(decl)
+    if ir is not None:
+        return ir
+    canonical = decl.canonical_declaration
+    if canonical is not None and canonical is not decl:
+        ir = mx.ir.IRFunction.FROM(canonical)
+    return ir
 
 
 def _var_decl_for(entity):
@@ -93,7 +107,7 @@ def _make_func_resolver(index):
         fd = _func_decl_for(index.entity(eid))
         if fd is None:
             return None
-        return mx.ir.IRFunction.FROM(fd)
+        return _ir_for_decl(fd)
     return resolve
 
 
@@ -143,7 +157,7 @@ def _make_global_resolver(index):
         align = align_bits // 8 if align_bits is not None else 8
         if align == 0:
             align = 8
-        initializer = mx.ir.IRFunction.FROM(vd)
+        initializer = _ir_for_decl(vd)
         return (vd.id, size, align, initializer)
     return resolve
 
@@ -152,26 +166,44 @@ def _make_global_resolver_with_hints(index, engine):
     """Like `_make_global_resolver` but returns 5-tuples with an optional
     address hint consulted before the substrate auto-allocates."""
     def resolve(eid):
-        vd = _var_decl_for(index.entity(eid))
-        if vd is None:
-            return None
-        ty = vd.type
-        bits = ty.size_in_bits
-        size = (bits + 7) // 8 if bits is not None else 0
-        align_bits = ty.alignment
-        align = align_bits // 8 if align_bits is not None else 8
-        if align == 0:
-            align = 8
-        initializer = mx.ir.IRFunction.FROM(vd)
-        canonical_eid = int(vd.id)
-        is_tls = _detect_tls(vd)
-        kind = "thread_local" if is_tls else "global"
         try:
-            name = str(vd.name) if vd.name else None
+            entity = index.entity(eid)
         except Exception:
+            entity = None
+        vd = _var_decl_for(entity)
+        if vd is not None:
+            ty = vd.type
+            bits = ty.size_in_bits
+            size = (bits + 7) // 8 if bits is not None else 0
+            align_bits = ty.alignment
+            align = align_bits // 8 if align_bits is not None else 8
+            if align == 0:
+                align = 8
+            initializer = _ir_for_decl(vd)
+            canonical_eid = int(vd.id)
+            is_tls = _detect_tls(vd)
+            kind = "thread_local" if is_tls else "global"
+            try:
+                name = str(vd.name) if vd.name else None
+            except Exception:
+                name = None
+        else:
+            # Entity didn't resolve to a VarDecl (may be a non-AST entity,
+            # unindexed, or truly anonymous). Still give the interceptor a
+            # chance to supply an address so that handlers registered with
+            # `intercept.address_for(kind="global")` without a name filter
+            # can map the entire global address space.
+            canonical_eid = int(eid)
+            size = 0
+            align = 8
+            initializer = None
+            kind = "global"
             name = None
         addr_hint = engine._resolve_address_for(
             canonical_eid, name, kind, size, align)
+
+        if vd is None and addr_hint is None:
+            return None
         return (canonical_eid, size, align, initializer, addr_hint)
     return resolve
 
@@ -295,7 +327,11 @@ def _path_match_one(path, key, target):
 class SymExEngine:
     def __init__(self, index):
         self._index = index
-        self.layout = None
+        # Target endianness used by every Python-side `to_bytes` /
+        # `from_bytes` helper. Defaults to little; set explicitly for
+        # big-endian targets BEFORE creating paths or placing globals.
+        self.endian: Endian = Endian.LITTLE
+        self._layout = None
         self._func_resolver = _make_func_resolver(index)
         # Phase 9: upgraded to 5-tuple with address hint.
         self._global_resolver = _make_global_resolver_with_hints(index, self)
@@ -332,6 +368,11 @@ class SymExEngine:
         # explore call so repeated references to the same entity reuse
         # the same address (memoized globally, not per-path).
         self._address_for_cache: dict[int, int] = {}
+        # Reverse map: virtual address → entity id. Kept in sync with
+        # _address_for_cache so exec_call can resolve indirect callee
+        # addresses back to declarations without reading synthetic data
+        # from the interpreter's flat memory.
+        self._addr_to_eid_cache: dict[int, int] = {}
         # Phase 9: value-origin side-table. Mint sites (address_for,
         # indirect_call, fresh_int) populate this for Phase 10 lineage.
         self.value_origins: dict[int, dict] = {}
@@ -342,6 +383,18 @@ class SymExEngine:
         self._current_path = None
         # Phase 9: func_addr_resolver closure passed to the substrate.
         self._func_addr_resolver = self._make_func_addr_resolver()
+        # Reverse resolver: virtual address → entity id.
+        self._entity_by_addr_resolver = self._make_entity_by_addr_resolver()
+
+    @property
+    def layout(self):
+        return self._layout
+
+    @layout.setter
+    def layout(self, value):
+        if value is not None:
+            value.byte_order = str(self.endian)
+        self._layout = value
 
     def _get_cfg(self, ir_func):
         """Return the cached CFGInfo for `ir_func`, computing it on
@@ -371,6 +424,11 @@ class SymExEngine:
     # Phase 9: address resolution machinery
     # ------------------------------------------------------------------
 
+    def _cache_address(self, eid: int, addr: int):
+        """Record eid↔addr in both the forward and reverse caches."""
+        self._address_for_cache[eid] = addr
+        self._addr_to_eid_cache[addr] = eid
+
     def _make_func_addr_resolver(self):
         """Build the func_addr_resolver closure passed to the substrate.
 
@@ -388,14 +446,28 @@ class SymExEngine:
             name = engine._func_name_resolver(eid_i)
             if name is not None and engine.layout is not None and name in engine.layout:
                 addr = engine.layout[name]
-                engine._address_for_cache[eid_i] = addr
+                engine._cache_address(eid_i, addr)
                 engine._fire_address_resolved(
                     eid_i, name, "function", 0, 8, addr, "pre_placed", None)
                 return addr
             addr = engine._dispatch_address_for(eid_i, name, "function", 0, 8)
             if addr is not None:
-                engine._address_for_cache[eid_i] = addr
+                engine._cache_address(eid_i, addr)
             return addr
+
+        return resolve
+
+    def _make_entity_by_addr_resolver(self):
+        """Build the entity_by_addr_resolver closure passed to the substrate.
+
+        Called by exec_call in the C++ interpreter loop to map an indirect
+        callee virtual address back to a known entity id.  Returns the int
+        entity id or 0 (kInvalidEntityId) on miss.
+        """
+        engine = self
+
+        def resolve(addr):
+            return engine._addr_to_eid_cache.get(int(addr), 0)
 
         return resolve
 
@@ -412,13 +484,13 @@ class SymExEngine:
             return cached
         if name is not None and self.layout is not None and name in self.layout:
             addr = self.layout[name]
-            self._address_for_cache[eid] = addr
+            self._cache_address(eid, addr)
             self._fire_address_resolved(
                 eid, name, kind, size, align, addr, "pre_placed", None)
             return addr
         addr = self._dispatch_address_for(eid, name, kind, size, align)
         if addr is not None:
-            self._address_for_cache[eid] = addr
+            self._cache_address(eid, addr)
         return addr
 
     def _dispatch_address_for(self, eid: int, name, kind: str,
@@ -456,7 +528,7 @@ class SymExEngine:
         path = self._current_path
         layout = self.layout
         mem = layout.memory if layout is not None else None
-        mem_view = MemView(mem) if mem is not None else None
+        mem_view = MemView(mem, endian=self.endian) if mem is not None else None
         ctx = Ctx(
             path=path,
             mem=mem_view,
@@ -464,6 +536,15 @@ class SymExEngine:
             layout=layout,
             solver=getattr(path, "solver", None),
         )
+        # Stash the decl on ctx so handlers can do `ctx.decl.type` etc.
+        # without enclosing over the index — Index.entity uses its own
+        # in-memory cache, so the lookup is cheap.
+        ctx.decl = None
+        if eid is not None and int(eid) != 0:
+            try:
+                ctx.decl = self._index.entity(int(eid))
+            except Exception:
+                pass
 
         handler_name = None
         if handlers:
@@ -498,7 +579,18 @@ class SymExEngine:
         path = self._current_path
         layout = self.layout
         mem = layout.memory if layout is not None else None
-        mem_view = MemView(mem) if mem is not None else None
+        mem_view = MemView(mem, endian=self.endian) if mem is not None else None
+
+        # The Index has its own in-memory cache; entity() is cheap.  The
+        # decl is what most analyst code actually wants to operate on,
+        # so put it directly on ctx alongside the kwargs payload.
+        decl = None
+        if eid is not None and int(eid) != 0:
+            try:
+                decl = self._index.entity(int(eid))
+            except Exception:
+                decl = None
+
         ctx = Ctx(
             path=path,
             mem=mem_view,
@@ -506,10 +598,12 @@ class SymExEngine:
             layout=layout,
             solver=getattr(path, "solver", None),
         )
+        ctx.decl = decl
 
         payload = {
             "eid": eid,
             "name": name,
+            "decl": decl,
             "kind": kind,
             "addr": addr,
             "source": source,
@@ -596,7 +690,7 @@ class SymExEngine:
             # address space — otherwise a freshly minted Layout() per
             # call would diverge from the one whose addresses are baked
             # into a previously-cloned state.
-            self.layout = Layout()
+            self.layout = Layout(endian=self.endian)
         layout = self.layout
         memory = layout.memory
 
@@ -649,7 +743,7 @@ class SymExEngine:
             raise ValueError(f"unknown explore strategy {strategy!r}")
 
         if self.layout is None:
-            self.layout = Layout()
+            self.layout = Layout(endian=self.endian)
         layout = self.layout
         memory = layout.memory
 
@@ -701,7 +795,7 @@ class SymExEngine:
             raise TypeError(
                 "explore_many: start_funcs is a bare string; pass a "
                 "list (e.g. [name]) or a regex / predicate")
-        if isinstance(start_funcs, (list, tuple)):
+        if isinstance(start_funcs, _SEQ_TYPES):
             return self._resolve_explicit_list(start_funcs)
         if callable(start_funcs):
             return self._resolve_by_predicate(start_funcs)
@@ -744,7 +838,7 @@ class SymExEngine:
                 continue
             if not pred(name):
                 continue
-            ir = mx.ir.IRFunction.FROM(fd)
+            ir = _ir_for_decl(fd)
             if ir is None:
                 continue
             fid = int(ir.id)
@@ -853,14 +947,14 @@ class SymExEngine:
 
         Returns the list of paths produced. Used by `Path.replay`.
         """
-        layout = self.layout if self.layout is not None else Layout()
+        layout = self.layout if self.layout is not None else Layout(endian=self.endian)
         memory = layout.memory
         strategy_obj = (_coerce_strategy(concretize)
                         if concretize is not None else self.address_strategy)
         until_pred = until if until is not None else ExploreUntil.never()
 
         fresh_state = _interp.clone_state(snapshot.state)
-        path = Path(fresh_state, memory, parent_id=parent_id)
+        path = Path(fresh_state, memory, parent_id=parent_id, endian=self.endian)
         path.events = EventLog(snapshot.events)
         path.tags = set(snapshot.tags)
         path.path_condition = list(snapshot.path_condition)
@@ -882,6 +976,9 @@ class SymExEngine:
         path._tls_shadow = dict(getattr(snapshot, "tls_shadow", {}))
         # Phase 10
         path._origin_by_name = dict(getattr(snapshot, "origin_by_name", {}))
+        # Phase 15
+        path.vars = dict(getattr(snapshot, "vars", {}))
+        path.shared = dict(getattr(snapshot, "shared", {}))
 
         if modify is not None:
             modify(path)
@@ -918,7 +1015,8 @@ class SymExEngine:
             if start_block is None:
                 _interp.init_state(state, memory, policy, ir_func, list(args),
                                    self._func_resolver, self._global_resolver,
-                                   self._func_addr_resolver)
+                                   self._func_addr_resolver,
+                                   self._entity_by_addr_resolver)
             else:
                 block = self._resolve_block(ir_func, start_block)
                 param_addrs = self._allocate_param_slots(ir_func, memory, args)
@@ -927,11 +1025,12 @@ class SymExEngine:
                     state, memory, policy, ir_func, block,
                     param_addrs, None, seed_dict,
                     self._func_resolver, self._global_resolver,
-                    self._func_addr_resolver)
+                    self._func_addr_resolver,
+                    self._entity_by_addr_resolver)
         finally:
             self._current_path = prev_path
 
-        path = Path(state, memory)
+        path = Path(state, memory, endian=self.endian)
         path._func_name = self._function_name(ir_func)
         path._layout = self.layout
         path.entry_func = ir_func
@@ -981,7 +1080,8 @@ class SymExEngine:
         fd = ir_func.declaration
         if fd is None:
             return addrs
-        for i, p in enumerate(fd.parameters):
+        i = 0
+        for p in fd.parameters:
             ty = p.type
             bits = ty.size_in_bits
             size = max(1, (bits + 7) // 8) if bits is not None else 8
@@ -995,8 +1095,9 @@ class SymExEngine:
                     val = int(val)
                 if isinstance(val, int):
                     memory.write_bytes(
-                        addr, val.to_bytes(size, "little",
+                        addr, val.to_bytes(size, str(self.endian),
                                            signed=(val < 0)))
+            i += 1
         return addrs
 
     def _step_one(self, path, memory, policy, slice_steps, concretize):
@@ -1004,7 +1105,13 @@ class SymExEngine:
         try:
             out = _interp.step(path.state, memory, policy, slice_steps,
                                self._func_resolver, self._global_resolver,
-                               self._func_addr_resolver)
+                               self._func_addr_resolver,
+                               self._entity_by_addr_resolver)
+        except StopNow:
+            self._current_path = None
+            if path.terminal is None:
+                path.terminal = Terminal.STOPPED
+            return [path]
         finally:
             self._current_path = None
 
@@ -1031,6 +1138,8 @@ class SymExEngine:
             return [path]
         if kind == StepResultKind.BRANCH:
             return self._handle_branch_forks(path, result, forks)
+        if kind == StepResultKind.SWITCH:
+            return self._handle_switch_forks(path, result, forks)
         if kind == StepResultKind.SUSPENDED:
             sub_kind = forks[0].get("sub_kind") if forks else None
             if sub_kind == "call-addr":
@@ -1069,6 +1178,104 @@ class SymExEngine:
                 "step": path.steps,
             })
             children.append(child)
+        return children
+
+    def _handle_switch_forks(self, path, result, forks):
+        """Realize a symbolic-SWITCH suspension as one forked path per
+        case (and one for the default block). Each child gets a
+        path-condition constraint pinning the selector into that case's
+        range. Infeasible children are dropped."""
+        if not forks:
+            path.terminal = Terminal.STUCK_BRANCH
+            return [path]
+
+        fork = forks[0]
+        sel = fork.get("selector")
+        sel_eid = int(fork.get("selector_eid") or 0)
+        cases = fork.get("cases") or []
+        default_block_obj = fork.get("default_block")
+        default_eid = fork.get("default_block_eid")
+        snapshot_state = fork["state"]
+
+        sel_is_z3 = _is_z3(sel)
+        z3 = _z3_module() if sel_is_z3 else None
+
+        children = []
+        first_state_used = [False]
+
+        def _take_state():
+            if not first_state_used[0]:
+                first_state_used[0] = True
+                return snapshot_state
+            return _interp.clone_state(snapshot_state)
+
+        def _bv_val(v):
+            return z3.BitVecVal(int(v), sel.size())
+
+        def _feasible(child):
+            if z3 is None:
+                return True
+            return child.solver.solver.check() == z3.sat
+
+        for low, high, target_eid, target_block_obj in cases:
+            child_state = _take_state()
+            _interp.resume_switch_case(child_state, target_block_obj)
+            child = self._fork_child(path, child_state)
+            if sel_is_z3:
+                if low == high:
+                    child.path_condition.append(sel == _bv_val(low))
+                else:
+                    child.path_condition.append(
+                        z3.And(sel >= _bv_val(low),
+                               sel <= _bv_val(high)))
+                child.solver.invalidate()
+                if not _feasible(child):
+                    continue
+            child.events.append({
+                "kind": SWITCH_CASE,
+                "selector_eid": sel_eid,
+                "low": low,
+                "high": high,
+                "target_block": target_eid,
+                "step": path.steps,
+            })
+            children.append(child)
+
+        if default_block_obj is not None and default_eid is not None:
+            child_state = _take_state()
+            _interp.resume_switch_case(child_state, default_block_obj)
+            child = self._fork_child(path, child_state)
+            if sel_is_z3 and cases:
+                disjuncts = []
+                for low, high, _eid, _blk in cases:
+                    if low == high:
+                        disjuncts.append(sel == _bv_val(low))
+                    else:
+                        disjuncts.append(
+                            z3.And(sel >= _bv_val(low),
+                                   sel <= _bv_val(high)))
+                child.path_condition.append(z3.Not(z3.Or(*disjuncts)))
+                child.solver.invalidate()
+                if _feasible(child):
+                    child.events.append({
+                        "kind": SWITCH_DEFAULT,
+                        "selector_eid": sel_eid,
+                        "target_block": default_eid,
+                        "step": path.steps,
+                    })
+                    children.append(child)
+            else:
+                child.events.append({
+                    "kind": SWITCH_DEFAULT,
+                    "selector_eid": sel_eid,
+                    "target_block": default_eid,
+                    "step": path.steps,
+                })
+                children.append(child)
+
+        if not children:
+            path.terminal = Terminal.INFEASIBLE
+            return [path]
         return children
 
     def _handle_suspension(self, path, result, forks, strategy):
@@ -1158,7 +1365,7 @@ class SymExEngine:
 
         layout = self.layout
         mem = layout.memory if layout is not None else None
-        mem_view = MemView(mem) if mem is not None else None
+        mem_view = MemView(mem, endian=self.endian) if mem is not None else None
         ctx = Ctx(
             path=path,
             mem=mem_view,
@@ -1198,7 +1405,7 @@ class SymExEngine:
             return [path]
 
         # Normalize to a list of candidates.
-        if not isinstance(chosen, (list, tuple)):
+        if not isinstance(chosen, _SEQ_TYPES):
             candidates = [chosen]
         else:
             candidates = list(chosen)
@@ -1240,7 +1447,8 @@ class SymExEngine:
             return _interp.clone_state(fork_entry["state"])
 
         z3 = _z3_module()
-        for fork_idx, addr in enumerate(resolved_addrs):
+        fork_idx = 0
+        for addr in resolved_addrs:
             child_state = take_state()
             _interp.resume_addr(child_state, address_eid, addr)
             child = self._fork_child(path, child_state)
@@ -1262,6 +1470,7 @@ class SymExEngine:
                 "step": path.steps,
             })
             children.append(child)
+            fork_idx += 1
 
         return children
 
@@ -1503,7 +1712,8 @@ class SymExEngine:
         """Build a fresh Path that inherits everything from `parent`
         except its interpreter state. Used by branch and suspension
         fork handling so the propagation rules stay in one place."""
-        child = Path(child_state, parent.mem, parent_id=parent.id)
+        child = Path(child_state, parent.mem, parent_id=parent.id,
+                     endian=parent._byte_order)
         child.events = EventLog(parent.events)
         child.tags = set(parent.tags)
         child.path_condition = list(parent.path_condition)
@@ -1512,10 +1722,19 @@ class SymExEngine:
         child._layout = parent._layout
         child.entry_func = parent.entry_func
         child.solver.adopt_fresh_vars(parent.solver._fresh_vars)
+        # Phase 8c: inherit the byte-granular symbolic shadow.  Without
+        # this the child sees parent's stamped 0xCD sentinel bytes in
+        # shared concrete memory but has no shadow entry to resolve them
+        # — every symbolic byte the parent wrote shows up as a literal
+        # 0xCD on the child, which is the wrong load value.
+        child._symbolic_shadow = dict(parent._symbolic_shadow)
         # Phase 9: inherit TLS base and shadow (isolation via per-path shadow).
         child.tls_base = parent.tls_base
         child._tls_shadow = dict(parent._tls_shadow)
         # Phase 10: inherit provenance table so forked paths know the
         # origins of all symbolic inputs minted before the fork.
         child._origin_by_name = dict(parent._origin_by_name)
+        # Phase 15: per-path copy of vars; shared reference for shared.
+        child.vars = dict(parent.vars)
+        child.shared = parent.shared
         return child
