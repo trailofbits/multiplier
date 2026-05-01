@@ -299,7 +299,12 @@ std::optional<FunctionIR> IRGenerator::Generate(
       alloca_inst.object_index = obj_idx;
       alloca_inst.type_entity_id = TypeEntityIdOf(param.Type());
       uint32_t alloca_idx = EmitTopLevel(std::move(alloca_inst));
-      object_to_alloca_[obj_idx] = alloca_idx;
+      auto [it, inserted] = object_to_alloca_.try_emplace(obj_idx, alloca_idx);
+      CHECK(inserted)
+          << "param ALLOCA re-registered for obj_idx=" << obj_idx
+          << " (param entity " << EntityIdOf(param)
+          << "); first registration at inst " << it->second
+          << ", second at inst " << alloca_idx;
     }
 
     // Emit local variable ALLOCAs in the frame block.
@@ -415,6 +420,7 @@ std::optional<FunctionIR> IRGenerator::Generate(
 
     // Verify block structure.
     VerifyBlocks();
+    VerifyIR();
 
     // Compute stack frame layout: assign offsets to non-dynamic objects.
     ComputeFrameLayout();
@@ -548,6 +554,7 @@ std::optional<FunctionIR> IRGenerator::GenerateGlobalInit(
     ComputeDominators();
     ComputeRPO();
     VerifyBlocks();
+    VerifyIR();
     ComputeFrameLayout();
 
     DLOG(INFO) << "Generated global init IR for var entity "
@@ -775,6 +782,21 @@ uint32_t IRGenerator::EmitLoadFromLValue(const pasta::Expr &e) {
 
   uint32_t addr_idx = EmitLValue(e);
 
+  // Hard trap at the codegen origin: if EmitLValue handed back a
+  // terminator's slot, this LOAD would emit `MEMORY/LOAD_* [%term]`.
+  // The substrate evaluates a terminator-as-value as 0, producing a
+  // load from address 0x0. The choke-point CHECK in EmitInstruction
+  // catches this too, but firing here gives a tighter stack focused
+  // on the lvalue site responsible.
+  if (addr_idx < func_.instructions.size()) {
+    CHECK(!mx::ir::IsTerminator(func_.instructions[addr_idx].opcode))
+        << "EmitLoadFromLValue: EmitLValue returned terminator slot "
+        << addr_idx << " (opcode="
+        << static_cast<int>(func_.instructions[addr_idx].opcode)
+        << ") for expr " << eid << " (kind="
+        << std::string(e.KindName()) << ")";
+  }
+
   // Check if this is a large object that can't be scalar-loaded.
   // For types > 8 bytes (structs, arrays, etc.), return the address directly —
   // the "value" of a large object is its pointer. Callers that need to copy
@@ -945,6 +967,28 @@ uint32_t IRGenerator::GetOrMakeObject(const pasta::Decl &decl) {
 // ---------------------------------------------------------------------------
 
 uint32_t IRGenerator::EmitInstruction(InstructionIR inst) {
+  // Choke-point trap: a value-producing instruction must not consume a
+  // terminator (IMPLICIT_GOTO, RET, BREAK, CONTINUE, GOTO, UNREACHABLE,
+  // COND_BRANCH, SWITCH, ...) as a value operand. The
+  // DeclRefExpr→EnumConstantDecl miscompile produced exactly this
+  // shape: a LOAD whose address operand was the entry IMPLICIT_GOTO.
+  // Aborting here gives a live stack frame showing the AST node that
+  // lost the decl reference.
+  if (!mx::ir::IsTerminator(inst.opcode)) {
+    for (uint32_t op_idx : inst.operand_indices) {
+      if (op_idx >= func_.instructions.size()) continue;
+      auto operand_op = func_.instructions[op_idx].opcode;
+      CHECK(!mx::ir::IsTerminator(operand_op))
+          << "EmitInstruction: opcode "
+          << static_cast<int>(inst.opcode)
+          << " (source_entity_id=" << inst.source_entity_id
+          << ") would consume terminator " << op_idx
+          << " (opcode=" << static_cast<int>(operand_op)
+          << ") as a value operand; a lvalue/rvalue lowering lost the "
+             "decl reference";
+    }
+  }
+
   inst.parent_block_index = current_block_index_;
   uint32_t idx = static_cast<uint32_t>(func_.instructions.size());
   func_.instructions.push_back(std::move(inst));
@@ -2272,6 +2316,27 @@ uint32_t IRGenerator::EmitRValue(const pasta::Expr &e) {
   // ExprWithCleanups, FullExpr -- unwrap.
   if (auto ewc = pasta::ExprWithCleanups::From(e)) {
     return EmitRValue(ewc->SubExpression());
+  }
+
+  // DeclRefExpr to an EnumConstantDecl is *not* an lvalue — it's an
+  // integer constant. Lower it to CONST directly so it never hits the
+  // load-from-lvalue fallback (which would produce MEMORY/LOAD_* whose
+  // address operand is a phantom "alloca" that was never registered,
+  // misroutes through `object_to_alloca_[obj_idx]` -> 0, and reads from
+  // `%0` — the entry block's IMPLICIT_GOTO).
+  if (auto dre = pasta::DeclRefExpr::From(e)) {
+    if (auto ec = pasta::EnumConstantDecl::From(dre->Declaration())) {
+      InstructionIR inst;
+      inst.opcode = mx::ir::OpCode::CONST;
+      inst.source_entity_id = eid;
+      llvm::APSInt v = ec->InitializerValue();
+      inst.int_value = v.getSExtValue();
+      inst.uint_value = v.getZExtValue();
+      inst.width = static_cast<uint8_t>(v.getBitWidth());
+      bool is_signed = v.isSigned();
+      inst.const_op = static_cast<uint8_t>(IntConstOp(inst.width, is_signed));
+      return emit_typed(std::move(inst));
+    }
   }
 
   // Lvalue expressions -- load from their address.
@@ -4404,9 +4469,24 @@ uint32_t IRGenerator::EmitLValue(const pasta::Expr &e) {
       }
     }
 
-    // Local/parameter → reference the ALLOCA directly.
+    // Local/parameter → reference the ALLOCA directly. Refuse anything
+    // that doesn't look like a local/parameter VarDecl: an unrecognised
+    // decl kind (EnumConstantDecl, LabelDecl, BindingDecl, ...) silently
+    // misroutes through `object_to_alloca_[obj_idx]` and returns slot 0,
+    // which is the entry IMPLICIT_GOTO. A LOAD whose address operand is
+    // a terminator is not just invalid — it has no diagnostic at the
+    // call site, so callers see address `0x0` at runtime instead.
+    CHECK(pasta::VarDecl::From(decl).has_value())
+        << "EmitLValue: DeclRefExpr to unsupported decl kind "
+        << std::string(decl.KindName())
+        << " (entity " << EntityIdOf(decl) << ", expr " << eid << ")";
+
     uint32_t obj_idx = GetOrMakeObject(decl);
-    return object_to_alloca_[obj_idx];
+    auto it = object_to_alloca_.find(obj_idx);
+    CHECK(it != object_to_alloca_.end())
+        << "EmitLValue: VarDecl " << EntityIdOf(decl)
+        << " has no registered ALLOCA (obj_idx=" << obj_idx << ")";
+    return it->second;
   }
 
   // MemberExpr.
@@ -4970,6 +5050,129 @@ void IRGenerator::VerifyBlocks() {
       DCHECK(found)
           << "Block " << bi << " <- " << pred_idx
           << " predecessor edge has no matching successor";
+    }
+  }
+}
+
+void IRGenerator::VerifyIR() {
+  using OpCode = mx::ir::OpCode;
+  using MemOp = mx::ir::MemOp;
+  auto &instructions = func_.instructions;
+  auto &blocks = func_.blocks;
+  if (instructions.empty()) return;
+
+  // Slot 0 is the entry block's first instruction (always IMPLICIT_GOTO,
+  // by construction). A value-producing instruction whose operand
+  // references slot 0 means a decl reference was lost during lowering.
+  auto is_scope_op = [](OpCode op) {
+    return op == OpCode::ENTER_SCOPE || op == OpCode::EXIT_SCOPE;
+  };
+  auto fmt_inst = [&](uint32_t idx) -> std::string {
+    if (idx >= instructions.size()) return "?";
+    return std::to_string(idx) + " (opcode=" +
+           std::to_string(static_cast<int>(instructions[idx].opcode)) + ")";
+  };
+
+  // Check #6: every block has a parent_structure_index. Orphaned blocks
+  // are the bug class fixed in #587 (compensation/unreachable/label
+  // forward-ref blocks); verifier guards against regression.
+  for (uint32_t bi = 0; bi < blocks.size(); ++bi) {
+    if (blocks[bi].parent_structure_index == UINT32_MAX) {
+      LOG(ERROR) << "VerifyIR: function entity "
+                 << func_.func_decl_entity_id
+                 << " block " << bi << " has no parent_structure_index";
+    }
+  }
+
+  for (uint32_t i = 0; i < instructions.size(); ++i) {
+    const auto &inst = instructions[i];
+
+    // Check #1 + #2 + #3: a value-producing instruction must not consume
+    // slot 0 (the entry IMPLICIT_GOTO), nor any other terminator/scope
+    // op, as a value operand. Skip terminators themselves — their
+    // "operands" can legitimately be the things they branch on, but the
+    // operand list of e.g. COND_BRANCH is the condition value, which
+    // isn't a terminator in well-formed IR. SWITCH consumes the
+    // selector via operand_indices[0], also a value.
+    for (uint32_t opi = 0; opi < inst.operand_indices.size(); ++opi) {
+      uint32_t op_idx = inst.operand_indices[opi];
+      if (op_idx >= instructions.size()) {
+        LOG(ERROR) << "VerifyIR: function entity "
+                   << func_.func_decl_entity_id
+                   << " inst " << i << " operand " << opi
+                   << " index " << op_idx << " out of range";
+        continue;
+      }
+      OpCode op_op = instructions[op_idx].opcode;
+
+      // A value operand referencing a terminator is the bug shape:
+      // the DeclRefExpr→EnumConstantDecl miscompile produced
+      // `MEMORY/LOAD_* [%term]` because EmitLValue handed back the
+      // entry IMPLICIT_GOTO's slot. Slot 0 specifically isn't the
+      // signal — it's whatever instruction was emitted first; only
+      // the terminator-as-value shape is unambiguously malformed.
+      if (mx::ir::IsTerminator(op_op)) {
+        LOG(ERROR) << "VerifyIR: function entity "
+                   << func_.func_decl_entity_id
+                   << " inst " << fmt_inst(i)
+                   << " operand " << opi
+                   << " is terminator " << fmt_inst(op_idx)
+                   << "; terminators do not produce values";
+        continue;
+      }
+
+      if (is_scope_op(op_op)) {
+        LOG(ERROR) << "VerifyIR: function entity "
+                   << func_.func_decl_entity_id
+                   << " inst " << fmt_inst(i)
+                   << " operand " << opi
+                   << " is scope marker " << fmt_inst(op_idx)
+                   << "; scope ops do not produce values";
+      }
+    }
+
+    // Check #4: MEMORY operand-count sanity vs. MemOp sub-opcode.
+    if (inst.opcode == OpCode::MEMORY) {
+      auto memop = static_cast<MemOp>(inst.mem_op);
+      auto n = inst.operand_indices.size();
+      if (mx::ir::IsAnyLoad(memop)) {
+        // Plain load: address only. (BIT_READ_* also one operand.)
+        if (n != 1u) {
+          LOG(ERROR) << "VerifyIR: function entity "
+                     << func_.func_decl_entity_id
+                     << " inst " << fmt_inst(i)
+                     << " (load mem_op=" << static_cast<int>(memop)
+                     << ") has " << n << " operands, expected 1";
+        }
+      } else if (mx::ir::IsAnyStore(memop)) {
+        // Store: address + value (two operands). Bit-field stores are
+        // store_le/store_be with bit_offset/bit_width set; same shape.
+        if (n != 2u) {
+          LOG(ERROR) << "VerifyIR: function entity "
+                     << func_.func_decl_entity_id
+                     << " inst " << fmt_inst(i)
+                     << " (store mem_op=" << static_cast<int>(memop)
+                     << ") has " << n << " operands, expected 2";
+        }
+      }
+      // Bulk/string MemOps have variable shapes; left to per-op
+      // checks if a concrete miscompile motivates it later.
+    }
+
+    // Check #5: SWITCH default sanity. With explicit-default codegen
+    // (#587), every SWITCH whose `default` is reachable sets
+    // is_default=true on its case entry and points to a real block.
+    // A switch whose only "default" path is implicit must not have a
+    // case entry pointing at slot 0.
+    if (inst.opcode == OpCode::SWITCH) {
+      for (const auto &c : inst.switch_cases) {
+        if (c.is_default && c.block_index == 0u) {
+          LOG(ERROR) << "VerifyIR: function entity "
+                     << func_.func_decl_entity_id
+                     << " inst " << fmt_inst(i)
+                     << " switch default branch points to slot 0";
+        }
+      }
     }
   }
 }

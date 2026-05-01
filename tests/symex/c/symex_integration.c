@@ -168,3 +168,51 @@ int32_t si_switch_constrained(int32_t sel) {
         default: return -1;
     }
 }
+
+// -----------------------------------------------------------------------
+// EnumConstantDecl reference regression corpus.
+//
+// A `DeclRefExpr` to an `EnumConstantDecl` is an rvalue that yields the
+// enumerator's integer value — it must lower to a CONST, never to a
+// MEMORY/LOAD. The functions and global below pin every shape of
+// EnumConstantDecl reference we hit in C (aggregate initializer,
+// scalar return, comparison, switch selector, function-call argument).
+// -----------------------------------------------------------------------
+
+enum si_color { si_red = 1, si_green = 2, si_blue = 3 };
+
+struct si_color_entry {
+    const char *name;
+    enum si_color k;
+};
+
+// Aggregate initializer: each entry's `k` is a DeclRefExpr to an
+// EnumConstantDecl. Without the fix these lower to MEMORY/LOAD_*.
+static struct si_color_entry si_color_table[] = {
+    { "red",   si_red   },
+    { "green", si_green },
+    { "blue",  si_blue  },
+};
+
+// Direct rvalue use: `return si_red;` is the bare DeclRefExpr.
+int32_t si_enum_return(void) {
+    return (int32_t)si_red;
+}
+
+// Comparison: scalar use of EnumConstantDecl on the rhs of ==.
+int32_t si_enum_cmp(int32_t k) {
+    if ((enum si_color)k == si_blue) return 100;
+    return 0;
+}
+
+// Pass an EnumConstantDecl as a function call argument.
+int32_t si_enum_take(int32_t k) { return k + 1; }
+int32_t si_enum_arg(void) {
+    return si_enum_take(si_green);
+}
+
+// Read the table back so the global initializer is reachable.
+const char *si_enum_table_name(int32_t i) {
+    if (i < 0 || i >= 3) return (const char *)0;
+    return si_color_table[i].name;
+}
