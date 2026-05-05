@@ -248,7 +248,7 @@ def test_p8a_4_overlay_concrete_then_symbolic_read(index):
     # Concrete write at offset +5: mirrors into the overlay.
     OFFSET = 5
     BYTE = 0xAB
-    policy.mem_write(("ptr", BUF + OFFSET), BYTE, 1, False)
+    policy.mem_write(BUF + OFFSET, BYTE, 1, False)
 
     # Second symbolic read: constrain the address to the write offset
     # and verify the model returns BYTE.

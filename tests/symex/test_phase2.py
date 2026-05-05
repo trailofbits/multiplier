@@ -113,7 +113,7 @@ def test_p2_3_intercept_memory_write_drops_write(index):
 
     policy = InterceptorPolicy(engine, _StubPath(), layout=layout,
                                 memory=layout.memory)
-    rv = policy.mem_write(("ptr", 0x20000), 99, 4, False)
+    rv = policy.mem_write(0x20000, 99, 4, False)
     assert rv is None  # treated-as-handled
     assert layout.memory.read_bytes(0x20000, 4) == \
         (42).to_bytes(4, "little")  # unchanged
@@ -245,7 +245,7 @@ def test_p2_8_chain_forwards_through_next_hook(index):
 
     policy = InterceptorPolicy(engine, _StubPath(), layout=layout,
                                 memory=layout.memory)
-    rv = policy.mem_read(("ptr", 0x20000), 4, False)
+    rv = policy.mem_read(0x20000, 4, False)
     assert rv == 0xBEEF
     assert order == ["a", "b"]
 
@@ -268,7 +268,7 @@ def test_p2_9_intercept_struct_field_pre_write(index):
 
     policy = InterceptorPolicy(engine, _StubPath(), layout=layout,
                                 memory=layout.memory)
-    rv = policy.mem_read(("ptr", 0x20000), 4, False)
+    rv = policy.mem_read(0x20000, 4, False)
     # Chain bottom reads concrete; the underlying memory now holds
     # 0xC0FFEE because the handler pre-wrote it.
     assert rv == 0xC0FFEE

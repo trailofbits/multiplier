@@ -470,6 +470,24 @@ struct Policy {
   void on_global_initialized_impl(SchedT &, const IRFunction &,
                                   const ValueT &) {}
 
+  // Failure-atomic handler for a GLOBAL_PTR whose backing entity could
+  // not be resolved (no resolver, no address_hint, no allocatable size).
+  // Default: terminate the path with ErrorKind::UNRESOLVED_GLOBAL.
+  // Symbolic policies override `_impl` to snapshot + emit a
+  // GlobalContinuation so a driver can supply an address and re-step.
+  template <typename SchedT, typename StateT>
+  void on_unresolved_global(SchedT &sched, StateT &state,
+                            RawEntityId src_eid,
+                            RawEntityId instruction_eid) {
+    self().on_unresolved_global_impl(sched, state, src_eid, instruction_eid);
+  }
+  template <typename SchedT, typename StateT>
+  void on_unresolved_global_impl(SchedT &sched, StateT &state,
+                                 RawEntityId, RawEntityId) {
+    sched.on_errored(ErrorKind::UNRESOLVED_GLOBAL, state.clone());
+    state.work_stack.clear();
+  }
+
   // Abort-request gate. PythonPolicy sets this when a Python hook raises
   // an exception so the loop can exit cleanly after the current item.
   bool abort_requested() const {

@@ -22,7 +22,6 @@ namespace mx::ir::interpret {
 enum class CallAction : uint8_t {
   INLINE,
   SKIP,
-  MODEL,
 };
 
 template <typename ValueT = Value>

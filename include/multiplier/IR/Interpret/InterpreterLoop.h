@@ -795,8 +795,16 @@ inline void compute_global_ptr(auto &state, PolicyT &policy,
   }
 
   GlobalResolution gr;
-  if (!policy.resolve_global(sched, src_eid, gr) || gr.info.size == 0) {
-    frame.values[id] = policy.make_default();
+  // Trust an address_hint even when the IR didn't carry a size: the
+  // hint already nails down `where`, and `place_at` substitutes 8 for
+  // size==0 internally. Only bail when we have no address and no way
+  // to allocate one — and when we bail, hand off to the policy: the
+  // concrete default errors the path; the symbolic policy snapshots
+  // and emits a GlobalContinuation so a driver can supply an address
+  // and re-step this instruction.
+  if (!policy.resolve_global(sched, src_eid, gr) ||
+      (gr.info.size == 0 && !gr.info.address_hint)) {
+    policy.on_unresolved_global(sched, state, src_eid, id);
     return;
   }
 
@@ -839,33 +847,36 @@ inline void compute_global_ptr(auto &state, PolicyT &policy,
   if (!placed_via_hint) {
     addr = policy.mem_allocate(sched, info.size, align);
   }
-  if (auto a = policy.extract_address(addr)) {
-    state.global_addresses[key] = *a;
-    if (key != src_eid) state.global_addresses[src_eid] = *a;
+  auto a = policy.extract_address(addr);
+  if (!a) {
+    policy.on_unresolved_global(sched, state, src_eid, id);
+    return;
+  }
+  state.global_addresses[key] = *a;
+  if (key != src_eid) state.global_addresses[src_eid] = *a;
 
-    // Store the result BEFORE pushing the initializer frame, because
-    // the push may reallocate the segment's vector and invalidate `frame`.
-    frame.values[id] = addr;
+  // Store the result BEFORE pushing the initializer frame, because
+  // the push may reallocate the segment's vector and invalidate `frame`.
+  frame.values[id] = addr;
 
-    if (info.initializer) {
-      CallFrame<ValueT> init_frame;
-      init_frame.func = *info.initializer;
-      init_frame.params = {addr};
-      init_frame.call_site = kInvalidEntityId;
-      for (auto obj : info.initializer->objects()) {
-        auto k = obj.kind();
-        if (k == ir::ObjectKind::PARAMETER ||
-            k == ir::ObjectKind::PARAMETER_VALUE) {
-          init_frame.param_ptrs.push_back(addr);
-        }
-      }
-      if (info.initializer->kind() == ir::FunctionKind::GLOBAL_INITIALIZER) {
+  if (info.initializer) {
+    CallFrame<ValueT> init_frame;
+    init_frame.func = *info.initializer;
+    init_frame.params = {addr};
+    init_frame.call_site = kInvalidEntityId;
+    for (auto obj : info.initializer->objects()) {
+      auto k = obj.kind();
+      if (k == ir::ObjectKind::PARAMETER ||
+          k == ir::ObjectKind::PARAMETER_VALUE) {
         init_frame.param_ptrs.push_back(addr);
       }
-      state.call_stack.push(std::move(init_frame));
-      state.work_stack.push_back({WorkKind::ENTER_BLOCK,
-                                  {}, info.initializer->entry_block()});
     }
+    if (info.initializer->kind() == ir::FunctionKind::GLOBAL_INITIALIZER) {
+      init_frame.param_ptrs.push_back(addr);
+    }
+    state.call_stack.push(std::move(init_frame));
+    state.work_stack.push_back({WorkKind::ENTER_BLOCK,
+                                {}, info.initializer->entry_block()});
   }
 }
 
@@ -901,7 +912,8 @@ inline void compute_func_ptr(auto &state, PolicyT &policy,
       ValueT addr = policy.mem_allocate(sched, 8, 8);
       auto a = policy.extract_address(addr);
       if (!a) {
-        frame.values[id] = ValueTraits<ValueT>::default_value();
+        sched.on_errored(ErrorKind::UNRESOLVED_GLOBAL, state.clone());
+        state.work_stack.clear();
         return;
       }
       slot_addr = *a;
@@ -1178,7 +1190,6 @@ inline void exec_call(auto &state, PolicyT &policy,
       case CallAction::INLINE:
         callee_ir = resolution.callee_ir;
         break;
-      case CallAction::MODEL:
       case CallAction::SKIP:
         frame.values[id] = resolution.return_value;
         return;

@@ -33,6 +33,7 @@ enum class ErrorKind : uint8_t {
   UNREACHABLE,
   EMPTY_STACK,
   NO_TERMINATOR,
+  UNRESOLVED_GLOBAL,
 };
 
 // ---------------------------------------------------------------------------

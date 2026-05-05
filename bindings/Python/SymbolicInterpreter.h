@@ -252,6 +252,22 @@ class PythonPolicy
   bool resolve_global(PythonScheduler &sched, RawEntityId entity_id,
                       GlobalResolution &resolution);
 
+  // Symbolic-side suspension for unresolved globals: snapshot, push the
+  // current work item back so resumption retries the COMPUTE_GLOBAL_PTR,
+  // emit a GlobalContinuation, and clear the live work_stack.
+  void on_unresolved_global_impl(PythonScheduler &sched,
+                                 SymbolicState &state,
+                                 RawEntityId src_eid,
+                                 RawEntityId instruction_eid) {
+    auto snap = make_sharable<SymbolicState>(state);
+    snap->work_stack.push_back(state.current_item);
+    auto cont = std::make_unique<
+        GlobalContinuation<SharedPyPtr, PyObjectRC>>(
+        std::move(snap), src_eid, instruction_eid);
+    sched.outcome.continuations.emplace_back(std::move(cont));
+    state.work_stack.clear();
+  }
+
   // Reverse-direction resolver: address → entity id.
   RawEntityId entity_for_address_impl(uint64_t addr) {
     if (entity_by_addr_resolver_) {

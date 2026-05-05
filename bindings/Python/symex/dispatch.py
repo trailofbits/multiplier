@@ -41,7 +41,7 @@ from .events import (
     BRANCH, LOOP, CONCRETIZE,
     BLOCK_ENTER, INSTRUCTION,
     ADDRESS_FOR, ADDRESS_RESOLVED,
-    EventKind, Phase, CallAction, VALUE_TAG_PTR,
+    EventKind, Phase,
 )
 from .lens import MemView, ArgsView
 
@@ -61,8 +61,8 @@ def _op_range(lo_name, hi_name):
 class SymExpr:
     """Default symbolic-value sentinel produced by InterceptorPolicy.
 
-    The class shape (not a 2-tuple) avoids the substrate's
-    `("ptr", N)` heuristic seeing a symbolic value as a pointer. The
+    A class (not an int) so the substrate's bare-int address heuristic
+    cannot mistake a symbolic value for a concrete pointer. The
     `kind`/`args` fields carry provenance for debugging and for Phase 4
     z3 lowering.
     """
@@ -84,12 +84,9 @@ class SymExpr:
 def extract_addr(addr):
     """Pull a concrete address out of the substrate's value form.
 
-    The substrate hands the policy `("ptr", N)` for live pointers and
-    bare ints occasionally; both normalize to an int. Anything else
-    (e.g., SymExpr) yields None.
+    Pointers come through as bare ints; anything else (SymExpr,
+    z3 expression, None) yields None.
     """
-    if isinstance(addr, tuple) and len(addr) == 2 and addr[0] == VALUE_TAG_PTR:
-        return int(addr[1])
     if isinstance(addr, int) and not isinstance(addr, bool):
         return int(addr)
     return None
@@ -416,11 +413,11 @@ def _make_default_mem_read(is_float, shadow=None, buf=None, byte_order="little")
 def _make_default_mem_write(is_float, shadow=None, byte_order="little"):
     """Return the chain bottom for a memory_write event.
 
-    Writes concrete bytes via the lens. Handles ints, ("ptr", N) pointer
-    tuples, raw bytes, and IEEE floats. A z3 write decomposes ``val`` into
-    per-byte extracts in the shadow dict; a concrete write clears any
-    covered shadow slots (concrete memory is the source of truth) and
-    writes the real bytes to ``ConcreteMemory``.
+    Writes concrete bytes via the lens. Handles ints, raw bytes, and
+    IEEE floats. A z3 write decomposes ``val`` into per-byte extracts
+    in the shadow dict; a concrete write clears any covered shadow
+    slots (concrete memory is the source of truth) and writes the
+    real bytes to ``ConcreteMemory``.
     """
     def default(ctx, addr, val, size):
         if isinstance(val, bool):
@@ -430,12 +427,6 @@ def _make_default_mem_write(is_float, shadow=None, byte_order="little"):
                 _shadow_write(shadow, addr, val, size)
             ctx.mem.write_bytes(
                 addr, val.to_bytes(size, byte_order, signed=(val < 0)))
-            return None
-        if isinstance(val, tuple) and len(val) == 2 and val[0] == VALUE_TAG_PTR:
-            if shadow is not None:
-                _shadow_write(shadow, addr, val, size)
-            ctx.mem.write_bytes(
-                addr, int(val[1]).to_bytes(size, byte_order, signed=False))
             return None
         if isinstance(val, _BYTES_TYPES):
             if shadow is not None:
@@ -1114,12 +1105,12 @@ class InterceptorPolicy:
 
     def _coerce_store_value(self, val, size, z3):
         """Lift a substrate-shaped store value to a z3 BitVec of `8*size`
-        bits. Accepts ints, bools, Python floats, `("ptr", N)` tuples,
-        and z3 BitVecs. Floats pack via the IEEE byte pattern (size 4 →
-        f32, size 8 → f64); the resulting BitVec is the bit pattern of
-        the float, matching how concrete float stores land on the
-        substrate's byte buffer. Returns None for shapes the overlay
-        can't represent."""
+        bits. Accepts ints, bools, Python floats, and z3 BitVecs.
+        Floats pack via the IEEE byte pattern (size 4 → f32, size 8 →
+        f64); the resulting BitVec is the bit pattern of the float,
+        matching how concrete float stores land on the substrate's
+        byte buffer. Returns None for shapes the overlay can't
+        represent."""
         bits = 8 * int(size)
         if isinstance(val, bool):
             return z3.BitVecVal(int(val), bits)
@@ -1135,18 +1126,15 @@ class InterceptorPolicy:
             else:
                 return None
             return z3.BitVecVal(int.from_bytes(packed, byte_order), bits)
-        if isinstance(val, tuple) and len(val) == 2 and \
-                val[0] == VALUE_TAG_PTR:
-            return z3.BitVecVal(int(val[1]) & ((1 << bits) - 1), bits)
         if isinstance(val, z3.BitVecRef):
             return _z3_resize(val, bits)
         return None
 
     def resolve_call(self, call_inst=None, target_eid=0, indirect_eid=0,
                      target_addr=0, args_list=(), is_indirect=False):
-        # Args land as a Python list of raw values (ints, ("ptr", N)
-        # tuples, SymExprs, …). Build an ArgsView over them so hooks
-        # have a consistent lens API.
+        # Args land as a Python list of raw values (ints, SymExprs, z3
+        # expressions, …). Build an ArgsView over them so hooks have a
+        # consistent lens API.
         args = list(args_list)
         ctx = self._make_ctx(args=args)
         ctx.inst = call_inst
@@ -1202,10 +1190,9 @@ class InterceptorPolicy:
                              target_addr=target_addr,
                              is_indirect=is_indirect, return_value=chosen,
                              handled=True)
-        if isinstance(chosen, tuple) and len(chosen) == 2 and \
-                chosen[0] in (CallAction.SKIP, CallAction.MODEL):
-            return chosen
-        return (CallAction.SKIP, chosen)
+        # Handlers return their replacement value directly; the substrate
+        # treats any non-None return as a skip with that value.
+        return chosen
 
     # ----- pure ops: propagate symbolic values, else fall through -----
 
@@ -1295,16 +1282,12 @@ class InterceptorPolicy:
     def _addr_as_z3(self, value, z3):
         """Normalize a substrate address-shaped value to a z3 BitVec.
 
-        Accepts: a z3 ExprRef (passes through), a `("ptr", N)` tuple
-        (concrete pointer — wrap as a 64-bit BitVecVal), or a Python int
-        / bool. Anything else returns None so callers can fall back to a
-        SymExpr.
+        Accepts: a z3 ExprRef (passes through) or a Python int / bool
+        (concrete pointer — wrap as a 64-bit BitVecVal). Anything else
+        returns None so callers can fall back to a SymExpr.
         """
         if isinstance(value, z3.ExprRef):
             return value
-        if isinstance(value, tuple) and len(value) == 2 and \
-                value[0] == VALUE_TAG_PTR:
-            return z3.BitVecVal(int(value[1]), 64)
         if isinstance(value, bool):
             return z3.BitVecVal(int(value), 64)
         if isinstance(value, int):
@@ -1527,9 +1510,6 @@ class InterceptorPolicy:
             int_val = int(val)
         elif isinstance(val, int):
             int_val = val
-        elif (isinstance(val, tuple) and len(val) == 2
-              and val[0] == VALUE_TAG_PTR):
-            int_val = int(val[1])
         elif isinstance(val, _BYTES_TYPES):
             i = 0
             for b in val:
@@ -1590,13 +1570,10 @@ class InterceptorPolicy:
 
 def _is_concrete(value):
     """A value is concrete if the substrate can interpret it without
-    policy help: ints, bools, None, and ("ptr", N) tuples."""
+    policy help: ints, bools, None."""
     if value is None:
         return True
     if isinstance(value, _INT_TYPES):
-        return True
-    if isinstance(value, tuple) and len(value) == 2 and \
-            value[0] == VALUE_TAG_PTR:
         return True
     return False
 

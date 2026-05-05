@@ -399,17 +399,16 @@ def test_p9_10_indirect_call_none_terminates(index):
     path._layout = engine.layout
 
     import z3
+    from multiplier.symex.events import MemAddrFork, MemAddrSuspension
     target_sym = z3.BitVec("sym_fp2", 64)
     fake_addr = mem.allocate(8, 8)
-    forks = [{
-        "state": state,
-        "address": target_sym,
-        "address_eid": fake_addr,
-        "sub_kind": "call-addr",
-    }]
+    forks = [MemAddrFork(state=state, address=target_sym,
+                          address_eid=fake_addr, size=8, is_write=False)]
+    result = MemAddrSuspension(address=target_sym, address_eid=fake_addr,
+                                size=8, is_write=False, is_call_target=True)
 
     children = engine._handle_symbolic_indirect_call(
-        path, ("suspended", None), forks, engine.address_strategy)
+        path, result, forks, engine.address_strategy)
 
     assert len(children) == 1
     assert children[0].terminal == Terminal.UNRESOLVED_CALL
