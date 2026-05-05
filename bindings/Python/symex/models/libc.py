@@ -38,7 +38,7 @@ def _memcpy(ctx, next_hook):
     if dst is None or src is None:
         return next_hook(ctx)
     ctx.mem.write_bytes(dst, ctx.mem.read_bytes(src, size))
-    return ("ptr", dst)
+    return dst
 
 
 def _memset(ctx, next_hook):
@@ -48,7 +48,7 @@ def _memset(ctx, next_hook):
     byte = ctx.args.read_int(1, size=4) & 0xFF
     size = ctx.args.read_int(2, size=8)
     ctx.mem.write_bytes(dst, bytes([byte]) * int(size))
-    return ("ptr", dst)
+    return dst
 
 
 def _read(ctx, next_hook):
@@ -65,7 +65,7 @@ def _read(ctx, next_hook):
 
 def _malloc(ctx, next_hook):
     size = ctx.args.read_int(0, size=8)
-    return ("ptr", ctx.layout.memory.allocate(int(size), 8))
+    return ctx.layout.memory.allocate(int(size), 8)
 
 
 def _free(ctx, next_hook):

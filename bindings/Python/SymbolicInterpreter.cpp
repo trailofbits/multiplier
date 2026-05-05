@@ -61,15 +61,6 @@ Value python_to_value(PyObject *obj) {
     }
     return make_int(v);
   }
-  if (PyTuple_Check(obj) && PyTuple_Size(obj) == 2) {
-    PyObject *tag = PyTuple_GetItem(obj, 0);
-    if (tag && PyUnicode_Check(tag)) {
-      const char *s = PyUnicode_AsUTF8(tag);
-      if (s && std::strcmp(s, "ptr") == 0) {
-        return make_uint(PyLong_AsUnsignedLongLong(PyTuple_GetItem(obj, 1)));
-      }
-    }
-  }
   return make_uint(0);
 }
 
@@ -104,15 +95,6 @@ Value python_to_value_f32_aware(PyObject *obj, bool needs_f32) {
     }
     return make_int(v);
   }
-  if (PyTuple_Check(obj) && PyTuple_Size(obj) == 2) {
-    PyObject *tag = PyTuple_GetItem(obj, 0);
-    if (tag && PyUnicode_Check(tag)) {
-      const char *s = PyUnicode_AsUTF8(tag);
-      if (s && std::strcmp(s, "ptr") == 0) {
-        return make_uint(PyLong_AsUnsignedLongLong(PyTuple_GetItem(obj, 1)));
-      }
-    }
-  }
   return make_uint(0);
 }
 
@@ -133,17 +115,6 @@ SharedPyPtr float_value_to_shared(const Value &v, uint32_t size) {
   SharedPyPtr result(obj);
   Py_XDECREF(obj);
   return result;
-}
-
-// Check if a SharedPyPtr holds a ("ptr", addr) tuple.
-std::optional<uint64_t> extract_ptr_tuple(PyObject *obj) {
-  if (!obj || !PyTuple_Check(obj) || PyTuple_Size(obj) != 2) return std::nullopt;
-  PyObject *tag = PyTuple_GetItem(obj, 0);
-  if (!tag || !PyUnicode_Check(tag)) return std::nullopt;
-  const char *s = PyUnicode_AsUTF8(tag);
-  if (!s || std::strcmp(s, "ptr") != 0) return std::nullopt;
-  PyObject *addr_obj = PyTuple_GetItem(obj, 1);
-  return PyLong_AsUnsignedLongLong(addr_obj);
 }
 
 // Wrapper struct layouts — must match Interpreter.cpp exactly.
@@ -304,24 +275,14 @@ static inline PyObject *or_none(PyObject *p) noexcept {
 // ===========================================================================
 
 std::optional<uint64_t> PythonPolicy::extract_address(const SharedPyPtr &val) {
-  if (auto a = extract_ptr_tuple(val.Get())) return a;
-  // A bare PyLong is also a concrete address — it's what
-  // `value_to_python` produces for a pointer loaded out of a slot
-  // (the C-level `Value` carries no "pointer-ness" tag, so the slot
-  // load surfaces as an int). Treating only `("ptr", N)` tuples as
-  // concrete sent every loaded-pointer dereference through the
-  // symbolic-suspension path, which the default address strategy
-  // collapsed to zero.
   PyObject *obj = val.Get();
-  if (obj && PyLong_Check(obj) && !PyBool_Check(obj)) {
-    uint64_t v = PyLong_AsUnsignedLongLong(obj);
-    if (v == static_cast<uint64_t>(-1) && PyErr_Occurred()) {
-      PyErr_Clear();
-      return std::nullopt;
-    }
-    return v;
+  if (!obj || !PyLong_Check(obj) || PyBool_Check(obj)) return std::nullopt;
+  uint64_t v = PyLong_AsUnsignedLongLong(obj);
+  if (v == static_cast<uint64_t>(-1) && PyErr_Occurred()) {
+    PyErr_Clear();
+    return std::nullopt;
   }
-  return std::nullopt;
+  return v;
 }
 
 int64_t PythonPolicy::extract_int(const SharedPyPtr &val) {
@@ -358,7 +319,7 @@ SharedPyPtr PythonPolicy::make_literal_int(int64_t v, uint8_t) {
 }
 
 SharedPyPtr PythonPolicy::make_literal_ptr(uint64_t addr) {
-  PyObject *obj = Py_BuildValue("(sK)", "ptr", addr);
+  PyObject *obj = PyLong_FromUnsignedLongLong(addr);
   SharedPyPtr result(obj);
   Py_XDECREF(obj);
   return result;
@@ -369,7 +330,14 @@ SharedPyPtr PythonPolicy::make_default() {
 }
 
 bool PythonPolicy::has_address(const SharedPyPtr &val) {
-  return extract_ptr_tuple(val.Get()).has_value();
+  PyObject *obj = val.Get();
+  if (!obj || !PyLong_Check(obj) || PyBool_Check(obj)) return false;
+  uint64_t v = PyLong_AsUnsignedLongLong(obj);
+  if (v == static_cast<uint64_t>(-1) && PyErr_Occurred()) {
+    PyErr_Clear();
+    return false;
+  }
+  return v != 0;
 }
 
 // ===========================================================================
@@ -512,11 +480,6 @@ SharedPyPtr PythonPolicy::ptr_add(const SharedPyPtr &base,
     if (!result) { capture_exception(); return make_default(); }
     Py_DECREF(result);
   }
-  // ptr_add yields a pointer; preserve the ("ptr", N) tagging so
-  // downstream `extract_address` can recover it. value_to_shared loses
-  // the tag (it always returns a PyLong), which would force callers
-  // through the symbolic-address suspension path with a default
-  // strategy that resolves to 0 and corrupts later memory ops.
   Value v = concrete_ptr_add(
       python_to_value(base.Get()), python_to_value(index.Get()), element_size);
   return make_literal_ptr(v.u64);
@@ -883,38 +846,38 @@ bool PythonPolicy::resolve_call(PythonScheduler &,
       return false;
     }
     if (result != Py_NotImplemented && result != Py_None) {
-      // Parse ("skip", return_value) or ("model", return_value).
-      if (PyTuple_Check(result) && PyTuple_Size(result) == 2) {
-        PyObject *tag = PyTuple_GetItem(result, 0);
-        PyObject *val = PyTuple_GetItem(result, 1);
-        if (tag && PyUnicode_Check(tag)) {
-          const char *action = PyUnicode_AsUTF8(tag);
-          if (action && std::strcmp(action, "skip") == 0) {
-            resolution.action = CallAction::SKIP;
-            if (val && val != Py_None) {
-              resolution.return_value = SharedPyPtr(val);
-            } else {
-              resolution.return_value = make_default();
-            }
-            Py_DECREF(result);
-            return true;
-          }
-          if (action && std::strcmp(action, "model") == 0) {
-            resolution.action = CallAction::MODEL;
-            if (val && val != Py_None) {
-              resolution.return_value = SharedPyPtr(val);
-            } else {
-              resolution.return_value = make_default();
-            }
-            Py_DECREF(result);
-            return true;
-          }
+      // Any non-None / non-NotImplemented return is a skip with that
+      // value as the call's result. A `Skip(value)` instance is the
+      // disambiguator for "skip even though the value is None"; we
+      // unwrap it here. Anything else is taken as the value itself.
+      static PyObject *cls_Skip = nullptr;
+      if (!cls_Skip) {
+        PyObject *mod = PyImport_ImportModule("multiplier.symex.events");
+        if (mod) {
+          cls_Skip = PyObject_GetAttrString(mod, "Skip");
+          Py_DECREF(mod);
+          if (!cls_Skip) PyErr_Clear();
+        } else {
+          PyErr_Clear();
         }
       }
+      resolution.action = CallAction::SKIP;
+      if (cls_Skip && PyObject_IsInstance(result, cls_Skip) > 0) {
+        PyObject *val = PyObject_GetAttrString(result, "value");
+        if (!val) {
+          PyErr_Clear();
+          resolution.return_value = make_default();
+        } else {
+          resolution.return_value = SharedPyPtr(val);
+          Py_DECREF(val);
+        }
+      } else {
+        resolution.return_value = SharedPyPtr(result);
+      }
       Py_DECREF(result);
-    } else {
-      Py_DECREF(result);
+      return true;
     }
+    Py_DECREF(result);
   }
 
   // Fall through to C++ func_resolver_.
@@ -1257,8 +1220,52 @@ PyObject *SymbolicStep(PyObject *state_obj, PyObject *memory_obj,
   sched.outcome.budget_exhausted = budget_hit;
   sched.outcome.steps = symbolic->steps;
 
+  // Lazily resolve the result/fork dataclass refs from the events
+  // module on first use. Each holds a strong ref for the lifetime of
+  // the process — they're class objects, not instances.
+  static PyObject *cls_Completed = nullptr;
+  static PyObject *cls_Errored = nullptr;
+  static PyObject *cls_Budget = nullptr;
+  static PyObject *cls_Branch = nullptr;
+  static PyObject *cls_Switch = nullptr;
+  static PyObject *cls_MemAddr = nullptr;
+  static PyObject *cls_GlobalSusp = nullptr;
+  static PyObject *cls_Suspended = nullptr;
+  static PyObject *cls_BranchFork = nullptr;
+  static PyObject *cls_SwitchFork = nullptr;
+  static PyObject *cls_MemAddrFork = nullptr;
+  static PyObject *cls_GlobalFork = nullptr;
+  if (!cls_Completed) {
+    PyObject *mod = PyImport_ImportModule("multiplier.symex.events");
+    if (!mod) return nullptr;
+    auto fetch = [&](const char *name) -> PyObject * {
+      return PyObject_GetAttrString(mod, name);
+    };
+    cls_Completed = fetch("Completed");
+    cls_Errored = fetch("Errored");
+    cls_Budget = fetch("Budget");
+    cls_Branch = fetch("Branch");
+    cls_Switch = fetch("Switch");
+    cls_MemAddr = fetch("MemAddrSuspension");
+    cls_GlobalSusp = fetch("GlobalSuspension");
+    cls_Suspended = fetch("Suspended");
+    cls_BranchFork = fetch("BranchFork");
+    cls_SwitchFork = fetch("SwitchFork");
+    cls_MemAddrFork = fetch("MemAddrFork");
+    cls_GlobalFork = fetch("GlobalFork");
+    Py_DECREF(mod);
+    if (!cls_Completed || !cls_Errored || !cls_Budget || !cls_Branch ||
+        !cls_Switch || !cls_MemAddr || !cls_GlobalSusp || !cls_Suspended ||
+        !cls_BranchFork || !cls_SwitchFork || !cls_MemAddrFork ||
+        !cls_GlobalFork) {
+      return nullptr;
+    }
+  }
+
   PyObject *result_dict = PyDict_New();
   if (!result_dict) return nullptr;
+
+  PyObject *result_obj = nullptr;
 
   // Terminal outcomes take precedence over continuations.
   if (sched.outcome.terminal) {
@@ -1266,14 +1273,10 @@ PyObject *SymbolicStep(PyObject *state_obj, PyObject *memory_obj,
     if (term.kind == TerminalKind::COMPLETED) {
       PyObject *py_val = term.return_value.Get();
       if (!py_val) py_val = Py_None;
-      PyObject *result_tuple = Py_BuildValue("(sO)", "completed", py_val);
-      PyDict_SetItemString(result_dict, "result", result_tuple);
-      Py_XDECREF(result_tuple);
+      result_obj = PyObject_CallFunction(cls_Completed, "(O)", py_val);
     } else {
-      PyObject *result_tuple = Py_BuildValue(
-          "(si)", "error", static_cast<int>(term.error_kind));
-      PyDict_SetItemString(result_dict, "result", result_tuple);
-      Py_XDECREF(result_tuple);
+      result_obj = PyObject_CallFunction(
+          cls_Errored, "(i)", static_cast<int>(term.error_kind));
     }
   } else if (!sched.outcome.continuations.empty()) {
     auto *first = sched.outcome.continuations.front().get();
@@ -1282,172 +1285,152 @@ PyObject *SymbolicStep(PyObject *state_obj, PyObject *memory_obj,
       if (!cond_obj) cond_obj = Py_None;
       uint64_t tb_eid = EntityId(bc->true_block().id()).Pack();
       uint64_t fb_eid = EntityId(bc->false_block().id()).Pack();
-      PyObject *result_tuple = Py_BuildValue(
-          "(sOKK)", "branch", cond_obj, tb_eid, fb_eid);
-      PyDict_SetItemString(result_dict, "result", result_tuple);
-      Py_XDECREF(result_tuple);
+      result_obj = PyObject_CallFunction(
+          cls_Branch, "(OKK)", cond_obj, tb_eid, fb_eid);
     } else if (auto *mc = dynamic_cast<MemAddrContinuation<SharedPyPtr, PyObjectRC> *>(first)) {
       PyObject *addr_obj = mc->symbolic_address().Get();
       if (!addr_obj) addr_obj = Py_None;
-      const char *sub_kind;
-      if (mc->is_call_target()) {
-        sub_kind = "call-addr";  // Phase 9: symbolic indirect-call callee
-      } else if (mc->is_write()) {
-        sub_kind = "store-addr";
-      } else {
-        sub_kind = "load-addr";
-      }
-      PyObject *result_tuple = Py_BuildValue(
-          "(ssOKIN)", "suspended",
-          sub_kind,
+      result_obj = PyObject_CallFunction(
+          cls_MemAddr, "(OKIOO)",
           addr_obj,
           static_cast<uint64_t>(mc->address_eid()),
           static_cast<unsigned int>(mc->size_bytes()),
-          PyBool_FromLong(mc->is_write() ? 1 : 0));
-      PyDict_SetItemString(result_dict, "result", result_tuple);
-      Py_XDECREF(result_tuple);
+          mc->is_write() ? Py_True : Py_False,
+          mc->is_call_target() ? Py_True : Py_False);
     } else if (auto *sc = dynamic_cast<SwitchContinuation<SharedPyPtr, PyObjectRC> *>(first)) {
       PyObject *sel_obj = sc->selector().Get();
       if (!sel_obj) sel_obj = Py_None;
-      PyObject *result_tuple = Py_BuildValue(
-          "(sOK)", "switch", sel_obj,
+      result_obj = PyObject_CallFunction(
+          cls_Switch, "(OK)", sel_obj,
           static_cast<uint64_t>(sc->selector_eid()));
-      PyDict_SetItemString(result_dict, "result", result_tuple);
-      Py_XDECREF(result_tuple);
+    } else if (auto *gc = dynamic_cast<GlobalContinuation<SharedPyPtr, PyObjectRC> *>(first)) {
+      result_obj = PyObject_CallFunction(
+          cls_GlobalSusp, "(KK)",
+          static_cast<uint64_t>(gc->entity_id()),
+          static_cast<uint64_t>(gc->instruction_id()));
     } else {
-      PyObject *desc = PyUnicode_FromString(first->describe().c_str());
-      PyObject *result_tuple = Py_BuildValue("(sO)", "suspended", desc);
-      PyDict_SetItemString(result_dict, "result", result_tuple);
-      Py_XDECREF(result_tuple);
-      Py_XDECREF(desc);
+      result_obj = PyObject_CallFunction(
+          cls_Suspended, "(s)", first->describe().c_str());
     }
+  } else if (sched.outcome.budget_exhausted) {
+    result_obj = PyObject_CallFunction(
+        cls_Budget, "(K)", sched.outcome.steps);
   } else {
-    if (sched.outcome.budget_exhausted) {
-      PyObject *budget_tuple = Py_BuildValue(
-          "(sK)", "budget", sched.outcome.steps);
-      PyDict_SetItemString(result_dict, "result", budget_tuple);
-      Py_XDECREF(budget_tuple);
-    } else {
-      PyDict_SetItemString(result_dict, "result", Py_None);
-    }
+    Py_INCREF(Py_None);
+    result_obj = Py_None;
   }
 
-  // Build forks list by enumerating each continuation. Branches walk
-  // their `next()` enumeration ({false, true}); each Resumption already
-  // carries a clone with cond_eid bound and DECIDE_COND_BRANCH re-pushed
-  // — stepping it dispatches the right edge. Memory-address suspensions
-  // produce a single fork holding the snapshot — the driver picks
-  // concrete addresses and calls `resume_addr` on each clone.
+  if (!result_obj) {
+    Py_DECREF(result_dict);
+    return nullptr;
+  }
+  PyDict_SetItemString(result_dict, "result", result_obj);
+  Py_DECREF(result_obj);
+
+  // Build forks list as typed *Fork dataclass instances. Each
+  // continuation contributes one or more entries depending on its
+  // enumeration shape (branches walk `next()` for {false, true}; the
+  // others produce one snapshot fork).
   PyObject *forks_list = PyList_New(0);
   for (auto &cont : sched.outcome.continuations) {
     if (auto *bc = dynamic_cast<BranchContinuation<SharedPyPtr, PyObjectRC> *>(cont.get())) {
       while (auto resumption = bc->next()) {
-        // resumption->state is already a fresh PyRef<SymbolicState>;
-        // hand it to the wrapper, which steals the strong ref.
         PyObject *state_obj = MakeSymbolicStateWrapper(
             std::move(resumption->state));
-        PyObject *dict = PyDict_New();
-        PyDict_SetItemString(dict, "state", state_obj);
-        Py_DECREF(state_obj);
         PyObject *dir_str = PyUnicode_FromString(resumption->label.c_str());
-        PyDict_SetItemString(dict, "direction", dir_str);
+        PyObject *fork = PyObject_CallFunction(
+            cls_BranchFork, "(OO)", state_obj, dir_str);
+        Py_DECREF(state_obj);
         Py_DECREF(dir_str);
-        PyList_Append(forks_list, dict);
-        Py_DECREF(dict);
+        if (!fork) {
+          Py_DECREF(forks_list);
+          Py_DECREF(result_dict);
+          return nullptr;
+        }
+        PyList_Append(forks_list, fork);
+        Py_DECREF(fork);
       }
     } else if (auto *sc = dynamic_cast<SwitchContinuation<SharedPyPtr, PyObjectRC> *>(cont.get())) {
       auto snap = sc->snapshot();
       if (!snap) continue;
-      // One fork entry per switch suspension; the driver walks
-      // `cases` + `default_block_eid` and clones the snapshot per
-      // child. The snapshot is stashed in `state` (already a fresh
-      // wrapper, not cloned — the driver clones via _interp.clone_state).
       PyObject *state_obj = MakeSymbolicStateWrapper(snap->clone());
-      PyObject *dict = PyDict_New();
-      PyDict_SetItemString(dict, "state", state_obj);
-      Py_XDECREF(state_obj);
-      PyObject *kind_str = PyUnicode_FromString("switch");
-      PyDict_SetItemString(dict, "kind", kind_str);
-      Py_DECREF(kind_str);
       PyObject *sel_obj = sc->selector().Get();
       if (!sel_obj) sel_obj = Py_None;
-      Py_INCREF(sel_obj);
-      PyDict_SetItemString(dict, "selector", sel_obj);
-      Py_DECREF(sel_obj);
-      PyObject *eid_obj = PyLong_FromUnsignedLongLong(sc->selector_eid());
-      PyDict_SetItemString(dict, "selector_eid", eid_obj);
-      Py_DECREF(eid_obj);
       PyObject *cases_list = PyList_New(0);
       for (const auto &c : sc->cases()) {
         uint64_t target_eid = EntityId(c.target_block.id()).Pack();
         PyObject *block_obj = ::mx::to_python<IRBlock>(c.target_block);
-        if (!block_obj) {
-          Py_INCREF(Py_None);
-          block_obj = Py_None;
-        }
-        // (low, high, target_block_eid, target_block_obj). Driver uses
-        // the eid for events / path-condition records and the IRBlock
-        // object for `_interp.resume_switch_case`.
+        if (!block_obj) { Py_INCREF(Py_None); block_obj = Py_None; }
         PyObject *case_tuple = Py_BuildValue(
             "(LLKN)", static_cast<long long>(c.low),
             static_cast<long long>(c.high),
-            target_eid, block_obj);  // 'N' steals block_obj
+            target_eid, block_obj);
         PyList_Append(cases_list, case_tuple);
         Py_DECREF(case_tuple);
       }
-      PyDict_SetItemString(dict, "cases", cases_list);
-      Py_DECREF(cases_list);
+      PyObject *def_block = nullptr;
+      PyObject *def_eid_obj = nullptr;
       uint64_t default_eid = EntityId(sc->default_block().id()).Pack();
       if (default_eid != 0) {
-        PyObject *def_eid = PyLong_FromUnsignedLongLong(default_eid);
-        PyDict_SetItemString(dict, "default_block_eid", def_eid);
-        Py_DECREF(def_eid);
-        PyObject *def_block = ::mx::to_python<IRBlock>(sc->default_block());
-        if (!def_block) {
-          Py_INCREF(Py_None);
-          def_block = Py_None;
-        }
-        PyDict_SetItemString(dict, "default_block", def_block);
-        Py_DECREF(def_block);
+        def_eid_obj = PyLong_FromUnsignedLongLong(default_eid);
+        def_block = ::mx::to_python<IRBlock>(sc->default_block());
+        if (!def_block) { Py_INCREF(Py_None); def_block = Py_None; }
       } else {
-        Py_INCREF(Py_None);
-        PyDict_SetItemString(dict, "default_block_eid", Py_None);
-        Py_DECREF(Py_None);
-        Py_INCREF(Py_None);
-        PyDict_SetItemString(dict, "default_block", Py_None);
-        Py_DECREF(Py_None);
+        Py_INCREF(Py_None); def_eid_obj = Py_None;
+        Py_INCREF(Py_None); def_block = Py_None;
       }
-      PyList_Append(forks_list, dict);
-      Py_DECREF(dict);
+      PyObject *fork = PyObject_CallFunction(
+          cls_SwitchFork, "(OOKOOO)",
+          state_obj, sel_obj,
+          static_cast<uint64_t>(sc->selector_eid()),
+          cases_list, def_block, def_eid_obj);
+      Py_DECREF(state_obj);
+      Py_DECREF(cases_list);
+      Py_DECREF(def_block);
+      Py_DECREF(def_eid_obj);
+      if (!fork) {
+        Py_DECREF(forks_list);
+        Py_DECREF(result_dict);
+        return nullptr;
+      }
+      PyList_Append(forks_list, fork);
+      Py_DECREF(fork);
+    } else if (auto *gc = dynamic_cast<GlobalContinuation<SharedPyPtr, PyObjectRC> *>(cont.get())) {
+      auto snap = gc->snapshot();
+      if (!snap) continue;
+      PyObject *state_obj = MakeSymbolicStateWrapper(snap->clone());
+      PyObject *fork = PyObject_CallFunction(
+          cls_GlobalFork, "(OKK)", state_obj,
+          static_cast<uint64_t>(gc->entity_id()),
+          static_cast<uint64_t>(gc->instruction_id()));
+      Py_DECREF(state_obj);
+      if (!fork) {
+        Py_DECREF(forks_list);
+        Py_DECREF(result_dict);
+        return nullptr;
+      }
+      PyList_Append(forks_list, fork);
+      Py_DECREF(fork);
     } else if (auto *mc = dynamic_cast<MemAddrContinuation<SharedPyPtr, PyObjectRC> *>(cont.get())) {
       auto snap = mc->snapshot();
       if (!snap) continue;
-      // Clone the snapshot so the driver can mutate (resume_addr) without
-      // disturbing the original continuation's snapshot reference.
       PyObject *state_obj = MakeSymbolicStateWrapper(snap->clone());
-      PyObject *dict = PyDict_New();
-      PyDict_SetItemString(dict, "state", state_obj);
-      Py_XDECREF(state_obj);
-      PyObject *kind_str = PyUnicode_FromString(
-          mc->is_write() ? "store-addr" : "load-addr");
-      PyDict_SetItemString(dict, "kind", kind_str);
-      Py_DECREF(kind_str);
       PyObject *addr_obj = mc->symbolic_address().Get();
       if (!addr_obj) addr_obj = Py_None;
-      Py_INCREF(addr_obj);
-      PyDict_SetItemString(dict, "address", addr_obj);
-      Py_DECREF(addr_obj);
-      PyObject *eid_obj = PyLong_FromUnsignedLongLong(mc->address_eid());
-      PyDict_SetItemString(dict, "address_eid", eid_obj);
-      Py_DECREF(eid_obj);
-      PyObject *size_obj = PyLong_FromUnsignedLong(mc->size_bytes());
-      PyDict_SetItemString(dict, "size", size_obj);
-      Py_DECREF(size_obj);
-      PyObject *iw_obj = PyBool_FromLong(mc->is_write() ? 1 : 0);
-      PyDict_SetItemString(dict, "is_write", iw_obj);
-      Py_DECREF(iw_obj);
-      PyList_Append(forks_list, dict);
-      Py_DECREF(dict);
+      PyObject *fork = PyObject_CallFunction(
+          cls_MemAddrFork, "(OOKIO)",
+          state_obj, addr_obj,
+          static_cast<uint64_t>(mc->address_eid()),
+          static_cast<unsigned int>(mc->size_bytes()),
+          mc->is_write() ? Py_True : Py_False);
+      Py_DECREF(state_obj);
+      if (!fork) {
+        Py_DECREF(forks_list);
+        Py_DECREF(result_dict);
+        return nullptr;
+      }
+      PyList_Append(forks_list, fork);
+      Py_DECREF(fork);
     }
   }
   PyDict_SetItemString(result_dict, "forks", forks_list);

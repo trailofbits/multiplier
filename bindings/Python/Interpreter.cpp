@@ -69,16 +69,6 @@ Value python_to_value(PyObject *obj) {
     }
     return make_int(v);
   }
-  if (PyTuple_Check(obj) && PyTuple_Size(obj) == 2) {
-    // Legacy ("ptr", addr) tuple — treat as integer.
-    PyObject *tag = PyTuple_GetItem(obj, 0);
-    if (tag && PyUnicode_Check(tag)) {
-      const char *s = PyUnicode_AsUTF8(tag);
-      if (s && std::strcmp(s, "ptr") == 0) {
-        return make_uint(PyLong_AsUnsignedLongLong(PyTuple_GetItem(obj, 1)));
-      }
-    }
-  }
   return make_uint(0);
 }
 
@@ -548,34 +538,52 @@ static PyObject *py_init_state(PyObject *, PyObject *args) {
   return nullptr;
 }
 
-// Concrete-path step result — translates the StepOutcome's terminal
-// (completed / errored) or suspension shape into the Python dict the
-// existing harness expects.
+// Concrete-path step result — wraps the StepOutcome's terminal /
+// suspension shape in the typed dataclasses defined in
+// `multiplier.symex.events`. Class refs are loaded lazily on first
+// call; subsequent calls reuse the cached refs.
 static PyObject *build_result_dict(
     const ir::interpret::StepOutcome<Value, ir::interpret::PyObjectRC>
         &outcome) {
+  static PyObject *cls_Completed = nullptr;
+  static PyObject *cls_Errored = nullptr;
+  static PyObject *cls_Suspended = nullptr;
+  if (!cls_Completed) {
+    PyObject *mod = PyImport_ImportModule("multiplier.symex.events");
+    if (!mod) return nullptr;
+    cls_Completed = PyObject_GetAttrString(mod, "Completed");
+    cls_Errored = PyObject_GetAttrString(mod, "Errored");
+    cls_Suspended = PyObject_GetAttrString(mod, "Suspended");
+    Py_DECREF(mod);
+    if (!cls_Completed || !cls_Errored || !cls_Suspended) return nullptr;
+  }
+
   PyObject *result_dict = PyDict_New();
   if (!result_dict) return nullptr;
 
-  PyObject *result_tuple;
+  PyObject *result_obj = nullptr;
   if (outcome.terminal) {
     auto &term = *outcome.terminal;
     if (term.kind == TerminalKind::COMPLETED) {
       PyObject *py_val = value_to_python(term.return_value);
-      result_tuple = Py_BuildValue("(sN)", "completed", py_val);
+      result_obj = PyObject_CallFunction(cls_Completed, "(N)", py_val);
     } else {
-      result_tuple = Py_BuildValue("(si)", "error",
-                                   static_cast<int>(term.error_kind));
+      result_obj = PyObject_CallFunction(
+          cls_Errored, "(i)", static_cast<int>(term.error_kind));
     }
   } else if (!outcome.continuations.empty()) {
     auto &cont = *outcome.continuations.front();
-    PyObject *desc = PyUnicode_FromString(cont.describe().c_str());
-    result_tuple = Py_BuildValue("(sN)", "suspended", desc);
+    result_obj = PyObject_CallFunction(
+        cls_Suspended, "(s)", cont.describe().c_str());
   } else {
-    result_tuple = Py_BuildValue("(s)", "suspended");
+    result_obj = PyObject_CallFunction(cls_Suspended, "(s)", "");
   }
-  PyDict_SetItemString(result_dict, "result", result_tuple);
-  Py_XDECREF(result_tuple);
+  if (!result_obj) {
+    Py_DECREF(result_dict);
+    return nullptr;
+  }
+  PyDict_SetItemString(result_dict, "result", result_obj);
+  Py_DECREF(result_obj);
 
   PyObject *empty_forks = PyList_New(0);
   PyDict_SetItemString(result_dict, "forks", empty_forks);
@@ -625,12 +633,21 @@ static PyObject *py_step(PyObject *, PyObject *args) {
     }
 
     if (budget_hit) {
+      static PyObject *cls_Budget = nullptr;
+      if (!cls_Budget) {
+        PyObject *mod = PyImport_ImportModule("multiplier.symex.events");
+        if (!mod) return nullptr;
+        cls_Budget = PyObject_GetAttrString(mod, "Budget");
+        Py_DECREF(mod);
+        if (!cls_Budget) return nullptr;
+      }
       PyObject *result_dict = PyDict_New();
       if (!result_dict) return nullptr;
-      PyObject *budget_tuple = Py_BuildValue(
-          "(sK)", "budget", concrete->steps);
-      PyDict_SetItemString(result_dict, "result", budget_tuple);
-      Py_XDECREF(budget_tuple);
+      PyObject *budget_obj = PyObject_CallFunction(
+          cls_Budget, "(K)", concrete->steps);
+      if (!budget_obj) { Py_DECREF(result_dict); return nullptr; }
+      PyDict_SetItemString(result_dict, "result", budget_obj);
+      Py_DECREF(budget_obj);
       PyObject *empty_forks = PyList_New(0);
       PyDict_SetItemString(result_dict, "forks", empty_forks);
       Py_DECREF(empty_forks);
@@ -701,10 +718,10 @@ static PyObject *py_resume_addr(PyObject *, PyObject *args) {
                     "resume_addr: symbolic state has no live call frame");
     return nullptr;
   }
-  PyObject *ptr_tuple = Py_BuildValue("(sK)", "ptr", chosen_addr);
-  if (!ptr_tuple) return nullptr;
-  SharedPyPtr ptr_val(ptr_tuple);
-  Py_DECREF(ptr_tuple);
+  PyObject *ptr_obj = PyLong_FromUnsignedLongLong(chosen_addr);
+  if (!ptr_obj) return nullptr;
+  SharedPyPtr ptr_val(ptr_obj);
+  Py_DECREF(ptr_obj);
   symbolic->call_stack.top().values[address_eid] = ptr_val;
   Py_RETURN_NONE;
 }
@@ -739,6 +756,39 @@ static PyObject *py_resume_addr_symbolic(PyObject *, PyObject *args) {
     return nullptr;
   }
   symbolic->call_stack.top().values[address_eid] = SharedPyPtr(py_value);
+  Py_RETURN_NONE;
+}
+
+// Resume a state suspended on an unresolved global. The snapshot's
+// work_stack still holds the suspended COMPUTE_GLOBAL_PTR item, so
+// stepping it after this call will re-enter `compute_global_ptr` and
+// hit the `state.global_addresses` cache — that cache is what the
+// substrate reads first (InterpreterLoop.h:791-795).
+//
+//   resume_global(state, entity_id, concrete_addr)
+static PyObject *py_resume_global(PyObject *, PyObject *args) {
+  PyObject *state_obj;
+  uint64_t entity_id;
+  uint64_t chosen_addr;
+  if (!PyArg_ParseTuple(args, "OKK", &state_obj, &entity_id,
+                         &chosen_addr)) {
+    return nullptr;
+  }
+  if (Py_TYPE(state_obj) != &InterpreterStateType) {
+    PyErr_SetString(PyExc_TypeError, "Expected InterpreterState");
+    return nullptr;
+  }
+  auto *sw = reinterpret_cast<InterpreterStateWrapper *>(state_obj);
+  auto *symbolic = sw->symbolic_state
+      ? reinterpret_cast<ir::interpret::PyWrapperFor<SymbolicState> *>(
+            sw->symbolic_state)->data
+      : nullptr;
+  if (!symbolic) {
+    PyErr_SetString(PyExc_RuntimeError,
+                    "resume_global: symbolic state not initialized");
+    return nullptr;
+  }
+  symbolic->global_addresses[entity_id] = chosen_addr;
   Py_RETURN_NONE;
 }
 
@@ -977,6 +1027,11 @@ static PyMethodDef InterpreterMethods[] = {
    "  Resume a state suspended on a symbolic SWITCH selector by "
    "entering the chosen target IRBlock. Path-condition constraints are "
    "the driver's responsibility."},
+  {"resume_global", py_resume_global, METH_VARARGS,
+   "resume_global(state, entity_id, concrete_addr)\n"
+   "  Resume a state suspended on an unresolved global by writing the "
+   "chosen address into the global_addresses cache; on the next step "
+   "the re-pushed COMPUTE_GLOBAL_PTR item cache-hits and proceeds."},
   {"get_value_at", py_get_value_at, METH_VARARGS,
    "get_value_at(state, eid) -> Python value\n"
    "  Read the cached value at an operand entity-id from the live "

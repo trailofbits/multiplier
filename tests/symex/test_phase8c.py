@@ -63,10 +63,10 @@ def test_p8c_1_shadow_roundtrips_symbolic_write(index):
     sym = z3.BitVec("sym_ret", SIZE * 8)
 
     writer = InterceptorPolicy(engine, path=path, layout=engine.layout)
-    writer.mem_write(("ptr", SLOT), sym, SIZE, False)
+    writer.mem_write(SLOT, sym, SIZE, False)
 
     reader = InterceptorPolicy(engine, path=path, layout=engine.layout)
-    got = reader.mem_read(("ptr", SLOT), SIZE, False)
+    got = reader.mem_read(SLOT, SIZE, False)
 
     assert _is_z3(got), \
         f"expected z3 expression from shadow read; got {type(got).__name__}"

@@ -66,9 +66,11 @@ def test_p0_1_init_state_at_entry_block_runs_to_completion(
     result = _run_via_init_state_at(index, ir, ir.entry_block,
                                      func_resolver=func_resolver,
                                      global_resolver=global_resolver)
+    from multiplier.symex.events import Completed
     assert result is not None, "interpreter returned no result"
-    assert result[0] == "completed", f"expected completed, got {result}"
-    assert result[1] == 0, f"test_arithmetic should return 0, got {result[1]}"
+    assert isinstance(result, Completed), f"expected Completed, got {result!r}"
+    assert result.return_value == 0, \
+        f"test_arithmetic should return 0, got {result.return_value}"
 
 
 def test_p0_2_init_state_at_non_entry_block_starts_there(
@@ -97,8 +99,9 @@ def test_p0_2_init_state_at_non_entry_block_starts_there(
     # Acceptable terminals: completed (likely with a different return
     # value than the canonical run), or error (e.g., uninitialized
     # locals) — we just need the loop to have run from `non_entry`.
-    assert result[0] in ("completed", "error"), \
-        f"unexpected terminal status: {result}"
+    from multiplier.symex.events import Completed, Errored
+    assert isinstance(result, (Completed, Errored)), \
+        f"unexpected terminal status: {result!r}"
 
 
 # --- P0.3: regression gate marker ----------------------------------------

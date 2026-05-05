@@ -6,18 +6,16 @@
 """Phase 8e — close the LOCAL_VALUE alloca regression that Phase 8d
 surfaced but couldn't fix in scope.
 
-The bug: `PythonPolicy::ptr_offset` and `ptr_add` fall back to the
-shared C++ concrete implementation when the InterceptorPolicy returns
-NotImplemented (its concrete-input fast path). The fallback used to
-funnel results through `value_to_shared`, which lowers a `Value` to a
-plain `PyLong`. The pointer "tag" carried by `("ptr", N)` tuples was
-lost — and downstream `extract_address` only recognizes tuples, so
-every GEP_FIELD-derived address looked symbolic to the substrate. The
-default address strategy concretized those to 0, sending all field
-stores to address 0 and leaving every `LOCAL_VALUE` slot zero-filled.
+The historical bug: `PythonPolicy::ptr_offset` and `ptr_add` used to
+fall back through `value_to_shared`, which produced bare PyLongs;
+`extract_address` only recognized `("ptr", N)` tuples then, so every
+GEP_FIELD-derived address looked symbolic. The default address
+strategy concretized those to 0, zero-filling every LOCAL_VALUE.
 
-The fix wraps both fallback paths in `make_literal_ptr` instead of
-`value_to_shared`, preserving the pointer tag.
+Pointer values now travel as bare ints throughout (the kind tag was
+removed), and `extract_address` recognizes them directly. The fix
+here was wrapping the fallback paths in `make_literal_ptr` so the
+pointer flowed back without being routed through `value_to_shared`.
 
 Catalog:
 
@@ -44,9 +42,10 @@ from conftest import run_via_concrete_policy
 
 
 def test_p8e_1_local_value_alloca_resolves(index):
-    """`make_large(7)` returns `("ptr", N)` and the slot decodes to the
-    five field values. Pre-fix the slot was zero-filled because the
-    GEP_FIELD-derived addresses were silently concretized to 0."""
+    """`make_large(7)` returns the slot address and the slot decodes
+    to the five field values. Pre-fix the slot was zero-filled
+    because the GEP_FIELD-derived addresses were silently
+    concretized to 0."""
     engine = SymExEngine(index)
     engine.layout = Layout()
     paths = engine.explore("make_large", args=[7])
@@ -57,9 +56,9 @@ def test_p8e_1_local_value_alloca_resolves(index):
         f"unexpected terminal {p.terminal!r}"
 
     rv = p.return_value
-    assert isinstance(rv, tuple) and len(rv) == 2 and rv[0] == "ptr", \
-        f"expected ('ptr', N) tuple; got {rv!r}"
-    slot_addr = rv[1]
+    assert isinstance(rv, int) and not isinstance(rv, bool), \
+        f"expected an int address; got {rv!r}"
+    slot_addr = rv
     assert slot_addr != 0
 
     data = p.mem.read_bytes(slot_addr, 20)

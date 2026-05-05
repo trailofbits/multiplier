@@ -21,9 +21,8 @@ class PassthroughPolicy:
 class SymExpr:
     """Opaque symbolic value used by ForkOnSymbolicBranchPolicy.
 
-    A class (not a tuple) so the substrate's address-extraction
-    heuristic — which matches 2-tuples whose first element is "ptr" —
-    cannot accidentally see a symbolic compare result as a pointer.
+    A class (not an int) so the substrate's address-extraction
+    can't mistake a symbolic compare result for a concrete pointer.
     """
     __slots__ = ("kind", "args")
 
@@ -45,12 +44,10 @@ class SymExpr:
 def _extract_addr(addr):
     """Pull a concrete address out of the substrate's value form.
 
-    The substrate hands the policy ("ptr", N) tuples for live pointers
-    and bare ints occasionally; both should normalize to an int.
+    Pointers come through as bare ints; anything else (None, symbolic
+    objects) yields None.
     """
-    if isinstance(addr, tuple) and len(addr) == 2 and addr[0] == "ptr":
-        return int(addr[1])
-    if isinstance(addr, int):
+    if isinstance(addr, int) and not isinstance(addr, bool):
         return addr
     return None
 
@@ -241,18 +238,23 @@ def run_until_terminal(state, mem, policy, func_resolver, global_resolver,
                        max_total_steps=100000, slice_steps=10000):
     """Drive the symbolic step loop until completion / error / suspended.
 
-    Returns the final ``result`` tuple from the last step dict.
+    Returns the final result dataclass from the last step dict.
     """
+    from multiplier.symex.events import (
+        Completed, Errored, Budget, Suspended,
+        MemAddrSuspension, GlobalSuspension,
+    )
+    terminal_types = (Completed, Errored, Suspended,
+                       MemAddrSuspension, GlobalSuspension)
     while state.steps < max_total_steps:
         out = interp.step(state, mem, policy, slice_steps,
                           func_resolver, global_resolver)
         result = out.get("result")
         if result is None:
             return None
-        status = result[0]
-        if status in ("completed", "error", "suspended"):
+        if isinstance(result, terminal_types):
             return result
-        if status == "budget":
+        if isinstance(result, Budget):
             continue
         return result
     return None
@@ -287,6 +289,10 @@ def run_via_concrete_policy(index, name, args=None):
     state = interp.InterpreterState()
     interp.init_state(state, policy, ir, args)
 
+    from multiplier.symex.events import (
+        Completed, Errored, Budget, Suspended,
+        MemAddrSuspension, GlobalSuspension,
+    )
     max_total_steps = 100000
     while state.steps < max_total_steps:
         out = interp.step(state, policy, 1000)
@@ -295,12 +301,12 @@ def run_via_concrete_policy(index, name, args=None):
         result = out.get("result") if isinstance(out, dict) else out
         if result is None:
             return None
-        status = result[0]
-        if status == "completed":
-            return result[1]
-        if status in ("error", "suspended"):
+        if isinstance(result, Completed):
+            return result.return_value
+        if isinstance(result, (Errored, Suspended,
+                               MemAddrSuspension, GlobalSuspension)):
             return None
-        if status == "budget":
+        if isinstance(result, Budget):
             continue
         return None
     return None

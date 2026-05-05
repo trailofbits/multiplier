@@ -29,9 +29,11 @@ from .path import Path, FindingsList
 from ._types import Endian
 from .events import (
     EventLog, EventKind, BRANCH, BranchDirection, Terminal, StopNow,
-    StepResultKind, Strategy, _FilterableList,
+    Strategy, _FilterableList,
     ADDRESS_FOR, ADDRESS_RESOLVED, INDIRECT_CALL_RESOLVED,
     SWITCH_CASE, SWITCH_DEFAULT,
+    Completed, Errored, Budget, Branch, Switch,
+    MemAddrSuspension, GlobalSuspension, Suspended,
 )
 from .until import ExploreUntil
 from .dispatch import (
@@ -1125,43 +1127,47 @@ class SymExEngine:
         if result is None:
             return [path]
 
-        kind = result[0]
-        if kind == StepResultKind.COMPLETED:
+        if isinstance(result, Completed):
             path.terminal = Terminal.COMPLETED
-            path.return_value = result[1]
+            path.return_value = result.return_value
             return [path]
-        if kind == StepResultKind.ERROR:
+        if isinstance(result, Errored):
             path.terminal = Terminal.ERROR
-            path.error_kind = result[1]
+            path.error_kind = result.error_kind
             return [path]
-        if kind == StepResultKind.BUDGET:
+        if isinstance(result, Budget):
             return [path]
-        if kind == StepResultKind.BRANCH:
+        if isinstance(result, Branch):
             return self._handle_branch_forks(path, result, forks)
-        if kind == StepResultKind.SWITCH:
+        if isinstance(result, Switch):
             return self._handle_switch_forks(path, result, forks)
-        if kind == StepResultKind.SUSPENDED:
-            sub_kind = forks[0].get("sub_kind") if forks else None
-            if sub_kind == "call-addr":
+        if isinstance(result, GlobalSuspension):
+            return self._handle_global_suspension(path, result, forks)
+        if isinstance(result, MemAddrSuspension):
+            if result.is_call_target:
                 return self._handle_symbolic_indirect_call(
                     path, result, forks, concretize)
             return self._handle_suspension(path, result, forks, concretize)
+        if isinstance(result, Suspended):
+            # Generic continuation we don't handle specifically.
+            path.terminal = Terminal.STUCK_SUSPENSION
+            return [path]
 
         path.terminal = Terminal.UNKNOWN
         return [path]
 
     def _handle_branch_forks(self, path, result, forks):
-        _, cond, t_eid, f_eid = result
         if not forks:
             path.terminal = Terminal.STUCK_BRANCH
             return [path]
 
+        cond = result.condition
         cond_z3 = _z3_bool(cond) if _is_z3(cond) else None
 
         children = []
         for entry in forks:
-            child_state = entry["state"]
-            direction = entry.get("direction", BranchDirection.UNKNOWN)
+            child_state = entry.state
+            direction = entry.direction or BranchDirection.UNKNOWN
             child = self._fork_child(path, child_state)
             if cond_z3 is not None:
                 if direction == BranchDirection.TRUE:
@@ -1173,8 +1179,8 @@ class SymExEngine:
             child.events.append({
                 "kind": BRANCH,
                 "direction": direction,
-                "true_block": t_eid,
-                "false_block": f_eid,
+                "true_block": result.true_block,
+                "false_block": result.false_block,
                 "step": path.steps,
             })
             children.append(child)
@@ -1190,12 +1196,12 @@ class SymExEngine:
             return [path]
 
         fork = forks[0]
-        sel = fork.get("selector")
-        sel_eid = int(fork.get("selector_eid") or 0)
-        cases = fork.get("cases") or []
-        default_block_obj = fork.get("default_block")
-        default_eid = fork.get("default_block_eid")
-        snapshot_state = fork["state"]
+        sel = fork.selector
+        sel_eid = int(fork.selector_eid or 0)
+        cases = fork.cases or []
+        default_block_obj = fork.default_block
+        default_eid = fork.default_block_eid
+        snapshot_state = fork.state
 
         sel_is_z3 = _is_z3(sel)
         z3 = _z3_module() if sel_is_z3 else None
@@ -1278,6 +1284,39 @@ class SymExEngine:
             return [path]
         return children
 
+    def _handle_global_suspension(self, path, result, forks):
+        """Resolve a GLOBAL_PTR suspension by firing the address_for
+        chain for the entity. On hit: write to global_addresses cache
+        and re-step from the snapshot (compute_global_ptr cache-hits).
+        On miss: terminate the path with UNRESOLVED_GLOBAL — nothing
+        knows where this global lives, so we can't make progress.
+        """
+        if not forks:
+            path.suspended = result
+            path.terminal = Terminal.STUCK_SUSPENSION
+            return [path]
+
+        fork = forks[0]
+        entity_id = int(fork.entity_id or 0)
+        snapshot_state = fork.state
+
+        name = None
+        if entity_id:
+            try:
+                decl = self._index.entity(entity_id)
+                if decl is not None and getattr(decl, "name", None):
+                    name = str(decl.name)
+            except Exception:
+                pass
+
+        addr = self._resolve_address_for(entity_id, name, "global", 0, 8)
+        if addr is None:
+            path.terminal = Terminal.UNRESOLVED_GLOBAL
+            return [path]
+
+        _interp.resume_global(snapshot_state, entity_id, int(addr))
+        return [self._fork_child(path, snapshot_state)]
+
     def _handle_suspension(self, path, result, forks, strategy):
         if not forks:
             path.suspended = result
@@ -1286,10 +1325,10 @@ class SymExEngine:
 
         fork_entry = forks[0]
         suspension = Suspension(
-            address_expr=fork_entry.get("address"),
-            address_eid=int(fork_entry.get("address_eid") or 0),
-            size=fork_entry.get("size"),
-            is_write=fork_entry.get("is_write"),
+            address_expr=fork_entry.address,
+            address_eid=int(fork_entry.address_eid or 0),
+            size=fork_entry.size,
+            is_write=fork_entry.is_write,
             path=path,
             layout=self.layout,
             solver=path.solver,
@@ -1317,8 +1356,8 @@ class SymExEngine:
         def _take_state():
             if not first_state_used[0]:
                 first_state_used[0] = True
-                return fork_entry["state"]
-            return _interp.clone_state(fork_entry["state"])
+                return fork_entry.state
+            return _interp.clone_state(fork_entry.state)
 
         for d in decisions:
             if isinstance(d, ConcretizeTo):
@@ -1356,8 +1395,8 @@ class SymExEngine:
             return [path]
 
         fork_entry = forks[0]
-        addr_expr = fork_entry.get("address")
-        address_eid = int(fork_entry.get("address_eid") or 0)
+        addr_expr = fork_entry.address
+        address_eid = int(fork_entry.address_eid or 0)
 
         from .dispatch import _build_chain, _DEFER
         from .ctx import Ctx
@@ -1443,8 +1482,8 @@ class SymExEngine:
         def take_state():
             if not first_used[0]:
                 first_used[0] = True
-                return fork_entry["state"]
-            return _interp.clone_state(fork_entry["state"])
+                return fork_entry.state
+            return _interp.clone_state(fork_entry.state)
 
         z3 = _z3_module()
         fork_idx = 0

@@ -12,7 +12,9 @@ substrate hands back string-keyed result tuples), but call sites can
 reference the typed members instead of repeating the literals.
 """
 
+from dataclasses import dataclass
 from enum import StrEnum
+from typing import Any, Optional
 
 
 class EventKind(StrEnum):
@@ -119,20 +121,119 @@ class Terminal(StrEnum):
     SINK_HIT = "sink-hit"
     # Phase 9: intercept.indirect_call returned None, refusing the call.
     UNRESOLVED_CALL = "unresolved-call"
+    # GLOBAL_PTR suspended on an unresolved entity and the address_for
+    # chain produced no answer — we can't make forward progress.
+    UNRESOLVED_GLOBAL = "unresolved-global"
     # Cosmetic placeholder used only by `path.summary()` when the path
     # is still live (`path.terminal is None`) — never actually written
     # to a Path.
     LIVE = "live"
 
 
-class StepResultKind(StrEnum):
-    """Kinds the C++ substrate returns in the `result` tuple."""
-    COMPLETED = "completed"
-    ERROR = "error"
-    BUDGET = "budget"
-    BRANCH = "branch"
-    SWITCH = "switch"
-    SUSPENDED = "suspended"
+# ===========================================================================
+# Step result + fork shapes
+#
+# The C++ substrate's `step()` call hands the Python driver one of these
+# typed result objects (in the dict's "result" slot) plus a list of typed
+# fork objects (in "forks"). Drivers dispatch via `isinstance`; the type
+# IS the discriminator. No string tags, no positional unpacking.
+# ===========================================================================
+
+@dataclass(frozen=True)
+class Completed:
+    return_value: Any
+
+
+@dataclass(frozen=True)
+class Errored:
+    error_kind: int
+
+
+@dataclass(frozen=True)
+class Budget:
+    steps: int
+
+
+@dataclass(frozen=True)
+class Branch:
+    condition: Any
+    true_block: int
+    false_block: int
+
+
+@dataclass(frozen=True)
+class Switch:
+    selector: Any
+    selector_eid: int
+
+
+@dataclass(frozen=True)
+class MemAddrSuspension:
+    address: Any
+    address_eid: int
+    size: int
+    is_write: bool
+    is_call_target: bool
+
+
+@dataclass(frozen=True)
+class GlobalSuspension:
+    entity_id: int
+    instruction_id: int
+
+
+@dataclass(frozen=True)
+class Suspended:
+    """Generic fallback for continuation kinds the driver doesn't
+    recognize specifically — carries only a description."""
+    description: str
+
+
+@dataclass(frozen=True)
+class Skip:
+    """Explicit "skip this call, use `value` as the return slot."
+
+    Most call handlers can return their replacement value directly —
+    the substrate treats any non-None return as a skip with that
+    value, since None already means "fall through to inlining."
+    `Skip(value)` is the disambiguator for the rare case where the
+    intent is to skip with `None` (e.g. `ctx.default()`).
+    """
+    value: Any = None
+
+
+# ---- Fork entries (one per resumption a continuation produces) ----
+
+@dataclass
+class BranchFork:
+    state: Any
+    direction: "BranchDirection"
+
+
+@dataclass
+class SwitchFork:
+    state: Any
+    selector: Any
+    selector_eid: int
+    cases: list  # list of (low, high, target_eid, target_block)
+    default_block: Any
+    default_block_eid: Optional[int]
+
+
+@dataclass
+class MemAddrFork:
+    state: Any
+    address: Any
+    address_eid: int
+    size: int
+    is_write: bool
+
+
+@dataclass
+class GlobalFork:
+    state: Any
+    entity_id: int
+    instruction_id: int
 
 
 class Strategy(StrEnum):
@@ -144,20 +245,6 @@ class Strategy(StrEnum):
 # constant used by Layout, MemView, Path, and the engine. Re-exported
 # here for back-compat with existing `from .events import Endian` users.
 from ._types import Endian  # noqa: E402,F401
-
-
-class CallAction(StrEnum):
-    """Substrate-facing tag for the second slot of resolve_call's
-    return tuple: ("skip", value) replaces the call with `value`;
-    ("model", value) is reserved for future modeled-call shapes."""
-    SKIP = "skip"
-    MODEL = "model"
-
-
-# Wire-protocol tag for "this Python value is a pointer to address N".
-# The C++ substrate inspects 2-tuples of shape `(VALUE_TAG_PTR, N)` to
-# recognise live pointers; keep this string stable.
-VALUE_TAG_PTR = "ptr"
 
 
 _MISSING = object()

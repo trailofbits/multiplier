@@ -8,9 +8,9 @@
 Phase 1 shipped read/write byte access. Phase 2 adds:
   - MemView.read_struct / write_struct over a (name, offset, size,
     signed) layout.
-  - ArgsView constructed from raw call args (ints, ("ptr", N) tuples,
-    arbitrary symbolic objects). `args[i]` returns the raw value;
-    typed accessors do the obvious thing.
+  - ArgsView constructed from raw call args (ints, arbitrary symbolic
+    objects). `args[i]` returns the raw value; typed accessors do the
+    obvious thing.
   - ArgsView.as_string(i) / as_pointer_to(i, type=...) for pointer
     arguments.
 """
@@ -23,9 +23,7 @@ from ._types import Endian
 
 
 def _coerce_addr(value):
-    """Pull an integer address out of a raw arg or pointer tuple."""
-    if isinstance(value, tuple) and len(value) == 2 and value[0] == "ptr":
-        return int(value[1])
+    """Pull an integer address out of a raw arg."""
     if isinstance(value, int) and not isinstance(value, bool):
         return int(value)
     return None
@@ -146,9 +144,9 @@ class ArgsView:
 
     Phase 2 unifies the previous mid-block-entry helper with the call-
     hook view. Constructed from a list of raw arg values; `args[i]`
-    returns the raw value (an int, a `("ptr", addr)` tuple, or an
-    arbitrary symbolic object). Typed accessors operate over either
-    the literal value or the pointed-to memory.
+    returns the raw value (an int, or an arbitrary symbolic object).
+    Typed accessors operate over either the literal value or the
+    pointed-to memory.
     """
 
     def __init__(self, mem_view, raw_args, sizes=None):

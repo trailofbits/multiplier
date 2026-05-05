@@ -37,14 +37,16 @@ class Ctx:
         self.solver = solver
 
     def default(self):
-        """The substrate's "natural default" for the current event.
+        """The substrate's "natural default" for the current event,
+        wrapped in `Skip` so the substrate treats it as an explicit
+        skip-with-this-value rather than a fall-through.
 
-        Phase 2 returns `None` for every event; per-event typed
-        defaults (e.g., width-correct zero for memory reads) can land
-        in Phase 3 if a use-case demands it. Use this when you want to
-        short-circuit a call or write without inlining.
+        Phase 2 uses `None` as the default value for every event;
+        per-event typed defaults (e.g., width-correct zero for
+        memory reads) can land later if a use-case demands it.
         """
-        return None
+        from .events import Skip
+        return Skip()
 
     def stop_path(self):
         """Mark the current path as stopped.

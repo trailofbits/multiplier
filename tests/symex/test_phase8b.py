@@ -171,7 +171,7 @@ def test_p8b_4_aggregate_return_still_reads_slot(index):
     standalone with concrete `base = 7`, then assert:
 
       1. The path completes.
-      2. `path.return_value` is a `("ptr", N)` tuple — proves the
+      2. `path.return_value` is an int address — proves the
          substrate took the `sz > 8` branch and returned the slot
          pointer rather than the RET's (now-undefined) operand.
       3. The 20-byte slot decodes to the five field values
@@ -189,10 +189,10 @@ def test_p8b_4_aggregate_return_still_reads_slot(index):
         f"unexpected terminal {p.terminal!r}"
 
     rv = p.return_value
-    assert isinstance(rv, tuple) and len(rv) == 2 and rv[0] == "ptr", \
-        f"expected ('ptr', N) tuple from sz>8 RET path; got {rv!r}"
+    assert isinstance(rv, int) and not isinstance(rv, bool), \
+        f"expected an int address from sz>8 RET path; got {rv!r}"
 
-    slot_addr = rv[1]
+    slot_addr = rv
     assert slot_addr != 0, \
         "return slot pointer is null — substrate didn't allocate"
     data = p.mem.read_bytes(slot_addr, 20)
@@ -229,7 +229,7 @@ def test_p8b_5_observe_global_read_fires_concrete(index):
         seen.append(payload)
 
     policy = InterceptorPolicy(engine, path=None, layout=engine.layout)
-    policy.mem_read(("ptr", BUF), 4, False)
+    policy.mem_read(BUF, 4, False)
 
     assert seen, "observe.global_read did not fire for a global access"
     hit = seen[0]
@@ -259,7 +259,7 @@ def test_p8b_6_observe_global_write_fires_concrete(index):
 
     # Drive a write through the policy directly (no IR run needed).
     policy = InterceptorPolicy(engine, path=None, layout=engine.layout)
-    policy.mem_write(("ptr", LOCK), 0xDEADBEEF, 4, False)
+    policy.mem_write(LOCK, 0xDEADBEEF, 4, False)
 
     assert seen, "observe.global_write did not fire for a global write"
     hit = seen[0]
@@ -353,7 +353,7 @@ def test_p8b_9_function_region_does_not_fire_global(index):
     # mem_read of a function placement: returns concrete (likely 0
     # since no memory backed there); we only care about the fan-out
     # filter.
-    policy.mem_read(("ptr", FN_ADDR), 4, False)
+    policy.mem_read(FN_ADDR, 4, False)
 
     assert not seen, \
         f"observe.global_read fired for a function placement: {seen!r}"
@@ -379,8 +379,8 @@ def test_p8b_10_global_read_selector_by_name(index):
         seen.append(payload)
 
     policy = InterceptorPolicy(engine, path=None, layout=engine.layout)
-    policy.mem_read(("ptr", LOCK), 4, False)
-    policy.mem_read(("ptr", USERS), 4, False)
+    policy.mem_read(LOCK, 4, False)
+    policy.mem_read(USERS, 4, False)
 
     assert len(seen) == 1, \
         f"selector should match only g_users; got {[p.get('name') for p in seen]}"
