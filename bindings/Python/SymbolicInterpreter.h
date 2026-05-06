@@ -366,6 +366,7 @@ class PythonPolicy
   PyObject *cached_on_enter_block_{nullptr};
   PyObject *cached_on_instruction_{nullptr};
   PyObject *cached_on_global_initialized_{nullptr};
+  PyObject *cached_mem_bulk_op_{nullptr};
 
   // Pending exception state. Captured when a Python hook raises so the
   // interpreter loop can exit cleanly and SymbolicStep can re-raise it.

@@ -47,6 +47,10 @@ class EventKind(StrEnum):
     ADDRESS_FOR = "address_for"
     ADDRESS_RESOLVED = "address_resolved"
     INDIRECT_CALL_RESOLVED = "indirect_call_resolved"
+    # Bulk memory ops (memcpy / memset / strlen / …) — one event per
+    # IR MEMORY-with-bulk-sub-opcode, so an analyst can intercept the
+    # whole op instead of seeing N per-byte mem_read / mem_write hooks.
+    BULK_MEMORY = "bulk_memory"
 
 
 # Module-level aliases — analysts and dispatcher import these by name.
@@ -69,6 +73,7 @@ INSTRUCTION = EventKind.INSTRUCTION
 ADDRESS_FOR = EventKind.ADDRESS_FOR
 ADDRESS_RESOLVED = EventKind.ADDRESS_RESOLVED
 INDIRECT_CALL_RESOLVED = EventKind.INDIRECT_CALL_RESOLVED
+BULK_MEMORY = EventKind.BULK_MEMORY
 
 
 ALL_EVENTS = frozenset({
@@ -80,6 +85,7 @@ ALL_EVENTS = frozenset({
     BLOCK_ENTER, INSTRUCTION,
     ADDRESS_FOR, ADDRESS_RESOLVED,
     INDIRECT_CALL_RESOLVED,
+    BULK_MEMORY,
 })
 
 
@@ -194,10 +200,11 @@ class Skip:
     """Explicit "skip this call, use `value` as the return slot."
 
     Most call handlers can return their replacement value directly —
-    the substrate treats any non-None return as a skip with that
-    value, since None already means "fall through to inlining."
-    `Skip(value)` is the disambiguator for the rare case where the
-    intent is to skip with `None` (e.g. `ctx.default()`).
+    `return None` stubs the call to return None, `return 42` returns
+    42, and so on. `NotImplemented` is the only signal that means
+    "fall through to inlining" (matching `mem_read` / `mem_write` and
+    the pure-op hooks). `Skip(value)` is kept as a typed marker that
+    `ctx.default()` returns; new handlers don't need to use it.
     """
     value: Any = None
 

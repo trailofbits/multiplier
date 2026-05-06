@@ -11,10 +11,12 @@ event-specific args and `next_hook`). It exposes the path, memory
 lens, args lens (for call events), layout, and solver.
 
 Hooks compose by calling `next_hook(...)` to forward to the rest of
-the chain. To short-circuit with the substrate's natural default
-(e.g., "let the call return None / 0 instead of inlining"), use
-`ctx.default()`. To stop the entire path cleanly, call
-`ctx.stop_path()` and then return `ctx.default()` (or any value).
+the chain. To short-circuit a call hook with `None` as the return
+value (the common "stub this function" case), just `return None`.
+`ctx.default()` is the typed equivalent. To fall through to the
+substrate's own resolver (e.g., let an IR function inline), return
+`NotImplemented`. To stop the entire path cleanly, call
+`ctx.stop_path()` and then return any value.
 """
 
 from .events import Terminal, StopNow
@@ -37,13 +39,12 @@ class Ctx:
         self.solver = solver
 
     def default(self):
-        """The substrate's "natural default" for the current event,
-        wrapped in `Skip` so the substrate treats it as an explicit
-        skip-with-this-value rather than a fall-through.
+        """The substrate's "natural default" for the current event.
 
-        Phase 2 uses `None` as the default value for every event;
-        per-event typed defaults (e.g., width-correct zero for
-        memory reads) can land later if a use-case demands it.
+        Equivalent to `return None` from a call handler — the call is
+        skipped with `None` as the return value. Returns `Skip()` (a
+        typed marker the substrate unwraps) so this is also safe in
+        any future hook surface that might re-disambiguate `None`.
         """
         from .events import Skip
         return Skip()

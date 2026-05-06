@@ -251,28 +251,22 @@ class NullDerefSink(Sink):
             mode="symbolic")
 
 
-# OpCode ranges for udiv / sdiv / urem / srem. Anchored to the IR
-# opcode names exactly like dispatch.py's compare/binary tables.
-_DIV_KINDS = ("UDIV", "DIV", "UREM", "REM")
-
-
 def _is_div_or_rem(op):
     """Return ("div"|"rem", is_signed) if `op` is a divide or remainder
-    opcode of any width, else None. Walks the cached `mx.ir.OpCode`
-    enum once per call; callers cache."""
+    opcode of any width, else None.
+
+    Drives off `mx.ir.OpCode(int(op)).name` so this stays in
+    lock-step with the C++ enum (no hand-maintained int table).
+    """
     import multiplier as mx
-    OP = mx.ir.OpCode
-    op_int = int(op)
-    for prefix in _DIV_KINDS:
-        for w in (8, 16, 32, 64):
-            try:
-                v = int(getattr(OP, f"{prefix}_{w}"))
-            except AttributeError:
-                continue
-            if v == op_int:
-                kind = "rem" if "REM" in prefix else "div"
-                signed = not prefix.startswith("U")
-                return (kind, signed)
+    try:
+        name = mx.ir.OpCode(int(op)).name
+    except ValueError:
+        return None
+    if name.startswith("UDIV_"): return ("div", False)
+    if name.startswith("DIV_"):  return ("div", True)
+    if name.startswith("UREM_"): return ("rem", False)
+    if name.startswith("REM_"):  return ("rem", True)
     return None
 
 

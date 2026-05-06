@@ -23,9 +23,39 @@ from ._types import Endian
 
 
 def _coerce_addr(value):
-    """Pull an integer address out of a raw arg."""
+    """Pull an integer address out of a raw arg.
+
+    Accepts plain Python ints and concrete z3 ``BitVecVal``s (after
+    z3.simplify), which is how concrete bytes flow when they come
+    back through a region overlay or per-path symbolic shadow.
+    Symbolic z3 expressions, ``None``, and other non-int shapes
+    return None — callers raise a typed error.
+    """
     if isinstance(value, int) and not isinstance(value, bool):
         return int(value)
+    return _bv_value_as_int(value)
+
+
+def _bv_value_as_int(value):
+    """Return the int value of a concrete z3 ``BitVecVal``, or None.
+
+    ``z3.simplify`` is run first so a constant expression like
+    ``Concat(BitVecVal(0, 8), BitVecVal(42, 8))`` collapses to a
+    single ``BitVecVal`` and round-trips correctly. Returns None for
+    any non-z3 value, symbolic z3 value, or when z3 is not installed.
+    """
+    try:
+        import z3 as _z3
+    except ImportError:
+        return None
+    if not isinstance(value, _z3.ExprRef):
+        return None
+    try:
+        simplified = _z3.simplify(value)
+    except Exception:
+        return None
+    if _z3.is_bv_value(simplified):
+        return simplified.as_long()
     return None
 
 
@@ -174,6 +204,18 @@ class ArgsView:
             return int(v)
         if isinstance(v, int):
             return v
+        # Concrete z3 BitVecVal (after simplify) — unwrap to a Python
+        # int. This is how concrete arg values arrive when they came
+        # back through a per-path shadow / region overlay.
+        bv = _bv_value_as_int(v)
+        if bv is not None:
+            if size is None:
+                return bv
+            mask = (1 << (size * 8)) - 1
+            bv &= mask
+            if signed and bv & (1 << (size * 8 - 1)):
+                bv -= 1 << (size * 8)
+            return bv
         # Pointer-shaped — read through it.
         a = _coerce_addr(v)
         if a is None:
