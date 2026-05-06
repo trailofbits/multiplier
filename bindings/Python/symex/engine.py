@@ -666,7 +666,7 @@ class SymExEngine:
 
     def explore(self, start_func, *, start_block=None, args=None, seed=None,
                 policy=None, until=None, slice_steps=_DEFAULT_SLICE_STEPS,
-                concretize=None, strategy=Strategy.BFS):
+                concretize=None, strategy=Strategy.BFS, from_path=None):
         ir_func = self._resolve_start(start_func)
         if ir_func is None:
             raise ValueError(f"start_func {start_func!r} not found in index")
@@ -699,9 +699,14 @@ class SymExEngine:
         init_policy = (InterceptorPolicy(self, None, layout=layout,
                                          memory=memory)
                        if use_interceptor else policy)
-        initial_path = self._init_path(
-            ir_func, memory, init_policy, args=args,
-            start_block=start_block, value_seed=seed)
+        if from_path is not None:
+            initial_path = self._init_path_after(
+                from_path, ir_func, memory, init_policy, args=args,
+                start_block=start_block, value_seed=seed)
+        else:
+            initial_path = self._init_path(
+                ir_func, memory, init_policy, args=args,
+                start_block=start_block, value_seed=seed)
 
         return PathSet(self._drive(
             [initial_path], memory, layout, policy,
@@ -1036,6 +1041,7 @@ class SymExEngine:
         path._func_name = self._function_name(ir_func)
         path._layout = self.layout
         path.entry_func = ir_func
+        path._engine = self
         # Set TLS base from layout (same for all paths; isolation via shadow).
         if self.layout is not None:
             path.tls_base = self.layout.tls_base
@@ -1047,6 +1053,95 @@ class SymExEngine:
             path._symbolic_shadow.update(init_shadow)
         # Register externally-supplied z3 BitVec args in the provenance
         # table so origin() / taint_sources() can trace through them.
+        self._register_z3_args(path, args)
+        return path
+
+    def _init_path_after(self, prior_path, ir_func, memory, policy, *, args,
+                          start_block=None, value_seed=None):
+        """Build an initial path for `engine.explore(..., from_path=…)`.
+
+        Clones `prior_path._state` and reinitializes it for `ir_func` —
+        `interp_init_state` (or `interp_init_state_at` when
+        `start_block` is given) clears `call_stack` / `work_stack` /
+        `global_addresses` / `function_addresses` / `steps` and pushes
+        a fresh entry frame for the target. The shared layout's
+        `ConcreteMemory` is unchanged, so substrate writes from the
+        prior exploration persist. Per-path symbolic state (shadow,
+        TLS, path condition, fresh vars, origin map, findings, vars)
+        is copied from `prior_path` so the new exploration sees
+        everything the previous one accumulated.
+
+        `shared` is shared by reference — that's its design contract;
+        analyst mutations during the chained explore remain visible
+        to anyone else holding the reference. Loop counters reset
+        because they're per-function-instantiation.
+        """
+        if args is None:
+            args = []
+        if value_seed is not None and start_block is None:
+            raise ValueError(
+                "value_seed requires start_block (mid-block entry)")
+
+        cloned_state = _interp.clone_state(prior_path._state)
+
+        prev_path = self._current_path
+        self._current_path = None
+        try:
+            if start_block is None:
+                _interp.init_state(cloned_state, memory, policy, ir_func,
+                                   list(args),
+                                   self._func_resolver, self._global_resolver,
+                                   self._func_addr_resolver,
+                                   self._entity_by_addr_resolver)
+            else:
+                block = self._resolve_block(ir_func, start_block)
+                param_addrs = self._allocate_param_slots(ir_func, memory, args)
+                seed_dict = {int(k): v for k, v
+                             in (value_seed or {}).items()}
+                _interp.init_state_at(
+                    cloned_state, memory, policy, ir_func, block,
+                    param_addrs, None, seed_dict,
+                    self._func_resolver, self._global_resolver,
+                    self._func_addr_resolver,
+                    self._entity_by_addr_resolver)
+        finally:
+            self._current_path = prev_path
+
+        path = Path(cloned_state, memory,
+                    parent_id=prior_path.id, endian=self.endian)
+        path._func_name = self._function_name(ir_func)
+        path._layout = self.layout
+        path.entry_func = ir_func
+        path._engine = self
+        if self.layout is not None:
+            path.tls_base = self.layout.tls_base
+
+        # Inherit per-path bits from the seed.
+        path._symbolic_shadow = dict(prior_path._symbolic_shadow)
+        path._tls_shadow = dict(prior_path._tls_shadow)
+        path.tls_base = prior_path.tls_base
+        path.path_condition = list(prior_path.path_condition)
+        path.solver.adopt_fresh_vars(prior_path.solver._fresh_vars)
+        path._origin_by_name = dict(prior_path._origin_by_name)
+        path.findings = FindingsList(prior_path.findings)
+        path.vars = dict(prior_path.vars)
+        path.shared = prior_path.shared
+        path._lazy_regions_used = prior_path._lazy_regions_used
+        path._region_at_suspension = prior_path._region_at_suspension
+
+        # Init-time z3 args land in the policy's ephemeral shadow;
+        # migrate them onto the path the same way `_init_path` does.
+        init_shadow = getattr(policy, "_shadow", None)
+        if init_shadow:
+            path._symbolic_shadow.update(init_shadow)
+        self._register_z3_args(path, args)
+        return path
+
+    def _register_z3_args(self, path, args):
+        """Record externally-supplied z3 BitVec args in the path's
+        provenance table so `path.origin` / `taint_sources` can trace
+        through them. Args that aren't z3, or whose `decl()` lookup
+        fails, are skipped silently."""
         for arg in (args or []):
             if _is_z3(arg):
                 try:
@@ -1061,7 +1156,6 @@ class SymExEngine:
                         }
                 except Exception:
                     pass
-        return path
 
     def _function_name(self, ir_func):
         fd = ir_func.declaration
@@ -1776,4 +1870,16 @@ class SymExEngine:
         # Phase 15: per-path copy of vars; shared reference for shared.
         child.vars = dict(parent.vars)
         child.shared = parent.shared
+        # Sink findings, region-at-suspension tag, and lazy-region
+        # budget counter all need to flow into forks the same way they
+        # flow into clones (path.py:244-250). Missing these meant every
+        # fork lost pre-fork findings, reset its region tag to None, and
+        # got a fresh `lazy_region_budget` allowance — letting total
+        # budget escape by O(num_forks).
+        child.findings = FindingsList(parent.findings)
+        child._region_at_suspension = parent._region_at_suspension
+        child._lazy_regions_used = parent._lazy_regions_used
+        # Carry the engine reference forward so children of a path
+        # produced by `engine.explore` can call `child.explore_next(...)`.
+        child._engine = getattr(parent, "_engine", None)
         return child

@@ -239,6 +239,7 @@ PythonPolicy::~PythonPolicy() {
   Py_XDECREF(cached_on_enter_block_);
   Py_XDECREF(cached_on_global_initialized_);
   Py_XDECREF(cached_on_instruction_);
+  Py_XDECREF(cached_mem_bulk_op_);
   Py_XDECREF(pending_exc_type_);
   Py_XDECREF(pending_exc_value_);
   Py_XDECREF(pending_exc_tb_);
@@ -699,6 +700,37 @@ bool PythonPolicy::exec_symbolic_store_impl(PythonScheduler &,
 bool PythonPolicy::mem_bulk_op(PythonScheduler &, MemOp sub,
                                 const std::vector<SharedPyPtr> &ops,
                                 const MemoryInst &mi, SharedPyPtr &result) {
+  // Try the Python policy first so analysts can intercept whole bulk
+  // ops (and so the per-byte default decomposition fires `mem_read` /
+  // `mem_write` hooks). NotImplemented = "fall through to concrete";
+  // any other return is the IR result of the bulk op.
+  if (PyObject *method = lookup_method(cached_mem_bulk_op_, "mem_bulk_op")) {
+    PyObject *ops_list = PyList_New(static_cast<Py_ssize_t>(ops.size()));
+    if (!ops_list) {
+      capture_exception();
+      result = make_default();
+      return true;
+    }
+    for (size_t i = 0; i < ops.size(); ++i) {
+      PyObject *o = or_none(ops[i].Get());
+      Py_INCREF(o);
+      PyList_SET_ITEM(ops_list, static_cast<Py_ssize_t>(i), o);
+    }
+    PyObject *py_result = PyObject_CallFunction(
+        method, "iN", static_cast<int>(sub), ops_list);
+    if (!py_result) {
+      capture_exception();
+      result = make_default();
+      return true;
+    }
+    if (py_result != Py_NotImplemented) {
+      result = SharedPyPtr(py_result);
+      Py_DECREF(py_result);
+      return true;
+    }
+    Py_DECREF(py_result);  // NotImplemented — fall through to concrete.
+  }
+
   std::vector<Value> concrete_ops;
   concrete_ops.reserve(ops.size());
   for (auto &op : ops) concrete_ops.push_back(python_to_value(op.Get()));
@@ -845,11 +877,13 @@ bool PythonPolicy::resolve_call(PythonScheduler &,
       capture_exception();
       return false;
     }
-    if (result != Py_NotImplemented && result != Py_None) {
-      // Any non-None / non-NotImplemented return is a skip with that
-      // value as the call's result. A `Skip(value)` instance is the
-      // disambiguator for "skip even though the value is None"; we
-      // unwrap it here. Anything else is taken as the value itself.
+    if (result != Py_NotImplemented) {
+      // Any non-NotImplemented return is a skip with that value as the
+      // call's result — `None` stubs the call to return `None`, an int
+      // / SymExpr / z3 expr is the replacement value, and `Skip(value)`
+      // is the typed marker analysts can still use (we unwrap it here).
+      // Only `NotImplemented` falls through to inlining, matching the
+      // convention used by `mem_read` / `mem_write` and the pure ops.
       static PyObject *cls_Skip = nullptr;
       if (!cls_Skip) {
         PyObject *mod = PyImport_ImportModule("multiplier.symex.events");

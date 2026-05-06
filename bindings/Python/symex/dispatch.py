@@ -41,6 +41,7 @@ from .events import (
     BRANCH, LOOP, CONCRETIZE,
     BLOCK_ENTER, INSTRUCTION,
     ADDRESS_FOR, ADDRESS_RESOLVED,
+    BULK_MEMORY,
     EventKind, Phase,
 )
 from .lens import MemView, ArgsView
@@ -81,15 +82,90 @@ class SymExpr:
             "SymExpr has no concrete truth value; route through is_true")
 
 
+def _concrete_int(v):
+    """Return a Python ``int`` if ``v`` is concretely an integer.
+
+    Accepts Python ``int`` (rejecting ``bool`` — booleans come through
+    only when a hook returned ``True``/``False`` and aren't valid
+    pointers / numeric operands), and z3 BitVec values. For z3 values
+    that aren't already a ``BitVecVal`` (e.g. ``Concat(BVV, BVV) + 0``
+    after a multi-byte concrete load through the shadow), one
+    ``z3.simplify`` is enough to collapse the structural shape to a
+    value when the expression is provably constant. Returns ``None``
+    when the value is genuinely symbolic.
+    """
+    if isinstance(v, bool):
+        return None
+    if isinstance(v, int):
+        return v
+    z3 = _z3_module()
+    if z3 is None or not isinstance(v, z3.ExprRef):
+        return None
+    if z3.is_bv_value(v):
+        return v.as_long()
+    s = z3.simplify(v)
+    if z3.is_bv_value(s):
+        return s.as_long()
+    return None
+
+
+def _concrete_bool(v):
+    """Return Python ``bool`` if ``v`` is concretely truthy or falsy.
+
+    Mirrors ``_concrete_int`` for branch / is_true sites. ``None``
+    means "still symbolic, fork".
+    """
+    if isinstance(v, bool):
+        return v
+    if isinstance(v, int):
+        return v != 0
+    z3 = _z3_module()
+    if z3 is None or not isinstance(v, z3.ExprRef):
+        return None
+    if z3.is_true(v):
+        return True
+    if z3.is_false(v):
+        return False
+    if z3.is_bv_value(v):
+        return v.as_long() != 0
+    s = z3.simplify(v)
+    if z3.is_true(s):
+        return True
+    if z3.is_false(s):
+        return False
+    if z3.is_bv_value(s):
+        return s.as_long() != 0
+    return None
+
+
 def extract_addr(addr):
     """Pull a concrete address out of the substrate's value form.
 
-    Pointers come through as bare ints; anything else (SymExpr,
-    z3 expression, None) yields None.
+    Pointers come through as bare ints (the common case) or as z3
+    BitVec values that may be structurally non-trivial (e.g. a
+    ``Concat(BVV, …) + 0`` produced by the shadow-driven load of a
+    pointer global). ``_concrete_int`` collapses both shapes to an
+    ``int``; symbolic addresses yield ``None`` so the substrate
+    emits a ``MemAddrContinuation``.
     """
-    if isinstance(addr, int) and not isinstance(addr, bool):
-        return int(addr)
-    return None
+    return _concrete_int(addr)
+
+
+# Back-compat alias — `_coerce_int` used to be its own thing for
+# bulk-op operands; keep the name working while everything points
+# at the unified helper.
+_coerce_int = _concrete_int
+
+
+def _memop_name(op):
+    """Return the analyst-facing name for an IR `MemOp` sub-opcode.
+
+    Derived from the `mx.ir.MemOp` enum so the name list stays in
+    lock-step with the C++ enum automatically — adding a new bulk op
+    in `OpCode.h` becomes available here without a separate edit.
+    Returns the lower-cased member name (e.g. ``"memcpy"``).
+    """
+    return mx.ir.MemOp(int(op)).name.lower()
 
 
 class _Selector:
@@ -102,11 +178,12 @@ class _Selector:
     """
 
     __slots__ = ("addr_range", "name", "eid", "func", "block", "region",
-                 "_layout", "_resolved_range", "kind", "target_kind", "decl")
+                 "_layout", "_resolved_range", "kind", "target_kind", "decl",
+                 "op")
 
     def __init__(self, addr_range=None, name=None, eid=None, func=None,
                  block=None, region=None, layout=None,
-                 kind=None, target_kind=None, decl=None):
+                 kind=None, target_kind=None, decl=None, op=None):
         self.addr_range = addr_range
         self.name = name
         # Allow `decl=<NamedDecl>` to substitute for both name and eid:
@@ -133,6 +210,10 @@ class _Selector:
         # Phase 9 axes
         self.kind = kind
         self.target_kind = target_kind
+        # Bulk-memory selector — matches "memcpy", "memset", … against
+        # the IR sub-opcode name, mirroring the `kind=` axis used by
+        # the address-resolution events.
+        self.op = op
 
     def matches_addr(self, addr):
         if self.addr_range is None:
@@ -181,6 +262,12 @@ class _Selector:
             return True
         return candidate is not None and candidate == self.target_kind
 
+    def matches_op(self, candidate):
+        """Match the bulk-memory op name: "memcpy", "memset", …."""
+        if self.op is None:
+            return True
+        return candidate is not None and candidate == self.op
+
     def _compute_range(self):
         if self._resolved_range is not None:
             return self._resolved_range
@@ -214,6 +301,7 @@ def make_selector(layout, **kwargs):
         layout=layout,
         kind=kwargs.get("kind"),
         target_kind=kwargs.get("target_kind"),
+        op=kwargs.get("op"),
     )
 
 
@@ -281,7 +369,7 @@ def _build_chain(handlers, default_fn):
 
 # ---- per-event default (chain bottom) functions -----------------------
 
-from ._types import _BYTES_TYPES, _INT_TYPES, _SEQ_TYPES
+from ._types import _BYTES_TYPES, _INT_TYPES, _SEQ_TYPES, Endian
 
 # Pre-built zero-fill byte strings indexed by size (0-16).
 _ZERO_BYTES = tuple(bytes(n) for n in range(17))
@@ -380,7 +468,24 @@ def _shadow_read(shadow, addr, size, data, buf):
     return _z3_concat_fold(z3, result)
 
 
-def _make_default_mem_read(is_float, shadow=None, buf=None, byte_order="little"):
+def _shadow_range_is_concrete(z3, shadow, addr, size):
+    """True iff no byte in [addr, addr+size) carries a symbolic-shaped
+    shadow entry. Missing entries (``None``) are concrete — they're
+    filled from ``ctx.mem.read_bytes`` data by ``_shadow_read``.
+    ``BitVecVal`` entries (concrete IR-side stores) are also concrete.
+    Only symbolic shapes (``Extract``, region-overlay selects, …)
+    return False so the read preserves the symbolic shape."""
+    i = 0
+    while i < size:
+        entry = shadow.get(addr + i)
+        if entry is not None and not z3.is_bv_value(entry):
+            return False
+        i += 1
+    return True
+
+
+def _make_default_mem_read(is_float, shadow=None, buf=None,
+                           byte_order=Endian.LITTLE):
     """Return the chain bottom for a memory_read event.
 
     Reads baseline bytes from ``ConcreteMemory`` first (always needed as
@@ -388,6 +493,17 @@ def _make_default_mem_read(is_float, shadow=None, buf=None, byte_order="little")
     shadow dict.  Shadow entries shadow the baseline; any range with no
     shadow entry goes straight to the concrete fallback.  Falls back to
     zero-fill on a read failure so OOB sinks still fire.
+
+    Concrete IR-side stores land in the shadow as ``BitVecVal`` bytes
+    (so sibling forks see their own writes through CoW). When the read
+    range is covered entirely by ``BitVecVal`` entries, collapse back
+    to a Python ``int`` (or float) so downstream comparisons stay
+    concrete — without this a round-tripped concrete value would
+    surface as a z3 expression and a later compare would fork or
+    produce a ``BoolRef`` the substrate can't store. Symbolic-shaped
+    entries (``Extract``, ``Concat``, region-overlay selects, …) are
+    preserved as-is, even when they happen to simplify to a constant
+    — analyst code relies on the *shape* signaling symbolic-ness.
     """
     _buf = buf if buf is not None else []
 
@@ -399,50 +515,95 @@ def _make_default_mem_read(is_float, shadow=None, buf=None, byte_order="little")
         if shadow is not None:
             sym = _shadow_read(shadow, addr, size, data, _buf)
             if sym is not None:
+                z3 = _z3_module()
+                if z3 is not None and _shadow_range_is_concrete(
+                        z3, shadow, addr, size):
+                    val = z3.simplify(sym).as_long()
+                    if is_float and size in (4, 8):
+                        # Shadow assembly is always little-endian
+                        # (`_shadow_read` puts byte-at-addr in the
+                        # LSB), so the int we get out is the LE
+                        # representation. Repacking LE matches.
+                        fmt = "<f" if size == 4 else "<d"
+                        return _struct.unpack(
+                            fmt, val.to_bytes(size, Endian.LITTLE))[0]
+                    return val
                 return sym
-        if is_float and size == 4:
-            fmt = "<f" if byte_order == "little" else ">f"
-            return _struct.unpack(fmt, data)[0]
-        if is_float and size == 8:
-            fmt = "<d" if byte_order == "little" else ">d"
+        if is_float and size in (4, 8):
+            prefix = "<" if byte_order == Endian.LITTLE else ">"
+            fmt = f"{prefix}f" if size == 4 else f"{prefix}d"
             return _struct.unpack(fmt, data)[0]
         return int.from_bytes(data, byte_order, signed=False)
     return default
 
 
-def _make_default_mem_write(is_float, shadow=None, byte_order="little"):
+def _make_default_mem_write(is_float, shadow=None, byte_order=Endian.LITTLE):
     """Return the chain bottom for a memory_write event.
 
-    Writes concrete bytes via the lens. Handles ints, raw bytes, and
-    IEEE floats. A z3 write decomposes ``val`` into per-byte extracts
-    in the shadow dict; a concrete write clears any covered shadow
-    slots (concrete memory is the source of truth) and writes the
-    real bytes to ``ConcreteMemory``.
+    Concrete values land in BOTH the per-path shadow (as ``BitVecVal``
+    bytes, little-endian internal layout) and ``ConcreteMemory``. The
+    shadow gives sibling forks per-path read isolation through the
+    dispatcher; ``ConcreteMemory`` keeps direct ``path.mem.read_bytes``
+    inspection working as before. Symbolic (z3) values land in the
+    shadow only — there's no concrete byte representation for them.
+
+    Without a shadow (test paths, substrate-only callers) the fallback
+    is just the ``ConcreteMemory`` write; symbolic writes have nowhere
+    to go and are silently dropped (matches prior behavior).
     """
     def default(ctx, addr, val, size):
         if isinstance(val, bool):
             val = int(val)
+        # ``BitVecVal(7, 32)`` IS a concrete int; route it through the
+        # int path so the write round-trips as a Python int rather
+        # than as Extract-of-BitVecVal bytes in the shadow. The check
+        # is intentionally strict (``is_bv_value`` only — no simplify)
+        # because a symbolic-shaped expression that *evaluates* to a
+        # constant (e.g. a region-overlay select that the test wants
+        # to surface as z3) should still take the symbolic path.
+        z3 = _z3_module()
+        if z3 is not None and isinstance(val, z3.ExprRef) \
+                and z3.is_bv_value(val):
+            val = val.as_long()
+
+        # Genuinely symbolic values: shadow only. No concrete
+        # representation, so nothing meaningful to put in ConcreteMemory.
+        if _is_z3(val):
+            if shadow is not None:
+                _shadow_write(shadow, addr, val, size)
+            return None
+
+        # Concrete values: bytes for ConcreteMemory + matching
+        # BitVecVal entries in the shadow (when z3 is available).
         if isinstance(val, int):
-            if shadow is not None:
-                _shadow_write(shadow, addr, val, size)
-            ctx.mem.write_bytes(
-                addr, val.to_bytes(size, byte_order, signed=(val < 0)))
-            return None
-        if isinstance(val, _BYTES_TYPES):
-            if shadow is not None:
-                _shadow_write(shadow, addr, val, size)
-            ctx.mem.write_bytes(addr, val)
-            return None
-        if isinstance(val, float):
-            if shadow is not None:
-                _shadow_write(shadow, addr, val, size)
-            prefix = "<" if byte_order == "little" else ">"
+            packed = val.to_bytes(size, byte_order, signed=(val < 0))
+        elif isinstance(val, _BYTES_TYPES):
+            packed = bytes(val)
+        elif isinstance(val, float):
+            prefix = "<" if byte_order == Endian.LITTLE else ">"
             fmt = f"{prefix}f" if size == 4 else f"{prefix}d"
-            ctx.mem.write_bytes(addr, _struct.pack(fmt, val))
+            packed = _struct.pack(fmt, val)
+        else:
             return None
-        if shadow is not None and _is_z3(val):
-            _shadow_write(shadow, addr, val, size)
-            return None
+
+        ctx.mem.write_bytes(addr, packed)
+
+        if shadow is not None:
+            z3 = _z3_module()
+            if z3 is not None:
+                # Shadow stores byte-at-addr in slot[addr], which
+                # `_shadow_read` reassembles LSB-first. Re-layout
+                # `packed` as LE so the shadow round-trips concrete
+                # writes correctly regardless of the requested
+                # ``byte_order`` for the concrete-mem write above.
+                if byte_order == Endian.LITTLE or len(packed) == 1:
+                    bytes_le = packed
+                else:
+                    bytes_le = packed[::-1]
+                i = 0
+                for b in bytes_le:
+                    shadow[addr + i] = z3.BitVecVal(b, 8)
+                    i += 1
         return None
     return default
 
@@ -469,10 +630,14 @@ def _default_branch(ctx, condition):
     Concrete conditions resolve to True / False naturally; symbolic
     conditions return `_FORK`, telling the InterceptorPolicy to hand
     control back to the substrate so it can enumerate edges via a
-    BranchContinuation.
+    BranchContinuation. A z3 expression that simplifies to a concrete
+    ``True``/``False`` resolves concretely too — without this, an
+    ``Eq(BVV(0), BVV(0))``-shaped condition would force a needless
+    fork.
     """
-    if isinstance(condition, _INT_TYPES):
-        return condition != 0
+    decided = _concrete_bool(condition)
+    if decided is not None:
+        return decided
     return _FORK
 
 
@@ -879,7 +1044,7 @@ class InterceptorPolicy:
                              _make_default_mem_read(bool(is_float),
                                                     self._shadow,
                                                     self._shadow_buf,
-                                                    byte_order=str(self._engine.endian)))
+                                                    byte_order=self._engine.endian))
         value = chain(ctx, addr_int, size_i)
 
         self._fire_observers(MEMORY_READ, Phase.AFTER, ctx,
@@ -917,7 +1082,7 @@ class InterceptorPolicy:
         chain = _build_chain(handlers,
                              _make_default_mem_write(bool(is_float),
                                                      self._shadow,
-                                                     byte_order=str(self._engine.endian)))
+                                                     byte_order=self._engine.endian))
         chain(ctx, addr_int, val, size_i)
 
         # Phase 6 invariant: when the region's overlay has been
@@ -1117,8 +1282,8 @@ class InterceptorPolicy:
         if isinstance(val, int):
             return z3.BitVecVal(val & ((1 << bits) - 1), bits)
         if isinstance(val, float):
-            byte_order = str(self._engine.endian)
-            prefix = "<" if byte_order == "little" else ">"
+            byte_order = self._engine.endian
+            prefix = "<" if byte_order == Endian.LITTLE else ">"
             if int(size) == 4:
                 packed = _struct.pack(f"{prefix}f", val)
             elif int(size) == 8:
@@ -1182,7 +1347,11 @@ class InterceptorPolicy:
                                  target_addr=target_addr,
                                  is_indirect=is_indirect, return_value=None,
                                  handled=False)
-            return None  # PythonPolicy treats None as "fall through".
+            # No handler claimed the call: tell the substrate to fall
+            # through to its own resolver. NotImplemented (matching
+            # mem_read / mem_write and the pure ops) is the
+            # fall-through signal; None is now a real "stub with None".
+            return NotImplemented
 
         self._fire_observers(event, Phase.AFTER, ctx,
                              target_eid=target_for_match,
@@ -1190,8 +1359,9 @@ class InterceptorPolicy:
                              target_addr=target_addr,
                              is_indirect=is_indirect, return_value=chosen,
                              handled=True)
-        # Handlers return their replacement value directly; the substrate
-        # treats any non-None return as a skip with that value.
+        # Handlers return their replacement value directly; the
+        # substrate treats any non-NotImplemented return as a skip with
+        # that value (None included — that's the stub-with-None case).
         return chosen
 
     # ----- pure ops: propagate symbolic values, else fall through -----
@@ -1361,23 +1531,378 @@ class InterceptorPolicy:
                              init_func=init_func, decl=decl,
                              name=name, eid=eid, addr=int(addr))
 
+    # ----- bulk memory ops (memcpy / memset / strlen / …) ----------
+    #
+    # The C++ substrate calls this for every IR MEMORY op whose
+    # sub-opcode is in the bulk range (32..56). Returning
+    # `NotImplemented` falls back to the substrate's concrete impl
+    # (raw `ConcreteMemory::memcpy/memset/read` — bypasses every
+    # hook); returning anything else is the IR result of the bulk op.
+    #
+    # The chain bottom (`_make_bulk_default`) decomposes supported ops
+    # into per-byte `mem_read` / `mem_write` calls so analyst hooks
+    # registered for `memory_read` / `memory_write` fire correctly.
+
+    def mem_bulk_op(self, op, ops):
+        try:
+            op_name = _memop_name(op)
+        except ValueError:
+            # Op value outside the MemOp enum (shouldn't happen, but
+            # don't crash the substrate if it does).
+            return NotImplemented
+        ctx = self._make_ctx()
+        ctx.op = op_name
+
+        handlers = self._matching_handlers(
+            BULK_MEMORY, lambda sel: sel.matches_op(op_name))
+        default = self._make_bulk_default(op_name)
+        if default is None and not handlers:
+            return NotImplemented
+        if default is None:
+            # Op kind has no built-in decomposer but at least one
+            # analyst handler is registered. Bottom of the chain
+            # signals "fall through to concrete" if every handler
+            # delegates downstream.
+            def default(*_args, **_kwargs):
+                return NotImplemented
+
+        chain = _build_chain(handlers, default)
+        return chain(ctx, *list(ops))
+
+    def _make_bulk_default(self, op_name):
+        if op_name in ("memcpy", "memmove"):
+            return self._default_memcpy_like
+        if op_name == "memset":
+            return self._default_memset
+        if op_name == "bzero":
+            return self._default_bzero
+        if op_name == "memcmp":
+            return self._default_memcmp
+        if op_name == "memchr":
+            return self._default_memchr
+        if op_name == "strlen":
+            return self._default_strlen
+        if op_name == "strnlen":
+            return self._default_strnlen
+        if op_name == "strcmp":
+            return self._default_strcmp
+        if op_name == "strncmp":
+            return self._default_strncmp
+        if op_name == "strchr":
+            return self._default_strchr
+        if op_name == "strrchr":
+            return self._default_strrchr
+        if op_name in ("strcpy", "stpcpy"):
+            return self._make_strcpy_like(op_name == "stpcpy")
+        if op_name in ("strncpy", "stpncpy"):
+            return self._make_strncpy_like(op_name == "stpncpy")
+        if op_name == "strcat":
+            return self._default_strcat
+        if op_name == "strncat":
+            return self._default_strncat
+        return None
+
+    # Per-op default decomposers. Each returns NotImplemented when an
+    # operand or a byte read is non-concrete and the op's semantics
+    # depend on the concrete value (e.g., a symbolic length, a
+    # symbolic null-terminator). Falling back to concrete preserves
+    # pre-existing behavior for those cases — analysts who want
+    # symbolic modelling intercept the bulk op themselves.
+
+    def _default_memcpy_like(self, ctx, dst, src, n):
+        n_int = _coerce_int(n)
+        dst_int = _coerce_int(dst)
+        src_int = _coerce_int(src)
+        if n_int is None or dst_int is None or src_int is None:
+            return NotImplemented
+        # Probe `src` for backing memory. The IR uses MEMCPY for
+        # struct-return-by-value: when the struct fits in a register
+        # the "src" value isn't a pointer, it's the raw u64 bit
+        # pattern of the struct. The C++ concrete fallback distinguishes
+        # those by trying a 1-byte probe; we mirror that here so the
+        # decomposition only handles real pointer-to-pointer copies.
+        if src_int == 0 or self._memory is None:
+            return NotImplemented
+        try:
+            self._memory.read_bytes(src_int, 1)
+        except RuntimeError:
+            return NotImplemented
+        for i in range(n_int):
+            byte = self.mem_read(src_int + i, 1, False)
+            if byte is NotImplemented:
+                return NotImplemented
+            self.mem_write(dst_int + i, byte, 1, False)
+        return dst
+
+    def _default_memset(self, ctx, dst, byte_val, n):
+        n_int = _coerce_int(n)
+        dst_int = _coerce_int(dst)
+        if n_int is None or dst_int is None:
+            return NotImplemented
+        b_int = _coerce_int(byte_val)
+        masked = (b_int & 0xFF) if b_int is not None else byte_val
+        for i in range(n_int):
+            self.mem_write(dst_int + i, masked, 1, False)
+        return dst
+
+    def _default_bzero(self, ctx, dst, n):
+        n_int = _coerce_int(n)
+        dst_int = _coerce_int(dst)
+        if n_int is None or dst_int is None:
+            return NotImplemented
+        for i in range(n_int):
+            self.mem_write(dst_int + i, 0, 1, False)
+        return dst
+
+    def _default_memcmp(self, ctx, a, b, n):
+        n_int = _coerce_int(n)
+        a_int = _coerce_int(a)
+        b_int = _coerce_int(b)
+        if n_int is None or a_int is None or b_int is None:
+            return NotImplemented
+        for i in range(n_int):
+            ba = _coerce_int(self.mem_read(a_int + i, 1, False))
+            bb = _coerce_int(self.mem_read(b_int + i, 1, False))
+            if ba is None or bb is None:
+                return NotImplemented
+            if ba != bb:
+                return -1 if ba < bb else 1
+        return 0
+
+    def _default_memchr(self, ctx, addr, byte, n):
+        n_int = _coerce_int(n)
+        addr_int = _coerce_int(addr)
+        b_int = _coerce_int(byte)
+        if n_int is None or addr_int is None or b_int is None:
+            return NotImplemented
+        needle = b_int & 0xFF
+        for i in range(n_int):
+            byte_val = _coerce_int(self.mem_read(addr_int + i, 1, False))
+            if byte_val is None:
+                return NotImplemented
+            if byte_val == needle:
+                return addr_int + i
+        return 0  # null pointer
+
+    def _default_strlen(self, ctx, addr):
+        addr_int = _coerce_int(addr)
+        if addr_int is None:
+            return NotImplemented
+        i = 0
+        while True:
+            byte = _coerce_int(self.mem_read(addr_int + i, 1, False))
+            if byte is None:
+                return NotImplemented
+            if byte == 0:
+                return i
+            i += 1
+
+    def _default_strnlen(self, ctx, addr, max_len):
+        addr_int = _coerce_int(addr)
+        max_int = _coerce_int(max_len)
+        if addr_int is None or max_int is None:
+            return NotImplemented
+        for i in range(max_int):
+            byte = _coerce_int(self.mem_read(addr_int + i, 1, False))
+            if byte is None:
+                return NotImplemented
+            if byte == 0:
+                return i
+        return max_int
+
+    def _default_strcmp(self, ctx, a, b):
+        a_int = _coerce_int(a)
+        b_int = _coerce_int(b)
+        if a_int is None or b_int is None:
+            return NotImplemented
+        i = 0
+        while True:
+            ba = _coerce_int(self.mem_read(a_int + i, 1, False))
+            bb = _coerce_int(self.mem_read(b_int + i, 1, False))
+            if ba is None or bb is None:
+                return NotImplemented
+            if ba != bb:
+                return -1 if ba < bb else 1
+            if ba == 0:
+                return 0
+            i += 1
+
+    def _default_strncmp(self, ctx, a, b, n):
+        n_int = _coerce_int(n)
+        a_int = _coerce_int(a)
+        b_int = _coerce_int(b)
+        if n_int is None or a_int is None or b_int is None:
+            return NotImplemented
+        for i in range(n_int):
+            ba = _coerce_int(self.mem_read(a_int + i, 1, False))
+            bb = _coerce_int(self.mem_read(b_int + i, 1, False))
+            if ba is None or bb is None:
+                return NotImplemented
+            if ba != bb:
+                return -1 if ba < bb else 1
+            if ba == 0:
+                return 0
+        return 0
+
+    def _default_strchr(self, ctx, addr, byte):
+        addr_int = _coerce_int(addr)
+        b_int = _coerce_int(byte)
+        if addr_int is None or b_int is None:
+            return NotImplemented
+        needle = b_int & 0xFF
+        i = 0
+        while True:
+            byte_val = _coerce_int(self.mem_read(addr_int + i, 1, False))
+            if byte_val is None:
+                return NotImplemented
+            if byte_val == needle:
+                return addr_int + i
+            if byte_val == 0:
+                return addr_int + i if needle == 0 else 0
+            i += 1
+
+    def _default_strrchr(self, ctx, addr, byte):
+        addr_int = _coerce_int(addr)
+        b_int = _coerce_int(byte)
+        if addr_int is None or b_int is None:
+            return NotImplemented
+        needle = b_int & 0xFF
+        last = -1
+        i = 0
+        while True:
+            byte_val = _coerce_int(self.mem_read(addr_int + i, 1, False))
+            if byte_val is None:
+                return NotImplemented
+            if byte_val == needle:
+                last = i
+            if byte_val == 0:
+                break
+            i += 1
+        return (addr_int + last) if last >= 0 else 0
+
+    def _make_strcpy_like(self, return_end):
+        """`strcpy` (return_end=False) and `stpcpy` (return_end=True)
+        share a body: walk src copying bytes (including the null
+        terminator) into dst. `stpcpy` returns a pointer to the
+        copied null; `strcpy` returns dst."""
+        def default(ctx, dst, src):
+            dst_int = _coerce_int(dst)
+            src_int = _coerce_int(src)
+            if dst_int is None or src_int is None:
+                return NotImplemented
+            i = 0
+            while True:
+                byte = self.mem_read(src_int + i, 1, False)
+                b_int = _coerce_int(byte)
+                if b_int is None:
+                    return NotImplemented
+                self.mem_write(dst_int + i, byte, 1, False)
+                if b_int == 0:
+                    return (dst_int + i) if return_end else dst
+                i += 1
+        return default
+
+    def _make_strncpy_like(self, return_end):
+        """`strncpy` (return_end=False) and `stpncpy` (return_end=True).
+        Copy at most n bytes of src to dst; if src is shorter than n,
+        the remaining dst bytes are zero-filled. `stpncpy` returns a
+        pointer to the byte AFTER the last non-null byte copied (or
+        dst+n if no null was found in the first n)."""
+        def default(ctx, dst, src, n):
+            n_int = _coerce_int(n)
+            dst_int = _coerce_int(dst)
+            src_int = _coerce_int(src)
+            if n_int is None or dst_int is None or src_int is None:
+                return NotImplemented
+            hit_null_at = -1
+            for i in range(n_int):
+                byte = self.mem_read(src_int + i, 1, False)
+                b_int = _coerce_int(byte)
+                if b_int is None:
+                    return NotImplemented
+                if hit_null_at >= 0:
+                    self.mem_write(dst_int + i, 0, 1, False)
+                else:
+                    self.mem_write(dst_int + i, byte, 1, False)
+                    if b_int == 0:
+                        hit_null_at = i
+            if return_end:
+                return (dst_int + hit_null_at) if hit_null_at >= 0 \
+                    else (dst_int + n_int)
+            return dst
+        return default
+
+    def _default_strcat(self, ctx, dst, src):
+        dst_int = _coerce_int(dst)
+        src_int = _coerce_int(src)
+        if dst_int is None or src_int is None:
+            return NotImplemented
+        # Find end of dst.
+        end = 0
+        while True:
+            byte = _coerce_int(self.mem_read(dst_int + end, 1, False))
+            if byte is None:
+                return NotImplemented
+            if byte == 0:
+                break
+            end += 1
+        # Copy src (including null) to dst+end.
+        i = 0
+        while True:
+            byte = self.mem_read(src_int + i, 1, False)
+            b_int = _coerce_int(byte)
+            if b_int is None:
+                return NotImplemented
+            self.mem_write(dst_int + end + i, byte, 1, False)
+            if b_int == 0:
+                return dst
+            i += 1
+
+    def _default_strncat(self, ctx, dst, src, n):
+        n_int = _coerce_int(n)
+        dst_int = _coerce_int(dst)
+        src_int = _coerce_int(src)
+        if n_int is None or dst_int is None or src_int is None:
+            return NotImplemented
+        end = 0
+        while True:
+            byte = _coerce_int(self.mem_read(dst_int + end, 1, False))
+            if byte is None:
+                return NotImplemented
+            if byte == 0:
+                break
+            end += 1
+        copied = 0
+        while copied < n_int:
+            byte = self.mem_read(src_int + copied, 1, False)
+            b_int = _coerce_int(byte)
+            if b_int is None:
+                return NotImplemented
+            self.mem_write(dst_int + end + copied, byte, 1, False)
+            if b_int == 0:
+                return dst
+            copied += 1
+        # No null in first n bytes; append a terminator.
+        self.mem_write(dst_int + end + copied, 0, 1, False)
+        return dst
+
     # ----- truth + branch resolution: fork on non-concrete -----
 
     def is_true(self, val):
-        # z3 truths always force a fork — the substrate enumerates
-        # both edges and the branch handler accumulates the path
-        # condition.
-        if _is_z3(val):
-            return None
         # If the analyst registered any BRANCH handlers, fall through to
         # `resolve_branch` (where we have the target eids) so they get a
         # chance to fire. The Phase 2 fast path only applies when no
         # handler is interested.
         if self._engine._intercepts.lookup(BRANCH):
             return None
-        if isinstance(val, _INT_TYPES):
-            return val != 0
-        return None
+        # Genuinely symbolic truths force a fork. Concrete-shaped z3
+        # (e.g. an ``Eq`` of two ``BitVecVal``s that simplifies to
+        # True/False) resolves concretely so the substrate doesn't
+        # explode the path set on a known-determined branch.
+        decided = _concrete_bool(val)
+        if decided is None:
+            return None
+        return decided
 
     def resolve_branch(self, branch_inst, condition, true_eid, false_eid):
         ctx = self._make_ctx()
@@ -1406,11 +1931,15 @@ class InterceptorPolicy:
             return True
 
         handlers = self._matching_handlers(BRANCH, _match)
-        if not handlers and isinstance(condition, _INT_TYPES) and \
-                not _is_z3(condition):
-            return condition != 0  # Phase 2 fast path
         if not handlers:
-            return None  # symbolic, no handler — let substrate fork
+            # Phase 2 fast path: resolve concretely when we can.
+            # Covers Python ints AND z3 expressions that simplify to
+            # a concrete bool, so a determinate branch on lifted-from-
+            # memory pointers doesn't force a fork.
+            decided = _concrete_bool(condition)
+            if decided is not None:
+                return decided
+            return None  # genuinely symbolic — let substrate fork
 
         chain = _build_chain(handlers, _default_branch)
         chosen = chain(ctx, condition)

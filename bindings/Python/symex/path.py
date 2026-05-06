@@ -207,6 +207,11 @@ class Path:
         #            visible to every path that shares the reference.
         self.vars: dict = {}
         self.shared: dict = {}
+        # Engine reference set by `engine._init_path` (and propagated
+        # by clones / forks) so `path.explore_next(...)` can locate
+        # the engine that produced this path. None for paths
+        # constructed bare (snapshot restore, manual test paths).
+        self._engine = None
 
     @property
     def state(self):
@@ -245,6 +250,7 @@ class Path:
         new_path.findings = FindingsList(self.findings)
         new_path.vars = dict(self.vars)
         new_path.shared = self.shared
+        new_path._engine = getattr(self, "_engine", None)
         return new_path
 
     def snapshot(self):
@@ -317,22 +323,74 @@ class Path:
         self.vars = dict(snap.vars)
         self.shared = dict(snap.shared)
 
-    def replay(self, *, modify, engine, slice_steps=1024,
+    def explore_next(self, start_func, *, start_block=None, args=None,
+                     seed=None, policy=None, until=None,
+                     slice_steps=None, concretize=None, strategy=None):
+        """Run a fresh `engine.explore(start_func, ...)` on top of this
+        path's final state.
+
+        Accepts the same keyword arguments as ``engine.explore`` and
+        forwards them with ``from_path=self``. The new exploration
+        inherits this path's per-path symbolic state
+        (``_symbolic_shadow``, ``path_condition``, ``solver`` fresh
+        vars, ``_origin_by_name``, ``_tls_shadow``, ``findings``,
+        ``vars``, ``shared``) and the engine's shared layout /
+        ``ConcreteMemory``. The interpreter's call stack and work
+        stack are reset so ``start_func`` runs from its entry block
+        (or ``start_block`` if given) as if invoked fresh.
+
+        Returns a ``PathSet``. Raises if this path wasn't produced by
+        an ``engine.explore(...)`` call (no engine reference to use).
+        """
+        engine = getattr(self, "_engine", None)
+        if engine is None:
+            raise RuntimeError(
+                "Path.explore_next requires the engine that produced "
+                "this path; the path was constructed without one "
+                "(e.g., via snapshot restore or a bare Path(...) call)")
+        kwargs = {"args": args, "from_path": self}
+        if slice_steps is not None:
+            kwargs["slice_steps"] = slice_steps
+        if start_block is not None:
+            kwargs["start_block"] = start_block
+        if seed is not None:
+            kwargs["seed"] = seed
+        if policy is not None:
+            kwargs["policy"] = policy
+        if until is not None:
+            kwargs["until"] = until
+        if concretize is not None:
+            kwargs["concretize"] = concretize
+        if strategy is not None:
+            kwargs["strategy"] = strategy
+        return engine.explore(start_func, **kwargs)
+
+    def replay(self, *, modify, engine=None, slice_steps=None,
                concretize=None, until=None):
         """Run a fresh exploration starting from a clone of this path,
         with `modify(path)` applied once before resuming.
+
+        ``engine`` defaults to the engine that produced this path
+        (``self._engine``); pass it explicitly only when working with
+        a snapshot-restored or manually-constructed Path.
 
         Returns the list of paths produced by the resumed exploration.
         Doesn't mutate `self`. The `modify` callback receives the
         cloned Path; it can use `path.mem`, `path.solver`, or directly
         write through the interpreter state.
         """
+        if engine is None:
+            engine = getattr(self, "_engine", None)
+            if engine is None:
+                raise RuntimeError(
+                    "Path.replay needs an engine — pass `engine=...` "
+                    "or use a path produced by `engine.explore(...)`")
         snap = self.snapshot()
-        return engine.resume_from(snap, modify=modify,
-                                  slice_steps=slice_steps,
-                                  concretize=concretize,
-                                  parent_id=self.id,
-                                  until=until)
+        kwargs = {"modify": modify, "concretize": concretize,
+                  "until": until, "parent_id": self.id}
+        if slice_steps is not None:
+            kwargs["slice_steps"] = slice_steps
+        return engine.resume_from(snap, **kwargs)
 
     def assert_(self, cond):
         """Add a z3 assertion to the path condition. If the path becomes
@@ -533,19 +591,90 @@ class Path:
         else:
             _shadow_write(self._symbolic_shadow, addr, value, size)
 
+    def read_memory(self, addr: int, size: int,
+                    *, endian: Endian = None,
+                    byte_order: Endian = None,
+                    signed: bool = False):
+        """Read ``size`` bytes from ``addr``, symbolic-aware.
+
+        Returns a z3 ``BitVec(8 * size)`` if any byte in the range has
+        a symbolic shadow entry; otherwise an unsigned ``int`` built
+        from the concrete bytes. Pass ``signed=True`` to interpret a
+        purely concrete result as two's-complement.
+
+        ``endian`` (or its alias ``byte_order``) defaults to the
+        path's byte order (``path.byte_order``). The mirror of
+        ``write_memory``: round-tripping a value through write→read
+        produces the same value (concrete or symbolic).
+        """
+        bo = self._resolve_endian(endian, byte_order)
+        try:
+            data = self._mem.read_bytes(addr, size)
+        except RuntimeError:
+            data = bytes(size)
+        sym = self._read_symbolic_bytes(addr, size, data, bo)
+        if sym is not None:
+            # `write_memory` plants concrete bytes as `BitVecVal` shadow
+            # entries (so they survive forks via `_symbolic_shadow`'s
+            # CoW). When every overlapping shadow byte is concrete the
+            # post-simplify result collapses to a `BitVecVal`; unwrap it
+            # to a Python int so concrete writes round-trip as ints.
+            z3 = _z3_module()
+            simplified = z3.simplify(sym) if z3 is not None else sym
+            if z3 is not None and z3.is_bv_value(simplified):
+                val = simplified.as_long()
+                if signed and val & (1 << (8 * size - 1)):
+                    val -= 1 << (8 * size)
+                return val
+            return simplified
+        return int.from_bytes(data, str(bo), signed=signed)
+
+    def _read_symbolic_bytes(self, addr, size, data, bo):
+        """Reconstruct a symbolic value from ``_symbolic_shadow`` if any
+        byte in ``[addr, addr+size)`` is shadowed; ``None`` otherwise.
+
+        Little-endian path defers to the existing ``_shadow_read``
+        helper used by the substrate-side default. Big-endian path
+        is spelled out separately because ``_shadow_read`` always
+        emits little-endian Concat order.
+        """
+        shadow = self._symbolic_shadow
+        if not shadow:
+            return None
+        from .dispatch import _shadow_read
+        if bo == Endian.LITTLE:
+            return _shadow_read(shadow, addr, size, data, self._shadow_buf)
+        # Big-endian: byte 0 is MSB. Bail to None when no overlap so
+        # the caller falls through to a concrete int.
+        z3 = _z3_module()
+        if not any((addr + i) in shadow for i in range(size)):
+            return None
+        parts = []
+        for i in range(size):
+            entry = shadow.get(addr + i)
+            parts.append(entry if entry is not None
+                         else z3.BitVecVal(data[i], 8))
+        return parts[0] if size == 1 else z3.Concat(*parts)
+
     def write_memory(self, addr: int, value, size: int = None,
                      *, endian: Endian = None,
                      byte_order: Endian = None) -> None:
-        """Write ``value`` to ``addr``, handling symbolic and concrete cases.
+        """Write ``value`` to ``addr``, per-path.
 
-        - z3 expression  → symbolic shadow
-        - int / bool     → concrete memory; ``size`` is required
-        - bytes/bytearray → concrete memory; ``size`` is ignored
+        Routes every shape through ``_symbolic_shadow`` so the write is
+        cloned-on-fork (``Path.clone`` deep-copies the shadow but
+        shares the underlying ``ConcreteMemory`` across paths;
+        mutating that map directly would leak into siblings).
 
-        ``endian`` (or its alias ``byte_order``) defaults to the path's byte
-        order (``path.byte_order``); pass ``Endian.BIG`` or ``Endian.LITTLE``
-        to override for this write only. For ``bytes`` input the byte order
-        is moot — bytes are written as-is.
+        - z3 expression  → stored verbatim per byte
+        - int / bool     → wrapped as ``BitVecVal`` per byte; ``size`` required
+        - bytes/bytearray → ``BitVecVal`` per byte; ``size`` ignored
+        - sequence       → element-wise (each int / z3 is one byte)
+
+        ``endian`` (or its alias ``byte_order``) defaults to the path's
+        byte order; pass ``Endian.BIG`` or ``Endian.LITTLE`` to override
+        per-call. For ``bytes`` input the byte order is moot — bytes are
+        written in their natural address order.
         """
         from .dispatch import _shadow_write, _is_z3, _z3_byte_at
         bo = self._resolve_endian(endian, byte_order)
@@ -558,14 +687,28 @@ class Path:
             else:
                 _shadow_write(self._symbolic_shadow, addr, value, size)
         elif isinstance(value, _BYTES_TYPES):
-            self._mem.write_bytes(addr, value)
+            z3 = _z3_module()
+            if z3 is None:
+                # No z3 available: shared-memory write is the only
+                # option. Document the limitation instead of silently
+                # losing per-path semantics.
+                raise RuntimeError(
+                    "write_memory of bytes requires z3; install z3 to "
+                    "get per-path concrete writes")
+            for i, b in enumerate(value):
+                self._symbolic_shadow[addr + i] = z3.BitVecVal(int(b) & 0xFF, 8)
         elif isinstance(value, _SEQ_TYPES):
             i = 0
             for elem in value:
                 if _is_z3(elem):
                     _shadow_write(self._symbolic_shadow, addr + i, elem, 1)
                 elif isinstance(elem, _INT_TYPES):
-                    self._mem.write_bytes(addr + i, _BYTE_TABLE[int(elem) & 0xFF])
+                    z3 = _z3_module()
+                    if z3 is None:
+                        raise RuntimeError(
+                            "write_memory of int sequence requires z3")
+                    self._symbolic_shadow[addr + i] = \
+                        z3.BitVecVal(int(elem) & 0xFF, 8)
                 else:
                     raise TypeError(
                         f"write_memory: element {i} has unsupported type "
@@ -575,10 +718,21 @@ class Path:
             if size is None:
                 raise ValueError(
                     "write_memory: size is required when writing an integer")
+            z3 = _z3_module()
+            if z3 is None:
+                raise RuntimeError(
+                    "write_memory of int requires z3; install z3 to "
+                    "get per-path concrete writes")
             val = int(value)
-            self._mem.write_bytes(addr,
-                                  val.to_bytes(size, str(bo),
-                                               signed=(val < 0)))
+            mask_bits = 8 * size
+            packed = val & ((1 << mask_bits) - 1)
+            sym_val = z3.BitVecVal(packed, mask_bits)
+            if bo == Endian.BIG:
+                for i in range(size):
+                    self._symbolic_shadow[addr + i] = \
+                        _z3_byte_at(sym_val, size - 1 - i)
+            else:
+                _shadow_write(self._symbolic_shadow, addr, sym_val, size)
         else:
             raise TypeError(
                 f"write_memory: unsupported value type {type(value).__name__}; "

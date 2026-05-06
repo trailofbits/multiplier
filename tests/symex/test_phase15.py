@@ -149,13 +149,17 @@ def test_p15_4_symbolic_switch_no_default(symex_index):
     sel = z3.BitVec("sel", 32)
     paths = e.explore("si_switch_no_default", args=[sel])
     completed = _completed(paths)
-    # Two case paths only.
-    assert len(completed) == 2, \
-        f"expected 2 paths (no default), got {len(completed)}: " \
-        f"{[p.return_value for p in completed]}"
+    # Three paths: case 1 (r=10), case 2 (r=20), and the implicit
+    # default that falls through to `return r` with r still at its
+    # initializer value 0. C "no `default:` label" doesn't remove the
+    # IR's default edge — the SwitchInst has three successors and the
+    # third is reachable for any sel ∉ {1, 2}.
+    assert len(completed) == 3, \
+        f"expected 3 paths (case 1, case 2, fall-through), " \
+        f"got {len(completed)}: {[p.return_value for p in completed]}"
     return_values = {p.return_value for p in completed}
-    assert return_values == {10, 20}, \
-        f"return values must be {{10, 20}}, got {return_values}"
+    assert return_values == {10, 20, 0}, \
+        f"return values must be {{10, 20, 0}}, got {return_values}"
 
 
 # ---------------------------------------------------------------------------
