@@ -354,7 +354,7 @@ PyTypeObject *InitType(void) noexcept {
   };
   tp->tp_name = "multiplier.frontend.TokenRange";
   tp->tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_SEQUENCE ;
-  tp->tp_doc = PyDoc_STR("Wrapper for mx::::TokenRange");
+  tp->tp_doc = PyDoc_STR("Wrapper for mx::TokenRange");
   tp->tp_as_number = &gNumberMethods;
   tp->tp_as_sequence = &gSequenceMethods;
   tp->tp_as_mapping = nullptr;
