@@ -683,7 +683,7 @@ PyTypeObject *InitType(void) noexcept {{
   }};
   tp->tp_name = "{py_namespace_path}{py_class_name}";
   tp->tp_flags = Py_TPFLAGS_DEFAULT{py_flag_instantiation}{py_flag_sequencing};
-  tp->tp_doc = PyDoc_STR("Wrapper for {cxx_namespace}::{cxx_class_name}");
+  tp->tp_doc = PyDoc_STR("Wrapper for {cxx_namespace}{cxx_class_name}");
   tp->tp_as_number = {py_number};
   tp->tp_as_sequence = {py_sequence};
   tp->tp_as_mapping = nullptr;

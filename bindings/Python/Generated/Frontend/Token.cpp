@@ -389,7 +389,7 @@ PyTypeObject *InitType(void) noexcept {
   };
   tp->tp_name = "multiplier.frontend.Token";
   tp->tp_flags = Py_TPFLAGS_DEFAULT;
-  tp->tp_doc = PyDoc_STR("Wrapper for mx::::Token");
+  tp->tp_doc = PyDoc_STR("Wrapper for mx::Token");
   tp->tp_as_number = &gNumberMethods;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;

@@ -418,7 +418,7 @@ PyTypeObject *InitType(void) noexcept {
   };
   tp->tp_name = "multiplier.ast.AutoType";
   tp->tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_DISALLOW_INSTANTIATION;
-  tp->tp_doc = PyDoc_STR("Wrapper for mx::::AutoType");
+  tp->tp_doc = PyDoc_STR("Wrapper for mx::AutoType");
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;

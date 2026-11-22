@@ -253,7 +253,7 @@ PyTypeObject *InitType(void) noexcept {
   };
   tp->tp_name = "multiplier.ir.IRStructure";
   tp->tp_flags = Py_TPFLAGS_DEFAULT;
-  tp->tp_doc = PyDoc_STR("Wrapper for mx::::IRStructure");
+  tp->tp_doc = PyDoc_STR("Wrapper for mx::IRStructure");
   tp->tp_as_number = nullptr;
   tp->tp_as_sequence = nullptr;
   tp->tp_as_mapping = nullptr;
